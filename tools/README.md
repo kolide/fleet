@@ -6,6 +6,10 @@ The files in this directory are intended to assist with Kolide development.
 
 * `example_config.json`: An example config file with insecure default passwords. Useful for testing in a local dev environment, but should /never/ be used in production.
 
+* `example_osquery.conf`: An example osquery config file that sets up basic configuration for distributed queries.
+
+* `example_osquery.flags`: An example osquery flagfile setting the config options that must be loaded before the full JSON config.
+
 * `kolide.crt` & `kolide.key`: Self-signed SSL certificate & key useful for testing locally with `osqueryd`. Works with domains `localhost` and `dockerhost`. Should /never/ be used in production.
 
 

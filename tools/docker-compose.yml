@@ -4,19 +4,23 @@ services:
   ubuntu14-osquery:
     image: kolide/osquery
     volumes:
-      - ./kolide.crt:/tmp/kolide.crt
+      - ./kolide.crt:/etc/osquery/kolide.crt
+      - ./example_osquery.flags:/etc/osquery/osquery.flags
+      - ./example_osquery.conf:/etc/osquery/osquery.conf
     extra_hosts:
       - "dockerhost:${LOCALHOST}"
     environment:
-      ENROLL_KEY: 'super secure'
-    command: osqueryd --verbose --force --enroll_tls_endpoint /api/v1/osquery/enroll --enroll_secret_env=ENROLL_KEY --disable_distributed=false --distributed_plugin tls --distributed_interval 5 --distributed_tls_max_attempts 3 --distributed_tls_read_endpoint /api/v1/osquery/read --distributed_tls_write_endpoint /api/v1/osquery/write --tls_dump true --tls_hostname dockerhost:8080 --tls_server_certs /tmp/kolide.crt
+      ENROLL_SECRET: 'super secure'
+    command: osqueryd --flagfile=/etc/osquery/osquery.flags
 
   centos7-osquery:
     image: kolide/centos7-osquery
     volumes:
-      - ./kolide.crt:/tmp/kolide.crt
+      - ./kolide.crt:/etc/osquery/kolide.crt
+      - ./example_osquery.flags:/etc/osquery/osquery.flags
+      - ./example_osquery.conf:/etc/osquery/osquery.conf
     extra_hosts:
       - "dockerhost:${LOCALHOST}"
     environment:
-      ENROLL_KEY: 'super secure'
-    command: osqueryd --verbose --force --enroll_tls_endpoint /api/v1/osquery/enroll --enroll_secret_env=ENROLL_KEY --disable_distributed=false --distributed_plugin tls --distributed_interval 5 --distributed_tls_max_attempts 3 --distributed_tls_read_endpoint /api/v1/osquery/read --distributed_tls_write_endpoint /api/v1/osquery/write --tls_dump true --tls_hostname dockerhost:8080 --tls_server_certs /tmp/kolide.crt
+      ENROLL_SECRET: 'super secure'
+    command: osqueryd --flagfile=/etc/osquery/osquery.flags
