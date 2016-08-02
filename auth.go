@@ -147,6 +147,7 @@ func JWTRenewalMiddleware(c *gin.Context) {
 	}
 
 	session.Set("jwt", jwt)
+	session.Save()
 
 	c.Next()
 }

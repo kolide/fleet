@@ -277,7 +277,7 @@ func TestUserManagementIntegration(t *testing.T) {
 	buff3.Write(body3)
 	req3, _ := http.NewRequest("PUT", "/user", buff3)
 	req3.Header.Set("Content-Type", "application/json")
-	req3.Header.Set("Cookie", res1.Header().Get("Set-Cookie"))
+	req3.Header.Set("Cookie", res2.Header().Get("Set-Cookie"))
 	r.ServeHTTP(res3, req3)
 
 	var user User
