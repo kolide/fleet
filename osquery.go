@@ -96,7 +96,7 @@ func OsqueryEnroll(c *gin.Context) {
 		Error
 
 	if err != nil && err != gorm.ErrRecordNotFound {
-		setError(c, err)
+		DatabaseError(c)
 		return
 
 	} else if err == gorm.ErrRecordNotFound {
