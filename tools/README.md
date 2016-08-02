@@ -2,7 +2,7 @@
 
 The files in this directory are intended to assist with Kolide development.
 
-* `docker-compose.yml`: This docker-compose file helps with starting `osqueryd` instances for testing Kolide. More on this [below](#Testing-with-containerized-osqueryd).
+* `docker-compose.yml`: This docker-compose file helps with starting `osqueryd` instances for testing Kolide. More on this [below](#testing-with-containerized-osqueryd).
 
 * `example_config.json`: An example config file with insecure default passwords. Useful for testing in a local dev environment, but should /never/ be used in production.
 
