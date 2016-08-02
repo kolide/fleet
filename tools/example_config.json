@@ -16,6 +16,6 @@
 		"jwt_key": "very secure"
 	},
         "osquery": {
-                "enroll_key": "super secure"
+                "enroll_secret": "super secure"
         }
 }
