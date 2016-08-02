@@ -317,7 +317,7 @@ func (req *integrationRequests) CheckUser(username, email, name string, admin, r
 		req.t.Fatalf("user's email was not set in the DB: %s", user.Email)
 	}
 	if (user.Admin && !admin) || (!user.Admin && admin) {
-		req.t.Fatal("user shouldn't be admin")
+		req.t.Fatal("user admin settings don't match")
 	}
 	if (user.NeedsPasswordReset && !reset) || (!user.NeedsPasswordReset && reset) {
 		req.t.Fatal("user reset settings don't match")
