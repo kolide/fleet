@@ -80,12 +80,7 @@ func OsqueryEnroll(c *gin.Context) {
 
 	}
 
-	db, err := openDB(config.MySQL.Username, config.MySQL.Password, config.MySQL.Address, config.MySQL.Database)
-	if err != nil {
-		setError(c, err)
-		//return
-	}
-	logrus.Debugf("Made it to here. What??")
+	db := mustOpenDB(config.MySQL.Username, config.MySQL.Password, config.MySQL.Address, config.MySQL.Database)
 	defer db.Close()
 
 	var host Host
