@@ -116,6 +116,8 @@ func main() {
 		}
 	}
 
+	logrus.Info(config.Osquery.EnrollSecret)
+
 	// route the executable based on the sub-command
 	switch kingpin.MustParse(args, err) {
 	case prepareDB.FullCommand():

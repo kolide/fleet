@@ -27,10 +27,15 @@ type AppConfigData struct {
 	SessionExpirationSeconds float64 `json:"session_expiration_seconds"`
 }
 
+type OsqueryConfigData struct {
+	EnrollSecret string `json:"enroll_secret"`
+}
+
 type configData struct {
-	MySQL  MySQLConfigData  `json:"mysql"`
-	Server ServerConfigData `json:"server"`
-	App    AppConfigData    `json:"app"`
+	MySQL   MySQLConfigData   `json:"mysql"`
+	Server  ServerConfigData  `json:"server"`
+	App     AppConfigData     `json:"app"`
+	Osquery OsqueryConfigData `json:"osquery"`
 }
 
 var defaultMySQLConfigData = MySQLConfigData{
