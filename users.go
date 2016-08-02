@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/Sirupsen/logrus"
@@ -81,32 +80,6 @@ func (u *User) MakeAdmin(db *gorm.DB) error {
 	return nil
 }
 
-func (u *User) FindUserByIdOrUsername(db *gorm.DB) (error, func(*gin.Context)) {
-	var err error
-	if u.ID != 0 && u.Username != "" {
-		err = db.Where("id = ? AND username = ?", u.ID, u.Username).First(&u).Error
-		if err != nil {
-			logrus.Errorf("Error finding user in database: %s", err.Error())
-			return err, DatabaseError
-		}
-	} else if u.ID != 0 {
-		err = db.Where("id = ?", u.ID).First(&u).Error
-		if err != nil {
-			logrus.Errorf("Error finding user in database: %s", err.Error())
-			return err, DatabaseError
-		}
-	} else if u.Username != "" {
-		err = db.Where("username = ?", u.Username).First(&u).Error
-		if err != nil {
-			logrus.Errorf("Error finding user in database: %s", err.Error())
-			return err, DatabaseError
-		}
-	} else {
-		return errors.New("Username or ID is required"), MalformedRequestError
-	}
-	return nil, nil
-}
-
 type GetUserRequestBody struct {
 	ID       uint   `json:"id"`
 	Username string `json:"username"`
@@ -147,9 +120,9 @@ func GetUser(c *gin.Context) {
 	var user User
 	user.ID = body.ID
 	user.Username = body.Username
-	err, responseFunction := user.FindUserByIdOrUsername(db)
+	err = db.Where(&user).First(&user).Error
 	if err != nil {
-		responseFunction(c)
+		DatabaseError(c)
 		return
 	}
 
@@ -255,9 +228,9 @@ func ModifyUser(c *gin.Context) {
 	user.ID = body.ID
 	user.Username = body.Username
 
-	err, responseFunction := user.FindUserByIdOrUsername(db)
+	err = db.Where(&user).First(&user).Error
 	if err != nil {
-		responseFunction(c)
+		DatabaseError(c)
 		return
 	}
 
@@ -324,9 +297,9 @@ func DeleteUser(c *gin.Context) {
 	var user User
 	user.ID = body.ID
 	user.Username = body.Username
-	err, responseFunction := user.FindUserByIdOrUsername(db)
+	err = db.Where(&user).First(&user).Error
 	if err != nil {
-		responseFunction(c)
+		DatabaseError(c)
 		return
 	}
 
@@ -377,9 +350,9 @@ func ChangeUserPassword(c *gin.Context) {
 	var user User
 	user.ID = body.ID
 	user.Username = body.Username
-	err, responseFunction := user.FindUserByIdOrUsername(db)
+	err = db.Where(&user).First(&user).Error
 	if err != nil {
-		responseFunction(c)
+		DatabaseError(c)
 		return
 	}
 
@@ -460,9 +433,9 @@ func SetUserAdminState(c *gin.Context) {
 	var user User
 	user.ID = body.ID
 	user.Username = body.Username
-	err, responseFunction := user.FindUserByIdOrUsername(db)
+	err = db.Where(&user).First(&user).Error
 	if err != nil {
-		responseFunction(c)
+		DatabaseError(c)
 		return
 	}
 
@@ -520,9 +493,9 @@ func SetUserEnabledState(c *gin.Context) {
 	var user User
 	user.ID = body.ID
 	user.Username = body.Username
-	err, responseFunction := user.FindUserByIdOrUsername(db)
+	err = db.Where(&user).First(&user).Error
 	if err != nil {
-		responseFunction(c)
+		DatabaseError(c)
 		return
 	}
 
