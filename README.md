@@ -7,7 +7,7 @@
 To build the code, run the following from the root of the repository:
 
 ```
-go build
+go build -o kolide
 ```
 
 ## Testing
@@ -20,22 +20,47 @@ go test
 
 ## Development Environment
 
-To set up the development environment via docker, run the following frmo the root of the repository:
+To set up a canonical development environment via docker,
+run the following from the root of the repository:
 
 ```
 docker-compose up
 ```
+You should now be able to access the application at https://<docker-ip>:8080
 
-Obviouly this requires that you have docker installed. At this point in time, automatic configuration tools are not included with this project.
+If you'd like to run tests or any one-off commands you can run the following
+```
+docker-compose run go test
+```
 
-If you'd like to shut down the virtual infrastructure created by docker, run the following from the root of the repository:
+Obviouly this requires that you have docker installed. At this point in time,
+automatic configuration tools are not included with this project.
+
+If you'd like to shut down the virtual infrastructure created by docker, run
+the following from the root of the repository:
 
 ```
 docker-compose down
 ```
 
-Once you `docker-compose up` and are running the databases, build the code and run the following command to create the database tables:
+Once you `docker-compose up` and are running the databases, build the code
+and run the following command to create the database tables:
 
 ```
-kolide prepare-db
+docker-compose run app ./kolide prepare-db
+```
+
+## Docker Deployment
+This repository comes with a simple Dockerfile. You can use this to easily deploy Kolide in any infrastructure context that can consume a docker image (heroku, kubernetes, rancher, etc).
+
+To build the image locally, run:
+
+```
+docker build --rm -t kolide .
+```
+
+To run the image locally, simply run:
+
+```
+docker run -t -p 8080:8080 kolide
 ```
