@@ -294,22 +294,13 @@ func (req *integrationRequests) CheckUser(username, email, name string, admin, r
 	if user.Email != email {
 		return errors.New(fmt.Sprintf("user's email was not set in the DB: %s", user.Email))
 	}
-	if user.Admin && !admin {
+	if (user.Admin && !admin) || (!user.Admin && admin) {
 		return errors.New("user shouldn't be admin")
 	}
-	if !user.Admin && admin {
-		return errors.New("user should be admin")
-	}
-	if user.NeedsPasswordReset && !reset {
+	if (user.NeedsPasswordReset && !reset) || (!user.NeedsPasswordReset && reset) {
 		return errors.New("user reset settings don't match")
 	}
-	if !user.NeedsPasswordReset && reset {
-		return errors.New("user reset settings don't match")
-	}
-	if user.Enabled && !enabled {
-		return errors.New("user enabled settings don't match")
-	}
-	if !user.Enabled && enabled {
+	if (user.Enabled && !enabled) || (!user.Enabled && enabled) {
 		return errors.New("user enabled settings don't match")
 	}
 	if user.Name != name {
