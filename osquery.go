@@ -5,12 +5,12 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 )
 
+// TODO: Turn binding:"required" back on once issue #35 is worked out
 type OsqueryEnrollPostBody struct {
-	EnrollSecret   string `json:"enroll_secret" binding:"required"`
-	HostIdentifier string `json:"host_identifier" binding:"required"`
+	EnrollSecret   string `json:"enroll_secret"`
+	HostIdentifier string `json:"host_identifier"`
 }
 
 type OsqueryConfigPostBody struct {
@@ -49,64 +49,44 @@ type OsqueryDistributedWritePostBody struct {
 	Queries map[string][]map[string]string `json:"queries" binding:"required"`
 }
 
-func genNodeKey() string {
-	return generateRandomText(12)
-}
-
-func setError(c *gin.Context, err error) {
-	logrus.WithError(err).Error("Returning 500")
-	c.AbortWithError(500, err)
-	// c.JSON(http.StatusInternalServerError,
-	// 	gin.H{
-	// 		"error": err.Error(),
-	// 	})
-}
-
 func OsqueryEnroll(c *gin.Context) {
 	var body OsqueryEnrollPostBody
 	err := c.BindJSON(&body)
 	if err != nil {
-		logrus.Debugf("Error parsing OsqueryEnroll POST body: %s", err.Error())
+		logrus.WithError(err).Debugf("Error parsing OsqueryEnroll POST body")
 		return
 	}
-	logrus.Debugf("OsqueryEnroll: %s %s", body.EnrollSecret, body.HostIdentifier)
+	logrus.Debugf("OsqueryEnroll: %+v", body)
 
 	if body.EnrollSecret != config.Osquery.EnrollSecret {
-		c.JSON(http.StatusBadRequest,
+		c.JSON(http.StatusUnauthorized,
 			gin.H{
+				"error":        "Invalid enroll secret",
 				"node_invalid": true,
 			})
 		return
 
 	}
 
-	db := mustOpenDB(config.MySQL.Username, config.MySQL.Password, config.MySQL.Address, config.MySQL.Database)
-	defer db.Close()
+	if body.HostIdentifier == "" {
+		c.JSON(http.StatusBadRequest,
+			gin.H{
+				"error":        "Missing host identifier",
+				"node_invalid": true,
+			})
+		return
 
-	var host Host
-	err = db.Debug().
-		Where("uuid = ? OR host_name = ?",
-			body.HostIdentifier, body.HostIdentifier).
-		First(&host).
-		Error
+	}
 
-	if err != nil && err != gorm.ErrRecordNotFound {
+	db := GetDB(c)
+
+	host, err := EnrollHost(db, body.HostIdentifier, "", "", "")
+	if err != nil {
 		DatabaseError(c)
 		return
-
-	} else if err == gorm.ErrRecordNotFound {
-		// Create new Host
-		host = Host{HostName: body.HostIdentifier, UUID: body.HostIdentifier}
 	}
 
-	host.NodeKey = genNodeKey()
-
-	if err = db.Debug().Save(&host).Error; err != nil {
-		setError(c, err)
-		return
-	}
-
-	logrus.Debugf("Host: %+v", host)
+	logrus.Debugf("New host created: %+v", host)
 
 	c.JSON(http.StatusOK,
 		gin.H{
