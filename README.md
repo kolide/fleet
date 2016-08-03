@@ -19,6 +19,12 @@ repository:
 go test
 ```
 
+Or if you using the Docker development enviornment run:
+
+```
+docker-compose app go test
+```
+
 ## Development Environment
 
 To set up a canonical development environment via docker,
@@ -27,6 +33,9 @@ run the following from the root of the repository:
 ```
 docker-compose up
 ```
+
+Once completed, you can access the application at `https://<your-docker-ip>:8080`
+where `your-docker-ip` is localhost in most native docker installations.
 
 This requires that you have docker installed. At this point in time,
 automatic configuration tools are not included with this project.
@@ -38,11 +47,17 @@ the following from the root of the repository:
 docker-compose down
 ```
 
-Once you `docker-compose up` and are running the databases, build the code
-and run the following command to create the database tables:
+Once you `docker-compose up` and are running the databases, you can re-build
+the code with:
 
 ```
-kolide prepare-db
+docker-compose run app go build -o kolide
+```
+
+and then run the following command to create the database tables:
+
+```
+docker-compose run app ./kolide prepare-db
 ```
 
 ## Docker Deployment
