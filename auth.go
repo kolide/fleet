@@ -47,7 +47,7 @@ func (vc *ViewerContext) UserID() (uint, error) {
 	return 0, errors.New("No user set")
 }
 
-func (vc *ViewerContext) CanPerformActions(db *gorm.DB) bool {
+func (vc *ViewerContext) CanPerformActions() bool {
 	if vc.user == nil {
 		return false
 	}
@@ -70,12 +70,12 @@ func (vc *ViewerContext) IsUserID(id uint) bool {
 	return false
 }
 
-func (vc *ViewerContext) CanPerformWriteActionOnUser(db *gorm.DB, u *User) bool {
-	return vc.CanPerformActions(db) && (vc.IsUserID(u.ID) || vc.IsAdmin())
+func (vc *ViewerContext) CanPerformWriteActionOnUser(u *User) bool {
+	return vc.CanPerformActions() && (vc.IsUserID(u.ID) || vc.IsAdmin())
 }
 
-func (vc *ViewerContext) CanPerformReadActionOnUser(db *gorm.DB, u *User) bool {
-	return vc.CanPerformActions(db) && (vc.IsUserID(u.ID) || vc.IsAdmin())
+func (vc *ViewerContext) CanPerformReadActionOnUser(u *User) bool {
+	return vc.CanPerformActions()
 }
 
 // GenerateJWT generates a JWT token in serialized string form given a
@@ -147,6 +147,7 @@ func JWTRenewalMiddleware(c *gin.Context) {
 	}
 
 	session.Set("jwt", jwt)
+	session.Save()
 
 	c.Next()
 }
@@ -246,12 +247,14 @@ func Login(c *gin.Context) {
 	session.Set("jwt", token)
 	session.Save()
 
-	c.JSON(200, map[string]interface{}{
-		"id":       user.ID,
-		"username": user.Username,
-		"email":    user.Email,
-		"name":     user.Name,
-		"admin":    user.Admin,
+	c.JSON(200, GetUserResponseBody{
+		ID:                 user.ID,
+		Username:           user.Username,
+		Name:               user.Name,
+		Email:              user.Email,
+		Admin:              user.Admin,
+		Enabled:            user.Enabled,
+		NeedsPasswordReset: user.NeedsPasswordReset,
 	})
 }
 
@@ -261,31 +264,14 @@ func Logout(c *gin.Context) {
 	c.JSON(200, nil)
 }
 
-const (
-	letters         = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	letterIndex     = 6                  // 6 bits to represent a letter index
-	letterIndexMask = 1<<letterIndex - 1 // All 1-bits, as many as letterIndex
-	letterIndexMax  = 63 / letterIndex   // # of letter indices fitting in 63 bits
-)
-
-var psrngSource = rand.NewSource(time.Now().UnixNano())
-
 func generateRandomText(length int) string {
-
-	text := make([]byte, length)
-	for i, cache, remain := length-1, psrngSource.Int63(), letterIndexMax; i >= 0; {
-		if remain == 0 {
-			cache, remain = psrngSource.Int63(), letterIndexMax
-		}
-		if idx := int(cache & letterIndexMask); idx < len(letters) {
-			text[i] = letters[idx]
-			i--
-		}
-		cache >>= letterIndex
-		remain--
+	rand.Seed(time.Now().UTC().UnixNano())
+	const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	result := make([]byte, length)
+	for i := 0; i < length; i++ {
+		result[i] = chars[rand.Intn(len(chars))]
 	}
-
-	return string(text)
+	return string(result)
 }
 
 func HashPassword(salt, password string) ([]byte, error) {

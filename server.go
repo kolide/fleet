@@ -1,6 +1,10 @@
 package main
 
 import (
+	"time"
+
+	"github.com/Sirupsen/logrus"
+	"github.com/gin-gonic/contrib/ginrus"
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,6 +29,13 @@ func UnauthorizedError(c *gin.Context) {
 	c.JSON(401, ServerError("Unauthorized"))
 }
 
+// MalformedRequestError emits a response that is appropriate in the event that
+// a request is received by a user which does not have required fields or is in
+// some way malformed
+func MalformedRequestError(c *gin.Context) {
+	c.JSON(400, ServerError("Malformed request"))
+}
+
 func createTestServer() *gin.Engine {
 	server := gin.New()
 	server.Use(TestingDatabaseMiddleware)
@@ -36,6 +47,22 @@ func createTestServer() *gin.Engine {
 func CreateServer() *gin.Engine {
 	server := gin.New()
 	server.Use(ProductionDatabaseMiddleware)
+
+	// TODO: The following loggers are not synchronized with each other or
+	// logrus.StandardLogger() used through the rest of the codebase. As
+	// such, their output may become intermingled.
+	// See https://github.com/Sirupsen/logrus/issues/391
+
+	// Ginrus middleware logs details about incoming requests using the
+	// logrus WithFields
+	requestLogger := logrus.New()
+	server.Use(ginrus.Ginrus(requestLogger, time.RFC3339, false))
+
+	// Recovery middleware recovers from panic(), returning a 500 response
+	// code and printing the panic information to the log
+	recoveryLogger := logrus.New()
+	recoveryLogger.WriterLevel(logrus.ErrorLevel)
+	server.Use(gin.RecoveryWithWriter(recoveryLogger.Writer()))
 
 	v1 := server.Group("/api/v1")
 
@@ -52,7 +79,7 @@ func CreateServer() *gin.Engine {
 	kolide.PATCH("/user", ModifyUser)
 	kolide.DELETE("/user", DeleteUser)
 
-	kolide.PATCH("/user/password", ResetUserPassword)
+	kolide.PATCH("/user/password", ChangeUserPassword)
 	kolide.PATCH("/user/admin", SetUserAdminState)
 	kolide.PATCH("/user/enabled", SetUserEnabledState)
 
