@@ -24,15 +24,15 @@ func TestIntegrationEnrollHostBadSecret(t *testing.T) {
 	var body map[string]interface{}
 	err := json.Unmarshal(resp.Body.Bytes(), &body)
 	if err != nil {
-		req.t.Fatalf("JSON decode error: %s JSON contents:\n %s", err.Error(), resp.Body.Bytes())
+		t.Fatalf("JSON decode error: %s JSON contents:\n %s", err.Error(), resp.Body.Bytes())
 	}
 
 	if body["error"] != "Invalid enroll secret" {
-		req.t.Errorf("Incorrect/missing error message: %s", body["error"])
+		t.Errorf("Incorrect/missing error message: %s", body["error"])
 	}
 
 	if invalid, ok := body["node_invalid"]; ok && invalid != true {
-		req.t.Errorf("Expected node_invalid = true")
+		t.Errorf("Expected node_invalid = true")
 	}
 }
 
@@ -54,19 +54,20 @@ func TestIntegrationEnrollHostMissingIdentifier(t *testing.T) {
 	var body map[string]interface{}
 	err := json.Unmarshal(resp.Body.Bytes(), &body)
 	if err != nil {
-		req.t.Fatalf("JSON decode error: %s JSON contents:\n %s", err.Error(), resp.Body.Bytes())
+		t.Fatalf("JSON decode error: %s JSON contents:\n %s", err.Error(), resp.Body.Bytes())
 	}
 
 	if body["error"] != "Missing host identifier" {
-		req.t.Errorf("Incorrect/missing error message: %s", body["error"])
+		t.Errorf("Incorrect/missing error message: %s", body["error"])
 	}
 
 	if invalid, ok := body["node_invalid"]; ok && invalid != true {
-		req.t.Errorf("Expected node_invalid = true")
+		t.Errorf("Expected node_invalid = true")
 	}
 }
 
 func TestIntegrationEnrollHostGood(t *testing.T) {
+	*debug = true
 	var req IntegrationRequests
 	req.New(t)
 
@@ -86,30 +87,30 @@ func TestIntegrationEnrollHostGood(t *testing.T) {
 	var body map[string]interface{}
 	err := json.Unmarshal(resp.Body.Bytes(), &body)
 	if err != nil {
-		req.t.Fatalf("JSON decode error: %s JSON contents:\n %s", err.Error(), resp.Body.Bytes())
+		t.Fatalf("JSON decode error: %s JSON contents:\n %s", err.Error(), resp.Body.Bytes())
 	}
 
 	if _, ok := body["error"]; ok {
-		req.t.Errorf("Unexpected error message: %s", body["error"])
+		t.Errorf("Unexpected error message: %s", body["error"])
 	}
 
 	if invalid, ok := body["node_invalid"]; ok && invalid == true {
-		req.t.Errorf("Expected node_invalid = false")
+		t.Errorf("Expected node_invalid = false")
 	}
 
 	nodeKey, ok := body["node_key"]
 	if !ok || nodeKey == "" {
-		req.t.Errorf("Expected node_key")
+		t.Errorf("Expected node_key")
 	}
 
 	var host Host
 	err = req.db.Where("uuid = ?", "fake_host_1").First(&host).Error
 	if err != nil {
-		req.t.Fatal("Host not saved to DB: %s", err.Error())
+		t.Fatal("Host not saved to DB: %s", err.Error())
 	}
 
 	if host.NodeKey != nodeKey {
-		req.t.Error("Saved node key different than response key, %s != %s",
+		t.Error("Saved node key different than response key, %s != %s",
 			host.NodeKey, nodeKey)
 	}
 
@@ -126,24 +127,24 @@ func TestIntegrationEnrollHostGood(t *testing.T) {
 	body = map[string]interface{}{}
 	err = json.Unmarshal(resp.Body.Bytes(), &body)
 	if err != nil {
-		req.t.Fatalf("JSON decode error: %s JSON contents:\n %s", err.Error(), resp.Body.Bytes())
+		t.Fatalf("JSON decode error: %s JSON contents:\n %s", err.Error(), resp.Body.Bytes())
 	}
 
 	if _, ok := body["error"]; ok {
-		req.t.Errorf("Unexpected error message: %s", body["error"])
+		t.Errorf("Unexpected error message: %s", body["error"])
 	}
 
 	if invalid, ok := body["node_invalid"]; ok && invalid == true {
-		req.t.Errorf("Expected node_invalid = false")
+		t.Errorf("Expected node_invalid = false")
 	}
 
 	newNodeKey, ok := body["node_key"]
 	if !ok || nodeKey == "" {
-		req.t.Errorf("Expected node_key")
+		t.Errorf("Expected node_key")
 	}
 
 	if newNodeKey == nodeKey {
-		req.t.Errorf("Node key should have changed, %s == %s", newNodeKey, nodeKey)
+		t.Errorf("Node key should have changed, %s == %s", newNodeKey, nodeKey)
 	}
 
 }
