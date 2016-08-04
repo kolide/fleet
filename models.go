@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/Sirupsen/logrus"
@@ -20,7 +21,11 @@ const (
 	TestingDB    DBEnvironment = iota
 )
 
-var injectedTestDB *gorm.DB
+var (
+	testDB         *gorm.DB
+	productionDB   *gorm.DB
+	productionOnce sync.Once
+)
 
 func GetDB(c *gin.Context) (*gorm.DB, error) {
 	f, ok := c.Get("DB")
@@ -29,17 +34,10 @@ func GetDB(c *gin.Context) (*gorm.DB, error) {
 	}
 	switch f.(DBEnvironment) {
 	case ProductionDB:
-		return openDB(config.MySQL.Username, config.MySQL.Password, config.MySQL.Address, config.MySQL.Database)
+		openDB(config.MySQL.Username, config.MySQL.Password, config.MySQL.Address, config.MySQL.Database)
+		return productionDB, nil
 	case TestingDB:
-		if injectedTestDB != nil {
-			return injectedTestDB, nil
-		}
-		db, err := openTestDB()
-		if err != nil {
-			return nil, errors.New("Could not open a test database")
-		}
-		injectedTestDB = db
-		return injectedTestDB, nil
+		return testDB, nil
 	default:
 		return nil, errors.New("GetDB not implemented for DBEnvironment object")
 	}
@@ -196,14 +194,19 @@ func setDBSettings(db *gorm.DB) {
 }
 
 func openDB(user, password, address, dbName string) (*gorm.DB, error) {
-	connectionString := fmt.Sprintf("%s:%s@(%s)/%s?charset=utf8&parseTime=True&loc=Local", user, password, address, dbName)
-	return gorm.Open("mysql", connectionString)
-	db, err := gorm.Open("mysql", connectionString)
-	if err != nil {
-		return nil, err
-	}
-	setDBSettings(db)
-	return db, nil
+	// Because of the connection pooling implemented by database/sql, we
+	// only ever want to execute this function once
+	productionOnce.Do(func() {
+		connectionString := fmt.Sprintf("%s:%s@(%s)/%s?charset=utf8&parseTime=True&loc=Local", user, password, address, dbName)
+		db, err := gorm.Open("mysql", connectionString)
+		if err != nil {
+			logrus.WithError(err).Fatal("Error opening DB")
+		}
+
+		setDBSettings(db)
+		productionDB = db
+	})
+	return productionDB, nil
 }
 
 /// Open a database connection, or panic
@@ -218,12 +221,16 @@ func mustOpenDB(user, password, address, dbName string) *gorm.DB {
 func openTestDB() (*gorm.DB, error) {
 	db, err := gorm.Open("sqlite3", ":memory:")
 	if err != nil {
-		return nil, err
+		logrus.WithError(err).Fatalf("Error opening DB")
 	}
 
 	setDBSettings(db)
 	createTables(db)
-	return db, db.Error
+	if db.Error != nil {
+		logrus.WithError(db.Error).Fatalf("Error opening DB")
+	}
+	testDB = db
+	return testDB, nil
 }
 
 func ProductionDatabaseMiddleware(c *gin.Context) {

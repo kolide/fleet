@@ -6,18 +6,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gorilla/sessions"
 )
-
-const testSessionName = "TestSession"
-
-func getTestStore() sessions.Store {
-	return sessions.NewCookieStore([]byte("test"))
-}
-
-func testSessionMiddleware(c *gin.Context) {
-	CreateSession(testSessionName, getTestStore())(c)
-}
 
 func TestSessionGetSet(t *testing.T) {
 	r := createTestServer()
