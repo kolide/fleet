@@ -236,6 +236,120 @@ func (req *IntegrationRequests) ChangePassword(username, currentPassword, newPas
 	return &responseBody
 }
 
+func (req *integrationRequests) GetUserSessionInfo(username, session string) *GetInfoAboutSessionsForUserResponseBody {
+	response := httptest.NewRecorder()
+	body, err := json.Marshal(GetInfoAboutSessionsForUserRequestBody{
+		Username: username,
+	})
+	if err != nil {
+		req.t.Fatal(err.Error())
+		return nil
+	}
+
+	buff := new(bytes.Buffer)
+	buff.Write(body)
+	request, _ := http.NewRequest("POST", "/user/sessions", buff)
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("Cookie", session)
+	req.r.ServeHTTP(response, request)
+
+	if response.Code != 200 {
+		req.t.Fatalf("Response code: %d", response.Code)
+		return nil
+	}
+
+	var responseBody GetInfoAboutSessionsForUserResponseBody
+	err = json.Unmarshal(response.Body.Bytes(), &responseBody)
+	if err != nil {
+		req.t.Fatal(err.Error())
+		return nil
+	}
+
+	return &responseBody
+}
+
+func (req *integrationRequests) DeleteUserSessions(username, session string) {
+	response := httptest.NewRecorder()
+	body, err := json.Marshal(GetInfoAboutSessionsForUserRequestBody{
+		Username: username,
+	})
+	if err != nil {
+		req.t.Fatal(err.Error())
+		return
+	}
+
+	buff := new(bytes.Buffer)
+	buff.Write(body)
+	request, _ := http.NewRequest("DELETE", "/user/sessions", buff)
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("Cookie", session)
+	req.r.ServeHTTP(response, request)
+
+	if response.Code != 200 {
+		req.t.Fatalf("Response code: %d", response.Code)
+		return
+	}
+
+	return
+}
+
+func (req *integrationRequests) GetSessionInfo(sessionKey, session string) *SessionInfoResponseBody {
+	response := httptest.NewRecorder()
+	body, err := json.Marshal(GetInfoAboutSessionRequestBody{
+		SessionKey: sessionKey,
+	})
+	if err != nil {
+		req.t.Fatal(err.Error())
+		return nil
+	}
+
+	buff := new(bytes.Buffer)
+	buff.Write(body)
+	request, _ := http.NewRequest("POST", "/session", buff)
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("Cookie", session)
+	req.r.ServeHTTP(response, request)
+
+	if response.Code != 200 {
+		req.t.Fatalf("Response code: %d", response.Code)
+		return nil
+	}
+
+	var responseBody SessionInfoResponseBody
+	err = json.Unmarshal(response.Body.Bytes(), &responseBody)
+	if err != nil {
+		req.t.Fatal(err.Error())
+		return nil
+	}
+
+	return &responseBody
+}
+
+func (req *integrationRequests) DeleteSession(sessionID uint, session string) {
+	response := httptest.NewRecorder()
+	body, err := json.Marshal(DeleteSessionRequestBody{
+		SessionID: sessionID,
+	})
+	if err != nil {
+		req.t.Fatal(err.Error())
+		return
+	}
+
+	buff := new(bytes.Buffer)
+	buff.Write(body)
+	request, _ := http.NewRequest("DELETE", "/session", buff)
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("Cookie", session)
+	req.r.ServeHTTP(response, request)
+
+	if response.Code != 200 {
+		req.t.Fatalf("Response code: %d", response.Code)
+		return
+	}
+
+	return
+}
+
 func (req *IntegrationRequests) SetAdminState(username string, admin bool, session *string) *GetUserResponseBody {
 	response := httptest.NewRecorder()
 	body, err := json.Marshal(SetUserAdminStateRequestBody{

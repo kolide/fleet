@@ -1,7 +1,11 @@
 package main
 
 import (
+	"strings"
 	"testing"
+
+	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/jinzhu/gorm"
 )
 
 func TestUserAndAccountManagement(t *testing.T) {
@@ -51,6 +55,60 @@ func TestUserAndAccountManagement(t *testing.T) {
 
 	// Get info on admin2 as user2
 	req.GetAndCheckUser("admin2", user2Session)
+
+	// Get session info for admin
+	adminSessionInfo := req.GetUserSessionInfo("admin", adminSession)
+	if len(adminSessionInfo.Sessions) != 1 {
+		t.Fatalf("Expected 1 session, found %d", len(adminSessionInfo.Sessions))
+	}
+
+	// Pull the token out of the JWT token and get the session info via that
+	token, err := ParseJWT(strings.Split(adminSession, "=")[1])
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	sessionKey := token.Claims.(jwt.MapClaims)["session_key"].(string)
+
+	adminSessionInfoVerify := req.GetSessionInfo(sessionKey, adminSession)
+
+	if adminSessionInfo.Sessions[0].SessionID != adminSessionInfoVerify.SessionID {
+		t.Fatal("Session IDs don't match")
+	}
+
+	// Delete the admin session
+	req.DeleteSession(adminSessionInfo.Sessions[0].SessionID, adminSession)
+
+	// Verify the session was deleted
+	sessionVerify := &Session{
+		Key: sessionKey,
+	}
+	err = req.db.Where(sessionVerify).First(sessionVerify).Error
+	if err != gorm.ErrRecordNotFound {
+		t.Fatal("Record should not exist in the database")
+	}
+
+	// Re-login as admin
+	req.Login("admin", "foobar", &adminSession)
+	var adminSession2 string
+	req.Login("admin", "foobar", &adminSession2)
+
+	// Get session info for admin
+	adminSessionInfo = req.GetUserSessionInfo("admin", adminSession)
+	if len(adminSessionInfo.Sessions) != 2 {
+		t.Fatalf("Expected 2 sessions, found %d", len(adminSessionInfo.Sessions))
+	}
+
+	// Delete all admin session as admin2
+	req.DeleteUserSessions("admin", admin2Session)
+
+	// Verify there are no admin sessions left
+	adminSessionInfo = req.GetUserSessionInfo("admin", admin2Session)
+	if len(adminSessionInfo.Sessions) != 0 {
+		t.Fatalf("Expected 0 sessions, found %d", len(adminSessionInfo.Sessions))
+	}
+
+	// Re-login as admin
+	req.Login("admin", "foobar", &adminSession)
 
 	// Modify user1 as admin
 	req.ModifyAndCheckUser("user1", "user1@kolide.co", "User One", false, false, adminSession)

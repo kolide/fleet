@@ -90,6 +90,12 @@ func CreateServer(db *gorm.DB) *gin.Engine {
 	kolide.PATCH("/user/admin", SetUserAdminState)
 	kolide.PATCH("/user/enabled", SetUserEnabledState)
 
+	kolide.POST("/user/sessions", GetInfoAboutSessionsForUser)
+	kolide.DELETE("/user/sessions", DeleteSessionsForUser)
+
+	kolide.DELETE("/session", DeleteSession)
+	kolide.POST("/session", GetInfoAboutSession)
+
 	// osquery API endpoints
 	osquery := v1.Group("/osquery")
 	osquery.POST("/enroll", OsqueryEnroll)

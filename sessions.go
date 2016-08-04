@@ -9,6 +9,7 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 )
 
@@ -299,7 +300,7 @@ func (s *GormSessionBackend) Create(userID uint) error {
 }
 
 func (s *GormSessionBackend) Destroy() error {
-	if s.Session() != nil {
+	if _, err := s.Session(); err != nil {
 		err := s.db.Delete(s.Session).Error
 		if err != nil {
 			return err
@@ -316,4 +317,275 @@ func (s *GormSessionBackend) MarkAccessed() error {
 	}
 	s.session.AccessedAt = time.Now().UTC()
 	return s.db.Save(s.session).Error
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Session management HTTP endpoints
+////////////////////////////////////////////////////////////////////////////////
+
+type DeleteSessionRequestBody struct {
+	SessionID uint `json:"session_id" binding:"required"`
+}
+
+func DeleteSession(c *gin.Context) {
+	var body DeleteSessionRequestBody
+	err := c.BindJSON(&body)
+	if err != nil {
+		logrus.Errorf(err.Error())
+		return
+	}
+
+	db, err := GetDB(c)
+	if err != nil {
+		logrus.Errorf("Could not open database: %s", err.Error())
+		DatabaseError(c)
+		return
+	}
+
+	vc, err := VC(c, db)
+	if err != nil {
+		logrus.Errorf("Could not create VC: %s", err.Error())
+		DatabaseError(c) // TODO tampered?
+		return
+	}
+
+	if !vc.CanPerformActions() {
+		UnauthorizedError(c)
+		return
+	}
+
+	session := &Session{
+		BaseModel: BaseModel{
+			ID: body.SessionID,
+		},
+	}
+	err = db.Where(session).First(session).Error
+	if err != nil {
+		switch err {
+		case gorm.ErrRecordNotFound:
+			c.JSON(404, nil)
+			return
+		default:
+			DatabaseError(c)
+			return
+		}
+	}
+
+	user := &User{
+		BaseModel: BaseModel{
+			ID: session.UserID,
+		},
+	}
+	err = db.Where(user).First(user).Error
+	if err != nil {
+		DatabaseError(c)
+		return
+	}
+
+	if !vc.CanPerformWriteActionOnUser(user) {
+		UnauthorizedError(c)
+		return
+	}
+
+	err = db.Delete(session).Error
+	if err != nil {
+		DatabaseError(c)
+		return
+	}
+
+	c.JSON(200, nil)
+}
+
+type DeleteSessionsForUserRequestBody struct {
+	ID       uint   `json:"id"`
+	Username string `json:"username"`
+}
+
+func DeleteSessionsForUser(c *gin.Context) {
+	var body DeleteSessionsForUserRequestBody
+	err := c.BindJSON(&body)
+	if err != nil {
+		logrus.Errorf(err.Error())
+	}
+
+	db, err := GetDB(c)
+	if err != nil {
+		logrus.Errorf("Could not open database: %s", err.Error())
+		DatabaseError(c)
+		return
+	}
+
+	vc, err := VC(c, db)
+	if err != nil {
+		logrus.Errorf("Could not create VC: %s", err.Error())
+		DatabaseError(c) // TODO tampered?
+		return
+	}
+
+	if !vc.CanPerformActions() {
+		UnauthorizedError(c)
+		return
+	}
+
+	var user User
+	user.ID = body.ID
+	user.Username = body.Username
+	err = db.Where(&user).First(&user).Error
+	if err != nil {
+		DatabaseError(c)
+		return
+	}
+
+	if !vc.CanPerformWriteActionOnUser(&user) {
+		UnauthorizedError(c)
+		return
+	}
+
+	err = db.Delete(&Session{}, "user_id = ?", user.ID).Error
+	if err != nil {
+		DatabaseError(c)
+		return
+	}
+
+	c.JSON(200, nil)
+
+}
+
+type GetInfoAboutSessionRequestBody struct {
+	SessionKey string `json:"session_key" binding:"required"`
+}
+
+type SessionInfoResponseBody struct {
+	SessionID  uint      `json:"session_id"`
+	UserID     uint      `json:"user_id"`
+	CreatedAt  time.Time `json:"created_at"`
+	AccessedAt time.Time `json:"created_at"`
+}
+
+func GetInfoAboutSession(c *gin.Context) {
+	var body GetInfoAboutSessionRequestBody
+	err := c.BindJSON(&body)
+	if err != nil {
+		logrus.Errorf(err.Error())
+		return
+	}
+
+	db, err := GetDB(c)
+	if err != nil {
+		logrus.Errorf("Could not open database: %s", err.Error())
+		DatabaseError(c)
+		return
+	}
+
+	vc, err := VC(c, db)
+	if err != nil {
+		logrus.Errorf("Could not create VC: %s", err.Error())
+		DatabaseError(c) // TODO tampered?
+		return
+	}
+
+	if !vc.CanPerformActions() {
+		UnauthorizedError(c)
+		return
+	}
+
+	var session Session
+	session.Key = body.SessionKey
+	err = db.Where(&session).First(&session).Error
+	if err != nil {
+		DatabaseError(c)
+		return
+	}
+
+	var user User
+	user.ID = session.UserID
+	err = db.Where(&user).First(&user).Error
+	if err != nil {
+		DatabaseError(c)
+		return
+	}
+
+	if !vc.IsAdmin() && !vc.IsUserID(user.ID) {
+		UnauthorizedError(c)
+		return
+	}
+
+	c.JSON(200, &SessionInfoResponseBody{
+		SessionID:  session.ID,
+		UserID:     session.UserID,
+		CreatedAt:  session.CreatedAt,
+		AccessedAt: session.AccessedAt,
+	})
+}
+
+type GetInfoAboutSessionsForUserRequestBody struct {
+	ID       uint   `json:"id"`
+	Username string `json:"username"`
+}
+
+type GetInfoAboutSessionsForUserResponseBody struct {
+	Sessions []*SessionInfoResponseBody `json:"sessions"`
+}
+
+func GetInfoAboutSessionsForUser(c *gin.Context) {
+	var body GetInfoAboutSessionsForUserRequestBody
+	err := c.BindJSON(&body)
+	if err != nil {
+		logrus.Errorf(err.Error())
+		return
+	}
+
+	db, err := GetDB(c)
+	if err != nil {
+		logrus.Errorf("Could not open database: %s", err.Error())
+		DatabaseError(c)
+		return
+	}
+
+	vc, err := VC(c, db)
+	if err != nil {
+		logrus.Errorf("Could not create VC: %s", err.Error())
+		DatabaseError(c) // TODO tampered?
+		return
+	}
+
+	if !vc.CanPerformActions() {
+		UnauthorizedError(c)
+		return
+	}
+
+	var user User
+	user.ID = body.ID
+	user.Username = body.Username
+	err = db.Where(&user).First(&user).Error
+	if err != nil {
+		DatabaseError(c)
+		return
+	}
+
+	if !vc.IsAdmin() && !vc.IsUserID(user.ID) {
+		UnauthorizedError(c)
+		return
+	}
+
+	var sessions []*Session
+	err = db.Where("user_id = ?", user.ID).Find(&sessions).Error
+	if err != nil {
+		DatabaseError(c)
+		return
+	}
+
+	var response []*SessionInfoResponseBody
+	for _, session := range sessions {
+		response = append(response, &SessionInfoResponseBody{
+			SessionID:  session.ID,
+			UserID:     session.UserID,
+			CreatedAt:  session.CreatedAt,
+			AccessedAt: session.AccessedAt,
+		})
+	}
+
+	c.JSON(200, &GetInfoAboutSessionsForUserResponseBody{
+		Sessions: response,
+	})
 }
