@@ -299,7 +299,7 @@ func (s *GormSessionBackend) Create(userID uint) error {
 }
 
 func (s *GormSessionBackend) Destroy() error {
-	if s.Session != nil {
+	if s.Session() != nil {
 		err := s.db.Delete(s.Session).Error
 		if err != nil {
 			return err

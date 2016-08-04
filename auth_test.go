@@ -45,7 +45,7 @@ func TestGenerateJWT(t *testing.T) {
 
 	sessionKey := claims["session_key"].(string)
 	if sessionKey != "4" {
-		t.Fatal("Claims are incorrect. session key is %d", sessionKey)
+		t.Fatalf("Claims are incorrect. session key is %s", sessionKey)
 	}
 }
 
