@@ -41,6 +41,8 @@ func (vc *ViewerContext) UserID() (uint, error) {
 	return 0, errors.New("No user set")
 }
 
+// CanPerformActions returns a bool indicating the current user's ability to
+// perform the most basic actions on the site
 func (vc *ViewerContext) CanPerformActions() bool {
 	if vc.user == nil {
 		return false
@@ -53,6 +55,8 @@ func (vc *ViewerContext) CanPerformActions() bool {
 	return true
 }
 
+// IsUserID return true if the given user id the same as the user which is
+// represented by this ViewerContext
 func (vc *ViewerContext) IsUserID(id uint) bool {
 	userID, err := vc.UserID()
 	if err != nil {
@@ -64,36 +68,16 @@ func (vc *ViewerContext) IsUserID(id uint) bool {
 	return false
 }
 
+// CanPerformWriteActionsOnUser returns a bool indicating the current user's
+// ability to perform write actions on the given user
 func (vc *ViewerContext) CanPerformWriteActionOnUser(u *User) bool {
 	return vc.CanPerformActions() && (vc.IsUserID(u.ID) || vc.IsAdmin())
 }
 
+// CanPerformReadActionsOnUser returns a bool indicating the current user's
+// ability to perform read actions on the given user
 func (vc *ViewerContext) CanPerformReadActionOnUser(u *User) bool {
 	return vc.CanPerformActions()
-}
-
-func GenerateJWT(sessionKey string) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"session_key": sessionKey,
-		// "Not Before": https://tools.ietf.org/html/rfc7519#section-4.1.5
-		"nbf": time.Now().UTC().Unix(),
-		// "Expiration Time": https://tools.ietf.org/html/rfc7519#section-4.1.4
-		"exp": time.Now().UTC().AddDate(0, 2, 0).Unix(),
-	})
-
-	return token.SignedString([]byte(config.App.JWTKey))
-}
-
-// ParseJWT attempts to parse a JWT token in serialized string form into a
-// JWT token in a deserialized jwt.Token struct.
-func ParseJWT(token string) (*jwt.Token, error) {
-	return jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
-		method, ok := t.Method.(*jwt.SigningMethodHMAC)
-		if !ok || method != jwt.SigningMethodHS256 {
-			return nil, errors.New("Unexpected signing method")
-		}
-		return []byte(config.App.JWTKey), nil
-	})
 }
 
 // GenerateVC generates a ViewerContext given a user struct
@@ -119,6 +103,62 @@ func VC(c *gin.Context, db *gorm.DB) (*ViewerContext, error) {
 	vc := sm.VC()
 	return vc, nil
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// JSON Web Tokens
+////////////////////////////////////////////////////////////////////////////////
+
+// Given a session key create a JWT to be delivered to the client
+func GenerateJWT(sessionKey string) (string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"session_key": sessionKey,
+	})
+
+	return token.SignedString([]byte(config.App.JWTKey))
+}
+
+// ParseJWT attempts to parse a JWT token in serialized string form into a
+// JWT token in a deserialized jwt.Token struct.
+func ParseJWT(token string) (*jwt.Token, error) {
+	return jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
+		method, ok := t.Method.(*jwt.SigningMethodHMAC)
+		if !ok || method != jwt.SigningMethodHS256 {
+			return nil, errors.New("Unexpected signing method")
+		}
+		return []byte(config.App.JWTKey), nil
+	})
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Login and password utilities
+////////////////////////////////////////////////////////////////////////////////
+
+func generateRandomText(length int) string {
+	rand.Seed(time.Now().UTC().UnixNano())
+	const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	result := make([]byte, length)
+	for i := 0; i < length; i++ {
+		result[i] = chars[rand.Intn(len(chars))]
+	}
+	return string(result)
+}
+
+func HashPassword(salt, password string) ([]byte, error) {
+	return bcrypt.GenerateFromPassword(
+		[]byte(fmt.Sprintf("%s%s", salt, password)),
+		config.App.BcryptCost,
+	)
+}
+
+func SaltAndHashPassword(password string) (string, []byte, error) {
+	salt := generateRandomText(config.App.SaltLength)
+	hashed, err := HashPassword(salt, password)
+	return salt, hashed, err
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Authentication and authorization web endpoints
+////////////////////////////////////////////////////////////////////////////////
 
 type LoginRequestBody struct {
 	Username string `json:"username" binding:"required"`
@@ -192,27 +232,4 @@ func Logout(c *gin.Context) {
 	}
 
 	c.JSON(200, nil)
-}
-
-func generateRandomText(length int) string {
-	rand.Seed(time.Now().UTC().UnixNano())
-	const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-	result := make([]byte, length)
-	for i := 0; i < length; i++ {
-		result[i] = chars[rand.Intn(len(chars))]
-	}
-	return string(result)
-}
-
-func HashPassword(salt, password string) ([]byte, error) {
-	return bcrypt.GenerateFromPassword(
-		[]byte(fmt.Sprintf("%s%s", salt, password)),
-		config.App.BcryptCost,
-	)
-}
-
-func SaltAndHashPassword(password string) (string, []byte, error) {
-	salt := generateRandomText(config.App.SaltLength)
-	hashed, err := HashPassword(salt, password)
-	return salt, hashed, err
 }

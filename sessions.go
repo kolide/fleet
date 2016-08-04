@@ -17,10 +17,12 @@ var (
 	// in the database
 	ErrNoActiveSession = errors.New("Active session is not present in the database")
 
-	// An error returned by SessionBackend.Session() if no session has been
-	// created yet
+	// An error returned by SessionBackend methods when no session object has
+	// been created yet but the requested action requires one
 	ErrSessionNotCreated = errors.New("The session has not been created")
 
+	// An error returned by SessionBackend.Get() when a session is requested but
+	// it has expired
 	ErrSessionExpired = errors.New("The session has expired")
 )
 
@@ -41,6 +43,8 @@ type Session struct {
 // Managing sessions
 ////////////////////////////////////////////////////////////////////////////////
 
+// SessionManager is a management object which helps with the administration of
+// sessions within the application. Use NewSessionManager to create an instance
 type SessionManager struct {
 	backend SessionBackend
 	request *http.Request
@@ -49,6 +53,9 @@ type SessionManager struct {
 	db      *gorm.DB
 }
 
+// NewSessionManager allows you to get a SessionManager instance for a given
+// web request. Unless you're interacting with login, logout, or core auth
+// code, this should be abstracted by the ViewerContext pattern.
 func NewSessionManager(request *http.Request, writer http.ResponseWriter, backend SessionBackend, db *gorm.DB) *SessionManager {
 	return &SessionManager{
 		request: request,
@@ -58,13 +65,16 @@ func NewSessionManager(request *http.Request, writer http.ResponseWriter, backen
 	}
 }
 
+// Get the ViewerContext instance for a user represented by the active session
 func (sm *SessionManager) VC() *ViewerContext {
 	cookie, err := sm.request.Cookie(CookieName)
 	if err != nil {
 		switch err {
 		case http.ErrNoCookie:
+			// No cookie was set
 			return EmptyVC()
 		default:
+			// Something went wrong and the cookie may or may not be set
 			logrus.Errorf("Couldn't get cookie: %s", err.Error())
 			return EmptyVC()
 		}
@@ -78,16 +88,19 @@ func (sm *SessionManager) VC() *ViewerContext {
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
+		logrus.Error("Could not parse the claims from the JWT token")
 		return EmptyVC()
 	}
 
 	sessionKeyClaim, ok := claims["session_key"]
 	if !ok {
+		logrus.Warn("JWT did not have session_key claim")
 		return EmptyVC()
 	}
 
 	sessionKey, ok := sessionKeyClaim.(string)
 	if !ok {
+		logrus.Warn("JWT session_key claim was not a string")
 		return EmptyVC()
 	}
 
@@ -95,6 +108,9 @@ func (sm *SessionManager) VC() *ViewerContext {
 	if err != nil {
 		switch err {
 		case ErrNoActiveSession:
+			// If the code path got this far, it's likely that the user was logged
+			// in some time in the past, but their session has been expired since
+			// their last usage of the application
 			return EmptyVC()
 		default:
 			logrus.Errorf("Couldn't call Get on backend object: %s", err.Error())
@@ -102,6 +118,8 @@ func (sm *SessionManager) VC() *ViewerContext {
 		}
 	}
 
+	// Generating a VC requires a user struct. Attempt to populate one using
+	// the user id of the current session holder
 	user := &User{BaseModel: BaseModel{ID: session.UserID}}
 	err = sm.db.Where(user).First(user).Error
 	if err != nil {
@@ -111,6 +129,8 @@ func (sm *SessionManager) VC() *ViewerContext {
 	return GenerateVC(user)
 }
 
+// MakeSessionForUserID creates a session in the database for a given user id.
+// You must call Save() after calling this.
 func (sm *SessionManager) MakeSessionForUserID(id uint) error {
 	err := sm.backend.Create(id)
 	if err != nil {
@@ -119,10 +139,15 @@ func (sm *SessionManager) MakeSessionForUserID(id uint) error {
 	return nil
 }
 
+// MakeSessionForUserID creates a session in the database for a given user
+// You must call Save() after calling this.
 func (sm *SessionManager) MakeSessionForUser(u *User) error {
 	return sm.MakeSessionForUserID(u.ID)
 }
 
+// Save writes the current session to a token and delivers the token as a cookie
+// to the user. Save must be called after every write action on this struct
+// (MakeSessionForUser, Destroy, etc.)
 func (sm *SessionManager) Save() error {
 	session, err := sm.backend.Session()
 	if err != nil {
@@ -143,6 +168,8 @@ func (sm *SessionManager) Save() error {
 	return nil
 }
 
+// Destory deletes the active session from the database and erases the session
+// instance from this object's access. You must call Save() after calling this.
 func (sm *SessionManager) Destroy() error {
 	if sm.backend != nil {
 		err := sm.backend.Destroy()
@@ -157,18 +184,35 @@ func (sm *SessionManager) Destroy() error {
 // Session Backend API
 ////////////////////////////////////////////////////////////////////////////////
 
+// SessionBackend is the abstract interface that all session backends must
+// conform to. SessionBackend instances are only expected to exist within the
+// context of a single request.
 type SessionBackend interface {
+	// Given a session key, find and return a session object or an error if one
+	// could not be found for the given key
 	Get(key string) (*Session, error)
+
+	// Create a session object tied to the given user ID
 	Create(userID uint) error
+
+	// Destroy the currently tracked session
 	Destroy() error
+
+	// Return the currently tracked session
 	Session() (*Session, error)
+
+	// Mark the currently tracked session as access to extend expiration
 	MarkAccessed() error
 }
 
+// BaseSessionBackend is a convenience struct that all SessionBackends can
+// embed
 type BaseSessionBackend struct {
 	session *Session
 }
 
+// Session returns the currently active session or an error if one is not
+// available
 func (backend *BaseSessionBackend) Session() (*Session, error) {
 	if backend.session == nil {
 		return nil, ErrSessionNotCreated
@@ -180,6 +224,8 @@ func (backend *BaseSessionBackend) Session() (*Session, error) {
 // Session Backend Plugins
 ////////////////////////////////////////////////////////////////////////////////
 
+// GormSessionBackend stores sessions using a pre-instantiated gorm database
+// object
 type GormSessionBackend struct {
 	BaseSessionBackend
 	db *gorm.DB
