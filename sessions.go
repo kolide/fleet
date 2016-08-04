@@ -1,8 +1,6 @@
 package main
 
 import (
-	"crypto/rand"
-	"encoding/base64"
 	"errors"
 	"net/http"
 	"time"
@@ -274,15 +272,14 @@ func (s *GormSessionBackend) Get(key string) (*Session, error) {
 }
 
 func (s *GormSessionBackend) Create(userID uint) error {
-	key := make([]byte, config.App.SessionKeySize)
-	_, err := rand.Read(key)
+	key, err := generateRandomText(config.App.SessionKeySize)
 	if err != nil {
 		return err
 	}
 
 	session := &Session{
 		UserID: userID,
-		Key:    base64.StdEncoding.EncodeToString(key),
+		Key:    key,
 	}
 
 	err = s.db.Create(session).Error
