@@ -186,7 +186,6 @@ func openTestDB() (*gorm.DB, error) {
 	db, err := gorm.Open("sqlite3", ":memory:")
 	if err != nil {
 		return nil, err
-		logrus.WithError(err).Fatalf("Error opening DB")
 	}
 
 	setDBSettings(db)
