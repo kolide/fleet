@@ -52,7 +52,8 @@ func NewUser(db *gorm.DB, username, password, email string, admin, needsPassword
 // to validate it against the hash stored in the database after joining the
 // supplied password with the stored password salt
 func (u *User) ValidatePassword(password string) error {
-	saltAndPass := []byte(fmt.Sprintf("%s%s", u.Salt, password))
+	saltAndPass := []byte(fmt.Sprintf("%s%s", password, u.Salt))
+	logrus.Info(string(saltAndPass))
 	return bcrypt.CompareHashAndPassword(u.Password, saltAndPass)
 }
 
@@ -371,7 +372,8 @@ func ChangeUserPassword(c *gin.Context) {
 	err = user.SetPassword(db, body.NewPassword)
 	if err != nil {
 		logrus.Errorf("Error setting user password: %s", err.Error())
-		// xxx don't try to write to the db?
+		DatabaseError(c) // probably not this
+		return
 	}
 
 	err = db.Save(&user).Error

@@ -4,18 +4,10 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"unicode/utf8"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 )
-
-func TestGenerateRandomText(t *testing.T) {
-	text := generateRandomText(12)
-	if utf8.RuneCountInString(text) != 12 {
-		t.Fatal("generateRandomText generated the wrong length string")
-	}
-}
 
 func TestGenerateVC(t *testing.T) {
 	db := openTestDB()

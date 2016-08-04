@@ -168,7 +168,7 @@ func (sm *SessionManager) Save() error {
 		return err
 	}
 
-	// Set proper flags on cookie for maximum security
+	// TODO: set proper flags on cookie for maximum security
 	http.SetCookie(sm.writer, &http.Cookie{
 		Name:  CookieName,
 		Value: token,

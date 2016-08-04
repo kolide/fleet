@@ -12,7 +12,7 @@
   },
   "app": {
     "bcrypt_cost": 12,
-    "salt_length": 32,
+    "salt_key_size": 12,
     "jwt_key": "very secure",
     "session_key_size": 64
   },

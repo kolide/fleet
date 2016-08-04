@@ -1,10 +1,10 @@
 package main
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"math/rand"
-	"time"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/dgrijalva/jwt-go"
@@ -55,7 +55,7 @@ func (vc *ViewerContext) CanPerformActions() bool {
 	return true
 }
 
-// IsUserID return true if the given user id the same as the user which is
+// IsUserID returns true if the given user id the same as the user which is
 // represented by this ViewerContext
 func (vc *ViewerContext) IsUserID(id uint) bool {
 	userID, err := vc.UserID()
@@ -133,25 +133,28 @@ func ParseJWT(token string) (*jwt.Token, error) {
 // Login and password utilities
 ////////////////////////////////////////////////////////////////////////////////
 
-func generateRandomText(length int) string {
-	rand.Seed(time.Now().UTC().UnixNano())
-	const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-	result := make([]byte, length)
-	for i := 0; i < length; i++ {
-		result[i] = chars[rand.Intn(len(chars))]
+func generateRandomText(keySize int) (string, error) {
+	key := make([]byte, keySize)
+	_, err := rand.Read(key)
+	if err != nil {
+		return "", err
 	}
-	return string(result)
+
+	return base64.StdEncoding.EncodeToString(key), nil
 }
 
 func HashPassword(salt, password string) ([]byte, error) {
 	return bcrypt.GenerateFromPassword(
-		[]byte(fmt.Sprintf("%s%s", salt, password)),
+		[]byte(fmt.Sprintf("%s%s", password, salt)),
 		config.App.BcryptCost,
 	)
 }
 
 func SaltAndHashPassword(password string) (string, []byte, error) {
-	salt := generateRandomText(config.App.SaltLength)
+	salt, err := generateRandomText(config.App.SaltKeySize)
+	if err != nil {
+		return "", []byte{}, err
+	}
 	hashed, err := HashPassword(salt, password)
 	return salt, hashed, err
 }
