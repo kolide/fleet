@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"sync"
 	"time"
 
 	"github.com/Sirupsen/logrus"
@@ -14,33 +13,12 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
-type DBEnvironment int
-
-const (
-	ProductionDB DBEnvironment = iota
-	TestingDB    DBEnvironment = iota
-)
-
-var (
-	testDB         *gorm.DB
-	productionDB   *gorm.DB
-	productionOnce sync.Once
-)
-
 func GetDB(c *gin.Context) (*gorm.DB, error) {
-	f, ok := c.Get("DB")
+	db, ok := c.MustGet("DB").(*gorm.DB)
 	if !ok {
-		return nil, errors.New("DB was not set on the supplied *gin.Context. Use a middleware to set it.")
+		return nil, errors.New("context did not contain DB")
 	}
-	switch f.(DBEnvironment) {
-	case ProductionDB:
-		openDB(config.MySQL.Username, config.MySQL.Password, config.MySQL.Address, config.MySQL.Database)
-		return productionDB, nil
-	case TestingDB:
-		return testDB, nil
-	default:
-		return nil, errors.New("GetDB not implemented for DBEnvironment object")
-	}
+	return db, nil
 }
 
 type BaseModel struct {
@@ -194,19 +172,14 @@ func setDBSettings(db *gorm.DB) {
 }
 
 func openDB(user, password, address, dbName string) (*gorm.DB, error) {
-	// Because of the connection pooling implemented by database/sql, we
-	// only ever want to execute this function once
-	productionOnce.Do(func() {
-		connectionString := fmt.Sprintf("%s:%s@(%s)/%s?charset=utf8&parseTime=True&loc=Local", user, password, address, dbName)
-		db, err := gorm.Open("mysql", connectionString)
-		if err != nil {
-			logrus.WithError(err).Fatal("Error opening DB")
-		}
+	connectionString := fmt.Sprintf("%s:%s@(%s)/%s?charset=utf8&parseTime=True&loc=Local", user, password, address, dbName)
+	db, err := gorm.Open("mysql", connectionString)
+	if err != nil {
+		logrus.WithError(err).Fatal("Error opening DB")
+	}
 
-		setDBSettings(db)
-		productionDB = db
-	})
-	return productionDB, nil
+	setDBSettings(db)
+	return db, nil
 }
 
 /// Open a database connection, or panic
@@ -229,18 +202,7 @@ func openTestDB() (*gorm.DB, error) {
 	if db.Error != nil {
 		logrus.WithError(db.Error).Fatalf("Error opening DB")
 	}
-	testDB = db
-	return testDB, nil
-}
-
-func ProductionDatabaseMiddleware(c *gin.Context) {
-	c.Set("DB", ProductionDB)
-	c.Next()
-}
-
-func TestingDatabaseMiddleware(c *gin.Context) {
-	c.Set("DB", TestingDB)
-	c.Next()
+	return db, nil
 }
 
 func dropTables(db *gorm.DB) {

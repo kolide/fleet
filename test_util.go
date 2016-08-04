@@ -41,7 +41,7 @@ func (req *IntegrationRequests) New(t *testing.T) {
 		t.Fatalf("Error opening DB: %s", err.Error())
 	}
 
-	req.r = createTestServer()
+	req.r = CreateServer(req.db)
 }
 
 func (req *IntegrationRequests) Login(username, password string, sessionOut *string) {

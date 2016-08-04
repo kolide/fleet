@@ -50,7 +50,9 @@ func TestGenerateVC(t *testing.T) {
 }
 
 func TestVC(t *testing.T) {
-	r := createTestServer()
+	db, _ := openTestDB()
+	r := createEmptyTestServer(db)
+
 	r.Use(testSessionMiddleware)
 	r.Use(JWTRenewalMiddleware)
 
