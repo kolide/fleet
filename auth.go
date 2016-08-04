@@ -210,16 +210,10 @@ func Login(c *gin.Context) {
 }
 
 func Logout(c *gin.Context) {
-	db, err := GetDB(c)
-	if err != nil {
-		logrus.Errorf("Could not open database: %s", err.Error())
-		DatabaseError(c)
-		return
-	}
-
+	db := GetDB(c)
 	sm := NewSessionManager(c.Request, c.Writer, &GormSessionBackend{db: db}, db)
 
-	err = sm.Destroy()
+	err := sm.Destroy()
 	if err != nil {
 		DatabaseError(c)
 		return

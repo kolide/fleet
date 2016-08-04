@@ -22,7 +22,7 @@ type appConfigData struct {
 	BcryptCost               int     `json:"bcrypt_cost"`
 	SaltLength               int     `json:"salt_length"`
 	JWTKey                   string  `json:"jwt_key"`
-	SessionKeySize           int     `json:"session_key_seize"`
+	SessionKeySize           int     `json:"session_key_size"`
 	SessionExpirationSeconds float64 `json:"session_expiration_seconds"`
 }
 

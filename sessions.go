@@ -335,13 +335,7 @@ func DeleteSession(c *gin.Context) {
 		return
 	}
 
-	db, err := GetDB(c)
-	if err != nil {
-		logrus.Errorf("Could not open database: %s", err.Error())
-		DatabaseError(c)
-		return
-	}
-
+	db := GetDB(c)
 	vc, err := VC(c, db)
 	if err != nil {
 		logrus.Errorf("Could not create VC: %s", err.Error())
@@ -408,13 +402,7 @@ func DeleteSessionsForUser(c *gin.Context) {
 		logrus.Errorf(err.Error())
 	}
 
-	db, err := GetDB(c)
-	if err != nil {
-		logrus.Errorf("Could not open database: %s", err.Error())
-		DatabaseError(c)
-		return
-	}
-
+	db := GetDB(c)
 	vc, err := VC(c, db)
 	if err != nil {
 		logrus.Errorf("Could not create VC: %s", err.Error())
@@ -470,13 +458,7 @@ func GetInfoAboutSession(c *gin.Context) {
 		return
 	}
 
-	db, err := GetDB(c)
-	if err != nil {
-		logrus.Errorf("Could not open database: %s", err.Error())
-		DatabaseError(c)
-		return
-	}
-
+	db := GetDB(c)
 	vc, err := VC(c, db)
 	if err != nil {
 		logrus.Errorf("Could not create VC: %s", err.Error())
@@ -535,7 +517,7 @@ func GetInfoAboutSessionsForUser(c *gin.Context) {
 		return
 	}
 
-	db, err := GetDB(c)
+	db := GetDB(c)
 	if err != nil {
 		logrus.Errorf("Could not open database: %s", err.Error())
 		DatabaseError(c)

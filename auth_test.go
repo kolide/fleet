@@ -50,7 +50,8 @@ func TestGenerateJWT(t *testing.T) {
 }
 
 func TestVC(t *testing.T) {
-	r := createTestServer()
+	db := openTestDB()
+	r := createEmptyTestServer(db)
 
 	user, err := NewUser(db, "marpaia", "foobar", "mike@kolide.co", false, false)
 	if err != nil {

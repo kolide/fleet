@@ -23,10 +23,7 @@ func (w *MockResponseWriter) WriteHeader(int) {
 }
 
 func TestSessionManagerVC(t *testing.T) {
-	db, err := openTestDB()
-	if err != nil {
-		t.Fatal(err.Error())
-	}
+	db := openTestDB()
 
 	admin, err := NewUser(db, "admin", "foobar", "admin@kolide.co", true, false)
 	if err != nil {
@@ -76,8 +73,8 @@ func TestSessionManagerVC(t *testing.T) {
 }
 
 func TestSessionCreation(t *testing.T) {
-	r := createTestServer()
-	db, _ := openTestDB()
+	db := openTestDB()
+	r := createEmptyTestServer(db)
 	admin, _ := NewUser(db, "admin", "foobar", "admin@kolide.co", true, false)
 
 	r.GET("/login", func(c *gin.Context) {
