@@ -175,32 +175,24 @@ func openDB(user, password, address, dbName string) (*gorm.DB, error) {
 	connectionString := fmt.Sprintf("%s:%s@(%s)/%s?charset=utf8&parseTime=True&loc=Local", user, password, address, dbName)
 	db, err := gorm.Open("mysql", connectionString)
 	if err != nil {
-		logrus.WithError(err).Fatal("Error opening DB")
+		return nil, err
 	}
 
 	setDBSettings(db)
 	return db, nil
 }
 
-/// Open a database connection, or panic
-func mustOpenDB(user, password, address, dbName string) *gorm.DB {
-	db, err := openDB(user, password, address, dbName)
-	if err != nil {
-		panic(fmt.Sprintf("Could not connect to DB: %s", err.Error()))
-	}
-	return db
-}
-
 func openTestDB() (*gorm.DB, error) {
 	db, err := gorm.Open("sqlite3", ":memory:")
 	if err != nil {
+		return nil, err
 		logrus.WithError(err).Fatalf("Error opening DB")
 	}
 
 	setDBSettings(db)
 	createTables(db)
 	if db.Error != nil {
-		logrus.WithError(db.Error).Fatalf("Error opening DB")
+		return nil, err
 	}
 	return db, nil
 }
