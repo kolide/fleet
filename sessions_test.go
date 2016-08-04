@@ -50,7 +50,7 @@ func TestSessionManagerVC(t *testing.T) {
 	token, err := GenerateJWT(session.Key)
 
 	cookie := &http.Cookie{
-		Name:  SessionName,
+		Name:  CookieName,
 		Value: token,
 	}
 

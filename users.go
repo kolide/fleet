@@ -112,6 +112,11 @@ func GetUser(c *gin.Context) {
 		return
 	}
 
+	if !vc.CanPerformActions() {
+		UnauthorizedError(c)
+		return
+	}
+
 	var user User
 	user.ID = body.ID
 	user.Username = body.Username
@@ -206,6 +211,11 @@ func ModifyUser(c *gin.Context) {
 	if err != nil {
 		logrus.Errorf("Could not create VC: %s", err.Error())
 		DatabaseError(c)
+		return
+	}
+
+	if !vc.CanPerformActions() {
+		UnauthorizedError(c)
 		return
 	}
 
@@ -322,18 +332,23 @@ func ChangeUserPassword(c *gin.Context) {
 
 	db := GetDB(c)
 
+	vc, err := VC(c, db)
+	if err != nil {
+		logrus.Errorf("Could not create VC: %s", err.Error())
+		DatabaseError(c)
+		return
+	}
+
+	if !vc.CanPerformActions() {
+		UnauthorizedError(c)
+		return
+	}
+
 	var user User
 	user.ID = body.ID
 	user.Username = body.Username
 	err = db.Where(&user).First(&user).Error
 	if err != nil {
-		DatabaseError(c)
-		return
-	}
-
-	vc, err := VC(c, db)
-	if err != nil {
-		logrus.Errorf("Could not create VC: %s", err.Error())
 		DatabaseError(c)
 		return
 	}

@@ -13,7 +13,8 @@
   "app": {
     "bcrypt_cost": 12,
     "salt_length": 32,
-    "jwt_key": "very secure"
+    "jwt_key": "very secure",
+    "session_key_size": 64
   },
   "osquery": {
     "enroll_secret": "super secure"

@@ -1,8 +1,11 @@
 package main
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/dgrijalva/jwt-go"
@@ -10,18 +13,28 @@ import (
 )
 
 var (
-	ErrNoActiveSession   = errors.New("Active session is not present in the database")
+	// An error returned by SessionBackend.Get() if no session record was found
+	// in the database
+	ErrNoActiveSession = errors.New("Active session is not present in the database")
+
+	// An error returned by SessionBackend.Session() if no session has been
+	// created yet
 	ErrSessionNotCreated = errors.New("The session has not been created")
+
+	ErrSessionExpired = errors.New("The session has expired")
 )
 
 const (
-	SessionName = "KolideSession"
+	// The name of the session cookie
+	CookieName = "KolideSession"
 )
 
+// Session is the model object which represents what an active session is
 type Session struct {
 	BaseModel
-	UserID uint   `gorm:"not null"`
-	Key    string `gorm:"not null;unique_index:idx_session_unique_key"`
+	UserID     uint   `gorm:"not null"`
+	Key        string `gorm:"not null;unique_index:idx_session_unique_key"`
+	AccessedAt time.Time
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -46,7 +59,7 @@ func NewSessionManager(request *http.Request, writer http.ResponseWriter, backen
 }
 
 func (sm *SessionManager) VC() *ViewerContext {
-	cookie, err := sm.request.Cookie(SessionName)
+	cookie, err := sm.request.Cookie(CookieName)
 	if err != nil {
 		switch err {
 		case http.ErrNoCookie:
@@ -123,7 +136,7 @@ func (sm *SessionManager) Save() error {
 
 	// Set proper flags on cookie for maximum security
 	http.SetCookie(sm.writer, &http.Cookie{
-		Name:  SessionName,
+		Name:  CookieName,
 		Value: token,
 	})
 
@@ -149,6 +162,7 @@ type SessionBackend interface {
 	Create(userID uint) error
 	Destroy() error
 	Session() (*Session, error)
+	MarkAccessed() error
 }
 
 type BaseSessionBackend struct {
@@ -185,22 +199,47 @@ func (s *GormSessionBackend) Get(key string) (*Session, error) {
 			return nil, err
 		}
 	}
+
+	if time.Since(session.AccessedAt).Seconds() >= config.App.SessionExpirationSeconds {
+		err = s.db.Delete(session).Error
+		if err != nil {
+			return nil, err
+		}
+		return nil, ErrSessionExpired
+	}
+
 	s.session = session
+
+	err = s.MarkAccessed()
+	if err != nil {
+		return nil, err
+	}
 
 	return s.session, nil
 }
 
 func (s *GormSessionBackend) Create(userID uint) error {
-	session := &Session{
-		UserID: userID,
-		Key:    generateRandomText(32),
+	key := make([]byte, config.App.SessionKeySize)
+	_, err := rand.Read(key)
+	if err != nil {
+		return err
 	}
 
-	err := s.db.Create(session).Error
+	session := &Session{
+		UserID: userID,
+		Key:    base64.StdEncoding.EncodeToString(key),
+	}
+
+	err = s.db.Create(session).Error
 	if err != nil {
 		return err
 	}
 	s.session = session
+
+	err = s.MarkAccessed()
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -215,4 +254,12 @@ func (s *GormSessionBackend) Destroy() error {
 	}
 
 	return nil
+}
+
+func (s *GormSessionBackend) MarkAccessed() error {
+	if s.session == nil {
+		return ErrSessionNotCreated
+	}
+	s.session.AccessedAt = time.Now().UTC()
+	return s.db.Save(s.session).Error
 }
