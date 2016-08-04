@@ -25,33 +25,32 @@ func TestGenerateVC(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 
-	tokenString, err := GenerateVC(user).JWT()
-	if err != nil {
-		t.Fatal(err.Error())
+	vc := GenerateVC(user)
+	if !vc.IsAdmin() {
+		t.Fatal("User is not an admin")
 	}
 
+}
+
+func TestGenerateJWTSession(t *testing.T) {
+	tokenString, err := GenerateJWTSession("4")
 	token, err := ParseJWT(tokenString)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
-
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok || !token.Valid {
 		t.Fatal("Token is invalid")
 	}
 
-	userID := uint(claims["user_id"].(float64))
-	if userID != user.ID {
-		t.Fatal("Claims are incorrect. userID is %d", userID)
+	sessionKey := claims["session_key"].(string)
+	if sessionKey != "4" {
+		t.Fatal("Claims are incorrect. session key is %d", sessionKey)
 	}
 }
 
 func TestVC(t *testing.T) {
-	db := openTestDB()
-	r := createEmptyTestServer(db)
-
-	r.Use(testSessionMiddleware)
-	r.Use(JWTRenewalMiddleware)
+	r := createTestServer()
 
 	user, err := NewUser(db, "marpaia", "foobar", "mike@kolide.co", false, false)
 	if err != nil {
@@ -64,24 +63,22 @@ func TestVC(t *testing.T) {
 	}
 
 	r.GET("/admin_login", func(c *gin.Context) {
-		token, err := GenerateVC(admin).JWT()
+		sm := NewSessionManager(c.Request, c.Writer, &GormSessionBackend{db: db}, db)
+		sm.MakeSessionForUser(admin)
+		err := sm.Save()
 		if err != nil {
 			t.Fatal(err.Error())
 		}
-		session := GetSession(c)
-		session.Set("jwt", token)
-		session.Save()
 		c.JSON(200, nil)
 	})
 
 	r.GET("/user_login", func(c *gin.Context) {
-		token, err := GenerateVC(user).JWT()
+		sm := NewSessionManager(c.Request, c.Writer, &GormSessionBackend{db: db}, db)
+		sm.MakeSessionForUser(user)
+		err := sm.Save()
 		if err != nil {
 			t.Fatal(err.Error())
 		}
-		session := GetSession(c)
-		session.Set("jwt", token)
-		session.Save()
 		c.JSON(200, nil)
 	})
 

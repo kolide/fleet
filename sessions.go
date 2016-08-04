@@ -1,90 +1,213 @@
 package main
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/gin-gonic/gin"
-	"github.com/gorilla/context"
-	"github.com/gorilla/sessions"
+	"github.com/dgrijalva/jwt-go"
+	"github.com/jinzhu/gorm"
 )
 
-// GetSession allows you to get the Session object given a web request. This
-// is often used in HTTP handlers as the main entry point into managing and
-// manipulating the session
-func GetSession(c *gin.Context) *Session {
-	return c.MustGet("Session").(*Session)
+var (
+	ErrNoActiveSession   = errors.New("Active session is not present in the database")
+	ErrSessionNotCreated = errors.New("The session has not been created")
+)
+
+type ActiveSession struct {
+	BaseModel
+	UserID uint   `gorm:"not null"`
+	Key    string `gorm:"not null;unique_index:idx_session_unique_key"`
 }
 
-// SessionMiddleware is the middleware used for production session management.
-// Tests should use `testSessionMiddleware`, which follows the same pattern,
-// but creates a session configured for testing.
-func SessionMiddleware(c *gin.Context) {
-	CreateSession("Session", sessions.NewCookieStore([]byte("c")))(c)
+////////////////////////////////////////////////////////////////////////////////
+// Managing sessions
+////////////////////////////////////////////////////////////////////////////////
+
+type SessionManager struct {
+	backend SessionBackend
+	request *http.Request
+	writer  http.ResponseWriter
+	session *ActiveSession
+	db      *gorm.DB
 }
 
-// CreateSessions is a helper which returns a gin.HandlerFunc which creates
-// a new session management middleware given the name of the session to manage
-// and the session storage mechanism. This is commonly used to generate session
-// middleware given a variety of settings in both production and testing
-// environments
-func CreateSession(name string, store sessions.Store) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		s := &Session{name, c.Request, store, nil, c.Writer}
-		c.Set("Session", s)
-		defer context.Clear(c.Request)
-		c.Next()
+func NewSessionManager(request *http.Request, writer http.ResponseWriter, backend SessionBackend, db *gorm.DB) *SessionManager {
+	return &SessionManager{
+		request: request,
+		backend: backend,
+		writer:  writer,
+		db:      db,
 	}
 }
 
-// Session is a convenience wrapper around gorilla sessions, which is provided
-// by github.com/gorilla/sessions
-type Session struct {
-	name    string
-	request *http.Request
-	store   sessions.Store
-	session *sessions.Session
-	writer  http.ResponseWriter
-}
-
-// Session returns the gorilla session from the Session struct and allows you
-// to use any of the functionality of the underlying sessions.Session struct
-func (s *Session) Session() *sessions.Session {
-	if s.session == nil {
-		var err error
-		s.session, err = s.store.Get(s.request, s.name)
-		if err != nil {
-			logrus.Error(err.Error())
+func (sm *SessionManager) VC() *ViewerContext {
+	cookie, err := sm.request.Cookie("KolideSession")
+	if err != nil {
+		switch err {
+		case http.ErrNoCookie:
+			return EmptyVC()
+		default:
+			logrus.Errorf("Couldn't get KolideSession cookie: %s", err.Error())
+			return EmptyVC()
 		}
 	}
-	return s.session
-}
 
-// Set simply sets a session key value pair which will be stored in the
-// current session for later usage
-func (s *Session) Set(key interface{}, val interface{}) {
-	s.Session().Values[key] = val
-}
-
-// Get retrieves a session key value pair which has previously been set
-func (s *Session) Get(key interface{}) interface{} {
-	return s.Session().Values[key]
-}
-
-// Delete deletes a session key value pair which has previously been set
-func (s *Session) Delete(key interface{}) {
-	delete(s.Session().Values, key)
-}
-
-// Clear deletes all session key value pairs that are set
-func (s *Session) Clear() {
-	for key := range s.Session().Values {
-		s.Delete(key)
+	token, err := ParseJWT(cookie.Value)
+	if err != nil {
+		logrus.Errorf("Couldn't parse JWT token string from cookie: %s", err.Error())
+		return EmptyVC()
 	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return EmptyVC()
+	}
+
+	sessionKeyClaim, ok := claims["session_key"]
+	if !ok {
+		return EmptyVC()
+	}
+
+	sessionKey, ok := sessionKeyClaim.(string)
+	if !ok {
+		return EmptyVC()
+	}
+
+	session, err := sm.backend.Get(sessionKey)
+	if err != nil {
+		switch err {
+		case ErrNoActiveSession:
+			return EmptyVC()
+		default:
+			logrus.Errorf("Couldn't call Get on backend object: %s", err.Error())
+			return EmptyVC()
+		}
+	}
+
+	user := &User{BaseModel: BaseModel{ID: session.UserID}}
+	err = sm.db.Where(user).First(user).Error
+	if err != nil {
+		return EmptyVC()
+	}
+
+	return GenerateVC(user)
 }
 
-// Save writes the session, which is required after altering the session in any
-// way
-func (s *Session) Save() error {
-	return s.Session().Save(s.request, s.writer)
+func (sm *SessionManager) MakeSessionForUserID(id uint) error {
+	err := sm.backend.Create(id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (sm *SessionManager) MakeSessionForUser(u *User) error {
+	return sm.MakeSessionForUserID(u.ID)
+}
+
+func (sm *SessionManager) Save() error {
+	session, err := sm.backend.Session()
+	if err != nil {
+		return err
+	}
+
+	token, err := GenerateJWTSession(session.Key)
+	if err != nil {
+		return err
+	}
+
+	http.SetCookie(sm.writer, &http.Cookie{
+		Name:  "KolideSession",
+		Value: token,
+	})
+
+	return nil
+}
+
+func (sm *SessionManager) Destroy() error {
+	if sm.backend != nil {
+		err := sm.backend.Destroy()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Session Backend API
+////////////////////////////////////////////////////////////////////////////////
+
+type SessionBackend interface {
+	Get(key string) (*ActiveSession, error)
+	Create(userID uint) error
+	Destroy() error
+	Session() (*ActiveSession, error)
+}
+
+type BaseSessionBackend struct {
+	session *ActiveSession
+}
+
+func (backend *BaseSessionBackend) Session() (*ActiveSession, error) {
+	if backend.session == nil {
+		return nil, ErrSessionNotCreated
+	}
+	return backend.session, nil
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Session Backend Plugins
+////////////////////////////////////////////////////////////////////////////////
+
+type GormSessionBackend struct {
+	BaseSessionBackend
+	db *gorm.DB
+}
+
+func (s *GormSessionBackend) Get(key string) (*ActiveSession, error) {
+	session := &ActiveSession{
+		Key: key,
+	}
+
+	err := s.db.Where(session).First(session).Error
+	if err != nil {
+		switch err {
+		case gorm.ErrRecordNotFound:
+			return nil, ErrNoActiveSession
+		default:
+			return nil, err
+		}
+	}
+	s.session = session
+
+	return s.session, nil
+}
+
+func (s *GormSessionBackend) Create(userID uint) error {
+	session := &ActiveSession{
+		UserID: userID,
+		Key:    generateRandomText(32),
+	}
+
+	err := s.db.Preload("Users").Create(session).Error
+	if err != nil {
+		return err
+	}
+	s.session = session
+
+	return nil
+}
+
+func (s *GormSessionBackend) Destroy() error {
+	if s.Session != nil {
+		err := s.db.Delete(s.Session).Error
+		if err != nil {
+			return err
+		}
+		s.session = nil
+	}
+
+	return nil
 }

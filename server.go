@@ -77,8 +77,6 @@ func CreateServer(db *gorm.DB) *gin.Engine {
 
 	// Kolide application API endpoints
 	kolide := v1.Group("/kolide")
-	kolide.Use(SessionMiddleware)
-	kolide.Use(JWTRenewalMiddleware)
 
 	kolide.POST("/login", Login)
 	kolide.GET("/logout", Logout)

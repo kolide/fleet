@@ -23,12 +23,6 @@ type ViewerContext struct {
 	user *User
 }
 
-// JWT returns a JWT token in serialized string form given a ViewerContext as
-// well as a potential error in the event that things have gone wrong.
-func (vc *ViewerContext) JWT() (string, error) {
-	return GenerateJWT(vc.user.ID)
-}
-
 // IsAdmin indicates whether or not the current user can perform administrative
 // actions.
 func (vc *ViewerContext) IsAdmin() bool {
@@ -78,12 +72,9 @@ func (vc *ViewerContext) CanPerformReadActionOnUser(u *User) bool {
 	return vc.CanPerformActions()
 }
 
-// GenerateJWT generates a JWT token in serialized string form given a
-// ViewerContext as well as a potential error in the event that things have
-// gone wrong.
-func GenerateJWT(userID uint) (string, error) {
+func GenerateJWTSession(sessionKey string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id": userID,
+		"session_key": sessionKey,
 		// "Not Before": https://tools.ietf.org/html/rfc7519#section-4.1.5
 		"nbf": time.Now().UTC().Unix(),
 		// "Expiration Time": https://tools.ietf.org/html/rfc7519#section-4.1.4
@@ -105,53 +96,6 @@ func ParseJWT(token string) (*jwt.Token, error) {
 	})
 }
 
-// JWTRenewalMiddleware optimistically tries to renew the user's JWT token.
-// This allows kolide to have sessions that last forever, assuming that a user
-// logs in and uses the application within a reasonable time window (which is
-// defined in the JWT token generation method). If anything goes wrong, this
-// middleware will back off and defer recovery of the situation to the
-// downstream web request.
-func JWTRenewalMiddleware(c *gin.Context) {
-	session := GetSession(c)
-	tokenCookie := session.Get("jwt")
-	if tokenCookie == nil {
-		c.Next()
-		return
-	}
-
-	tokenString, ok := tokenCookie.(string)
-	if !ok {
-		c.Next()
-		return
-	}
-
-	token, err := ParseJWT(tokenString)
-	if err != nil {
-		c.Next()
-		return
-	}
-
-	claims, ok := token.Claims.(jwt.MapClaims)
-
-	if !ok || !token.Valid {
-		c.Next()
-		return
-	}
-
-	userID := uint(claims["user_id"].(float64))
-
-	jwt, err := GenerateJWT(userID)
-	if err != nil {
-		c.Next()
-		return
-	}
-
-	session.Set("jwt", jwt)
-	session.Save()
-
-	c.Next()
-}
-
 // GenerateVC generates a ViewerContext given a user struct
 func GenerateVC(user *User) *ViewerContext {
 	return &ViewerContext{
@@ -171,35 +115,9 @@ func EmptyVC() *ViewerContext {
 // to parse a user's jwt token out of the active session, validate the token,
 // and generate an appropriate ViewerContext given the data in the session.
 func VC(c *gin.Context, db *gorm.DB) (*ViewerContext, error) {
-	session := GetSession(c)
-	tokenCookie := session.Get("jwt")
-	if tokenCookie == nil {
-		return nil, errors.New("jwt session attribute not set")
-	}
-
-	tokenString, ok := tokenCookie.(string)
-	if !ok {
-		return nil, errors.New("jwt token was not string")
-	}
-
-	token, err := ParseJWT(tokenString)
-	if err != nil {
-		return nil, err
-	}
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if !ok || !token.Valid {
-		return nil, errors.New("Invalid token")
-	}
-
-	userID := uint(claims["user_id"].(float64))
-	var user User
-	err = db.Where("id = ?", userID).First(&user).Error
-	if err != nil {
-		return nil, err
-	}
-
-	return GenerateVC(&user), nil
-
+	sm := NewSessionManager(c.Request, c.Writer, &GormSessionBackend{db: db}, db)
+	vc := sm.VC()
+	return vc, nil
 }
 
 type LoginRequestBody struct {
@@ -217,8 +135,8 @@ func Login(c *gin.Context) {
 
 	db := GetDB(c)
 
-	var user User
-	err = db.Where("username = ?", body.Username).First(&user).Error
+	user := &User{Username: body.Username}
+	err = db.Where(user).First(user).Error
 	if err != nil {
 		logrus.Debugf("User not found: %s", body.Username)
 		UnauthorizedError(c)
@@ -232,15 +150,13 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	token, err := GenerateVC(&user).JWT()
+	sm := NewSessionManager(c.Request, c.Writer, &GormSessionBackend{db: db}, db)
+	sm.MakeSessionForUser(user)
+	err = sm.Save()
 	if err != nil {
-		logrus.Fatalf("Error generating token: %s", err.Error())
 		DatabaseError(c)
 		return
 	}
-	session := GetSession(c)
-	session.Set("jwt", token)
-	session.Save()
 
 	c.JSON(200, GetUserResponseBody{
 		ID:                 user.ID,
@@ -254,8 +170,27 @@ func Login(c *gin.Context) {
 }
 
 func Logout(c *gin.Context) {
-	session := GetSession(c)
-	session.Clear()
+	db, err := GetDB(c)
+	if err != nil {
+		logrus.Errorf("Could not open database: %s", err.Error())
+		DatabaseError(c)
+		return
+	}
+
+	sm := NewSessionManager(c.Request, c.Writer, &GormSessionBackend{db: db}, db)
+
+	err = sm.Destroy()
+	if err != nil {
+		DatabaseError(c)
+		return
+	}
+
+	err = sm.Save()
+	if err != nil {
+		DatabaseError(c)
+		return
+	}
+
 	c.JSON(200, nil)
 }
 
