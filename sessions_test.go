@@ -30,12 +30,8 @@ func TestSessionManagerVC(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 
-	backend := &GormSessionBackend{db: db}
-	err = backend.Create(admin.ID)
-	if err != nil {
-		t.Fatal(err.Error())
-	}
-	session, err := backend.Session()
+	backend := &GormSessionBackend{db}
+	session, err := backend.Create(admin.ID)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
@@ -78,7 +74,7 @@ func TestSessionCreation(t *testing.T) {
 	admin, _ := NewUser(db, "admin", "foobar", "admin@kolide.co", true, false)
 
 	r.GET("/login", func(c *gin.Context) {
-		sm := NewSessionManager(c.Request, c.Writer, &GormSessionBackend{db: db}, db)
+		sm := NewSessionManager(c.Request, c.Writer, &GormSessionBackend{db}, db)
 		sm.MakeSessionForUser(admin)
 		err := sm.Save()
 		if err != nil {
@@ -88,7 +84,7 @@ func TestSessionCreation(t *testing.T) {
 	})
 
 	r.GET("/resource", func(c *gin.Context) {
-		sm := NewSessionManager(c.Request, c.Writer, &GormSessionBackend{db: db}, db)
+		sm := NewSessionManager(c.Request, c.Writer, &GormSessionBackend{db}, db)
 		vc := sm.VC()
 		if !vc.IsAdmin() {
 			t.Fatal("Request is not admin")
@@ -97,7 +93,7 @@ func TestSessionCreation(t *testing.T) {
 	})
 
 	r.GET("/nope", func(c *gin.Context) {
-		sm := NewSessionManager(c.Request, c.Writer, &GormSessionBackend{db: db}, db)
+		sm := NewSessionManager(c.Request, c.Writer, &GormSessionBackend{db}, db)
 		vc := sm.VC()
 		if !vc.IsAdmin() {
 			t.Fatal("Request is not admin")

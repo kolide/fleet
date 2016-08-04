@@ -105,7 +105,7 @@ func (sm *SessionManager) VC() *ViewerContext {
 			return EmptyVC()
 		}
 
-		session, err := sm.backend.Get(sessionKey)
+		session, err := sm.backend.FindKey(sessionKey)
 		if err != nil {
 			switch err {
 			case ErrNoActiveSession:
@@ -139,10 +139,11 @@ func (sm *SessionManager) VC() *ViewerContext {
 // MakeSessionForUserID creates a session in the database for a given user id.
 // You must call Save() after calling this.
 func (sm *SessionManager) MakeSessionForUserID(id uint) error {
-	err := sm.backend.Create(id)
+	session, err := sm.backend.Create(id)
 	if err != nil {
 		return err
 	}
+	sm.session = session
 	return nil
 }
 
@@ -156,12 +157,7 @@ func (sm *SessionManager) MakeSessionForUser(u *User) error {
 // to the user. Save must be called after every write action on this struct
 // (MakeSessionForUser, Destroy, etc.)
 func (sm *SessionManager) Save() error {
-	session, err := sm.backend.Session()
-	if err != nil {
-		return err
-	}
-
-	token, err := GenerateJWT(session.Key)
+	token, err := GenerateJWT(sm.session.Key)
 	if err != nil {
 		return err
 	}
@@ -179,7 +175,7 @@ func (sm *SessionManager) Save() error {
 // instance from this object's access. You must call Save() after calling this.
 func (sm *SessionManager) Destroy() error {
 	if sm.backend != nil {
-		err := sm.backend.Destroy()
+		err := sm.backend.Destroy(sm.session)
 		if err != nil {
 			return err
 		}
@@ -197,34 +193,26 @@ func (sm *SessionManager) Destroy() error {
 type SessionBackend interface {
 	// Given a session key, find and return a session object or an error if one
 	// could not be found for the given key
-	Get(key string) (*Session, error)
+	FindKey(key string) (*Session, error)
+
+	// Given a session id, find and return a session object or an error if one
+	// could not be found for the given id
+	FindID(id uint) (*Session, error)
+
+	// Find all of the active sessions for a given user
+	FindAllForUser(id uint) ([]*Session, error)
 
 	// Create a session object tied to the given user ID
-	Create(userID uint) error
+	Create(userID uint) (*Session, error)
 
 	// Destroy the currently tracked session
-	Destroy() error
+	Destroy(session *Session) error
 
-	// Return the currently tracked session
-	Session() (*Session, error)
+	// Destroy all of the sessions for a given user
+	DestroyAllForUser(id uint) error
 
 	// Mark the currently tracked session as access to extend expiration
-	MarkAccessed() error
-}
-
-// BaseSessionBackend is a convenience struct that all SessionBackends can
-// embed
-type BaseSessionBackend struct {
-	session *Session
-}
-
-// Session returns the currently active session or an error if one is not
-// available
-func (backend *BaseSessionBackend) Session() (*Session, error) {
-	if backend.session == nil {
-		return nil, ErrSessionNotCreated
-	}
-	return backend.session, nil
+	MarkAccessed(session *Session) error
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -234,11 +222,53 @@ func (backend *BaseSessionBackend) Session() (*Session, error) {
 // GormSessionBackend stores sessions using a pre-instantiated gorm database
 // object
 type GormSessionBackend struct {
-	BaseSessionBackend
 	db *gorm.DB
 }
 
-func (s *GormSessionBackend) Get(key string) (*Session, error) {
+func (s *GormSessionBackend) validate(session *Session) error {
+	if time.Since(session.AccessedAt).Seconds() >= config.App.SessionExpirationSeconds {
+		err := s.db.Delete(session).Error
+		if err != nil {
+			return err
+		}
+		return ErrSessionExpired
+	}
+
+	err := s.MarkAccessed(session)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *GormSessionBackend) FindID(id uint) (*Session, error) {
+	session := &Session{
+		BaseModel: BaseModel{
+			ID: id,
+		},
+	}
+
+	err := s.db.Where(session).First(session).Error
+	if err != nil {
+		switch err {
+		case gorm.ErrRecordNotFound:
+			return nil, ErrNoActiveSession
+		default:
+			return nil, err
+		}
+	}
+
+	err = s.validate(session)
+	if err != nil {
+		return nil, err
+	}
+
+	return session, nil
+
+}
+
+func (s *GormSessionBackend) FindKey(key string) (*Session, error) {
 	session := &Session{
 		Key: key,
 	}
@@ -253,28 +283,24 @@ func (s *GormSessionBackend) Get(key string) (*Session, error) {
 		}
 	}
 
-	if time.Since(session.AccessedAt).Seconds() >= config.App.SessionExpirationSeconds {
-		err = s.db.Delete(session).Error
-		if err != nil {
-			return nil, err
-		}
-		return nil, ErrSessionExpired
-	}
-
-	s.session = session
-
-	err = s.MarkAccessed()
+	err = s.validate(session)
 	if err != nil {
 		return nil, err
 	}
 
-	return s.session, nil
+	return session, nil
 }
 
-func (s *GormSessionBackend) Create(userID uint) error {
+func (s *GormSessionBackend) FindAllForUser(id uint) ([]*Session, error) {
+	var sessions []*Session
+	err := s.db.Where("user_id = ?", id).Find(&sessions).Error
+	return sessions, err
+}
+
+func (s *GormSessionBackend) Create(userID uint) (*Session, error) {
 	key, err := generateRandomText(config.App.SessionKeySize)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	session := &Session{
@@ -284,11 +310,19 @@ func (s *GormSessionBackend) Create(userID uint) error {
 
 	err = s.db.Create(session).Error
 	if err != nil {
-		return err
+		return nil, err
 	}
-	s.session = session
 
-	err = s.MarkAccessed()
+	err = s.MarkAccessed(session)
+	if err != nil {
+		return nil, err
+	}
+
+	return session, nil
+}
+
+func (s *GormSessionBackend) Destroy(session *Session) error {
+	err := s.db.Delete(session).Error
 	if err != nil {
 		return err
 	}
@@ -296,24 +330,13 @@ func (s *GormSessionBackend) Create(userID uint) error {
 	return nil
 }
 
-func (s *GormSessionBackend) Destroy() error {
-	if _, err := s.Session(); err != nil {
-		err := s.db.Delete(s.Session).Error
-		if err != nil {
-			return err
-		}
-		s.session = nil
-	}
-
-	return nil
+func (s *GormSessionBackend) DestroyAllForUser(id uint) error {
+	return s.db.Delete(&Session{}, "user_id = ?", id).Error
 }
 
-func (s *GormSessionBackend) MarkAccessed() error {
-	if s.session == nil {
-		return ErrSessionNotCreated
-	}
-	s.session.AccessedAt = time.Now().UTC()
-	return s.db.Save(s.session).Error
+func (s *GormSessionBackend) MarkAccessed(session *Session) error {
+	session.AccessedAt = time.Now().UTC()
+	return s.db.Save(session).Error
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -338,22 +361,12 @@ func DeleteSession(c *gin.Context) {
 		return
 	}
 
-	session := &Session{
-		BaseModel: BaseModel{
-			ID: body.SessionID,
-		},
-	}
 	db := GetDB(c)
-	err = db.Where(session).First(session).Error
+	sb := &GormSessionBackend{db}
+
+	session, err := sb.FindID(body.SessionID)
 	if err != nil {
-		switch err {
-		case gorm.ErrRecordNotFound:
-			c.JSON(404, nil)
-			return
-		default:
-			DatabaseError(c)
-			return
-		}
+
 	}
 
 	user := &User{
@@ -372,7 +385,7 @@ func DeleteSession(c *gin.Context) {
 		return
 	}
 
-	err = db.Delete(session).Error
+	err = sb.Destroy(session)
 	if err != nil {
 		DatabaseError(c)
 		return
@@ -414,6 +427,8 @@ func DeleteSessionsForUser(c *gin.Context) {
 		return
 	}
 
+	sb := &GormSessionBackend{db: db}
+	err = sb.DestroyAllForUser(user.ID)
 	err = db.Delete(&Session{}, "user_id = ?", user.ID).Error
 	if err != nil {
 		DatabaseError(c)
@@ -450,9 +465,8 @@ func GetInfoAboutSession(c *gin.Context) {
 	}
 
 	db := GetDB(c)
-	var session Session
-	session.Key = body.SessionKey
-	err = db.Where(&session).First(&session).Error
+	sb := &GormSessionBackend{db}
+	session, err := sb.FindKey(body.SessionKey)
 	if err != nil {
 		DatabaseError(c)
 		return
@@ -517,8 +531,8 @@ func GetInfoAboutSessionsForUser(c *gin.Context) {
 		return
 	}
 
-	var sessions []*Session
-	err = db.Where("user_id = ?", user.ID).Find(&sessions).Error
+	sb := &GormSessionBackend{db}
+	sessions, err := sb.FindAllForUser(user.ID)
 	if err != nil {
 		DatabaseError(c)
 		return
