@@ -98,8 +98,7 @@ func EmptyVC() *ViewerContext {
 // to parse a user's jwt token out of the active session, validate the token,
 // and generate an appropriate ViewerContext given the data in the session.
 func VC(c *gin.Context) *ViewerContext {
-	db := GetDB(c)
-	sm := NewSessionManager(c.Request, c.Writer, &GormSessionBackend{db: db}, db)
+	sm := NewSessionManager(c)
 	return sm.VC()
 }
 
@@ -194,7 +193,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	sm := NewSessionManager(c.Request, c.Writer, &GormSessionBackend{db: db}, db)
+	sm := NewSessionManager(c)
 	sm.MakeSessionForUser(user)
 	err = sm.Save()
 	if err != nil {
@@ -214,8 +213,7 @@ func Login(c *gin.Context) {
 }
 
 func Logout(c *gin.Context) {
-	db := GetDB(c)
-	sm := NewSessionManager(c.Request, c.Writer, &GormSessionBackend{db: db}, db)
+	sm := NewSessionManager(c)
 
 	err := sm.Destroy()
 	if err != nil {

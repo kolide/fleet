@@ -40,6 +40,7 @@ func MalformedRequestError(c *gin.Context) {
 func createEmptyTestServer(db *gorm.DB) *gin.Engine {
 	server := gin.New()
 	server.Use(DatabaseMiddleware(db))
+	server.Use(SessionBackendMiddleware)
 	return server
 }
 
@@ -56,6 +57,7 @@ func DatabaseMiddleware(db *gorm.DB) gin.HandlerFunc {
 func CreateServer(db *gorm.DB) *gin.Engine {
 	server := gin.New()
 	server.Use(DatabaseMiddleware(db))
+	server.Use(SessionBackendMiddleware)
 
 	// TODO: The following loggers are not synchronized with each other or
 	// logrus.StandardLogger() used through the rest of the codebase. As

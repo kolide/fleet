@@ -56,12 +56,12 @@ type SessionManager struct {
 // NewSessionManager allows you to get a SessionManager instance for a given
 // web request. Unless you're interacting with login, logout, or core auth
 // code, this should be abstracted by the ViewerContext pattern.
-func NewSessionManager(request *http.Request, writer http.ResponseWriter, backend SessionBackend, db *gorm.DB) *SessionManager {
+func NewSessionManager(c *gin.Context) *SessionManager {
 	return &SessionManager{
-		request: request,
-		backend: backend,
-		writer:  writer,
-		db:      db,
+		request: c.Request,
+		backend: GetSessionBackend(c),
+		writer:  c.Writer,
+		db:      GetDB(c),
 	}
 }
 
@@ -343,6 +343,22 @@ func (s *GormSessionBackend) MarkAccessed(session *Session) error {
 // Session management HTTP endpoints
 ////////////////////////////////////////////////////////////////////////////////
 
+// Setting the session backend via a middleware
+func SessionBackendMiddleware(c *gin.Context) {
+	db := GetDB(c)
+	c.Set("SessionBackend", &GormSessionBackend{db})
+	c.Next()
+}
+
+// Get the database connection from the context, or panic
+func GetSessionBackend(c *gin.Context) SessionBackend {
+	return c.MustGet("SessionBackend").(SessionBackend)
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Session management HTTP endpoints
+////////////////////////////////////////////////////////////////////////////////
+
 type DeleteSessionRequestBody struct {
 	SessionID uint `json:"session_id" binding:"required"`
 }
@@ -361,14 +377,14 @@ func DeleteSession(c *gin.Context) {
 		return
 	}
 
-	db := GetDB(c)
-	sb := &GormSessionBackend{db}
+	sb := GetSessionBackend(c)
 
 	session, err := sb.FindID(body.SessionID)
 	if err != nil {
 
 	}
 
+	db := GetDB(c)
 	user := &User{
 		BaseModel: BaseModel{
 			ID: session.UserID,
@@ -427,7 +443,7 @@ func DeleteSessionsForUser(c *gin.Context) {
 		return
 	}
 
-	sb := &GormSessionBackend{db: db}
+	sb := GetSessionBackend(c)
 	err = sb.DestroyAllForUser(user.ID)
 	err = db.Delete(&Session{}, "user_id = ?", user.ID).Error
 	if err != nil {
@@ -464,14 +480,14 @@ func GetInfoAboutSession(c *gin.Context) {
 		return
 	}
 
-	db := GetDB(c)
-	sb := &GormSessionBackend{db}
+	sb := GetSessionBackend(c)
 	session, err := sb.FindKey(body.SessionKey)
 	if err != nil {
 		DatabaseError(c)
 		return
 	}
 
+	db := GetDB(c)
 	var user User
 	user.ID = session.UserID
 	err = db.Where(&user).First(&user).Error
@@ -531,7 +547,7 @@ func GetInfoAboutSessionsForUser(c *gin.Context) {
 		return
 	}
 
-	sb := &GormSessionBackend{db}
+	sb := GetSessionBackend(c)
 	sessions, err := sb.FindAllForUser(user.ID)
 	if err != nil {
 		DatabaseError(c)

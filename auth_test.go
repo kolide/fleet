@@ -56,7 +56,7 @@ func TestVC(t *testing.T) {
 	}
 
 	r.GET("/admin_login", func(c *gin.Context) {
-		sm := NewSessionManager(c.Request, c.Writer, &GormSessionBackend{db: db}, db)
+		sm := NewSessionManager(c)
 		sm.MakeSessionForUser(admin)
 		err := sm.Save()
 		if err != nil {
@@ -66,7 +66,7 @@ func TestVC(t *testing.T) {
 	})
 
 	r.GET("/user_login", func(c *gin.Context) {
-		sm := NewSessionManager(c.Request, c.Writer, &GormSessionBackend{db: db}, db)
+		sm := NewSessionManager(c)
 		sm.MakeSessionForUser(user)
 		err := sm.Save()
 		if err != nil {

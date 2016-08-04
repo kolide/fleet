@@ -55,7 +55,12 @@ func TestSessionManagerVC(t *testing.T) {
 
 	writer := &MockResponseWriter{}
 
-	sm := NewSessionManager(req, writer, backend, db)
+	sm := &SessionManager{
+		request: req,
+		writer:  writer,
+		backend: backend,
+		db:      db,
+	}
 	vc := sm.VC()
 
 	if !vc.IsAdmin() {
@@ -74,7 +79,7 @@ func TestSessionCreation(t *testing.T) {
 	admin, _ := NewUser(db, "admin", "foobar", "admin@kolide.co", true, false)
 
 	r.GET("/login", func(c *gin.Context) {
-		sm := NewSessionManager(c.Request, c.Writer, &GormSessionBackend{db}, db)
+		sm := NewSessionManager(c)
 		sm.MakeSessionForUser(admin)
 		err := sm.Save()
 		if err != nil {
@@ -84,7 +89,7 @@ func TestSessionCreation(t *testing.T) {
 	})
 
 	r.GET("/resource", func(c *gin.Context) {
-		sm := NewSessionManager(c.Request, c.Writer, &GormSessionBackend{db}, db)
+		sm := NewSessionManager(c)
 		vc := sm.VC()
 		if !vc.IsAdmin() {
 			t.Fatal("Request is not admin")
@@ -93,7 +98,7 @@ func TestSessionCreation(t *testing.T) {
 	})
 
 	r.GET("/nope", func(c *gin.Context) {
-		sm := NewSessionManager(c.Request, c.Writer, &GormSessionBackend{db}, db)
+		sm := NewSessionManager(c)
 		vc := sm.VC()
 		if !vc.IsAdmin() {
 			t.Fatal("Request is not admin")
