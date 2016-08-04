@@ -9,7 +9,7 @@ import (
 )
 
 func TestSessionGetSet(t *testing.T) {
-	db, _ := openTestDB()
+	db := openTestDB()
 	r := createEmptyTestServer(db)
 	r.Use(testSessionMiddleware)
 	r.Use(JWTRenewalMiddleware)
@@ -40,7 +40,7 @@ func TestSessionGetSet(t *testing.T) {
 }
 
 func TestSessionDeleteKey(t *testing.T) {
-	db, _ := openTestDB()
+	db := openTestDB()
 	r := createEmptyTestServer(db)
 	r.Use(testSessionMiddleware)
 	r.Use(JWTRenewalMiddleware)
@@ -83,7 +83,7 @@ func TestSessionDeleteKey(t *testing.T) {
 }
 
 func TestSessionFlashes(t *testing.T) {
-	db, _ := openTestDB()
+	db := openTestDB()
 	r := createEmptyTestServer(db)
 	r.Use(testSessionMiddleware)
 	r.Use(JWTRenewalMiddleware)
@@ -131,7 +131,7 @@ func TestSessionFlashes(t *testing.T) {
 }
 
 func TestSessionClear(t *testing.T) {
-	db, _ := openTestDB()
+	db := openTestDB()
 	r := createEmptyTestServer(db)
 
 	data := map[string]string{

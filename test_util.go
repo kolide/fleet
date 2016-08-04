@@ -32,7 +32,7 @@ func (req *IntegrationRequests) New(t *testing.T) {
 	req.t = t
 
 	*debug = false
-	req.db, _ = openTestDB()
+	req.db = openTestDB()
 
 	// Until we have a better solution for first-user onboarding, manually
 	// create an admin
@@ -119,7 +119,7 @@ func (req *IntegrationRequests) GetUser(username string, session *string) *GetUs
 
 	buff := new(bytes.Buffer)
 	buff.Write(body)
-	request, _ := http.NewRequest("GET", "/api/v1/kolide/user", buff)
+	request, _ := http.NewRequest("POST", "/api/v1/kolide/user", buff)
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("Cookie", *session)
 	req.r.ServeHTTP(response, request)

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
@@ -13,12 +12,9 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
-func GetDB(c *gin.Context) (*gorm.DB, error) {
-	db, ok := c.MustGet("DB").(*gorm.DB)
-	if !ok {
-		return nil, errors.New("context did not contain DB")
-	}
-	return db, nil
+// Get the database connection from the context, or panic
+func GetDB(c *gin.Context) *gorm.DB {
+	return c.MustGet("DB").(*gorm.DB)
 }
 
 type BaseModel struct {
@@ -182,18 +178,18 @@ func openDB(user, password, address, dbName string) (*gorm.DB, error) {
 	return db, nil
 }
 
-func openTestDB() (*gorm.DB, error) {
+func openTestDB() *gorm.DB {
 	db, err := gorm.Open("sqlite3", ":memory:")
 	if err != nil {
-		return nil, err
+		panic(fmt.Sprintf("Error opening test DB: %s", err.Error()))
 	}
 
 	setDBSettings(db)
 	createTables(db)
 	if db.Error != nil {
-		return nil, err
+		panic(fmt.Sprintf("Error creating test DB tables: %s", db.Error.Error()))
 	}
-	return db, nil
+	return db
 }
 
 func dropTables(db *gorm.DB) {

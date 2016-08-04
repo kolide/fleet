@@ -43,8 +43,7 @@ func createEmptyTestServer(db *gorm.DB) *gin.Engine {
 	return server
 }
 
-// Adapted from
-// https://github.com/gin-gonic/gin/issues/420#issuecomment-233893183
+// Adapted from https://goo.gl/03Qxiy
 func DatabaseMiddleware(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Set("DB", db)
@@ -84,7 +83,7 @@ func CreateServer(db *gorm.DB) *gin.Engine {
 	kolide.POST("/login", Login)
 	kolide.GET("/logout", Logout)
 
-	kolide.GET("/user", GetUser)
+	kolide.POST("/user", GetUser)
 	kolide.PUT("/user", CreateUser)
 	kolide.PATCH("/user", ModifyUser)
 	kolide.DELETE("/user", DeleteUser)
