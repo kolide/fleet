@@ -5,7 +5,7 @@ import (
 )
 
 func TestEnrollHost(t *testing.T) {
-	db := openTestDB()
+	db := openTestDB(t)
 
 	expect := Host{
 		UUID:      "uuid123",
@@ -42,7 +42,7 @@ func TestEnrollHost(t *testing.T) {
 }
 
 func TestReEnrollHost(t *testing.T) {
-	db := openTestDB()
+	db := openTestDB(t)
 
 	expect := Host{
 		UUID:      "uuid123",

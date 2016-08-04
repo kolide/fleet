@@ -112,7 +112,7 @@ type Host struct {
 	Labels    []*Label `gorm:"many2many:host_labels;"`
 }
 
-func genNodeKey() string {
+func genNodeKey() (string, error) {
 	return generateRandomText(12)
 }
 
@@ -135,7 +135,10 @@ func EnrollHost(db *gorm.DB, uuid, hostName, ipAddress, platform string) (*Host,
 	}
 
 	// Generate a new key each enrollment
-	host.NodeKey = genNodeKey()
+	host.NodeKey, err = genNodeKey()
+	if err != nil {
+		return nil, err
+	}
 
 	// Update these fields if provided
 	if hostName != "" {
