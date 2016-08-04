@@ -112,52 +112,6 @@ type Host struct {
 	Labels    []*Label `gorm:"many2many:host_labels;"`
 }
 
-func genNodeKey() (string, error) {
-	return generateRandomText(12)
-}
-
-// Enroll a host. Even if this is an existing host, a new node key should be
-// generated and saved to the DB.
-func EnrollHost(db *gorm.DB, uuid, hostName, ipAddress, platform string) (*Host, error) {
-	host := &Host{}
-	err := db.Where("uuid = ?", uuid).First(&host).Error
-	if err != nil && err != gorm.ErrRecordNotFound {
-		return nil, err
-
-	} else if err == gorm.ErrRecordNotFound {
-		// Create new Host
-		host = &Host{
-			UUID:      uuid,
-			HostName:  hostName,
-			IPAddress: ipAddress,
-			Platform:  platform,
-		}
-	}
-
-	// Generate a new key each enrollment
-	host.NodeKey, err = genNodeKey()
-	if err != nil {
-		return nil, err
-	}
-
-	// Update these fields if provided
-	if hostName != "" {
-		host.HostName = hostName
-	}
-	if ipAddress != "" {
-		host.IPAddress = ipAddress
-	}
-	if platform != "" {
-		host.Platform = platform
-	}
-
-	if err := db.Save(&host).Error; err != nil {
-		return nil, err
-	}
-
-	return host, nil
-}
-
 type Label struct {
 	BaseModel
 	Name  string `gorm:"not null;unique_index:idx_label_unique_name"`

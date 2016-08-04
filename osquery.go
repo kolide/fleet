@@ -5,6 +5,7 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 )
 
 // TODO: Turn binding:"required" back on once issue #35 is worked out
@@ -47,6 +48,56 @@ type OsqueryDistributedReadPostBody struct {
 type OsqueryDistributedWritePostBody struct {
 	NodeKey string                         `json:"node_key" binding:"required"`
 	Queries map[string][]map[string]string `json:"queries" binding:"required"`
+}
+
+// Generate a node key using 16 random bytes Base64 encoded
+func genNodeKey() (string, error) {
+	return generateRandomText(16)
+}
+
+// Enroll a host. Even if this is an existing host, a new node key should be
+// generated and saved to the DB.
+func EnrollHost(db *gorm.DB, uuid, hostName, ipAddress, platform string) (*Host, error) {
+	host := &Host{}
+	err := db.Where("uuid = ?", uuid).First(&host).Error
+	if err != nil {
+		switch err {
+		case gorm.ErrRecordNotFound:
+			// Create new Host
+			host = &Host{
+				UUID:      uuid,
+				HostName:  hostName,
+				IPAddress: ipAddress,
+				Platform:  platform,
+			}
+
+		default:
+			return nil, err
+		}
+	}
+
+	// Generate a new key each enrollment
+	host.NodeKey, err = genNodeKey()
+	if err != nil {
+		return nil, err
+	}
+
+	// Update these fields if provided
+	if hostName != "" {
+		host.HostName = hostName
+	}
+	if ipAddress != "" {
+		host.IPAddress = ipAddress
+	}
+	if platform != "" {
+		host.Platform = platform
+	}
+
+	if err := db.Save(&host).Error; err != nil {
+		return nil, err
+	}
+
+	return host, nil
 }
 
 func OsqueryEnroll(c *gin.Context) {
