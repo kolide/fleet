@@ -50,6 +50,7 @@ type SessionManager struct {
 	request *http.Request
 	writer  http.ResponseWriter
 	session *Session
+	vc      *ViewerContext
 	db      *gorm.DB
 }
 
@@ -67,66 +68,73 @@ func NewSessionManager(request *http.Request, writer http.ResponseWriter, backen
 
 // Get the ViewerContext instance for a user represented by the active session
 func (sm *SessionManager) VC() *ViewerContext {
-	cookie, err := sm.request.Cookie(CookieName)
-	if err != nil {
-		switch err {
-		case http.ErrNoCookie:
-			// No cookie was set
-			return EmptyVC()
-		default:
-			// Something went wrong and the cookie may or may not be set
-			logrus.Errorf("Couldn't get cookie: %s", err.Error())
+	if sm.session == nil {
+		cookie, err := sm.request.Cookie(CookieName)
+		if err != nil {
+			switch err {
+			case http.ErrNoCookie:
+				// No cookie was set
+				return EmptyVC()
+			default:
+				// Something went wrong and the cookie may or may not be set
+				logrus.Errorf("Couldn't get cookie: %s", err.Error())
+				return EmptyVC()
+			}
+		}
+
+		token, err := ParseJWT(cookie.Value)
+		if err != nil {
+			logrus.Errorf("Couldn't parse JWT token string from cookie: %s", err.Error())
 			return EmptyVC()
 		}
-	}
 
-	token, err := ParseJWT(cookie.Value)
-	if err != nil {
-		logrus.Errorf("Couldn't parse JWT token string from cookie: %s", err.Error())
-		return EmptyVC()
-	}
-
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if !ok {
-		logrus.Error("Could not parse the claims from the JWT token")
-		return EmptyVC()
-	}
-
-	sessionKeyClaim, ok := claims["session_key"]
-	if !ok {
-		logrus.Warn("JWT did not have session_key claim")
-		return EmptyVC()
-	}
-
-	sessionKey, ok := sessionKeyClaim.(string)
-	if !ok {
-		logrus.Warn("JWT session_key claim was not a string")
-		return EmptyVC()
-	}
-
-	session, err := sm.backend.Get(sessionKey)
-	if err != nil {
-		switch err {
-		case ErrNoActiveSession:
-			// If the code path got this far, it's likely that the user was logged
-			// in some time in the past, but their session has been expired since
-			// their last usage of the application
-			return EmptyVC()
-		default:
-			logrus.Errorf("Couldn't call Get on backend object: %s", err.Error())
+		claims, ok := token.Claims.(jwt.MapClaims)
+		if !ok {
+			logrus.Error("Could not parse the claims from the JWT token")
 			return EmptyVC()
 		}
+
+		sessionKeyClaim, ok := claims["session_key"]
+		if !ok {
+			logrus.Warn("JWT did not have session_key claim")
+			return EmptyVC()
+		}
+
+		sessionKey, ok := sessionKeyClaim.(string)
+		if !ok {
+			logrus.Warn("JWT session_key claim was not a string")
+			return EmptyVC()
+		}
+
+		session, err := sm.backend.Get(sessionKey)
+		if err != nil {
+			switch err {
+			case ErrNoActiveSession:
+				// If the code path got this far, it's likely that the user was logged
+				// in some time in the past, but their session has been expired since
+				// their last usage of the application
+				return EmptyVC()
+			default:
+				logrus.Errorf("Couldn't call Get on backend object: %s", err.Error())
+				return EmptyVC()
+			}
+		}
+		sm.session = session
 	}
 
-	// Generating a VC requires a user struct. Attempt to populate one using
-	// the user id of the current session holder
-	user := &User{BaseModel: BaseModel{ID: session.UserID}}
-	err = sm.db.Where(user).First(user).Error
-	if err != nil {
-		return EmptyVC()
+	if sm.vc == nil {
+		// Generating a VC requires a user struct. Attempt to populate one using
+		// the user id of the current session holder
+		user := &User{BaseModel: BaseModel{ID: sm.session.UserID}}
+		err := sm.db.Where(user).First(user).Error
+		if err != nil {
+			return EmptyVC()
+		}
+
+		sm.vc = GenerateVC(user)
 	}
 
-	return GenerateVC(user)
+	return sm.vc
 }
 
 // MakeSessionForUserID creates a session in the database for a given user id.
