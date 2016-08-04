@@ -9,7 +9,6 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -98,10 +97,10 @@ func EmptyVC() *ViewerContext {
 // VC accepts a web request context and a database handler and attempts
 // to parse a user's jwt token out of the active session, validate the token,
 // and generate an appropriate ViewerContext given the data in the session.
-func VC(c *gin.Context, db *gorm.DB) (*ViewerContext, error) {
+func VC(c *gin.Context) *ViewerContext {
+	db := GetDB(c)
 	sm := NewSessionManager(c.Request, c.Writer, &GormSessionBackend{db: db}, db)
-	vc := sm.VC()
-	return vc, nil
+	return sm.VC()
 }
 
 ////////////////////////////////////////////////////////////////////////////////

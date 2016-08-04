@@ -175,7 +175,7 @@ func (sm *SessionManager) Save() error {
 	return nil
 }
 
-// Destory deletes the active session from the database and erases the session
+// Destroy deletes the active session from the database and erases the session
 // instance from this object's access. You must call Save() after calling this.
 func (sm *SessionManager) Destroy() error {
 	if sm.backend != nil {
@@ -332,14 +332,7 @@ func DeleteSession(c *gin.Context) {
 		return
 	}
 
-	db := GetDB(c)
-	vc, err := VC(c, db)
-	if err != nil {
-		logrus.Errorf("Could not create VC: %s", err.Error())
-		DatabaseError(c) // TODO tampered?
-		return
-	}
-
+	vc := VC(c)
 	if !vc.CanPerformActions() {
 		UnauthorizedError(c)
 		return
@@ -350,6 +343,7 @@ func DeleteSession(c *gin.Context) {
 			ID: body.SessionID,
 		},
 	}
+	db := GetDB(c)
 	err = db.Where(session).First(session).Error
 	if err != nil {
 		switch err {
@@ -399,19 +393,13 @@ func DeleteSessionsForUser(c *gin.Context) {
 		logrus.Errorf(err.Error())
 	}
 
-	db := GetDB(c)
-	vc, err := VC(c, db)
-	if err != nil {
-		logrus.Errorf("Could not create VC: %s", err.Error())
-		DatabaseError(c) // TODO tampered?
-		return
-	}
-
+	vc := VC(c)
 	if !vc.CanPerformActions() {
 		UnauthorizedError(c)
 		return
 	}
 
+	db := GetDB(c)
 	var user User
 	user.ID = body.ID
 	user.Username = body.Username
@@ -455,19 +443,13 @@ func GetInfoAboutSession(c *gin.Context) {
 		return
 	}
 
-	db := GetDB(c)
-	vc, err := VC(c, db)
-	if err != nil {
-		logrus.Errorf("Could not create VC: %s", err.Error())
-		DatabaseError(c) // TODO tampered?
-		return
-	}
-
+	vc := VC(c)
 	if !vc.CanPerformActions() {
 		UnauthorizedError(c)
 		return
 	}
 
+	db := GetDB(c)
 	var session Session
 	session.Key = body.SessionKey
 	err = db.Where(&session).First(&session).Error
@@ -514,25 +496,13 @@ func GetInfoAboutSessionsForUser(c *gin.Context) {
 		return
 	}
 
-	db := GetDB(c)
-	if err != nil {
-		logrus.Errorf("Could not open database: %s", err.Error())
-		DatabaseError(c)
-		return
-	}
-
-	vc, err := VC(c, db)
-	if err != nil {
-		logrus.Errorf("Could not create VC: %s", err.Error())
-		DatabaseError(c) // TODO tampered?
-		return
-	}
-
+	vc := VC(c)
 	if !vc.CanPerformActions() {
 		UnauthorizedError(c)
 		return
 	}
 
+	db := GetDB(c)
 	var user User
 	user.ID = body.ID
 	user.Username = body.Username

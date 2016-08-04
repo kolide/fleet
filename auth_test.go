@@ -76,10 +76,7 @@ func TestVC(t *testing.T) {
 	})
 
 	r.GET("/admin", func(c *gin.Context) {
-		vc, err := VC(c, db)
-		if err != nil {
-			t.Fatal(err.Error())
-		}
+		vc := VC(c)
 		if !vc.IsAdmin() {
 			t.Fatal("Not admin")
 		}
@@ -87,10 +84,7 @@ func TestVC(t *testing.T) {
 	})
 
 	r.GET("/user", func(c *gin.Context) {
-		vc, err := VC(c, db)
-		if err != nil {
-			t.Fatal(err.Error())
-		}
+		vc := VC(c)
 		if vc.IsAdmin() {
 			t.Fatal("Not user")
 		}

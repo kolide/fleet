@@ -17,13 +17,9 @@ func TestUserAndAccountManagement(t *testing.T) {
 	// Instantiate the variables that will store the most recent session cookie
 	// for each user context that will be created
 	var adminSession string
-	_ = adminSession
 	var admin2Session string
-	_ = admin2Session
 	var user1Session string
-	_ = user1Session
 	var user2Session string
-	_ = user2Session
 
 	// Test logging in with the first admin
 	req.Login("admin", "foobar", &adminSession)
