@@ -143,7 +143,7 @@ type Decorator struct {
 
 var tables = [...]interface{}{
 	&User{},
-	&ActiveSession{},
+	&Session{},
 	&ScheduledQuery{},
 	&Pack{},
 	&DiscoveryQuery{},

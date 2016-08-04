@@ -47,9 +47,10 @@ func TestSessionManagerVC(t *testing.T) {
 		t.Fatal("IDs do not match")
 	}
 
-	token, err := GenerateJWTSession(session.Key)
+	token, err := GenerateJWT(session.Key)
+
 	cookie := &http.Cookie{
-		Name:  "KolideSession",
+		Name:  SessionName,
 		Value: token,
 	}
 

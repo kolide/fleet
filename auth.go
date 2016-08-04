@@ -72,7 +72,7 @@ func (vc *ViewerContext) CanPerformReadActionOnUser(u *User) bool {
 	return vc.CanPerformActions()
 }
 
-func GenerateJWTSession(sessionKey string) (string, error) {
+func GenerateJWT(sessionKey string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"session_key": sessionKey,
 		// "Not Before": https://tools.ietf.org/html/rfc7519#section-4.1.5

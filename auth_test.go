@@ -32,8 +32,8 @@ func TestGenerateVC(t *testing.T) {
 
 }
 
-func TestGenerateJWTSession(t *testing.T) {
-	tokenString, err := GenerateJWTSession("4")
+func TestGenerateJWT(t *testing.T) {
+	tokenString, err := GenerateJWT("4")
 	token, err := ParseJWT(tokenString)
 	if err != nil {
 		t.Fatal(err.Error())

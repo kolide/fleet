@@ -14,7 +14,11 @@ var (
 	ErrSessionNotCreated = errors.New("The session has not been created")
 )
 
-type ActiveSession struct {
+const (
+	SessionName = "KolideSession"
+)
+
+type Session struct {
 	BaseModel
 	UserID uint   `gorm:"not null"`
 	Key    string `gorm:"not null;unique_index:idx_session_unique_key"`
@@ -28,7 +32,7 @@ type SessionManager struct {
 	backend SessionBackend
 	request *http.Request
 	writer  http.ResponseWriter
-	session *ActiveSession
+	session *Session
 	db      *gorm.DB
 }
 
@@ -42,13 +46,13 @@ func NewSessionManager(request *http.Request, writer http.ResponseWriter, backen
 }
 
 func (sm *SessionManager) VC() *ViewerContext {
-	cookie, err := sm.request.Cookie("KolideSession")
+	cookie, err := sm.request.Cookie(SessionName)
 	if err != nil {
 		switch err {
 		case http.ErrNoCookie:
 			return EmptyVC()
 		default:
-			logrus.Errorf("Couldn't get KolideSession cookie: %s", err.Error())
+			logrus.Errorf("Couldn't get cookie: %s", err.Error())
 			return EmptyVC()
 		}
 	}
@@ -112,13 +116,14 @@ func (sm *SessionManager) Save() error {
 		return err
 	}
 
-	token, err := GenerateJWTSession(session.Key)
+	token, err := GenerateJWT(session.Key)
 	if err != nil {
 		return err
 	}
 
+	// Set proper flags on cookie for maximum security
 	http.SetCookie(sm.writer, &http.Cookie{
-		Name:  "KolideSession",
+		Name:  SessionName,
 		Value: token,
 	})
 
@@ -140,17 +145,17 @@ func (sm *SessionManager) Destroy() error {
 ////////////////////////////////////////////////////////////////////////////////
 
 type SessionBackend interface {
-	Get(key string) (*ActiveSession, error)
+	Get(key string) (*Session, error)
 	Create(userID uint) error
 	Destroy() error
-	Session() (*ActiveSession, error)
+	Session() (*Session, error)
 }
 
 type BaseSessionBackend struct {
-	session *ActiveSession
+	session *Session
 }
 
-func (backend *BaseSessionBackend) Session() (*ActiveSession, error) {
+func (backend *BaseSessionBackend) Session() (*Session, error) {
 	if backend.session == nil {
 		return nil, ErrSessionNotCreated
 	}
@@ -166,8 +171,8 @@ type GormSessionBackend struct {
 	db *gorm.DB
 }
 
-func (s *GormSessionBackend) Get(key string) (*ActiveSession, error) {
-	session := &ActiveSession{
+func (s *GormSessionBackend) Get(key string) (*Session, error) {
+	session := &Session{
 		Key: key,
 	}
 
@@ -186,12 +191,12 @@ func (s *GormSessionBackend) Get(key string) (*ActiveSession, error) {
 }
 
 func (s *GormSessionBackend) Create(userID uint) error {
-	session := &ActiveSession{
+	session := &Session{
 		UserID: userID,
 		Key:    generateRandomText(32),
 	}
 
-	err := s.db.Preload("Users").Create(session).Error
+	err := s.db.Create(session).Error
 	if err != nil {
 		return err
 	}
