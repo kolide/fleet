@@ -19,10 +19,10 @@ repository:
 go test
 ```
 
-Or if you using the Docker development enviornment run:
+Or if you using the Docker development environment run:
 
 ```
-docker-compose app go test
+docker-compose app exec go test
 ```
 
 ## Development Environment
@@ -51,13 +51,13 @@ Once you `docker-compose up` and are running the databases, you can re-build
 the code with:
 
 ```
-docker-compose run app go build -o kolide
+docker-compose exec app go build -o kolide
 ```
 
 and then run the following command to create the database tables:
 
 ```
-docker-compose run app ./kolide prepare-db
+docker-compose exec app ./kolide prepare-db
 ```
 
 ## Docker Deployment
