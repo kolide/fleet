@@ -2,11 +2,13 @@ package main
 
 import (
 	"io"
+	"net/http"
 	_ "net/http/pprof"
 	"time"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/gin-gonic/contrib/ginrus"
+	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/kolide/kolide-ose/sessions"
@@ -97,6 +99,14 @@ func CreateServer(db *gorm.DB, w io.Writer) *gin.Engine {
 	recoveryLogger.WriterLevel(logrus.ErrorLevel)
 	recoveryLogger.Out = w
 	server.Use(gin.RecoveryWithWriter(recoveryLogger.Writer()))
+
+	// Kolide react entrypoint
+	server.HTMLRender = loadTemplates("react.tmpl")
+	server.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "react.tmpl", gin.H{})
+	})
+	// Kolide assets
+	server.Use(static.Serve("/assets", BinaryFileSystem("/build")))
 
 	v1 := server.Group("/api/v1")
 
