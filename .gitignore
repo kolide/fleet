@@ -3,3 +3,8 @@ kolide
 kolide-ose*
 vendor/
 *.test
+bindata.go
+.DS_Store
+.pid
+node_modules
+build
