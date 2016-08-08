@@ -1,5 +1,5 @@
 require('normalize.css');
-require('./global');
+require('#css/global');
 
 /**
  * Components.

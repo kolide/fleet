@@ -1,3 +1,7 @@
+/**
+ * Global CSS Variables.
+ * @module css/vars
+ */
 module.exports = {
-  mainColor: '#666'
+  mainColor: '#333'
 };

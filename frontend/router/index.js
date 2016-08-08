@@ -17,7 +17,7 @@ export function run() {
 
 }
 
-require('../css');
+require('#css');
 // Style live reloading
 if (module.hot) {
   let c = 0;

@@ -1,10 +1,10 @@
 body {
-  margin:40px auto;
-  max-width:650px;
+  margin:px(40) auto;
+  max-width:px(650);
   line-height:1.6;
-  font-size:18px;
-  color:#444;
-  padding:0 10px;
+  font-size:px(18);
+  color:$mainColor;
+  padding:0 px(10);
 }
 
 h1,h2,h3 {
