@@ -15,14 +15,15 @@ LDFLAGS       = -w -X main.commitHash=$(GIT_HASH)
 build: $(ON) $(GO_BINDATA) clean $(TARGET)
 
 clean:
+	mkdir -p build
 	rm -rf build/*
 	rm -rf $(BINDATA)
 
 $(ON):
-	go install $(GOPATH)/src/vendor/github.com/olebedev/on
+	go get $(GOPATH)/src/vendor/github.com/olebedev/on
 
 $(GO_BINDATA):
-	go install $(GOPATH)/src/vendor/github.com/jteeuwen/go-bindata/...
+	go get $(GOPATH)/src/vendor/github.com/jteeuwen/go-bindata/...
 
 $(BUNDLE): $(APP)
 	$(NODE_BIN)/webpack --progress --colors --bail
