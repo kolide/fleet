@@ -192,31 +192,6 @@ func (req *IntegrationRequests) ModifyUser(username, name, email, session string
 	return &responseBody
 }
 
-func (req *IntegrationRequests) DeleteUser(username, session string) {
-	response := httptest.NewRecorder()
-	body, err := json.Marshal(DeleteUserRequestBody{
-		Username: username,
-	})
-	if err != nil {
-		req.t.Fatal(err.Error())
-		return
-	}
-
-	buff := new(bytes.Buffer)
-	buff.Write(body)
-	request, _ := http.NewRequest("DELETE", "/api/v1/kolide/user", buff)
-	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Cookie", session)
-	req.r.ServeHTTP(response, request)
-
-	if response.Code != 200 {
-		req.t.Fatalf("Response code: %d", response.Code)
-		return
-	}
-
-	return
-}
-
 func (req *IntegrationRequests) ChangePassword(username, currentPassword, newPassword, session string) *GetUserResponseBody {
 	response := httptest.NewRecorder()
 	body, err := json.Marshal(ChangePasswordRequestBody{
@@ -468,16 +443,6 @@ func (req *IntegrationRequests) CreateAndCheckUser(username, password, email, na
 func (req *IntegrationRequests) ModifyAndCheckUser(username, email, name string, admin, reset bool, session string) {
 	resp := req.ModifyUser(username, name, email, session)
 	req.CheckUser(username, email, name, admin, reset, resp.Enabled)
-}
-
-func (req *IntegrationRequests) DeleteAndCheckUser(username, session string) {
-	req.DeleteUser(username, session)
-
-	var user User
-	err := req.db.Where("username = ?", username).First(&user).Error
-	if err == nil {
-		req.t.Fatal("User should have been deleted.")
-	}
 }
 
 func (req *IntegrationRequests) SetEnabledStateAndCheckUser(username string, enabled bool, session string) {

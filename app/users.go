@@ -311,65 +311,6 @@ func ModifyUser(c *gin.Context) {
 	})
 }
 
-// swagger:parameters DeleteUser
-type DeleteUserRequestBody struct {
-	ID       uint   `json:"id"`
-	Username string `json:"username"`
-}
-
-// swagger:route DELETE /api/v1/kolide/user DeleteUser
-//
-// Delete a user account
-//
-// Using this API will allow the requester to permanently delete a user account.
-// This endpoint enforces that the requester is an admin.
-//
-//     Consumes:
-//     - application/json
-//
-//     Produces:
-//     - application/json
-//
-//     Schemes: https
-//
-//     Security:
-//       authenticated: yes
-//
-//     Responses:
-//       200: nil
-func DeleteUser(c *gin.Context) {
-	var body DeleteUserRequestBody
-	err := ParseAndValidateJSON(c, &body)
-	if err != nil {
-		errors.ReturnError(c, err)
-		return
-	}
-
-	vc := VC(c)
-	if !vc.IsAdmin() {
-		UnauthorizedError(c)
-		return
-	}
-
-	db := GetDB(c)
-	var user User
-	user.ID = body.ID
-	user.Username = body.Username
-	err = db.Where(&user).First(&user).Error
-	if err != nil {
-		errors.ReturnError(c, errors.DatabaseError(err))
-		return
-	}
-
-	err = db.Delete(&user).Error
-	if err != nil {
-		logrus.Errorf("Error deleting user from database: %s", err.Error())
-		errors.ReturnError(c, errors.DatabaseError(err))
-		return
-	}
-	c.JSON(200, nil)
-}
-
 // swagger:parameters ChangeUserPassword
 type ChangePasswordRequestBody struct {
 	ID                uint   `json:"id"`
@@ -913,5 +854,106 @@ func GetInfoAboutSessionsForUser(c *gin.Context) {
 
 	c.JSON(200, &GetInfoAboutSessionsForUserResponseBody{
 		Sessions: response,
+	})
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Password Reset HTTP endpoints
+////////////////////////////////////////////////////////////////////////////////
+
+// swagger:parameters ChangeUserPassword
+type ResetPasswordRequestBody struct {
+	ID                uint   `json:"id"`
+	Username          string `json:"username"`
+	CurrentPassword   string `json:"current_password"`
+	NewPassword       string `json:"new_password" binding:"required"`
+	NewPasswordConfim string `json:"new_password_confirm" binding:"required"`
+}
+
+// swagger:route POST /api/v1/kolide/user/password/reset ResetUserPassword
+//
+// Reset a user's password
+//
+// Using this API will allow the requester to reset their password. Users
+// should include their own user id as the "id" paramater and/or their own
+// username as the "username" parameter. Admins can change the passords for
+// other users by defining their ID or username.
+//
+// Resetting a user's password req
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: https
+//
+//     Security:
+//       authenticated: yes
+//
+//     Responses:
+//       200: GetUserResponseBody
+func ResetUserPassword(c *gin.Context) {
+	var body ChangePasswordRequestBody
+	err := c.BindJSON(&body)
+	if err != nil {
+		logrus.Errorf("Error parsing ResetPassword post body: %s", err.Error())
+		return
+	}
+
+	if body.NewPassword != body.NewPasswordConfim {
+		c.JSON(406, map[string]interface{}{"error": "Passwords do not match"})
+		return
+	}
+
+	vc := VC(c)
+	if !vc.CanPerformActions() {
+		UnauthorizedError(c)
+		return
+	}
+
+	db := GetDB(c)
+	var user User
+	user.ID = body.ID
+	user.Username = body.Username
+	err = db.Where(&user).First(&user).Error
+	if err != nil {
+		DatabaseError(c)
+		return
+	}
+
+	if !vc.IsAdmin() {
+		if !vc.IsUserID(user.ID) {
+			UnauthorizedError(c)
+			return
+		}
+		if user.ValidatePassword(body.CurrentPassword) != nil {
+			UnauthorizedError(c)
+			return
+		}
+	}
+
+	err = user.SetPassword(db, body.NewPassword)
+	if err != nil {
+		logrus.Errorf("Error setting user password: %s", err.Error())
+		DatabaseError(c) // probably not this
+		return
+	}
+
+	err = db.Save(&user).Error
+	if err != nil {
+		logrus.Errorf("Error updating user in database: %s", err.Error())
+		DatabaseError(c)
+		return
+	}
+	c.JSON(200, GetUserResponseBody{
+		ID:                 user.ID,
+		Username:           user.Username,
+		Name:               user.Name,
+		Email:              user.Email,
+		Admin:              user.Admin,
+		Enabled:            user.Enabled,
+		NeedsPasswordReset: user.NeedsPasswordReset,
 	})
 }

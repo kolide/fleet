@@ -149,9 +149,9 @@ func CreateServer(db *gorm.DB, w io.Writer) *gin.Engine {
 	kolide.POST("/user", GetUser)
 	kolide.PUT("/user", CreateUser)
 	kolide.PATCH("/user", ModifyUser)
-	kolide.DELETE("/user", DeleteUser)
 
 	kolide.PATCH("/user/password", ChangeUserPassword)
+	kolide.POST("/user/password/reset", ResetUserPassword)
 	kolide.PATCH("/user/admin", SetUserAdminState)
 	kolide.PATCH("/user/enabled", SetUserEnabledState)
 

@@ -157,10 +157,4 @@ func TestUserAndAccountManagement(t *testing.T) {
 
 	// user1 can view user2
 	req.GetUser("user2", user2Session)
-
-	// Delete admin2 as admin1
-	req.DeleteAndCheckUser("admin2", adminSession)
-
-	// Delete user2 as admin
-	req.DeleteAndCheckUser("user2", adminSession)
 }
