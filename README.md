@@ -2,11 +2,15 @@
 
 ## Building
 
-To build the code, run the following from the root of the repository:
+To build the code ensure you have `node` and `npm` installed run the
+following from the root of the repository:
 
 ```
-go build -o kolide
+npm install
+make
 ```
+
+This will produce a binary called `kolide` in the root of the repo.
 
 ## Testing
 
@@ -25,38 +29,29 @@ docker-compose app exec go test
 
 ## Development Environment
 
-To set up a canonical development environment via docker,
-run the following from the root of the repository:
+To setup a working local development environment run perform the following tasks:
+
+1. Install the following dependencies:
+  * [Docker & docker-compose](https://www.docker.com/products/overview#/install_the_platform)
+  * [go 1.6.x](https://golang.org/dl/)
+  * [nodejs 0.6.x](https://nodejs.org/en/download/current/) (and npm)
+  * A GNU compatible version of `make`
+
+1. Start up all external servers with `docker-compose up`
+
+1. In the root of the repository run:
 
 ```
-docker-compose up
+npm install
+make
+./kolide prepare-db
+make serve
 ```
 
-Once completed, you can access the application at `https://<your-docker-ip>:8080`
-where `your-docker-ip` is localhost in most native docker installations.
+By default, the last command will run the development proxy on
+`http://localhost:8081` which allows you to make live changes to the code and
+have them hot-reload.
 
-This requires that you have docker installed. At this point in time,
-automatic configuration tools are not included with this project.
-
-If you'd like to shut down the virtual infrastructure created by docker, run
-the following from the root of the repository:
-
-```
-docker-compose down
-```
-
-Once you `docker-compose up` and are running the databases, you can re-build
-the code with:
-
-```
-docker-compose exec app go build -o kolide
-```
-
-and then run the following command to create the database tables:
-
-```
-docker-compose exec app ./kolide prepare-db
-```
 
 ## Docker Deployment
 This repository comes with a simple Dockerfile. You can use this to easily

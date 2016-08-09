@@ -1,4 +1,9 @@
 kolide.exe
 kolide
 kolide-ose*
-vendor/
+bindata.go
+.DS_Store
+.pid
+/vendor
+/node_modules
+/build/*

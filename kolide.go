@@ -19,7 +19,9 @@ var (
 	versionMajor   = 0
 	versionMinor   = 1
 	versionPatch   = 0
+	commitHash     = ""
 	version        = fmt.Sprintf("%d.%d.%d", versionMajor, versionMinor, versionPatch)
+	fullVersion    = fmt.Sprintf("%d.%d.%d (commit: %v)", versionMajor, versionMinor, versionPatch, commitHash)
 )
 
 var (
@@ -78,7 +80,7 @@ func (hook logContextHook) Fire(entry *logrus.Entry) error {
 
 func main() {
 	// configure flag parsing and parse flags
-	app.Version(version)
+	app.Version(fullVersion)
 	args, err := app.Parse(os.Args[1:])
 
 	// configure the application based on the flags that have been set
