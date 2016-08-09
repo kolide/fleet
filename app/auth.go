@@ -3,13 +3,13 @@ package app
 import (
 	"crypto/rand"
 	"encoding/base64"
-	"errors"
 	"fmt"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/kolide/kolide-ose/config"
+	"github.com/kolide/kolide-ose/errors"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -38,7 +38,7 @@ func (vc *ViewerContext) UserID() (uint, error) {
 	if vc.user != nil {
 		return vc.user.ID, nil
 	}
-	return 0, errors.New("No user set")
+	return 0, errors.New("Unauthorized", "No user set")
 }
 
 // CanPerformActions returns a bool indicating the current user's ability to
@@ -212,7 +212,7 @@ func Login(c *gin.Context) {
 	sm.MakeSessionForUserID(user.ID)
 	err = sm.Save()
 	if err != nil {
-		DatabaseError(c)
+		errors.ReturnError(c, err)
 		return
 	}
 
@@ -252,13 +252,13 @@ func Logout(c *gin.Context) {
 
 	err := sm.Destroy()
 	if err != nil {
-		DatabaseError(c)
+		errors.ReturnError(c, err)
 		return
 	}
 
 	err = sm.Save()
 	if err != nil {
-		DatabaseError(c)
+		errors.ReturnError(c, err)
 		return
 	}
 

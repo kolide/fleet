@@ -7,6 +7,7 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+	"github.com/kolide/kolide-ose/errors"
 	"github.com/kolide/kolide-ose/sessions"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -145,7 +146,7 @@ func GetUser(c *gin.Context) {
 	user.Username = body.Username
 	err = db.Where(&user).First(&user).Error
 	if err != nil {
-		DatabaseError(c)
+		errors.ReturnError(c, err)
 		return
 	}
 
@@ -212,7 +213,7 @@ func CreateUser(c *gin.Context) {
 	user, err := NewUser(db, body.Username, body.Password, body.Email, body.Admin, body.NeedsPasswordReset)
 	if err != nil {
 		logrus.Errorf("Error creating new user: %s", err.Error())
-		DatabaseError(c)
+		errors.ReturnError(c, err)
 		return
 	}
 
@@ -278,7 +279,7 @@ func ModifyUser(c *gin.Context) {
 	db := GetDB(c)
 	err = db.Where(&user).First(&user).Error
 	if err != nil {
-		DatabaseError(c)
+		errors.ReturnError(c, err)
 		return
 	}
 
@@ -296,7 +297,7 @@ func ModifyUser(c *gin.Context) {
 	err = db.Save(&user).Error
 	if err != nil {
 		logrus.Errorf("Error updating user in database: %s", err.Error())
-		DatabaseError(c)
+		errors.ReturnError(c, err)
 		return
 	}
 	c.JSON(200, GetUserResponseBody{
@@ -356,14 +357,14 @@ func DeleteUser(c *gin.Context) {
 	user.Username = body.Username
 	err = db.Where(&user).First(&user).Error
 	if err != nil {
-		DatabaseError(c)
+		errors.ReturnError(c, err)
 		return
 	}
 
 	err = db.Delete(&user).Error
 	if err != nil {
 		logrus.Errorf("Error deleting user from database: %s", err.Error())
-		DatabaseError(c)
+		errors.ReturnError(c, err)
 		return
 	}
 	c.JSON(200, nil)
@@ -425,7 +426,7 @@ func ChangeUserPassword(c *gin.Context) {
 	user.Username = body.Username
 	err = db.Where(&user).First(&user).Error
 	if err != nil {
-		DatabaseError(c)
+		errors.ReturnError(c, err)
 		return
 	}
 
@@ -443,14 +444,14 @@ func ChangeUserPassword(c *gin.Context) {
 	err = user.SetPassword(db, body.NewPassword)
 	if err != nil {
 		logrus.Errorf("Error setting user password: %s", err.Error())
-		DatabaseError(c) // probably not this
+		errors.ReturnError(c, err) // probably not this
 		return
 	}
 
 	err = db.Save(&user).Error
 	if err != nil {
 		logrus.Errorf("Error updating user in database: %s", err.Error())
-		DatabaseError(c)
+		errors.ReturnError(c, err)
 		return
 	}
 	c.JSON(200, GetUserResponseBody{
@@ -511,7 +512,7 @@ func SetUserAdminState(c *gin.Context) {
 	user.Username = body.Username
 	err = db.Where(&user).First(&user).Error
 	if err != nil {
-		DatabaseError(c)
+		errors.ReturnError(c, err)
 		return
 	}
 
@@ -519,7 +520,7 @@ func SetUserAdminState(c *gin.Context) {
 	err = db.Save(&user).Error
 	if err != nil {
 		logrus.Errorf("Error updating user in database: %s", err.Error())
-		DatabaseError(c)
+		errors.ReturnError(c, err)
 		return
 	}
 	c.JSON(200, GetUserResponseBody{
@@ -580,7 +581,7 @@ func SetUserEnabledState(c *gin.Context) {
 	user.Username = body.Username
 	err = db.Where(&user).First(&user).Error
 	if err != nil {
-		DatabaseError(c)
+		errors.ReturnError(c, err)
 		return
 	}
 
@@ -588,7 +589,7 @@ func SetUserEnabledState(c *gin.Context) {
 	err = db.Save(&user).Error
 	if err != nil {
 		logrus.Errorf("Error updating user in database: %s", err.Error())
-		DatabaseError(c)
+		errors.ReturnError(c, err)
 		return
 	}
 	c.JSON(200, GetUserResponseBody{
@@ -672,7 +673,7 @@ func DeleteSession(c *gin.Context) {
 	user := &User{ID: session.UserID}
 	err = db.Where(user).First(user).Error
 	if err != nil {
-		DatabaseError(c)
+		errors.ReturnError(c, err)
 		return
 	}
 
@@ -683,7 +684,7 @@ func DeleteSession(c *gin.Context) {
 
 	err = sb.Destroy(session)
 	if err != nil {
-		DatabaseError(c)
+		errors.ReturnError(c, err)
 		return
 	}
 
@@ -736,7 +737,7 @@ func DeleteSessionsForUser(c *gin.Context) {
 	user.Username = body.Username
 	err = db.Where(&user).First(&user).Error
 	if err != nil {
-		DatabaseError(c)
+		errors.ReturnError(c, err)
 		return
 	}
 
@@ -748,7 +749,7 @@ func DeleteSessionsForUser(c *gin.Context) {
 	sb := GetSessionBackend(c)
 	err = sb.DestroyAllForUser(user.ID)
 	if err != nil {
-		DatabaseError(c)
+		errors.ReturnError(c, err)
 		return
 	}
 
@@ -806,7 +807,7 @@ func GetInfoAboutSession(c *gin.Context) {
 	sb := GetSessionBackend(c)
 	session, err := sb.FindKey(body.SessionKey)
 	if err != nil {
-		DatabaseError(c)
+		errors.ReturnError(c, err)
 		return
 	}
 
@@ -815,7 +816,7 @@ func GetInfoAboutSession(c *gin.Context) {
 	user.ID = session.UserID
 	err = db.Where(&user).First(&user).Error
 	if err != nil {
-		DatabaseError(c)
+		errors.ReturnError(c, err)
 		return
 	}
 
@@ -883,7 +884,7 @@ func GetInfoAboutSessionsForUser(c *gin.Context) {
 	user.Username = body.Username
 	err = db.Where(&user).First(&user).Error
 	if err != nil {
-		DatabaseError(c)
+		errors.ReturnError(c, err)
 		return
 	}
 
@@ -895,7 +896,7 @@ func GetInfoAboutSessionsForUser(c *gin.Context) {
 	sb := GetSessionBackend(c)
 	sessions, err := sb.FindAllForUser(user.ID)
 	if err != nil {
-		DatabaseError(c)
+		errors.ReturnError(c, err)
 		return
 	}
 

@@ -33,12 +33,6 @@ func ServerError(e string) *map[string]interface{} {
 	}
 }
 
-// DatabaseError emits a response that is appropriate in the event that a
-// database failure occurs, a record is not found in the database, etc
-func DatabaseError(c *gin.Context) {
-	c.JSON(500, ServerError("Database error"))
-}
-
 // UnauthorizedError emits a response that is appropriate in the event that a
 // request is received by a user which is not authorized to carry out the
 // requested action
