@@ -9,19 +9,32 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/go-playground/validator.v8"
 )
 
+func TestNew(t *testing.T) {
+	kolideErr := New("Public message", "Private message")
+
+	expect := &KolideError{
+		Err:            nil,
+		StatusCode:     http.StatusInternalServerError,
+		PublicMessage:  "Public message",
+		PrivateMessage: "Private message",
+	}
+	assert.Equal(t, expect, kolideErr)
+}
+
 func TestNewFromError(t *testing.T) {
 	err := errors.New("Foo error")
-	kolideErr := NewFromError(err, http.StatusInternalServerError, "Public error")
+	kolideErr := NewFromError(err, StatusUnprocessableEntity, "Public error")
 
 	assert.Equal(t, "Public error", kolideErr.Error())
 
 	expect := &KolideError{
 		Err:            err,
-		StatusCode:     http.StatusInternalServerError,
+		StatusCode:     StatusUnprocessableEntity,
 		PublicMessage:  "Public error",
 		PrivateMessage: "Foo error",
 	}
@@ -149,4 +162,25 @@ func TestReturnErrorValidationError(t *testing.T) {
 	sort.Sort(expect)
 
 	assert.Equal(t, expect, compFields)
+}
+
+func TestReturnErrorGormError(t *testing.T) {
+	r := gin.New()
+
+	r.POST("/foo", func(c *gin.Context) {
+		err := gorm.Errors{}
+		err.Add(gorm.ErrInvalidSQL)
+		ReturnError(c, err)
+	})
+
+	req, _ := http.NewRequest("POST", "/foo", nil)
+	resp := httptest.NewRecorder()
+
+	r.ServeHTTP(resp, req)
+
+	if resp.Code != http.StatusInternalServerError {
+		t.Errorf("Should respond with 500, got %d", resp.Code)
+	}
+
+	assert.JSONEq(t, `{"message": "Database error"}`, resp.Body.String())
 }

@@ -5,6 +5,7 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 	"gopkg.in/go-playground/validator.v8"
 )
 
@@ -53,6 +54,7 @@ const StatusUnprocessableEntity = 422
 // appropriate for the dynamic error type.
 func ReturnError(c *gin.Context, err error) {
 	switch typedErr := err.(type) {
+
 	case *KolideError:
 		c.JSON(typedErr.StatusCode,
 			gin.H{"message": typedErr.PublicMessage})
@@ -70,9 +72,14 @@ func ReturnError(c *gin.Context, err error) {
 
 		c.JSON(StatusUnprocessableEntity,
 			gin.H{"message": "Validation error",
-				"errors": errors})
+				"errors": errors,
+			})
 		logrus.WithError(typedErr).Debug("Validation error")
 
+	case gorm.Errors, *gorm.Errors:
+		c.JSON(http.StatusInternalServerError,
+			gin.H{"message": "Database error"})
+		logrus.WithError(typedErr).Debug(typedErr.Error())
 	default:
 		c.JSON(http.StatusInternalServerError,
 			gin.H{"message": "Unspecified error"})
