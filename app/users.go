@@ -344,11 +344,12 @@ func ModifyUser(c *gin.Context) {
 
 // swagger:parameters ChangeUserPassword
 type ChangePasswordRequestBody struct {
-	ID                uint   `json:"id"`
-	Username          string `json:"username"`
-	CurrentPassword   string `json:"current_password"`
-	NewPassword       string `json:"new_password" validate:"required"`
-	NewPasswordConfim string `json:"new_password_confirm" validate:"required"`
+	ID                 uint   `json:"id"`
+	Username           string `json:"username"`
+	CurrentPassword    string `json:"current_password"`
+	PasswordResetToken string `json:"password_reset_token"`
+	NewPassword        string `json:"new_password" validate:"required"`
+	NewPasswordConfim  string `json:"new_password_confirm" validate:"required"`
 }
 
 // swagger:route PATCH /api/v1/kolide/user/password ChangeUserPassword
@@ -408,8 +409,37 @@ func ChangeUserPassword(c *gin.Context) {
 		return
 	}
 
-	if !vc.IsAdmin() {
-		if user.ValidatePassword(body.CurrentPassword) != nil {
+	var reset PasswordResetRequest
+	deleteResetRequest := func() {
+		if err != nil {
+			err = db.Delete(&reset).Error
+			if err != nil {
+				DatabaseError(c)
+				return
+			}
+		}
+	}
+	if body.PasswordResetToken != "" {
+		reset.Token = body.PasswordResetToken
+		err = db.Find(&reset).First(&reset).Error
+		if err != nil {
+			UnauthorizedError(c)
+			return
+		}
+
+		if time.Now().After(reset.ExpiresAt) {
+			deleteResetRequest()
+			UnauthorizedError(c)
+			return
+		}
+		defer deleteResetRequest()
+	} else if !vc.IsAdmin() {
+		if body.CurrentPassword != "" {
+			if user.ValidatePassword(body.CurrentPassword) != nil {
+				UnauthorizedError(c)
+				return
+			}
+		} else {
 			UnauthorizedError(c)
 			return
 		}
@@ -428,6 +458,7 @@ func ChangeUserPassword(c *gin.Context) {
 		errors.ReturnError(c, errors.DatabaseError(err))
 		return
 	}
+
 	c.JSON(200, GetUserResponseBody{
 		ID:                 user.ID,
 		Username:           user.Username,
@@ -1071,11 +1102,11 @@ func VerifyPasswordResetRequest(c *gin.Context) {
 		}
 	}
 
-	campaign := &PasswordResetRequest{
+	reset := &PasswordResetRequest{
 		UserID: user.ID,
 		Token:  body.Token,
 	}
-	err = db.Where(campaign).First(campaign).Error
+	err = db.Where(reset).First(reset).Error
 	if err != nil {
 		switch err {
 		case gorm.ErrRecordNotFound:
@@ -1089,9 +1120,16 @@ func VerifyPasswordResetRequest(c *gin.Context) {
 		}
 	}
 
+	if time.Now().After(reset.ExpiresAt) {
+		c.JSON(404, VerifyPasswordResetRequestResponseBody{
+			Valid: false,
+		})
+		return
+	}
+
 	c.JSON(200, VerifyPasswordResetRequestResponseBody{
 		Valid: true,
-		ID:    campaign.ID,
+		ID:    reset.ID,
 	})
 }
 
