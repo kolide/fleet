@@ -1,7 +1,9 @@
 package app
 
 import (
+	"encoding/json"
 	"io"
+	"net/http"
 	_ "net/http/pprof"
 	"time"
 
@@ -10,9 +12,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/kolide/kolide-ose/config"
+	"github.com/kolide/kolide-ose/errors"
 	"github.com/kolide/kolide-ose/osquery"
 	"github.com/kolide/kolide-ose/sessions"
+	"gopkg.in/go-playground/validator.v8"
 )
+
+var validate *validator.Validate = validator.New(&validator.Config{TagName: "validate", FieldNameTag: "json"})
 
 // Get the database connection from the context, or panic
 func GetDB(c *gin.Context) *gorm.DB {
@@ -71,6 +77,22 @@ func NewSessionManager(c *gin.Context) *sessions.SessionManager {
 		Backend: GetSessionBackend(c),
 		Writer:  c.Writer,
 	}
+}
+
+func parseJSON(c *gin.Context, obj interface{}) error {
+	decoder := json.NewDecoder(c.Request.Body)
+	if err := decoder.Decode(obj); err != nil {
+		return err
+	}
+	return nil
+}
+
+func ParseAndValidateJSON(c *gin.Context, obj interface{}) error {
+	if err := parseJSON(c, obj); err != nil {
+		return errors.NewFromError(err, http.StatusBadRequest, "JSON parse error")
+	}
+
+	return validate.Struct(obj)
 }
 
 // CreateServer creates a gin.Engine HTTP server and configures it to be in a
