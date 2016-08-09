@@ -44,21 +44,21 @@ func (vc *ViewerContext) UserID() (uint, error) {
 // CanPerformActions returns a bool indicating the current user's ability to
 // perform the most basic actions on the site
 func (vc *ViewerContext) CanPerformActions() bool {
-	if vc.user == nil {
-		return false
+	if vc.IsLoggedIn() && !vc.user.NeedsPasswordReset {
+		return true
 	}
 
-	if !vc.user.Enabled {
-		return false
-	}
-
-	return true
+	return false
 }
 
 // IsLoggedIn determines whether or not the current VC is attached to a user
 // account
 func (vc *ViewerContext) IsLoggedIn() bool {
-	return vc.user != nil
+	if vc.user != nil && vc.user.Enabled {
+		return true
+	}
+
+	return false
 }
 
 // IsUserID returns true if the given user id the same as the user which is
@@ -83,7 +83,7 @@ func (vc *ViewerContext) CanPerformWriteActionOnUser(u *User) bool {
 // CanPerformReadActionsOnUser returns a bool indicating the current user's
 // ability to perform read actions on the given user
 func (vc *ViewerContext) CanPerformReadActionOnUser(u *User) bool {
-	return vc.CanPerformActions()
+	return vc.CanPerformActions() || (vc.IsLoggedIn() && vc.IsUserID(u.ID))
 }
 
 // GenerateVC generates a ViewerContext given a user struct

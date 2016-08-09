@@ -135,7 +135,7 @@ func GetUser(c *gin.Context) {
 	}
 
 	vc := VC(c)
-	if !vc.CanPerformActions() {
+	if !vc.IsLoggedIn() {
 		UnauthorizedError(c)
 		return
 	}
@@ -362,20 +362,22 @@ func ChangeUserPassword(c *gin.Context) {
 	}
 
 	db := GetDB(c)
-	var user User
-	user.ID = body.ID
-	user.Username = body.Username
-	err = db.Where(&user).First(&user).Error
+	user := &User{
+		ID:       body.ID,
+		Username: body.Username,
+	}
+	err = db.Where(user).First(user).Error
 	if err != nil {
 		errors.ReturnError(c, errors.DatabaseError(err))
 		return
 	}
 
+	if !vc.CanPerformWriteActionOnUser(user) {
+		UnauthorizedError(c)
+		return
+	}
+
 	if !vc.IsAdmin() {
-		if !vc.IsUserID(user.ID) {
-			UnauthorizedError(c)
-			return
-		}
 		if user.ValidatePassword(body.CurrentPassword) != nil {
 			UnauthorizedError(c)
 			return
@@ -477,9 +479,10 @@ func SetUserAdminState(c *gin.Context) {
 
 // swagger:parameters SetUserEnabledState
 type SetUserEnabledStateRequestBody struct {
-	ID       uint   `json:"id"`
-	Username string `json:"username"`
-	Enabled  bool   `json:"enabled"`
+	ID              uint   `json:"id"`
+	Username        string `json:"username"`
+	Enabled         bool   `json:"enabled"`
+	CurrentPassword string `json:"current_password"`
 }
 
 // swagger:route PATCH /api/v1/kolide/user/enabled SetUserEnabledState
@@ -487,7 +490,9 @@ type SetUserEnabledStateRequestBody struct {
 // Enable or disable a user.
 //
 // This endpoint allows an existing admin to enable a disabled user or
-// disable an enabled user.
+// disable an enabled user. If a user calls this endpoint, to disable,
+// their own account, they must also submit their current password, to
+// verify their request.
 //
 //     Consumes:
 //     - application/json
@@ -511,19 +516,32 @@ func SetUserEnabledState(c *gin.Context) {
 	}
 
 	vc := VC(c)
-	if !vc.IsAdmin() {
+	if !vc.CanPerformActions() {
 		UnauthorizedError(c)
 		return
 	}
 
 	db := GetDB(c)
-	var user User
-	user.ID = body.ID
-	user.Username = body.Username
-	err = db.Where(&user).First(&user).Error
+	user := &User{
+		ID:       body.ID,
+		Username: body.Username,
+	}
+	err = db.Where(user).First(user).Error
 	if err != nil {
 		errors.ReturnError(c, errors.DatabaseError(err))
 		return
+	}
+
+	if !vc.CanPerformWriteActionOnUser(user) {
+		UnauthorizedError(c)
+		return
+	}
+
+	if !vc.IsAdmin() {
+		if user.ValidatePassword(body.CurrentPassword) != nil {
+			UnauthorizedError(c)
+			return
+		}
 	}
 
 	user.Enabled = body.Enabled
@@ -754,9 +772,8 @@ func GetInfoAboutSession(c *gin.Context) {
 	}
 
 	db := GetDB(c)
-	var user User
-	user.ID = session.UserID
-	err = db.Where(&user).First(&user).Error
+	user := &User{ID: session.UserID}
+	err = db.Where(user).First(user).Error
 	if err != nil {
 		errors.ReturnError(c, errors.DatabaseError(err))
 		return
@@ -821,16 +838,17 @@ func GetInfoAboutSessionsForUser(c *gin.Context) {
 	}
 
 	db := GetDB(c)
-	var user User
-	user.ID = body.ID
-	user.Username = body.Username
-	err = db.Where(&user).First(&user).Error
+	user := &User{
+		ID:       body.ID,
+		Username: body.Username,
+	}
+	err = db.Where(user).First(user).Error
 	if err != nil {
 		errors.ReturnError(c, errors.DatabaseError(err))
 		return
 	}
 
-	if !vc.IsAdmin() && !vc.IsUserID(user.ID) {
+	if !vc.CanPerformWriteActionOnUser(user) {
 		UnauthorizedError(c)
 		return
 	}
@@ -911,7 +929,7 @@ func ResetUserPassword(c *gin.Context) {
 
 	if !vc.IsLoggedIn() {
 		if body.Email == "" {
-			NotFoundRequestError(c)
+			UnauthorizedError(c)
 			return
 		}
 		user.Email = body.Email
@@ -930,7 +948,8 @@ func ResetUserPassword(c *gin.Context) {
 	}
 
 	if vc.IsAdmin() || vc.IsUserID(user.ID) {
-		// logged-in admin user resetting a password
+		// logged-in admin user resetting a password or logged-in user
+		// resetting their own password
 
 		user.NeedsPasswordReset = true
 
@@ -940,6 +959,8 @@ func ResetUserPassword(c *gin.Context) {
 			DatabaseError(c)
 			return
 		}
+
+		// create new password reset token
 
 		// email user with link to reset password
 
