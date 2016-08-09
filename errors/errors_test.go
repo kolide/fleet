@@ -69,6 +69,8 @@ func TestReturnErrorKolideError(t *testing.T) {
 	assert.JSONEq(t, expect, resp.Body.String())
 }
 
+// These types and functions for performing an unordered comparison on a
+// []map[string]string] as parsed from the error JSON
 type errorField map[string]string
 type errorFields []errorField
 
@@ -123,6 +125,8 @@ func TestReturnErrorValidationError(t *testing.T) {
 		t.Errorf("Unexpected type for errors")
 	}
 
+	// The error fields must be copied from []interface{} to
+	// []map[string][string] before we can sort
 	compFields := make(errorFields, 0, 0)
 	for _, field := range fields {
 		field := field.(map[string]interface{})
@@ -140,6 +144,7 @@ func TestReturnErrorValidationError(t *testing.T) {
 		{"code": "invalid", "field": "password", "message": "required"},
 	}
 
+	// Sort to standardize ordering before comparison
 	sort.Sort(compFields)
 	sort.Sort(expect)
 

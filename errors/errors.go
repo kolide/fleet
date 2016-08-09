@@ -8,6 +8,10 @@ import (
 	"gopkg.in/go-playground/validator.v8"
 )
 
+// Kolide's internal representation for errors. It can be used to wrap another
+// error (stored in Err), and additionally contains fields for public
+// (PublicMessage) and private (PrivateMessage) error messages as well as the
+// HTTP status code (StatusCode) corresponding to the error.
 type KolideError struct {
 	Err            error
 	StatusCode     int
@@ -15,10 +19,14 @@ type KolideError struct {
 	PrivateMessage string
 }
 
+// Implementation of error interface
 func (e *KolideError) Error() string {
 	return e.PublicMessage
 }
 
+// Create a new KolideError from an error type. The public message and status
+// code should be specified, while the private message will be drawn from
+// err.Error()
 func NewFromError(err error, status int, publicMessage string) *KolideError {
 	return &KolideError{
 		Err:            err,
@@ -28,8 +36,21 @@ func NewFromError(err error, status int, publicMessage string) *KolideError {
 	}
 }
 
+// Create a new KolideError specifying the public and private messages. The
+// status code will be set to 500.
+func New(publicMessage, privateMessage string) *KolideError {
+	return &KolideError{
+		StatusCode:     http.StatusInternalServerError,
+		PublicMessage:  publicMessage,
+		PrivateMessage: privateMessage,
+	}
+}
+
+// The status code returned for validation errors. Inspired by the Github API.
 const StatusUnprocessableEntity = 422
 
+// Handle an error, printing debug information, writing to the HTTP response as
+// appropriate for the dynamic error type.
 func ReturnError(c *gin.Context, err error) {
 	switch typedErr := err.(type) {
 	case *KolideError:
