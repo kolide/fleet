@@ -13,6 +13,21 @@ import (
 	"gopkg.in/go-playground/validator.v8"
 )
 
+func TestNewFromError(t *testing.T) {
+	err := errors.New("Foo error")
+	kolideErr := NewFromError(err, http.StatusInternalServerError, "Public error")
+
+	assert.Equal(t, "Public error", kolideErr.Error())
+
+	expect := &KolideError{
+		Err:            err,
+		StatusCode:     http.StatusInternalServerError,
+		PublicMessage:  "Public error",
+		PrivateMessage: "Foo error",
+	}
+	assert.Equal(t, expect, kolideErr)
+}
+
 func TestReturnErrorUnspecified(t *testing.T) {
 	r := gin.New()
 	r.POST("/foo", func(c *gin.Context) {
