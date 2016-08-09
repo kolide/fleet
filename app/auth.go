@@ -55,6 +55,12 @@ func (vc *ViewerContext) CanPerformActions() bool {
 	return true
 }
 
+// IsLoggedIn determines whether or not the current VC is attached to a user
+// account
+func (vc *ViewerContext) IsLoggedIn() bool {
+	return vc.user != nil
+}
+
 // IsUserID returns true if the given user id the same as the user which is
 // represented by this ViewerContext
 func (vc *ViewerContext) IsUserID(id uint) bool {

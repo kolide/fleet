@@ -39,6 +39,18 @@ func UnauthorizedError(c *gin.Context) {
 		))
 }
 
+// NotFoundRequestError emits a response that is appropriate in the event that
+// a request is received for a resource which is not found
+func NotFoundRequestError(c *gin.Context) {
+	errors.ReturnError(
+		c,
+		errors.NewWithStatus(
+			http.StatusNotFound,
+			"Not Found",
+			"Not Found",
+		))
+}
+
 // Create a new server for testing purposes with no routes attached
 func createEmptyTestServer(db *gorm.DB) *gin.Engine {
 	server := gin.New()
