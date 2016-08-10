@@ -212,7 +212,7 @@ func Login(c *gin.Context) {
 	sm.MakeSessionForUserID(user.ID)
 	err = sm.Save()
 	if err != nil {
-		errors.ReturnError(c, err)
+		errors.ReturnError(c, errors.DatabaseError(err))
 		return
 	}
 
@@ -252,13 +252,13 @@ func Logout(c *gin.Context) {
 
 	err := sm.Destroy()
 	if err != nil {
-		errors.ReturnError(c, err)
+		errors.ReturnError(c, errors.DatabaseError(err))
 		return
 	}
 
 	err = sm.Save()
 	if err != nil {
-		errors.ReturnError(c, err)
+		errors.ReturnError(c, errors.DatabaseError(err))
 		return
 	}
 
