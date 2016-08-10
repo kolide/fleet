@@ -942,11 +942,17 @@ func GetInfoAboutSessionsForUser(c *gin.Context) {
 // Password Reset HTTP endpoints
 ////////////////////////////////////////////////////////////////////////////////
 
-// swagger:parameters ChangeUserPassword
+// swagger:parameters ResetUserPassword
 type ResetPasswordRequestBody struct {
 	ID       uint   `json:"id"`
 	Username string `json:"username"`
 	Email    string `json:"email"`
+}
+
+// swagger:response ResetPasswordResponseBody
+type ResetPasswordResponseBody struct {
+	ID       uint   `json:"id"`
+	Username string `json:"username"`
 }
 
 // swagger:route POST /api/v1/kolide/user/password/reset ResetUserPassword
@@ -972,7 +978,7 @@ type ResetPasswordRequestBody struct {
 //       authenticated: yes
 //
 //     Responses:
-//       200: GetUserResponseBody
+//       200: ResetPasswordResponseBody
 func ResetUserPassword(c *gin.Context) {
 	var body ResetPasswordRequestBody
 	err := c.BindJSON(&body)
@@ -1050,10 +1056,9 @@ func ResetUserPassword(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, GetUserResponseBody{
-		ID:                 user.ID,
-		Username:           user.Username,
-		NeedsPasswordReset: user.NeedsPasswordReset,
+	c.JSON(200, ResetPasswordResponseBody{
+		ID:       user.ID,
+		Username: user.Username,
 	})
 }
 
