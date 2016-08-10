@@ -95,6 +95,7 @@ func ReturnError(c *gin.Context, err error) {
 		c.JSON(http.StatusInternalServerError,
 			gin.H{"message": "Database error"})
 		logrus.WithError(typedErr).Debug(typedErr.Error())
+
 	default:
 		c.JSON(http.StatusInternalServerError,
 			gin.H{"message": "Unspecified error"})
