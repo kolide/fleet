@@ -2,6 +2,7 @@ package app
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	_ "net/http/pprof"
@@ -83,6 +84,16 @@ func ParseAndValidateJSON(c *gin.Context, obj interface{}) error {
 	return validate.Struct(obj)
 }
 
+func NotFound(c *gin.Context) {
+	errors.ReturnError(
+		c,
+		errors.NewWithStatus(
+			http.StatusNotFound,
+			"Not found",
+			fmt.Sprintf("Route not found for request: %+v", c.Request),
+		))
+}
+
 // CreateServer creates a gin.Engine HTTP server and configures it to be in a
 // state such that it is ready to serve HTTP requests for the kolide application
 func CreateServer(db *gorm.DB, w io.Writer) *gin.Engine {
@@ -114,6 +125,9 @@ func CreateServer(db *gorm.DB, w io.Writer) *gin.Engine {
 	recoveryLogger.WriterLevel(logrus.ErrorLevel)
 	recoveryLogger.Out = w
 	server.Use(gin.RecoveryWithWriter(recoveryLogger.Writer()))
+
+	// Set the 404 route
+	server.NoRoute(NotFound)
 
 	v1 := server.Group("/api/v1")
 
