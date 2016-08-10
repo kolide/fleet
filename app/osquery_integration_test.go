@@ -103,11 +103,11 @@ func TestIntegrationEnrollHostGood(t *testing.T) {
 	var host Host
 	err = req.db.Where("uuid = ?", "fake_host_1").First(&host).Error
 	if err != nil {
-		t.Fatal("Host not saved to DB: %s", err.Error())
+		t.Fatalf("Host not saved to DB: %s", err.Error())
 	}
 
 	if host.NodeKey != nodeKey {
-		t.Error("Saved node key different than response key, %s != %s",
+		t.Errorf("Saved node key different than response key, %s != %s",
 			host.NodeKey, nodeKey)
 	}
 
