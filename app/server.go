@@ -13,6 +13,7 @@ import (
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+	"github.com/jordan-wright/email"
 	"github.com/kolide/kolide-ose/errors"
 	"github.com/kolide/kolide-ose/sessions"
 	"github.com/spf13/viper"
@@ -21,9 +22,33 @@ import (
 
 var validate *validator.Validate = validator.New(&validator.Config{TagName: "validate", FieldNameTag: "json"})
 
+type SMTPConnectionPool interface {
+	Send(e *email.Email, timeout time.Duration) error
+	Close()
+}
+
+// Get the SMTP connection pool from the context, or panic
+func GetSMTPConnectionPool(c *gin.Context) SMTPConnectionPool {
+	return c.MustGet("SMTPConnectionPool").(SMTPConnectionPool)
+}
+
+func SMTPConnectionPoolMiddleware(pool SMTPConnectionPool) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Set("SMTPConnectionPool", pool)
+		c.Next()
+	}
+}
+
 // Get the database connection from the context, or panic
 func GetDB(c *gin.Context) *gorm.DB {
 	return c.MustGet("DB").(*gorm.DB)
+}
+
+func DatabaseMiddleware(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Set("DB", db)
+		c.Next()
+	}
 }
 
 // UnauthorizedError emits a response that is appropriate in the event that a
@@ -57,14 +82,6 @@ func createEmptyTestServer(db *gorm.DB) *gin.Engine {
 	server.Use(DatabaseMiddleware(db))
 	server.Use(SessionBackendMiddleware)
 	return server
-}
-
-// Adapted from https://goo.gl/03Qxiy
-func DatabaseMiddleware(db *gorm.DB) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Set("DB", db)
-		c.Next()
-	}
 }
 
 // NewSessionManager allows you to get a SessionManager instance for a given
@@ -109,9 +126,10 @@ func NotFound(c *gin.Context) {
 
 // CreateServer creates a gin.Engine HTTP server and configures it to be in a
 // state such that it is ready to serve HTTP requests for the kolide application
-func CreateServer(db *gorm.DB, w io.Writer) *gin.Engine {
+func CreateServer(db *gorm.DB, pool SMTPConnectionPool, w io.Writer) *gin.Engine {
 	server := gin.New()
 	server.Use(DatabaseMiddleware(db))
+	server.Use(SMTPConnectionPoolMiddleware(pool))
 	server.Use(SessionBackendMiddleware)
 
 	sessions.Configure(&sessions.SessionConfiguration{

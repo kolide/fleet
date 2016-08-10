@@ -5,6 +5,8 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"net"
+	"net/smtp"
 	"os"
 	"path"
 	"runtime"
@@ -13,6 +15,7 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/gin-gonic/gin"
+	"github.com/jordan-wright/email"
 	"github.com/kolide/kolide-ose/app"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -93,6 +96,15 @@ the way that the kolide server works.
 		if err != nil {
 			logrus.Fatalf("Error opening database: %s", err.Error())
 		}
+
+		smtpHost, _, err := net.SplitHostPort(config.Mail.Address)
+		if err != nil {
+			logrus.WithError(err).Fatal("Could not parse mail address string")
+		}
+		smtpConnectionPool := email.NewPool(
+			config.Mail.Address,
+			config.Mail.PoolConnections,
+			smtp.PlainAuth("", config.Mail.Username, config.Mail.Password, smtpHost))
 
 		fmt.Println(`
 

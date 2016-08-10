@@ -7,9 +7,11 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+	"github.com/jordan-wright/email"
 )
 
 type testLogger struct {
@@ -43,16 +45,30 @@ func openTestDB(t *testing.T) *gorm.DB {
 	return db
 }
 
+type MockSMTPConnectionPool struct{}
+
+func NewMockSMTPConnectionPool() *MockSMTPConnectionPool {
+	return &MockSMTPConnectionPool{}
+}
+
+func (pool *MockSMTPConnectionPool) Send(e *email.Email, timeout time.Duration) error {
+	return nil
+}
+
+func (pool *MockSMTPConnectionPool) Close() {}
+
 type IntegrationRequests struct {
-	r  *gin.Engine
-	db *gorm.DB
-	t  *testing.T
+	r    *gin.Engine
+	db   *gorm.DB
+	pool SMTPConnectionPool
+	t    *testing.T
 }
 
 func (req *IntegrationRequests) New(t *testing.T) {
 	req.t = t
 
 	req.db = openTestDB(t)
+	req.pool = NewMockSMTPConnectionPool()
 
 	// Until we have a better solution for first-user onboarding, manually
 	// create an admin
@@ -61,7 +77,7 @@ func (req *IntegrationRequests) New(t *testing.T) {
 		t.Fatalf("Error opening DB: %s", err.Error())
 	}
 
-	req.r = CreateServer(req.db, &testLogger{t: t})
+	req.r = CreateServer(req.db, req.pool, &testLogger{t: t})
 }
 
 func (req *IntegrationRequests) Login(username, password string, sessionOut *string) {
