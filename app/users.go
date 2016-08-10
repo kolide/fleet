@@ -415,7 +415,7 @@ func ChangeUserPassword(c *gin.Context) {
 		if err != nil {
 			err = db.Delete(&reset).Error
 			if err != nil {
-				DatabaseError(c)
+				errors.ReturnError(c, errors.DatabaseError(err))
 				return
 			}
 		}
@@ -1009,7 +1009,7 @@ func ResetUserPassword(c *gin.Context) {
 			NotFoundRequestError(c)
 			return
 		default:
-			DatabaseError(c)
+			errors.ReturnError(c, errors.DatabaseError(err))
 			return
 		}
 	}
@@ -1026,14 +1026,14 @@ func ResetUserPassword(c *gin.Context) {
 
 			err = GetDB(c).Save(user).Error
 			if err != nil {
-				DatabaseError(c)
+				errors.ReturnError(c, errors.DatabaseError(err))
 				return
 			}
 		}
 
 		request, err := NewPasswordResetRequest(GetDB(c), user.ID, time.Now().Add(time.Hour*24))
 		if err != nil {
-			DatabaseError(c)
+			errors.ReturnError(c, errors.DatabaseError(err))
 			return
 		}
 
@@ -1047,7 +1047,7 @@ func ResetUserPassword(c *gin.Context) {
 
 		err = GetSMTPConnectionPool(c).Send(e, time.Second*10)
 		if err != nil {
-			DatabaseError(c) // not the best error
+			errors.ReturnError(c, errors.DatabaseError(err)) // not the best error
 			return
 		}
 	} else {
@@ -1114,7 +1114,7 @@ func VerifyPasswordResetRequest(c *gin.Context) {
 			})
 			return
 		default:
-			DatabaseError(c)
+			errors.ReturnError(c, errors.DatabaseError(err))
 			return
 		}
 	}
@@ -1132,7 +1132,7 @@ func VerifyPasswordResetRequest(c *gin.Context) {
 			})
 			return
 		default:
-			DatabaseError(c)
+			errors.ReturnError(c, errors.DatabaseError(err))
 			return
 		}
 	}
@@ -1189,7 +1189,7 @@ func DeletePasswordResetRequest(c *gin.Context) {
 			NotFoundRequestError(c)
 			return
 		default:
-			DatabaseError(c)
+			errors.ReturnError(c, errors.DatabaseError(err))
 			return
 		}
 	}
@@ -1197,7 +1197,7 @@ func DeletePasswordResetRequest(c *gin.Context) {
 	user := &User{ID: campaign.UserID}
 	err = db.Where(user).First(user).Error
 	if err != nil {
-		DatabaseError(c)
+		errors.ReturnError(c, errors.DatabaseError(err))
 		return
 	}
 
@@ -1209,7 +1209,7 @@ func DeletePasswordResetRequest(c *gin.Context) {
 
 	err = db.Delete(campaign).Error
 	if err != nil {
-		DatabaseError(c)
+		errors.ReturnError(c, errors.DatabaseError(err))
 		return
 	}
 
