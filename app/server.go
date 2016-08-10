@@ -13,7 +13,6 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/kolide/kolide-ose/config"
 	"github.com/kolide/kolide-ose/errors"
-	"github.com/kolide/kolide-ose/osquery"
 	"github.com/kolide/kolide-ose/sessions"
 	"gopkg.in/go-playground/validator.v8"
 )
@@ -137,11 +136,11 @@ func CreateServer(db *gorm.DB, w io.Writer) *gin.Engine {
 
 	// osquery API endpoints
 	osq := v1.Group("/osquery")
-	osq.POST("/enroll", osquery.OsqueryEnroll)
-	osq.POST("/config", osquery.OsqueryConfig)
-	osq.POST("/log", osquery.OsqueryLog)
-	osq.POST("/distributed/read", osquery.OsqueryDistributedRead)
-	osq.POST("/distributed/write", osquery.OsqueryDistributedWrite)
+	osq.POST("/enroll", OsqueryEnroll)
+	osq.POST("/config", OsqueryConfig)
+	osq.POST("/log", OsqueryLog)
+	osq.POST("/distributed/read", OsqueryDistributedRead)
+	osq.POST("/distributed/write", OsqueryDistributedWrite)
 
 	return server
 }
