@@ -1,3 +1,5 @@
+require('es6-promise').polyfill();
+
 var path = require('path');
 var webpack = require('webpack');
 var autoprefixer = require('autoprefixer');

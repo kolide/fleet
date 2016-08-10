@@ -136,7 +136,7 @@ func CreateServer(db *gorm.DB, w io.Writer) *gin.Engine {
 		c.HTML(http.StatusOK, "react.tmpl", gin.H{})
 	})
 	// Kolide assets
-	server.Use(static.Serve("/assets", BinaryFileSystem("/build")))
+	server.Use(static.Serve("/assets", NewBinaryFileSystem("/build")))
 
 	v1 := server.Group("/api/v1")
 

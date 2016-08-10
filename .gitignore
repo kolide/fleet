@@ -1,10 +1,8 @@
-kolide.exe
 kolide
 kolide-ose*
-vendor/
-*.test
-bindata.go
+*.exe
+vendor
+app/bindata.go
 .DS_Store
-.pid
 node_modules
 build

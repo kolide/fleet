@@ -21,8 +21,8 @@ require('#css');
 // Style live reloading
 if (module.hot) {
   let c = 0;
-  module.hot.accept('../css', () => {
-    require('../css');
+  module.hot.accept('#css', () => {
+    require('#css');
     const a = document.createElement('a');
     const link = document.querySelector('link[rel="stylesheet"]');
     a.href = link.href;
