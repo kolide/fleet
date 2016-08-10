@@ -87,6 +87,7 @@ To view test a test coverage report in a terminal, run the following:
 go tool cover -func=./sessions/sessions.cover
 ```
 
+<<<<<<< 99ed93c20a4c7f6a1fb3eabd70bec7c3d80cff81
 ### Starting the local development environment
 
 To set up a canonical development environment via docker,
@@ -137,6 +138,25 @@ make watch
 ```
 
 This is only supported on OS X and Linux.
+
+### Testing Email
+
+To intercept sent emails while running a Kolide development environment, make
+sure that you've set the SMTP address to `<docker host ip>:1025` and leave the
+username and password blank. Then, visit `<docker host ip>:8025` in a web 
+browser to view the [MailHog](https://github.com/mailhog/MailHog) UI.
+
+For example, if docker is running natively on your `localhost`, then your mail
+settings should look something like:
+
+```json
+{
+  "mail": {
+    "address": "localhost:1025",
+    "pool_connections": 4
+  }
+}
+```
 
 ### Stopping the local development environment
 
