@@ -26,6 +26,18 @@ func TestNew(t *testing.T) {
 	assert.Equal(t, expect, kolideErr)
 }
 
+func TestNewWithStatus(t *testing.T) {
+	kolideErr := NewWithStatus(http.StatusUnauthorized, "Public message", "Private message")
+
+	expect := &KolideError{
+		Err:            nil,
+		StatusCode:     http.StatusUnauthorized,
+		PublicMessage:  "Public message",
+		PrivateMessage: "Private message",
+	}
+	assert.Equal(t, expect, kolideErr)
+}
+
 func TestNewFromError(t *testing.T) {
 	err := errors.New("Foo error")
 	kolideErr := NewFromError(err, StatusUnprocessableEntity, "Public error")

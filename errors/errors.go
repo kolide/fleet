@@ -25,6 +25,26 @@ func (e *KolideError) Error() string {
 	return e.PublicMessage
 }
 
+// Create a new KolideError specifying the public and private messages. The
+// status code will be set to 500.
+func New(publicMessage, privateMessage string) *KolideError {
+	return &KolideError{
+		StatusCode:     http.StatusInternalServerError,
+		PublicMessage:  publicMessage,
+		PrivateMessage: privateMessage,
+	}
+}
+
+// Create a new KolideError specifying the HTTP status, and public and private
+// messages.
+func NewWithStatus(status int, publicMessage, privateMessage string) *KolideError {
+	return &KolideError{
+		StatusCode:     status,
+		PublicMessage:  publicMessage,
+		PrivateMessage: privateMessage,
+	}
+}
+
 // Create a new KolideError from an error type. The public message and status
 // code should be specified, while the private message will be drawn from
 // err.Error()
@@ -34,16 +54,6 @@ func NewFromError(err error, status int, publicMessage string) *KolideError {
 		StatusCode:     status,
 		PublicMessage:  publicMessage,
 		PrivateMessage: err.Error(),
-	}
-}
-
-// Create a new KolideError specifying the public and private messages. The
-// status code will be set to 500.
-func New(publicMessage, privateMessage string) *KolideError {
-	return &KolideError{
-		StatusCode:     http.StatusInternalServerError,
-		PublicMessage:  publicMessage,
-		PrivateMessage: privateMessage,
 	}
 }
 

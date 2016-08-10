@@ -25,26 +25,17 @@ func GetDB(c *gin.Context) *gorm.DB {
 	return c.MustGet("DB").(*gorm.DB)
 }
 
-// ServerError is a helper which accepts a string error and returns a map in
-// format that is required by gin.Context.JSON
-func ServerError(e string) *map[string]interface{} {
-	return &map[string]interface{}{
-		"error": e,
-	}
-}
-
 // UnauthorizedError emits a response that is appropriate in the event that a
 // request is received by a user which is not authorized to carry out the
 // requested action
 func UnauthorizedError(c *gin.Context) {
-	c.JSON(401, ServerError("Unauthorized"))
-}
-
-// MalformedRequestError emits a response that is appropriate in the event that
-// a request is received by a user which does not have required fields or is in
-// some way malformed
-func MalformedRequestError(c *gin.Context) {
-	c.JSON(400, ServerError("Malformed request"))
+	errors.ReturnError(
+		c,
+		errors.NewWithStatus(
+			http.StatusUnauthorized,
+			"Unauthorized",
+			"Unauthorized",
+		))
 }
 
 func createEmptyTestServer(db *gorm.DB) *gin.Engine {
