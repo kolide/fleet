@@ -7,6 +7,7 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+	"github.com/jordan-wright/email"
 	"github.com/kolide/kolide-ose/config"
 	"github.com/kolide/kolide-ose/errors"
 	"github.com/kolide/kolide-ose/sessions"
@@ -1031,7 +1032,18 @@ func ResetUserPassword(c *gin.Context) {
 		}
 
 		// email user with link to reset password
-		logrus.Infof("Send email with the following token as a param: %s", request.Token)
+		e := email.NewEmail()
+		e.From = "Kolide <no-reply@kolide.co>"
+		e.To = []string{user.Email}
+		e.Subject = "Your Kolide Password Reset Request"
+		e.Text = []byte(fmt.Sprintf("https://foobar.com/?token=%s", request.Token))
+		e.HTML = []byte(fmt.Sprintf("<pre>https://foobar.com/?token=%s</pre>", request.Token))
+
+		err = GetSMTPConnectionPool(c).Send(e, time.Second*10)
+		if err != nil {
+			DatabaseError(c) // not the best error
+			return
+		}
 	} else {
 		// Logged-in user trying to reset another user's password
 		UnauthorizedError(c)
