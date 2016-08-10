@@ -168,9 +168,9 @@ func GetUser(c *gin.Context) {
 
 // swagger:parameters CreateUser
 type CreateUserRequestBody struct {
-	Username           string `json:"username" binding:"required"`
-	Password           string `json:"password" binding:"required"`
-	Email              string `json:"email" binding:"required"`
+	Username           string `json:"username" validate:"required"`
+	Password           string `json:"password" validate:"required"`
+	Email              string `json:"email" validate:"required"`
 	Admin              bool   `json:"admin"`
 	NeedsPasswordReset bool   `json:"needs_password_reset"`
 }
@@ -375,8 +375,8 @@ type ChangePasswordRequestBody struct {
 	ID                uint   `json:"id"`
 	Username          string `json:"username"`
 	CurrentPassword   string `json:"current_password"`
-	NewPassword       string `json:"new_password" binding:"required"`
-	NewPasswordConfim string `json:"new_password_confirm" binding:"required"`
+	NewPassword       string `json:"new_password" validate:"required"`
+	NewPasswordConfim string `json:"new_password_confirm" validate:"required"`
 }
 
 // swagger:route PATCH /api/v1/kolide/user/password ChangeUserPassword
@@ -625,7 +625,7 @@ func GetSessionBackend(c *gin.Context) sessions.SessionBackend {
 
 // swagger:parameters DeleteSession
 type DeleteSessionRequestBody struct {
-	SessionID uint `json:"session_id" binding:"required"`
+	SessionID uint `json:"session_id" validate:"required"`
 }
 
 // swagger:route DELETE /api/v1/kolide/session DeleteSession
@@ -759,7 +759,7 @@ func DeleteSessionsForUser(c *gin.Context) {
 
 // swagger:parameters GetInfoAboutSession
 type GetInfoAboutSessionRequestBody struct {
-	SessionKey string `json:"session_key" binding:"required"`
+	SessionKey string `json:"session_key" validate:"required"`
 }
 
 // swagger:response SessionInfoResponseBody

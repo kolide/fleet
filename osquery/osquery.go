@@ -8,17 +8,17 @@ import (
 )
 
 type OsqueryEnrollPostBody struct {
-	EnrollSecret string `json:"enroll_secret" binding:"required"`
+	EnrollSecret string `json:"enroll_secret" validate:"required"`
 }
 
 type OsqueryConfigPostBody struct {
-	NodeKey string `json:"node_key" binding:"required"`
+	NodeKey string `json:"node_key" validate:"required"`
 }
 
 type OsqueryLogPostBody struct {
-	NodeKey string                   `json:"node_key" binding:"required"`
-	LogType string                   `json:"log_type" binding:"required"`
-	Data    []map[string]interface{} `json:"data" binding:"required"`
+	NodeKey string                   `json:"node_key" validate:"required"`
+	LogType string                   `json:"log_type" validate:"required"`
+	Data    []map[string]interface{} `json:"data" validate:"required"`
 }
 
 type OsqueryResultLog struct {
@@ -39,12 +39,12 @@ type OsqueryStatusLog struct {
 }
 
 type OsqueryDistributedReadPostBody struct {
-	NodeKey string `json:"node_key" binding:"required"`
+	NodeKey string `json:"node_key" validate:"required"`
 }
 
 type OsqueryDistributedWritePostBody struct {
-	NodeKey string                         `json:"node_key" binding:"required"`
-	Queries map[string][]map[string]string `json:"queries" binding:"required"`
+	NodeKey string                         `json:"node_key" validate:"required"`
+	Queries map[string][]map[string]string `json:"queries" validate:"required"`
 }
 
 func OsqueryEnroll(c *gin.Context) {

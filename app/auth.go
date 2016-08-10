@@ -157,8 +157,8 @@ func SaltAndHashPassword(password string) (string, []byte, error) {
 
 // swagger:parameters Login
 type LoginRequestBody struct {
-	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	Username string `json:"username" validate:"required"`
+	Password string `json:"password" validate:"required"`
 }
 
 // swagger:route POST /api/v1/kolide/login Login
