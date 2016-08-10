@@ -53,6 +53,19 @@ func TestNewFromError(t *testing.T) {
 	assert.Equal(t, expect, kolideErr)
 }
 
+func TestDatabaseError(t *testing.T) {
+	err := errors.New("Foo error")
+	kolideErr := DatabaseError(err)
+
+	expect := &KolideError{
+		Err:            err,
+		StatusCode:     http.StatusInternalServerError,
+		PublicMessage:  "Database error",
+		PrivateMessage: "Foo error",
+	}
+	assert.Equal(t, expect, kolideErr)
+}
+
 func TestReturnErrorUnspecified(t *testing.T) {
 	r := gin.New()
 	r.POST("/foo", func(c *gin.Context) {

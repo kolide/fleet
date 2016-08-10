@@ -37,6 +37,7 @@ func UnauthorizedError(c *gin.Context) {
 		))
 }
 
+// Create a new server for testing purposes with no routes attached
 func createEmptyTestServer(db *gorm.DB) *gin.Engine {
 	server := gin.New()
 	server.Use(DatabaseMiddleware(db))
@@ -63,6 +64,7 @@ func NewSessionManager(c *gin.Context) *sessions.SessionManager {
 	}
 }
 
+// Unmarshal JSON from the gin context into a struct
 func parseJSON(c *gin.Context, obj interface{}) error {
 	decoder := json.NewDecoder(c.Request.Body)
 	if err := decoder.Decode(obj); err != nil {
@@ -71,6 +73,8 @@ func parseJSON(c *gin.Context, obj interface{}) error {
 	return nil
 }
 
+// Parse JSON into a struct with json.Unmarshal, followed by validation with
+// the validator library.
 func ParseAndValidateJSON(c *gin.Context, obj interface{}) error {
 	if err := parseJSON(c, obj); err != nil {
 		return errors.NewFromError(err, http.StatusBadRequest, "JSON parse error")
