@@ -1,9 +1,13 @@
-package main
+package app
 
 import (
 	"encoding/json"
 	"net/http"
 	"testing"
+
+	"github.com/kolide/kolide-ose/config"
+	"github.com/kolide/kolide-ose/errors"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestIntegrationEnrollHostBadSecret(t *testing.T) {
@@ -47,7 +51,7 @@ func TestIntegrationEnrollHostMissingIdentifier(t *testing.T) {
 
 	resp := req.EnrollHost("super secret", "")
 
-	if resp.Code != http.StatusBadRequest {
+	if resp.Code != errors.StatusUnprocessableEntity {
 		t.Error("Should error with missing host identifier")
 	}
 
@@ -57,17 +61,10 @@ func TestIntegrationEnrollHostMissingIdentifier(t *testing.T) {
 		t.Fatalf("JSON decode error: %s JSON contents:\n %s", err.Error(), resp.Body.Bytes())
 	}
 
-	if body["error"] != "Missing host identifier" {
-		t.Errorf("Incorrect/missing error message: %s", body["error"])
-	}
-
-	if invalid, ok := body["node_invalid"]; ok && invalid != true {
-		t.Errorf("Expected node_invalid = true")
-	}
+	assert.Equal(t, "Validation error", body["message"])
 }
 
 func TestIntegrationEnrollHostGood(t *testing.T) {
-	*debug = true
 	var req IntegrationRequests
 	req.New(t)
 

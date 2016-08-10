@@ -6,6 +6,8 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
+	"github.com/kolide/kolide-ose/config"
 	"github.com/kolide/kolide-ose/errors"
 )
 
@@ -146,10 +148,9 @@ type Decorator struct {
 	Query     string
 }
 
-//
-
 type OsqueryEnrollPostBody struct {
-	EnrollSecret string `json:"enroll_secret" validate:"required"`
+	EnrollSecret   string `json:"enroll_secret" validate:"required"`
+	HostIdentifier string `json:"host_identifier" validate:"required"`
 }
 
 type OsqueryConfigPostBody struct {
@@ -188,6 +189,56 @@ type OsqueryDistributedWritePostBody struct {
 	Queries map[string][]map[string]string `json:"queries" validate:"required"`
 }
 
+// Generate a node key using NodeKeySize random bytes Base64 encoded
+func newNodeKey() (string, error) {
+	return generateRandomText(config.Osquery.NodeKeySize)
+}
+
+// Enroll a host. Even if this is an existing host, a new node key should be
+// generated and saved to the DB.
+func EnrollHost(db *gorm.DB, uuid, hostName, ipAddress, platform string) (*Host, error) {
+	host := &Host{}
+	err := db.Where("uuid = ?", uuid).First(&host).Error
+	if err != nil {
+		switch err {
+		case gorm.ErrRecordNotFound:
+			// Create new Host
+			host = &Host{
+				UUID:      uuid,
+				HostName:  hostName,
+				IPAddress: ipAddress,
+				Platform:  platform,
+			}
+
+		default:
+			return nil, err
+		}
+	}
+
+	// Generate a new key each enrollment
+	host.NodeKey, err = newNodeKey()
+	if err != nil {
+		return nil, err
+	}
+
+	// Update these fields if provided
+	if hostName != "" {
+		host.HostName = hostName
+	}
+	if ipAddress != "" {
+		host.IPAddress = ipAddress
+	}
+	if platform != "" {
+		host.Platform = platform
+	}
+
+	if err := db.Save(&host).Error; err != nil {
+		return nil, err
+	}
+
+	return host, nil
+}
+
 func OsqueryEnroll(c *gin.Context) {
 	var body OsqueryEnrollPostBody
 	err := ParseAndValidateJSON(c, &body)
@@ -195,11 +246,43 @@ func OsqueryEnroll(c *gin.Context) {
 		errors.ReturnError(c, err)
 		return
 	}
-	logrus.Debugf("OsqueryEnroll: %s", body.EnrollSecret)
+	logrus.Debugf("OsqueryEnroll: %+v", body)
+
+	logrus.Debugf("Expected: %s, Got %s, Equal: %t", config.Osquery.EnrollSecret, body.EnrollSecret, config.Osquery.EnrollSecret == body.EnrollSecret)
+
+	if body.EnrollSecret != config.Osquery.EnrollSecret {
+		c.JSON(http.StatusUnauthorized,
+			gin.H{
+				"error":        "Invalid enroll secret",
+				"node_invalid": true,
+			})
+		return
+
+	}
+
+	if body.HostIdentifier == "" {
+		c.JSON(http.StatusBadRequest,
+			gin.H{
+				"error":        "Missing host identifier",
+				"node_invalid": true,
+			})
+		return
+
+	}
+
+	db := GetDB(c)
+
+	host, err := EnrollHost(db, body.HostIdentifier, "", "", "")
+	if err != nil {
+		errors.ReturnError(c, errors.DatabaseError(err))
+		return
+	}
+
+	logrus.Debugf("New host created: %+v", host)
 
 	c.JSON(http.StatusOK,
 		gin.H{
-			"node_key":     "7",
+			"node_key":     host.NodeKey,
 			"node_invalid": false,
 		})
 }
