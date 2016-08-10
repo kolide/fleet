@@ -185,9 +185,9 @@ type LoginRequestBody struct {
 //       200: GetUserResponseBody
 func Login(c *gin.Context) {
 	var body LoginRequestBody
-	err := c.BindJSON(&body)
+	err := ParseAndValidateJSON(c, &body)
 	if err != nil {
-		logrus.Errorf("Error parsing Login post body: %s", err.Error())
+		errors.ReturnError(c, err)
 		return
 	}
 

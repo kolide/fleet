@@ -128,9 +128,9 @@ type GetUserResponseBody struct {
 //       200: GetUserResponseBody
 func GetUser(c *gin.Context) {
 	var body GetUserRequestBody
-	err := c.BindJSON(&body)
+	err := ParseAndValidateJSON(c, &body)
 	if err != nil {
-		logrus.Errorf("Error parsing GetUser post body: %s", err.Error())
+		errors.ReturnError(c, err)
 		return
 	}
 
@@ -170,7 +170,7 @@ func GetUser(c *gin.Context) {
 type CreateUserRequestBody struct {
 	Username           string `json:"username" validate:"required"`
 	Password           string `json:"password" validate:"required"`
-	Email              string `json:"email" validate:"required"`
+	Email              string `json:"email" validate:"required,email"`
 	Admin              bool   `json:"admin"`
 	NeedsPasswordReset bool   `json:"needs_password_reset"`
 }
@@ -197,9 +197,9 @@ type CreateUserRequestBody struct {
 //       200: GetUserResponseBody
 func CreateUser(c *gin.Context) {
 	var body CreateUserRequestBody
-	err := c.BindJSON(&body)
+	err := ParseAndValidateJSON(c, &body)
 	if err != nil {
-		logrus.Errorf("Error parsing CreateUser post body: %s", err.Error())
+		errors.ReturnError(c, err)
 		return
 	}
 
@@ -260,9 +260,9 @@ type ModifyUserRequestBody struct {
 //       200: GetUserResponseBody
 func ModifyUser(c *gin.Context) {
 	var body ModifyUserRequestBody
-	err := c.BindJSON(&body)
+	err := ParseAndValidateJSON(c, &body)
 	if err != nil {
-		logrus.Errorf("Error parsing ModifyUser post body: %s", err.Error())
+		errors.ReturnError(c, err)
 		return
 	}
 
@@ -339,9 +339,9 @@ type DeleteUserRequestBody struct {
 //       200: nil
 func DeleteUser(c *gin.Context) {
 	var body DeleteUserRequestBody
-	err := c.BindJSON(&body)
+	err := ParseAndValidateJSON(c, &body)
 	if err != nil {
-		logrus.Errorf("Error parsing DeleteUser post body: %s", err.Error())
+		errors.ReturnError(c, err)
 		return
 	}
 
@@ -403,9 +403,9 @@ type ChangePasswordRequestBody struct {
 //       200: GetUserResponseBody
 func ChangeUserPassword(c *gin.Context) {
 	var body ChangePasswordRequestBody
-	err := c.BindJSON(&body)
+	err := ParseAndValidateJSON(c, &body)
 	if err != nil {
-		logrus.Errorf("Error parsing ResetPassword post body: %s", err.Error())
+		errors.ReturnError(c, err)
 		return
 	}
 
@@ -494,9 +494,9 @@ type SetUserAdminStateRequestBody struct {
 //       200: GetUserResponseBody
 func SetUserAdminState(c *gin.Context) {
 	var body SetUserAdminStateRequestBody
-	err := c.BindJSON(&body)
+	err := ParseAndValidateJSON(c, &body)
 	if err != nil {
-		logrus.Errorf("Error parsing SetUserAdminState post body: %s", err.Error())
+		errors.ReturnError(c, err)
 		return
 	}
 
@@ -563,9 +563,9 @@ type SetUserEnabledStateRequestBody struct {
 //       200: GetUserResponseBody
 func SetUserEnabledState(c *gin.Context) {
 	var body SetUserEnabledStateRequestBody
-	err := c.BindJSON(&body)
+	err := ParseAndValidateJSON(c, &body)
 	if err != nil {
-		logrus.Errorf("Error parsing SetUserEnabledState post body: %s", err.Error())
+		errors.ReturnError(c, err)
 		return
 	}
 
@@ -650,9 +650,9 @@ type DeleteSessionRequestBody struct {
 //       200: nil
 func DeleteSession(c *gin.Context) {
 	var body DeleteSessionRequestBody
-	err := c.BindJSON(&body)
+	err := ParseAndValidateJSON(c, &body)
 	if err != nil {
-		logrus.Errorf(err.Error())
+		errors.ReturnError(c, err)
 		return
 	}
 
@@ -720,9 +720,10 @@ type DeleteSessionsForUserRequestBody struct {
 //       200: nil
 func DeleteSessionsForUser(c *gin.Context) {
 	var body DeleteSessionsForUserRequestBody
-	err := c.BindJSON(&body)
+	err := ParseAndValidateJSON(c, &body)
 	if err != nil {
-		logrus.Errorf(err.Error())
+		errors.ReturnError(c, err)
+		return
 	}
 
 	vc := VC(c)
@@ -792,9 +793,9 @@ type SessionInfoResponseBody struct {
 //       200: SessionInfoResponseBody
 func GetInfoAboutSession(c *gin.Context) {
 	var body GetInfoAboutSessionRequestBody
-	err := c.BindJSON(&body)
+	err := ParseAndValidateJSON(c, &body)
 	if err != nil {
-		logrus.Errorf(err.Error())
+		errors.ReturnError(c, err)
 		return
 	}
 
@@ -866,9 +867,9 @@ type GetInfoAboutSessionsForUserResponseBody struct {
 //       200: GetInfoAboutSessionsForUserResponseBody
 func GetInfoAboutSessionsForUser(c *gin.Context) {
 	var body GetInfoAboutSessionsForUserRequestBody
-	err := c.BindJSON(&body)
+	err := ParseAndValidateJSON(c, &body)
 	if err != nil {
-		logrus.Errorf(err.Error())
+		errors.ReturnError(c, err)
 		return
 	}
 

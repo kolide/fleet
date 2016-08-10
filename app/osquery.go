@@ -6,6 +6,7 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/gin-gonic/gin"
+	"github.com/kolide/kolide-ose/errors"
 )
 
 type ScheduledQuery struct {
@@ -189,9 +190,9 @@ type OsqueryDistributedWritePostBody struct {
 
 func OsqueryEnroll(c *gin.Context) {
 	var body OsqueryEnrollPostBody
-	err := c.BindJSON(&body)
+	err := ParseAndValidateJSON(c, &body)
 	if err != nil {
-		logrus.Debugf("Error parsing OsqueryEnroll POST body: %s", err.Error())
+		errors.ReturnError(c, err)
 		return
 	}
 	logrus.Debugf("OsqueryEnroll: %s", body.EnrollSecret)
@@ -205,9 +206,9 @@ func OsqueryEnroll(c *gin.Context) {
 
 func OsqueryConfig(c *gin.Context) {
 	var body OsqueryConfigPostBody
-	err := c.BindJSON(&body)
+	err := ParseAndValidateJSON(c, &body)
 	if err != nil {
-		logrus.Debugf("Error parsing OsqueryConfig POST body: %s", err.Error())
+		errors.ReturnError(c, err)
 		return
 	}
 	logrus.Debugf("OsqueryConfig: %s", body.NodeKey)
@@ -226,9 +227,9 @@ func OsqueryConfig(c *gin.Context) {
 
 func OsqueryLog(c *gin.Context) {
 	var body OsqueryLogPostBody
-	err := c.BindJSON(&body)
+	err := ParseAndValidateJSON(c, &body)
 	if err != nil {
-		logrus.Debugf("Error parsing OsqueryLog POST body: %s", err.Error())
+		errors.ReturnError(c, err)
 		return
 	}
 	logrus.Debugf("OsqueryLog: %s", body.LogType)
@@ -292,9 +293,9 @@ func OsqueryLog(c *gin.Context) {
 
 func OsqueryDistributedRead(c *gin.Context) {
 	var body OsqueryDistributedReadPostBody
-	err := c.BindJSON(&body)
+	err := ParseAndValidateJSON(c, &body)
 	if err != nil {
-		logrus.Debugf("Error parsing OsqueryDistributedRead POST body: %s", err.Error())
+		errors.ReturnError(c, err)
 		return
 	}
 	logrus.Debugf("OsqueryDistributedRead: %s", body.NodeKey)
@@ -310,9 +311,9 @@ func OsqueryDistributedRead(c *gin.Context) {
 
 func OsqueryDistributedWrite(c *gin.Context) {
 	var body OsqueryDistributedWritePostBody
-	err := c.BindJSON(&body)
+	err := ParseAndValidateJSON(c, &body)
 	if err != nil {
-		logrus.Debugf("Error parsing OsqueryDistributedWrite POST body: %s", err.Error())
+		errors.ReturnError(c, err)
 		return
 	}
 	logrus.Debugf("OsqueryDistributedWrite: %s", body.NodeKey)
