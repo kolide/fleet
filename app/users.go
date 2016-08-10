@@ -135,6 +135,7 @@ func GetUser(c *gin.Context) {
 	}
 
 	vc := VC(c)
+
 	if !vc.CanPerformActions() {
 		UnauthorizedError(c)
 		return

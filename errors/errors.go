@@ -57,6 +57,11 @@ func NewFromError(err error, status int, publicMessage string) *KolideError {
 	}
 }
 
+// Wrap a DB error wit the extra KolideError decorations
+func DatabaseError(err error) *KolideError {
+	return NewFromError(err, http.StatusInternalServerError, "Database error")
+}
+
 // The status code returned for validation errors. Inspired by the Github API.
 const StatusUnprocessableEntity = 422
 
