@@ -7,26 +7,9 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
-	"time"
 
-	"github.com/jordan-wright/email"
 	"github.com/kolide/kolide-ose/sessions"
 )
-
-type MockSMTPConnectionPool struct {
-	Emails []*email.Email
-}
-
-func NewMockSMTPConnectionPool() *MockSMTPConnectionPool {
-	return &MockSMTPConnectionPool{}
-}
-
-func (pool *MockSMTPConnectionPool) Send(e *email.Email, timeout time.Duration) error {
-	pool.Emails = append(pool.Emails, e)
-	return nil
-}
-
-func (pool *MockSMTPConnectionPool) Close() {}
 
 func TestGetEmailSubject(t *testing.T) {
 	subject, err := GetEmailSubject(PasswordResetEmail)
@@ -76,7 +59,7 @@ func (w *mockResponseWriter) WriteHeader(int) {
 
 func TestUnauthenticatedPasswordReset(t *testing.T) {
 	db := openTestDB(t)
-	pool := NewMockSMTPConnectionPool()
+	pool := newMockSMTPConnectionPool()
 	r := CreateServer(db, pool, &testLogger{t: t})
 	admin, _ := NewUser(db, "admin", "foobar", "admin@kolide.co", true, false)
 
@@ -135,7 +118,7 @@ func TestUnauthenticatedPasswordReset(t *testing.T) {
 
 func TestAuthenticatedPasswordReset(t *testing.T) {
 	db := openTestDB(t)
-	pool := NewMockSMTPConnectionPool()
+	pool := newMockSMTPConnectionPool()
 	r := CreateServer(db, pool, &testLogger{t: t})
 	admin, _ := NewUser(db, "admin", "foobar", "admin@kolide.co", true, false)
 	request, _ := http.NewRequest("GET", "/", nil)
@@ -188,7 +171,7 @@ func TestAuthenticatedPasswordReset(t *testing.T) {
 }
 
 func TestSendEmail(t *testing.T) {
-	pool := NewMockSMTPConnectionPool()
+	pool := newMockSMTPConnectionPool()
 	err := SendEmail(pool, "mike@kolide.co", "hi", []byte("<p>hey</p>"), []byte("hey"))
 	if err != nil {
 		t.Fatal(err.PrivateMessage)

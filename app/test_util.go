@@ -54,7 +54,7 @@ func (req *IntegrationRequests) New(t *testing.T) {
 	req.t = t
 
 	req.db = openTestDB(t)
-	req.pool = NewMockSMTPConnectionPool()
+	req.pool = newMockSMTPConnectionPool()
 
 	// Until we have a better solution for first-user onboarding, manually
 	// create an admin

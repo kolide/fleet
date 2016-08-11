@@ -29,6 +29,21 @@ type SMTPConnectionPool interface {
 	Close()
 }
 
+type mockSMTPConnectionPool struct {
+	Emails []*email.Email
+}
+
+func newMockSMTPConnectionPool() *mockSMTPConnectionPool {
+	return &mockSMTPConnectionPool{}
+}
+
+func (pool *mockSMTPConnectionPool) Send(e *email.Email, timeout time.Duration) error {
+	pool.Emails = append(pool.Emails, e)
+	return nil
+}
+
+func (pool *mockSMTPConnectionPool) Close() {}
+
 func SendEmail(pool SMTPConnectionPool, to, subject string, html, text []byte) *errors.KolideError {
 	e := email.Email{
 		From:    fmt.Sprintf("Kolide <%s>", NoReplyEmailAddress),
