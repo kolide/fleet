@@ -31,12 +31,8 @@ func TestIntegrationEnrollHostBadSecret(t *testing.T) {
 		t.Fatalf("JSON decode error: %s JSON contents:\n %s", err.Error(), resp.Body.Bytes())
 	}
 
-	if body["error"] != "Invalid enroll secret" {
-		t.Errorf("Incorrect/missing error message: %s", body["error"])
-	}
-
-	if invalid, ok := body["node_invalid"]; ok && invalid != true {
-		t.Errorf("Expected node_invalid = true")
+	if _, ok := body["node_key"]; ok {
+		t.Errorf("Should not return node key when secret is invalid")
 	}
 }
 
