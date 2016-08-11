@@ -247,7 +247,6 @@ func OsqueryEnroll(c *gin.Context) {
 		errors.ReturnError(c, err)
 		return
 	}
-	logrus.Debugf("OsqueryEnroll: %+v", body)
 
 	if body.EnrollSecret != config.Osquery.EnrollSecret {
 		errors.ReturnError(
