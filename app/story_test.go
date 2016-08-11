@@ -76,10 +76,10 @@ func TestUserAndAccountManagement(t *testing.T) {
 	req.DeleteSession(adminSessionInfo.Sessions[0].SessionID, adminSession)
 
 	// Verify the session was deleted
-	sessionVerify := &sessions.Session{
+	sessionVerify := sessions.Session{
 		Key: sessionKey,
 	}
-	err = req.db.Where(sessionVerify).First(sessionVerify).Error
+	err = req.db.Where(&sessionVerify).First(&sessionVerify).Error
 	if err != gorm.ErrRecordNotFound {
 		t.Fatal("Record should not exist in the database")
 	}

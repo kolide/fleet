@@ -38,7 +38,7 @@ func NewUser(db *gorm.DB, username, password, email string, admin, needsPassword
 	if err != nil {
 		return nil, err
 	}
-	user := &User{
+	user := User{
 		Username:           username,
 		Password:           hash,
 		Salt:               salt,
@@ -48,11 +48,11 @@ func NewUser(db *gorm.DB, username, password, email string, admin, needsPassword
 		NeedsPasswordReset: needsPasswordReset,
 	}
 
-	err = db.Create(user).Error
+	err = db.Create(&user).Error
 	if err != nil {
 		return nil, err
 	}
-	return user, nil
+	return &user, nil
 }
 
 type PasswordResetRequest struct {
@@ -65,7 +65,7 @@ type PasswordResetRequest struct {
 }
 
 func NewPasswordResetRequest(db *gorm.DB, userID uint, expires time.Time) (*PasswordResetRequest, error) {
-	campaign := &PasswordResetRequest{
+	campaign := PasswordResetRequest{
 		UserID:    userID,
 		ExpiresAt: expires,
 	}
@@ -76,12 +76,12 @@ func NewPasswordResetRequest(db *gorm.DB, userID uint, expires time.Time) (*Pass
 	}
 	campaign.Token = token
 
-	err = db.Create(campaign).Error
+	err = db.Create(&campaign).Error
 	if err != nil {
 		return nil, err
 	}
 
-	return campaign, nil
+	return &campaign, nil
 }
 
 // ValidatePassword accepts a potential password for a given user and attempts
@@ -172,17 +172,17 @@ func GetUser(c *gin.Context) {
 	}
 
 	db := GetDB(c)
-	user := &User{
+	user := User{
 		ID:       body.ID,
 		Username: body.Username,
 	}
-	err = db.Where(user).First(user).Error
+	err = db.Where(&user).First(&user).Error
 	if err != nil {
 		errors.ReturnError(c, errors.DatabaseError(err))
 		return
 	}
 
-	if !vc.CanPerformReadActionOnUser(user) {
+	if !vc.CanPerformReadActionOnUser(&user) {
 		UnauthorizedError(c)
 		return
 	}
@@ -304,9 +304,10 @@ func ModifyUser(c *gin.Context) {
 		return
 	}
 
-	var user User
-	user.ID = body.ID
-	user.Username = body.Username
+	user := User{
+		ID:       body.ID,
+		Username: body.Username,
+	}
 
 	db := GetDB(c)
 	err = db.Where(&user).First(&user).Error
@@ -395,17 +396,17 @@ func ChangeUserPassword(c *gin.Context) {
 	}
 
 	db := GetDB(c)
-	user := &User{
+	user := User{
 		ID:       body.ID,
 		Username: body.Username,
 	}
-	err = db.Where(user).First(user).Error
+	err = db.Where(&user).First(&user).Error
 	if err != nil {
 		errors.ReturnError(c, errors.DatabaseError(err))
 		return
 	}
 
-	if !vc.CanPerformWriteActionOnUser(user) {
+	if !vc.CanPerformWriteActionOnUser(&user) {
 		UnauthorizedError(c)
 		return
 	}
@@ -513,9 +514,10 @@ func SetUserAdminState(c *gin.Context) {
 	}
 
 	db := GetDB(c)
-	var user User
-	user.ID = body.ID
-	user.Username = body.Username
+	user := User{
+		ID:       body.ID,
+		Username: body.Username,
+	}
 	err = db.Where(&user).First(&user).Error
 	if err != nil {
 		errors.ReturnError(c, errors.DatabaseError(err))
@@ -585,17 +587,17 @@ func SetUserEnabledState(c *gin.Context) {
 	}
 
 	db := GetDB(c)
-	user := &User{
+	user := User{
 		ID:       body.ID,
 		Username: body.Username,
 	}
-	err = db.Where(user).First(user).Error
+	err = db.Where(&user).First(&user).Error
 	if err != nil {
 		errors.ReturnError(c, errors.DatabaseError(err))
 		return
 	}
 
-	if !vc.CanPerformWriteActionOnUser(user) {
+	if !vc.CanPerformWriteActionOnUser(&user) {
 		UnauthorizedError(c)
 		return
 	}
@@ -692,14 +694,14 @@ func DeleteSession(c *gin.Context) {
 	}
 
 	db := GetDB(c)
-	user := &User{ID: session.UserID}
-	err = db.Where(user).First(user).Error
+	user := User{ID: session.UserID}
+	err = db.Where(&user).First(&user).Error
 	if err != nil {
 		errors.ReturnError(c, errors.DatabaseError(err))
 		return
 	}
 
-	if !vc.CanPerformWriteActionOnUser(user) {
+	if !vc.CanPerformWriteActionOnUser(&user) {
 		UnauthorizedError(c)
 		return
 	}
@@ -755,9 +757,10 @@ func DeleteSessionsForUser(c *gin.Context) {
 	}
 
 	db := GetDB(c)
-	var user User
-	user.ID = body.ID
-	user.Username = body.Username
+	user := User{
+		ID:       body.ID,
+		Username: body.Username,
+	}
 	err = db.Where(&user).First(&user).Error
 	if err != nil {
 		errors.ReturnError(c, errors.DatabaseError(err))
@@ -835,8 +838,8 @@ func GetInfoAboutSession(c *gin.Context) {
 	}
 
 	db := GetDB(c)
-	user := &User{ID: session.UserID}
-	err = db.Where(user).First(user).Error
+	user := User{ID: session.UserID}
+	err = db.Where(&user).First(&user).Error
 	if err != nil {
 		errors.ReturnError(c, errors.DatabaseError(err))
 		return
@@ -901,17 +904,17 @@ func GetInfoAboutSessionsForUser(c *gin.Context) {
 	}
 
 	db := GetDB(c)
-	user := &User{
+	user := User{
 		ID:       body.ID,
 		Username: body.Username,
 	}
-	err = db.Where(user).First(user).Error
+	err = db.Where(&user).First(&user).Error
 	if err != nil {
 		errors.ReturnError(c, errors.DatabaseError(err))
 		return
 	}
 
-	if !vc.CanPerformWriteActionOnUser(user) {
+	if !vc.CanPerformWriteActionOnUser(&user) {
 		UnauthorizedError(c)
 		return
 	}
@@ -987,7 +990,7 @@ func ResetUserPassword(c *gin.Context) {
 		return
 	}
 
-	user := &User{
+	user := User{
 		ID:       body.ID,
 		Username: body.Username,
 	}
@@ -1002,7 +1005,7 @@ func ResetUserPassword(c *gin.Context) {
 		user.Email = body.Email
 	}
 
-	err = GetDB(c).Where(user).First(user).Error
+	err = GetDB(c).Where(&user).First(&user).Error
 	if err != nil {
 		switch err {
 		case gorm.ErrRecordNotFound:
@@ -1019,7 +1022,7 @@ func ResetUserPassword(c *gin.Context) {
 		// resetting their own password or logged-out user presumably resetting
 		// their own password
 
-		if vc.CanPerformWriteActionOnUser(user) {
+		if vc.CanPerformWriteActionOnUser(&user) {
 			// if the user is logged out, don't perform the user state
 			// modifications
 			user.NeedsPasswordReset = true
@@ -1050,7 +1053,7 @@ func ResetUserPassword(c *gin.Context) {
 			errors.ReturnError(c, errors.InternalServerError(err))
 		}
 
-		e := &email.Email{
+		e := email.Email{
 			From:    fmt.Sprintf("Kolide <%s>", NoReplyEmailAddress),
 			To:      []string{user.Email},
 			Subject: subject,
@@ -1058,7 +1061,7 @@ func ResetUserPassword(c *gin.Context) {
 			Text:    text,
 		}
 
-		err = GetSMTPConnectionPool(c).Send(e, time.Second*10)
+		err = GetSMTPConnectionPool(c).Send(&e, time.Second*10)
 		if err != nil {
 			errors.ReturnError(c, errors.DatabaseError(err)) // not the best error
 			return
@@ -1114,11 +1117,11 @@ func VerifyPasswordResetRequest(c *gin.Context) {
 	}
 
 	db := GetDB(c)
-	user := &User{
+	user := User{
 		ID:       body.UserID,
 		Username: body.Username,
 	}
-	err = db.Where(user).First(user).Error
+	err = db.Where(&user).First(&user).Error
 	if err != nil {
 		switch err {
 		case gorm.ErrRecordNotFound:
@@ -1132,11 +1135,11 @@ func VerifyPasswordResetRequest(c *gin.Context) {
 		}
 	}
 
-	reset := &PasswordResetRequest{
+	reset := PasswordResetRequest{
 		UserID: user.ID,
 		Token:  body.Token,
 	}
-	err = db.Where(reset).First(reset).Error
+	err = db.Where(&reset).First(&reset).Error
 	if err != nil {
 		switch err {
 		case gorm.ErrRecordNotFound:
@@ -1194,8 +1197,8 @@ func DeletePasswordResetRequest(c *gin.Context) {
 	}
 
 	db := GetDB(c)
-	campaign := &PasswordResetRequest{ID: body.ID}
-	err = db.Where(campaign).First(campaign).Error
+	campaign := PasswordResetRequest{ID: body.ID}
+	err = db.Where(&campaign).First(&campaign).Error
 	if err != nil {
 		switch err {
 		case gorm.ErrRecordNotFound:
@@ -1207,15 +1210,15 @@ func DeletePasswordResetRequest(c *gin.Context) {
 		}
 	}
 
-	user := &User{ID: campaign.UserID}
-	err = db.Where(user).First(user).Error
+	user := User{ID: campaign.UserID}
+	err = db.Where(&user).First(&user).Error
 	if err != nil {
 		errors.ReturnError(c, errors.DatabaseError(err))
 		return
 	}
 
 	vc := VC(c)
-	if !vc.CanPerformWriteActionOnUser(user) {
+	if !vc.CanPerformWriteActionOnUser(&user) {
 		UnauthorizedError(c)
 		return
 	}

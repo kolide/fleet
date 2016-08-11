@@ -40,7 +40,7 @@ type mockResponseWriter struct {
 	headers map[string][]string
 }
 
-func newMocResponseWriter() *mockResponseWriter {
+func newMockResponseWriter() *mockResponseWriter {
 	return &mockResponseWriter{
 		headers: map[string][]string{},
 	}
@@ -107,10 +107,10 @@ func TestUnauthenticatedPasswordReset(t *testing.T) {
 		t.Fatalf("Email is going to the wrong address: %s", e.To)
 	}
 
-	verify := &User{
+	verify := User{
 		ID: admin.ID,
 	}
-	db.Find(verify).First(verify)
+	db.Find(&verify).First(&verify)
 	if verify.NeedsPasswordReset {
 		t.Fatal("User should not need password reset")
 	}
@@ -122,8 +122,8 @@ func TestAuthenticatedPasswordReset(t *testing.T) {
 	r := CreateServer(db, pool, &testLogger{t: t})
 	admin, _ := NewUser(db, "admin", "foobar", "admin@kolide.co", true, false)
 	request, _ := http.NewRequest("GET", "/", nil)
-	writer := newMocResponseWriter()
-	sm := &sessions.SessionManager{
+	writer := newMockResponseWriter()
+	sm := sessions.SessionManager{
 		Backend: &sessions.GormSessionBackend{DB: db},
 		Request: request,
 		Writer:  writer,
@@ -161,10 +161,10 @@ func TestAuthenticatedPasswordReset(t *testing.T) {
 		t.Fatalf("Email is going to the wrong address: %s", e.To)
 	}
 
-	verify := &User{
+	verify := User{
 		ID: admin.ID,
 	}
-	db.Find(verify).First(verify)
+	db.Find(&verify).First(&verify)
 	if !verify.NeedsPasswordReset {
 		t.Fatal("User should need password reset")
 	}

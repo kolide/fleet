@@ -44,7 +44,10 @@ func GetEmailBody(t EmailType, params interface{}) (html []byte, text []byte, er
 			resetParams.Token,
 		))
 	default:
-		err = errors.New("Couldn't get email body", "Email type unknown")
+		err = errors.New(
+			"Couldn't get email body",
+			fmt.Sprintf("Email type unknown: %d", t),
+		)
 	}
 	return
 }
@@ -54,6 +57,9 @@ func GetEmailSubject(t EmailType) (string, error) {
 	case PasswordResetEmail:
 		return "Your Kolide Password Reset Request", nil
 	default:
-		return "", errors.New("Couldn't get email subject", "Email type unknown")
+		return "", errors.New(
+			"Couldn't get email subject",
+			fmt.Sprintf("Email type unknown: %d", t),
+		)
 	}
 }

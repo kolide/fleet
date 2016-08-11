@@ -44,21 +44,13 @@ func (vc *ViewerContext) UserID() (uint, error) {
 // CanPerformActions returns a bool indicating the current user's ability to
 // perform the most basic actions on the site
 func (vc *ViewerContext) CanPerformActions() bool {
-	if vc.IsLoggedIn() && !vc.user.NeedsPasswordReset {
-		return true
-	}
-
-	return false
+	return vc.IsLoggedIn() && !vc.user.NeedsPasswordReset
 }
 
 // IsLoggedIn determines whether or not the current VC is attached to a user
 // account
 func (vc *ViewerContext) IsLoggedIn() bool {
-	if vc.user != nil && vc.user.Enabled {
-		return true
-	}
-
-	return false
+	return vc.user != nil && vc.user.Enabled
 }
 
 // IsUserID returns true if the given user id the same as the user which is
@@ -116,13 +108,13 @@ func VC(c *gin.Context) *ViewerContext {
 func VCForID(db *gorm.DB, id uint) *ViewerContext {
 	// Generating a VC requires a user struct. Attempt to populate one using
 	// the user id of the current session holder
-	user := &User{ID: id}
-	err := db.Where(user).First(user).Error
+	user := User{ID: id}
+	err := db.Where(&user).First(&user).Error
 	if err != nil {
 		return EmptyVC()
 	}
 
-	return GenerateVC(user)
+	return GenerateVC(&user)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -199,8 +191,8 @@ func Login(c *gin.Context) {
 
 	db := GetDB(c)
 
-	user := &User{Username: body.Username}
-	err = db.Where(user).First(user).Error
+	user := User{Username: body.Username}
+	err = db.Where(&user).First(&user).Error
 	if err != nil {
 		logrus.Debugf("User not found: %s", body.Username)
 		UnauthorizedError(c)
