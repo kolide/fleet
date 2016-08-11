@@ -1055,7 +1055,7 @@ func ResetUserPassword(c *gin.Context) {
 		}
 
 		kerr = SendEmail(GetSMTPConnectionPool(c), user.Email, subject, html, text)
-		if err != nil {
+		if kerr != nil {
 			errors.ReturnError(c, kerr)
 			return
 		}
