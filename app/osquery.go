@@ -198,8 +198,8 @@ func newNodeKey() (string, error) {
 // Enroll a host. Even if this is an existing host, a new node key should be
 // generated and saved to the DB.
 func EnrollHost(db *gorm.DB, uuid, hostName, ipAddress, platform string) (*Host, error) {
-	var host Host
-	err := db.Where("uuid = ?", uuid).First(&host).Error
+	host := Host{UUID: uuid}
+	err := db.Where(&host).First(&host).Error
 	if err != nil {
 		switch err {
 		case gorm.ErrRecordNotFound:
