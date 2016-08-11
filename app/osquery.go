@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -248,24 +249,13 @@ func OsqueryEnroll(c *gin.Context) {
 	}
 	logrus.Debugf("OsqueryEnroll: %+v", body)
 
-	logrus.Debugf("Expected: %s, Got %s, Equal: %t", config.Osquery.EnrollSecret, body.EnrollSecret, config.Osquery.EnrollSecret == body.EnrollSecret)
-
 	if body.EnrollSecret != config.Osquery.EnrollSecret {
-		c.JSON(http.StatusUnauthorized,
-			gin.H{
-				"error":        "Invalid enroll secret",
-				"node_invalid": true,
-			})
-		return
-
-	}
-
-	if body.HostIdentifier == "" {
-		c.JSON(http.StatusBadRequest,
-			gin.H{
-				"error":        "Missing host identifier",
-				"node_invalid": true,
-			})
+		errors.ReturnError(
+			c,
+			errors.NewWithStatus(http.StatusUnauthorized,
+				"Node key invalid",
+				fmt.Sprintf("Invalid node secret provided: %s", body.EnrollSecret),
+			))
 		return
 
 	}
