@@ -87,7 +87,6 @@ To view test a test coverage report in a terminal, run the following:
 go tool cover -func=./sessions/sessions.cover
 ```
 
-<<<<<<< 99ed93c20a4c7f6a1fb3eabd70bec7c3d80cff81
 ### Starting the local development environment
 
 To set up a canonical development environment via docker,
