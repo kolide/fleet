@@ -1037,7 +1037,7 @@ func ResetUserPassword(c *gin.Context) {
 			return
 		}
 
-		html, text, err := GetEmailBody(PasswordResetEmail, &PasswordResetRequestParameters{
+		html, text, err := GetEmailBody(PasswordResetEmail, &PasswordResetRequestEmailParameters{
 			Name:  user.Name,
 			Token: request.Token,
 		})

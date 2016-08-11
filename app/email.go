@@ -13,7 +13,7 @@ const (
 	PasswordResetEmail EmailType = iota
 )
 
-type PasswordResetRequestParameters struct {
+type PasswordResetRequestEmailParameters struct {
 	Name  string
 	Token string
 }
@@ -25,7 +25,7 @@ const (
 func GetEmailBody(t EmailType, params interface{}) (html []byte, text []byte, err error) {
 	switch t {
 	case PasswordResetEmail:
-		resetParams, ok := params.(*PasswordResetRequestParameters)
+		resetParams, ok := params.(*PasswordResetRequestEmailParameters)
 		if !ok {
 			err = errors.New("Couldn't get email body", "Parameters were of incorrect type")
 			return
