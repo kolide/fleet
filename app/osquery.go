@@ -198,13 +198,13 @@ func newNodeKey() (string, error) {
 // Enroll a host. Even if this is an existing host, a new node key should be
 // generated and saved to the DB.
 func EnrollHost(db *gorm.DB, uuid, hostName, ipAddress, platform string) (*Host, error) {
-	host := &Host{}
+	var host Host
 	err := db.Where("uuid = ?", uuid).First(&host).Error
 	if err != nil {
 		switch err {
 		case gorm.ErrRecordNotFound:
 			// Create new Host
-			host = &Host{
+			host = Host{
 				UUID:      uuid,
 				HostName:  hostName,
 				IPAddress: ipAddress,
@@ -237,7 +237,7 @@ func EnrollHost(db *gorm.DB, uuid, hostName, ipAddress, platform string) (*Host,
 		return nil, err
 	}
 
-	return host, nil
+	return &host, nil
 }
 
 func OsqueryEnroll(c *gin.Context) {
