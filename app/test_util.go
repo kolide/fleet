@@ -45,13 +45,16 @@ func openTestDB(t *testing.T) *gorm.DB {
 	return db
 }
 
-type MockSMTPConnectionPool struct{}
+type MockSMTPConnectionPool struct {
+	Emails []*email.Email
+}
 
 func NewMockSMTPConnectionPool() *MockSMTPConnectionPool {
 	return &MockSMTPConnectionPool{}
 }
 
 func (pool *MockSMTPConnectionPool) Send(e *email.Email, timeout time.Duration) error {
+	pool.Emails = append(pool.Emails, e)
 	return nil
 }
 

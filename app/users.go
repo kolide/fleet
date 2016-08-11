@@ -1037,13 +1037,26 @@ func ResetUserPassword(c *gin.Context) {
 			return
 		}
 
-		// email user with link to reset password
-		e := email.NewEmail()
-		e.From = "Kolide <no-reply@kolide.co>"
-		e.To = []string{user.Email}
-		e.Subject = "Your Kolide Password Reset Request"
-		e.Text = []byte(fmt.Sprintf("Reset your password: https://%s/account/password/reset?token=%s", config.App.WebAddress, request.Token))
-		e.HTML = []byte(fmt.Sprintf("<a href=\"https://%s/account/password/reset?token=%s\">Reset your password</a>", config.App.WebAddress, request.Token))
+		html, text, err := GetEmailBody(PasswordResetEmail, &PasswordResetRequestParameters{
+			Name:  user.Name,
+			Token: request.Token,
+		})
+		if err != nil {
+			errors.ReturnError(c, errors.InternalServerError(err))
+		}
+
+		subject, err := GetEmailSubject(PasswordResetEmail)
+		if err != nil {
+			errors.ReturnError(c, errors.InternalServerError(err))
+		}
+
+		e := &email.Email{
+			From:    fmt.Sprintf("Kolide <%s>", NoReplyEmailAddress),
+			To:      []string{user.Email},
+			Subject: subject,
+			HTML:    html,
+			Text:    text,
+		}
 
 		err = GetSMTPConnectionPool(c).Send(e, time.Second*10)
 		if err != nil {
