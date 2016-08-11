@@ -104,7 +104,7 @@ func TestUnauthenticatedPasswordReset(t *testing.T) {
 
 	e := pool.Emails[0]
 	if e.To[0] != admin.Email {
-		t.Fatalf("Email is going to the wrong address", e.To)
+		t.Fatalf("Email is going to the wrong address: %s", e.To)
 	}
 
 	verify := &User{
@@ -158,7 +158,7 @@ func TestAuthenticatedPasswordReset(t *testing.T) {
 
 	e := pool.Emails[0]
 	if e.To[0] != admin.Email {
-		t.Fatalf("Email is going to the wrong address", e.To)
+		t.Fatalf("Email is going to the wrong address: %s", e.To)
 	}
 
 	verify := &User{
