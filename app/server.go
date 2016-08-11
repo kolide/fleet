@@ -13,7 +13,6 @@ import (
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
-	"github.com/jordan-wright/email"
 	"github.com/kolide/kolide-ose/errors"
 	"github.com/kolide/kolide-ose/sessions"
 	"github.com/spf13/viper"
@@ -21,11 +20,6 @@ import (
 )
 
 var validate *validator.Validate = validator.New(&validator.Config{TagName: "validate", FieldNameTag: "json"})
-
-type SMTPConnectionPool interface {
-	Send(e *email.Email, timeout time.Duration) error
-	Close()
-}
 
 // Get the SMTP connection pool from the context, or panic
 func GetSMTPConnectionPool(c *gin.Context) SMTPConnectionPool {

@@ -7,9 +7,26 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
+	"github.com/jordan-wright/email"
 	"github.com/kolide/kolide-ose/sessions"
 )
+
+type MockSMTPConnectionPool struct {
+	Emails []*email.Email
+}
+
+func NewMockSMTPConnectionPool() *MockSMTPConnectionPool {
+	return &MockSMTPConnectionPool{}
+}
+
+func (pool *MockSMTPConnectionPool) Send(e *email.Email, timeout time.Duration) error {
+	pool.Emails = append(pool.Emails, e)
+	return nil
+}
+
+func (pool *MockSMTPConnectionPool) Close() {}
 
 func TestGetEmailSubject(t *testing.T) {
 	subject, err := GetEmailSubject(PasswordResetEmail)
@@ -167,5 +184,21 @@ func TestAuthenticatedPasswordReset(t *testing.T) {
 	db.Find(&verify).First(&verify)
 	if !verify.NeedsPasswordReset {
 		t.Fatal("User should need password reset")
+	}
+}
+
+func TestSendEmail(t *testing.T) {
+	pool := NewMockSMTPConnectionPool()
+	err := SendEmail(pool, "mike@kolide.co", "hi", []byte("<p>hey</p>"), []byte("hey"))
+	if err != nil {
+		t.Fatal(err.PrivateMessage)
+	}
+
+	if len(pool.Emails) != 1 {
+		t.Fatalf("Email not sent. %d emails in pool.", len(pool.Emails))
+	}
+
+	if string(pool.Emails[0].Text) != "hey" {
+		t.Fatalf("Text didn't match. Wanted \"hey\". Got \"%s\"", pool.Emails[0].Text)
 	}
 }

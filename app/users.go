@@ -7,7 +7,6 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
-	"github.com/jordan-wright/email"
 	"github.com/kolide/kolide-ose/config"
 	"github.com/kolide/kolide-ose/errors"
 	"github.com/kolide/kolide-ose/sessions"
@@ -1040,30 +1039,24 @@ func ResetUserPassword(c *gin.Context) {
 			return
 		}
 
-		html, text, err := GetEmailBody(PasswordResetEmail, &PasswordResetRequestEmailParameters{
+		html, text, kerr := GetEmailBody(PasswordResetEmail, &PasswordResetRequestEmailParameters{
 			Name:  user.Name,
 			Token: request.Token,
 		})
-		if err != nil {
-			errors.ReturnError(c, errors.InternalServerError(err))
+		if kerr != nil {
+			errors.ReturnError(c, kerr)
+			return
 		}
 
-		subject, err := GetEmailSubject(PasswordResetEmail)
+		subject, kerr := GetEmailSubject(PasswordResetEmail)
 		if err != nil {
-			errors.ReturnError(c, errors.InternalServerError(err))
+			errors.ReturnError(c, kerr)
+			return
 		}
 
-		e := email.Email{
-			From:    fmt.Sprintf("Kolide <%s>", NoReplyEmailAddress),
-			To:      []string{user.Email},
-			Subject: subject,
-			HTML:    html,
-			Text:    text,
-		}
-
-		err = GetSMTPConnectionPool(c).Send(&e, time.Second*10)
+		kerr = SendEmail(GetSMTPConnectionPool(c), user.Email, subject, html, text)
 		if err != nil {
-			errors.ReturnError(c, errors.DatabaseError(err)) // not the best error
+			errors.ReturnError(c, kerr)
 			return
 		}
 	} else {

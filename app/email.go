@@ -2,7 +2,9 @@ package app
 
 import (
 	"fmt"
+	"time"
 
+	"github.com/jordan-wright/email"
 	"github.com/kolide/kolide-ose/config"
 	"github.com/kolide/kolide-ose/errors"
 )
@@ -22,7 +24,29 @@ const (
 	NoReplyEmailAddress = "no-reply@kolide.co"
 )
 
-func GetEmailBody(t EmailType, params interface{}) (html []byte, text []byte, err error) {
+type SMTPConnectionPool interface {
+	Send(e *email.Email, timeout time.Duration) error
+	Close()
+}
+
+func SendEmail(pool SMTPConnectionPool, to, subject string, html, text []byte) *errors.KolideError {
+	e := email.Email{
+		From:    fmt.Sprintf("Kolide <%s>", NoReplyEmailAddress),
+		To:      []string{to},
+		Subject: subject,
+		HTML:    html,
+		Text:    text,
+	}
+
+	err := pool.Send(&e, time.Second*10)
+	if err != nil {
+		return errors.New("Mail error", "Error attempting to send email on the SMTP pool")
+	}
+
+	return nil
+}
+
+func GetEmailBody(t EmailType, params interface{}) (html []byte, text []byte, err *errors.KolideError) {
 	switch t {
 	case PasswordResetEmail:
 		resetParams, ok := params.(*PasswordResetRequestEmailParameters)
@@ -52,7 +76,7 @@ func GetEmailBody(t EmailType, params interface{}) (html []byte, text []byte, er
 	return
 }
 
-func GetEmailSubject(t EmailType) (string, error) {
+func GetEmailSubject(t EmailType) (string, *errors.KolideError) {
 	switch t {
 	case PasswordResetEmail:
 		return "Your Kolide Password Reset Request", nil

@@ -7,11 +7,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
-	"github.com/jordan-wright/email"
 )
 
 type testLogger struct {
@@ -44,21 +42,6 @@ func openTestDB(t *testing.T) *gorm.DB {
 
 	return db
 }
-
-type MockSMTPConnectionPool struct {
-	Emails []*email.Email
-}
-
-func NewMockSMTPConnectionPool() *MockSMTPConnectionPool {
-	return &MockSMTPConnectionPool{}
-}
-
-func (pool *MockSMTPConnectionPool) Send(e *email.Email, timeout time.Duration) error {
-	pool.Emails = append(pool.Emails, e)
-	return nil
-}
-
-func (pool *MockSMTPConnectionPool) Close() {}
 
 type IntegrationRequests struct {
 	r    *gin.Engine
