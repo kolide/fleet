@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/jordan-wright/email"
@@ -55,7 +56,7 @@ func SendEmail(pool SMTPConnectionPool, to, subject string, html, text []byte) e
 
 	err := pool.Send(&e, time.Second*10)
 	if err != nil {
-		return errors.New("Mail error", "Error attempting to send email on the SMTP pool")
+		return errors.NewFromError(err, http.StatusInternalServerError, "Email error")
 	}
 
 	return nil
