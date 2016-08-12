@@ -1162,7 +1162,7 @@ func VerifyPasswordResetRequest(c *gin.Context) {
 
 // swagger:parameters DeletePasswordResetRequest
 type DeletePasswordResetRequestRequestBody struct {
-	ID uint `json:"id" binding:"required"`
+	ID uint `json:"id" validate:"required"`
 }
 
 // swagger:route DELETE /api/v1/kolide/user/password/reset DeletePasswordResetRequest
