@@ -174,7 +174,7 @@ func TestSendEmail(t *testing.T) {
 	pool := newMockSMTPConnectionPool()
 	err := SendEmail(pool, "mike@kolide.co", "hi", []byte("<p>hey</p>"), []byte("hey"))
 	if err != nil {
-		t.Fatal(err.PrivateMessage)
+		t.Fatal(err.Error())
 	}
 
 	if len(pool.Emails) != 1 {

@@ -8,9 +8,9 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
-	"github.com/kolide/kolide-ose/config"
 	"github.com/kolide/kolide-ose/errors"
 	"github.com/kolide/kolide-ose/sessions"
+	"github.com/spf13/viper"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -70,7 +70,7 @@ func NewPasswordResetRequest(db *gorm.DB, userID uint, expires time.Time) (*Pass
 		ExpiresAt: expires,
 	}
 
-	token, err := generateRandomText(config.App.EmailTokenKeySize)
+	token, err := generateRandomText(viper.GetInt("smtp.token_key_size"))
 	if err != nil {
 		return nil, err
 	}

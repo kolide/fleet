@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/jordan-wright/email"
-	"github.com/kolide/kolide-ose/config"
 	"github.com/kolide/kolide-ose/errors"
+	"github.com/spf13/viper"
 )
 
 type EmailType int
@@ -73,13 +73,13 @@ func GetEmailBody(t EmailType, params interface{}) (html []byte, text []byte, er
 		html = []byte(fmt.Sprintf(
 			"Hi %s! <a href=\"%s/password/reset?token=%s\">Reset your password!</a>",
 			resetParams.Name,
-			config.App.WebAddress,
+			viper.GetString("app.web_address"),
 			resetParams.Token,
 		))
 		text = []byte(fmt.Sprintf(
 			"Hi %s! Reset your password: %s/password/reset?token=%s",
 			resetParams.Name,
-			config.App.WebAddress,
+			viper.GetString("app.web_address"),
 			resetParams.Token,
 		))
 	default:
