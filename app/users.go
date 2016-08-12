@@ -984,7 +984,7 @@ type ResetPasswordResponseBody struct {
 //       200: ResetPasswordResponseBody
 func ResetUserPassword(c *gin.Context) {
 	var body ResetPasswordRequestBody
-	err := c.BindJSON(&body)
+	err := ParseAndValidateJSON(c, &body)
 	if err != nil {
 		logrus.Errorf("Error parsing ResetPassword post body: %s", err.Error())
 		return
@@ -1104,7 +1104,7 @@ type VerifyPasswordResetRequestResponseBody struct {
 //       200: VerifyPasswordResetRequestResponseBody
 func VerifyPasswordResetRequest(c *gin.Context) {
 	var body VerifyPasswordResetRequestRequestBody
-	err := c.BindJSON(&body)
+	err := ParseAndValidateJSON(c, &body)
 	if err != nil {
 		logrus.Errorf("Error parsing request body: %s", err.Error())
 		return
@@ -1184,7 +1184,7 @@ type DeletePasswordResetRequestRequestBody struct {
 //       200: nil
 func DeletePasswordResetRequest(c *gin.Context) {
 	var body DeletePasswordResetRequestRequestBody
-	err := c.BindJSON(&body)
+	err := ParseAndValidateJSON(c, &body)
 	if err != nil {
 		logrus.Errorf("Error parsing request body: %s", err.Error())
 		return
