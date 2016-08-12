@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/Sirupsen/logrus"
@@ -1035,28 +1036,28 @@ func ResetUserPassword(c *gin.Context) {
 
 		request, err := NewPasswordResetRequest(GetDB(c), user.ID, time.Now().Add(time.Hour*24))
 		if err != nil {
-			errors.ReturnError(c, errors.DatabaseError(err))
+			errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
 			return
 		}
 
-		html, text, kerr := GetEmailBody(PasswordResetEmail, &PasswordResetRequestEmailParameters{
+		html, text, err := GetEmailBody(PasswordResetEmail, &PasswordResetRequestEmailParameters{
 			Name:  user.Name,
 			Token: request.Token,
 		})
-		if kerr != nil {
-			errors.ReturnError(c, kerr)
-			return
-		}
-
-		subject, kerr := GetEmailSubject(PasswordResetEmail)
 		if err != nil {
-			errors.ReturnError(c, kerr)
+			errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Email error"))
 			return
 		}
 
-		kerr = SendEmail(GetSMTPConnectionPool(c), user.Email, subject, html, text)
-		if kerr != nil {
-			errors.ReturnError(c, kerr)
+		subject, err := GetEmailSubject(PasswordResetEmail)
+		if err != nil {
+			errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Email error"))
+			return
+		}
+
+		err = SendEmail(GetSMTPConnectionPool(c), user.Email, subject, html, text)
+		if err != nil {
+			errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Email error"))
 			return
 		}
 	} else {

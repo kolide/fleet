@@ -44,7 +44,7 @@ func (pool *mockSMTPConnectionPool) Send(e *email.Email, timeout time.Duration) 
 
 func (pool *mockSMTPConnectionPool) Close() {}
 
-func SendEmail(pool SMTPConnectionPool, to, subject string, html, text []byte) *errors.KolideError {
+func SendEmail(pool SMTPConnectionPool, to, subject string, html, text []byte) error {
 	e := email.Email{
 		From:    fmt.Sprintf("Kolide <%s>", NoReplyEmailAddress),
 		To:      []string{to},
@@ -61,7 +61,7 @@ func SendEmail(pool SMTPConnectionPool, to, subject string, html, text []byte) *
 	return nil
 }
 
-func GetEmailBody(t EmailType, params interface{}) (html []byte, text []byte, err *errors.KolideError) {
+func GetEmailBody(t EmailType, params interface{}) (html []byte, text []byte, err error) {
 	switch t {
 	case PasswordResetEmail:
 		resetParams, ok := params.(*PasswordResetRequestEmailParameters)
@@ -91,7 +91,7 @@ func GetEmailBody(t EmailType, params interface{}) (html []byte, text []byte, er
 	return
 }
 
-func GetEmailSubject(t EmailType) (string, *errors.KolideError) {
+func GetEmailSubject(t EmailType) (string, error) {
 	switch t {
 	case PasswordResetEmail:
 		return "Your Kolide Password Reset Request", nil
