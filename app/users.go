@@ -187,7 +187,7 @@ func GetUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, GetUserResponseBody{
+	c.JSON(http.StatusOK, GetUserResponseBody{
 		ID:                 user.ID,
 		Username:           user.Username,
 		Name:               user.Name,
@@ -249,7 +249,7 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, GetUserResponseBody{
+	c.JSON(http.StatusOK, GetUserResponseBody{
 		ID:                 user.ID,
 		Username:           user.Username,
 		Name:               user.Name,
@@ -333,7 +333,7 @@ func ModifyUser(c *gin.Context) {
 		errors.ReturnError(c, errors.DatabaseError(err))
 		return
 	}
-	c.JSON(200, GetUserResponseBody{
+	c.JSON(http.StatusOK, GetUserResponseBody{
 		ID:                 user.ID,
 		Username:           user.Username,
 		Name:               user.Name,
@@ -461,7 +461,7 @@ func ChangeUserPassword(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, GetUserResponseBody{
+	c.JSON(http.StatusOK, GetUserResponseBody{
 		ID:                 user.ID,
 		Username:           user.Username,
 		Name:               user.Name,
@@ -531,7 +531,7 @@ func SetUserAdminState(c *gin.Context) {
 		errors.ReturnError(c, errors.DatabaseError(err))
 		return
 	}
-	c.JSON(200, GetUserResponseBody{
+	c.JSON(http.StatusOK, GetUserResponseBody{
 		ID:                 user.ID,
 		Username:           user.Username,
 		Name:               user.Name,
@@ -616,7 +616,7 @@ func SetUserEnabledState(c *gin.Context) {
 		errors.ReturnError(c, errors.DatabaseError(err))
 		return
 	}
-	c.JSON(200, GetUserResponseBody{
+	c.JSON(http.StatusOK, GetUserResponseBody{
 		ID:                 user.ID,
 		Username:           user.Username,
 		Name:               user.Name,
@@ -712,7 +712,7 @@ func DeleteSession(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, nil)
+	c.JSON(http.StatusOK, nil)
 }
 
 // swagger:parameters DeleteSessionsForUser
@@ -779,7 +779,7 @@ func DeleteSessionsForUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, nil)
+	c.JSON(http.StatusOK, nil)
 
 }
 
@@ -850,7 +850,7 @@ func GetInfoAboutSession(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, &SessionInfoResponseBody{
+	c.JSON(http.StatusOK, &SessionInfoResponseBody{
 		SessionID:  session.ID,
 		UserID:     session.UserID,
 		CreatedAt:  session.CreatedAt,
@@ -936,7 +936,7 @@ func GetInfoAboutSessionsForUser(c *gin.Context) {
 		})
 	}
 
-	c.JSON(200, &GetInfoAboutSessionsForUserResponseBody{
+	c.JSON(http.StatusOK, &GetInfoAboutSessionsForUserResponseBody{
 		Sessions: response,
 	})
 }
@@ -1066,7 +1066,7 @@ func ResetUserPassword(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, ResetPasswordResponseBody{
+	c.JSON(http.StatusOK, ResetPasswordResponseBody{
 		ID:       user.ID,
 		Username: user.Username,
 	})
@@ -1119,7 +1119,7 @@ func VerifyPasswordResetRequest(c *gin.Context) {
 	if err != nil {
 		switch err {
 		case gorm.ErrRecordNotFound:
-			c.JSON(404, &VerifyPasswordResetRequestResponseBody{
+			c.JSON(http.StatusNotFound, &VerifyPasswordResetRequestResponseBody{
 				Valid: false,
 			})
 			return
@@ -1137,7 +1137,7 @@ func VerifyPasswordResetRequest(c *gin.Context) {
 	if err != nil {
 		switch err {
 		case gorm.ErrRecordNotFound:
-			c.JSON(404, VerifyPasswordResetRequestResponseBody{
+			c.JSON(http.StatusNotFound, VerifyPasswordResetRequestResponseBody{
 				Valid: false,
 			})
 			return
@@ -1148,13 +1148,13 @@ func VerifyPasswordResetRequest(c *gin.Context) {
 	}
 
 	if time.Now().After(reset.ExpiresAt) {
-		c.JSON(404, VerifyPasswordResetRequestResponseBody{
+		c.JSON(http.StatusNotFound, VerifyPasswordResetRequestResponseBody{
 			Valid: false,
 		})
 		return
 	}
 
-	c.JSON(200, VerifyPasswordResetRequestResponseBody{
+	c.JSON(http.StatusOK, VerifyPasswordResetRequestResponseBody{
 		Valid: true,
 		ID:    reset.ID,
 	})
@@ -1223,5 +1223,5 @@ func DeletePasswordResetRequest(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, nil)
+	c.JSON(http.StatusOK, nil)
 }
