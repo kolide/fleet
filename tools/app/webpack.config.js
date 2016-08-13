@@ -38,7 +38,7 @@ var repo = path.join(__dirname, "../../")
 
 var config  = {
   entry: {
-    bundle: path.join(repo, 'frontend/index.js')
+    bundle: path.join(repo, 'frontend/Main.js')
   },
   output: {
     path: path.join(repo, 'build'),
@@ -65,6 +65,8 @@ var config  = {
     alias: {
       '#app': path.join(repo, 'frontend'),
       '#components': path.join(repo, 'frontend/components'),
+      '#stores': path.join(repo, 'frontend/stores'),
+      '#actions': path.join(repo, 'frontend/actions'),
       '#css': path.join(repo, 'frontend/css')
     }
   },
