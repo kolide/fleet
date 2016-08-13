@@ -2,6 +2,7 @@ machine:
   environment:
     IMPORT_PATH: "/home/ubuntu/.go_workspace/src/github.com/kolide"
     APP_PATH: "$IMPORT_PATH/kolide-ose"
+    GOVENDOREXPERIMENT: 1
 dependencies:
   override:
     - make deps
