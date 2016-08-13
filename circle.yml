@@ -2,9 +2,7 @@ dependencies:
   pre:
     - make deps
     - go generate
-  override:
-    - go get -t -d -v ./...
 
 test:
   override:
-    - go test -v
+    - go test $(glide novendor)
