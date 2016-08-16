@@ -19,6 +19,7 @@ import (
 	"github.com/kolide/kolide-ose/app"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 var (
@@ -43,8 +44,8 @@ osquery management and orchestration
 
 Configurable Options:
 
-Options may be supplied in a yaml configuration file or via environment 
-variables. You only need to define the configuration values for which you 
+Options may be supplied in a yaml configuration file or via environment
+variables. You only need to define the configuration values for which you
 wish to override the default value.
 
 Available Configurations:
@@ -138,7 +139,27 @@ $7777777....$....$777$.....+DI..DDD..DDI...8D...D8......$D:..8D....8D...8D......
 		fmt.Println("Use Ctrl-C to stop")
 		fmt.Print("\n\n")
 
-		err = app.CreateServer(db, smtpConnectionPool, os.Stderr).RunTLS(
+		resultWriter := &lumberjack.Logger{
+			Filename:   "result.log",
+			MaxSize:    500, // megabytes
+			MaxBackups: 3,
+			MaxAge:     28, //days
+		}
+
+		statusWriter := &lumberjack.Logger{
+			Filename:   "status.log",
+			MaxSize:    500, // megabytes
+			MaxBackups: 3,
+			MaxAge:     28, //days
+		}
+
+		err = app.CreateServer(
+			db,
+			smtpConnectionPool,
+			os.Stderr,
+			resultWriter,
+			statusWriter,
+		).RunTLS(
 			viper.GetString("server.address"),
 			viper.GetString("server.cert"),
 			viper.GetString("server.key"),
@@ -154,7 +175,7 @@ var prepareCmd = &cobra.Command{
 	Short: "Subcommands for initializing kolide infrastructure",
 	Long: `
 Subcommands for initializing kolide infrastructure
-	
+
 To setup kolide infrastructure, use one of the available commands.
 `,
 	Run: func(cmd *cobra.Command, args []string) {

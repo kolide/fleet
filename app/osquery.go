@@ -1,7 +1,9 @@
 package app
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
@@ -11,6 +13,41 @@ import (
 	"github.com/kolide/kolide-ose/errors"
 	"github.com/spf13/viper"
 )
+
+type OsqueryResultHandler interface {
+	HandleResultLog(log OsqueryResultLog, nodeKey string) error
+}
+
+type OsqueryStatusHandler interface {
+	HandleStatusLog(log OsqueryStatusLog, nodeKey string) error
+}
+
+type OsqueryHandler struct {
+	ResultHandler OsqueryResultHandler
+	StatusHandler OsqueryStatusHandler
+}
+
+type OsqueryLogWriter struct {
+	Writer io.Writer
+}
+
+func (w *OsqueryLogWriter) HandleStatusLog(log OsqueryStatusLog, nodeKey string) error {
+	encoder := json.NewEncoder(w.Writer)
+	err := encoder.Encode(log)
+	if err != nil {
+		return errors.NewFromError(err, http.StatusInternalServerError, "Error writing result log")
+	}
+	return nil
+}
+
+func (w *OsqueryLogWriter) HandleResultLog(log OsqueryResultLog, nodeKey string) error {
+	encoder := json.NewEncoder(w.Writer)
+	err := encoder.Encode(log)
+	if err != nil {
+		return errors.NewFromError(err, http.StatusInternalServerError, "Error writing status log")
+	}
+	return nil
+}
 
 type ScheduledQuery struct {
 	ID           uint `gorm:"primary_key"`
@@ -159,9 +196,9 @@ type OsqueryConfigPostBody struct {
 }
 
 type OsqueryLogPostBody struct {
-	NodeKey string                   `json:"node_key" validate:"required"`
-	LogType string                   `json:"log_type" validate:"required"`
-	Data    []map[string]interface{} `json:"data" validate:"required"`
+	NodeKey string          `json:"node_key" validate:"required"`
+	LogType string          `json:"log_type" validate:"required"`
+	Data    json.RawMessage `json:"data" validate:"required"`
 }
 
 type OsqueryResultLog struct {
@@ -297,7 +334,68 @@ func OsqueryConfig(c *gin.Context) {
 		})
 }
 
-func OsqueryLog(c *gin.Context) {
+func authenticateRequest(db *gorm.DB, nodeKey string) error {
+	host := Host{NodeKey: nodeKey}
+	err := db.Where(&host).First(&host).Error
+	if err != nil {
+		switch err {
+		case gorm.ErrRecordNotFound:
+			e := errors.NewFromError(
+				err,
+				http.StatusUnauthorized,
+				"Unauthorized",
+			)
+			e.Extra = map[string]interface{}{"node_invalid": "true"}
+			return e
+		default:
+			return errors.DatabaseError(err)
+		}
+	}
+
+	return nil
+}
+
+func (h *OsqueryHandler) handleStatusLogs(db *gorm.DB, data json.RawMessage, nodeKey string) error {
+	var statuses []OsqueryStatusLog
+	if err := json.Unmarshal(data, &statuses); err != nil {
+		return errors.NewFromError(err, http.StatusBadRequest, "JSON parse error")
+	}
+
+	for _, status := range statuses {
+		if err := h.StatusHandler.HandleStatusLog(status, nodeKey); err != nil {
+			return err
+		}
+		logrus.Debugf("Osquery status: %+v", status)
+	}
+
+	return nil
+}
+
+func (h *OsqueryHandler) handleResultLogs(db *gorm.DB, data json.RawMessage, nodeKey string) error {
+	var results []OsqueryResultLog
+	if err := json.Unmarshal(data, &results); err != nil {
+		return errors.NewFromError(err, http.StatusBadRequest, "JSON parse error")
+	}
+
+	for _, result := range results {
+		if err := h.ResultHandler.HandleResultLog(result, nodeKey); err != nil {
+			return err
+		}
+		logrus.Debugf("Osquery result: %+v", result)
+	}
+
+	return nil
+}
+
+func updateLastSeen(db *gorm.DB, host Host) error {
+	err := db.Exec("UPDATE hosts SET updated_at=? WHERE node_key=?", time.Now(), host.NodeKey).Error
+	if err != nil {
+		return errors.DatabaseError(err)
+	}
+	return nil
+}
+
+func (h *OsqueryHandler) OsqueryLog(c *gin.Context) {
 	var body OsqueryLogPostBody
 	err := ParseAndValidateJSON(c, &body)
 	if err != nil {
@@ -306,61 +404,42 @@ func OsqueryLog(c *gin.Context) {
 	}
 	logrus.Debugf("OsqueryLog: %s", body.LogType)
 
-	if body.LogType == "status" {
-		for _, data := range body.Data {
-			var log OsqueryStatusLog
+	db := GetDB(c)
 
-			severity, ok := data["severity"].(string)
-			if ok {
-				log.Severity = severity
-			} else {
-				logrus.Error("Error asserting the type of status log severity")
-			}
-
-			filename, ok := data["filename"].(string)
-			if ok {
-				log.Filename = filename
-			} else {
-				logrus.Error("Error asserting the type of status log filename")
-			}
-
-			line, ok := data["line"].(string)
-			if ok {
-				log.Line = line
-			} else {
-				logrus.Error("Error asserting the type of status log line")
-			}
-
-			message, ok := data["message"].(string)
-			if ok {
-				log.Message = message
-			} else {
-				logrus.Error("Error asserting the type of status log message")
-			}
-
-			version, ok := data["version"].(string)
-			if ok {
-				log.Version = version
-			} else {
-				logrus.Error("Error asserting the type of status log version")
-			}
-
-			logrus.WithFields(logrus.Fields{
-				"node_key": body.NodeKey,
-				"severity": log.Severity,
-				"filename": log.Filename,
-				"line":     log.Line,
-				"version":  log.Version,
-			}).Info(log.Message)
-		}
-	} else if body.LogType == "result" {
-		// TODO: handle all of the different kinds of results logs
+	err = authenticateRequest(db, body.NodeKey)
+	if err != nil {
+		errors.ReturnError(c, err)
+		return
 	}
 
-	c.JSON(http.StatusOK,
-		gin.H{
-			"node_invalid": false,
-		})
+	switch body.LogType {
+	case "status":
+		err = h.handleStatusLogs(db, body.Data, body.NodeKey)
+
+	case "result":
+		err = h.handleResultLogs(db, body.Data, body.NodeKey)
+
+	default:
+		err = errors.NewWithStatus(
+			errors.StatusUnprocessableEntity,
+			"Unknown result type",
+			fmt.Sprintf("Unknown result type: %s", body.LogType),
+		)
+	}
+
+	if err != nil {
+		errors.ReturnError(c, err)
+		return
+	}
+
+	err = updateLastSeen(db, Host{NodeKey: body.NodeKey})
+
+	if err != nil {
+		errors.ReturnError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{})
 }
 
 func OsqueryDistributedRead(c *gin.Context) {

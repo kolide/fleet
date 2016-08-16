@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -63,7 +64,7 @@ func (req *IntegrationRequests) New(t *testing.T) {
 		t.Fatalf("Error opening DB: %s", err.Error())
 	}
 
-	req.r = CreateServer(req.db, req.pool, &testLogger{t: t})
+	req.r = CreateServer(req.db, req.pool, &testLogger{t: t}, ioutil.Discard, ioutil.Discard)
 }
 
 func (req *IntegrationRequests) Login(username, password string, sessionOut *string) {

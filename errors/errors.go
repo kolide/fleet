@@ -12,12 +12,15 @@ import (
 // Kolide's internal representation for errors. It can be used to wrap another
 // error (stored in Err), and additionally contains fields for public
 // (PublicMessage) and private (PrivateMessage) error messages as well as the
-// HTTP status code (StatusCode) corresponding to the error.
+// HTTP status code (StatusCode) corresponding to the error. Extra holds extra
+// information that will be inserted as top level key/value pairs in the error
+// response.
 type KolideError struct {
 	Err            error
 	StatusCode     int
 	PublicMessage  string
 	PrivateMessage string
+	Extra          map[string]interface{}
 }
 
 // Implementation of error interface
@@ -73,11 +76,25 @@ const StatusUnprocessableEntity = 422
 // Handle an error, printing debug information, writing to the HTTP response as
 // appropriate for the dynamic error type.
 func ReturnError(c *gin.Context, err error) {
+	baseReturnError(c, err, "message")
+}
+
+// osqueryd does not check the HTTP status code, and only looks for a
+func ReturnOsqueryError(c *gin.Context, err error) {
+	baseReturnError(c, err, "error")
+}
+
+func baseReturnError(c *gin.Context, err error, messageKey string) {
 	switch typedErr := err.(type) {
 
 	case *KolideError:
-		c.JSON(typedErr.StatusCode,
-			gin.H{"message": typedErr.PublicMessage})
+		errJSON := map[string]interface{}{}
+		for key, val := range typedErr.Extra {
+			errJSON[key] = val
+		}
+		errJSON["message"] = typedErr.PublicMessage
+
+		c.JSON(typedErr.StatusCode, errJSON)
 		logrus.WithError(typedErr.Err).Debug(typedErr.PrivateMessage)
 
 	case validator.ValidationErrors:
