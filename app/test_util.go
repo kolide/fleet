@@ -71,23 +71,19 @@ type IntegrationRequests struct {
 }
 
 func (req *IntegrationRequests) New(t *testing.T) {
-	req.t = t
-
-	req.db = openTestDB(t)
-	req.pool = newMockSMTPConnectionPool()
-
-	req.statusHandler = new(mockOsqueryStatusLogWriter)
-	req.resultHandler = new(mockOsqueryResultLogWriter)
-
-	// Until we have a better solution for first-user onboarding, manually
-	// create an admin
-	_, err := NewUser(req.db, "admin", "foobar", "admin@kolide.co", true, false)
-	if err != nil {
-		t.Fatalf("Error opening DB: %s", err.Error())
-	}
-
-	gin.SetMode(gin.ReleaseMode)
-	req.r = CreateServer(req.db, req.pool, &testLogger{t: t}, req.resultHandler, req.statusHandler)
+	// req.t = t
+	//
+	// req.db = openTestDB(t)
+	// req.pool = newMockSMTPConnectionPool()
+	//
+	// // Until we have a better solution for first-user onboarding, manually
+	// // create an admin
+	// _, err := NewUser(req.db, "admin", "foobar", "admin@kolide.co", true, false)
+	// if err != nil {
+	// 	t.Fatalf("Error opening DB: %s", err.Error())
+	// }
+	//
+	// req.r = CreateServer(req.db, req.pool, &testLogger{t: t})
 }
 
 func (req *IntegrationRequests) Login(username, password string, sessionOut *string) {

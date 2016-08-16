@@ -17,6 +17,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jordan-wright/email"
 	"github.com/kolide/kolide-ose/app"
+	"github.com/kolide/kolide-ose/datastore"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	lumberjack "gopkg.in/natefinch/lumberjack.v2"
@@ -165,7 +166,12 @@ $7777777....$....$777$.....+DI..DDD..DDI...8D...D8......$D:..8D....8D...8D......
 			},
 		}
 
+		ds, err := datastore.New("gorm", "")
+		if err != nil {
+			logrus.WithError(err).Fatal("error creating db conn")
+		}
 		err = app.CreateServer(
+			ds,
 			db,
 			smtpConnectionPool,
 			os.Stderr,

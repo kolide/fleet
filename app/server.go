@@ -38,9 +38,14 @@ func GetDB(c *gin.Context) *gorm.DB {
 	return c.MustGet("DB").(*gorm.DB)
 }
 
-func DatabaseMiddleware(db *gorm.DB) gin.HandlerFunc {
+func datastore(c *gin.Context) Datastore {
+	return c.MustGet("DS").(Datastore)
+}
+
+func DatabaseMiddleware(db *gorm.DB, ds Datastore) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Set("DB", db)
+		c.Set("DS", ds)
 		c.Next()
 	}
 }
@@ -73,7 +78,7 @@ func NotFoundRequestError(c *gin.Context) {
 // Create a new server for testing purposes with no routes attached
 func createEmptyTestServer(db *gorm.DB) *gin.Engine {
 	server := gin.New()
-	server.Use(DatabaseMiddleware(db))
+	server.Use(DatabaseMiddleware(db, nil))
 	server.Use(SessionBackendMiddleware)
 	return server
 }
@@ -120,9 +125,9 @@ func NotFound(c *gin.Context) {
 
 // CreateServer creates a gin.Engine HTTP server and configures it to be in a
 // state such that it is ready to serve HTTP requests for the kolide application
-func CreateServer(db *gorm.DB, pool SMTPConnectionPool, w io.Writer, resultHandler OsqueryResultHandler, statusHandler OsqueryStatusHandler) *gin.Engine {
+func CreateServer(ds Datastore, db *gorm.DB, pool SMTPConnectionPool, w io.Writer) *gin.Engine {
 	server := gin.New()
-	server.Use(DatabaseMiddleware(db))
+	server.Use(DatabaseMiddleware(db, ds))
 	server.Use(SMTPConnectionPoolMiddleware(pool))
 	server.Use(SessionBackendMiddleware)
 

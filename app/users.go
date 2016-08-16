@@ -29,6 +29,12 @@ type User struct {
 	NeedsPasswordReset bool
 }
 
+// Datastore combines all methods for backend interactions
+type Datastore interface {
+	UserStore
+}
+
+// UserStore contains methods for managing users in a datastore
 type UserStore interface {
 	NewUser(user *User) (*User, error)
 }
@@ -37,7 +43,7 @@ type UserStore interface {
 // NewUser exists largely to allow the API to simply accept a string password
 // while using the applications password hashing mechanisms to salt and hash the
 // password.
-func NewUser(db *gorm.DB, username, password, email string, admin, needsPasswordReset bool) (*User, error) {
+func newUser(username, password, email string, admin, needsPasswordReset bool) (*User, error) {
 	salt, hash, err := SaltAndHashPassword(password)
 	if err != nil {
 		return nil, err
@@ -50,11 +56,6 @@ func NewUser(db *gorm.DB, username, password, email string, admin, needsPassword
 		Admin:              admin,
 		Enabled:            true,
 		NeedsPasswordReset: needsPasswordReset,
-	}
-
-	err = db.Create(&user).Error
-	if err != nil {
-		return nil, err
 	}
 	return &user, nil
 }
@@ -239,16 +240,27 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
+	// TODO move this to middleware
 	vc := VC(c)
 	if !vc.IsAdmin() {
 		UnauthorizedError(c)
 		return
 	}
 
-	db := GetDB(c)
-	user, err := NewUser(db, body.Username, body.Password, body.Email, body.Admin, body.NeedsPasswordReset)
+	// temporary, pass args explicitly as well
+	db := datastore(c)
+
+	u, err := newUser(body.Username, body.Password, body.Email, body.Admin, body.NeedsPasswordReset)
 	if err != nil {
 		logrus.Errorf("Error creating new user: %s", err.Error())
+		errors.ReturnError(c, err)
+		return
+	}
+
+	// save user in db
+	user, err := db.NewUser(u)
+	if err != nil {
+		logrus.Errorf("error creating new user: %s", err)
 		errors.ReturnError(c, errors.DatabaseError(err))
 		return
 	}
