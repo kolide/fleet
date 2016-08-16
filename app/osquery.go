@@ -221,11 +221,12 @@ type OsqueryResultLog struct {
 }
 
 type OsqueryStatusLog struct {
-	Severity string `json:"severity"`
-	Filename string `json:"filename"`
-	Line     string `json:"line"`
-	Message  string `json:"message"`
-	Version  string `json:"version"`
+	Severity    string            `json:"severity"`
+	Filename    string            `json:"filename"`
+	Line        string            `json:"line"`
+	Message     string            `json:"message"`
+	Version     string            `json:"version"`
+	Decorations map[string]string `json:"decorations"`
 }
 
 type OsqueryDistributedReadPostBody struct {
@@ -404,11 +405,13 @@ func (h *OsqueryHandler) handleResultLogs(db *gorm.DB, data json.RawMessage, nod
 
 // Set the update time for the provided host to indicate that it has
 // successfully checked in.
-func updateLastSeen(db *gorm.DB, host Host) error {
-	err := db.Exec("UPDATE hosts SET updated_at=? WHERE node_key=?", time.Now(), host.NodeKey).Error
+func updateLastSeen(db *gorm.DB, host *Host) error {
+	updateTime := time.Now()
+	err := db.Exec("UPDATE hosts SET updated_at=? WHERE node_key=?", updateTime, host.NodeKey).Error
 	if err != nil {
 		return errors.DatabaseError(err)
 	}
+	host.UpdatedAt = updateTime
 	return nil
 }
 
@@ -450,7 +453,7 @@ func (h *OsqueryHandler) OsqueryLog(c *gin.Context) {
 		return
 	}
 
-	err = updateLastSeen(db, Host{NodeKey: body.NodeKey})
+	err = updateLastSeen(db, &Host{NodeKey: body.NodeKey})
 
 	if err != nil {
 		errors.ReturnError(c, err)
