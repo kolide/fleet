@@ -6,7 +6,25 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"github.com/kolide/kolide-ose/app"
+	"github.com/kolide/kolide-ose/sessions"
 )
+
+var tables = [...]interface{}{
+	&app.User{},
+	&app.PasswordResetRequest{},
+	&sessions.Session{},
+	&app.ScheduledQuery{},
+	&app.Pack{},
+	&app.DiscoveryQuery{},
+	&app.Host{},
+	&app.Label{},
+	&app.Option{},
+	&app.Decorator{},
+	&app.Target{},
+	&app.DistributedQuery{},
+	&app.Query{},
+	&app.DistributedQueryExecution{},
+}
 
 type gormDB struct {
 	DB *gorm.DB
@@ -19,6 +37,22 @@ func (orm gormDB) NewUser(user *app.User) (*app.User, error) {
 		return nil, err
 	}
 	return user, nil
+}
+
+func (orm gormDB) migrate() error {
+	var err error
+	for _, table := range tables {
+		err = orm.DB.AutoMigrate(table).Error
+	}
+	return err
+}
+
+func (orm gormDB) rollback() error {
+	var err error
+	for _, table := range tables {
+		err = orm.DB.DropTableIfExists(table).Error
+	}
+	return err
 }
 
 // create connection with mysql backend, using a backoff timer and maxAttempts
