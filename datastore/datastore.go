@@ -9,18 +9,17 @@ import (
 	"github.com/kolide/kolide-ose/app"
 )
 
-// Datastore combines all methods for backend interactions
-type Datastore interface {
-	app.UserStore
-}
-
 type gormDB struct {
 	DB *gorm.DB
 }
 
 // NewUser creates a new user in the gorm backend
-func (db gormDB) NewUser(user *app.User) (*app.User, error) {
-	panic("not implemented")
+func (orm gormDB) NewUser(user *app.User) (*app.User, error) {
+	err := orm.DB.Create(user).Error
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }
 
 type dbOptions struct {
@@ -40,7 +39,7 @@ func LimitAttempts(attempts int) DBOption {
 
 // New creates a Datastore with a database connection
 // Use DBOption to pass optional arguments
-func New(driver, conn string, opts ...DBOption) (Datastore, error) {
+func New(driver, conn string, opts ...DBOption) (app.Datastore, error) {
 	opt := &dbOptions{
 		maxAttempts: 15, // default attempts
 	}
@@ -50,6 +49,7 @@ func New(driver, conn string, opts ...DBOption) (Datastore, error) {
 		}
 	}
 
+	var db app.Datastore
 	switch driver {
 	case "gorm":
 		db, err := openGORM("mysql", conn, opt.maxAttempts)
@@ -58,7 +58,7 @@ func New(driver, conn string, opts ...DBOption) (Datastore, error) {
 		}
 		return gormDB{DB: db}, nil
 	}
-	return nil, nil
+	return db, nil
 }
 
 // create connection with mysql backend, using a backoff timer and maxAttempts
