@@ -37,7 +37,11 @@ func New(driver, conn string, opts ...DBOption) (app.Datastore, error) {
 		if err != nil {
 			return nil, err
 		}
-		return gormDB{DB: db}, nil
+		ds := gormDB{DB: db}
+		if err := ds.migrate(); err != nil {
+			return nil, err
+		}
+		return ds, nil
 	}
 	return db, nil
 }
