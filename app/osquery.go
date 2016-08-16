@@ -32,19 +32,17 @@ type OsqueryLogWriter struct {
 }
 
 func (w *OsqueryLogWriter) HandleStatusLog(log OsqueryStatusLog, nodeKey string) error {
-	encoder := json.NewEncoder(w.Writer)
-	err := encoder.Encode(log)
+	err := json.NewEncoder(w.Writer).Encode(log)
 	if err != nil {
-		return errors.NewFromError(err, http.StatusInternalServerError, "Error writing result log")
+		return errors.NewFromError(err, http.StatusInternalServerError, "error writing result log")
 	}
 	return nil
 }
 
 func (w *OsqueryLogWriter) HandleResultLog(log OsqueryResultLog, nodeKey string) error {
-	encoder := json.NewEncoder(w.Writer)
-	err := encoder.Encode(log)
+	err := json.NewEncoder(w.Writer).Encode(log)
 	if err != nil {
-		return errors.NewFromError(err, http.StatusInternalServerError, "Error writing status log")
+		return errors.NewFromError(err, http.StatusInternalServerError, "error writing status log")
 	}
 	return nil
 }
