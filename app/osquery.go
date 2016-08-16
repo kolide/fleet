@@ -14,19 +14,31 @@ import (
 	"github.com/spf13/viper"
 )
 
+// The "output plugin" interface for osquery result logs. The implementer of
+// this interface can do whatever processing they would like with the log,
+// returning the appropriate error status
 type OsqueryResultHandler interface {
 	HandleResultLog(log OsqueryResultLog, nodeKey string) error
 }
 
+// The "output plugin" interface for osquery status logs. The implementer of
+// this interface can do whatever processing they would like with the log,
+// returning the appropriate error status
 type OsqueryStatusHandler interface {
 	HandleStatusLog(log OsqueryStatusLog, nodeKey string) error
 }
 
+// This struct is used for injecting dependencies for osquery TLS processing.
+// It can be configured in a `main` function to bind the appropriate handlers
+// and it's methods can be attached to routes.
 type OsqueryHandler struct {
 	ResultHandler OsqueryResultHandler
 	StatusHandler OsqueryStatusHandler
 }
 
+// Basic implementation of the `OsqueryResultHandler` and
+// `OsqueryStatusHandler` interfaces. It will write the logs to the io.Writer
+// provided in Writer.
 type OsqueryLogWriter struct {
 	Writer io.Writer
 }
@@ -332,6 +344,8 @@ func OsqueryConfig(c *gin.Context) {
 		})
 }
 
+// Authenticate a (post-enrollment) TLS request from osqueryd. To do this we
+// verify that the provided node key is valid.
 func authenticateRequest(db *gorm.DB, nodeKey string) error {
 	host := Host{NodeKey: nodeKey}
 	err := db.Where(&host).First(&host).Error
@@ -343,6 +357,7 @@ func authenticateRequest(db *gorm.DB, nodeKey string) error {
 				http.StatusUnauthorized,
 				"Unauthorized",
 			)
+			// osqueryd expects the literal string "true" here
 			e.Extra = map[string]interface{}{"node_invalid": "true"}
 			return e
 		default:
@@ -353,6 +368,7 @@ func authenticateRequest(db *gorm.DB, nodeKey string) error {
 	return nil
 }
 
+// Unmarshal the status logs before sending them to the status log handler
 func (h *OsqueryHandler) handleStatusLogs(db *gorm.DB, data json.RawMessage, nodeKey string) error {
 	var statuses []OsqueryStatusLog
 	if err := json.Unmarshal(data, &statuses); err != nil {
@@ -369,6 +385,7 @@ func (h *OsqueryHandler) handleStatusLogs(db *gorm.DB, data json.RawMessage, nod
 	return nil
 }
 
+// Unmarshal the result logs before sending them to the result log handler
 func (h *OsqueryHandler) handleResultLogs(db *gorm.DB, data json.RawMessage, nodeKey string) error {
 	var results []OsqueryResultLog
 	if err := json.Unmarshal(data, &results); err != nil {
@@ -385,6 +402,8 @@ func (h *OsqueryHandler) handleResultLogs(db *gorm.DB, data json.RawMessage, nod
 	return nil
 }
 
+// Set the update time for the provided host to indicate that it has
+// successfully checked in.
 func updateLastSeen(db *gorm.DB, host Host) error {
 	err := db.Exec("UPDATE hosts SET updated_at=? WHERE node_key=?", time.Now(), host.NodeKey).Error
 	if err != nil {
@@ -393,6 +412,7 @@ func updateLastSeen(db *gorm.DB, host Host) error {
 	return nil
 }
 
+// Endpoint used by the osqueryd TLS logger plugin
 func (h *OsqueryHandler) OsqueryLog(c *gin.Context) {
 	var body OsqueryLogPostBody
 	err := ParseAndValidateJSON(c, &body)
