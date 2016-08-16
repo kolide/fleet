@@ -43,7 +43,7 @@ type UserStore interface {
 // NewUser exists largely to allow the API to simply accept a string password
 // while using the applications password hashing mechanisms to salt and hash the
 // password.
-func newUser(username, password, email string, admin, needsPasswordReset bool) (*User, error) {
+func NewUser(username, password, email string, admin, needsPasswordReset bool) (*User, error) {
 	salt, hash, err := SaltAndHashPassword(password)
 	if err != nil {
 		return nil, err
@@ -250,7 +250,7 @@ func CreateUser(c *gin.Context) {
 	// temporary, pass args explicitly as well
 	db := datastore(c)
 
-	u, err := newUser(body.Username, body.Password, body.Email, body.Admin, body.NeedsPasswordReset)
+	u, err := NewUser(body.Username, body.Password, body.Email, body.Admin, body.NeedsPasswordReset)
 	if err != nil {
 		logrus.Errorf("Error creating new user: %s", err.Error())
 		errors.ReturnError(c, err)
