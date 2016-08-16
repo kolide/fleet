@@ -166,9 +166,18 @@ $7777777....$....$777$.....+DI..DDD..DDI...8D...D8......$D:..8D....8D...8D......
 			},
 		}
 
-		ds, err := datastore.New("gorm", "")
-		if err != nil {
-			logrus.WithError(err).Fatal("error creating db conn")
+		// app datastore
+		var ds app.Datastore
+		{
+			user := viper.GetString("mysql.username")
+			password := viper.GetString("mysql.password")
+			host := viper.GetString("mysql.address")
+			dbName := viper.GetString("mysql.database")
+			connString := fmt.Sprintf("%s:%s@(%s)/%s?charset=utf8&parseTime=True&loc=Local", user, password, host, dbName)
+			ds, err = datastore.New("gorm", connString)
+			if err != nil {
+				logrus.WithError(err).Fatal("error creating db conn")
+			}
 		}
 		err = app.CreateServer(
 			ds,
