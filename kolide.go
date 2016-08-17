@@ -139,18 +139,20 @@ $7777777....$....$777$.....+DI..DDD..DDI...8D...D8......$D:..8D....8D...8D......
 		fmt.Println("Use Ctrl-C to stop")
 		fmt.Print("\n\n")
 
+		resultFile := viper.GetString("osquery.result_log_file")
 		resultHandler := &app.OsqueryLogWriter{
 			Writer: &lumberjack.Logger{
-				Filename:   "result.log",
+				Filename:   resultFile,
 				MaxSize:    500, // megabytes
 				MaxBackups: 3,
 				MaxAge:     28, //days
 			},
 		}
 
+		statusFile := viper.GetString("osquery.status_log_file")
 		statusHandler := &app.OsqueryLogWriter{
 			Writer: &lumberjack.Logger{
-				Filename:   "status.log",
+				Filename:   statusFile,
 				MaxSize:    500, // megabytes
 				MaxBackups: 3,
 				MaxAge:     28, //days
@@ -268,6 +270,8 @@ func initConfig() {
 	setDefaultConfigValue("session.expiration_seconds", 60*60*24*90)
 
 	setDefaultConfigValue("osquery.node_key_size", 24)
+	setDefaultConfigValue("osquery.status_log_file", "/tmp/osquery_status")
+	setDefaultConfigValue("osquery.result_log_file", "/tmp/osquery_result")
 
 	if debug {
 		logrus.SetLevel(logrus.DebugLevel)
@@ -320,5 +324,6 @@ func init() {
 }
 
 func main() {
+
 	rootCmd.Execute()
 }
