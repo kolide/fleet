@@ -163,8 +163,8 @@ $7777777....$....$777$.....+DI..DDD..DDI...8D...D8......$D:..8D....8D...8D......
 			db,
 			smtpConnectionPool,
 			os.Stderr,
-			statusHandler,
 			resultHandler,
+			statusHandler,
 		).RunTLS(
 			viper.GetString("server.address"),
 			viper.GetString("server.cert"),
@@ -255,9 +255,9 @@ func initConfig() {
 	setDefaultConfigValue("mysql.password", "kolide")
 	setDefaultConfigValue("mysql.database", "kolide")
 
-	setDefaultConfigValue("server.address", "localhost:8080")
+	setDefaultConfigValue("server.address", "0.0.0.0:8080")
 
-	setDefaultConfigValue("app.web_address", "localhost:8080")
+	setDefaultConfigValue("app.web_address", "0.0.0.0:8080")
 
 	setDefaultConfigValue("auth.bcrypt_cost", 12)
 	setDefaultConfigValue("auth.salt_key_size", 24)
