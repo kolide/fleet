@@ -9,15 +9,22 @@ import (
 
 // TestUser tests the UserStore interface
 // this test uses the default testing backend
-func TestUser(t *testing.T) {
+func TestCreateUser(t *testing.T) {
 	db := setup(t)
 	defer teardown(t, db)
 
-	testUser(t, db)
+	testCreateUser(t, db)
 }
 
-func testUser(t *testing.T, db app.UserStore) {
-	var userTests = []struct {
+func TestSaveUser(t *testing.T) {
+	db := setup(t)
+	defer teardown(t, db)
+
+	testSaveUser(t, db)
+}
+
+func testCreateUser(t *testing.T, db app.UserStore) {
+	var createTests = []struct {
 		username, password, email string
 		isAdmin, passwordReset    bool
 	}{
@@ -25,7 +32,7 @@ func testUser(t *testing.T, db app.UserStore) {
 		{"jason", "foobar", "jason@kolide.co", true, false},
 	}
 
-	for _, tt := range userTests {
+	for _, tt := range createTests {
 		u, err := app.NewUser(tt.username, tt.password, tt.email, tt.isAdmin, tt.passwordReset)
 		if err != nil {
 			t.Fatal(err)
@@ -57,6 +64,56 @@ func testUser(t *testing.T, db app.UserStore) {
 			t.Errorf("expected email: %s, got %s", tt.email, verify.Email)
 		}
 	}
+}
+
+func createTestUsers(t *testing.T, db app.UserStore) []*app.User {
+	var createTests = []struct {
+		username, password, email string
+		isAdmin, passwordReset    bool
+	}{
+		{"marpaia", "foobar", "mike@kolide.co", true, false},
+		{"jason", "foobar", "jason@kolide.co", false, false},
+	}
+
+	var users []*app.User
+	for _, tt := range createTests {
+		u, err := app.NewUser(tt.username, tt.password, tt.email, tt.isAdmin, tt.passwordReset)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		user, err := db.NewUser(u)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		users = append(users, user)
+	}
+	if len(users) == 0 {
+		t.Fatal("expected a list of users, got 0")
+	}
+	return users
+}
+
+func testSaveUser(t *testing.T, db app.UserStore) {
+	users := createTestUsers(t, db)
+	for _, user := range users {
+		user.Admin = false
+		err := db.SaveUser(user)
+		if err != nil {
+			t.Fatalf("failed to save user %s", user.Name)
+		}
+
+		verify, err := db.User(user.Username)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if verify.Admin != user.Admin {
+			t.Errorf("expected admin attribute to be %s, got %v", user.Admin, verify.Admin)
+		}
+	}
+
 }
 
 // setup creates a datastore for testing
