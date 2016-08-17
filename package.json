@@ -132,6 +132,7 @@
     }
   },
   "devDependencies": {
+    "babel-plugin-transform-flow-strip-types": "^6.8.0",
     "babel-preset-react": "^6.11.1",
     "eslint-plugin-flowtype": "^2.7.1",
     "flow-bin": "^0.30.0",
