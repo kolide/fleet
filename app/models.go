@@ -12,6 +12,16 @@ import (
 	"github.com/kolide/kolide-ose/sessions"
 )
 
+// Datastore combines all methods for backend interactions
+type Datastore interface {
+	UserStore
+	HostStore
+}
+
+type HostStore interface {
+	EnrollHost(uuid, hostname, ip, platform string, nodeKeySize int) (*Host, error)
+}
+
 var tables = [...]interface{}{
 	&User{},
 	&PasswordResetRequest{},

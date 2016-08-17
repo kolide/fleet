@@ -29,11 +29,6 @@ type User struct {
 	NeedsPasswordReset bool
 }
 
-// Datastore combines all methods for backend interactions
-type Datastore interface {
-	UserStore
-}
-
 // UserStore contains methods for managing users in a datastore
 type UserStore interface {
 	NewUser(user *User) (*User, error)

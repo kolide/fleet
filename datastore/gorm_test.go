@@ -8,7 +8,18 @@ import (
 	"github.com/kolide/kolide-ose/app"
 )
 
-// TestUser tests the UserStore interface
+func TestEnrollHostMySQLGORM(t *testing.T) {
+	address := os.Getenv("MYSQL_ADDR")
+	if address == "" {
+		t.SkipNow()
+	}
+	db := setupMySQLGORM(t)
+	defer teardownMySQLGORM(t, db)
+
+	testEnrollHost(t, db)
+}
+
+// TestCreateUser tests the UserStore interface
 // this test uses the MySQL GORM backend
 func TestCreateUserMySQLGORM(t *testing.T) {
 	address := os.Getenv("MYSQL_ADDR")
