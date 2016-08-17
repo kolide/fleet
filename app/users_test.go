@@ -2,33 +2,6 @@ package app
 
 import "testing"
 
-func TestNewUser(t *testing.T) {
-	db := openTestDB(t)
-
-	user, err := NewUser(db, "marpaia", "foobar", "mike@kolide.co", true, false)
-	if err != nil {
-		t.Fatal(err.Error())
-	}
-
-	if user.Username != "marpaia" {
-		t.Fatalf("Username is not what's expected: %s", user.Username)
-	}
-
-	if user.Email != "mike@kolide.co" {
-		t.Fatalf("Email is not what's expected: %s", user.Email)
-	}
-
-	if !user.Admin {
-		t.Fatal("User is not an admin")
-	}
-
-	var verify User
-	db.Where("username = ?", "marpaia").First(&verify)
-	if verify.ID != user.ID {
-		t.Fatal("Couldn't select user back from database")
-	}
-}
-
 func TestValidatePassword(t *testing.T) {
 	db := openTestDB(t)
 

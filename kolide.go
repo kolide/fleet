@@ -17,6 +17,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jordan-wright/email"
 	"github.com/kolide/kolide-ose/app"
+	"github.com/kolide/kolide-ose/datastore"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -138,7 +139,21 @@ $7777777....$....$777$.....+DI..DDD..DDI...8D...D8......$D:..8D....8D...8D......
 		fmt.Println("Use Ctrl-C to stop")
 		fmt.Print("\n\n")
 
-		err = app.CreateServer(db, smtpConnectionPool, os.Stderr).RunTLS(
+		// app datastore
+		var ds app.Datastore
+		{
+			user := viper.GetString("mysql.username")
+			password := viper.GetString("mysql.password")
+			host := viper.GetString("mysql.address")
+			dbName := viper.GetString("mysql.database")
+			connString := fmt.Sprintf("%s:%s@(%s)/%s?charset=utf8&parseTime=True&loc=Local", user, password, host, dbName)
+			ds, err = datastore.New("gorm", connString)
+			if err != nil {
+				logrus.WithError(err).Fatal("error creating db conn")
+			}
+		}
+
+		err = app.CreateServer(ds, db, smtpConnectionPool, os.Stderr).RunTLS(
 			viper.GetString("server.address"),
 			viper.GetString("server.cert"),
 			viper.GetString("server.key"),
