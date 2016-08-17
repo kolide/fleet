@@ -1,4 +1,7 @@
-/**
+/*
+ * Copyright 2016-present, Kolide, Inc.
+ * All rights reserved.
+ *
  * @flow
  */
 
@@ -10,6 +13,11 @@ import { UserGetters } from 'frontend/stores/User';
 
 import Infrastructure from 'frontend/components/Infrastructure';
 
+/**
+ * Navbar is the react component for the application navbar.
+ *
+ * @exports Navbar
+ */
 const Navbar = React.createClass({
   mixins: [
     Dispatcher.ReactMixin

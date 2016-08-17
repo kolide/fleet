@@ -1,4 +1,4 @@
-WEBPACK = $(shell npm bin)/webpack --config=tools/app/webpack.config.js
+NPMBIN=$(shell npm bin)
 
 .prefix:
 ifeq ($(OS), Windows_NT)
@@ -8,7 +8,7 @@ else
 endif
 
 generate: .prefix
-	$(WEBPACK) --progress --colors --bail
+	$(NPMBIN)/webpack --progress --colors --bail
 	go-bindata -pkg=app -o=app/bindata.go frontend/templates/ build/
 
 deps:
@@ -18,6 +18,12 @@ deps:
 ifneq ($(OS), Windows_NT)
 	go get -u github.com/olebedev/on
 endif
+
+docs:
+	$(NPMBIN)/jsdoc frontend -r -c .jsdoc.json -P package.json --verbose
+
+lint:
+	$(NPMBIN)/flow check
 
 distclean:
 	mkdir -p build

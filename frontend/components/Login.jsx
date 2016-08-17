@@ -1,4 +1,7 @@
-/**
+/*
+ * Copyright 2016-present, Kolide, Inc.
+ * All rights reserved.
+ *
  * @flow
  */
 
@@ -9,6 +12,11 @@ import { UserGetters } from 'frontend/stores/User';
 
 import AppActions from 'frontend/actions/App';
 
+/**
+ * Login is the main page component for the login page.
+ *
+ * @exports Login
+ */
 const Login = React.createClass({
   mixins: [
     Dispatcher.ReactMixin

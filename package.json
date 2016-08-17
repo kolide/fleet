@@ -52,6 +52,9 @@
       "react",
       "stage-0"
     ],
+    "plugins": [
+      "transform-flow-strip-types"
+    ],
     "env": {
       "dev": {
         "presets": [
@@ -99,6 +102,9 @@
     }
   },
   "devDependencies": {
-    "flow-bin": "^0.30.0"
+    "babel-preset-react": "^6.11.1",
+    "flow-bin": "^0.30.0",
+    "jsdoc": "^3.4.0",
+    "jsdoc-babel": "^0.2.1"
   }
 }

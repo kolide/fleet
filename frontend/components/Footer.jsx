@@ -1,9 +1,17 @@
-/**
+/*
+ * Copyright 2016-present, Kolide, Inc.
+ * All rights reserved.
+ *
  * @flow
  */
- 
+
 import React from 'react';
 
+/**
+ * Footer is the react component for the application footer
+ *
+ * @exports Footer
+ */
 const Footer = React.createClass({
   render() {
     return (

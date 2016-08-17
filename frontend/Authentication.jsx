@@ -1,4 +1,7 @@
-/**
+/*
+ * Copyright 2016-present, Kolide, Inc.
+ * All rights reserved.
+ *
  * @flow
  */
 
@@ -9,6 +12,19 @@ import { UserGetters } from 'frontend/stores/User';
 
 import Login from 'frontend/components/Login';
 
+/**
+ * requireAuthentication wraps a component and ensure that the current user is
+ * logged in before rendering the component
+ *
+ * @example
+ * import { requireAuthentication } from 'frontend/Authentication';
+ * // in react router:
+ * <Route path="/" component={requireAuthentication(FooComponent)}></Route>
+ *
+ * @param {React.Component} higherOrderComponent The component to wrap
+ * @return {React.Component}
+ * @exports requireAuthentication
+ */
 function requireAuthentication(higherOrderComponent: $FlowFixMe) {
   return React.createClass({
     mixins: [Dispatcher.ReactMixin],

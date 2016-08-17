@@ -1,4 +1,7 @@
-/**
+/*
+ * Copyright 2016-present, Kolide, Inc.
+ * All rights reserved.
+ *
  * @flow
  */
 
@@ -7,6 +10,11 @@ import Dispatcher from 'frontend/Dispatcher';
 
 import Page from 'frontend/components/Page';
 
+/**
+ * Infrastructure is the main page component for viewing infrastructure
+ *
+ * @exports Infrastructure
+ */
 const Infrastructure = React.createClass({
   mixins: [
     Dispatcher.ReactMixin
