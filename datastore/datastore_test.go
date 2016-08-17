@@ -1,7 +1,11 @@
 package datastore
 
 import (
+	"bytes"
+	"fmt"
+	"math/rand"
 	"testing"
+	"time"
 
 	"github.com/jinzhu/gorm"
 	"github.com/kolide/kolide-ose/app"
@@ -97,6 +101,51 @@ func createTestUsers(t *testing.T, db app.UserStore) []*app.User {
 
 func testSaveUser(t *testing.T, db app.UserStore) {
 	users := createTestUsers(t, db)
+	testAdminAttribute(t, db, users)
+	testEmailAttribute(t, db, users)
+	testPasswordAttribute(t, db, users)
+}
+
+func testPasswordAttribute(t *testing.T, db app.UserStore, users []*app.User) {
+	for _, user := range users {
+		user.Password = []byte(randomString(8))
+		err := db.SaveUser(user)
+		if err != nil {
+			t.Fatalf("failed to save user %s", user.Name)
+		}
+
+		verify, err := db.User(user.Username)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if !bytes.Equal(verify.Password, user.Password) {
+			t.Errorf("expected password attribute to be %v, got %v", user.Password, verify.Password)
+		}
+
+	}
+}
+
+func testEmailAttribute(t *testing.T, db app.UserStore, users []*app.User) {
+	for _, user := range users {
+		user.Email = fmt.Sprintf("test.%s", user.Email)
+		err := db.SaveUser(user)
+		if err != nil {
+			t.Fatalf("failed to save user %s", user.Name)
+		}
+
+		verify, err := db.User(user.Username)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if verify.Email != user.Email {
+			t.Errorf("expected admin attribute to be %v, got %v", user.Email, verify.Email)
+		}
+	}
+}
+
+func testAdminAttribute(t *testing.T, db app.UserStore, users []*app.User) {
 	for _, user := range users {
 		user.Admin = false
 		err := db.SaveUser(user)
@@ -110,10 +159,9 @@ func testSaveUser(t *testing.T, db app.UserStore) {
 		}
 
 		if verify.Admin != user.Admin {
-			t.Errorf("expected admin attribute to be %s, got %v", user.Admin, verify.Admin)
+			t.Errorf("expected admin attribute to be %v, got %v", user.Admin, verify.Admin)
 		}
 	}
-
 }
 
 // setup creates a datastore for testing
@@ -134,4 +182,14 @@ func teardown(t *testing.T, ds app.Datastore) {
 	if err := backend.rollback(); err != nil {
 		t.Fatal(err)
 	}
+}
+
+func randomString(strlen int) string {
+	rand.Seed(time.Now().UTC().UnixNano())
+	const chars = "abcdefghijklmnopqrstuvwxyz0123456789"
+	result := make([]byte, strlen)
+	for i := 0; i < strlen; i++ {
+		result[i] = chars[rand.Intn(len(chars))]
+	}
+	return string(result)
 }

@@ -102,14 +102,14 @@ func (u *User) ValidatePassword(password string) error {
 // SetPassword accepts a new password for a user object and updates the salt
 // and hash for that user in the database. This function assumes that the
 // appropriate authorization checks have already occurred by the caller.
-func (u *User) SetPassword(db *gorm.DB, password string) error {
+func (u *User) SetPassword(password string) error {
 	salt, hash, err := SaltAndHashPassword(password)
 	if err != nil {
 		return err
 	}
 	u.Salt = salt
 	u.Password = hash
-	return db.Save(u).Error
+	return nil
 }
 
 // MakeAdmin is a simple wrapper around promoting a user to an administrator.
@@ -465,7 +465,7 @@ func ChangeUserPassword(c *gin.Context) {
 		}
 	}
 
-	err = user.SetPassword(db, body.NewPassword)
+	err = user.SetPassword(body.NewPassword)
 	if err != nil {
 		logrus.Errorf("Error setting user password: %s", err.Error())
 		errors.ReturnError(c, errors.DatabaseError(err)) // probably not this
