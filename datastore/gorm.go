@@ -51,6 +51,10 @@ func (orm gormDB) User(username string) (*app.User, error) {
 	return &user, nil
 }
 
+func (orm gormDB) SaveUser(user *app.User) error {
+	return orm.DB.Save(user).Error
+}
+
 func (orm gormDB) migrate() error {
 	var err error
 	for _, table := range tables {

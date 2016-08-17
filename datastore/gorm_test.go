@@ -10,7 +10,7 @@ import (
 
 // TestUser tests the UserStore interface
 // this test uses the MySQL GORM backend
-func TestUserMySQLGORM(t *testing.T) {
+func TestCreateUserMySQLGORM(t *testing.T) {
 	address := os.Getenv("MYSQL_ADDR")
 	if address == "" {
 		t.SkipNow()
@@ -19,7 +19,19 @@ func TestUserMySQLGORM(t *testing.T) {
 	db := setupMySQLGORM(t)
 	defer teardownMySQLGORM(t, db)
 
-	testUser(t, db)
+	testCreateUser(t, db)
+}
+
+func TestSaveUserMySQLGORM(t *testing.T) {
+	address := os.Getenv("MYSQL_ADDR")
+	if address == "" {
+		t.SkipNow()
+	}
+
+	db := setupMySQLGORM(t)
+	defer teardownMySQLGORM(t, db)
+
+	testSaveUser(t, db)
 }
 
 func setupMySQLGORM(t *testing.T) app.Datastore {

@@ -38,6 +38,7 @@ type Datastore interface {
 type UserStore interface {
 	NewUser(user *User) (*User, error)
 	User(username string) (*User, error)
+	SaveUser(user *User) error
 }
 
 // NewUser is a wrapper around the creation of a new user.
