@@ -92,7 +92,7 @@ func baseReturnError(c *gin.Context, err error, messageKey string) {
 		for key, val := range typedErr.Extra {
 			errJSON[key] = val
 		}
-		errJSON["message"] = typedErr.PublicMessage
+		errJSON[messageKey] = typedErr.PublicMessage
 
 		c.JSON(typedErr.StatusCode, errJSON)
 		logrus.WithError(typedErr.Err).Debug(typedErr.PrivateMessage)
@@ -108,19 +108,19 @@ func baseReturnError(c *gin.Context, err error, messageKey string) {
 		}
 
 		c.JSON(StatusUnprocessableEntity,
-			gin.H{"message": "Validation error",
+			gin.H{messageKey: "Validation error",
 				"errors": errors,
 			})
 		logrus.WithError(typedErr).Debug("Validation error")
 
 	case gorm.Errors, *gorm.Errors:
 		c.JSON(http.StatusInternalServerError,
-			gin.H{"message": "Database error"})
+			gin.H{messageKey: "Database error"})
 		logrus.WithError(typedErr).Debug(typedErr.Error())
 
 	default:
 		c.JSON(http.StatusInternalServerError,
-			gin.H{"message": "Unspecified error"})
+			gin.H{messageKey: "Unspecified error"})
 		logrus.WithError(typedErr).Debug("Unspecified error")
 	}
 }

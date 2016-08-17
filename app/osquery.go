@@ -206,26 +206,26 @@ type OsqueryConfigPostBody struct {
 }
 
 type OsqueryLogPostBody struct {
-	NodeKey string          `json:"node_key" validate:"required"`
-	LogType string          `json:"log_type" validate:"required"`
-	Data    json.RawMessage `json:"data" validate:"required"`
+	NodeKey string           `json:"node_key" validate:"required"`
+	LogType string           `json:"log_type" validate:"required"`
+	Data    *json.RawMessage `json:"data" validate:"required"`
 }
 
 type OsqueryResultLog struct {
-	Name           string            `json:"name"`
-	HostIdentifier string            `json:"hostIdentifier"`
-	UnixTime       string            `json:"unixTime"`
-	CalendarTime   string            `json:"calendarTime"`
+	Name           string            `json:"name" validate:"required"`
+	HostIdentifier string            `json:"hostIdentifier" validate:"required"`
+	UnixTime       string            `json:"unixTime" validate:"required"`
+	CalendarTime   string            `json:"calendarTime" validate:"required"`
 	Columns        map[string]string `json:"columns"`
-	Action         string            `json:"action"`
+	Action         string            `json:"action" validate:"required"`
 }
 
 type OsqueryStatusLog struct {
-	Severity    string            `json:"severity"`
-	Filename    string            `json:"filename"`
-	Line        string            `json:"line"`
-	Message     string            `json:"message"`
-	Version     string            `json:"version"`
+	Severity    string            `json:"severity" validate:"required"`
+	Filename    string            `json:"filename" validate:"required"`
+	Line        string            `json:"line" validate:"required"`
+	Message     string            `json:"message" validate:"required"`
+	Version     string            `json:"version" validate:"required"`
 	Decorations map[string]string `json:"decorations"`
 }
 
@@ -292,12 +292,12 @@ func OsqueryEnroll(c *gin.Context) {
 	var body OsqueryEnrollPostBody
 	err := ParseAndValidateJSON(c, &body)
 	if err != nil {
-		errors.ReturnError(c, err)
+		errors.ReturnOsqueryError(c, err)
 		return
 	}
 
 	if body.EnrollSecret != viper.GetString("osquery.enroll_secret") {
-		errors.ReturnError(
+		errors.ReturnOsqueryError(
 			c,
 			errors.NewWithStatus(http.StatusUnauthorized,
 				"Node key invalid",
@@ -311,7 +311,7 @@ func OsqueryEnroll(c *gin.Context) {
 
 	host, err := EnrollHost(db, body.HostIdentifier, "", "", "")
 	if err != nil {
-		errors.ReturnError(c, errors.DatabaseError(err))
+		errors.ReturnOsqueryError(c, errors.DatabaseError(err))
 		return
 	}
 
@@ -328,7 +328,7 @@ func OsqueryConfig(c *gin.Context) {
 	var body OsqueryConfigPostBody
 	err := ParseAndValidateJSON(c, &body)
 	if err != nil {
-		errors.ReturnError(c, err)
+		errors.ReturnOsqueryError(c, err)
 		return
 	}
 	logrus.Debugf("OsqueryConfig: %s", body.NodeKey)
@@ -370,11 +370,12 @@ func authenticateRequest(db *gorm.DB, nodeKey string) error {
 }
 
 // Unmarshal the status logs before sending them to the status log handler
-func (h *OsqueryHandler) handleStatusLogs(db *gorm.DB, data json.RawMessage, nodeKey string) error {
+func (h *OsqueryHandler) handleStatusLogs(db *gorm.DB, data *json.RawMessage, nodeKey string) error {
 	var statuses []OsqueryStatusLog
-	if err := json.Unmarshal(data, &statuses); err != nil {
+	if err := json.Unmarshal(*data, &statuses); err != nil {
 		return errors.NewFromError(err, http.StatusBadRequest, "JSON parse error")
 	}
+	// Perhaps we should validate the unmarshalled status log
 
 	for _, status := range statuses {
 		if err := h.StatusHandler.HandleStatusLog(status, nodeKey); err != nil {
@@ -387,11 +388,12 @@ func (h *OsqueryHandler) handleStatusLogs(db *gorm.DB, data json.RawMessage, nod
 }
 
 // Unmarshal the result logs before sending them to the result log handler
-func (h *OsqueryHandler) handleResultLogs(db *gorm.DB, data json.RawMessage, nodeKey string) error {
+func (h *OsqueryHandler) handleResultLogs(db *gorm.DB, data *json.RawMessage, nodeKey string) error {
 	var results []OsqueryResultLog
-	if err := json.Unmarshal(data, &results); err != nil {
+	if err := json.Unmarshal(*data, &results); err != nil {
 		return errors.NewFromError(err, http.StatusBadRequest, "JSON parse error")
 	}
+	// Perhaps we should validate the unmarshalled result log
 
 	for _, result := range results {
 		if err := h.ResultHandler.HandleResultLog(result, nodeKey); err != nil {
@@ -420,16 +422,15 @@ func (h *OsqueryHandler) OsqueryLog(c *gin.Context) {
 	var body OsqueryLogPostBody
 	err := ParseAndValidateJSON(c, &body)
 	if err != nil {
-		errors.ReturnError(c, err)
+		errors.ReturnOsqueryError(c, err)
 		return
 	}
-	logrus.Debugf("OsqueryLog: %s", body.LogType)
 
 	db := GetDB(c)
 
 	err = authenticateRequest(db, body.NodeKey)
 	if err != nil {
-		errors.ReturnError(c, err)
+		errors.ReturnOsqueryError(c, err)
 		return
 	}
 
@@ -449,14 +450,14 @@ func (h *OsqueryHandler) OsqueryLog(c *gin.Context) {
 	}
 
 	if err != nil {
-		errors.ReturnError(c, err)
+		errors.ReturnOsqueryError(c, err)
 		return
 	}
 
 	err = updateLastSeen(db, &Host{NodeKey: body.NodeKey})
 
 	if err != nil {
-		errors.ReturnError(c, err)
+		errors.ReturnOsqueryError(c, err)
 		return
 	}
 
@@ -467,7 +468,7 @@ func OsqueryDistributedRead(c *gin.Context) {
 	var body OsqueryDistributedReadPostBody
 	err := ParseAndValidateJSON(c, &body)
 	if err != nil {
-		errors.ReturnError(c, err)
+		errors.ReturnOsqueryError(c, err)
 		return
 	}
 	logrus.Debugf("OsqueryDistributedRead: %s", body.NodeKey)
@@ -485,7 +486,7 @@ func OsqueryDistributedWrite(c *gin.Context) {
 	var body OsqueryDistributedWritePostBody
 	err := ParseAndValidateJSON(c, &body)
 	if err != nil {
-		errors.ReturnError(c, err)
+		errors.ReturnOsqueryError(c, err)
 		return
 	}
 	logrus.Debugf("OsqueryDistributedWrite: %s", body.NodeKey)

@@ -139,26 +139,30 @@ $7777777....$....$777$.....+DI..DDD..DDI...8D...D8......$D:..8D....8D...8D......
 		fmt.Println("Use Ctrl-C to stop")
 		fmt.Print("\n\n")
 
-		resultWriter := &lumberjack.Logger{
-			Filename:   "result.log",
-			MaxSize:    500, // megabytes
-			MaxBackups: 3,
-			MaxAge:     28, //days
+		resultHandler := &app.OsqueryLogWriter{
+			Writer: &lumberjack.Logger{
+				Filename:   "result.log",
+				MaxSize:    500, // megabytes
+				MaxBackups: 3,
+				MaxAge:     28, //days
+			},
 		}
 
-		statusWriter := &lumberjack.Logger{
-			Filename:   "status.log",
-			MaxSize:    500, // megabytes
-			MaxBackups: 3,
-			MaxAge:     28, //days
+		statusHandler := &app.OsqueryLogWriter{
+			Writer: &lumberjack.Logger{
+				Filename:   "status.log",
+				MaxSize:    500, // megabytes
+				MaxBackups: 3,
+				MaxAge:     28, //days
+			},
 		}
 
 		err = app.CreateServer(
 			db,
 			smtpConnectionPool,
 			os.Stderr,
-			resultWriter,
-			statusWriter,
+			statusHandler,
+			resultHandler,
 		).RunTLS(
 			viper.GetString("server.address"),
 			viper.GetString("server.cert"),

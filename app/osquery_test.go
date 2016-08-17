@@ -142,21 +142,13 @@ func TestOsqueryLogWriterResult(t *testing.T) {
 
 }
 
-type mockOsqueryStatusLogWriter struct {
-	Logs []OsqueryStatusLog
-}
-
-func (w *mockOsqueryStatusLogWriter) HandleStatusLog(log OsqueryStatusLog, nodeKey string) error {
-	w.Logs = append(w.Logs, log)
-	return nil
-}
-
 func TestOsqueryHandlerHandleStatusLogs(t *testing.T) {
 	writer := new(mockOsqueryStatusLogWriter)
 	handler := OsqueryHandler{StatusHandler: writer}
 
+	data := json.RawMessage("{")
 	assert.Error(t,
-		handler.handleStatusLogs(nil, json.RawMessage("{"), "foo"),
+		handler.handleStatusLogs(nil, &data, "foo"),
 		"should error with bad json",
 	)
 
@@ -186,27 +178,19 @@ func TestOsqueryHandlerHandleStatusLogs(t *testing.T) {
 
 	jsonVal, err := json.Marshal(&expect)
 	assert.NoError(t, err)
-
-	assert.NoError(t, handler.handleStatusLogs(nil, jsonVal, "foo"))
+	data = json.RawMessage(jsonVal)
+	assert.NoError(t, handler.handleStatusLogs(nil, &data, "foo"))
 
 	assert.Equal(t, expect, writer.Logs)
-}
-
-type mockOsqueryResultLogWriter struct {
-	Logs []OsqueryResultLog
-}
-
-func (w *mockOsqueryResultLogWriter) HandleResultLog(log OsqueryResultLog, nodeKey string) error {
-	w.Logs = append(w.Logs, log)
-	return nil
 }
 
 func TestOsqueryHandlerHandleResultLogs(t *testing.T) {
 	writer := new(mockOsqueryResultLogWriter)
 	handler := OsqueryHandler{ResultHandler: writer}
 
+	data := json.RawMessage("{")
 	assert.Error(t,
-		handler.handleResultLogs(nil, json.RawMessage("{"), "foo"),
+		handler.handleResultLogs(nil, &data, "foo"),
 		"should error with bad json",
 	)
 
@@ -239,7 +223,8 @@ func TestOsqueryHandlerHandleResultLogs(t *testing.T) {
 	jsonVal, err := json.Marshal(&expect)
 	assert.NoError(t, err)
 
-	assert.NoError(t, handler.handleResultLogs(nil, jsonVal, "foo"))
+	data = json.RawMessage(jsonVal)
+	assert.NoError(t, handler.handleResultLogs(nil, &data, "foo"))
 
 	assert.Equal(t, expect, writer.Logs)
 }
