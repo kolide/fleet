@@ -1,13 +1,16 @@
 import React from 'react';
 import { render } from 'react-dom';
-import { Router, Route, IndexRoute, browserHistory } from 'react-router';
+import { Router, Route, IndexRedirect, browserHistory, withRouter } from 'react-router';
 import { Promise } from 'bluebird';
 
 import Dispatcher from '#app/Dispatcher';
+import { requireAuthentication } from '#app/Authentication';
 
-import App from '#components/App';
+import Infrastructure from '#components/Infrastructure';
+import Login from '#components/Login'
+
 import AppActions from '#actions/App';
-import AppStore from '#stores/App';
+import UserStore from '#stores/User';
 
 
 if (typeof window !== 'undefined') {
@@ -29,14 +32,18 @@ if (typeof window !== 'undefined') {
   }
 
   Dispatcher.registerStores({
-    app: AppStore,
+    user: UserStore,
   })
 
   AppActions.fetchInitialState();
 
   render((
     <Router history={browserHistory}>
-      <Route path="/" component={App}></Route>
+      <Route path="/">
+        <IndexRedirect to={Infrastructure.getRoute()} />
+        <Route path={Login.getRoute()} component={withRouter(Login)}></Route>
+        <Route path={Infrastructure.getRoute()} component={withRouter(requireAuthentication(Infrastructure))}></Route>
+      </Route>
     </Router>
   ), document.getElementById('app'))
 }
