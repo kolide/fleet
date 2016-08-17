@@ -97,5 +97,8 @@
     "parserOptions": {
       "sourceType": "module"
     }
+  },
+  "devDependencies": {
+    "flow-bin": "^0.30.0"
   }
 }

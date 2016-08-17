@@ -63,11 +63,7 @@ var config  = {
   resolve: {
     extensions: ['', '.js', '.jsx', '.css'],
     alias: {
-      '#app': path.join(repo, 'frontend'),
-      '#components': path.join(repo, 'frontend/components'),
-      '#stores': path.join(repo, 'frontend/stores'),
-      '#actions': path.join(repo, 'frontend/actions'),
-      '#css': path.join(repo, 'frontend/css')
+      'frontend': path.join(repo, 'frontend')
     }
   },
   svgo1: {

@@ -1,7 +1,7 @@
 import React from 'react';
 
-import Navbar from '#components/Navbar'
-import Footer from '#components/Footer'
+import Navbar from 'frontend/components/Navbar'
+import Footer from 'frontend/components/Footer'
 
 const Page = React.createClass({
   render() {

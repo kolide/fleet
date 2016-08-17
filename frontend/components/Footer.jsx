@@ -1,3 +1,7 @@
+/**
+ * @flow
+ */
+ 
 import React from 'react';
 
 const Footer = React.createClass({

@@ -1,7 +1,11 @@
-import React, { Component } from 'react';
-import Dispatcher from '#app/Dispatcher';
+/**
+ * @flow
+ */
 
-import Page from '#components/Page';
+import React, { Component } from 'react';
+import Dispatcher from 'frontend/Dispatcher';
+
+import Page from 'frontend/components/Page';
 
 const Infrastructure = React.createClass({
   mixins: [

@@ -1,8 +1,13 @@
-import { Store, toImmutable } from 'nuclear-js';
+/**
+ * @flow
+ */
+
+import { Store } from 'nuclear-js';
+import * as Immutable from 'immutable';
 
 var UserStore = new Store({
   getInitialState() {
-    return toImmutable({
+    return Immutable.Map({
       logged_in: false,
       is_authenticating: false,
     });
@@ -15,20 +20,20 @@ var UserStore = new Store({
 
 });
 
-function receiveUserInfo(state, user) {
-  return state.merge(toImmutable({
-    id: user.id,
-    username: user.username,
-    email: user.email,
-    name: user.name,
-    admin: user.admin,
-    needs_password_reset: user.needs_password_reset,
+function receiveUserInfo(state: Immutable.Map<string, any>, user: Immutable.Map<string, any>) {
+  return state.merge(Immutable.Map({
+    id: user.get("id"),
+    username: user.get("username"),
+    email: user.get("email"),
+    name: user.get("name"),
+    admin: user.get("admin"),
+    needs_password_reset: user.get("needs_password_reset"),
     logged_in: true,
   }));
 }
 
-function setAuthenticatingState(state, isAuthenticating) {
-  return state.merge(toImmutable({
+function setAuthenticatingState(state: Immutable.Map<string, any>, isAuthenticating: Immutable.Map<string, any>) {
+  return state.merge(Immutable.Map({
     is_authenticating: isAuthenticating,
   }));
 }
@@ -46,4 +51,4 @@ var UserGetters = {
 
 
 export default UserStore;
-exports.UserGetters = UserGetters;
+export { UserGetters };

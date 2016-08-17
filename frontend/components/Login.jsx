@@ -1,9 +1,13 @@
+/**
+ * @flow
+ */
+
 import React from 'react';
-import Dispatcher from '#app/Dispatcher';
+import Dispatcher from 'frontend/Dispatcher';
 
-import { UserGetters } from '#stores/User';
+import { UserGetters } from 'frontend/stores/User';
 
-import AppActions from '#actions/App';
+import AppActions from 'frontend/actions/App';
 
 const Login = React.createClass({
   mixins: [
@@ -19,6 +23,8 @@ const Login = React.createClass({
 
   getInitialState() {
     return {
+      logged_in: null,
+      is_authenticating: null,
       username: "",
       password: ""
     }
@@ -30,16 +36,16 @@ const Login = React.createClass({
     }
   },
 
-  onClickLoginButton(event) {
+  onClickLoginButton(event: any) {
     event.preventDefault();
     AppActions.login(this.state.username, this.state.password, "foo");
   },
 
-  onChangeUsername(event) {
+  onChangeUsername(event: any) {
     this.state.username = event.target.value;
   },
 
-  onChangePassword(event) {
+  onChangePassword(event: any) {
     this.state.password = event.target.value;
   },
 

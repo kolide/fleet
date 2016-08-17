@@ -1,11 +1,15 @@
+/**
+ * @flow
+ */
+
 import React from 'react';
-import Dispatcher from '#app/Dispatcher';
+import Dispatcher from 'frontend/Dispatcher';
 
-import { UserGetters } from '#stores/User';
+import { UserGetters } from 'frontend/stores/User';
 
-import Login from '#components/Login';
+import Login from 'frontend/components/Login';
 
-function requireAuthentication(higherOrderComponent) {
+function requireAuthentication(higherOrderComponent: $FlowFixMe) {
   return React.createClass({
     mixins: [Dispatcher.ReactMixin],
 
@@ -15,11 +19,17 @@ function requireAuthentication(higherOrderComponent) {
       }
     },
 
+    getInitialState() {
+      return {
+        logged_in: null,
+      }
+    },
+
     componentWillMount() {
       this.checkAuth();
     },
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: $FlowFixMe) {
       this.checkAuth();
     },
 

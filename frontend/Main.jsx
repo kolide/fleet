@@ -1,16 +1,20 @@
+/**
+ * @flow
+ */
+
 import React from 'react';
 import { render } from 'react-dom';
 import { Router, Route, IndexRedirect, browserHistory, withRouter } from 'react-router';
 import { Promise } from 'bluebird';
 
-import Dispatcher from '#app/Dispatcher';
-import { requireAuthentication } from '#app/Authentication';
+import Dispatcher from 'frontend/Dispatcher';
+import { requireAuthentication } from 'frontend/Authentication';
 
-import Infrastructure from '#components/Infrastructure';
-import Login from '#components/Login'
+import Infrastructure from 'frontend/components/Infrastructure';
+import Login from 'frontend/components/Login'
 
-import AppActions from '#actions/App';
-import UserStore from '#stores/User';
+import AppActions from 'frontend/actions/App';
+import UserStore from 'frontend/stores/User';
 
 
 if (typeof window !== 'undefined') {
@@ -18,15 +22,20 @@ if (typeof window !== 'undefined') {
   window.self = window;
   require('whatwg-fetch');
 
-  require('#css');
+  require('frontend/css');
   if (module.hot) {
     let c = 0;
     module.hot.accept('#css', () => {
-      require('#css');
-      const a = document.createElement('a');
-      const link = document.querySelector('link[rel="stylesheet"]');
+      require('frontend/css');
+
+      var a = document.createElement('a');
+      var link = document.querySelector('link[rel="stylesheet"]');
+
+      // @FlowFixMe clean up style loading
       a.href = link.href;
       a.search = '?' + c++;
+      
+      // @FlowFixMe clean up style loading
       link.href = a.href;
     });
   }

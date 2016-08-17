@@ -1,10 +1,14 @@
+/**
+ * @flow
+ */
+
 import React from 'react';
 import { Link } from 'react-router';
-import Dispatcher from '#app/Dispatcher';
+import Dispatcher from 'frontend/Dispatcher';
 
-import { UserGetters } from '#stores/User';
+import { UserGetters } from 'frontend/stores/User';
 
-import Infrastructure from '#components/Infrastructure';
+import Infrastructure from 'frontend/components/Infrastructure';
 
 const Navbar = React.createClass({
   mixins: [
