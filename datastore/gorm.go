@@ -39,6 +39,18 @@ func (orm gormDB) NewUser(user *app.User) (*app.User, error) {
 	return user, nil
 }
 
+// User returns a specific user in the gorm backend
+func (orm gormDB) User(username string) (*app.User, error) {
+	user := app.User{
+		Username: username,
+	}
+	err := orm.DB.Where("username = ?", username).First(&user).Error
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
 func (orm gormDB) migrate() error {
 	var err error
 	for _, table := range tables {
