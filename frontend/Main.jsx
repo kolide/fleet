@@ -28,7 +28,7 @@ if (typeof window !== 'undefined') {
   require('frontend/css');
   if (module.hot) {
     let c = 0;
-    module.hot.accept('#css', () => {
+    module.hot.accept('frontend/css', () => {
       require('frontend/css');
 
       var a = document.createElement('a');

@@ -4,7 +4,6 @@ var path = require('path');
 var webpack = require('webpack');
 var autoprefixer = require('autoprefixer');
 var precss = require('precss');
-var functions = require('postcss-functions');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 var postCssLoader = [
@@ -84,15 +83,6 @@ var config  = {
       {removeDesc: true}
     ]
   },
-  postcss: function() {
-    return [autoprefixer, precss({
-      variables: {
-        variables: require(path.join(repo, 'frontend/css/vars'))
-      }
-    }), functions({
-      functions: require(path.join(repo, 'frontend/css/funcs'))
-    })]
-  }
 };
 
 module.exports = config;

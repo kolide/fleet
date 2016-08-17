@@ -26,27 +26,27 @@ const Login = React.createClass({
     return {
       logged_in: UserGetters.logged_in,
       is_authenticating: UserGetters.is_authenticating,
-    }
+    };
   },
 
   getInitialState() {
     return {
       logged_in: null,
       is_authenticating: null,
-      username: "",
-      password: ""
-    }
+      username: '',
+      password: ''
+    };
   },
 
   componentWillMount() {
     if (this.state.logged_in) {
-      this.props.router.push("/");
+      this.props.router.push('/');
     }
   },
 
   onClickLoginButton(event: any) {
     event.preventDefault();
-    AppActions.login(this.state.username, this.state.password, "foo");
+    AppActions.login(this.state.username, this.state.password, 'foo');
   },
 
   onChangeUsername(event: any) {
@@ -82,10 +82,10 @@ const Login = React.createClass({
       </div>
     );
   },
-})
+});
 
 Login.getRoute = function() {
-  return "/login";
-}
+  return '/login';
+};
 
-export default Login
+export default Login;

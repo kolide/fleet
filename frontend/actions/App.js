@@ -35,6 +35,8 @@ module.exports = {
   login(email: string, password: string, redirectTo: string) {
     Dispatcher.dispatch('IS_AUTHENTICATING', true);
 
+    
+
     var user = Immutable.Map({
       id: 'marpaia',
       username: 'marpaia',
@@ -46,6 +48,7 @@ module.exports = {
 
     Dispatcher.dispatch('RECEIVE_USER_INFO', user);
     browserHistory.push('/');
+
     Dispatcher.dispatch('IS_AUTHENTICATING', false);
   },
 };
