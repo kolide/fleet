@@ -76,9 +76,9 @@ Available Configurations:
   osquery:
       enroll_secret      (string)  (KOLIDE_OSQUERY_ENROLL_SECRET)
       node_key_size      (int)     (KOLIDE_OSQUERY_NODE_KEY_SIZE)
-  tool:
-      debug              (bool)    (KOLIDE_TOOL_DEBUG)
-      disable_banner     (bool)    (KOLIDE_TOOL_DISABLE_BANNER)
+  logging:
+      debug              (bool)    (KOLIDE_LOGGING_DEBUG)
+      disable_banner     (bool)    (KOLIDE_LOGGING_DISABLE_BANNER)
 `,
 }
 
@@ -117,7 +117,7 @@ the way that the kolide server works.
 			viper.GetInt("smtp.pool_connections"),
 			smtp.PlainAuth("", viper.GetString("smtp.username"), viper.GetString("smtp.password"), smtpHost))
 
-		if !viper.GetBool("tool.disable_banner") {
+		if !viper.GetBool("logging.disable_banner") {
 			fmt.Println(`
 
  .........77777$7$....................... .   .  .  .. .... .. . .. . ..
@@ -277,10 +277,10 @@ func initConfig() {
 	setDefaultConfigValue("osquery.status_log_file", "/tmp/osquery_status")
 	setDefaultConfigValue("osquery.result_log_file", "/tmp/osquery_result")
 
-	setDefaultConfigValue("tool.debug", false)
-	setDefaultConfigValue("tool.disable_banner", false)
+	setDefaultConfigValue("logging.debug", false)
+	setDefaultConfigValue("logging.disable_banner", false)
 
-	if viper.GetBool("tool.debug") {
+	if viper.GetBool("logging.debug") {
 		logrus.SetLevel(logrus.DebugLevel)
 	} else {
 		logrus.SetLevel(logrus.WarnLevel)
