@@ -1,6 +1,9 @@
 package datastore
 
 import (
+	"crypto/rand"
+	"encoding/base64"
+	"errors"
 	"fmt"
 	"time"
 
@@ -53,6 +56,62 @@ func (orm gormDB) User(username string) (*app.User, error) {
 
 func (orm gormDB) SaveUser(user *app.User) error {
 	return orm.DB.Save(user).Error
+}
+
+func generateRandomText(keySize int) (string, error) {
+	key := make([]byte, keySize)
+	_, err := rand.Read(key)
+	if err != nil {
+		return "", err
+	}
+
+	return base64.StdEncoding.EncodeToString(key), nil
+}
+
+func (orm gormDB) EnrollHost(uuid, hostname, ip, platform string, nodeKeySize int) (*app.Host, error) {
+	if uuid == "" {
+		return nil, errors.New("missing uuid for host enrollment, programmer error?")
+	}
+	host := app.Host{UUID: uuid}
+	err := orm.DB.Where(&host).First(&host).Error
+	if err != nil {
+		switch err {
+		case gorm.ErrRecordNotFound:
+			// Create new Host
+			host = app.Host{
+				UUID:      uuid,
+				HostName:  hostname,
+				IPAddress: ip,
+				Platform:  platform,
+			}
+
+		default:
+			return nil, err
+		}
+	}
+
+	// Generate a new key each enrollment
+	host.NodeKey, err = generateRandomText(nodeKeySize)
+	if err != nil {
+		return nil, err
+	}
+
+	// Update these fields if provided
+	if hostname != "" {
+		host.HostName = hostname
+	}
+	if ip != "" {
+		host.IPAddress = ip
+	}
+	if platform != "" {
+		host.Platform = platform
+	}
+
+	if err := orm.DB.Save(&host).Error; err != nil {
+		return nil, err
+	}
+
+	return &host, nil
 }
 
 func (orm gormDB) migrate() error {
