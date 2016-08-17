@@ -17,7 +17,7 @@ var UserStore = new Store({
   /**
    * Return the initial state of the store on application launch.
    */
-  getInitialState() {
+  getInitialState(): Immutable.Map<string, any> {
     return Immutable.Map({
       logged_in: false,
       is_authenticating: false,
@@ -39,14 +39,14 @@ var UserStore = new Store({
    * @param {Immutable.Map<string, any>} state The current store state
    * @param {Immutable.Map<string, any>} user User data to be received
    */
-  receiveUserInfo(state: Immutable.Map<string, any>, user: Immutable.Map<string, any>) {
+  receiveUserInfo(state: Immutable.Map<string, any>, user: Immutable.Map<string, any>): Immutable.Map<string, any> {
     return state.merge(Immutable.Map({
-      id: user.get("id"),
-      username: user.get("username"),
-      email: user.get("email"),
-      name: user.get("name"),
-      admin: user.get("admin"),
-      needs_password_reset: user.get("needs_password_reset"),
+      id: user.get('id'),
+      username: user.get('username'),
+      email: user.get('email'),
+      name: user.get('name'),
+      admin: user.get('admin'),
+      needs_password_reset: user.get('needs_password_reset'),
       logged_in: true,
     }));
   },
@@ -57,7 +57,7 @@ var UserStore = new Store({
    * @param {Immutable.Map<string, any>} state The current store state
    * @param {Immutable.Map<string, any>} isAuthenticating The auth state
    */
-  setAuthenticatingState(state: Immutable.Map<string, any>, isAuthenticating: Immutable.Map<string, any>) {
+  setAuthenticatingState(state: Immutable.Map<string, any>, isAuthenticating: Immutable.Map<string, any>): Immutable.Map<string, any> {
     return state.merge(Immutable.Map({
       is_authenticating: isAuthenticating,
     }));

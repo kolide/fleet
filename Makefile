@@ -1,4 +1,7 @@
-NPMBIN=$(shell npm bin)
+NPM_BIN = ./node_modules/.bin/
+ifeq ($(OS), Windows_NT)
+	NPM_BIN = node_modules\\.bin\\
+endif
 
 .prefix:
 ifeq ($(OS), Windows_NT)
@@ -8,7 +11,7 @@ else
 endif
 
 generate: .prefix
-	$(NPMBIN)/webpack --progress --colors --bail
+	$(NPM_BIN)webpack --progress --colors --bail
 	go-bindata -pkg=app -o=app/bindata.go frontend/templates/ build/
 
 deps:
@@ -20,10 +23,11 @@ ifneq ($(OS), Windows_NT)
 endif
 
 docs:
-	$(NPMBIN)/jsdoc frontend -r -c .jsdoc.json -P package.json --verbose
+	$(NPM_BIN)jsdoc frontend -r -c .jsdoc.json -P package.json --verbose
 
 lint:
-	$(NPMBIN)/flow check
+	$(NPM_BIN)flow check
+	$(NPM_BIN)eslint frontend
 
 distclean:
 	mkdir -p build

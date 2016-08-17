@@ -1,3 +1,10 @@
+/*
+ * Copyright 2016-present, Kolide, Inc.
+ * All rights reserved.
+ *
+ * @flow
+ */
+
 /**
  * Global CSS Functions.
  * @module css/funcs
@@ -10,7 +17,7 @@ module.exports = {
   * // returns "height: 5px;"
     height: px(5);
   */
-  px: function(val) {
+  px: function(val: number): string {
     return val + 'px';
   }
 };

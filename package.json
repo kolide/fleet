@@ -64,6 +64,12 @@
     }
   },
   "eslintConfig": {
+    "parser": "babel-eslint",
+    "settings": {
+      "flowtype": {
+        "onlyFilesWithFlowAnnotation": false
+      }
+    },
     "rules": {
       "indent": [
         2,
@@ -83,7 +89,30 @@
       ],
       "react/jsx-uses-react": 2,
       "react/jsx-uses-vars": 2,
-      "react/react-in-jsx-scope": 2
+      "react/react-in-jsx-scope": 2,
+      "flowtype/define-flow-type": 1,
+      "flowtype/require-parameter-type": 1,
+      "flowtype/require-return-type": [
+        1,
+        "always",
+        {
+          "annotateUndefined": "never"
+        }
+      ],
+      "flowtype/space-after-type-colon": [
+        1,
+        "always"
+      ],
+      "flowtype/space-before-type-colon": [
+        1,
+        "never"
+      ],
+      "flowtype/type-id-match": [
+        1,
+        "^([A-Z][a-z0-9]+)+Type$"
+      ],
+      "flowtype/use-flow-type": 1,
+      "flowtype/valid-syntax": 1
     },
     "env": {
       "es6": true,
@@ -95,7 +124,8 @@
       "modules": true
     },
     "plugins": [
-      "react"
+      "react",
+      "flowtype"
     ],
     "parserOptions": {
       "sourceType": "module"
@@ -103,6 +133,7 @@
   },
   "devDependencies": {
     "babel-preset-react": "^6.11.1",
+    "eslint-plugin-flowtype": "^2.7.1",
     "flow-bin": "^0.30.0",
     "jsdoc": "^3.4.0",
     "jsdoc-babel": "^0.2.1"
