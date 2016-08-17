@@ -38,7 +38,7 @@ var repo = path.join(__dirname, "../../")
 
 var config  = {
   entry: {
-    bundle: path.join(repo, 'frontend/Main.js')
+    bundle: path.join(repo, 'frontend/Main.jsx')
   },
   output: {
     path: path.join(repo, 'build'),
