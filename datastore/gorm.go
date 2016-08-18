@@ -146,7 +146,7 @@ func (orm gormDB) FindPassswordResetByID(id uint) (*app.PasswordResetRequest, er
 	reset := &app.PasswordResetRequest{
 		ID: id,
 	}
-	err := orm.DB.Find(reset).First(&reset).Error
+	err := orm.DB.Find(reset).First(reset).Error
 	return reset, err
 }
 
@@ -154,12 +154,17 @@ func (orm gormDB) FindPassswordResetByToken(token string) (*app.PasswordResetReq
 	reset := &app.PasswordResetRequest{
 		Token: token,
 	}
-	err := orm.DB.Find(reset).First(&reset).Error
+	err := orm.DB.Find(reset).First(reset).Error
 	return reset, err
 }
 
 func (orm gormDB) FindPassswordResetByTokenAndUserID(token string, userID uint) (*app.PasswordResetRequest, error) {
-	panic("not implemented")
+	reset := &app.PasswordResetRequest{
+		Token: token,
+		ID:    userID,
+	}
+	err := orm.DB.Find(reset).First(reset).Error
+	return reset, err
 }
 
 func (orm gormDB) Migrate() error {

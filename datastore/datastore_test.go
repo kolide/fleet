@@ -11,6 +11,38 @@ import (
 	"github.com/kolide/kolide-ose/app"
 )
 
+func TestPasswordResetRequests(t *testing.T) {
+	db := setup(t)
+	defer teardown(t, db)
+
+	testPasswordResetRequests(t, db)
+}
+
+func testPasswordResetRequests(t *testing.T, db app.Datastore) {
+	createTestUsers(t, db)
+	now := time.Now()
+	tomorrow := now.Add(time.Hour * 24)
+	var passwordResetTests = []struct {
+		userID  uint
+		expires time.Time
+		token   string
+	}{
+		{userID: 1, expires: tomorrow, token: "abcd"},
+	}
+
+	for _, tt := range passwordResetTests {
+		req, err := db.CreatePassworResetRequest(tt.userID, tt.expires, tt.token)
+		if err != nil {
+			t.Fatalf("failed to create PasswordResetRequest campaign in datastore")
+		}
+
+		if req.UserID != tt.userID {
+			t.Fatalf("expected %v, got %v", tt.userID, req.UserID)
+		}
+
+	}
+}
+
 func TestEnrollHost(t *testing.T) {
 	db := setup(t)
 	defer teardown(t, db)
@@ -268,8 +300,8 @@ func setup(t *testing.T) app.Datastore {
 		t.Fatal(err)
 	}
 	// Log using t.Log so that output only shows up if the test fails
-	db.SetLogger(&testLogger{t: t})
-	db.LogMode(true)
+	// db.SetLogger(&testLogger{t: t})
+	// db.LogMode(true)
 	return ds
 }
 
