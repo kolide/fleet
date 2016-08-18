@@ -170,14 +170,19 @@ $7777777....$....$777$.....+DI..DDD..DDI...8D...D8......$D:..8D....8D...8D......
 				logrus.WithError(err).Fatal("error creating db conn")
 			}
 		}
+		sessionBackend := datastore.NewSessionBackend(ds)
 		err = app.CreateServer(
+			sessionBackend,
 			ds,
-			db,
 			smtpConnectionPool,
 			os.Stderr,
 			resultHandler,
 			statusHandler,
 		).RunTLS(
+			viper.GetString("server.address"),
+			viper.GetString("server.cert"),
+			viper.GetString("server.key"),
+		)
 
 		if err != nil {
 			logrus.WithError(err).Fatal("Error running server")

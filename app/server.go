@@ -119,7 +119,7 @@ func NotFound(c *gin.Context) {
 
 // CreateServer creates a gin.Engine HTTP server and configures it to be in a
 // state such that it is ready to serve HTTP requests for the kolide application
-func CreateServer(backend sessions.SessionBackend, db datastore.Datastore, pool SMTPConnectionPool, w io.Writer) *gin.Engine {
+func CreateServer(backend sessions.SessionBackend, db datastore.Datastore, pool SMTPConnectionPool, w io.Writer, resultHandler OsqueryResultHandler, statusHandler OsqueryStatusHandler) *gin.Engine {
 	server := gin.New()
 	server.Use(DatabaseMiddleware(db))
 	server.Use(SMTPConnectionPoolMiddleware(pool))

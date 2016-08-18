@@ -17,6 +17,8 @@ type Host struct {
 // HostStore enrolls hosts in the datastore
 type HostStore interface {
 	EnrollHost(uuid, hostname, ip, platform string, nodeKeySize int) (*Host, error)
+	AuthenticateHost(nodeKey string) (*Host, error)
+	UpdateLastSeen(host *Host) error
 }
 
 type Label struct {

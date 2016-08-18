@@ -3,11 +3,12 @@ package datastore
 import (
 	"crypto/rand"
 	"encoding/base64"
-	"errors"
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/jinzhu/gorm"
+	"github.com/kolide/kolide-ose/errors"
 	"github.com/kolide/kolide-ose/kolide"
 	"github.com/kolide/kolide-ose/sessions"
 )
@@ -79,7 +80,7 @@ func generateRandomText(keySize int) (string, error) {
 
 func (orm gormDB) EnrollHost(uuid, hostname, ip, platform string, nodeKeySize int) (*kolide.Host, error) {
 	if uuid == "" {
-		return nil, errors.New("missing uuid for host enrollment, programmer error?")
+		return nil, errors.New("missing uuid for host enrollment", "programmer error?")
 	}
 	host := kolide.Host{UUID: uuid}
 	err := orm.DB.Where(&host).First(&host).Error
@@ -121,6 +122,38 @@ func (orm gormDB) EnrollHost(uuid, hostname, ip, platform string, nodeKeySize in
 	}
 
 	return &host, nil
+}
+
+func (orm gormDB) AuthenticateHost(nodeKey string) (*kolide.Host, error) {
+	host := kolide.Host{NodeKey: nodeKey}
+	err := orm.DB.Where(&host).First(&host).Error
+	if err != nil {
+		switch err {
+		case gorm.ErrRecordNotFound:
+			e := errors.NewFromError(
+				err,
+				http.StatusUnauthorized,
+				"Unauthorized",
+			)
+			// osqueryd expects the literal string "true" here
+			e.Extra = map[string]interface{}{"node_invalid": "true"}
+			return nil, e
+		default:
+			return nil, errors.DatabaseError(err)
+		}
+	}
+
+	return &host, nil
+}
+
+func (orm gormDB) UpdateLastSeen(host *kolide.Host) error {
+	updateTime := time.Now()
+	err := orm.DB.Exec("UPDATE hosts SET updated_at=? WHERE node_key=?", updateTime, host.NodeKey).Error
+	if err != nil {
+		return errors.DatabaseError(err)
+	}
+	host.UpdatedAt = updateTime
+	return nil
 }
 
 func (orm gormDB) CreatePassworResetRequest(userID uint, expires time.Time, token string) (*kolide.PasswordResetRequest, error) {

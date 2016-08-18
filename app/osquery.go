@@ -5,12 +5,11 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"time"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	"github.com/kolide/kolide-ose/errors"
+	"github.com/kolide/kolide-ose/kolide"
 	"github.com/spf13/viper"
 )
 
@@ -162,32 +161,8 @@ func OsqueryConfig(c *gin.Context) {
 		})
 }
 
-// Authenticate a (post-enrollment) TLS request from osqueryd. To do this we
-// verify that the provided node key is valid.
-func authenticateRequest(db *gorm.DB, nodeKey string) error {
-	host := Host{NodeKey: nodeKey}
-	err := db.Where(&host).First(&host).Error
-	if err != nil {
-		switch err {
-		case gorm.ErrRecordNotFound:
-			e := errors.NewFromError(
-				err,
-				http.StatusUnauthorized,
-				"Unauthorized",
-			)
-			// osqueryd expects the literal string "true" here
-			e.Extra = map[string]interface{}{"node_invalid": "true"}
-			return e
-		default:
-			return errors.DatabaseError(err)
-		}
-	}
-
-	return nil
-}
-
 // Unmarshal the status logs before sending them to the status log handler
-func (h *OsqueryHandler) handleStatusLogs(db *gorm.DB, data *json.RawMessage, nodeKey string) error {
+func (h *OsqueryHandler) handleStatusLogs(data *json.RawMessage, nodeKey string) error {
 	var statuses []OsqueryStatusLog
 	if err := json.Unmarshal(*data, &statuses); err != nil {
 		return errors.NewFromError(err, http.StatusBadRequest, "JSON parse error")
@@ -205,7 +180,7 @@ func (h *OsqueryHandler) handleStatusLogs(db *gorm.DB, data *json.RawMessage, no
 }
 
 // Unmarshal the result logs before sending them to the result log handler
-func (h *OsqueryHandler) handleResultLogs(db *gorm.DB, data *json.RawMessage, nodeKey string) error {
+func (h *OsqueryHandler) handleResultLogs(data *json.RawMessage, nodeKey string) error {
 	var results []OsqueryResultLog
 	if err := json.Unmarshal(*data, &results); err != nil {
 		return errors.NewFromError(err, http.StatusBadRequest, "JSON parse error")
@@ -222,18 +197,6 @@ func (h *OsqueryHandler) handleResultLogs(db *gorm.DB, data *json.RawMessage, no
 	return nil
 }
 
-// Set the update time for the provided host to indicate that it has
-// successfully checked in.
-func updateLastSeen(db *gorm.DB, host *Host) error {
-	updateTime := time.Now()
-	err := db.Exec("UPDATE hosts SET updated_at=? WHERE node_key=?", updateTime, host.NodeKey).Error
-	if err != nil {
-		return errors.DatabaseError(err)
-	}
-	host.UpdatedAt = updateTime
-	return nil
-}
-
 // Endpoint used by the osqueryd TLS logger plugin
 func (h *OsqueryHandler) OsqueryLog(c *gin.Context) {
 	var body OsqueryLogPostBody
@@ -245,7 +208,7 @@ func (h *OsqueryHandler) OsqueryLog(c *gin.Context) {
 
 	db := GetDB(c)
 
-	err = authenticateRequest(db, body.NodeKey)
+	_, err = db.AuthenticateHost(body.NodeKey)
 	if err != nil {
 		errors.ReturnOsqueryError(c, err)
 		return
@@ -253,10 +216,10 @@ func (h *OsqueryHandler) OsqueryLog(c *gin.Context) {
 
 	switch body.LogType {
 	case "status":
-		err = h.handleStatusLogs(db, body.Data, body.NodeKey)
+		err = h.handleStatusLogs(body.Data, body.NodeKey)
 
 	case "result":
-		err = h.handleResultLogs(db, body.Data, body.NodeKey)
+		err = h.handleResultLogs(body.Data, body.NodeKey)
 
 	default:
 		err = errors.NewWithStatus(
@@ -271,7 +234,7 @@ func (h *OsqueryHandler) OsqueryLog(c *gin.Context) {
 		return
 	}
 
-	err = updateLastSeen(db, &Host{NodeKey: body.NodeKey})
+	err = db.UpdateLastSeen(&kolide.Host{NodeKey: body.NodeKey})
 
 	if err != nil {
 		errors.ReturnOsqueryError(c, err)
