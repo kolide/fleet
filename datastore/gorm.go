@@ -15,13 +15,13 @@ import (
 
 var tables = [...]interface{}{
 	&kolide.User{},
-	&app.PasswordResetRequest{},
+	&kolide.PasswordResetRequest{},
 	&sessions.Session{},
 	&app.ScheduledQuery{},
 	&app.Pack{},
 	&app.DiscoveryQuery{},
-	&app.Host{},
-	&app.Label{},
+	&kolide.Host{},
+	&kolide.Label{},
 	&app.Option{},
 	&app.Decorator{},
 	&app.Target{},
@@ -78,17 +78,17 @@ func generateRandomText(keySize int) (string, error) {
 	return base64.StdEncoding.EncodeToString(key), nil
 }
 
-func (orm gormDB) EnrollHost(uuid, hostname, ip, platform string, nodeKeySize int) (*app.Host, error) {
+func (orm gormDB) EnrollHost(uuid, hostname, ip, platform string, nodeKeySize int) (*kolide.Host, error) {
 	if uuid == "" {
 		return nil, errors.New("missing uuid for host enrollment, programmer error?")
 	}
-	host := app.Host{UUID: uuid}
+	host := kolide.Host{UUID: uuid}
 	err := orm.DB.Where(&host).First(&host).Error
 	if err != nil {
 		switch err {
 		case gorm.ErrRecordNotFound:
 			// Create new Host
-			host = app.Host{
+			host = kolide.Host{
 				UUID:      uuid,
 				HostName:  hostname,
 				IPAddress: ip,
@@ -124,8 +124,8 @@ func (orm gormDB) EnrollHost(uuid, hostname, ip, platform string, nodeKeySize in
 	return &host, nil
 }
 
-func (orm gormDB) CreatePassworResetRequest(userID uint, expires time.Time, token string) (*app.PasswordResetRequest, error) {
-	campaign := &app.PasswordResetRequest{
+func (orm gormDB) CreatePassworResetRequest(userID uint, expires time.Time, token string) (*kolide.PasswordResetRequest, error) {
+	campaign := &kolide.PasswordResetRequest{
 		UserID:    userID,
 		ExpiresAt: expires,
 		Token:     token,
@@ -138,29 +138,29 @@ func (orm gormDB) CreatePassworResetRequest(userID uint, expires time.Time, toke
 	return campaign, nil
 }
 
-func (orm gormDB) DeletePasswordResetRequest(req *app.PasswordResetRequest) error {
+func (orm gormDB) DeletePasswordResetRequest(req *kolide.PasswordResetRequest) error {
 	err := orm.DB.Delete(req).Error
 	return err
 }
 
-func (orm gormDB) FindPassswordResetByID(id uint) (*app.PasswordResetRequest, error) {
-	reset := &app.PasswordResetRequest{
+func (orm gormDB) FindPassswordResetByID(id uint) (*kolide.PasswordResetRequest, error) {
+	reset := &kolide.PasswordResetRequest{
 		ID: id,
 	}
 	err := orm.DB.Find(reset).First(reset).Error
 	return reset, err
 }
 
-func (orm gormDB) FindPassswordResetByToken(token string) (*app.PasswordResetRequest, error) {
-	reset := &app.PasswordResetRequest{
+func (orm gormDB) FindPassswordResetByToken(token string) (*kolide.PasswordResetRequest, error) {
+	reset := &kolide.PasswordResetRequest{
 		Token: token,
 	}
 	err := orm.DB.Find(reset).First(reset).Error
 	return reset, err
 }
 
-func (orm gormDB) FindPassswordResetByTokenAndUserID(token string, userID uint) (*app.PasswordResetRequest, error) {
-	reset := &app.PasswordResetRequest{
+func (orm gormDB) FindPassswordResetByTokenAndUserID(token string, userID uint) (*kolide.PasswordResetRequest, error) {
+	reset := &kolide.PasswordResetRequest{
 		Token: token,
 		ID:    userID,
 	}

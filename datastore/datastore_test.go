@@ -52,7 +52,7 @@ func TestEnrollHost(t *testing.T) {
 
 }
 
-func testEnrollHost(t *testing.T, db app.HostStore) {
+func testEnrollHost(t *testing.T, db kolide.HostStore) {
 	var enrollTests = []struct {
 		uuid, hostname, ip, platform string
 		nodeKeySize                  int
@@ -83,7 +83,7 @@ func testEnrollHost(t *testing.T, db app.HostStore) {
 		},
 	}
 
-	var hosts []*app.Host
+	var hosts []*kolide.Host
 	for i, tt := range enrollTests {
 		h, err := db.EnrollHost(tt.uuid, tt.hostname, tt.ip, tt.platform, tt.nodeKeySize)
 		if err != nil {
