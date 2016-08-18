@@ -29,14 +29,6 @@ type User struct {
 	NeedsPasswordReset bool
 }
 
-// UserStore contains methods for managing users in a datastore
-type UserStore interface {
-	NewUser(user *User) (*User, error)
-	User(username string) (*User, error)
-	UserByID(id uint) (*User, error)
-	SaveUser(user *User) error
-}
-
 // NewUser is a wrapper around the creation of a new user.
 // NewUser exists largely to allow the API to simply accept a string password
 // while using the applications password hashing mechanisms to salt and hash the
