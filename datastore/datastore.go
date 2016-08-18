@@ -4,6 +4,7 @@ package datastore
 import (
 	"github.com/Sirupsen/logrus"
 	"github.com/kolide/kolide-ose/app"
+	"github.com/kolide/kolide-ose/errors"
 	"github.com/kolide/kolide-ose/sessions"
 )
 
@@ -58,7 +59,7 @@ func New(driver, conn string, opts ...DBOption) (app.Datastore, error) {
 	}
 	for _, option := range opts {
 		if err := option(opt); err != nil {
-			return nil, err
+			return nil, errors.DatabaseError(err)
 		}
 	}
 
@@ -72,7 +73,7 @@ func New(driver, conn string, opts ...DBOption) (app.Datastore, error) {
 	case "gorm":
 		db, err := openGORM("mysql", conn, opt.maxAttempts)
 		if err != nil {
-			return nil, err
+			return nil, errors.DatabaseError(err)
 		}
 		// configure logger
 		if opt.logger != nil {
@@ -81,15 +82,16 @@ func New(driver, conn string, opts ...DBOption) (app.Datastore, error) {
 		}
 		ds := gormDB{DB: db}
 		if err := ds.Migrate(); err != nil {
-			return nil, err
+			return nil, errors.DatabaseError(err)
 		}
 		return ds, nil
 	}
 	return db, nil
 }
 
-// temporary
+// NewSessionBackend creates a new session from a datastore
+// this function nis temporary
 func NewSessionBackend(ds app.Datastore) sessions.SessionBackend {
 	db := ds.(gormDB)
-	return &sessions.GormSessionBackend{db.DB}
+	return &sessions.GormSessionBackend{DB: db.DB}
 }
