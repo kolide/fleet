@@ -39,8 +39,14 @@ func testEnrollHost(t *testing.T, db app.HostStore) {
 		2: {uuid: "008F0688-5311-4C59-86EE-00C2D6FC3EC2",
 			hostname:    "home.kolide.co",
 			ip:          "127.0.0.1",
-			platform:    "darwin",
+			platform:    "Mac OSX",
 			nodeKeySize: 25,
+		},
+		3: {uuid: "uuid123",
+			hostname:    "fakehostname",
+			ip:          "192.168.1.1",
+			platform:    "Mac OSX",
+			nodeKeySize: 1,
 		},
 	}
 
@@ -52,6 +58,22 @@ func testEnrollHost(t *testing.T, db app.HostStore) {
 
 		if h.UUID != tt.uuid {
 			t.Errorf("expected %s, got %s, test # %v", tt.uuid, h.UUID, i)
+		}
+
+		if h.HostName != tt.hostname {
+			t.Errorf("expected %s, got %s", tt.hostname, h.HostName)
+		}
+
+		if h.IPAddress != tt.ip {
+			t.Errorf("expected %s, got %s", tt.ip, h.IPAddress)
+		}
+
+		if h.Platform != tt.platform {
+			t.Errorf("expected %s, got %s", tt.platform, h.Platform)
+		}
+
+		if h.NodeKey == "" {
+			t.Errorf("node key was not set, test # %v", i)
 		}
 	}
 }

@@ -9,7 +9,6 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	"github.com/kolide/kolide-ose/errors"
 	"github.com/spf13/viper"
 )
@@ -238,56 +237,6 @@ type OsqueryDistributedWritePostBody struct {
 	Queries map[string][]map[string]string `json:"queries" validate:"required"`
 }
 
-// Generate a node key using NodeKeySize random bytes Base64 encoded
-func newNodeKey() (string, error) {
-	return generateRandomText(viper.GetInt("osquery.node_key_size"))
-}
-
-// Enroll a host. Even if this is an existing host, a new node key should be
-// generated and saved to the DB.
-func EnrollHost(db *gorm.DB, uuid, hostName, ipAddress, platform string) (*Host, error) {
-	host := Host{UUID: uuid}
-	err := db.Where(&host).First(&host).Error
-	if err != nil {
-		switch err {
-		case gorm.ErrRecordNotFound:
-			// Create new Host
-			host = Host{
-				UUID:      uuid,
-				HostName:  hostName,
-				IPAddress: ipAddress,
-				Platform:  platform,
-			}
-
-		default:
-			return nil, err
-		}
-	}
-
-	// Generate a new key each enrollment
-	host.NodeKey, err = newNodeKey()
-	if err != nil {
-		return nil, err
-	}
-
-	// Update these fields if provided
-	if hostName != "" {
-		host.HostName = hostName
-	}
-	if ipAddress != "" {
-		host.IPAddress = ipAddress
-	}
-	if platform != "" {
-		host.Platform = platform
-	}
-
-	if err := db.Save(&host).Error; err != nil {
-		return nil, err
-	}
-
-	return &host, nil
-}
-
 func OsqueryEnroll(c *gin.Context) {
 	var body OsqueryEnrollPostBody
 	err := ParseAndValidateJSON(c, &body)
@@ -296,6 +245,7 @@ func OsqueryEnroll(c *gin.Context) {
 		return
 	}
 
+	// TODO make config value explicit
 	if body.EnrollSecret != viper.GetString("osquery.enroll_secret") {
 		errors.ReturnOsqueryError(
 			c,
@@ -307,9 +257,12 @@ func OsqueryEnroll(c *gin.Context) {
 
 	}
 
-	db := GetDB(c)
+	// temporary, pass args explicitly as well
+	db := datastore(c)
 
-	host, err := EnrollHost(db, body.HostIdentifier, "", "", "")
+	// TODO make config value explicit
+	nodeKeySize := viper.GetInt("osquery.node_key_size")
+	host, err := db.EnrollHost(body.HostIdentifier, "", "", "", nodeKeySize)
 	if err != nil {
 		errors.ReturnOsqueryError(c, errors.DatabaseError(err))
 		return
