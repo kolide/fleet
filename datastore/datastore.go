@@ -3,14 +3,22 @@ package datastore
 
 import (
 	"github.com/Sirupsen/logrus"
-	"github.com/kolide/kolide-ose/app"
 	"github.com/kolide/kolide-ose/errors"
+	"github.com/kolide/kolide-ose/kolide"
 	"github.com/kolide/kolide-ose/sessions"
 )
 
+type Datastore interface {
+	kolide.UserStore
+	kolide.HostStore
+	kolide.CampaignStore
+	Drop() error
+	Migrate() error
+}
+
 type dbOptions struct {
 	maxAttempts int
-	db          app.Datastore
+	db          Datastore
 	debug       bool // gorm debug
 	logger      *logrus.Logger
 }
@@ -44,7 +52,7 @@ func Debug() DBOption {
 
 // datastore allows you to pass your own datastore
 // this option can be used to pass a specific testing implementation
-func datastore(db app.Datastore) DBOption {
+func datastore(db Datastore) DBOption {
 	return func(o *dbOptions) error {
 		o.db = db
 		return nil
@@ -53,7 +61,7 @@ func datastore(db app.Datastore) DBOption {
 
 // New creates a Datastore with a database connection
 // Use DBOption to pass optional arguments
-func New(driver, conn string, opts ...DBOption) (app.Datastore, error) {
+func New(driver, conn string, opts ...DBOption) (Datastore, error) {
 	opt := &dbOptions{
 		maxAttempts: 15, // default attempts
 	}
@@ -68,7 +76,7 @@ func New(driver, conn string, opts ...DBOption) (app.Datastore, error) {
 		return opt.db, nil
 	}
 
-	var db app.Datastore
+	var db Datastore
 	switch driver {
 	case "gorm":
 		db, err := openGORM("mysql", conn, opt.maxAttempts)
@@ -91,7 +99,7 @@ func New(driver, conn string, opts ...DBOption) (app.Datastore, error) {
 
 // NewSessionBackend creates a new session from a datastore
 // this function nis temporary
-func NewSessionBackend(ds app.Datastore) sessions.SessionBackend {
+func NewSessionBackend(ds Datastore) sessions.SessionBackend {
 	db := ds.(gormDB)
 	return &sessions.GormSessionBackend{DB: db.DB}
 }

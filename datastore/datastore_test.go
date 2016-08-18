@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/jinzhu/gorm"
-	"github.com/kolide/kolide-ose/app"
 	"github.com/kolide/kolide-ose/kolide"
 )
 
@@ -19,7 +18,7 @@ func TestPasswordResetRequests(t *testing.T) {
 	testPasswordResetRequests(t, db)
 }
 
-func testPasswordResetRequests(t *testing.T, db app.Datastore) {
+func testPasswordResetRequests(t *testing.T, db Datastore) {
 	createTestUsers(t, db)
 	now := time.Now()
 	tomorrow := now.Add(time.Hour * 24)
@@ -291,7 +290,7 @@ func testAdminAttribute(t *testing.T, db kolide.UserStore, users []*kolide.User)
 }
 
 // setup creates a datastore for testing
-func setup(t *testing.T) app.Datastore {
+func setup(t *testing.T) Datastore {
 	db, err := gorm.Open("sqlite3", ":memory:")
 	if err != nil {
 		t.Fatalf("error opening test db: %s", err)
@@ -306,7 +305,7 @@ func setup(t *testing.T) app.Datastore {
 	return ds
 }
 
-func teardown(t *testing.T, ds app.Datastore) {
+func teardown(t *testing.T, ds Datastore) {
 	if err := ds.Drop(); err != nil {
 		t.Fatal(err)
 	}

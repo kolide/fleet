@@ -7,7 +7,6 @@ import (
 
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
-	"github.com/kolide/kolide-ose/app"
 )
 
 func TestEnrollHostMySQLGORM(t *testing.T) {
@@ -47,7 +46,7 @@ func TestSaveUserMySQLGORM(t *testing.T) {
 	testSaveUser(t, db)
 }
 
-func setupMySQLGORM(t *testing.T) app.Datastore {
+func setupMySQLGORM(t *testing.T) Datastore {
 	// TODO use ENV vars from docker config
 	user := "kolide"
 	password := "kolide"
@@ -68,7 +67,7 @@ func setupMySQLGORM(t *testing.T) app.Datastore {
 	return db
 }
 
-func teardownMySQLGORM(t *testing.T, db app.Datastore) {
+func teardownMySQLGORM(t *testing.T, db Datastore) {
 	if err := db.Drop(); err != nil {
 		t.Fatal(err)
 	}

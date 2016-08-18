@@ -158,8 +158,7 @@ $7777777....$....$777$.....+DI..DDD..DDI...8D...D8......$D:..8D....8D...8D......
 			},
 		}
 
-		// app datastore
-		var ds app.Datastore
+		var ds datastore.Datastore
 		{
 			user := viper.GetString("mysql.username")
 			password := viper.GetString("mysql.password")
@@ -205,7 +204,7 @@ var dbCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		var err error
-		var db app.Datastore // app datastore
+		var db datastore.Datastore // app datastore
 		{
 			user := viper.GetString("mysql.username")
 			password := viper.GetString("mysql.password")

@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/jinzhu/gorm"
-	"github.com/kolide/kolide-ose/app"
 	"github.com/kolide/kolide-ose/kolide"
 	"github.com/kolide/kolide-ose/sessions"
 )
@@ -17,17 +16,17 @@ var tables = [...]interface{}{
 	&kolide.User{},
 	&kolide.PasswordResetRequest{},
 	&sessions.Session{},
-	&app.ScheduledQuery{},
-	&app.Pack{},
-	&app.DiscoveryQuery{},
+	&kolide.ScheduledQuery{},
+	&kolide.Pack{},
+	&kolide.DiscoveryQuery{},
 	&kolide.Host{},
 	&kolide.Label{},
-	&app.Option{},
-	&app.Decorator{},
-	&app.Target{},
-	&app.DistributedQuery{},
-	&app.Query{},
-	&app.DistributedQueryExecution{},
+	&kolide.Option{},
+	&kolide.Decorator{},
+	&kolide.Target{},
+	&kolide.DistributedQuery{},
+	&kolide.Query{},
+	&kolide.DistributedQueryExecution{},
 }
 
 type gormDB struct {
