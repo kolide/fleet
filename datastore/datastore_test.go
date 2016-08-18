@@ -50,11 +50,14 @@ func testEnrollHost(t *testing.T, db app.HostStore) {
 		},
 	}
 
+	var hosts []*app.Host
 	for i, tt := range enrollTests {
 		h, err := db.EnrollHost(tt.uuid, tt.hostname, tt.ip, tt.platform, tt.nodeKeySize)
 		if err != nil {
 			t.Fatalf("failed to enroll host. test # %v, err=%v", i, err)
 		}
+
+		hosts = append(hosts, h)
 
 		if h.UUID != tt.uuid {
 			t.Errorf("expected %s, got %s, test # %v", tt.uuid, h.UUID, i)
@@ -76,6 +79,29 @@ func testEnrollHost(t *testing.T, db app.HostStore) {
 			t.Errorf("node key was not set, test # %v", i)
 		}
 	}
+
+	for i, enrolled := range hosts {
+		oldNodeKey := enrolled.NodeKey
+		newhostname := fmt.Sprintf("changed.%s", enrolled.HostName)
+
+		h, err := db.EnrollHost(enrolled.UUID, newhostname, enrolled.IPAddress, enrolled.Platform, 15)
+		if err != nil {
+			t.Fatalf("failed to re-enroll host. test # %v, err=%v", i, err)
+		}
+		if h.UUID != enrolled.UUID {
+			t.Errorf("expected %s, got %s, test # %v", enrolled.UUID, h.UUID, i)
+		}
+
+		if h.NodeKey == "" {
+			t.Errorf("node key was not set, test # %v", i)
+		}
+
+		if h.NodeKey == oldNodeKey {
+			t.Error("node key should have changed, test # %v", i)
+		}
+
+	}
+
 }
 
 // TestUser tests the UserStore interface
