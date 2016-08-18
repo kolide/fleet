@@ -170,9 +170,7 @@ $7777777....$....$777$.....+DI..DDD..DDI...8D...D8......$D:..8D....8D...8D......
 				logrus.WithError(err).Fatal("error creating db conn")
 			}
 		}
-		sessionBackend := datastore.NewSessionBackend(ds)
 		err = app.CreateServer(
-			sessionBackend,
 			ds,
 			smtpConnectionPool,
 			os.Stderr,

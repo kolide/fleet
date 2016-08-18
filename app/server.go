@@ -13,7 +13,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/kolide/kolide-ose/datastore"
 	"github.com/kolide/kolide-ose/errors"
-	"github.com/kolide/kolide-ose/sessions"
+	"github.com/kolide/kolide-ose/kolide"
 	"github.com/spf13/viper"
 	"gopkg.in/go-playground/validator.v8"
 )
@@ -77,13 +77,10 @@ func NotFoundRequestError(c *gin.Context) {
 // 	return server
 // }
 
-// NewSessionManager allows you to get a SessionManager instance for a given
-// web request. Unless you're interacting with login, logout, or core auth
-// code, this should be abstracted by the ViewerContext pattern.
-func NewSessionManager(c *gin.Context) *sessions.SessionManager {
-	return &sessions.SessionManager{
+func NewSessionManager(c *gin.Context) *kolide.SessionManager {
+	return &kolide.SessionManager{
 		Request: c.Request,
-		Backend: GetSessionBackend(c),
+		Store:   GetDB(c),
 		Writer:  c.Writer,
 	}
 }
@@ -119,13 +116,12 @@ func NotFound(c *gin.Context) {
 
 // CreateServer creates a gin.Engine HTTP server and configures it to be in a
 // state such that it is ready to serve HTTP requests for the kolide application
-func CreateServer(backend sessions.SessionBackend, db datastore.Datastore, pool SMTPConnectionPool, w io.Writer, resultHandler OsqueryResultHandler, statusHandler OsqueryStatusHandler) *gin.Engine {
+func CreateServer(ds datastore.Datastore, pool SMTPConnectionPool, w io.Writer, resultHandler OsqueryResultHandler, statusHandler OsqueryStatusHandler) *gin.Engine {
 	server := gin.New()
-	server.Use(DatabaseMiddleware(db))
+	server.Use(DatabaseMiddleware(ds))
 	server.Use(SMTPConnectionPoolMiddleware(pool))
-	server.Use(SessionBackendMiddleware(backend))
 
-	sessions.Configure(&sessions.SessionConfiguration{
+	kolide.ConfigureSession(&kolide.SessionConfiguration{
 		CookieName:     "KolideSession",
 		JWTKey:         viper.GetString("auth.jwt_key"),
 		SessionKeySize: viper.GetInt("session.key_size"),

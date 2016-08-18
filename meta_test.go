@@ -12,7 +12,6 @@ var goSourceDirectories = []string{
 	"datastore",
 	"errors",
 	"kolide",
-	"sessions",
 }
 
 var goSourceDirectoriesCount int
