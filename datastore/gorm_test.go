@@ -5,6 +5,8 @@ import (
 	"os"
 	"testing"
 
+	_ "github.com/jinzhu/gorm/dialects/mysql"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/kolide/kolide-ose/app"
 )
 
@@ -59,7 +61,7 @@ func setupMySQLGORM(t *testing.T) app.Datastore {
 	}
 
 	backend := db.(gormDB)
-	if err := backend.migrate(); err != nil {
+	if err := backend.Migrate(); err != nil {
 		t.Fatal(err)
 	}
 
@@ -67,8 +69,7 @@ func setupMySQLGORM(t *testing.T) app.Datastore {
 }
 
 func teardownMySQLGORM(t *testing.T, db app.Datastore) {
-	backend := db.(gormDB)
-	if err := backend.rollback(); err != nil {
+	if err := db.Drop(); err != nil {
 		t.Fatal(err)
 	}
 }

@@ -54,6 +54,15 @@ func (orm gormDB) User(username string) (*app.User, error) {
 	return &user, nil
 }
 
+func (orm gormDB) UserByID(id uint) (*app.User, error) {
+	user := app.User{ID: id}
+	err := orm.DB.Where(&user).First(&user).Error
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
 func (orm gormDB) SaveUser(user *app.User) error {
 	return orm.DB.Save(user).Error
 }
@@ -114,7 +123,46 @@ func (orm gormDB) EnrollHost(uuid, hostname, ip, platform string, nodeKeySize in
 	return &host, nil
 }
 
-func (orm gormDB) migrate() error {
+func (orm gormDB) CreatePassworResetRequest(userID uint, expires time.Time, token string) (*app.PasswordResetRequest, error) {
+	campaign := &app.PasswordResetRequest{
+		UserID:    userID,
+		ExpiresAt: expires,
+		Token:     token,
+	}
+	err := orm.DB.Create(campaign).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return campaign, nil
+}
+
+func (orm gormDB) DeletePasswordResetRequest(req *app.PasswordResetRequest) error {
+	err := orm.DB.Delete(req).Error
+	return err
+}
+
+func (orm gormDB) FindPassswordResetByID(id uint) (*app.PasswordResetRequest, error) {
+	reset := &app.PasswordResetRequest{
+		ID: id,
+	}
+	err := orm.DB.Find(reset).First(&reset).Error
+	return reset, err
+}
+
+func (orm gormDB) FindPassswordResetByToken(token string) (*app.PasswordResetRequest, error) {
+	reset := &app.PasswordResetRequest{
+		Token: token,
+	}
+	err := orm.DB.Find(reset).First(&reset).Error
+	return reset, err
+}
+
+func (orm gormDB) FindPassswordResetByTokenAndUserID(token string, userID uint) (*app.PasswordResetRequest, error) {
+	panic("not implemented")
+}
+
+func (orm gormDB) Migrate() error {
 	var err error
 	for _, table := range tables {
 		err = orm.DB.AutoMigrate(table).Error
@@ -122,7 +170,7 @@ func (orm gormDB) migrate() error {
 	return err
 }
 
-func (orm gormDB) rollback() error {
+func (orm gormDB) Drop() error {
 	var err error
 	for _, table := range tables {
 		err = orm.DB.DropTableIfExists(table).Error
