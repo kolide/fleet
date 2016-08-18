@@ -97,7 +97,7 @@ func testEnrollHost(t *testing.T, db app.HostStore) {
 		}
 
 		if h.NodeKey == oldNodeKey {
-			t.Error("node key should have changed, test # %v", i)
+			t.Errorf("node key should have changed, test # %v", i)
 		}
 
 	}
@@ -264,17 +264,32 @@ func setup(t *testing.T) app.Datastore {
 		t.Fatalf("error opening test db: %s", err)
 	}
 	ds := gormDB{DB: db}
-	if err := ds.migrate(); err != nil {
+	if err := ds.Migrate(); err != nil {
 		t.Fatal(err)
 	}
+	// Log using t.Log so that output only shows up if the test fails
+	db.SetLogger(&testLogger{t: t})
+	db.LogMode(true)
 	return ds
 }
 
 func teardown(t *testing.T, ds app.Datastore) {
-	backend := ds.(gormDB)
-	if err := backend.rollback(); err != nil {
+	if err := ds.Drop(); err != nil {
 		t.Fatal(err)
 	}
+}
+
+type testLogger struct {
+	t *testing.T
+}
+
+func (t *testLogger) Print(v ...interface{}) {
+	t.t.Log(v...)
+}
+
+func (t *testLogger) Write(p []byte) (n int, err error) {
+	t.t.Log(string(p))
+	return len(p), nil
 }
 
 func randomString(strlen int) string {

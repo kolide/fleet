@@ -7,7 +7,6 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	"github.com/kolide/kolide-ose/errors"
 	"github.com/spf13/viper"
 	"golang.org/x/crypto/bcrypt"
@@ -105,16 +104,15 @@ func VC(c *gin.Context) *ViewerContext {
 	return VCForID(GetDB(c), session.UserID)
 }
 
-func VCForID(db *gorm.DB, id uint) *ViewerContext {
+func VCForID(db UserStore, id uint) *ViewerContext {
 	// Generating a VC requires a user struct. Attempt to populate one using
 	// the user id of the current session holder
-	user := User{ID: id}
-	err := db.Where(&user).First(&user).Error
+	user, err := db.UserByID(id)
 	if err != nil {
 		return EmptyVC()
 	}
 
-	return GenerateVC(&user)
+	return GenerateVC(user)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -191,8 +189,7 @@ func Login(c *gin.Context) {
 
 	db := GetDB(c)
 
-	user := User{Username: body.Username}
-	err = db.Where(&user).First(&user).Error
+	user, err := db.User(body.Username)
 	if err != nil {
 		logrus.Debugf("User not found: %s", body.Username)
 		UnauthorizedError(c)

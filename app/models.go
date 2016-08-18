@@ -1,74 +1,28 @@
 package app
 
-import (
-	"fmt"
-
-	"github.com/Sirupsen/logrus"
-	"github.com/jinzhu/gorm"
-	"github.com/spf13/viper"
-
-	_ "github.com/jinzhu/gorm/dialects/mysql"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
-	"github.com/kolide/kolide-ose/sessions"
-)
+import "time"
 
 // Datastore combines all methods for backend interactions
 type Datastore interface {
 	UserStore
 	HostStore
+	CampaignStore
+	Drop() error
+	Migrate() error
 }
 
 type HostStore interface {
 	EnrollHost(uuid, hostname, ip, platform string, nodeKeySize int) (*Host, error)
 }
 
-var tables = [...]interface{}{
-	&User{},
-	&PasswordResetRequest{},
-	&sessions.Session{},
-	&ScheduledQuery{},
-	&Pack{},
-	&DiscoveryQuery{},
-	&Host{},
-	&Label{},
-	&Option{},
-	&Decorator{},
-	&Target{},
-	&DistributedQuery{},
-	&Query{},
-	&DistributedQueryExecution{},
-}
+type CampaignStore interface {
+	CreatePassworResetRequest(userID uint, expires time.Time, token string) (*PasswordResetRequest, error)
 
-func setDBSettings(db *gorm.DB) {
-	// Tell gorm to use the logrus logger
-	db.SetLogger(logrus.StandardLogger())
+	DeletePasswordResetRequest(req *PasswordResetRequest) error
 
-	// If debug mode is enabled, tell gorm to turn on logmode (log each
-	// query as it is executed)
-	if viper.GetBool("debug") {
-		db.LogMode(true)
-	}
-}
+	FindPassswordResetByID(id uint) (*PasswordResetRequest, error)
 
-func OpenDB(user, password, address, dbName string) (*gorm.DB, error) {
-	connectionString := fmt.Sprintf("%s:%s@(%s)/%s?charset=utf8&parseTime=True&loc=Local", user, password, address, dbName)
-	db, err := gorm.Open("mysql", connectionString)
-	if err != nil {
-		return nil, err
-	}
+	FindPassswordResetByToken(token string) (*PasswordResetRequest, error)
 
-	setDBSettings(db)
-	return db, nil
-}
-
-func DropTables(db *gorm.DB) {
-	for _, table := range tables {
-		db.DropTableIfExists(table)
-	}
-}
-
-func CreateTables(db *gorm.DB) {
-	for _, table := range tables {
-		db.AutoMigrate(table)
-	}
+	FindPassswordResetByTokenAndUserID(token string, id uint) (*PasswordResetRequest, error)
 }

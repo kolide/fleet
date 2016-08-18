@@ -210,7 +210,7 @@ func OsqueryEnroll(c *gin.Context) {
 	}
 
 	// temporary, pass args explicitly as well
-	db := datastore(c)
+	db := GetDB(c)
 
 	// TODO make config value explicit
 	nodeKeySize := viper.GetInt("osquery.node_key_size")
