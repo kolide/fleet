@@ -11,7 +11,7 @@ import (
 type Datastore interface {
 	kolide.UserStore
 	kolide.HostStore
-	kolide.CampaignStore
+	kolide.EmailStore
 	Drop() error
 	Migrate() error
 }

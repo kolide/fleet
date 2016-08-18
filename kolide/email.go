@@ -7,7 +7,7 @@ import (
 )
 
 // CampaignStore manages email campaigns in the database
-type CampaignStore interface {
+type EmailStore interface {
 	CreatePassworResetRequest(userID uint, expires time.Time, token string) (*PasswordResetRequest, error)
 
 	DeletePasswordResetRequest(req *PasswordResetRequest) error
@@ -31,7 +31,7 @@ type PasswordResetRequest struct {
 }
 
 // NewPasswordResetRequest creates a password reset email campaign
-func NewPasswordResetRequest(db CampaignStore, userID uint, expires time.Time) (*PasswordResetRequest, error) {
+func NewPasswordResetRequest(db EmailStore, userID uint, expires time.Time) (*PasswordResetRequest, error) {
 
 	token, err := generateRandomText(viper.GetInt("smtp.token_key_size"))
 	if err != nil {
