@@ -2,6 +2,53 @@ package kolide
 
 import "time"
 
+// HostStore enrolls hosts in the datastore
+type OsqueryStore interface {
+	// Host methods
+	EnrollHost(uuid, hostname, ip, platform string, nodeKeySize int) (*Host, error)
+	AuthenticateHost(nodeKey string) (*Host, error)
+	UpdateLastSeen(host *Host) error
+	GetLabelQueriesForHost(host *Host) (map[string]string, error)
+
+	// Query methods
+	InsertQuery(query *Query) error
+
+	// Label methods
+	InsertLabel(label *Label) error
+}
+
+type Host struct {
+	ID        uint `gorm:"primary_key"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	NodeKey   string `gorm:"unique_index:idx_host_unique_nodekey"`
+	HostName  string
+	UUID      string `gorm:"unique_index:idx_host_unique_uuid"`
+	IPAddress string
+	Platform  string
+	Labels    []*Label `gorm:"many2many:host_labels;"`
+}
+
+type Label struct {
+	ID        uint `gorm:"primary_key"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Name      string `gorm:"not null;unique_index:idx_label_unique_name"`
+	QueryID   uint
+	Hosts     []Host
+}
+
+type LabelQueryExecution struct {
+	ID        uint `gorm:"primary_key"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Matches   bool
+	LabelID   uint
+	HostID    uint
+}
+
+//select * from hosts h, labels l, label_query_executions lqe, queries q where lqe.host_id = h.id and lqe.label_id = l.id and l.query_id = q.id;
+
 type ScheduledQuery struct {
 	ID           uint `gorm:"primary_key"`
 	CreatedAt    time.Time
@@ -12,7 +59,6 @@ type ScheduledQuery struct {
 	Interval     uint `gorm:"not null"`
 	Snapshot     bool
 	Differential bool
-	Platform     string
 	PackID       uint
 }
 
@@ -20,6 +66,7 @@ type Query struct {
 	ID        uint `gorm:"primary_key"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	Platform  string
 	Query     string   `gorm:"not null"`
 	Targets   []Target `gorm:"many2many:query_targets"`
 }

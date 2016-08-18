@@ -25,6 +25,7 @@ var tables = [...]interface{}{
 	&kolide.DiscoveryQuery{},
 	&kolide.Host{},
 	&kolide.Label{},
+	&kolide.LabelQueryExecution{},
 	&kolide.Option{},
 	&kolide.Decorator{},
 	&kolide.Target{},
@@ -318,6 +319,60 @@ func (orm gormDB) DestroyAllSessionsForUser(id uint) error {
 func (orm gormDB) MarkSessionAccessed(session *kolide.Session) error {
 	session.AccessedAt = time.Now().UTC()
 	return orm.DB.Save(session).Error
+}
+
+func (orm gormDB) InsertQuery(query *kolide.Query) error {
+	if query == nil {
+		return errors.New(
+			"error creating query",
+			"nil pointer passed to InsertQuery",
+		)
+	}
+	return orm.DB.Create(query).Error
+}
+
+func (orm gormDB) InsertLabel(label *kolide.Label) error {
+	if label == nil {
+		return errors.New(
+			"error creating label",
+			"nil pointer passed to InsertLabel",
+		)
+	}
+	return orm.DB.Create(label).Error
+}
+
+func (orm gormDB) GetLabelQueriesForHost(host *kolide.Host) (map[string]string, error) {
+	if host == nil {
+		return nil, errors.New(
+			"error finding host queries",
+			"nil pointer passed to GetLabelQueriesForHost",
+		)
+	}
+	rows, err := orm.DB.Raw(`
+SELECT q.id, q.query
+FROM labels l JOIN queries q
+ON l.query_id = q.id
+WHERE q.platform = ?
+AND q.id NOT IN (
+  SELECT l.query_id
+  FROM labels l
+  JOIN label_query_executions lqe
+  ON lqe.label_id = l.id
+  WHERE lqe.host_id = ?
+)`, host.Platform, host.ID).Rows()
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return nil, errors.DatabaseError(err)
+	}
+	defer rows.Close()
+
+	results := make(map[string]string)
+	for rows.Next() {
+		var id, query string
+		rows.Scan(&id, &query)
+		results[id] = query
+	}
+
+	return results, nil
 }
 
 func (orm gormDB) Migrate() error {
