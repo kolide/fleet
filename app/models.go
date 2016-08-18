@@ -11,10 +11,20 @@ type Datastore interface {
 	Migrate() error
 }
 
+// UserStore contains methods for managing users in a datastore
+type UserStore interface {
+	NewUser(user *User) (*User, error)
+	User(username string) (*User, error)
+	UserByID(id uint) (*User, error)
+	SaveUser(user *User) error
+}
+
+// HostStore enrolls hosts in the datastore
 type HostStore interface {
 	EnrollHost(uuid, hostname, ip, platform string, nodeKeySize int) (*Host, error)
 }
 
+// CampaignStore manages email campaigns in the database
 type CampaignStore interface {
 	CreatePassworResetRequest(userID uint, expires time.Time, token string) (*PasswordResetRequest, error)
 
