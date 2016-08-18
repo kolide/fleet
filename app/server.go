@@ -151,12 +151,9 @@ func CreateServer(db *gorm.DB, pool SMTPConnectionPool, w io.Writer, resultHandl
 	recoveryLogger.Out = w
 	server.Use(gin.RecoveryWithWriter(recoveryLogger.Writer()))
 
-	// Set the 404 route
-	server.NoRoute(NotFound)
-
 	// Kolide react entrypoint
 	server.HTMLRender = loadTemplates("react.tmpl")
-	server.GET("/", func(c *gin.Context) {
+	server.NoRoute(func(c *gin.Context) {
 		c.HTML(http.StatusOK, "react.tmpl", gin.H{})
 	})
 	// Kolide assets

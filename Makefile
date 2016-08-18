@@ -1,4 +1,7 @@
-WEBPACK = $(shell npm bin)/webpack --config=tools/app/webpack.config.js
+NPM_BIN = ./node_modules/.bin/
+ifeq ($(OS), Windows_NT)
+	NPM_BIN = node_modules\\.bin\\
+endif
 
 .prefix:
 ifeq ($(OS), Windows_NT)
@@ -8,8 +11,8 @@ else
 endif
 
 generate: .prefix
+	$(NPM_BIN)webpack --progress --colors --bail
 	go-bindata -pkg=app -o=app/bindata.go frontend/templates/ build/
-	$(WEBPACK) --progress --colors --bail
 
 deps:
 	npm install
@@ -20,6 +23,13 @@ ifneq ($(OS), Windows_NT)
 endif
 	# install vendored deps
 	glide install
+
+docs:
+	$(NPM_BIN)jsdoc frontend -r -c .jsdoc.json -P package.json --verbose
+
+lint:
+	$(NPM_BIN)flow check
+	$(NPM_BIN)eslint frontend
 
 distclean:
 	mkdir -p build

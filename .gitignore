@@ -5,6 +5,7 @@ kolide-ose
 
 # output directories
 build
+out
 vendor
 node_modules
 

@@ -1,0 +1,9 @@
+[options]
+module.name_mapper='^frontend\/\(.*\)$' -> '<PROJECT_ROOT>/frontend/\1'
+suppress_comment= \\(.\\|\n\\)*\\@FlowFixMe
+suppress_type=$FlowIssue
+suppress_type=$FlowFixMe
+suppress_type=$FixMe
+
+[libs]
+./node_modules/fbjs/flow/lib

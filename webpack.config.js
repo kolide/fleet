@@ -4,7 +4,6 @@ var path = require('path');
 var webpack = require('webpack');
 var autoprefixer = require('autoprefixer');
 var precss = require('precss');
-var functions = require('postcss-functions');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 var postCssLoader = [
@@ -34,11 +33,11 @@ if (process.env.NODE_ENV === 'production') {
   postCssLoader.splice(1, 1) // drop human readable names
 };
 
-var repo = path.join(__dirname, "../../")
+var repo = path.join(__dirname, ".")
 
 var config  = {
   entry: {
-    bundle: path.join(repo, 'frontend/index.js')
+    bundle: path.join(repo, 'frontend/Main.jsx')
   },
   output: {
     path: path.join(repo, 'build'),
@@ -63,9 +62,7 @@ var config  = {
   resolve: {
     extensions: ['', '.js', '.jsx', '.css'],
     alias: {
-      '#app': path.join(repo, 'frontend'),
-      '#components': path.join(repo, 'frontend/components'),
-      '#css': path.join(repo, 'frontend/css')
+      'frontend': path.join(repo, 'frontend')
     }
   },
   svgo1: {
@@ -86,15 +83,6 @@ var config  = {
       {removeDesc: true}
     ]
   },
-  postcss: function() {
-    return [autoprefixer, precss({
-      variables: {
-        variables: require(path.join(repo, 'frontend/css/vars'))
-      }
-    }), functions({
-      functions: require(path.join(repo, 'frontend/css/funcs'))
-    })]
-  }
 };
 
 module.exports = config;
