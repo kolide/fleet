@@ -9,11 +9,12 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"github.com/kolide/kolide-ose/app"
+	"github.com/kolide/kolide-ose/kolide"
 	"github.com/kolide/kolide-ose/sessions"
 )
 
 var tables = [...]interface{}{
-	&app.User{},
+	&kolide.User{},
 	&app.PasswordResetRequest{},
 	&sessions.Session{},
 	&app.ScheduledQuery{},
@@ -34,7 +35,7 @@ type gormDB struct {
 }
 
 // NewUser creates a new user in the gorm backend
-func (orm gormDB) NewUser(user *app.User) (*app.User, error) {
+func (orm gormDB) NewUser(user *kolide.User) (*kolide.User, error) {
 	err := orm.DB.Create(user).Error
 	if err != nil {
 		return nil, err
@@ -43,27 +44,27 @@ func (orm gormDB) NewUser(user *app.User) (*app.User, error) {
 }
 
 // User returns a specific user in the gorm backend
-func (orm gormDB) User(username string) (*app.User, error) {
-	user := app.User{
+func (orm gormDB) User(username string) (*kolide.User, error) {
+	user := &kolide.User{
 		Username: username,
 	}
-	err := orm.DB.Where("username = ?", username).First(&user).Error
+	err := orm.DB.Where("username = ?", username).First(user).Error
 	if err != nil {
 		return nil, err
 	}
-	return &user, nil
+	return user, nil
 }
 
-func (orm gormDB) UserByID(id uint) (*app.User, error) {
-	user := app.User{ID: id}
-	err := orm.DB.Where(&user).First(&user).Error
+func (orm gormDB) UserByID(id uint) (*kolide.User, error) {
+	user := &kolide.User{ID: id}
+	err := orm.DB.Where(user).First(user).Error
 	if err != nil {
 		return nil, err
 	}
-	return &user, nil
+	return user, nil
 }
 
-func (orm gormDB) SaveUser(user *app.User) error {
+func (orm gormDB) SaveUser(user *kolide.User) error {
 	return orm.DB.Save(user).Error
 }
 

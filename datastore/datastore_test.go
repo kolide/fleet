@@ -9,6 +9,7 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"github.com/kolide/kolide-ose/app"
+	"github.com/kolide/kolide-ose/kolide"
 )
 
 func TestPasswordResetRequests(t *testing.T) {
@@ -152,7 +153,7 @@ func TestSaveUser(t *testing.T) {
 	testSaveUser(t, db)
 }
 
-func testCreateUser(t *testing.T, db app.UserStore) {
+func testCreateUser(t *testing.T, db kolide.UserStore) {
 	var createTests = []struct {
 		username, password, email string
 		isAdmin, passwordReset    bool
@@ -162,7 +163,7 @@ func testCreateUser(t *testing.T, db app.UserStore) {
 	}
 
 	for _, tt := range createTests {
-		u, err := app.NewUser(tt.username, tt.password, tt.email, tt.isAdmin, tt.passwordReset)
+		u, err := kolide.NewUser(tt.username, tt.password, tt.email, tt.isAdmin, tt.passwordReset)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -195,7 +196,7 @@ func testCreateUser(t *testing.T, db app.UserStore) {
 	}
 }
 
-func createTestUsers(t *testing.T, db app.UserStore) []*app.User {
+func createTestUsers(t *testing.T, db kolide.UserStore) []*kolide.User {
 	var createTests = []struct {
 		username, password, email string
 		isAdmin, passwordReset    bool
@@ -204,9 +205,9 @@ func createTestUsers(t *testing.T, db app.UserStore) []*app.User {
 		{"jason", "foobar", "jason@kolide.co", false, false},
 	}
 
-	var users []*app.User
+	var users []*kolide.User
 	for _, tt := range createTests {
-		u, err := app.NewUser(tt.username, tt.password, tt.email, tt.isAdmin, tt.passwordReset)
+		u, err := kolide.NewUser(tt.username, tt.password, tt.email, tt.isAdmin, tt.passwordReset)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -224,14 +225,14 @@ func createTestUsers(t *testing.T, db app.UserStore) []*app.User {
 	return users
 }
 
-func testSaveUser(t *testing.T, db app.UserStore) {
+func testSaveUser(t *testing.T, db kolide.UserStore) {
 	users := createTestUsers(t, db)
 	testAdminAttribute(t, db, users)
 	testEmailAttribute(t, db, users)
 	testPasswordAttribute(t, db, users)
 }
 
-func testPasswordAttribute(t *testing.T, db app.UserStore, users []*app.User) {
+func testPasswordAttribute(t *testing.T, db kolide.UserStore, users []*kolide.User) {
 	for _, user := range users {
 		user.Password = []byte(randomString(8))
 		err := db.SaveUser(user)
@@ -251,7 +252,7 @@ func testPasswordAttribute(t *testing.T, db app.UserStore, users []*app.User) {
 	}
 }
 
-func testEmailAttribute(t *testing.T, db app.UserStore, users []*app.User) {
+func testEmailAttribute(t *testing.T, db kolide.UserStore, users []*kolide.User) {
 	for _, user := range users {
 		user.Email = fmt.Sprintf("test.%s", user.Email)
 		err := db.SaveUser(user)
@@ -270,7 +271,7 @@ func testEmailAttribute(t *testing.T, db app.UserStore, users []*app.User) {
 	}
 }
 
-func testAdminAttribute(t *testing.T, db app.UserStore, users []*app.User) {
+func testAdminAttribute(t *testing.T, db kolide.UserStore, users []*kolide.User) {
 	for _, user := range users {
 		user.Admin = false
 		err := db.SaveUser(user)

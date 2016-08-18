@@ -1,22 +1,18 @@
 package app
 
-import "time"
+import (
+	"time"
+
+	"github.com/kolide/kolide-ose/kolide"
+)
 
 // Datastore combines all methods for backend interactions
 type Datastore interface {
-	UserStore
+	kolide.UserStore
 	HostStore
 	CampaignStore
 	Drop() error
 	Migrate() error
-}
-
-// UserStore contains methods for managing users in a datastore
-type UserStore interface {
-	NewUser(user *User) (*User, error)
-	User(username string) (*User, error)
-	UserByID(id uint) (*User, error)
-	SaveUser(user *User) error
 }
 
 // HostStore enrolls hosts in the datastore
