@@ -4,14 +4,8 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 )
-
-func init() {
-	viper.Set("session.cookie_name", "KolideSession")
-	viper.Set("session.key_size", 24)
-}
 
 func TestLoginAndLogout(t *testing.T) {
 	// create the test datastore and server
