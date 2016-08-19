@@ -78,3 +78,50 @@ func TestLoginAndLogout(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Len(t, sessions, 0)
 }
+
+func TestNeedsPasswordReset(t *testing.T) {
+	// create the test datastore and server
+	ds := createTestUsers(t, createTestDatastore(t))
+	server := createTestServer(ds)
+
+	////////////////////////////////////////////////////////////////////////////
+	// log-in with a user which needs a password reset
+	////////////////////////////////////////////////////////////////////////////
+
+	// log in with admin test user
+	response := makeRequest(
+		t,
+		server,
+		"POST",
+		"/api/v1/kolide/login",
+		CreateUserRequestBody{
+			Username: "user2",
+			Password: "foobar",
+		},
+		"",
+	)
+	assert.Equal(t, http.StatusOK, response.Code)
+
+	// ensure that a non-empty cookie was in-fact set
+	userCookie := response.Header().Get("Set-Cookie")
+	assert.NotEmpty(t, userCookie)
+
+	////////////////////////////////////////////////////////////////////////////
+	// get the info of user1 from user2's account
+	////////////////////////////////////////////////////////////////////////////
+
+	user1, err := ds.User("user1")
+	assert.Nil(t, err)
+
+	response = makeRequest(
+		t,
+		server,
+		"POST",
+		"/api/v1/kolide/user",
+		GetUserRequestBody{
+			ID: user1.ID,
+		},
+		userCookie,
+	)
+	assert.Equal(t, http.StatusUnauthorized, response.Code)
+}

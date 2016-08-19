@@ -14,7 +14,56 @@ func init() {
 }
 
 func TestGetUser(t *testing.T) {
+	// create the test datastore and server
+	ds := createTestUsers(t, createTestDatastore(t))
+	server := createTestServer(ds)
 
+	////////////////////////////////////////////////////////////////////////////
+	// log-in with a user
+	////////////////////////////////////////////////////////////////////////////
+
+	// log in with admin test user
+	response := makeRequest(
+		t,
+		server,
+		"POST",
+		"/api/v1/kolide/login",
+		CreateUserRequestBody{
+			Username: "user1",
+			Password: "foobar",
+		},
+		"",
+	)
+	assert.Equal(t, http.StatusOK, response.Code)
+
+	// ensure that a non-empty cookie was in-fact set
+	userCookie := response.Header().Get("Set-Cookie")
+	assert.NotEmpty(t, userCookie)
+
+	////////////////////////////////////////////////////////////////////////////
+	// get the info of user2 from user1's account
+	////////////////////////////////////////////////////////////////////////////
+
+	user2, err := ds.User("user2")
+	assert.Nil(t, err)
+
+	response = makeRequest(
+		t,
+		server,
+		"POST",
+		"/api/v1/kolide/user",
+		GetUserRequestBody{
+			ID: user2.ID,
+		},
+		userCookie,
+	)
+	assert.Equal(t, http.StatusOK, response.Code)
+
+	var user2Info GetUserResponseBody
+	err = parseJSONFromBody(response.Body, &user2Info)
+	assert.Nil(t, err)
+
+	assert.True(t, user2Info.NeedsPasswordReset)
 }
 
 func TestCreateUser(t *testing.T) {

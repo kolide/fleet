@@ -94,7 +94,11 @@ func NewSessionManager(c *gin.Context) *kolide.SessionManager {
 
 // Unmarshal JSON from the gin context into a struct
 func parseJSON(c *gin.Context, obj interface{}) error {
-	decoder := json.NewDecoder(c.Request.Body)
+	return parseJSONFromBody(c.Request.Body, obj)
+}
+
+func parseJSONFromBody(body io.Reader, obj interface{}) error {
+	decoder := json.NewDecoder(body)
 	if err := decoder.Decode(obj); err != nil {
 		return errors.NewFromError(err, http.StatusBadRequest, "JSON parse error")
 	}
