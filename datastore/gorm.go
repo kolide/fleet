@@ -10,6 +10,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/kolide/kolide-ose/errors"
 	"github.com/kolide/kolide-ose/kolide"
+	"github.com/spf13/viper"
 )
 
 var tables = [...]interface{}{
@@ -204,7 +205,11 @@ func (orm gormDB) FindPassswordResetByTokenAndUserID(token string, userID uint) 
 }
 
 func (orm gormDB) validateSession(session *kolide.Session) error {
-	if time.Since(session.AccessedAt).Seconds() >= kolide.SessionLifespan {
+	sessionLifeSpan := viper.GetFloat64("session.expiration_seconds")
+	if sessionLifeSpan == 0 {
+		return nil
+	}
+	if time.Since(session.AccessedAt).Seconds() >= sessionLifeSpan {
 		err := orm.DB.Delete(session).Error
 		if err != nil {
 			return err
@@ -274,7 +279,7 @@ func (orm gormDB) FindAllSessionsForUser(id uint) ([]*kolide.Session, error) {
 }
 
 func (orm gormDB) CreateSessionForUserID(userID uint) (*kolide.Session, error) {
-	key := make([]byte, kolide.SessionKeySize)
+	key := make([]byte, viper.GetInt("session.key_size"))
 	_, err := rand.Read(key)
 	if err != nil {
 		return nil, err

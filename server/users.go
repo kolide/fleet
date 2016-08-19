@@ -1,4 +1,4 @@
-package app
+package server
 
 import (
 	"crypto/rand"
@@ -909,7 +909,7 @@ func ResetUserPassword(c *gin.Context) {
 			return
 		}
 
-		html, text, err := GetEmailBody(PasswordResetEmail, PasswordResetRequestEmailParameters{
+		html, text, err := kolide.GetEmailBody(kolide.PasswordResetEmail, kolide.PasswordResetRequestEmailParameters{
 			Name:  user.Name,
 			Token: request.Token,
 		})
@@ -918,13 +918,13 @@ func ResetUserPassword(c *gin.Context) {
 			return
 		}
 
-		subject, err := GetEmailSubject(PasswordResetEmail)
+		subject, err := kolide.GetEmailSubject(kolide.PasswordResetEmail)
 		if err != nil {
 			errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Email error"))
 			return
 		}
 
-		err = SendEmail(GetSMTPConnectionPool(c), user.Email, subject, html, text)
+		err = kolide.SendEmail(GetSMTPConnectionPool(c), user.Email, subject, html, text)
 		if err != nil {
 			errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Email error"))
 			return

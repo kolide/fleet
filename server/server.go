@@ -1,4 +1,4 @@
-package app
+package server
 
 import (
 	"encoding/json"
@@ -14,18 +14,17 @@ import (
 	"github.com/kolide/kolide-ose/datastore"
 	"github.com/kolide/kolide-ose/errors"
 	"github.com/kolide/kolide-ose/kolide"
-	"github.com/spf13/viper"
 	"gopkg.in/go-playground/validator.v8"
 )
 
 var validate = validator.New(&validator.Config{TagName: "validate", FieldNameTag: "json"})
 
 // Get the SMTP connection pool from the context, or panic
-func GetSMTPConnectionPool(c *gin.Context) SMTPConnectionPool {
-	return c.MustGet("SMTPConnectionPool").(SMTPConnectionPool)
+func GetSMTPConnectionPool(c *gin.Context) kolide.SMTPConnectionPool {
+	return c.MustGet("SMTPConnectionPool").(kolide.SMTPConnectionPool)
 }
 
-func SMTPConnectionPoolMiddleware(pool SMTPConnectionPool) gin.HandlerFunc {
+func SMTPConnectionPoolMiddleware(pool kolide.SMTPConnectionPool) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Set("SMTPConnectionPool", pool)
 		c.Next()
@@ -116,17 +115,10 @@ func NotFound(c *gin.Context) {
 
 // CreateServer creates a gin.Engine HTTP server and configures it to be in a
 // state such that it is ready to serve HTTP requests for the kolide application
-func CreateServer(ds datastore.Datastore, pool SMTPConnectionPool, w io.Writer, resultHandler OsqueryResultHandler, statusHandler OsqueryStatusHandler) *gin.Engine {
+func CreateServer(ds datastore.Datastore, pool kolide.SMTPConnectionPool, w io.Writer, resultHandler OsqueryResultHandler, statusHandler OsqueryStatusHandler) *gin.Engine {
 	server := gin.New()
 	server.Use(DatabaseMiddleware(ds))
 	server.Use(SMTPConnectionPoolMiddleware(pool))
-
-	kolide.ConfigureSession(&kolide.SessionConfiguration{
-		CookieName:     viper.GetString("session.cookie_name")
-		JWTKey:         viper.GetString("auth.jwt_key"),
-		SessionKeySize: viper.GetInt("session.key_size"),
-		Lifespan:       viper.GetFloat64("session.expiration_seconds"),
-	})
 
 	// TODO: The following loggers are not synchronized with each other or
 	// logrus.StandardLogger() used through the rest of the codebase. As

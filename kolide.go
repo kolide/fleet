@@ -18,8 +18,8 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/jordan-wright/email"
-	"github.com/kolide/kolide-ose/app"
 	"github.com/kolide/kolide-ose/datastore"
+	"github.com/kolide/kolide-ose/server"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	lumberjack "gopkg.in/natefinch/lumberjack.v2"
@@ -140,7 +140,7 @@ $7777777....$....$777$.....+DI..DDD..DDI...8D...D8......$D:..8D....8D...8D......
 		}
 
 		resultFile := viper.GetString("osquery.result_log_file")
-		resultHandler := &app.OsqueryLogWriter{
+		resultHandler := &server.OsqueryLogWriter{
 			Writer: &lumberjack.Logger{
 				Filename:   resultFile,
 				MaxSize:    500, // megabytes
@@ -150,7 +150,7 @@ $7777777....$....$777$.....+DI..DDD..DDI...8D...D8......$D:..8D....8D...8D......
 		}
 
 		statusFile := viper.GetString("osquery.status_log_file")
-		statusHandler := &app.OsqueryLogWriter{
+		statusHandler := &server.OsqueryLogWriter{
 			Writer: &lumberjack.Logger{
 				Filename:   statusFile,
 				MaxSize:    500, // megabytes
@@ -171,7 +171,7 @@ $7777777....$....$777$.....+DI..DDD..DDI...8D...D8......$D:..8D....8D...8D......
 				logrus.WithError(err).Fatal("error creating db conn")
 			}
 		}
-		err = app.CreateServer(
+		err = server.CreateServer(
 			ds,
 			smtpConnectionPool,
 			os.Stderr,
