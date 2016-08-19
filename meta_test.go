@@ -67,3 +67,7 @@ func TestGoTest(t *testing.T) {
 		<-done
 	}
 }
+
+func TestFail(t *testing.T) {
+	t.Fatal("i always fail")
+}
