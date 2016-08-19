@@ -7,14 +7,14 @@ type OsqueryStore interface {
 	// Host methods
 	EnrollHost(uuid, hostname, ip, platform string, nodeKeySize int) (*Host, error)
 	AuthenticateHost(nodeKey string) (*Host, error)
-	UpdateLastSeen(host *Host) error
+	MarkHostSeen(host *Host, t time.Time) error
 	GetLabelQueriesForHost(host *Host) (map[string]string, error)
 
 	// Query methods
-	InsertQuery(query *Query) error
+	NewQuery(query *Query) error
 
 	// Label methods
-	InsertLabel(label *Label) error
+	NewLabel(label *Label) error
 }
 
 type Host struct {
@@ -46,8 +46,6 @@ type LabelQueryExecution struct {
 	LabelID   uint
 	HostID    uint
 }
-
-//select * from hosts h, labels l, label_query_executions lqe, queries q where lqe.host_id = h.id and lqe.label_id = l.id and l.query_id = q.id;
 
 type ScheduledQuery struct {
 	ID           uint `gorm:"primary_key"`

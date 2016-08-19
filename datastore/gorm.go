@@ -155,9 +155,9 @@ func (orm gormDB) AuthenticateHost(nodeKey string) (*kolide.Host, error) {
 	return &host, nil
 }
 
-func (orm gormDB) UpdateLastSeen(host *kolide.Host) error {
+func (orm gormDB) MarkHostSeen(host *kolide.Host, t time.Time) error {
 	updateTime := time.Now()
-	err := orm.DB.Exec("UPDATE hosts SET updated_at=? WHERE node_key=?", updateTime, host.NodeKey).Error
+	err := orm.DB.Exec("UPDATE hosts SET updated_at=? WHERE node_key=?", t, host.NodeKey).Error
 	if err != nil {
 		return errors.DatabaseError(err)
 	}
@@ -321,21 +321,21 @@ func (orm gormDB) MarkSessionAccessed(session *kolide.Session) error {
 	return orm.DB.Save(session).Error
 }
 
-func (orm gormDB) InsertQuery(query *kolide.Query) error {
+func (orm gormDB) NewQuery(query *kolide.Query) error {
 	if query == nil {
 		return errors.New(
 			"error creating query",
-			"nil pointer passed to InsertQuery",
+			"nil pointer passed to NewQuery",
 		)
 	}
 	return orm.DB.Create(query).Error
 }
 
-func (orm gormDB) InsertLabel(label *kolide.Label) error {
+func (orm gormDB) NewLabel(label *kolide.Label) error {
 	if label == nil {
 		return errors.New(
 			"error creating label",
-			"nil pointer passed to InsertLabel",
+			"nil pointer passed to NewLabel",
 		)
 	}
 	return orm.DB.Create(label).Error

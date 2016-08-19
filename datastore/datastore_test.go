@@ -392,11 +392,11 @@ func testGetLabelQueriesForHost(t *testing.T, db kolide.OsqueryStore) {
 	expectQueries := make(map[string]string)
 
 	for i, query := range labelQueries {
-		assert.NoError(t, db.InsertQuery(query))
+		assert.NoError(t, db.NewQuery(query))
 		expectQueries[fmt.Sprint(i+1)] = query.Query
 	}
 	// this one should not show up
-	assert.NoError(t, db.InsertQuery(&kolide.Query{
+	assert.NoError(t, db.NewQuery(&kolide.Query{
 		Platform: "not_darwin",
 		Query:    "query5",
 	}))
@@ -426,7 +426,7 @@ func testGetLabelQueriesForHost(t *testing.T, db kolide.OsqueryStore) {
 	}
 
 	for _, label := range labels {
-		assert.NoError(t, db.InsertLabel(label))
+		assert.NoError(t, db.NewLabel(label))
 	}
 
 	host.Platform = "darwin"
