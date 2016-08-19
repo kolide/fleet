@@ -14,4 +14,4 @@ dependencies:
 
 test:
   override:
-    - docker run -v $(pwd):/go/src/github.com/kolide/kolide-ose kolide/kolide-builder:1.6 -C
+    - docker run -v $(pwd):/go/src/github.com/kolide/kolide-ose kolide/kolide-builder:1.6 -C; echo $?
