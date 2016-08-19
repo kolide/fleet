@@ -43,20 +43,20 @@ type SMTPConnectionPool interface {
 	Close()
 }
 
-type mockSMTPConnectionPool struct {
+type MockSMTPConnectionPool struct {
 	Emails []*email.Email
 }
 
-func newMockSMTPConnectionPool() *mockSMTPConnectionPool {
-	return &mockSMTPConnectionPool{}
+func NewMockSMTPConnectionPool() *MockSMTPConnectionPool {
+	return &MockSMTPConnectionPool{}
 }
 
-func (pool *mockSMTPConnectionPool) Send(e *email.Email, timeout time.Duration) error {
+func (pool *MockSMTPConnectionPool) Send(e *email.Email, timeout time.Duration) error {
 	pool.Emails = append(pool.Emails, e)
 	return nil
 }
 
-func (pool *mockSMTPConnectionPool) Close() {}
+func (pool *MockSMTPConnectionPool) Close() {}
 
 func SendEmail(pool SMTPConnectionPool, to, subject string, html, text []byte) error {
 	e := email.Email{

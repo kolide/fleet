@@ -171,7 +171,13 @@ func Login(c *gin.Context) {
 	}
 
 	sm := NewSessionManager(c)
-	sm.MakeSessionForUserID(user.ID)
+
+	err = sm.MakeSessionForUserID(user.ID)
+	if err != nil {
+		errors.ReturnError(c, errors.DatabaseError(err))
+		return
+	}
+
 	err = sm.Save()
 	if err != nil {
 		errors.ReturnError(c, errors.DatabaseError(err))
