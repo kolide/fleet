@@ -7,6 +7,7 @@ import (
 	"github.com/Sirupsen/logrus"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/kolide/kolide-ose/errors"
+	"github.com/spf13/viper"
 )
 
 const publicErrorMessage string = "Session error"
@@ -27,21 +28,6 @@ var (
 	// An error returned by SessionStore which indicates that the token
 	// or it's content were malformed
 	ErrSessionMalformed = errors.New(publicErrorMessage, "The session token was malformed")
-)
-
-var (
-	// The name of the session cookie
-	CookieName = "Session"
-
-	// The key to be used to sign and verify JWTs
-	jwtKey = ""
-
-	// The amount of random data, in bytes, which will be used to create each
-	// session key
-	SessionKeySize = 64
-
-	// The amount of seconds that will pass before an inactive user is logged out
-	SessionLifespan = float64(60 * 60 * 24 * 90)
 )
 
 // SessionStore is the abstract interface that all session backends must
@@ -81,29 +67,6 @@ type Session struct {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Configuring the library
-////////////////////////////////////////////////////////////////////////////////
-
-type SessionConfiguration struct {
-	CookieName     string
-	JWTKey         string
-	SessionKeySize int
-	Lifespan       float64
-}
-
-func ConfigureSession(s *SessionConfiguration) {
-	CookieName = s.CookieName
-	jwtKey = s.JWTKey
-	SessionKeySize = s.SessionKeySize
-	SessionLifespan = s.Lifespan
-}
-
-// Set the name of the cookie
-func SetCookieName(name string) {
-	CookieName = name
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // Managing sessions
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -118,7 +81,7 @@ type SessionManager struct {
 
 func (sm *SessionManager) Session() (*Session, error) {
 	if sm.session == nil {
-		cookie, err := sm.Request.Cookie(CookieName)
+		cookie, err := sm.Request.Cookie(viper.GetString("session.cookie_name"))
 		if err != nil {
 			switch err {
 			case http.ErrNoCookie:
@@ -196,7 +159,7 @@ func (sm *SessionManager) Save() error {
 
 	// TODO: set proper flags on cookie for maximum security
 	http.SetCookie(sm.Writer, &http.Cookie{
-		Name:  CookieName,
+		Name:  viper.GetString("session.cookie_name"),
 		Value: token,
 	})
 
@@ -225,7 +188,7 @@ func GenerateJWT(sessionKey string) (string, error) {
 		"session_key": sessionKey,
 	})
 
-	return token.SignedString([]byte(jwtKey))
+	return token.SignedString([]byte(viper.GetString("auth.jwt_key")))
 }
 
 // ParseJWT attempts to parse a JWT token in serialized string form into a
@@ -236,6 +199,6 @@ func ParseJWT(token string) (*jwt.Token, error) {
 		if !ok || method != jwt.SigningMethodHS256 {
 			return nil, errors.New(publicErrorMessage, "Unexpected signing method")
 		}
-		return []byte(jwtKey), nil
+		return []byte(viper.GetString("auth.jwt_key")), nil
 	})
 }

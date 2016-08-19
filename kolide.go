@@ -76,6 +76,7 @@ Available Configurations:
   session:
       key_size           (int)     (KOLIDE_SESSION_KEY_SIZE)
       expiration_seconds (float64) (KOLIDE_SESSION_EXPIRATION_SECONDS)
+      cookie_name	     (string)  (KOLIDE_SESSION_COOKIE_NAME)
   osquery:
       enroll_secret      (string)  (KOLIDE_OSQUERY_ENROLL_SECRET)
       node_key_size      (int)     (KOLIDE_OSQUERY_NODE_KEY_SIZE)
@@ -280,6 +281,7 @@ func initConfig() {
 
 	setDefaultConfigValue("app.web_address", "0.0.0.0:8080")
 
+	setDefaultConfigValue("auth.jwt_key", "CHANGEME")
 	setDefaultConfigValue("auth.bcrypt_cost", 12)
 	setDefaultConfigValue("auth.salt_key_size", 24)
 
@@ -289,6 +291,7 @@ func initConfig() {
 
 	setDefaultConfigValue("session.key_size", 64)
 	setDefaultConfigValue("session.expiration_seconds", 60*60*24*90)
+	setDefaultConfigValue("session.cookie_name", "KolideSession")
 
 	setDefaultConfigValue("osquery.node_key_size", 24)
 	setDefaultConfigValue("osquery.status_log_file", "/tmp/osquery_status")

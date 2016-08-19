@@ -122,7 +122,7 @@ func CreateServer(ds datastore.Datastore, pool SMTPConnectionPool, w io.Writer, 
 	server.Use(SMTPConnectionPoolMiddleware(pool))
 
 	kolide.ConfigureSession(&kolide.SessionConfiguration{
-		CookieName:     "KolideSession",
+		CookieName:     viper.GetString("session.cookie_name")
 		JWTKey:         viper.GetString("auth.jwt_key"),
 		SessionKeySize: viper.GetInt("session.key_size"),
 		Lifespan:       viper.GetFloat64("session.expiration_seconds"),

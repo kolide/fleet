@@ -9,10 +9,10 @@ import (
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/spf13/viper"
 )
 
 func TestGenerateJWT(t *testing.T) {
-	jwtKey = "very secure"
 	tokenString, err := GenerateJWT("4")
 	token, err := ParseJWT(tokenString)
 	if err != nil {
@@ -51,6 +51,7 @@ func (w *mockResponseWriter) WriteHeader(int) {
 }
 
 func TestSessionManager(t *testing.T) {
+	viper.Set("session.cookie_name", "KolideSession")
 	r, _ := http.NewRequest("GET", "/", nil)
 	w := newMockResponseWriter()
 	sb := newMockSessionStore()
@@ -72,6 +73,9 @@ func TestSessionManager(t *testing.T) {
 	}
 
 	header := w.Header().Get("Set-Cookie")
+	if header == "" {
+		t.Fatal("No cookie was set")
+	}
 	tokenString := strings.Split(header, "=")[1]
 	token, err := ParseJWT(tokenString)
 	if err != nil {
@@ -135,7 +139,7 @@ func (s *mockSessionStore) nextID() uint {
 }
 
 func (s *mockSessionStore) CreateSessionForUserID(userID uint) (*Session, error) {
-	key := make([]byte, SessionKeySize)
+	key := make([]byte, 24)
 	_, err := rand.Read(key)
 	if err != nil {
 		return nil, err
