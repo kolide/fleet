@@ -341,7 +341,7 @@ func (orm gormDB) NewLabel(label *kolide.Label) error {
 	return orm.DB.Create(label).Error
 }
 
-func (orm gormDB) GetLabelQueriesForHost(host *kolide.Host) (map[string]string, error) {
+func (orm gormDB) GetLabelQueriesForHost(host *kolide.Host, cutoff time.Time) (map[string]string, error) {
 	if host == nil {
 		return nil, errors.New(
 			"error finding host queries",
@@ -353,13 +353,14 @@ SELECT q.id, q.query
 FROM labels l JOIN queries q
 ON l.query_id = q.id
 WHERE q.platform = ?
-AND q.id NOT IN (
+AND q.id NOT IN /* subtract the set of executions that are recent enough */
+(
   SELECT l.query_id
   FROM labels l
   JOIN label_query_executions lqe
   ON lqe.label_id = l.id
-  WHERE lqe.host_id = ?
-)`, host.Platform, host.ID).Rows()
+  WHERE lqe.host_id = ? AND lqe.updated_at > ?
+)`, host.Platform, host.ID, cutoff).Rows()
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return nil, errors.DatabaseError(err)
 	}

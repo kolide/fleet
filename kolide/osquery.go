@@ -8,7 +8,7 @@ type OsqueryStore interface {
 	EnrollHost(uuid, hostname, ip, platform string, nodeKeySize int) (*Host, error)
 	AuthenticateHost(nodeKey string) (*Host, error)
 	MarkHostSeen(host *Host, t time.Time) error
-	GetLabelQueriesForHost(host *Host) (map[string]string, error)
+	GetLabelQueriesForHost(host *Host, cutoff time.Time) (map[string]string, error)
 
 	// Query methods
 	NewQuery(query *Query) error
@@ -161,4 +161,12 @@ type Decorator struct {
 	Type      DecoratorType `gorm:"not null"`
 	Interval  int
 	Query     string
+}
+
+// GetLabelQueriesForHost calculates the appropriate update cutoff (given
+// interval) and uses the datastore to retrieve the label queries for the
+// provided host.
+func GetLabelQueriesForHost(store OsqueryStore, host *Host, interval time.Duration) (map[string]string, error) {
+	cutoff := time.Now().Add(-interval)
+	return store.GetLabelQueriesForHost(host, cutoff)
 }
