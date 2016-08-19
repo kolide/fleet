@@ -8,7 +8,7 @@ machine:
 dependencies:
   pre:
     - docker info
-    - docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
+    - docker login -e $DOCKER_HUB_EMAIL -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
   override:
     - docker pull kolide/kolide-builder:1.6
 
