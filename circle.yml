@@ -5,22 +5,13 @@ machine:
   services:
     - docker
 
-  environment:
-    IMPORT_PATH: "/home/ubuntu/.go_workspace/src/github.com/kolide"
-    APP_PATH: "$IMPORT_PATH/kolide-ose"
-    GO15VENDOREXPERIMENT: 1
-
 dependencies:
   pre:
     - docker info
+    - docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
   override:
-    - make deps
-    - go generate
+    - docker pull kolide/kolide-builder:1.6
 
 test:
-  pre:
-    - mkdir -p "$IMPORT_PATH"
-    - ln -sf "$(pwd)" "$APP_PATH"
-    - cd "$APP_PATH" && glide install
   override:
-    - cd "$APP_PATH" && go test -cover $(glide nv)
+    - docker run --rm $(pwd):/go/src/github.com/kolide/kolide-ose kolide/kolide-builder:1.6 -C
