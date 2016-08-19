@@ -92,23 +92,10 @@ func NewSessionManager(c *gin.Context) *kolide.SessionManager {
 	}
 }
 
-// Unmarshal JSON from the gin context into a struct
-func parseJSON(c *gin.Context, obj interface{}) error {
-	return parseJSONFromBody(c.Request.Body, obj)
-}
-
-func parseJSONFromBody(body io.Reader, obj interface{}) error {
-	decoder := json.NewDecoder(body)
-	if err := decoder.Decode(obj); err != nil {
-		return errors.NewFromError(err, http.StatusBadRequest, "JSON parse error")
-	}
-	return nil
-}
-
 // Parse JSON into a struct with json.Unmarshal, followed by validation with
 // the validator library.
 func ParseAndValidateJSON(c *gin.Context, obj interface{}) error {
-	if err := parseJSON(c, obj); err != nil {
+	if err := json.NewDecoder(c.Request.Body).Decode(obj); err != nil {
 		return err
 	}
 

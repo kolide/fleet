@@ -284,7 +284,11 @@ func (orm gormDB) FindAllSessionsForUser(id uint) ([]*kolide.Session, error) {
 }
 
 func (orm gormDB) CreateSessionForUserID(userID uint) (*kolide.Session, error) {
-	key := make([]byte, viper.GetInt("session.key_size"))
+	sessionKeySize := viper.GetInt("session.key_size")
+	if sessionKeySize == 0 {
+		sessionKeySize = 24
+	}
+	key := make([]byte, sessionKeySize)
 	_, err := rand.Read(key)
 	if err != nil {
 		return nil, err

@@ -8,6 +8,7 @@ import (
 )
 
 func TestLoginAndLogout(t *testing.T) {
+	t.Parallel()
 	// create the test datastore and server
 	ds := createTestUsers(t, createTestDatastore(t))
 	server := createTestServer(ds)
@@ -74,6 +75,7 @@ func TestLoginAndLogout(t *testing.T) {
 }
 
 func TestNeedsPasswordReset(t *testing.T) {
+	t.Parallel()
 	// create the test datastore and server
 	ds := createTestUsers(t, createTestDatastore(t))
 	server := createTestServer(ds)

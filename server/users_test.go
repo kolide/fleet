@@ -1,17 +1,12 @@
 package server
 
 import (
+	"encoding/json"
 	"net/http"
 	"testing"
 
-	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 )
-
-func init() {
-	viper.Set("session.cookie_name", "KolideSession")
-	viper.Set("session.key_size", 24)
-}
 
 func TestGetUser(t *testing.T) {
 	// create the test datastore and server
@@ -60,7 +55,7 @@ func TestGetUser(t *testing.T) {
 	assert.Equal(t, http.StatusOK, response.Code)
 
 	var user2Info GetUserResponseBody
-	err = parseJSONFromBody(response.Body, &user2Info)
+	err = json.NewDecoder(response.Body).Decode(&user2Info)
 	assert.Nil(t, err)
 
 	assert.True(t, user2Info.NeedsPasswordReset)
@@ -117,4 +112,37 @@ func TestCreateUser(t *testing.T) {
 	// ensure that the new user was created in the database
 	_, err := ds.User("tester")
 	assert.Nil(t, err)
+}
+
+func TestModifyUser(t *testing.T) {
+}
+
+func TestChangePassword(t *testing.T) {
+}
+
+func TestSetUserAdminState(t *testing.T) {
+}
+
+func TestSetUserEnabledState(t *testing.T) {
+}
+
+func TestDeleteSession(t *testing.T) {
+}
+
+func TestDeleteSessionForUser(t *testing.T) {
+}
+
+func TestGetInfoAboutSession(t *testing.T) {
+}
+
+func TestGetInfoAboutSessionsForUser(t *testing.T) {
+}
+
+func TestResetUserPassword(t *testing.T) {
+}
+
+func TestVerifyPasswordRequest(t *testing.T) {
+}
+
+func TestDeletePasswordResetRequest(t *testing.T) {
 }
