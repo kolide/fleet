@@ -14,10 +14,18 @@ import (
 	"github.com/kolide/kolide-ose/datastore"
 	"github.com/kolide/kolide-ose/errors"
 	"github.com/kolide/kolide-ose/kolide"
+	"github.com/spf13/viper"
 	"gopkg.in/go-playground/validator.v8"
 )
 
 var validate = validator.New(&validator.Config{TagName: "validate", FieldNameTag: "json"})
+
+// initialize the library based on configurations
+func init() {
+	if !viper.GetBool("tool.debug") {
+		gin.SetMode(gin.ReleaseMode)
+	}
+}
 
 // Get the SMTP connection pool from the context, or panic
 func GetSMTPConnectionPool(c *gin.Context) kolide.SMTPConnectionPool {

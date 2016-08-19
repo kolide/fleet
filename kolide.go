@@ -15,7 +15,6 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/gin-gonic/gin"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/jordan-wright/email"
@@ -335,8 +334,6 @@ func (hook logContextHook) Fire(entry *logrus.Entry) error {
 }
 
 func init() {
-	gin.SetMode(gin.ReleaseMode)
-
 	logrus.AddHook(logContextHook{})
 
 	rand.Seed(time.Now().UnixNano())
