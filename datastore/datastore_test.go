@@ -366,7 +366,7 @@ func testGetLabelQueriesForHost(t *testing.T, db kolide.OsqueryStore) {
 	}
 
 	// No queries should be returned before labels or queries added
-	queries, err := db.GetLabelQueriesForHost(host, time.Now().Add(10*time.Minute))
+	queries, err := db.LabelQueriesForHost(host, time.Now().Add(10*time.Minute))
 	assert.NoError(t, err)
 	assert.Empty(t, queries)
 
@@ -402,7 +402,7 @@ func testGetLabelQueriesForHost(t *testing.T, db kolide.OsqueryStore) {
 	}))
 
 	// No queries should be returned before labels added
-	queries, err = db.GetLabelQueriesForHost(host, time.Now().Add(10*time.Minute))
+	queries, err = db.LabelQueriesForHost(host, time.Now().Add(10*time.Minute))
 	assert.NoError(t, err)
 	assert.Empty(t, queries)
 
@@ -432,7 +432,7 @@ func testGetLabelQueriesForHost(t *testing.T, db kolide.OsqueryStore) {
 	host.Platform = "darwin"
 
 	// Now queries should be returned
-	queries, err = db.GetLabelQueriesForHost(host, time.Now().Add(10*time.Minute))
+	queries, err = db.LabelQueriesForHost(host, time.Now().Add(10*time.Minute))
 	assert.NoError(t, err)
 	assert.Equal(t, expectQueries, queries)
 }

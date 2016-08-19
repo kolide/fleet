@@ -341,7 +341,7 @@ func (orm gormDB) NewLabel(label *kolide.Label) error {
 	return orm.DB.Create(label).Error
 }
 
-func (orm gormDB) GetLabelQueriesForHost(host *kolide.Host, cutoff time.Time) (map[string]string, error) {
+func (orm gormDB) LabelQueriesForHost(host *kolide.Host, cutoff time.Time) (map[string]string, error) {
 	if host == nil {
 		return nil, errors.New(
 			"error finding host queries",
