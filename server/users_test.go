@@ -13,23 +13,20 @@ func init() {
 	viper.Set("session.key_size", 24)
 }
 
-func TestLoginAndLogout(t *testing.T) {
+func TestGetUser(t *testing.T) {
+
+}
+
+func TestCreateUser(t *testing.T) {
 	// create the test datastore and server
 	ds := createTestUsers(t, createTestDatastore(t))
 	server := createTestServer(ds)
 
-	admin, err := ds.User("admin1")
-
-	// ensure that there are no sessions in the database for our test user
-	sessions, err := ds.FindAllSessionsForUser(admin.ID)
-	assert.Nil(t, err)
-	assert.Len(t, sessions, 0)
-
 	////////////////////////////////////////////////////////////////////////////
-	// Test logging in
+	// log-in with an admin
 	////////////////////////////////////////////////////////////////////////////
 
-	// log in with test user created above
+	// log in with admin test user
 	response := makeRequest(
 		t,
 		server,
@@ -44,37 +41,31 @@ func TestLoginAndLogout(t *testing.T) {
 	assert.Equal(t, http.StatusOK, response.Code)
 
 	// ensure that a non-empty cookie was in-fact set
-	cookie := response.Header().Get("Set-Cookie")
-	assert.NotEmpty(t, cookie)
-
-	// ensure that a session was created for our test user and stored
-	sessions, err = ds.FindAllSessionsForUser(admin.ID)
-	assert.Nil(t, err)
-	assert.Len(t, sessions, 1)
-
-	// ensure the session key is not blank
-	assert.NotEqual(t, "", sessions[0].Key)
+	adminCookie := response.Header().Get("Set-Cookie")
+	assert.NotEmpty(t, adminCookie)
 
 	////////////////////////////////////////////////////////////////////////////
-	// Test logging out
+	// create test user account
 	////////////////////////////////////////////////////////////////////////////
 
-	// log out our test user
+	// make the request to create the new user and verify that it succeeded
 	response = makeRequest(
 		t,
 		server,
-		"GET",
-		"/api/v1/kolide/logout",
-		nil,
-		cookie,
+		"PUT",
+		"/api/v1/kolide/user",
+		CreateUserRequestBody{
+			Username:           "tester",
+			Password:           "temp",
+			Email:              "tester@kolide.co",
+			Admin:              false,
+			NeedsPasswordReset: true,
+		},
+		adminCookie,
 	)
 	assert.Equal(t, http.StatusOK, response.Code)
 
-	// ensure that a cookie was actually set to erase the current cookie
-	assert.Equal(t, "KolideSession=", response.Header().Get("Set-Cookie"))
-
-	// ensure that our user's session was deleted from the store
-	sessions, err = ds.FindAllSessionsForUser(admin.ID)
+	// ensure that the new user was created in the database
+	_, err := ds.User("tester")
 	assert.Nil(t, err)
-	assert.Len(t, sessions, 0)
 }
