@@ -15,4 +15,3 @@ dependencies:
 test:
   override:
       - docker run -v $(pwd):/go/src/github.com/kolide/kolide-ose -v /home/ubuntu/.go_workspace/pkg:/go/pkg kolide/kolide-builder:1.6 -C
-      - ls /home/ubuntu/.go_workspace/pkg/linux_amd64/github.com
