@@ -350,14 +350,14 @@ func testAdminAttribute(t *testing.T, db kolide.UserStore, users []*kolide.User)
 
 // TestUser tests the UserStore interface
 // this test uses the default testing backend
-func TestGetLabelQueriesForHost(t *testing.T) {
+func TestLabelQueries(t *testing.T) {
 	db := setup(t)
 	defer teardown(t, db)
 
-	testGetLabelQueriesForHost(t, db)
+	testLabelQueries(t, db)
 }
 
-func testGetLabelQueriesForHost(t *testing.T, db kolide.OsqueryStore) {
+func testLabelQueries(t *testing.T, db kolide.OsqueryStore) {
 	var host *kolide.Host
 	var err error
 	for i := 0; i < 10; i++ {

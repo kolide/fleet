@@ -436,7 +436,7 @@ func (orm gormDB) RecordLabelQueryExecutions(host *kolide.Host, results map[stri
 	case "mysql":
 		queryString += `
 ON DUPLICATE KEY UPDATE
-updated_at = VALUES(updated_at)
+updated_at = VALUES(updated_at),
 matches = VALUES(matches)
 `
 	}
