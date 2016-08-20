@@ -444,8 +444,7 @@ func GetInfoAboutSession(c *gin.Context) {
 
 // swagger:parameters GetInfoAboutSessionsForUser
 type GetInfoAboutSessionsForUserRequestBody struct {
-	ID       uint   `json:"id"`
-	Username string `json:"username"`
+	ID uint `json:"id"`
 }
 
 // swagger:response GetInfoAboutSessionsForUserResponseBody
