@@ -258,7 +258,6 @@ func ModifyUser(c *gin.Context) {
 // swagger:parameters ChangeUserPassword
 type ChangePasswordRequestBody struct {
 	ID                 uint   `json:"id"`
-	Username           string `json:"username"`
 	CurrentPassword    string `json:"current_password"`
 	PasswordResetToken string `json:"password_reset_token"`
 	NewPassword        string `json:"new_password" validate:"required"`
@@ -380,9 +379,8 @@ func ChangeUserPassword(c *gin.Context) {
 
 // swagger:parameters SetUserAdminState
 type SetUserAdminStateRequestBody struct {
-	ID       uint   `json:"id"`
-	Username string `json:"username"`
-	Admin    bool   `json:"admin"`
+	ID    uint `json:"id"`
+	Admin bool `json:"admin"`
 }
 
 // swagger:route PATCH /api/v1/kolide/user/admin SetUserAdminState
@@ -447,7 +445,6 @@ func SetUserAdminState(c *gin.Context) {
 // swagger:parameters SetUserEnabledState
 type SetUserEnabledStateRequestBody struct {
 	ID              uint   `json:"id"`
-	Username        string `json:"username"`
 	Enabled         bool   `json:"enabled"`
 	CurrentPassword string `json:"current_password"`
 }
@@ -598,8 +595,7 @@ func DeleteSession(c *gin.Context) {
 
 // swagger:parameters DeleteSessionsForUser
 type DeleteSessionsForUserRequestBody struct {
-	ID       uint   `json:"id"`
-	Username string `json:"username"`
+	ID uint `json:"id"`
 }
 
 // swagger:route DELETE /api/v1/kolide/user/sessions DeleteSessionsForUser
