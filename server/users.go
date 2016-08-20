@@ -295,7 +295,7 @@ func ChangeUserPassword(c *gin.Context) {
 	}
 
 	if body.NewPassword != body.NewPasswordConfim {
-		c.JSON(406, map[string]interface{}{"error": "Passwords do not match"})
+		errors.ReturnError(c, errors.NewWithStatus(http.StatusBadRequest, "Submitted passwords do not match", ""))
 		return
 	}
 

@@ -300,7 +300,235 @@ func TestSetUserEnabledState(t *testing.T) {
 	assert.False(t, user1.Enabled)
 }
 
-func TestChangePassword(t *testing.T) {
+func TestUserChangeTheirOwnPassword(t *testing.T) {
+	// create the test datastore and server
+	ds := createTestUsers(t, createTestDatastore(t))
+	server := createTestServer(ds)
+
+	////////////////////////////////////////////////////////////////////////////
+	// log-in with a user
+	////////////////////////////////////////////////////////////////////////////
+
+	// log in with admin test user
+	response := makeRequest(
+		t,
+		server,
+		"POST",
+		"/api/v1/kolide/login",
+		CreateUserRequestBody{
+			Username: "user1",
+			Password: "foobar",
+		},
+		"",
+	)
+	assert.Equal(t, http.StatusOK, response.Code)
+
+	// ensure that a non-empty cookie was in-fact set
+	userCookie := response.Header().Get("Set-Cookie")
+	assert.NotEmpty(t, userCookie)
+
+	////////////////////////////////////////////////////////////////////////////
+	// user changes their own password
+	////////////////////////////////////////////////////////////////////////////
+
+	user1, err := ds.User("user1")
+	assert.Nil(t, err)
+
+	response = makeRequest(
+		t,
+		server,
+		"PATCH",
+		"/api/v1/kolide/user/password",
+		ChangePasswordRequestBody{
+			ID:                user1.ID,
+			CurrentPassword:   "foobar",
+			NewPassword:       "baz",
+			NewPasswordConfim: "baz",
+		},
+		userCookie,
+	)
+	assert.Equal(t, http.StatusOK, response.Code)
+
+	////////////////////////////////////////////////////////////////////////////
+	// verify change in the database
+	////////////////////////////////////////////////////////////////////////////
+
+	user1, err = ds.User("user1")
+	assert.Nil(t, err)
+	assert.Nil(t, user1.ValidatePassword("baz"))
+}
+
+func TestUserChangeOtherUsersPassword(t *testing.T) {
+	// create the test datastore and server
+	ds := createTestUsers(t, createTestDatastore(t))
+	server := createTestServer(ds)
+
+	////////////////////////////////////////////////////////////////////////////
+	// log-in with a user
+	////////////////////////////////////////////////////////////////////////////
+
+	// log in with admin test user
+	response := makeRequest(
+		t,
+		server,
+		"POST",
+		"/api/v1/kolide/login",
+		CreateUserRequestBody{
+			Username: "user1",
+			Password: "foobar",
+		},
+		"",
+	)
+	assert.Equal(t, http.StatusOK, response.Code)
+
+	// ensure that a non-empty cookie was in-fact set
+	userCookie := response.Header().Get("Set-Cookie")
+	assert.NotEmpty(t, userCookie)
+
+	////////////////////////////////////////////////////////////////////////////
+	// user tries to change other user's password
+	////////////////////////////////////////////////////////////////////////////
+
+	user2, err := ds.User("user2")
+	assert.Nil(t, err)
+
+	response = makeRequest(
+		t,
+		server,
+		"PATCH",
+		"/api/v1/kolide/user/password",
+		ChangePasswordRequestBody{
+			ID:                user2.ID,
+			CurrentPassword:   "foobar",
+			NewPassword:       "baz",
+			NewPasswordConfim: "baz",
+		},
+		userCookie,
+	)
+	assert.Equal(t, http.StatusUnauthorized, response.Code)
+
+	////////////////////////////////////////////////////////////////////////////
+	// verify nothing changed in the database
+	////////////////////////////////////////////////////////////////////////////
+
+	user2, err = ds.User("user2")
+	assert.Nil(t, err)
+	assert.Nil(t, user2.ValidatePassword("foobar"))
+}
+
+func TestAdminChangeUserPassword(t *testing.T) {
+	// create the test datastore and server
+	ds := createTestUsers(t, createTestDatastore(t))
+	server := createTestServer(ds)
+
+	////////////////////////////////////////////////////////////////////////////
+	// log-in with an admin
+	////////////////////////////////////////////////////////////////////////////
+
+	// log in with admin test user
+	response := makeRequest(
+		t,
+		server,
+		"POST",
+		"/api/v1/kolide/login",
+		CreateUserRequestBody{
+			Username: "admin1",
+			Password: "foobar",
+		},
+		"",
+	)
+	assert.Equal(t, http.StatusOK, response.Code)
+
+	// ensure that a non-empty cookie was in-fact set
+	adminCookie := response.Header().Get("Set-Cookie")
+	assert.NotEmpty(t, adminCookie)
+
+	////////////////////////////////////////////////////////////////////////////
+	// admin changes other user's password
+	////////////////////////////////////////////////////////////////////////////
+
+	user2, err := ds.User("user2")
+	assert.Nil(t, err)
+
+	response = makeRequest(
+		t,
+		server,
+		"PATCH",
+		"/api/v1/kolide/user/password",
+		ChangePasswordRequestBody{
+			ID:                user2.ID,
+			NewPassword:       "baz",
+			NewPasswordConfim: "baz",
+		},
+		adminCookie,
+	)
+	assert.Equal(t, http.StatusOK, response.Code)
+
+	////////////////////////////////////////////////////////////////////////////
+	// verify change in the database
+	////////////////////////////////////////////////////////////////////////////
+
+	user2, err = ds.User("user2")
+	assert.Nil(t, err)
+	assert.Nil(t, user2.ValidatePassword("baz"))
+}
+
+func TestChangePasswordEnforcesSamePassword(t *testing.T) {
+	// create the test datastore and server
+	ds := createTestUsers(t, createTestDatastore(t))
+	server := createTestServer(ds)
+
+	////////////////////////////////////////////////////////////////////////////
+	// log-in with an admin
+	////////////////////////////////////////////////////////////////////////////
+
+	// log in with admin test user
+	response := makeRequest(
+		t,
+		server,
+		"POST",
+		"/api/v1/kolide/login",
+		CreateUserRequestBody{
+			Username: "admin1",
+			Password: "foobar",
+		},
+		"",
+	)
+	assert.Equal(t, http.StatusOK, response.Code)
+
+	// ensure that a non-empty cookie was in-fact set
+	adminCookie := response.Header().Get("Set-Cookie")
+	assert.NotEmpty(t, adminCookie)
+
+	////////////////////////////////////////////////////////////////////////////
+	// admin tries to change other user's password but mismatches the password
+	// confirmation
+	////////////////////////////////////////////////////////////////////////////
+
+	user2, err := ds.User("user2")
+	assert.Nil(t, err)
+
+	response = makeRequest(
+		t,
+		server,
+		"PATCH",
+		"/api/v1/kolide/user/password",
+		ChangePasswordRequestBody{
+			ID:                user2.ID,
+			NewPassword:       "foo",
+			NewPasswordConfim: "bar",
+		},
+		adminCookie,
+	)
+	assert.Equal(t, http.StatusBadRequest, response.Code)
+
+	////////////////////////////////////////////////////////////////////////////
+	// verify that nothing changed in the database
+	////////////////////////////////////////////////////////////////////////////
+
+	user2, err = ds.User("user2")
+	assert.Nil(t, err)
+	assert.Nil(t, user2.ValidatePassword("foobar"))
 }
 
 func TestResetUserPassword(t *testing.T) {
