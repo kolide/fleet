@@ -119,3 +119,15 @@ func TestNeedsPasswordReset(t *testing.T) {
 	)
 	assert.Equal(t, http.StatusUnauthorized, response.Code)
 }
+
+func TestDeleteSession(t *testing.T) {
+}
+
+func TestDeleteSessionForUser(t *testing.T) {
+}
+
+func TestGetInfoAboutSession(t *testing.T) {
+}
+
+func TestGetInfoAboutSessionsForUser(t *testing.T) {
+}
