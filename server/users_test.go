@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/kolide/kolide-ose/kolide"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -367,7 +368,7 @@ func TestUserChangeOtherUsersPassword(t *testing.T) {
 	// log-in with a user
 	////////////////////////////////////////////////////////////////////////////
 
-	// log in with admin test user
+	// log in with test user
 	response := makeRequest(
 		t,
 		server,
@@ -532,10 +533,141 @@ func TestChangePasswordEnforcesSamePassword(t *testing.T) {
 }
 
 func TestResetUserPassword(t *testing.T) {
+	pool := kolide.NewMockSMTPConnectionPool()
+	ds := createTestUsers(t, createTestDatastore(t))
+	server := createTestServerWithSMTP(ds, pool)
+
+	////////////////////////////////////////////////////////////////////////////
+	// Trigger a password reset email for a user
+	////////////////////////////////////////////////////////////////////////////
+
+	response := makeRequest(
+		t,
+		server,
+		"POST",
+		"/api/v1/kolide/user/password/reset",
+		ResetPasswordRequestBody{
+			Username: "user1",
+			Email:    "user1@kolide.co",
+		},
+		"",
+	)
+	assert.Equal(t, http.StatusOK, response.Code)
+	assert.Len(t, pool.Emails, 1)
 }
 
 func TestVerifyPasswordRequest(t *testing.T) {
+	ds := createTestUsers(t, createTestDatastore(t))
+	server := createTestServer(ds)
+
+	////////////////////////////////////////////////////////////////////////////
+	// Trigger a password reset email for a user
+	////////////////////////////////////////////////////////////////////////////
+
+	response := makeRequest(
+		t,
+		server,
+		"POST",
+		"/api/v1/kolide/user/password/reset",
+		ResetPasswordRequestBody{
+			Username: "user1",
+			Email:    "user1@kolide.co",
+		},
+		"",
+	)
+	assert.Equal(t, http.StatusOK, response.Code)
+
+	////////////////////////////////////////////////////////////////////////////
+	// Verify the token
+	////////////////////////////////////////////////////////////////////////////
+	user, err := ds.User("user1")
+	assert.Nil(t, err)
+
+	resets, err := ds.FindPassswordResetsByUserID(user.ID)
+	assert.Nil(t, err)
+	assert.Len(t, resets, 1)
+	assert.Equal(t, user.ID, resets[0].UserID)
+
+	response = makeRequest(
+		t,
+		server,
+		"POST",
+		"/api/v1/kolide/user/password/reset/verify",
+		VerifyPasswordResetRequestRequestBody{
+			UserID: user.ID,
+			Token:  resets[0].Token,
+		},
+		"",
+	)
+	assert.Equal(t, http.StatusOK, response.Code)
+
+	var verify VerifyPasswordResetRequestResponseBody
+	err = json.NewDecoder(response.Body).Decode(&verify)
+	assert.Nil(t, err)
+	assert.True(t, verify.Valid)
 }
 
 func TestDeletePasswordResetRequest(t *testing.T) {
+	ds := createTestUsers(t, createTestDatastore(t))
+	server := createTestServer(ds)
+
+	////////////////////////////////////////////////////////////////////////////
+	// Trigger a password reset email for a user
+	////////////////////////////////////////////////////////////////////////////
+
+	response := makeRequest(
+		t,
+		server,
+		"POST",
+		"/api/v1/kolide/user/password/reset",
+		ResetPasswordRequestBody{
+			Username: "user1",
+			Email:    "user1@kolide.co",
+		},
+		"",
+	)
+	assert.Equal(t, http.StatusOK, response.Code)
+
+	////////////////////////////////////////////////////////////////////////////
+	// Delete the token
+	////////////////////////////////////////////////////////////////////////////
+	user, err := ds.User("user1")
+	assert.Nil(t, err)
+
+	resets, err := ds.FindPassswordResetsByUserID(user.ID)
+	assert.Nil(t, err)
+	assert.Len(t, resets, 1)
+	assert.Equal(t, user.ID, resets[0].UserID)
+
+	// log in with test user
+	response = makeRequest(
+		t,
+		server,
+		"POST",
+		"/api/v1/kolide/login",
+		CreateUserRequestBody{
+			Username: "user1",
+			Password: "foobar",
+		},
+		"",
+	)
+	assert.Equal(t, http.StatusOK, response.Code)
+	userCookie := response.Header().Get("Set-Cookie")
+	assert.NotEmpty(t, userCookie)
+
+	response = makeRequest(
+		t,
+		server,
+		"DELETE",
+		"/api/v1/kolide/user/password/reset",
+		DeletePasswordResetRequestRequestBody{
+			ID: resets[0].ID,
+		},
+		userCookie,
+	)
+	assert.Equal(t, http.StatusOK, response.Code)
+
+	resets, err = ds.FindPassswordResetsByUserID(user.ID)
+	assert.NotNil(t, err)
+	assert.Len(t, resets, 0)
 }

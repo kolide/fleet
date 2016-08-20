@@ -16,7 +16,7 @@ func TestGetEmailSubject(t *testing.T) {
 }
 
 func TestGetEmailBody(t *testing.T) {
-	html, text, err := GetEmailBody(PasswordResetEmail, &PasswordResetRequestEmailParameters{
+	html, text, err := GetEmailBody(PasswordResetEmail, PasswordResetRequestEmailParameters{
 		Name:  "Foo",
 		Token: "1234",
 	})

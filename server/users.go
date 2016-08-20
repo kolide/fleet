@@ -574,25 +574,37 @@ func ResetUserPassword(c *gin.Context) {
 	db := GetDB(c)
 	vc := VC(c)
 
-	var userEmail string
 	if !vc.IsLoggedIn() {
-		if body.Email == "" {
+		if body.Email == "" || body.Username == "" {
 			UnauthorizedError(c)
+			errors.NewWithStatus(http.StatusBadRequest, "Must submit email and username", "Required parameters were not submitted")
 			return
 		}
-		userEmail = body.Email
 	}
 
-	// TODO: Should this find user by email if user isn't logged in?
-	// gorm makes this confusing...
-	_ = userEmail
-	user, err := db.UserByID(body.ID)
+	user, err := db.User(body.Username)
 	if err != nil {
 		switch err {
 		case gorm.ErrRecordNotFound:
-			NotFoundRequestError(c)
+			errors.NewWithStatus(http.StatusBadRequest, "Invalid username", "Username not found in the database")
 			return
 		default:
+			errors.ReturnError(c, errors.DatabaseError(err))
+			return
+		}
+	}
+	if user.Email != body.Email {
+		errors.NewWithStatus(http.StatusUnauthorized, "Invalid email", "Supplied email does not match user record")
+		return
+	}
+
+	// If an admin is requesting a password reset for a user, require that the
+	// user change their password to log in
+	if vc.IsAdmin() && !vc.IsUserID(user.ID) {
+		user.NeedsPasswordReset = true
+
+		err = db.SaveUser(user)
+		if err != nil {
 			errors.ReturnError(c, errors.DatabaseError(err))
 			return
 		}
@@ -603,28 +615,19 @@ func ResetUserPassword(c *gin.Context) {
 		// resetting their own password or logged-out user presumably resetting
 		// their own password
 
-		if vc.CanPerformWriteActionOnUser(user) {
-			// if the user is logged out, don't perform the user state
-			// modifications
-			user.NeedsPasswordReset = true
-
-			err = db.SaveUser(user)
-			if err != nil {
-				errors.ReturnError(c, errors.DatabaseError(err))
-				return
-			}
-		}
-
 		request, err := kolide.NewPasswordResetRequest(GetDB(c), user.ID, time.Now().Add(time.Hour*24))
 		if err != nil {
 			errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
 			return
 		}
 
-		html, text, err := kolide.GetEmailBody(kolide.PasswordResetEmail, kolide.PasswordResetRequestEmailParameters{
-			Name:  user.Name,
-			Token: request.Token,
-		})
+		html, text, err := kolide.GetEmailBody(
+			kolide.PasswordResetEmail,
+			kolide.PasswordResetRequestEmailParameters{
+				Name:  user.Name,
+				Token: request.Token,
+			},
+		)
 		if err != nil {
 			errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Email error"))
 			return
@@ -655,15 +658,13 @@ func ResetUserPassword(c *gin.Context) {
 
 // swagger:parameters VerifyPasswordResetRequest
 type VerifyPasswordResetRequestRequestBody struct {
-	Username string `json:"username"`
-	UserID   uint   `json:"user_id"`
-	Token    string `json:"token"`
+	UserID uint   `json:"user_id"`
+	Token  string `json:"token"`
 }
 
 // swagger:parameters VerifyPasswordResetRequestResponseBody
 type VerifyPasswordResetRequestResponseBody struct {
 	Valid bool `json:"valid"`
-	ID    uint `json:"id"`
 }
 
 // swagger:route POST /api/v1/kolide/user/password/verify VerifyPasswordResetRequest
@@ -692,11 +693,11 @@ func VerifyPasswordResetRequest(c *gin.Context) {
 	}
 
 	db := GetDB(c)
-	user, err := db.UserByID(body.UserID)
+	_, err = db.UserByID(body.UserID)
 	if err != nil {
 		switch err {
 		case gorm.ErrRecordNotFound:
-			c.JSON(http.StatusNotFound, &VerifyPasswordResetRequestResponseBody{
+			c.JSON(http.StatusBadRequest, &VerifyPasswordResetRequestResponseBody{
 				Valid: false,
 			})
 			return
@@ -706,11 +707,11 @@ func VerifyPasswordResetRequest(c *gin.Context) {
 		}
 	}
 
-	reset, err := db.FindPassswordResetByTokenAndUserID(body.Token, user.ID)
+	reset, err := db.FindPassswordResetByTokenAndUserID(body.Token, body.UserID)
 	if err != nil {
 		switch err {
 		case gorm.ErrRecordNotFound:
-			c.JSON(http.StatusNotFound, VerifyPasswordResetRequestResponseBody{
+			c.JSON(http.StatusBadRequest, VerifyPasswordResetRequestResponseBody{
 				Valid: false,
 			})
 			return
@@ -721,7 +722,7 @@ func VerifyPasswordResetRequest(c *gin.Context) {
 	}
 
 	if time.Now().After(reset.ExpiresAt) {
-		c.JSON(http.StatusNotFound, VerifyPasswordResetRequestResponseBody{
+		c.JSON(http.StatusBadRequest, VerifyPasswordResetRequestResponseBody{
 			Valid: false,
 		})
 		return
@@ -729,7 +730,6 @@ func VerifyPasswordResetRequest(c *gin.Context) {
 
 	c.JSON(http.StatusOK, VerifyPasswordResetRequestResponseBody{
 		Valid: true,
-		ID:    reset.ID,
 	})
 }
 

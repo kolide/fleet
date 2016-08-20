@@ -33,9 +33,13 @@ func makeRequest(t *testing.T, server http.Handler, verb, endpoint string, body 
 }
 
 func createTestServer(ds datastore.Datastore) http.Handler {
+	return createTestServerWithSMTP(ds, kolide.NewMockSMTPConnectionPool())
+}
+
+func createTestServerWithSMTP(ds datastore.Datastore, pool kolide.SMTPConnectionPool) http.Handler {
 	return CreateServer(
 		ds,
-		kolide.NewMockSMTPConnectionPool(),
+		pool,
 		os.Stderr,
 		&MockOsqueryResultHandler{},
 		&MockOsqueryStatusHandler{},
