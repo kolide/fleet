@@ -419,13 +419,8 @@ func (orm gormDB) RecordLabelQueryExecutions(host *kolide.Host, results map[stri
 
 	// Build up all the values and the query string
 	vals := []interface{}{}
-	for key, res := range results {
+	for labelId, res := range results {
 		insert.WriteString("(?,?,?,?),")
-		// labelId, err := strconv.Atoi(key)
-		// if err != nil {
-		// 	return errors.NewFromError(err, errors.StatusUnprocessableEntity, "Received non-int query key")
-		// }
-		labelId := key
 		vals = append(vals, t, res, labelId, host.ID)
 	}
 
