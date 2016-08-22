@@ -47,8 +47,6 @@ restart: stop
 endif
 
 docker:
-	# clean up build folder
-	rm -rf build/*
 	# pull the latest version of the build container
 	docker pull kolide/kolide-builder:1.6
 	# run build step to build linux binary

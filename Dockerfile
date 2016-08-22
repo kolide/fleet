@@ -1,5 +1,5 @@
 FROM alpine:3.4
-MAINTAINER Victor Vrantchan <victor@kolide.co> (@groob)
+MAINTAINER Kolide Developers <engineering@kolide.co>
 
 COPY ./build/kolide /kolide
 
