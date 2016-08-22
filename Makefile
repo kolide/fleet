@@ -45,3 +45,13 @@ restart: stop
 	kolide serve & echo $$! > $(PID_FILE)
 
 endif
+
+docker:
+	# clean up build folder
+	rm -rf build/*
+	# pull the latest version of the build container
+	docker pull kolide/kolide-builder:1.6
+	# run build step to build linux binary
+	docker run --rm -it -v $(shell pwd):/go/src/github.com/kolide/kolide-ose -v ${GOPATH}/pkg:/go/pkg kolide/kolide-builder:1.6 -B
+	# compose up
+	docker-compose up
