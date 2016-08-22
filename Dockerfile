@@ -1,6 +1,6 @@
 FROM alpine:3.4
 MAINTAINER Victor Vrantchan <victor@kolide.co> (@groob)
 
-COPY ./build/kolide-ose /kolide
+COPY ./build/kolide /kolide
 
 CMD ["/kolide", "serve"]
