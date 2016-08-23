@@ -276,3 +276,263 @@ func OsqueryDistributedWrite(c *gin.Context) {
 			"node_invalid": false,
 		})
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Query Management API Endpoints
+////////////////////////////////////////////////////////////////////////////////
+
+// swagger:parameters GetQuery
+type GetQueryRequestBody struct{}
+
+// swagger:response GetQueryResponseBody
+type GetQueryResponseBody struct{}
+
+// swagger:route POST /api/v1/kolide/query
+//
+// Get information about a query
+//
+// Using this API will allow the requester to inspect and get info on queries
+// that have been saved within a given instance of the kolide application
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: https
+//
+//     Security:
+//       authenticated: yes
+//
+//     Responses:
+//       200: GetQueryResponseBody
+func GetQuery(c *gin.Context) {}
+
+// swagger:parameters CreateQuery
+type CreateQueryRequestBody struct{}
+
+// swagger:route PUT /api/v1/kolide/query
+//
+// Create a new query
+//
+// Using this API will allow the requester to create a new query
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: https
+//
+//     Security:
+//       authenticated: yes
+//
+//     Responses:
+//       200: GetQueryResponseBody
+func CreateQuery(c *gin.Context) {}
+
+// swagger:parameters ModifyQuery
+type ModifyQueryRequestBody struct{}
+
+// swagger:route PATCH /api/v1/kolide/query
+//
+// Modify a query
+//
+// Using this API will allow the requester to modify the parameters and
+// attributes of a query
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: https
+//
+//     Security:
+//       authenticated: yes
+//
+//     Responses:
+//       200: GetQueryResponseBody
+func ModifyQuery(c *gin.Context) {}
+
+// swagger:parameters DeleteQuery
+type DeleteQueryRequestBody struct{}
+
+// swagger:route DELETE /api/v1/kolide/query
+//
+// Delete a query
+//
+// Using this API will allow the requester to delete a query
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: https
+//
+//     Security:
+//       authenticated: yes
+//
+//     Responses:
+//       200: GetQueryResponseBody
+func DeleteQuery(c *gin.Context) {}
+
+////////////////////////////////////////////////////////////////////////////////
+// Pack Management API Endpoints
+////////////////////////////////////////////////////////////////////////////////
+
+// swagger:parameters GetPack
+type GetPackRequestBody struct{}
+
+// swagger:response GetPackResponseBody
+type GetPackResponseBody struct{}
+
+// swagger:route POST /api/v1/kolide/pack
+//
+// Get information about a pack
+//
+// Using this API will allow the requester to inspect and get info on packs
+// that have been created within a given instance of the kolide application
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: https
+//
+//     Security:
+//       authenticated: yes
+//
+//     Responses:
+//       200: GetPackResponseBody
+func GetPack(c *gin.Context) {}
+
+// swagger:parameters CreatePack
+type CreatePackRequestBody struct{}
+
+// swagger:route PUT /api/v1/kolide/pack
+//
+// Create a new pack
+//
+// Using this API will allow the requester to create a new pack
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: https
+//
+//     Security:
+//       authenticated: yes
+//
+//     Responses:
+//       200: GetPackResponseBody
+func CreatePack(c *gin.Context) {}
+
+// swagger:parameters ModifyPack
+type ModifyPackRequestBody struct{}
+
+// swagger:route PATCH /api/v1/kolide/pack
+//
+// Modify a pack
+//
+// Using this API will allow the requester to modify the parameters and
+// attributes of a pack
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: https
+//
+//     Security:
+//       authenticated: yes
+//
+//     Responses:
+//       200: GetPackResponseBody
+func ModifyPack(c *gin.Context) {}
+
+// swagger:parameters DeletePack
+type DeletePackRequestBody struct{}
+
+// swagger:route DELETE /api/v1/kolide/pack
+//
+// Delete a pack
+//
+// Using this API will allow the requester to delete a pack
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: https
+//
+//     Security:
+//       authenticated: yes
+//
+//     Responses:
+//       200: GetPackResponseBody
+func DeletePack(c *gin.Context) {}
+
+// swagger:parameters AddQueryToPack
+type AddQueryToPackRequestBody struct{}
+
+// swagger:route PUT /api/v1/kolide/pack/query
+//
+// Add a query to a pack
+//
+// Using this API will allow the requester to add an existing query to an
+// existing pack
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: https
+//
+//     Security:
+//       authenticated: yes
+//
+//     Responses:
+//       200: GetPackResponseBody
+func AddQueryToPack(c *gin.Context) {}
+
+// swagger:parameters DeleteQueryFromPack
+type DeleteQueryFromPackRequestBody struct{}
+
+// swagger:route DELETE /api/v1/kolide/pack/query
+//
+// Delete a query from a pack
+//
+// Using this API will allow the requester to delete an existing query from an
+// existing pack
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: https
+//
+//     Security:
+//       authenticated: yes
+//
+//     Responses:
+//       200: GetPackResponseBody
+func DeleteQueryFromPack(c *gin.Context) {}

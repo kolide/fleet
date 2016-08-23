@@ -173,6 +173,19 @@ func CreateServer(ds datastore.Datastore, pool kolide.SMTPConnectionPool, w io.W
 	kolide.DELETE("/session", DeleteSession)
 	kolide.POST("/session", GetInfoAboutSession)
 
+	kolide.POST("/query", GetQuery)
+	kolide.PUT("/query", CreateQuery)
+	kolide.PATCH("/query", ModifyQuery)
+	kolide.DELETE("/query", DeleteQuery)
+
+	kolide.POST("/pack", GetPack)
+	kolide.PUT("/pack", CreatePack)
+	kolide.PATCH("/pack", ModifyPack)
+	kolide.DELETE("/pack", DeletePack)
+
+	kolide.PUT("/pack/query", AddQueryToPack)
+	kolide.DELETE("/pack/query", DeleteQueryFromPack)
+
 	// osquery API endpoints
 	osq := v1.Group("/osquery")
 
