@@ -435,7 +435,6 @@ func CreateQuery(c *gin.Context) {
 		return
 	}
 
-	ds := GetDB(c)
 	query := &kolide.Query{
 		Name:         body.Name,
 		Query:        body.Query,
@@ -445,6 +444,8 @@ func CreateQuery(c *gin.Context) {
 		Platform:     body.Platform,
 		Version:      body.Version,
 	}
+
+	ds := GetDB(c)
 	err = ds.NewQuery(query)
 	if err != nil {
 		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
@@ -464,7 +465,15 @@ func CreateQuery(c *gin.Context) {
 }
 
 // swagger:parameters ModifyQuery
-type ModifyQueryRequestBody struct{}
+type ModifyQueryRequestBody struct {
+	Name         string `json:"name" validate:"required"`
+	Query        string `json:"query" validate:"required"`
+	Interval     uint   `json:"interval" validate:"required"`
+	Snapshot     bool   `json:"snapshot" validate:"required"`
+	Differential bool   `json:"differential" validate:"required"`
+	Platform     string `json:"platform" validate:"required"`
+	Version      string `json:"version"validate:"required"`
+}
 
 // swagger:route PATCH /api/v1/kolide/queries/:id
 //
@@ -486,7 +495,58 @@ type ModifyQueryRequestBody struct{}
 //
 //     Responses:
 //       200: GetQueryResponseBody
-func ModifyQuery(c *gin.Context) {}
+func ModifyQuery(c *gin.Context) {
+	var body CreateQueryRequestBody
+	err := ParseAndValidateJSON(c, &body)
+	if err != nil {
+		errors.ReturnError(c, err)
+		return
+	}
+
+	vc := VC(c)
+	if !vc.CanPerformActions() {
+		UnauthorizedError(c)
+		return
+	}
+
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		errors.NewWithStatus(http.StatusBadRequest, "Invalid ID", "Query ID was not a uint")
+		return
+	}
+
+	ds := GetDB(c)
+	query, err := ds.Query(uint(id))
+	if err != nil {
+		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		return
+	}
+
+	query.Name = body.Name
+	query.Query = body.Query
+	query.Interval = body.Interval
+	query.Snapshot = body.Snapshot
+	query.Differential = body.Differential
+	query.Platform = body.Platform
+	query.Version = body.Version
+
+	err = ds.SaveQuery(query)
+	if err != nil {
+		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		return
+	}
+
+	c.JSON(http.StatusOK, GetQueryResponseBody{
+		ID:           query.ID,
+		Name:         query.Name,
+		Query:        query.Query,
+		Interval:     query.Interval,
+		Snapshot:     query.Snapshot,
+		Differential: query.Differential,
+		Platform:     query.Platform,
+		Version:      query.Version,
+	})
+}
 
 // swagger:parameters DeleteQuery
 type DeleteQueryRequestBody struct{}
