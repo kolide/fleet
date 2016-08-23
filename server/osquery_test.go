@@ -143,6 +143,71 @@ func TestGetQuery(t *testing.T) {
 	assert.Equal(t, q.Name, query.Name)
 }
 
+func TestCreateQuery(t *testing.T) {
+	ds := createTestUsers(t, createTestPacksAndQueries(t, createTestDatastore(t)))
+	server := createTestServer(ds)
+
+	////////////////////////////////////////////////////////////////////////////
+	// try to create query while logged out
+	////////////////////////////////////////////////////////////////////////////
+
+	response := makeRequest(
+		t,
+		server,
+		"POST",
+		"/api/v1/kolide/queries",
+		CreateQueryRequestBody{
+			Name:  "new query",
+			Query: "select * from time;",
+		},
+		"",
+	)
+	assert.Equal(t, http.StatusUnauthorized, response.Code)
+
+	////////////////////////////////////////////////////////////////////////////
+	// log-in with a user
+	////////////////////////////////////////////////////////////////////////////
+
+	// log in with admin test user
+	response = makeRequest(
+		t,
+		server,
+		"POST",
+		"/api/v1/kolide/login",
+		CreateUserRequestBody{
+			Username: "user1",
+			Password: "foobar",
+		},
+		"",
+	)
+	assert.Equal(t, http.StatusOK, response.Code)
+
+	// ensure that a non-empty cookie was in-fact set
+	userCookie := response.Header().Get("Set-Cookie")
+	assert.NotEmpty(t, userCookie)
+
+	////////////////////////////////////////////////////////////////////////////
+	// create query from a user account
+	////////////////////////////////////////////////////////////////////////////
+
+	response = makeRequest(
+		t,
+		server,
+		"POST",
+		"/api/v1/kolide/queries",
+		CreateQueryRequestBody{
+			Name:  "new query",
+			Query: "select * from time;",
+		},
+		userCookie,
+	)
+	assert.Equal(t, http.StatusOK, response.Code)
+	var q GetQueryResponseBody
+	err := json.NewDecoder(response.Body).Decode(&q)
+	assert.Nil(t, err)
+	assert.Equal(t, q.Name, "new query")
+}
+
 func TestGetAllPacks(t *testing.T) {
 	ds := createTestUsers(t, createTestPacksAndQueries(t, createTestDatastore(t)))
 	server := createTestServer(ds)

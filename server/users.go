@@ -139,14 +139,12 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	// TODO move this to middleware
 	vc := VC(c)
 	if !vc.IsAdmin() {
 		UnauthorizedError(c)
 		return
 	}
 
-	// temporary, pass args explicitly as well
 	db := GetDB(c)
 
 	u, err := kolide.NewUser(body.Username, body.Password, body.Email, body.Admin, body.NeedsPasswordReset)
@@ -156,7 +154,6 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	// save user in db
 	user, err := db.NewUser(u)
 	if err != nil {
 		logrus.Errorf("error creating new user: %s", err)

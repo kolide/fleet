@@ -366,13 +366,13 @@ func GetQuery(c *gin.Context) {
 		return
 	}
 
-	ds := GetDB(c)
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		errors.NewWithStatus(http.StatusBadRequest, "Invalid ID", "Query ID was not a uint")
 		return
 	}
 
+	ds := GetDB(c)
 	query, err := ds.Query(uint(id))
 	if err != nil {
 		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
@@ -392,7 +392,15 @@ func GetQuery(c *gin.Context) {
 }
 
 // swagger:parameters CreateQuery
-type CreateQueryRequestBody struct{}
+type CreateQueryRequestBody struct {
+	Name         string `json:"name" validate:"required"`
+	Query        string `json:"query" validate:"required"`
+	Interval     uint   `json:"interval"`
+	Snapshot     bool   `json:"snapshot"`
+	Differential bool   `json:"differential"`
+	Platform     string `json:"platform"`
+	Version      string `json:"version"`
+}
 
 // swagger:route POST /api/v1/kolide/queries
 //
@@ -413,7 +421,42 @@ type CreateQueryRequestBody struct{}
 //
 //     Responses:
 //       200: GetQueryResponseBody
-func CreateQuery(c *gin.Context) {}
+func CreateQuery(c *gin.Context) {
+	var body CreateQueryRequestBody
+	err := ParseAndValidateJSON(c, &body)
+	if err != nil {
+		errors.ReturnError(c, err)
+		return
+	}
+
+	vc := VC(c)
+	if !vc.CanPerformActions() {
+		UnauthorizedError(c)
+		return
+	}
+
+	ds := GetDB(c)
+	query := &kolide.Query{
+		Name:     body.Name,
+		Platform: body.Platform,
+	}
+	err = ds.NewQuery(query)
+	if err != nil {
+		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		return
+	}
+
+	c.JSON(http.StatusOK, GetQueryResponseBody{
+		ID:           query.ID,
+		Name:         query.Name,
+		Query:        query.Query,
+		Interval:     query.Interval,
+		Snapshot:     query.Snapshot,
+		Differential: query.Differential,
+		Platform:     query.Platform,
+		Version:      query.Version,
+	})
+}
 
 // swagger:parameters ModifyQuery
 type ModifyQueryRequestBody struct{}
@@ -547,13 +590,13 @@ func GetPack(c *gin.Context) {
 		return
 	}
 
-	ds := GetDB(c)
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		errors.NewWithStatus(http.StatusBadRequest, "Invalid ID", "Pack ID was not a uint")
 		return
 	}
 
+	ds := GetDB(c)
 	pack, err := ds.Pack(uint(id))
 	if err != nil {
 		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
