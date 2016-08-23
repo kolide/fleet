@@ -185,7 +185,9 @@ func CreateServer(ds datastore.Datastore, pool kolide.SMTPConnectionPool, w io.W
 	kolide.PATCH("/packs/:id", ModifyPack)
 	kolide.DELETE("/packs/:id", DeletePack)
 
+	// TODO this should be changed to "/packs/:pid/queries/:qid"
 	kolide.PUT("/pack/:pid/query/:qid", AddQueryToPack)
+	// TODO this should be changed to "/packs/:pid/queries/:qid"
 	kolide.DELETE("/pack/:pid/query/:qid", DeleteQueryFromPack)
 
 	// osquery API endpoints
