@@ -281,13 +281,42 @@ func OsqueryDistributedWrite(c *gin.Context) {
 // Query Management API Endpoints
 ////////////////////////////////////////////////////////////////////////////////
 
+// swagger:parameters GetAllQueries
+type GetAllQueriesRequestBody struct{}
+
+// swagger:response GetAllQueriesResponseBody
+type GetAllQueriesResponseBody struct{}
+
+// swagger:route GET /api/v1/kolide/queries
+//
+// Get information about all queries
+//
+// Using this API will allow the requester to inspect and get info on all
+// queries that have been saved within a given instance of the kolide
+// application
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: https
+//
+//     Security:
+//       authenticated: yes
+//
+//     Responses:
+//       200: GetAllQueriesResponseBody
+func GetAllQueries(c *gin.Context) {}
+
 // swagger:parameters GetQuery
 type GetQueryRequestBody struct{}
 
 // swagger:response GetQueryResponseBody
 type GetQueryResponseBody struct{}
 
-// swagger:route POST /api/v1/kolide/query
+// swagger:route GET /api/v1/kolide/query/:id
 //
 // Get information about a query
 //
@@ -312,7 +341,7 @@ func GetQuery(c *gin.Context) {}
 // swagger:parameters CreateQuery
 type CreateQueryRequestBody struct{}
 
-// swagger:route PUT /api/v1/kolide/query
+// swagger:route POST /api/v1/kolide/queries
 //
 // Create a new query
 //
@@ -336,7 +365,7 @@ func CreateQuery(c *gin.Context) {}
 // swagger:parameters ModifyQuery
 type ModifyQueryRequestBody struct{}
 
-// swagger:route PATCH /api/v1/kolide/query
+// swagger:route PATCH /api/v1/kolide/queries/:id
 //
 // Modify a query
 //
@@ -361,7 +390,7 @@ func ModifyQuery(c *gin.Context) {}
 // swagger:parameters DeleteQuery
 type DeleteQueryRequestBody struct{}
 
-// swagger:route DELETE /api/v1/kolide/query
+// swagger:route DELETE /api/v1/kolide/queries/:id
 //
 // Delete a query
 //
@@ -385,6 +414,35 @@ func DeleteQuery(c *gin.Context) {}
 ////////////////////////////////////////////////////////////////////////////////
 // Pack Management API Endpoints
 ////////////////////////////////////////////////////////////////////////////////
+
+// swagger:parameters GetAllPacks
+type GetAllPacksRequestBody struct{}
+
+// swagger:response GetAllPacksResponseBody
+type GetAllPacksResponseBody struct{}
+
+// swagger:route GET /api/v1/kolide/packs
+//
+// Get information about all pack
+//
+// Using this API will allow the requester to inspect and get info on all of
+// the packs that have been created within a given instance of the kolide
+// application
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: https
+//
+//     Security:
+//       authenticated: yes
+//
+//     Responses:
+//       200: GetAllPacksResponseBody
+func GetAllPacks(c *gin.Context) {}
 
 // swagger:parameters GetPack
 type GetPackRequestBody struct{}
@@ -490,7 +548,7 @@ func DeletePack(c *gin.Context) {}
 // swagger:parameters AddQueryToPack
 type AddQueryToPackRequestBody struct{}
 
-// swagger:route PUT /api/v1/kolide/pack/query
+// swagger:route PUT /api/v1/kolide/packs/:pid/queries/:qid
 //
 // Add a query to a pack
 //
@@ -515,7 +573,7 @@ func AddQueryToPack(c *gin.Context) {}
 // swagger:parameters DeleteQueryFromPack
 type DeleteQueryFromPackRequestBody struct{}
 
-// swagger:route DELETE /api/v1/kolide/pack/query
+// swagger:route DELETE /api/v1/kolide/packs/:pid/queries/:qid
 //
 // Delete a query from a pack
 //

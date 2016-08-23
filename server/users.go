@@ -31,8 +31,7 @@ func generateRandomText(keySize int) (string, error) {
 
 // swagger:parameters GetUser
 type GetUserRequestBody struct {
-	ID       uint   `json:"id"`
-	Username string `json:"username"`
+	ID uint `json:"id"`
 }
 
 // swagger:response GetUserResponseBody

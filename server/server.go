@@ -170,21 +170,23 @@ func CreateServer(ds datastore.Datastore, pool kolide.SMTPConnectionPool, w io.W
 	kolide.POST("/user/sessions", GetInfoAboutSessionsForUser)
 	kolide.DELETE("/user/sessions", DeleteSessionsForUser)
 
-	kolide.DELETE("/session", DeleteSession)
 	kolide.POST("/session", GetInfoAboutSession)
+	kolide.DELETE("/session", DeleteSession)
 
-	kolide.POST("/query", GetQuery)
-	kolide.PUT("/query", CreateQuery)
-	kolide.PATCH("/query", ModifyQuery)
-	kolide.DELETE("/query", DeleteQuery)
+	kolide.PUT("/pack/:pid/query/:qid", AddQueryToPack)
+	kolide.DELETE("/pack/:pid/queries/:qid", DeleteQueryFromPack)
 
-	kolide.POST("/pack", GetPack)
-	kolide.PUT("/pack", CreatePack)
-	kolide.PATCH("/pack", ModifyPack)
-	kolide.DELETE("/pack", DeletePack)
+	kolide.GET("/queries", GetAllQueries)
+	kolide.GET("/queries/:id", GetQuery)
+	kolide.POST("/queries", CreateQuery)
+	kolide.PATCH("/queries/:id", ModifyQuery)
+	kolide.DELETE("/queries/:id", DeleteQuery)
 
-	kolide.PUT("/pack/query", AddQueryToPack)
-	kolide.DELETE("/pack/query", DeleteQueryFromPack)
+	kolide.GET("/packs", GetAllPacks)
+	kolide.GET("/packs/:id", GetPack)
+	kolide.POST("/packs", CreatePack)
+	kolide.PATCH("/packs/:id", ModifyPack)
+	kolide.DELETE("/packs/:id", DeletePack)
 
 	// osquery API endpoints
 	osq := v1.Group("/osquery")
