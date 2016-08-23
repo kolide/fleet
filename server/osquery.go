@@ -32,8 +32,9 @@ type OsqueryStatusHandler interface {
 // It can be configured in a `main` function to bind the appropriate handlers
 // and it's methods can be attached to routes.
 type OsqueryHandler struct {
-	ResultHandler OsqueryResultHandler
-	StatusHandler OsqueryStatusHandler
+	LabelQueryInterval time.Duration
+	ResultHandler      OsqueryResultHandler
+	StatusHandler      OsqueryStatusHandler
 }
 
 // Basic implementation of the `OsqueryResultHandler` and
@@ -64,8 +65,27 @@ type OsqueryEnrollPostBody struct {
 	HostIdentifier string `json:"host_identifier" validate:"required"`
 }
 
+// OsqueryConfigPostBody is the generic osquery config endpoint request body
+// structure. Typically the node key and action will be parsed, and then the
+// Data JSON will be unmarshalled into one of the more specific OsqueryConfig*
+// structs.
 type OsqueryConfigPostBody struct {
-	NodeKey string `json:"node_key" validate:"required"`
+	NodeKey string           `json:"node_key" validate:"required"`
+	Action  string           `json:"action" validate:"required"`
+	Data    *json.RawMessage `json:"data" validate:"required"`
+}
+
+// OsqueryConfigDetail is the expected extra information provided with an
+// initial config request. This data will be used to determine which label
+// queries are supplied to the host.
+type OsqueryConfigDetail struct {
+	Platform string `json:"platform" validate:"required"`
+}
+
+// OsqueryConfigQueryResults contains the final information needed to generate a
+// config for the host. It containst the results of the label queries.
+type OsqueryConfigQueryResults struct {
+	Results map[string]bool `json:"results" validate:"required"`
 }
 
 type OsqueryLogPostBody struct {
@@ -141,25 +161,88 @@ func OsqueryEnroll(c *gin.Context) {
 		})
 }
 
-func OsqueryConfig(c *gin.Context) {
+// func OsqueryConfig(c *gin.Context) {
+// 	var body OsqueryConfigPostBody
+// 	err := ParseAndValidateJSON(c, &body)
+// 	if err != nil {
+// 		errors.ReturnOsqueryError(c, err)
+// 		return
+// 	}
+// 	logrus.Debugf("OsqueryConfig: %s", body.NodeKey)
+
+// 	c.JSON(http.StatusOK,
+// 		gin.H{
+// 			"schedule": map[string]map[string]interface{}{
+// 				"time": {
+// 					"query":    "select * from time;",
+// 					"interval": 1,
+// 				},
+// 			},
+// 			"node_invalid": false,
+// 		})
+// }
+
+func (h *OsqueryHandler) handleConfigDetail(db kolide.OsqueryStore, host *kolide.Host, data *json.RawMessage) (map[string]string, error) {
+	var detail OsqueryConfigDetail
+	if err := json.Unmarshal(*data, &detail); err != nil {
+		return nil, errors.NewFromError(err, http.StatusBadRequest, "JSON parse error")
+	}
+	if err := ValidateStruct(&detail); err != nil {
+		return nil, err
+	}
+
+	// Update fields from detail
+	if host.Platform != detail.Platform {
+		host.Platform = detail.Platform
+		if err := db.SaveHost(host); err != nil {
+			return nil, err
+		}
+	}
+
+	return kolide.LabelQueriesForHost(db, host, h.LabelQueryInterval)
+}
+
+// Endpoint used by the osqueryd TLS logger plugin
+func (h *OsqueryHandler) OsqueryConfig(c *gin.Context) {
 	var body OsqueryConfigPostBody
 	err := ParseAndValidateJSON(c, &body)
 	if err != nil {
 		errors.ReturnOsqueryError(c, err)
 		return
 	}
-	logrus.Debugf("OsqueryConfig: %s", body.NodeKey)
 
-	c.JSON(http.StatusOK,
-		gin.H{
-			"schedule": map[string]map[string]interface{}{
-				"time": {
-					"query":    "select * from time;",
-					"interval": 1,
-				},
-			},
-			"node_invalid": false,
-		})
+	db := GetDB(c)
+
+	host, err := db.AuthenticateHost(body.NodeKey)
+	if err != nil {
+		errors.ReturnOsqueryError(c, err)
+		return
+	}
+
+	var res map[string]string
+	switch body.Action {
+	case "request":
+		res, err = h.handleConfigDetail(db, host, body.Data)
+		if err != nil {
+			c.JSON(http.StatusOK, res)
+			return
+		}
+
+	case "results":
+		err = h.handleResultLogs(body.Data, body.NodeKey)
+
+	default:
+		err = errors.NewWithStatus(
+			errors.StatusUnprocessableEntity,
+			"Unknown config request action",
+			fmt.Sprintf("Unknown config request action: %s", body.Action),
+		)
+	}
+
+	if err != nil {
+		errors.ReturnOsqueryError(c, err)
+		return
+	}
 }
 
 // Unmarshal the status logs before sending them to the status log handler

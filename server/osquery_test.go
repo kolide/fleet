@@ -5,7 +5,10 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+	"time"
 
+	"github.com/golang/mock/gomock"
+	"github.com/kolide/kolide-ose/errors"
 	"github.com/kolide/kolide-ose/kolide"
 	"github.com/stretchr/testify/assert"
 )
@@ -841,4 +844,137 @@ func TestDeleteQueryFromPack(t *testing.T) {
 	err = json.NewDecoder(response.Body).Decode(&p)
 	assert.Nil(t, err)
 	assert.Len(t, p.Queries, len(queriesInPack)-1)
+}
+
+func TestHandleConfigDetail(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	db := kolide.NewMockOsqueryStore(ctrl)
+
+	detail := OsqueryConfigDetail{Platform: "darwin"}
+
+	detailBytes, err := json.Marshal(detail)
+	assert.NoError(t, err)
+	detailJSON := json.RawMessage(detailBytes)
+
+	host := &kolide.Host{
+		NodeKey: "fake_key",
+	}
+
+	expectHost := &kolide.Host{
+		NodeKey:  "fake_key",
+		Platform: "darwin",
+	}
+
+	handler := OsqueryHandler{
+		LabelQueryInterval: time.Minute,
+	}
+
+	expectQueries := map[string]string{
+		"1": "query1",
+		"3": "query3",
+	}
+
+	db.EXPECT().SaveHost(expectHost)
+	db.EXPECT().LabelQueriesForHost(expectHost, gomock.Any()).
+		Return(expectQueries, nil).
+		Do(func(_ *kolide.Host, cutoff time.Time) {
+			// Check that the cutoff is in the correct interval
+			expectCutoff := time.Now().Add(-handler.LabelQueryInterval)
+			allowedDelta := 5 * time.Second
+			assert.WithinDuration(t, expectCutoff, cutoff, allowedDelta)
+		})
+
+	res, err := handler.handleConfigDetail(db, host, &detailJSON)
+	assert.NoError(t, err)
+	assert.Equal(t, expectQueries, res)
+
+}
+
+func TestHandleConfigDetailNoSave(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	db := kolide.NewMockOsqueryStore(ctrl)
+
+	detail := OsqueryConfigDetail{Platform: "darwin"}
+
+	detailBytes, err := json.Marshal(detail)
+	assert.NoError(t, err)
+	detailJSON := json.RawMessage(detailBytes)
+
+	host := &kolide.Host{
+		NodeKey:  "fake_key",
+		Platform: "darwin",
+	}
+
+	expectHost := &kolide.Host{
+		NodeKey:  "fake_key",
+		Platform: "darwin",
+	}
+
+	handler := OsqueryHandler{
+		LabelQueryInterval: time.Hour,
+	}
+
+	expectQueries := map[string]string{}
+
+	// Note that we don't expect a call to save because the platform did
+	// not change
+	db.EXPECT().LabelQueriesForHost(expectHost, gomock.Any()).
+		Return(expectQueries, nil).
+		Do(func(_ *kolide.Host, cutoff time.Time) {
+			// Check that the cutoff is in the correct interval
+			expectCutoff := time.Now().Add(-handler.LabelQueryInterval)
+			allowedDelta := 5 * time.Second
+			assert.WithinDuration(t, expectCutoff, cutoff, allowedDelta)
+		})
+
+	res, err := handler.handleConfigDetail(db, host, &detailJSON)
+	assert.NoError(t, err)
+	assert.Equal(t, expectQueries, res)
+
+}
+
+func TestHandleConfigDetailError(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	db := kolide.NewMockOsqueryStore(ctrl)
+
+	detail := OsqueryConfigDetail{Platform: "darwin"}
+
+	detailBytes, err := json.Marshal(detail)
+	assert.NoError(t, err)
+	detailJSON := json.RawMessage(detailBytes)
+
+	host := &kolide.Host{
+		NodeKey:  "fake_key",
+		Platform: "darwin",
+	}
+
+	expectHost := &kolide.Host{
+		NodeKey:  "fake_key",
+		Platform: "darwin",
+	}
+
+	handler := OsqueryHandler{
+		LabelQueryInterval: time.Hour,
+	}
+
+	// The DB call should error in this test
+	db.EXPECT().LabelQueriesForHost(expectHost, gomock.Any()).
+		Return(nil, errors.New("public", "private")).
+		Do(func(_ *kolide.Host, cutoff time.Time) {
+			// Check that the cutoff is in the correct interval
+			expectCutoff := time.Now().Add(-handler.LabelQueryInterval)
+			allowedDelta := 5 * time.Second
+			assert.WithinDuration(t, expectCutoff, cutoff, allowedDelta)
+		})
+
+	res, err := handler.handleConfigDetail(db, host, &detailJSON)
+	assert.Error(t, err)
+	assert.Nil(t, res)
+
 }

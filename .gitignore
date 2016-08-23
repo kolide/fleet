@@ -9,6 +9,7 @@ node_modules
 
 # generated artifacts
 server/bindata.go
+kolide/mock_osquery.go
 *.cover
 *.test
 *.log

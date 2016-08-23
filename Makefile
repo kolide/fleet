@@ -10,10 +10,12 @@ endif
 generate: .prefix
 	go-bindata -pkg=server -o=server/bindata.go frontend/templates/ build/
 	$(WEBPACK) --progress --colors --bail
+	mockgen -source kolide/osquery.go -destination kolide/mock_osquery.go -package kolide
 
 deps:
 	npm install
 	go get -u github.com/Masterminds/glide
+	go get -u github.com/golang/mock/mockgen
 	go get -u github.com/jteeuwen/go-bindata/...
 ifneq ($(OS), Windows_NT)
 	go get -u github.com/olebedev/on
