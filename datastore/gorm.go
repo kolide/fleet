@@ -422,6 +422,12 @@ func (orm gormDB) Query(name string) (*kolide.Query, error) {
 	return query, nil
 }
 
+func (orm gormDB) Queries() ([]*kolide.Query, error) {
+	var queries []*kolide.Query
+	err := orm.DB.Find(&queries).Error
+	return queries, err
+}
+
 func (orm gormDB) NewLabel(label *kolide.Label) error {
 	if label == nil {
 		return errors.New(
@@ -560,6 +566,12 @@ func (orm gormDB) Pack(name string) (*kolide.Pack, error) {
 		return nil, err
 	}
 	return pack, nil
+}
+
+func (orm gormDB) Packs() ([]*kolide.Pack, error) {
+	var packs []*kolide.Pack
+	err := orm.DB.Find(&packs).Error
+	return packs, err
 }
 
 func (orm gormDB) AddQueryToPack(query *kolide.Query, pack *kolide.Pack) error {

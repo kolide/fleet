@@ -281,11 +281,10 @@ func OsqueryDistributedWrite(c *gin.Context) {
 // Query Management API Endpoints
 ////////////////////////////////////////////////////////////////////////////////
 
-// swagger:parameters GetAllQueries
-type GetAllQueriesRequestBody struct{}
-
 // swagger:response GetAllQueriesResponseBody
-type GetAllQueriesResponseBody struct{}
+type GetAllQueriesResponseBody struct {
+	Queries []*kolide.Query `json:"queries"`
+}
 
 // swagger:route GET /api/v1/kolide/queries
 //
@@ -308,7 +307,25 @@ type GetAllQueriesResponseBody struct{}
 //
 //     Responses:
 //       200: GetAllQueriesResponseBody
-func GetAllQueries(c *gin.Context) {}
+func GetAllQueries(c *gin.Context) {
+	vc := VC(c)
+	if !vc.CanPerformActions() {
+		UnauthorizedError(c)
+		return
+	}
+
+	ds := GetDB(c)
+	queries, err := ds.Queries()
+	if err != nil {
+		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		return
+	}
+
+	c.JSON(http.StatusOK, GetAllQueriesResponseBody{
+		Queries: queries,
+	})
+
+}
 
 // swagger:parameters GetQuery
 type GetQueryRequestBody struct{}
