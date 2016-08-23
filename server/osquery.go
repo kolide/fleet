@@ -324,7 +324,6 @@ func GetAllQueries(c *gin.Context) {
 	c.JSON(http.StatusOK, GetAllQueriesResponseBody{
 		Queries: queries,
 	})
-
 }
 
 // swagger:parameters GetQuery
@@ -432,11 +431,10 @@ func DeleteQuery(c *gin.Context) {}
 // Pack Management API Endpoints
 ////////////////////////////////////////////////////////////////////////////////
 
-// swagger:parameters GetAllPacks
-type GetAllPacksRequestBody struct{}
-
 // swagger:response GetAllPacksResponseBody
-type GetAllPacksResponseBody struct{}
+type GetAllPacksResponseBody struct {
+	Packs []*kolide.Pack `json:"packs"`
+}
 
 // swagger:route GET /api/v1/kolide/packs
 //
@@ -459,7 +457,24 @@ type GetAllPacksResponseBody struct{}
 //
 //     Responses:
 //       200: GetAllPacksResponseBody
-func GetAllPacks(c *gin.Context) {}
+func GetAllPacks(c *gin.Context) {
+	vc := VC(c)
+	if !vc.CanPerformActions() {
+		UnauthorizedError(c)
+		return
+	}
+
+	ds := GetDB(c)
+	packs, err := ds.Packs()
+	if err != nil {
+		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		return
+	}
+
+	c.JSON(http.StatusOK, GetAllPacksResponseBody{
+		Packs: packs,
+	})
+}
 
 // swagger:parameters GetPack
 type GetPackRequestBody struct{}
