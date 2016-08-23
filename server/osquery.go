@@ -850,9 +850,6 @@ func ModifyPack(c *gin.Context) {
 	})
 }
 
-// swagger:parameters DeletePack
-type DeletePackRequestBody struct{}
-
 // swagger:route DELETE /api/v1/kolide/pack
 //
 // Delete a pack
@@ -872,7 +869,34 @@ type DeletePackRequestBody struct{}
 //
 //     Responses:
 //       200: GetPackResponseBody
-func DeletePack(c *gin.Context) {}
+func DeletePack(c *gin.Context) {
+	vc := VC(c)
+	if !vc.CanPerformActions() {
+		UnauthorizedError(c)
+		return
+	}
+
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		errors.NewWithStatus(http.StatusBadRequest, "Invalid ID", "Query ID was not a uint")
+		return
+	}
+
+	ds := GetDB(c)
+	pack, err := ds.Pack(uint(id))
+	if err != nil {
+		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		return
+	}
+
+	err = ds.DeletePack(pack)
+	if err != nil {
+		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		return
+	}
+
+	c.JSON(http.StatusOK, nil)
+}
 
 // swagger:parameters AddQueryToPack
 type AddQueryToPackRequestBody struct{}

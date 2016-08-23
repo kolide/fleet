@@ -601,3 +601,66 @@ func TestModifyPack(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, pack.Name, "new name")
 }
+
+func TestDeletePack(t *testing.T) {
+	ds := createTestUsers(t, createTestPacksAndQueries(t, createTestDatastore(t)))
+	server := createTestServer(ds)
+	packs, err := ds.Packs()
+	assert.Nil(t, err)
+	assert.NotEmpty(t, packs)
+	pack := packs[0]
+
+	////////////////////////////////////////////////////////////////////////////
+	// try to delete pack while logged out
+	////////////////////////////////////////////////////////////////////////////
+
+	response := makeRequest(
+		t,
+		server,
+		"DELETE",
+		fmt.Sprintf("/api/v1/kolide/packs/%d", pack.ID),
+		nil,
+		"",
+	)
+	assert.Equal(t, http.StatusUnauthorized, response.Code)
+
+	////////////////////////////////////////////////////////////////////////////
+	// log-in with a user
+	////////////////////////////////////////////////////////////////////////////
+
+	// log in with test user
+	response = makeRequest(
+		t,
+		server,
+		"POST",
+		"/api/v1/kolide/login",
+		CreateUserRequestBody{
+			Username: "user1",
+			Password: "foobar",
+		},
+		"",
+	)
+	assert.Equal(t, http.StatusOK, response.Code)
+
+	// ensure that a non-empty cookie was in-fact set
+	userCookie := response.Header().Get("Set-Cookie")
+	assert.NotEmpty(t, userCookie)
+
+	////////////////////////////////////////////////////////////////////////////
+	// delete pack from a user account
+	////////////////////////////////////////////////////////////////////////////
+
+	response = makeRequest(
+		t,
+		server,
+		"DELETE",
+		fmt.Sprintf("/api/v1/kolide/packs/%d", pack.ID),
+		nil,
+		userCookie,
+	)
+	assert.Equal(t, http.StatusOK, response.Code)
+
+	// ensure result was persisted to the database
+	pack, err = ds.Pack(pack.ID)
+	assert.NotNil(t, err)
+}

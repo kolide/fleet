@@ -554,7 +554,17 @@ func (orm gormDB) DeletePack(pack *kolide.Pack) error {
 			"nil pointer passed to DeletePack",
 		)
 	}
-	return orm.DB.Delete(pack).Error
+	err := orm.DB.Delete(pack).Error
+	if err != nil {
+		return err
+	}
+
+	err = orm.DB.Where("pack_id = ?", pack.ID).Delete(&kolide.PackQuery{}).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (orm gormDB) Pack(id uint) (*kolide.Pack, error) {
