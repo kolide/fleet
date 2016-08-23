@@ -466,13 +466,13 @@ func CreateQuery(c *gin.Context) {
 
 // swagger:parameters ModifyQuery
 type ModifyQueryRequestBody struct {
-	Name         string `json:"name" validate:"required"`
-	Query        string `json:"query" validate:"required"`
-	Interval     uint   `json:"interval" validate:"required"`
-	Snapshot     bool   `json:"snapshot" validate:"required"`
-	Differential bool   `json:"differential" validate:"required"`
-	Platform     string `json:"platform" validate:"required"`
-	Version      string `json:"version"validate:"required"`
+	Name         *string `json:"name"`
+	Query        *string `json:"query"`
+	Interval     *uint   `json:"interval"`
+	Snapshot     *bool   `json:"snapshot"`
+	Differential *bool   `json:"differential"`
+	Platform     *string `json:"platform"`
+	Version      *string `json:"version"`
 }
 
 // swagger:route PATCH /api/v1/kolide/queries/:id
@@ -496,7 +496,7 @@ type ModifyQueryRequestBody struct {
 //     Responses:
 //       200: GetQueryResponseBody
 func ModifyQuery(c *gin.Context) {
-	var body CreateQueryRequestBody
+	var body ModifyQueryRequestBody
 	err := ParseAndValidateJSON(c, &body)
 	if err != nil {
 		errors.ReturnError(c, err)
@@ -522,13 +522,33 @@ func ModifyQuery(c *gin.Context) {
 		return
 	}
 
-	query.Name = body.Name
-	query.Query = body.Query
-	query.Interval = body.Interval
-	query.Snapshot = body.Snapshot
-	query.Differential = body.Differential
-	query.Platform = body.Platform
-	query.Version = body.Version
+	if body.Name != nil {
+		query.Name = *body.Name
+	}
+
+	if body.Query != nil {
+		query.Query = *body.Query
+	}
+
+	if body.Interval != nil {
+		query.Interval = *body.Interval
+	}
+
+	if body.Snapshot != nil {
+		query.Snapshot = *body.Snapshot
+	}
+
+	if body.Differential != nil {
+		query.Differential = *body.Differential
+	}
+
+	if body.Platform != nil {
+		query.Platform = *body.Platform
+	}
+
+	if body.Version != nil {
+		query.Version = *body.Version
+	}
 
 	err = ds.SaveQuery(query)
 	if err != nil {
@@ -733,7 +753,10 @@ func CreatePack(c *gin.Context) {
 }
 
 // swagger:parameters ModifyPack
-type ModifyPackRequestBody struct{}
+type ModifyPackRequestBody struct {
+	Name     *string `json:"name"`
+	Platform *string `json:"platform"`
+}
 
 // swagger:route PATCH /api/v1/kolide/pack
 //
@@ -755,7 +778,53 @@ type ModifyPackRequestBody struct{}
 //
 //     Responses:
 //       200: GetPackResponseBody
-func ModifyPack(c *gin.Context) {}
+func ModifyPack(c *gin.Context) {
+	var body ModifyPackRequestBody
+	err := ParseAndValidateJSON(c, &body)
+	if err != nil {
+		errors.ReturnError(c, err)
+		return
+	}
+
+	vc := VC(c)
+	if !vc.CanPerformActions() {
+		UnauthorizedError(c)
+		return
+	}
+
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		errors.NewWithStatus(http.StatusBadRequest, "Invalid ID", "Pack ID was not a uint")
+		return
+	}
+
+	ds := GetDB(c)
+	pack, err := ds.Pack(uint(id))
+	if err != nil {
+		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		return
+	}
+
+	if body.Name != nil {
+		pack.Name = *body.Name
+	}
+
+	if body.Platform != nil {
+		pack.Platform = *body.Platform
+	}
+
+	err = ds.SavePack(pack)
+	if err != nil {
+		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		return
+	}
+
+	c.JSON(http.StatusOK, GetPackResponseBody{
+		ID:       pack.ID,
+		Name:     pack.Name,
+		Platform: pack.Platform,
+	})
+}
 
 // swagger:parameters DeletePack
 type DeletePackRequestBody struct{}

@@ -43,7 +43,7 @@ func TestGetAllQueries(t *testing.T) {
 	// log-in with a user
 	////////////////////////////////////////////////////////////////////////////
 
-	// log in with admin test user
+	// log in with test user
 	response = makeRequest(
 		t,
 		server,
@@ -106,7 +106,7 @@ func TestGetQuery(t *testing.T) {
 	// log-in with a user
 	////////////////////////////////////////////////////////////////////////////
 
-	// log in with admin test user
+	// log in with test user
 	response = makeRequest(
 		t,
 		server,
@@ -168,7 +168,7 @@ func TestCreateQuery(t *testing.T) {
 	// log-in with a user
 	////////////////////////////////////////////////////////////////////////////
 
-	// log in with admin test user
+	// log in with test user
 	response = makeRequest(
 		t,
 		server,
@@ -215,6 +215,7 @@ func TestModifyQuery(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotEmpty(t, queries)
 	query := queries[0]
+	newName := "new name"
 
 	////////////////////////////////////////////////////////////////////////////
 	// try to modify query while logged out
@@ -226,13 +227,7 @@ func TestModifyQuery(t *testing.T) {
 		"PATCH",
 		fmt.Sprintf("/api/v1/kolide/queries/%d", query.ID),
 		ModifyQueryRequestBody{
-			Name:         "new name",
-			Query:        query.Query,
-			Interval:     query.Interval,
-			Snapshot:     query.Snapshot,
-			Differential: query.Differential,
-			Platform:     query.Platform,
-			Version:      query.Version,
+			Name: &newName,
 		},
 		"",
 	)
@@ -242,7 +237,7 @@ func TestModifyQuery(t *testing.T) {
 	// log-in with a user
 	////////////////////////////////////////////////////////////////////////////
 
-	// log in with admin test user
+	// log in with a test user
 	response = makeRequest(
 		t,
 		server,
@@ -270,13 +265,7 @@ func TestModifyQuery(t *testing.T) {
 		"PATCH",
 		fmt.Sprintf("/api/v1/kolide/queries/%d", query.ID),
 		ModifyQueryRequestBody{
-			Name:         "new name",
-			Query:        query.Query,
-			Interval:     query.Interval,
-			Snapshot:     query.Snapshot,
-			Differential: query.Differential,
-			Platform:     query.Platform,
-			Version:      query.Version,
+			Name: &newName,
 		},
 		userCookie,
 	)
@@ -314,7 +303,7 @@ func TestGetAllPacks(t *testing.T) {
 	// log-in with a user
 	////////////////////////////////////////////////////////////////////////////
 
-	// log in with admin test user
+	// log in with test user
 	response = makeRequest(
 		t,
 		server,
@@ -377,7 +366,7 @@ func TestGetPack(t *testing.T) {
 	// log-in with a user
 	////////////////////////////////////////////////////////////////////////////
 
-	// log in with admin test user
+	// log in with test user
 	response = makeRequest(
 		t,
 		server,
@@ -438,7 +427,7 @@ func TestCreatePack(t *testing.T) {
 	// log-in with a user
 	////////////////////////////////////////////////////////////////////////////
 
-	// log in with admin test user
+	// log in with test user
 	response = makeRequest(
 		t,
 		server,
@@ -475,4 +464,77 @@ func TestCreatePack(t *testing.T) {
 	err := json.NewDecoder(response.Body).Decode(&p)
 	assert.Nil(t, err)
 	assert.Equal(t, p.Name, "new pack")
+}
+
+func TestModifyPack(t *testing.T) {
+	ds := createTestUsers(t, createTestPacksAndQueries(t, createTestDatastore(t)))
+	server := createTestServer(ds)
+	packs, err := ds.Packs()
+	assert.Nil(t, err)
+	assert.NotEmpty(t, packs)
+	pack := packs[0]
+	newName := "new name"
+
+	////////////////////////////////////////////////////////////////////////////
+	// try to modify pack while logged out
+	////////////////////////////////////////////////////////////////////////////
+
+	response := makeRequest(
+		t,
+		server,
+		"PATCH",
+		fmt.Sprintf("/api/v1/kolide/packs/%d", pack.ID),
+		ModifyPackRequestBody{
+			Name: &newName,
+		},
+		"",
+	)
+	assert.Equal(t, http.StatusUnauthorized, response.Code)
+
+	////////////////////////////////////////////////////////////////////////////
+	// log-in with a user
+	////////////////////////////////////////////////////////////////////////////
+
+	// log in with a test user
+	response = makeRequest(
+		t,
+		server,
+		"POST",
+		"/api/v1/kolide/login",
+		CreateUserRequestBody{
+			Username: "user1",
+			Password: "foobar",
+		},
+		"",
+	)
+	assert.Equal(t, http.StatusOK, response.Code)
+
+	// ensure that a non-empty cookie was in-fact set
+	userCookie := response.Header().Get("Set-Cookie")
+	assert.NotEmpty(t, userCookie)
+
+	////////////////////////////////////////////////////////////////////////////
+	// modify pack from a user account
+	////////////////////////////////////////////////////////////////////////////
+
+	response = makeRequest(
+		t,
+		server,
+		"PATCH",
+		fmt.Sprintf("/api/v1/kolide/packs/%d", pack.ID),
+		ModifyPackRequestBody{
+			Name: &newName,
+		},
+		userCookie,
+	)
+	assert.Equal(t, http.StatusOK, response.Code)
+	var p GetPackResponseBody
+	err = json.NewDecoder(response.Body).Decode(&p)
+	assert.Nil(t, err)
+	assert.Equal(t, p.Name, "new name")
+
+	// ensure the result was persisted to the database
+	pack, err = ds.Pack(pack.ID)
+	assert.Nil(t, err)
+	assert.Equal(t, pack.Name, "new name")
 }
