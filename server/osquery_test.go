@@ -201,3 +201,66 @@ func TestGetAllPacks(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Len(t, packs.Packs, 2)
 }
+
+func TestGetPack(t *testing.T) {
+	ds := createTestUsers(t, createTestPacksAndQueries(t, createTestDatastore(t)))
+	server := createTestServer(ds)
+	packs, err := ds.Packs()
+	assert.Nil(t, err)
+	assert.NotEmpty(t, packs)
+	pack := packs[0]
+
+	////////////////////////////////////////////////////////////////////////////
+	// try to get pack while logged out
+	////////////////////////////////////////////////////////////////////////////
+
+	response := makeRequest(
+		t,
+		server,
+		"GET",
+		fmt.Sprintf("/api/v1/kolide/packs/%d", pack.ID),
+		nil,
+		"",
+	)
+	assert.Equal(t, http.StatusUnauthorized, response.Code)
+
+	////////////////////////////////////////////////////////////////////////////
+	// log-in with a user
+	////////////////////////////////////////////////////////////////////////////
+
+	// log in with admin test user
+	response = makeRequest(
+		t,
+		server,
+		"POST",
+		"/api/v1/kolide/login",
+		CreateUserRequestBody{
+			Username: "user1",
+			Password: "foobar",
+		},
+		"",
+	)
+	assert.Equal(t, http.StatusOK, response.Code)
+
+	// ensure that a non-empty cookie was in-fact set
+	userCookie := response.Header().Get("Set-Cookie")
+	assert.NotEmpty(t, userCookie)
+
+	////////////////////////////////////////////////////////////////////////////
+	// get pack from a user account
+	////////////////////////////////////////////////////////////////////////////
+
+	response = makeRequest(
+		t,
+		server,
+		"GET",
+		fmt.Sprintf("/api/v1/kolide/packs/%d", pack.ID),
+		nil,
+		userCookie,
+	)
+	assert.Equal(t, http.StatusOK, response.Code)
+	var p GetPackResponseBody
+	err = json.NewDecoder(response.Body).Decode(&p)
+	assert.Nil(t, err)
+	assert.Equal(t, p.Name, pack.Name)
+}

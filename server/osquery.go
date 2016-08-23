@@ -513,11 +513,12 @@ func GetAllPacks(c *gin.Context) {
 	})
 }
 
-// swagger:parameters GetPack
-type GetPackRequestBody struct{}
-
 // swagger:response GetPackResponseBody
-type GetPackResponseBody struct{}
+type GetPackResponseBody struct {
+	ID       uint   `json:"id"`
+	Name     string `json:"name"`
+	Platform string `json:"platform"`
+}
 
 // swagger:route POST /api/v1/kolide/pack
 //
@@ -539,7 +540,32 @@ type GetPackResponseBody struct{}
 //
 //     Responses:
 //       200: GetPackResponseBody
-func GetPack(c *gin.Context) {}
+func GetPack(c *gin.Context) {
+	vc := VC(c)
+	if !vc.CanPerformActions() {
+		UnauthorizedError(c)
+		return
+	}
+
+	ds := GetDB(c)
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		errors.NewWithStatus(http.StatusBadRequest, "Invalid ID", "Pack ID was not a uint")
+		return
+	}
+
+	pack, err := ds.Pack(uint(id))
+	if err != nil {
+		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		return
+	}
+
+	c.JSON(http.StatusOK, GetPackResponseBody{
+		ID:       pack.ID,
+		Name:     pack.Name,
+		Platform: pack.Platform,
+	})
+}
 
 // swagger:parameters CreatePack
 type CreatePackRequestBody struct{}
