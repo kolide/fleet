@@ -1007,4 +1007,43 @@ func AddQueryToPack(c *gin.Context) {
 //     Responses:
 //       200: GetPackResponseBody
 func DeleteQueryFromPack(c *gin.Context) {
+	vc := VC(c)
+	if !vc.CanPerformActions() {
+		UnauthorizedError(c)
+		return
+	}
+
+	packID, err := strconv.ParseUint(c.Param("pid"), 10, 64)
+	if err != nil {
+		errors.NewWithStatus(http.StatusBadRequest, "Invalid ID", "Pack ID was not a uint")
+		return
+	}
+
+	queryID, err := strconv.ParseUint(c.Param("qid"), 10, 64)
+	if err != nil {
+		errors.NewWithStatus(http.StatusBadRequest, "Invalid ID", "Query ID was not a uint")
+		return
+	}
+
+	ds := GetDB(c)
+
+	pack, err := ds.Pack(uint(packID))
+	if err != nil {
+		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		return
+	}
+
+	query, err := ds.Query(uint(queryID))
+	if err != nil {
+		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		return
+	}
+
+	err = ds.RemoveQueryFromPack(query, pack)
+	if err != nil {
+		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		return
+	}
+
+	c.JSON(http.StatusOK, nil)
 }
