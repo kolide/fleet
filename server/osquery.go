@@ -437,8 +437,13 @@ func CreateQuery(c *gin.Context) {
 
 	ds := GetDB(c)
 	query := &kolide.Query{
-		Name:     body.Name,
-		Platform: body.Platform,
+		Name:         body.Name,
+		Query:        body.Query,
+		Interval:     body.Interval,
+		Snapshot:     body.Snapshot,
+		Differential: body.Differential,
+		Platform:     body.Platform,
+		Version:      body.Version,
 	}
 	err = ds.NewQuery(query)
 	if err != nil {
@@ -611,7 +616,10 @@ func GetPack(c *gin.Context) {
 }
 
 // swagger:parameters CreatePack
-type CreatePackRequestBody struct{}
+type CreatePackRequestBody struct {
+	Name     string `json:"name" validate:"required"`
+	Platform string `json:"platform"`
+}
 
 // swagger:route PUT /api/v1/kolide/pack
 //
@@ -632,7 +640,37 @@ type CreatePackRequestBody struct{}
 //
 //     Responses:
 //       200: GetPackResponseBody
-func CreatePack(c *gin.Context) {}
+func CreatePack(c *gin.Context) {
+	var body CreatePackRequestBody
+	err := ParseAndValidateJSON(c, &body)
+	if err != nil {
+		errors.ReturnError(c, err)
+		return
+	}
+
+	vc := VC(c)
+	if !vc.CanPerformActions() {
+		UnauthorizedError(c)
+		return
+	}
+
+	ds := GetDB(c)
+	pack := &kolide.Pack{
+		Name:     body.Name,
+		Platform: body.Platform,
+	}
+	err = ds.NewPack(pack)
+	if err != nil {
+		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		return
+	}
+
+	c.JSON(http.StatusOK, GetPackResponseBody{
+		ID:       pack.ID,
+		Name:     pack.Name,
+		Platform: pack.Platform,
+	})
+}
 
 // swagger:parameters ModifyPack
 type ModifyPackRequestBody struct{}

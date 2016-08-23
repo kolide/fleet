@@ -329,3 +329,66 @@ func TestGetPack(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, p.Name, pack.Name)
 }
+
+func TestCreatePack(t *testing.T) {
+	ds := createTestUsers(t, createTestPacksAndQueries(t, createTestDatastore(t)))
+	server := createTestServer(ds)
+
+	////////////////////////////////////////////////////////////////////////////
+	// try to create pack while logged out
+	////////////////////////////////////////////////////////////////////////////
+
+	response := makeRequest(
+		t,
+		server,
+		"POST",
+		"/api/v1/kolide/packs",
+		CreatePackRequestBody{
+			Name: "new pack",
+		},
+		"",
+	)
+	assert.Equal(t, http.StatusUnauthorized, response.Code)
+
+	////////////////////////////////////////////////////////////////////////////
+	// log-in with a user
+	////////////////////////////////////////////////////////////////////////////
+
+	// log in with admin test user
+	response = makeRequest(
+		t,
+		server,
+		"POST",
+		"/api/v1/kolide/login",
+		CreateUserRequestBody{
+			Username: "user1",
+			Password: "foobar",
+		},
+		"",
+	)
+	assert.Equal(t, http.StatusOK, response.Code)
+
+	// ensure that a non-empty cookie was in-fact set
+	userCookie := response.Header().Get("Set-Cookie")
+	assert.NotEmpty(t, userCookie)
+
+	////////////////////////////////////////////////////////////////////////////
+	// create query from a user account
+	////////////////////////////////////////////////////////////////////////////
+
+	response = makeRequest(
+		t,
+		server,
+		"POST",
+		"/api/v1/kolide/packs",
+		CreateQueryRequestBody{
+			Name: "new pack",
+		},
+		userCookie,
+	)
+	assert.Equal(t, http.StatusOK, response.Code)
+	var p GetPackResponseBody
+	err := json.NewDecoder(response.Body).Decode(&p)
+	assert.Nil(t, err)
+	assert.Equal(t, p.Name, "new pack")
+}
