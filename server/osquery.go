@@ -622,16 +622,15 @@ func DeleteQuery(c *gin.Context) {
 
 // swagger:response GetAllPacksResponseBody
 type GetAllPacksResponseBody struct {
-	Packs []*kolide.Pack `json:"packs"`
+	Packs []uint `json:"packs"`
 }
 
 // swagger:route GET /api/v1/kolide/packs
 //
 // Get information about all pack
 //
-// Using this API will allow the requester to inspect and get info on all of
-// the packs that have been created within a given instance of the kolide
-// application
+// Using this API will allow the requester to get the IDs of all of the packs
+// that have been created within a given instance of the kolide application
 //
 //     Consumes:
 //     - application/json
@@ -660,19 +659,25 @@ func GetAllPacks(c *gin.Context) {
 		return
 	}
 
+	var packIDs []uint
+	for _, pack := range packs {
+		packIDs = append(packIDs, pack.ID)
+	}
+
 	c.JSON(http.StatusOK, GetAllPacksResponseBody{
-		Packs: packs,
+		Packs: packIDs,
 	})
 }
 
 // swagger:response GetPackResponseBody
 type GetPackResponseBody struct {
-	ID       uint   `json:"id"`
-	Name     string `json:"name"`
-	Platform string `json:"platform"`
+	ID       uint                   `json:"id"`
+	Name     string                 `json:"name"`
+	Platform string                 `json:"platform"`
+	Queries  []GetQueryResponseBody `json:queries`
 }
 
-// swagger:route POST /api/v1/kolide/pack
+// swagger:route GET /api/v1/kolide/pack/:id
 //
 // Get information about a pack
 //
@@ -712,10 +717,31 @@ func GetPack(c *gin.Context) {
 		return
 	}
 
+	queries, err := ds.GetQueriesInPack(pack)
+	if err != nil {
+		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		return
+	}
+
+	var queriesResponse []GetQueryResponseBody
+	for _, query := range queries {
+		queriesResponse = append(queriesResponse, GetQueryResponseBody{
+			ID:           query.ID,
+			Name:         query.Name,
+			Query:        query.Query,
+			Interval:     query.Interval,
+			Snapshot:     query.Snapshot,
+			Differential: query.Differential,
+			Platform:     query.Platform,
+			Version:      query.Version,
+		})
+	}
+
 	c.JSON(http.StatusOK, GetPackResponseBody{
 		ID:       pack.ID,
 		Name:     pack.Name,
 		Platform: pack.Platform,
+		Queries:  queriesResponse,
 	})
 }
 
@@ -898,9 +924,6 @@ func DeletePack(c *gin.Context) {
 	c.JSON(http.StatusOK, nil)
 }
 
-// swagger:parameters AddQueryToPack
-type AddQueryToPackRequestBody struct{}
-
 // swagger:route PUT /api/v1/kolide/packs/:pid/queries/:qid
 //
 // Add a query to a pack
@@ -920,11 +943,48 @@ type AddQueryToPackRequestBody struct{}
 //       authenticated: yes
 //
 //     Responses:
-//       200: GetPackResponseBody
-func AddQueryToPack(c *gin.Context) {}
+//       200: nil
+func AddQueryToPack(c *gin.Context) {
+	vc := VC(c)
+	if !vc.CanPerformActions() {
+		UnauthorizedError(c)
+		return
+	}
 
-// swagger:parameters DeleteQueryFromPack
-type DeleteQueryFromPackRequestBody struct{}
+	packID, err := strconv.ParseUint(c.Param("pid"), 10, 64)
+	if err != nil {
+		errors.NewWithStatus(http.StatusBadRequest, "Invalid ID", "Pack ID was not a uint")
+		return
+	}
+
+	queryID, err := strconv.ParseUint(c.Param("qid"), 10, 64)
+	if err != nil {
+		errors.NewWithStatus(http.StatusBadRequest, "Invalid ID", "Query ID was not a uint")
+		return
+	}
+
+	ds := GetDB(c)
+
+	pack, err := ds.Pack(uint(packID))
+	if err != nil {
+		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		return
+	}
+
+	query, err := ds.Query(uint(queryID))
+	if err != nil {
+		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		return
+	}
+
+	err = ds.AddQueryToPack(query, pack)
+	if err != nil {
+		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		return
+	}
+
+	c.JSON(http.StatusOK, nil)
+}
 
 // swagger:route DELETE /api/v1/kolide/packs/:pid/queries/:qid
 //
@@ -946,4 +1006,5 @@ type DeleteQueryFromPackRequestBody struct{}
 //
 //     Responses:
 //       200: GetPackResponseBody
-func DeleteQueryFromPack(c *gin.Context) {}
+func DeleteQueryFromPack(c *gin.Context) {
+}

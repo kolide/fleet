@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/kolide/kolide-ose/kolide"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -663,4 +664,95 @@ func TestDeletePack(t *testing.T) {
 	// ensure result was persisted to the database
 	pack, err = ds.Pack(pack.ID)
 	assert.NotNil(t, err)
+}
+
+func TestAddQueryToPack(t *testing.T) {
+	ds := createTestUsers(t, createTestPacksAndQueries(t, createTestDatastore(t)))
+	server := createTestServer(ds)
+
+	packs, err := ds.Packs()
+	assert.Nil(t, err)
+	assert.NotEmpty(t, packs)
+	pack := packs[0]
+
+	queriesInPack, err := ds.GetQueriesInPack(pack)
+	assert.Nil(t, err)
+	assert.NotEmpty(t, queriesInPack)
+
+	////////////////////////////////////////////////////////////////////////////
+	// log-in with a user
+	////////////////////////////////////////////////////////////////////////////
+
+	// log in with test user
+	response := makeRequest(
+		t,
+		server,
+		"POST",
+		"/api/v1/kolide/login",
+		CreateUserRequestBody{
+			Username: "user1",
+			Password: "foobar",
+		},
+		"",
+	)
+	assert.Equal(t, http.StatusOK, response.Code)
+
+	// ensure that a non-empty cookie was in-fact set
+	userCookie := response.Header().Get("Set-Cookie")
+	assert.NotEmpty(t, userCookie)
+
+	////////////////////////////////////////////////////////////////////////////
+	// count queries in pack
+	////////////////////////////////////////////////////////////////////////////
+
+	response = makeRequest(
+		t,
+		server,
+		"GET",
+		fmt.Sprintf("/api/v1/kolide/packs/%d", pack.ID),
+		nil,
+		userCookie,
+	)
+	assert.Equal(t, http.StatusOK, response.Code)
+	var p GetPackResponseBody
+	err = json.NewDecoder(response.Body).Decode(&p)
+	assert.Nil(t, err)
+	assert.Len(t, p.Queries, len(queriesInPack))
+
+	////////////////////////////////////////////////////////////////////////////
+	// add a query to the pack
+	////////////////////////////////////////////////////////////////////////////
+	query := &kolide.Query{
+		Name:  "new query",
+		Query: "select * from time;",
+	}
+	err = ds.NewQuery(query)
+	assert.Nil(t, err)
+
+	response = makeRequest(
+		t,
+		server,
+		"PUT",
+		fmt.Sprintf("/api/v1/kolide/pack/%d/query/%d", pack.ID, query.ID),
+		nil,
+		userCookie,
+	)
+	assert.Equal(t, http.StatusOK, response.Code)
+
+	////////////////////////////////////////////////////////////////////////////
+	// verify the number of queries in pack
+	////////////////////////////////////////////////////////////////////////////
+
+	response = makeRequest(
+		t,
+		server,
+		"GET",
+		fmt.Sprintf("/api/v1/kolide/packs/%d", pack.ID),
+		nil,
+		userCookie,
+	)
+	assert.Equal(t, http.StatusOK, response.Code)
+	err = json.NewDecoder(response.Body).Decode(&p)
+	assert.Nil(t, err)
+	assert.Len(t, p.Queries, len(queriesInPack)+1)
 }
