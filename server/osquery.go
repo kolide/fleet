@@ -191,7 +191,7 @@ func (h *OsqueryHandler) handleConfigDetail(db kolide.OsqueryStore, host *kolide
 		return nil, err
 	}
 
-	// Update fields from detail
+	// Update fields from detail (only save if there are changes)
 	if host.Platform != detail.Platform {
 		host.Platform = detail.Platform
 		if err := db.SaveHost(host); err != nil {
@@ -200,6 +200,18 @@ func (h *OsqueryHandler) handleConfigDetail(db kolide.OsqueryStore, host *kolide
 	}
 
 	return kolide.LabelQueriesForHost(db, host, h.LabelQueryInterval)
+}
+
+func (h *OsqueryHandler) handleConfigQueryResults(db kolide.OsqueryStore, host *kolide.Host, data *json.RawMessage) error {
+	var results OsqueryConfigQueryResults
+	if err := json.Unmarshal(*data, &results); err != nil {
+		return errors.NewFromError(err, http.StatusBadRequest, "JSON parse error")
+	}
+	if err := ValidateStruct(&results); err != nil {
+		return err
+	}
+
+	return db.RecordLabelQueryExecutions(host, results.Results, time.Now())
 }
 
 // Endpoint used by the osqueryd TLS logger plugin
@@ -229,7 +241,8 @@ func (h *OsqueryHandler) OsqueryConfig(c *gin.Context) {
 		}
 
 	case "results":
-		err = h.handleResultLogs(body.Data, body.NodeKey)
+		err = h.handleConfigQueryResults(db, host, body.Data)
+		// Now we should be able to calculate the appropriate config
 
 	default:
 		err = errors.NewWithStatus(
@@ -243,6 +256,8 @@ func (h *OsqueryHandler) OsqueryConfig(c *gin.Context) {
 		errors.ReturnOsqueryError(c, err)
 		return
 	}
+
+	// TODO: Generate the config and return it here!
 }
 
 // Unmarshal the status logs before sending them to the status log handler

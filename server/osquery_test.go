@@ -937,6 +937,13 @@ func TestHandleConfigDetailNoSave(t *testing.T) {
 
 }
 
+func marshalRawMessage(t *testing.T, obj interface{}) *json.RawMessage {
+	objBytes, err := json.Marshal(obj)
+	assert.NoError(t, err)
+	objJSON := json.RawMessage(objBytes)
+	return &objJSON
+}
+
 func TestHandleConfigDetailError(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
@@ -977,4 +984,77 @@ func TestHandleConfigDetailError(t *testing.T) {
 	assert.Error(t, err)
 	assert.Nil(t, res)
 
+}
+
+func TestHandleConfigQueryResults(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	db := kolide.NewMockOsqueryStore(ctrl)
+
+	results := OsqueryConfigQueryResults{
+		Results: map[string]bool{
+			"1": true,
+			"3": false,
+			"4": true,
+		},
+	}
+
+	resultsJSON := marshalRawMessage(t, results)
+
+	host := &kolide.Host{
+		NodeKey:  "fake_key",
+		Platform: "darwin",
+	}
+
+	handler := OsqueryHandler{
+		LabelQueryInterval: time.Hour,
+	}
+
+	db.EXPECT().RecordLabelQueryExecutions(host, results.Results, gomock.Any()).
+		Return(nil).
+		Do(func(_ *kolide.Host, _ map[string]bool, recordTime time.Time) {
+			// Check that the cutoff is in the correct interval
+			allowedDelta := 5 * time.Second
+			assert.WithinDuration(t, time.Now(), recordTime, allowedDelta)
+		})
+
+	assert.NoError(t, handler.handleConfigQueryResults(db, host, resultsJSON))
+}
+
+func TestHandleConfigQueryResultsError(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	db := kolide.NewMockOsqueryStore(ctrl)
+
+	results := OsqueryConfigQueryResults{
+		Results: map[string]bool{
+			"1": true,
+			"3": false,
+			"4": true,
+		},
+	}
+
+	resultsJSON := marshalRawMessage(t, results)
+
+	host := &kolide.Host{
+		NodeKey:  "fake_key",
+		Platform: "darwin",
+	}
+
+	handler := OsqueryHandler{
+		LabelQueryInterval: time.Hour,
+	}
+
+	// DB errors this time
+	db.EXPECT().RecordLabelQueryExecutions(host, results.Results, gomock.Any()).
+		Return(errors.New("public", "private")).
+		Do(func(_ *kolide.Host, _ map[string]bool, recordTime time.Time) {
+			// Check that the cutoff is in the correct interval
+			allowedDelta := 5 * time.Second
+			assert.WithinDuration(t, time.Now(), recordTime, allowedDelta)
+		})
+
+	assert.Error(t, handler.handleConfigQueryResults(db, host, resultsJSON))
 }
