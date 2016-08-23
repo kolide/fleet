@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/Sirupsen/logrus"
@@ -326,11 +327,17 @@ func GetAllQueries(c *gin.Context) {
 	})
 }
 
-// swagger:parameters GetQuery
-type GetQueryRequestBody struct{}
-
 // swagger:response GetQueryResponseBody
-type GetQueryResponseBody struct{}
+type GetQueryResponseBody struct {
+	ID           uint   `json:"id"`
+	Name         string `json:"name"`
+	Query        string `json:"query"`
+	Interval     uint   `json:"interval"`
+	Snapshot     bool   `json:"snapshot"`
+	Differential bool   `json:"differential"`
+	Platform     string `json:"platform"`
+	Version      string `json:"version"`
+}
 
 // swagger:route GET /api/v1/kolide/query/:id
 //
@@ -352,7 +359,37 @@ type GetQueryResponseBody struct{}
 //
 //     Responses:
 //       200: GetQueryResponseBody
-func GetQuery(c *gin.Context) {}
+func GetQuery(c *gin.Context) {
+	vc := VC(c)
+	if !vc.CanPerformActions() {
+		UnauthorizedError(c)
+		return
+	}
+
+	ds := GetDB(c)
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		errors.NewWithStatus(http.StatusBadRequest, "Invalid ID", "Query ID was not a uint")
+		return
+	}
+
+	query, err := ds.Query(uint(id))
+	if err != nil {
+		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		return
+	}
+
+	c.JSON(http.StatusOK, GetQueryResponseBody{
+		ID:           query.ID,
+		Name:         query.Name,
+		Query:        query.Query,
+		Interval:     query.Interval,
+		Snapshot:     query.Snapshot,
+		Differential: query.Differential,
+		Platform:     query.Platform,
+		Version:      query.Version,
+	})
+}
 
 // swagger:parameters CreateQuery
 type CreateQueryRequestBody struct{}

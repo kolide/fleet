@@ -411,9 +411,9 @@ func (orm gormDB) DeleteQuery(query *kolide.Query) error {
 	return orm.DB.Delete(query).Error
 }
 
-func (orm gormDB) Query(name string) (*kolide.Query, error) {
+func (orm gormDB) Query(id uint) (*kolide.Query, error) {
 	query := &kolide.Query{
-		Name: name,
+		ID: id,
 	}
 	err := orm.DB.Where(query).First(query).Error
 	if err != nil {
@@ -557,9 +557,9 @@ func (orm gormDB) DeletePack(pack *kolide.Pack) error {
 	return orm.DB.Delete(pack).Error
 }
 
-func (orm gormDB) Pack(name string) (*kolide.Pack, error) {
+func (orm gormDB) Pack(id uint) (*kolide.Pack, error) {
 	pack := &kolide.Pack{
-		Name: name,
+		ID: id,
 	}
 	err := orm.DB.Where(pack).First(pack).Error
 	if err != nil {

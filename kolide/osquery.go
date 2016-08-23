@@ -15,7 +15,7 @@ type OsqueryStore interface {
 	NewQuery(query *Query) error
 	SaveQuery(query *Query) error
 	DeleteQuery(query *Query) error
-	Query(name string) (*Query, error)
+	Query(id uint) (*Query, error)
 	Queries() ([]*Query, error)
 
 	// Label methods
@@ -25,7 +25,7 @@ type OsqueryStore interface {
 	NewPack(pack *Pack) error
 	SavePack(pack *Pack) error
 	DeletePack(pack *Pack) error
-	Pack(name string) (*Pack, error)
+	Pack(id uint) (*Pack, error)
 	Packs() ([]*Pack, error)
 
 	// Modifying the queries in packs

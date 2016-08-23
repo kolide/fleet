@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"testing"
 
@@ -77,6 +78,69 @@ func TestGetAllQueries(t *testing.T) {
 	err := json.NewDecoder(response.Body).Decode(&queries)
 	assert.Nil(t, err)
 	assert.Len(t, queries.Queries, 3)
+}
+
+func TestGetQuery(t *testing.T) {
+	ds := createTestUsers(t, createTestPacksAndQueries(t, createTestDatastore(t)))
+	server := createTestServer(ds)
+	queries, err := ds.Queries()
+	assert.Nil(t, err)
+	assert.NotEmpty(t, queries)
+	query := queries[0]
+
+	////////////////////////////////////////////////////////////////////////////
+	// try to get query while logged out
+	////////////////////////////////////////////////////////////////////////////
+
+	response := makeRequest(
+		t,
+		server,
+		"GET",
+		fmt.Sprintf("/api/v1/kolide/queries/%d", query.ID),
+		nil,
+		"",
+	)
+	assert.Equal(t, http.StatusUnauthorized, response.Code)
+
+	////////////////////////////////////////////////////////////////////////////
+	// log-in with a user
+	////////////////////////////////////////////////////////////////////////////
+
+	// log in with admin test user
+	response = makeRequest(
+		t,
+		server,
+		"POST",
+		"/api/v1/kolide/login",
+		CreateUserRequestBody{
+			Username: "user1",
+			Password: "foobar",
+		},
+		"",
+	)
+	assert.Equal(t, http.StatusOK, response.Code)
+
+	// ensure that a non-empty cookie was in-fact set
+	userCookie := response.Header().Get("Set-Cookie")
+	assert.NotEmpty(t, userCookie)
+
+	////////////////////////////////////////////////////////////////////////////
+	// get query from a user account
+	////////////////////////////////////////////////////////////////////////////
+
+	response = makeRequest(
+		t,
+		server,
+		"GET",
+		fmt.Sprintf("/api/v1/kolide/queries/%d", query.ID),
+		nil,
+		userCookie,
+	)
+	assert.Equal(t, http.StatusOK, response.Code)
+	var q GetQueryResponseBody
+	err = json.NewDecoder(response.Body).Decode(&q)
+	assert.Nil(t, err)
+	assert.Equal(t, q.Name, query.Name)
 }
 
 func TestGetAllPacks(t *testing.T) {
