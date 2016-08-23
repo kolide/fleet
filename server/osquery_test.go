@@ -281,6 +281,69 @@ func TestModifyQuery(t *testing.T) {
 	assert.Equal(t, query.Name, "new name")
 }
 
+func TestDeleteQuery(t *testing.T) {
+	ds := createTestUsers(t, createTestPacksAndQueries(t, createTestDatastore(t)))
+	server := createTestServer(ds)
+	queries, err := ds.Queries()
+	assert.Nil(t, err)
+	assert.NotEmpty(t, queries)
+	query := queries[0]
+
+	////////////////////////////////////////////////////////////////////////////
+	// try to delete query while logged out
+	////////////////////////////////////////////////////////////////////////////
+
+	response := makeRequest(
+		t,
+		server,
+		"DELETE",
+		fmt.Sprintf("/api/v1/kolide/queries/%d", query.ID),
+		nil,
+		"",
+	)
+	assert.Equal(t, http.StatusUnauthorized, response.Code)
+
+	////////////////////////////////////////////////////////////////////////////
+	// log-in with a user
+	////////////////////////////////////////////////////////////////////////////
+
+	// log in with test user
+	response = makeRequest(
+		t,
+		server,
+		"POST",
+		"/api/v1/kolide/login",
+		CreateUserRequestBody{
+			Username: "user1",
+			Password: "foobar",
+		},
+		"",
+	)
+	assert.Equal(t, http.StatusOK, response.Code)
+
+	// ensure that a non-empty cookie was in-fact set
+	userCookie := response.Header().Get("Set-Cookie")
+	assert.NotEmpty(t, userCookie)
+
+	////////////////////////////////////////////////////////////////////////////
+	// delete query from a user account
+	////////////////////////////////////////////////////////////////////////////
+
+	response = makeRequest(
+		t,
+		server,
+		"DELETE",
+		fmt.Sprintf("/api/v1/kolide/queries/%d", query.ID),
+		nil,
+		userCookie,
+	)
+	assert.Equal(t, http.StatusOK, response.Code)
+
+	// ensure result was persisted to the database
+	query, err = ds.Query(query.ID)
+	assert.NotNil(t, err)
+}
+
 func TestGetAllPacks(t *testing.T) {
 	ds := createTestUsers(t, createTestPacksAndQueries(t, createTestDatastore(t)))
 	server := createTestServer(ds)

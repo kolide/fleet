@@ -568,9 +568,6 @@ func ModifyQuery(c *gin.Context) {
 	})
 }
 
-// swagger:parameters DeleteQuery
-type DeleteQueryRequestBody struct{}
-
 // swagger:route DELETE /api/v1/kolide/queries/:id
 //
 // Delete a query
@@ -589,8 +586,35 @@ type DeleteQueryRequestBody struct{}
 //       authenticated: yes
 //
 //     Responses:
-//       200: GetQueryResponseBody
-func DeleteQuery(c *gin.Context) {}
+//       200: nil
+func DeleteQuery(c *gin.Context) {
+	vc := VC(c)
+	if !vc.CanPerformActions() {
+		UnauthorizedError(c)
+		return
+	}
+
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		errors.NewWithStatus(http.StatusBadRequest, "Invalid ID", "Query ID was not a uint")
+		return
+	}
+
+	ds := GetDB(c)
+	query, err := ds.Query(uint(id))
+	if err != nil {
+		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		return
+	}
+
+	err = ds.DeleteQuery(query)
+	if err != nil {
+		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		return
+	}
+
+	c.JSON(http.StatusOK, nil)
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Pack Management API Endpoints
