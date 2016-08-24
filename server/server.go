@@ -100,10 +100,10 @@ func ParseAndValidateJSON(c *gin.Context, obj interface{}) error {
 		return err
 	}
 
-	return ValidateStruct(obj)
+	return validateStruct(obj)
 }
 
-func ValidateStruct(obj interface{}) error {
+func validateStruct(obj interface{}) error {
 	return validate.Struct(obj)
 }
 

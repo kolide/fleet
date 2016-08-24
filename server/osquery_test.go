@@ -886,7 +886,7 @@ func TestHandleConfigDetail(t *testing.T) {
 			assert.WithinDuration(t, expectCutoff, cutoff, allowedDelta)
 		})
 
-	res, err := handler.handleConfigDetail(db, host, &detailJSON)
+	res, err := handler.handleConfigDetail(db, host, detailJSON)
 	assert.NoError(t, err)
 	assert.Equal(t, expectQueries, res)
 
@@ -931,17 +931,17 @@ func TestHandleConfigDetailNoSave(t *testing.T) {
 			assert.WithinDuration(t, expectCutoff, cutoff, allowedDelta)
 		})
 
-	res, err := handler.handleConfigDetail(db, host, &detailJSON)
+	res, err := handler.handleConfigDetail(db, host, detailJSON)
 	assert.NoError(t, err)
 	assert.Equal(t, expectQueries, res)
 
 }
 
-func marshalRawMessage(t *testing.T, obj interface{}) *json.RawMessage {
+func marshalRawMessage(t *testing.T, obj interface{}) json.RawMessage {
 	objBytes, err := json.Marshal(obj)
 	assert.NoError(t, err)
 	objJSON := json.RawMessage(objBytes)
-	return &objJSON
+	return objJSON
 }
 
 func TestHandleConfigDetailError(t *testing.T) {
@@ -980,7 +980,7 @@ func TestHandleConfigDetailError(t *testing.T) {
 			assert.WithinDuration(t, expectCutoff, cutoff, allowedDelta)
 		})
 
-	res, err := handler.handleConfigDetail(db, host, &detailJSON)
+	res, err := handler.handleConfigDetail(db, host, detailJSON)
 	assert.Error(t, err)
 	assert.Nil(t, res)
 

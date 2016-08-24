@@ -161,12 +161,12 @@ func OsqueryEnroll(c *gin.Context) {
 		})
 }
 
-func (h *OsqueryHandler) handleConfigDetail(db kolide.OsqueryStore, host *kolide.Host, data *json.RawMessage) (map[string]string, error) {
+func (h *OsqueryHandler) handleConfigDetail(db kolide.OsqueryStore, host *kolide.Host, data json.RawMessage) (map[string]string, error) {
 	var detail OsqueryConfigDetail
-	if err := json.Unmarshal(*data, &detail); err != nil {
+	if err := json.Unmarshal(data, &detail); err != nil {
 		return nil, errors.NewFromError(err, http.StatusBadRequest, "JSON parse error")
 	}
-	if err := ValidateStruct(&detail); err != nil {
+	if err := validateStruct(&detail); err != nil {
 		return nil, err
 	}
 
@@ -181,12 +181,12 @@ func (h *OsqueryHandler) handleConfigDetail(db kolide.OsqueryStore, host *kolide
 	return kolide.LabelQueriesForHost(db, host, h.LabelQueryInterval)
 }
 
-func (h *OsqueryHandler) handleConfigQueryResults(db kolide.OsqueryStore, host *kolide.Host, data *json.RawMessage) error {
+func (h *OsqueryHandler) handleConfigQueryResults(db kolide.OsqueryStore, host *kolide.Host, data json.RawMessage) error {
 	var results OsqueryConfigQueryResults
-	if err := json.Unmarshal(*data, &results); err != nil {
+	if err := json.Unmarshal(data, &results); err != nil {
 		return errors.NewFromError(err, http.StatusBadRequest, "JSON parse error")
 	}
-	if err := ValidateStruct(&results); err != nil {
+	if err := validateStruct(&results); err != nil {
 		return err
 	}
 
@@ -210,17 +210,23 @@ func (h *OsqueryHandler) OsqueryConfig(c *gin.Context) {
 		return
 	}
 
+	if body.Data == nil {
+		errors.ReturnOsqueryError(c,
+			errors.New("Missing body data", "Got nil pointer for data in config"),
+		)
+	}
+
 	var res map[string]string
 	switch body.Action {
 	case "request":
-		res, err = h.handleConfigDetail(db, host, body.Data)
+		res, err = h.handleConfigDetail(db, host, *body.Data)
 		if err != nil {
 			c.JSON(http.StatusOK, res)
 			return
 		}
 
 	case "results":
-		err = h.handleConfigQueryResults(db, host, body.Data)
+		err = h.handleConfigQueryResults(db, host, *body.Data)
 		// Now we should be able to calculate the appropriate config
 
 	default:
@@ -240,9 +246,9 @@ func (h *OsqueryHandler) OsqueryConfig(c *gin.Context) {
 }
 
 // Unmarshal the status logs before sending them to the status log handler
-func (h *OsqueryHandler) handleStatusLogs(data *json.RawMessage, nodeKey string) error {
+func (h *OsqueryHandler) handleStatusLogs(data json.RawMessage, nodeKey string) error {
 	var statuses []OsqueryStatusLog
-	if err := json.Unmarshal(*data, &statuses); err != nil {
+	if err := json.Unmarshal(data, &statuses); err != nil {
 		return errors.NewFromError(err, http.StatusBadRequest, "JSON parse error")
 	}
 	// Perhaps we should validate the unmarshalled status log
@@ -258,9 +264,9 @@ func (h *OsqueryHandler) handleStatusLogs(data *json.RawMessage, nodeKey string)
 }
 
 // Unmarshal the result logs before sending them to the result log handler
-func (h *OsqueryHandler) handleResultLogs(data *json.RawMessage, nodeKey string) error {
+func (h *OsqueryHandler) handleResultLogs(data json.RawMessage, nodeKey string) error {
 	var results []OsqueryResultLog
-	if err := json.Unmarshal(*data, &results); err != nil {
+	if err := json.Unmarshal(data, &results); err != nil {
 		return errors.NewFromError(err, http.StatusBadRequest, "JSON parse error")
 	}
 	// Perhaps we should validate the unmarshalled result log
@@ -292,12 +298,18 @@ func (h *OsqueryHandler) OsqueryLog(c *gin.Context) {
 		return
 	}
 
+	if body.Data == nil {
+		errors.ReturnOsqueryError(c,
+			errors.New("Missing body data", "Got nil pointer for data in log"),
+		)
+	}
+
 	switch body.LogType {
 	case "status":
-		err = h.handleStatusLogs(body.Data, body.NodeKey)
+		err = h.handleStatusLogs(*body.Data, body.NodeKey)
 
 	case "result":
-		err = h.handleResultLogs(body.Data, body.NodeKey)
+		err = h.handleResultLogs(*body.Data, body.NodeKey)
 
 	default:
 		err = errors.NewWithStatus(
