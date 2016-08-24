@@ -674,7 +674,7 @@ type GetPackResponseBody struct {
 	ID       uint                   `json:"id"`
 	Name     string                 `json:"name"`
 	Platform string                 `json:"platform"`
-	Queries  []GetQueryResponseBody `json:queries`
+	Queries  []GetQueryResponseBody `json:"queries"`
 }
 
 // swagger:route GET /api/v1/kolide/pack/:id
