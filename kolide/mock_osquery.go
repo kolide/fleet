@@ -102,6 +102,48 @@ func (_mr *_MockOsqueryStoreRecorder) NewQuery(arg0 interface{}) *gomock.Call {
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "NewQuery", arg0)
 }
 
+func (_m *MockOsqueryStore) SaveQuery(query *Query) error {
+	ret := _m.ctrl.Call(_m, "SaveQuery", query)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+func (_mr *_MockOsqueryStoreRecorder) SaveQuery(arg0 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "SaveQuery", arg0)
+}
+
+func (_m *MockOsqueryStore) DeleteQuery(query *Query) error {
+	ret := _m.ctrl.Call(_m, "DeleteQuery", query)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+func (_mr *_MockOsqueryStoreRecorder) DeleteQuery(arg0 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "DeleteQuery", arg0)
+}
+
+func (_m *MockOsqueryStore) Query(id uint) (*Query, error) {
+	ret := _m.ctrl.Call(_m, "Query", id)
+	ret0, _ := ret[0].(*Query)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+func (_mr *_MockOsqueryStoreRecorder) Query(arg0 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "Query", arg0)
+}
+
+func (_m *MockOsqueryStore) Queries() ([]*Query, error) {
+	ret := _m.ctrl.Call(_m, "Queries")
+	ret0, _ := ret[0].([]*Query)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+func (_mr *_MockOsqueryStoreRecorder) Queries() *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "Queries")
+}
+
 func (_m *MockOsqueryStore) NewLabel(label *Label) error {
 	ret := _m.ctrl.Call(_m, "NewLabel", label)
 	ret0, _ := ret[0].(error)
@@ -110,4 +152,87 @@ func (_m *MockOsqueryStore) NewLabel(label *Label) error {
 
 func (_mr *_MockOsqueryStoreRecorder) NewLabel(arg0 interface{}) *gomock.Call {
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "NewLabel", arg0)
+}
+
+func (_m *MockOsqueryStore) NewPack(pack *Pack) error {
+	ret := _m.ctrl.Call(_m, "NewPack", pack)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+func (_mr *_MockOsqueryStoreRecorder) NewPack(arg0 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "NewPack", arg0)
+}
+
+func (_m *MockOsqueryStore) SavePack(pack *Pack) error {
+	ret := _m.ctrl.Call(_m, "SavePack", pack)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+func (_mr *_MockOsqueryStoreRecorder) SavePack(arg0 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "SavePack", arg0)
+}
+
+func (_m *MockOsqueryStore) DeletePack(pack *Pack) error {
+	ret := _m.ctrl.Call(_m, "DeletePack", pack)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+func (_mr *_MockOsqueryStoreRecorder) DeletePack(arg0 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "DeletePack", arg0)
+}
+
+func (_m *MockOsqueryStore) Pack(id uint) (*Pack, error) {
+	ret := _m.ctrl.Call(_m, "Pack", id)
+	ret0, _ := ret[0].(*Pack)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+func (_mr *_MockOsqueryStoreRecorder) Pack(arg0 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "Pack", arg0)
+}
+
+func (_m *MockOsqueryStore) Packs() ([]*Pack, error) {
+	ret := _m.ctrl.Call(_m, "Packs")
+	ret0, _ := ret[0].([]*Pack)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+func (_mr *_MockOsqueryStoreRecorder) Packs() *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "Packs")
+}
+
+func (_m *MockOsqueryStore) AddQueryToPack(query *Query, pack *Pack) error {
+	ret := _m.ctrl.Call(_m, "AddQueryToPack", query, pack)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+func (_mr *_MockOsqueryStoreRecorder) AddQueryToPack(arg0, arg1 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "AddQueryToPack", arg0, arg1)
+}
+
+func (_m *MockOsqueryStore) GetQueriesInPack(pack *Pack) ([]*Query, error) {
+	ret := _m.ctrl.Call(_m, "GetQueriesInPack", pack)
+	ret0, _ := ret[0].([]*Query)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+func (_mr *_MockOsqueryStoreRecorder) GetQueriesInPack(arg0 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "GetQueriesInPack", arg0)
+}
+
+func (_m *MockOsqueryStore) RemoveQueryFromPack(query *Query, pack *Pack) error {
+	ret := _m.ctrl.Call(_m, "RemoveQueryFromPack", query, pack)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+func (_mr *_MockOsqueryStoreRecorder) RemoveQueryFromPack(arg0, arg1 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "RemoveQueryFromPack", arg0, arg1)
 }
