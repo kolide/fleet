@@ -161,27 +161,6 @@ func OsqueryEnroll(c *gin.Context) {
 		})
 }
 
-// func OsqueryConfig(c *gin.Context) {
-// 	var body OsqueryConfigPostBody
-// 	err := ParseAndValidateJSON(c, &body)
-// 	if err != nil {
-// 		errors.ReturnOsqueryError(c, err)
-// 		return
-// 	}
-// 	logrus.Debugf("OsqueryConfig: %s", body.NodeKey)
-
-// 	c.JSON(http.StatusOK,
-// 		gin.H{
-// 			"schedule": map[string]map[string]interface{}{
-// 				"time": {
-// 					"query":    "select * from time;",
-// 					"interval": 1,
-// 				},
-// 			},
-// 			"node_invalid": false,
-// 		})
-// }
-
 func (h *OsqueryHandler) handleConfigDetail(db kolide.OsqueryStore, host *kolide.Host, data *json.RawMessage) (map[string]string, error) {
 	var detail OsqueryConfigDetail
 	if err := json.Unmarshal(*data, &detail); err != nil {
