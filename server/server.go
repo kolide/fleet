@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/Sirupsen/logrus"
@@ -100,6 +101,15 @@ func ParseAndValidateJSON(c *gin.Context, obj interface{}) error {
 	}
 
 	return validate.Struct(obj)
+}
+
+func ParseAndValidateUrlID(c *gin.Context, name string) (uint, error) {
+	id, err := strconv.ParseUint(c.Param(name), 10, 64)
+	if err != nil {
+		// TODO change to http.StatusUnprocessableEntity when it's available
+		return 0, errors.NewWithStatus(422, "Invalid ID", "Query ID was not a uint")
+	}
+	return uint(id), nil
 }
 
 func NotFound(c *gin.Context) {

@@ -71,7 +71,7 @@ func createTestPacksAndQueries(t *testing.T, ds datastore.Datastore) datastore.D
 	assert.Nil(t, err)
 
 	query1 := &kolide.Query{
-		Name: "query1",
+		Name:  "query1",
 		Query: "select * from time;",
 	}
 	err = ds.NewQuery(query1)

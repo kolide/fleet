@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/Sirupsen/logrus"
@@ -360,20 +359,20 @@ type GetQueryResponseBody struct {
 //     Responses:
 //       200: GetQueryResponseBody
 func GetQuery(c *gin.Context) {
+	id, err := ParseAndValidateUrlID(c, "id")
+	if err != nil {
+		errors.ReturnError(c, err)
+		return
+	}
+
 	vc := VC(c)
 	if !vc.CanPerformActions() {
 		UnauthorizedError(c)
 		return
 	}
 
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	if err != nil {
-		errors.NewWithStatus(http.StatusBadRequest, "Invalid ID", "Query ID was not a uint")
-		return
-	}
-
 	ds := GetDB(c)
-	query, err := ds.Query(uint(id))
+	query, err := ds.Query(id)
 	if err != nil {
 		errors.ReturnError(c, err)
 		return
@@ -502,6 +501,11 @@ func ModifyQuery(c *gin.Context) {
 		errors.ReturnError(c, err)
 		return
 	}
+	id, err := ParseAndValidateUrlID(c, "id")
+	if err != nil {
+		errors.ReturnError(c, err)
+		return
+	}
 
 	vc := VC(c)
 	if !vc.CanPerformActions() {
@@ -509,14 +513,8 @@ func ModifyQuery(c *gin.Context) {
 		return
 	}
 
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	if err != nil {
-		errors.NewWithStatus(http.StatusBadRequest, "Invalid ID", "Query ID was not a uint")
-		return
-	}
-
 	ds := GetDB(c)
-	query, err := ds.Query(uint(id))
+	query, err := ds.Query(id)
 	if err != nil {
 		errors.ReturnError(c, err)
 		return
@@ -588,20 +586,20 @@ func ModifyQuery(c *gin.Context) {
 //     Responses:
 //       200: nil
 func DeleteQuery(c *gin.Context) {
+	id, err := ParseAndValidateUrlID(c, "id")
+	if err != nil {
+		errors.ReturnError(c, err)
+		return
+	}
+
 	vc := VC(c)
 	if !vc.CanPerformActions() {
 		UnauthorizedError(c)
 		return
 	}
 
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	if err != nil {
-		errors.NewWithStatus(http.StatusBadRequest, "Invalid ID", "Query ID was not a uint")
-		return
-	}
-
 	ds := GetDB(c)
-	query, err := ds.Query(uint(id))
+	query, err := ds.Query(id)
 	if err != nil {
 		errors.ReturnError(c, err)
 		return
@@ -698,20 +696,20 @@ type GetPackResponseBody struct {
 //     Responses:
 //       200: GetPackResponseBody
 func GetPack(c *gin.Context) {
+	id, err := ParseAndValidateUrlID(c, "id")
+	if err != nil {
+		errors.ReturnError(c, err)
+		return
+	}
+
 	vc := VC(c)
 	if !vc.CanPerformActions() {
 		UnauthorizedError(c)
 		return
 	}
 
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	if err != nil {
-		errors.NewWithStatus(http.StatusBadRequest, "Invalid ID", "Pack ID was not a uint")
-		return
-	}
-
 	ds := GetDB(c)
-	pack, err := ds.Pack(uint(id))
+	pack, err := ds.Pack(id)
 	if err != nil {
 		errors.ReturnError(c, err)
 		return
@@ -835,16 +833,15 @@ func ModifyPack(c *gin.Context) {
 		errors.ReturnError(c, err)
 		return
 	}
+	id, err := ParseAndValidateUrlID(c, "id")
+	if err != nil {
+		errors.ReturnError(c, err)
+		return
+	}
 
 	vc := VC(c)
 	if !vc.CanPerformActions() {
 		UnauthorizedError(c)
-		return
-	}
-
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	if err != nil {
-		errors.NewWithStatus(http.StatusBadRequest, "Invalid ID", "Pack ID was not a uint")
 		return
 	}
 
@@ -896,15 +893,15 @@ func ModifyPack(c *gin.Context) {
 //     Responses:
 //       200: GetPackResponseBody
 func DeletePack(c *gin.Context) {
-	vc := VC(c)
-	if !vc.CanPerformActions() {
-		UnauthorizedError(c)
+	id, err := ParseAndValidateUrlID(c, "id")
+	if err != nil {
+		errors.ReturnError(c, err)
 		return
 	}
 
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	if err != nil {
-		errors.NewWithStatus(http.StatusBadRequest, "Invalid ID", "Query ID was not a uint")
+	vc := VC(c)
+	if !vc.CanPerformActions() {
+		UnauthorizedError(c)
 		return
 	}
 
@@ -945,33 +942,31 @@ func DeletePack(c *gin.Context) {
 //     Responses:
 //       200: nil
 func AddQueryToPack(c *gin.Context) {
+	packID, err := ParseAndValidateUrlID(c, "pid")
+	if err != nil {
+		errors.ReturnError(c, err)
+		return
+	}
+	queryID, err := ParseAndValidateUrlID(c, "qid")
+	if err != nil {
+		errors.ReturnError(c, err)
+		return
+	}
+
 	vc := VC(c)
 	if !vc.CanPerformActions() {
 		UnauthorizedError(c)
 		return
 	}
 
-	packID, err := strconv.ParseUint(c.Param("pid"), 10, 64)
-	if err != nil {
-		errors.NewWithStatus(http.StatusBadRequest, "Invalid ID", "Pack ID was not a uint")
-		return
-	}
-
-	queryID, err := strconv.ParseUint(c.Param("qid"), 10, 64)
-	if err != nil {
-		errors.NewWithStatus(http.StatusBadRequest, "Invalid ID", "Query ID was not a uint")
-		return
-	}
-
 	ds := GetDB(c)
-
-	pack, err := ds.Pack(uint(packID))
+	pack, err := ds.Pack(packID)
 	if err != nil {
 		errors.ReturnError(c, err)
 		return
 	}
 
-	query, err := ds.Query(uint(queryID))
+	query, err := ds.Query(queryID)
 	if err != nil {
 		errors.ReturnError(c, err)
 		return
@@ -1007,26 +1002,24 @@ func AddQueryToPack(c *gin.Context) {
 //     Responses:
 //       200: GetPackResponseBody
 func DeleteQueryFromPack(c *gin.Context) {
+	packID, err := ParseAndValidateUrlID(c, "pid")
+	if err != nil {
+		errors.ReturnError(c, err)
+		return
+	}
+	queryID, err := ParseAndValidateUrlID(c, "qid")
+	if err != nil {
+		errors.ReturnError(c, err)
+		return
+	}
+
 	vc := VC(c)
 	if !vc.CanPerformActions() {
 		UnauthorizedError(c)
 		return
 	}
 
-	packID, err := strconv.ParseUint(c.Param("pid"), 10, 64)
-	if err != nil {
-		errors.NewWithStatus(http.StatusBadRequest, "Invalid ID", "Pack ID was not a uint")
-		return
-	}
-
-	queryID, err := strconv.ParseUint(c.Param("qid"), 10, 64)
-	if err != nil {
-		errors.NewWithStatus(http.StatusBadRequest, "Invalid ID", "Query ID was not a uint")
-		return
-	}
-
 	ds := GetDB(c)
-
 	pack, err := ds.Pack(uint(packID))
 	if err != nil {
 		errors.ReturnError(c, err)
