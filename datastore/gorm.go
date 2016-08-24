@@ -601,7 +601,7 @@ func (orm gormDB) AddQueryToPack(query *kolide.Query, pack *kolide.Pack) error {
 func (orm gormDB) GetQueriesInPack(pack *kolide.Pack) ([]*kolide.Query, error) {
 	var queries []*kolide.Query
 	if pack == nil {
-		return queries, errors.New(
+		return nil, errors.New(
 			"error getting queries in pack",
 			"nil pointer passed to GetQueriesInPack",
 		)
@@ -648,7 +648,7 @@ AND
 			&query.Version,
 		)
 		if err != nil {
-			return queries, err
+			return nil, err
 		}
 		queries = append(queries, query)
 	}

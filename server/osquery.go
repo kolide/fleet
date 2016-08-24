@@ -318,7 +318,7 @@ func GetAllQueries(c *gin.Context) {
 	ds := GetDB(c)
 	queries, err := ds.Queries()
 	if err != nil {
-		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		errors.ReturnError(c, err)
 		return
 	}
 
@@ -375,7 +375,7 @@ func GetQuery(c *gin.Context) {
 	ds := GetDB(c)
 	query, err := ds.Query(uint(id))
 	if err != nil {
-		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		errors.ReturnError(c, err)
 		return
 	}
 
@@ -448,7 +448,7 @@ func CreateQuery(c *gin.Context) {
 	ds := GetDB(c)
 	err = ds.NewQuery(query)
 	if err != nil {
-		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		errors.ReturnError(c, err)
 		return
 	}
 
@@ -518,7 +518,7 @@ func ModifyQuery(c *gin.Context) {
 	ds := GetDB(c)
 	query, err := ds.Query(uint(id))
 	if err != nil {
-		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		errors.ReturnError(c, err)
 		return
 	}
 
@@ -552,7 +552,7 @@ func ModifyQuery(c *gin.Context) {
 
 	err = ds.SaveQuery(query)
 	if err != nil {
-		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		errors.ReturnError(c, err)
 		return
 	}
 
@@ -603,17 +603,17 @@ func DeleteQuery(c *gin.Context) {
 	ds := GetDB(c)
 	query, err := ds.Query(uint(id))
 	if err != nil {
-		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		errors.ReturnError(c, err)
 		return
 	}
 
 	err = ds.DeleteQuery(query)
 	if err != nil {
-		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		errors.ReturnError(c, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, nil)
+	c.JSON(http.StatusNoContent, nil)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -655,7 +655,7 @@ func GetAllPacks(c *gin.Context) {
 	ds := GetDB(c)
 	packs, err := ds.Packs()
 	if err != nil {
-		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		errors.ReturnError(c, err)
 		return
 	}
 
@@ -713,13 +713,13 @@ func GetPack(c *gin.Context) {
 	ds := GetDB(c)
 	pack, err := ds.Pack(uint(id))
 	if err != nil {
-		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		errors.ReturnError(c, err)
 		return
 	}
 
 	queries, err := ds.GetQueriesInPack(pack)
 	if err != nil {
-		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		errors.ReturnError(c, err)
 		return
 	}
 
@@ -791,7 +791,7 @@ func CreatePack(c *gin.Context) {
 	}
 	err = ds.NewPack(pack)
 	if err != nil {
-		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		errors.ReturnError(c, err)
 		return
 	}
 
@@ -851,7 +851,7 @@ func ModifyPack(c *gin.Context) {
 	ds := GetDB(c)
 	pack, err := ds.Pack(uint(id))
 	if err != nil {
-		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		errors.ReturnError(c, err)
 		return
 	}
 
@@ -865,7 +865,7 @@ func ModifyPack(c *gin.Context) {
 
 	err = ds.SavePack(pack)
 	if err != nil {
-		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		errors.ReturnError(c, err)
 		return
 	}
 
@@ -911,17 +911,17 @@ func DeletePack(c *gin.Context) {
 	ds := GetDB(c)
 	pack, err := ds.Pack(uint(id))
 	if err != nil {
-		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		errors.ReturnError(c, err)
 		return
 	}
 
 	err = ds.DeletePack(pack)
 	if err != nil {
-		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		errors.ReturnError(c, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, nil)
+	c.JSON(http.StatusNoContent, nil)
 }
 
 // swagger:route PUT /api/v1/kolide/packs/:pid/queries/:qid
@@ -967,23 +967,23 @@ func AddQueryToPack(c *gin.Context) {
 
 	pack, err := ds.Pack(uint(packID))
 	if err != nil {
-		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		errors.ReturnError(c, err)
 		return
 	}
 
 	query, err := ds.Query(uint(queryID))
 	if err != nil {
-		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		errors.ReturnError(c, err)
 		return
 	}
 
 	err = ds.AddQueryToPack(query, pack)
 	if err != nil {
-		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		errors.ReturnError(c, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, nil)
+	c.JSON(http.StatusNoContent, nil)
 }
 
 // swagger:route DELETE /api/v1/kolide/packs/:pid/queries/:qid
@@ -1029,21 +1029,21 @@ func DeleteQueryFromPack(c *gin.Context) {
 
 	pack, err := ds.Pack(uint(packID))
 	if err != nil {
-		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		errors.ReturnError(c, err)
 		return
 	}
 
 	query, err := ds.Query(uint(queryID))
 	if err != nil {
-		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		errors.ReturnError(c, err)
 		return
 	}
 
 	err = ds.RemoveQueryFromPack(query, pack)
 	if err != nil {
-		errors.ReturnError(c, errors.NewFromError(err, http.StatusInternalServerError, "Database error"))
+		errors.ReturnError(c, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, nil)
+	c.JSON(http.StatusNoContent, nil)
 }

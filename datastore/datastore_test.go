@@ -524,7 +524,7 @@ func testSaveQuery(t *testing.T, ds Datastore) {
 	}
 	err := ds.SaveQuery(&query)
 	assert.Nil(t, err)
-	assert.NotEqual(t, query.ID, 0)
+	assert.NotEqual(t, 0, query.ID)
 
 	query.Query = "baz"
 	err = ds.SaveQuery(&query)
@@ -532,7 +532,7 @@ func testSaveQuery(t *testing.T, ds Datastore) {
 
 	queryVerify, err := ds.Query(query.ID)
 	assert.Nil(t, err)
-	assert.Equal(t, queryVerify.Query, "baz")
+	assert.Equal(t, "baz", queryVerify.Query)
 }
 
 func testDeleteQuery(t *testing.T, ds Datastore) {

@@ -338,7 +338,7 @@ func TestDeleteQuery(t *testing.T) {
 		nil,
 		userCookie,
 	)
-	assert.Equal(t, http.StatusOK, response.Code)
+	assert.Equal(t, http.StatusNoContent, response.Code)
 
 	// ensure result was persisted to the database
 	query, err = ds.Query(query.ID)
@@ -659,7 +659,7 @@ func TestDeletePack(t *testing.T) {
 		nil,
 		userCookie,
 	)
-	assert.Equal(t, http.StatusOK, response.Code)
+	assert.Equal(t, http.StatusNoContent, response.Code)
 
 	// ensure result was persisted to the database
 	pack, err = ds.Pack(pack.ID)
@@ -737,7 +737,7 @@ func TestAddQueryToPack(t *testing.T) {
 		nil,
 		userCookie,
 	)
-	assert.Equal(t, http.StatusOK, response.Code)
+	assert.Equal(t, http.StatusNoContent, response.Code)
 
 	////////////////////////////////////////////////////////////////////////////
 	// verify the number of queries in pack
@@ -823,7 +823,7 @@ func TestDeleteQueryFromPack(t *testing.T) {
 		nil,
 		userCookie,
 	)
-	assert.Equal(t, http.StatusOK, response.Code)
+	assert.Equal(t, http.StatusNoContent, response.Code)
 
 	////////////////////////////////////////////////////////////////////////////
 	// verify the number of queries in pack
