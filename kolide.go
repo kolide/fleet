@@ -174,9 +174,25 @@ $7777777....$....$777$.....+DI..DDD..DDI...8D...D8......$D:..8D....8D...8D......
 			)
 		}
 
-		ds, err := datastore.New("gorm-mysql", connString)
-		if err != nil {
-			logrus.WithError(err).Fatal("error creating db connection")
+		var ds datastore.Datastore
+		{
+			// session config
+			sessionLifespan := viper.GetFloat64("session.expiration_seconds")
+			sessionKeySize := viper.GetInt("session.key_size")
+
+			opts := []datastore.DBOption{
+				datastore.SessionLifespan(sessionLifespan),
+				datastore.SessionKeySize(sessionKeySize),
+			}
+
+			ds, err = datastore.New(
+				"gorm-mysql",
+				connString,
+				opts...,
+			)
+			if err != nil {
+				logrus.WithError(err).Fatal("error creating db connection")
+			}
 		}
 
 		handler := server.CreateServer(
