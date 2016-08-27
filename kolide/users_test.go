@@ -13,10 +13,13 @@ func TestValidatePassword(t *testing.T) {
 	}
 
 	for _, tt := range passwordTests {
-		user, err := NewUser(tt.Username, tt.Password, tt.Email, tt.Admin, tt.PasswordReset)
-		if err != nil {
-			t.Fatalf("error creating new user: %s", err)
+		user := &User{
+			Username:           tt.Username,
+			Email:              tt.Email,
+			Admin:              tt.Admin,
+			NeedsPasswordReset: tt.PasswordReset,
 		}
+		user.setPassword(tt.Password, 60, 10)
 
 		{
 			err := user.ValidatePassword(tt.Password)

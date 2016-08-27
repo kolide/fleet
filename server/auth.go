@@ -158,7 +158,6 @@ func Login(c *gin.Context) {
 	}
 
 	db := GetDB(c)
-
 	user, err := db.User(body.Username)
 	if err != nil {
 		logrus.Debugf("User not found: %s", body.Username)

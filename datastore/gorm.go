@@ -9,13 +9,18 @@ import (
 	"strings"
 	"time"
 
+	stderr "errors"
+
 	_ "github.com/go-sql-driver/mysql" // db driver
 	_ "github.com/mattn/go-sqlite3"    // db driver
 
 	"github.com/jinzhu/gorm"
 	"github.com/kolide/kolide-ose/errors"
 	"github.com/kolide/kolide-ose/kolide"
-	"github.com/spf13/viper"
+)
+
+var (
+	ErrNotFound = stderr.New("resource not found")
 )
 
 var tables = [...]interface{}{
@@ -37,8 +42,10 @@ var tables = [...]interface{}{
 }
 
 type gormDB struct {
-	DB     *gorm.DB
-	Driver string
+	DB              *gorm.DB
+	Driver          string
+	sessionKeySize  int
+	sessionLifespan float64
 }
 
 func (orm gormDB) Name() string {
@@ -87,41 +94,6 @@ func openGORM(driver, conn string, maxAttempts int) (*gorm.DB, error) {
 		return nil, fmt.Errorf("failed to connect to mysql backend, err = %v", err)
 	}
 	return db, nil
-}
-
-// NewUser creates a new user in the gorm backend
-func (orm gormDB) NewUser(user *kolide.User) (*kolide.User, error) {
-	err := orm.DB.Create(user).Error
-	if err != nil {
-		return nil, err
-	}
-	return user, nil
-}
-
-// User returns a specific user in the gorm backend
-func (orm gormDB) User(username string) (*kolide.User, error) {
-	user := &kolide.User{
-		Username: username,
-	}
-	err := orm.DB.Where("username = ?", username).First(user).Error
-	if err != nil {
-		return nil, err
-	}
-	return user, nil
-}
-
-// UserByID returns a datastore user given a user ID
-func (orm gormDB) UserByID(id uint) (*kolide.User, error) {
-	user := &kolide.User{ID: id}
-	err := orm.DB.Where(user).First(user).Error
-	if err != nil {
-		return nil, err
-	}
-	return user, nil
-}
-
-func (orm gormDB) SaveUser(user *kolide.User) error {
-	return orm.DB.Save(user).Error
 }
 
 func generateRandomText(keySize int) (string, error) {
@@ -273,11 +245,10 @@ func (orm gormDB) FindPassswordResetByTokenAndUserID(token string, userID uint) 
 }
 
 func (orm gormDB) validateSession(session *kolide.Session) error {
-	sessionLifeSpan := viper.GetFloat64("session.expiration_seconds")
-	if sessionLifeSpan == 0 {
+	if orm.sessionLifespan == 0 {
 		return nil
 	}
-	if time.Since(session.AccessedAt).Seconds() >= sessionLifeSpan {
+	if time.Since(session.AccessedAt).Seconds() >= orm.sessionLifespan {
 		err := orm.DB.Delete(session).Error
 		if err != nil {
 			return err
@@ -336,7 +307,6 @@ func (orm gormDB) FindSessionByKey(key string) (*kolide.Session, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return session, nil
 }
 
@@ -347,11 +317,7 @@ func (orm gormDB) FindAllSessionsForUser(id uint) ([]*kolide.Session, error) {
 }
 
 func (orm gormDB) CreateSessionForUserID(userID uint) (*kolide.Session, error) {
-	sessionKeySize := viper.GetInt("session.key_size")
-	if sessionKeySize == 0 {
-		sessionKeySize = 24
-	}
-	key := make([]byte, sessionKeySize)
+	key := make([]byte, orm.sessionKeySize)
 	_, err := rand.Read(key)
 	if err != nil {
 		return nil, err
@@ -510,9 +476,9 @@ func (orm gormDB) RecordLabelQueryExecutions(host *kolide.Host, results map[stri
 
 	// Build up all the values and the query string
 	vals := []interface{}{}
-	for labelId, res := range results {
+	for labelID, res := range results {
 		insert.WriteString("(?,?,?,?),")
-		vals = append(vals, t, res, labelId, host.ID)
+		vals = append(vals, t, res, labelID, host.ID)
 	}
 
 	queryString := insert.String()
