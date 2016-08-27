@@ -1,5 +1,7 @@
 package kolide
 
+import "errors"
+
 // UserService has methods for working with users
 type UserService interface {
 	UserStore
@@ -7,6 +9,9 @@ type UserService interface {
 }
 
 func (svc service) NewUser(user *User) (*User, error) {
+	if user.Password == nil {
+		return nil, errors.New("user password not set")
+	}
 	err := user.setPassword(string(user.Password), svc.saltKeySize, svc.bcryptCost)
 	if err != nil {
 		return nil, err
