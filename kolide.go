@@ -17,6 +17,7 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/jordan-wright/email"
 	"github.com/kolide/kolide-ose/datastore"
+	"github.com/kolide/kolide-ose/kolide"
 	"github.com/kolide/kolide-ose/server"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -174,7 +175,7 @@ $7777777....$....$777$.....+DI..DDD..DDI...8D...D8......$D:..8D....8D...8D......
 			)
 		}
 
-		var ds datastore.Datastore
+		var ds kolide.Datastore
 		{
 			// session config
 			sessionLifespan := viper.GetFloat64("session.expiration_seconds")

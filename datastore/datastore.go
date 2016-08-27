@@ -6,20 +6,9 @@ import (
 	"github.com/kolide/kolide-ose/kolide"
 )
 
-// Datastore combines all the interfaces in the Kolide DAL
-type Datastore interface {
-	kolide.UserStore
-	kolide.OsqueryStore
-	kolide.EmailStore
-	kolide.SessionStore
-	Name() string
-	Drop() error
-	Migrate() error
-}
-
 // New creates a Datastore with a database connection
 // Use DBOption to pass optional arguments
-func New(driver, conn string, opts ...DBOption) (Datastore, error) {
+func New(driver, conn string, opts ...DBOption) (kolide.Datastore, error) {
 	opt := &dbOptions{
 		// configure defaults
 		maxAttempts:     defaultMaxAttempts,
@@ -43,12 +32,17 @@ func New(driver, conn string, opts ...DBOption) (Datastore, error) {
 		if err != nil {
 			return nil, errors.DatabaseError(err)
 		}
+		ds := gormDB{
+			DB:              db,
+			Driver:          "mysql",
+			sessionKeySize:  opt.sessionKeySize,
+			sessionLifespan: opt.sessionLifespan,
+		}
 		// configure logger
 		if opt.logger != nil {
 			db.SetLogger(opt.logger)
 			db.LogMode(opt.debug)
 		}
-		ds := gormDB{DB: db, Driver: "mysql"}
 		if err := ds.Migrate(); err != nil {
 			return nil, errors.DatabaseError(err)
 		}

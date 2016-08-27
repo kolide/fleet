@@ -448,7 +448,7 @@ type GetQueryResponseBody struct {
 //     Responses:
 //       200: GetQueryResponseBody
 func GetQuery(c *gin.Context) {
-	id, err := ParseAndValidateUrlID(c, "id")
+	id, err := ParseAndValidateURLID(c, "id")
 	if err != nil {
 		errors.ReturnError(c, err)
 		return
@@ -590,7 +590,7 @@ func ModifyQuery(c *gin.Context) {
 		errors.ReturnError(c, err)
 		return
 	}
-	id, err := ParseAndValidateUrlID(c, "id")
+	id, err := ParseAndValidateURLID(c, "id")
 	if err != nil {
 		errors.ReturnError(c, err)
 		return
@@ -675,7 +675,7 @@ func ModifyQuery(c *gin.Context) {
 //     Responses:
 //       200: nil
 func DeleteQuery(c *gin.Context) {
-	id, err := ParseAndValidateUrlID(c, "id")
+	id, err := ParseAndValidateURLID(c, "id")
 	if err != nil {
 		errors.ReturnError(c, err)
 		return
@@ -785,7 +785,7 @@ type GetPackResponseBody struct {
 //     Responses:
 //       200: GetPackResponseBody
 func GetPack(c *gin.Context) {
-	id, err := ParseAndValidateUrlID(c, "id")
+	id, err := ParseAndValidateURLID(c, "id")
 	if err != nil {
 		errors.ReturnError(c, err)
 		return
@@ -922,7 +922,7 @@ func ModifyPack(c *gin.Context) {
 		errors.ReturnError(c, err)
 		return
 	}
-	id, err := ParseAndValidateUrlID(c, "id")
+	id, err := ParseAndValidateURLID(c, "id")
 	if err != nil {
 		errors.ReturnError(c, err)
 		return
@@ -982,7 +982,7 @@ func ModifyPack(c *gin.Context) {
 //     Responses:
 //       200: GetPackResponseBody
 func DeletePack(c *gin.Context) {
-	id, err := ParseAndValidateUrlID(c, "id")
+	id, err := ParseAndValidateURLID(c, "id")
 	if err != nil {
 		errors.ReturnError(c, err)
 		return
@@ -1031,12 +1031,12 @@ func DeletePack(c *gin.Context) {
 //     Responses:
 //       200: nil
 func AddQueryToPack(c *gin.Context) {
-	packID, err := ParseAndValidateUrlID(c, "pid")
+	packID, err := ParseAndValidateURLID(c, "pid")
 	if err != nil {
 		errors.ReturnError(c, err)
 		return
 	}
-	queryID, err := ParseAndValidateUrlID(c, "qid")
+	queryID, err := ParseAndValidateURLID(c, "qid")
 	if err != nil {
 		errors.ReturnError(c, err)
 		return
@@ -1091,12 +1091,12 @@ func AddQueryToPack(c *gin.Context) {
 //     Responses:
 //       200: GetPackResponseBody
 func DeleteQueryFromPack(c *gin.Context) {
-	packID, err := ParseAndValidateUrlID(c, "pid")
+	packID, err := ParseAndValidateURLID(c, "pid")
 	if err != nil {
 		errors.ReturnError(c, err)
 		return
 	}
-	queryID, err := ParseAndValidateUrlID(c, "qid")
+	queryID, err := ParseAndValidateURLID(c, "qid")
 	if err != nil {
 		errors.ReturnError(c, err)
 		return

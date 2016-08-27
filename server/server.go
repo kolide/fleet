@@ -12,7 +12,6 @@ import (
 	"github.com/gin-gonic/contrib/ginrus"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
-	"github.com/kolide/kolide-ose/datastore"
 	"github.com/kolide/kolide-ose/errors"
 	"github.com/kolide/kolide-ose/kolide"
 	"github.com/spf13/viper"
@@ -28,11 +27,13 @@ func init() {
 	}
 }
 
+// GetSMTPConnectionPool ...
 // Get the SMTP connection pool from the context, or panic
 func GetSMTPConnectionPool(c *gin.Context) kolide.SMTPConnectionPool {
 	return c.MustGet("SMTPConnectionPool").(kolide.SMTPConnectionPool)
 }
 
+// SMTPConnectionPoolMiddleware ...
 func SMTPConnectionPoolMiddleware(pool kolide.SMTPConnectionPool) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Set("SMTPConnectionPool", pool)
@@ -40,14 +41,22 @@ func SMTPConnectionPoolMiddleware(pool kolide.SMTPConnectionPool) gin.HandlerFun
 	}
 }
 
+// GetDB ..
 // Get the database connection from the context, or panic
-func GetDB(c *gin.Context) datastore.Datastore {
-	return c.MustGet("DB").(datastore.Datastore)
+func GetDB(c *gin.Context) kolide.Datastore {
+	return c.MustGet("DB").(kolide.Datastore)
 }
 
-func DatabaseMiddleware(db datastore.Datastore) gin.HandlerFunc {
+func GetSVC(c *gin.Context) kolide.Service {
+	return c.MustGet("SVC").(kolide.Service)
+}
+
+// DatabaseMiddleware ...
+func DatabaseMiddleware(db kolide.Datastore) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		svc := kolide.NewService(db)
 		c.Set("DB", db)
+		c.Set("SVC", svc)
 		c.Next()
 	}
 }
@@ -78,13 +87,14 @@ func NotFoundRequestError(c *gin.Context) {
 }
 
 // Create a new server for testing purposes with no routes attached
-// func createEmptyTestServer(db datastore.Datastore) *gin.Engine {
+// func createEmptyTestServer(db kolide.Datastore) *gin.Engine {
 // 	server := gin.New()
 // 	server.Use(DatabaseMiddleware(db))
 // 	server.Use(SessionBackendMiddleware)
 // 	return server
 // }
 
+// NewSessionManager ...
 func NewSessionManager(c *gin.Context) *kolide.SessionManager {
 	return &kolide.SessionManager{
 		Request: c.Request,
@@ -93,6 +103,7 @@ func NewSessionManager(c *gin.Context) *kolide.SessionManager {
 	}
 }
 
+// ParseAndValidateJSON ...
 // Parse JSON into a struct with json.Unmarshal, followed by validation with
 // the validator library.
 func ParseAndValidateJSON(c *gin.Context, obj interface{}) error {
@@ -107,7 +118,8 @@ func validateStruct(obj interface{}) error {
 	return validate.Struct(obj)
 }
 
-func ParseAndValidateUrlID(c *gin.Context, name string) (uint, error) {
+// ParseAndValidateURLID ...
+func ParseAndValidateURLID(c *gin.Context, name string) (uint, error) {
 	id, err := strconv.ParseUint(c.Param(name), 10, 64)
 	if err != nil {
 		// TODO change to http.StatusUnprocessableEntity when it's available
@@ -116,6 +128,7 @@ func ParseAndValidateUrlID(c *gin.Context, name string) (uint, error) {
 	return uint(id), nil
 }
 
+// NotFound ...
 func NotFound(c *gin.Context) {
 	errors.ReturnError(
 		c,
@@ -128,7 +141,7 @@ func NotFound(c *gin.Context) {
 
 // CreateServer creates a gin.Engine HTTP server and configures it to be in a
 // state such that it is ready to serve HTTP requests for the kolide application
-func CreateServer(ds datastore.Datastore, pool kolide.SMTPConnectionPool, w io.Writer, resultHandler OsqueryResultHandler, statusHandler OsqueryStatusHandler) *gin.Engine {
+func CreateServer(ds kolide.Datastore, pool kolide.SMTPConnectionPool, w io.Writer, resultHandler OsqueryResultHandler, statusHandler OsqueryStatusHandler) *gin.Engine {
 	server := gin.New()
 	server.Use(DatabaseMiddleware(ds))
 	server.Use(SMTPConnectionPoolMiddleware(pool))

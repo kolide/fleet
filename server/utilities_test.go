@@ -33,11 +33,11 @@ func makeRequest(t *testing.T, server http.Handler, verb, endpoint string, body 
 	return response
 }
 
-func createTestServer(ds datastore.Datastore) http.Handler {
+func createTestServer(ds kolide.Datastore) http.Handler {
 	return createTestServerWithSMTP(ds, kolide.NewMockSMTPConnectionPool())
 }
 
-func createTestServerWithSMTP(ds datastore.Datastore, pool kolide.SMTPConnectionPool) http.Handler {
+func createTestServerWithSMTP(ds kolide.Datastore, pool kolide.SMTPConnectionPool) http.Handler {
 	return CreateServer(
 		ds,
 		pool,
@@ -47,15 +47,18 @@ func createTestServerWithSMTP(ds datastore.Datastore, pool kolide.SMTPConnection
 	)
 }
 
-func createTestDatastore(t *testing.T) datastore.Datastore {
-	ds, err := datastore.New("gorm-sqlite3", ":memory:")
+func createTestDatastore(t *testing.T) kolide.Datastore {
+	opts := []datastore.DBOption{
+		datastore.SessionKeySize(64),
+	}
+	ds, err := datastore.New("gorm-sqlite3", ":memory:", opts...)
 	if err != nil {
 		t.Fatal(err)
 	}
 	return ds
 }
 
-func createTestPacksAndQueries(t *testing.T, ds datastore.Datastore) datastore.Datastore {
+func createTestPacksAndQueries(t *testing.T, ds kolide.Datastore) kolide.Datastore {
 	var err error
 
 	pack1 := &kolide.Pack{
@@ -103,7 +106,8 @@ func createTestPacksAndQueries(t *testing.T, ds datastore.Datastore) datastore.D
 	return ds
 }
 
-func createTestUsers(t *testing.T, ds datastore.Datastore) datastore.Datastore {
+func createTestUsers(t *testing.T, ds kolide.Datastore) kolide.Datastore {
+	svc := kolide.NewService(ds)
 	type NewUserParams struct {
 		Username           string
 		Password           string
@@ -113,28 +117,28 @@ func createTestUsers(t *testing.T, ds datastore.Datastore) datastore.Datastore {
 	}
 
 	users := []NewUserParams{
-		NewUserParams{
+		{
 			Username:           "admin1",
 			Password:           "foobar",
 			Email:              "admin@kolide.co",
 			Admin:              true,
 			NeedsPasswordReset: false,
 		},
-		NewUserParams{
+		{
 			Username:           "admin2",
 			Password:           "foobar",
 			Email:              "admin2@kolide.co",
 			Admin:              true,
 			NeedsPasswordReset: false,
 		},
-		NewUserParams{
+		{
 			Username:           "user1",
 			Password:           "foobar",
 			Email:              "user1@kolide.co",
 			Admin:              false,
 			NeedsPasswordReset: false,
 		},
-		NewUserParams{
+		{
 			Username:           "user2",
 			Password:           "foobar",
 			Email:              "user2@kolide.co",
@@ -144,17 +148,15 @@ func createTestUsers(t *testing.T, ds datastore.Datastore) datastore.Datastore {
 	}
 
 	for _, user := range users {
-		newUser, err := kolide.NewUser(
-			user.Username,
-			user.Password,
-			user.Email,
-			user.Admin,
-			user.NeedsPasswordReset,
-		)
-		if err != nil {
-			t.Fatal(err)
+		newUser := &kolide.User{
+			Username:           user.Username,
+			Password:           []byte(user.Password),
+			Email:              user.Email,
+			Admin:              user.Admin,
+			Enabled:            true,
+			NeedsPasswordReset: user.NeedsPasswordReset,
 		}
-		newUser, err = ds.NewUser(newUser)
+		_, err := svc.NewUser(newUser)
 		if err != nil {
 			t.Fatal(err)
 		}

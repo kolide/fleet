@@ -19,7 +19,7 @@ func TestPasswordResetRequests(t *testing.T) {
 	testPasswordResetRequests(t, db)
 }
 
-func testPasswordResetRequests(t *testing.T, db Datastore) {
+func testPasswordResetRequests(t *testing.T, db kolide.Datastore) {
 	createTestUsers(t, db)
 	now := time.Now()
 	tomorrow := now.Add(time.Hour * 24)
@@ -193,9 +193,12 @@ func testCreateUser(t *testing.T, db kolide.UserStore) {
 	}
 
 	for _, tt := range createTests {
-		u, err := kolide.NewUser(tt.username, tt.password, tt.email, tt.isAdmin, tt.passwordReset)
-		if err != nil {
-			t.Fatal(err)
+		u := &kolide.User{
+			Username:           tt.username,
+			Password:           []byte(tt.password),
+			Email:              tt.email,
+			Admin:              tt.isAdmin,
+			NeedsPasswordReset: tt.passwordReset,
 		}
 
 		user, err := db.NewUser(u)
@@ -265,9 +268,12 @@ func createTestUsers(t *testing.T, db kolide.UserStore) []*kolide.User {
 
 	var users []*kolide.User
 	for _, tt := range createTests {
-		u, err := kolide.NewUser(tt.username, tt.password, tt.email, tt.isAdmin, tt.passwordReset)
-		if err != nil {
-			t.Fatal(err)
+		u := &kolide.User{
+			Username:           tt.username,
+			Password:           []byte(tt.password),
+			Email:              tt.email,
+			Admin:              tt.isAdmin,
+			NeedsPasswordReset: tt.passwordReset,
 		}
 
 		user, err := db.NewUser(u)
@@ -473,7 +479,7 @@ func testLabelQueries(t *testing.T, db kolide.OsqueryStore) {
 }
 
 // setup creates a datastore for testing
-func setup(t *testing.T) Datastore {
+func setup(t *testing.T) kolide.Datastore {
 	db, err := gorm.Open("sqlite3", ":memory:")
 	if err != nil {
 		t.Fatalf("error opening test db: %s", err)
@@ -488,7 +494,7 @@ func setup(t *testing.T) Datastore {
 	return ds
 }
 
-func teardown(t *testing.T, ds Datastore) {
+func teardown(t *testing.T, ds kolide.Datastore) {
 	if err := ds.Drop(); err != nil {
 		t.Fatal(err)
 	}
@@ -517,7 +523,7 @@ func randomString(strlen int) string {
 	return string(result)
 }
 
-func testSaveQuery(t *testing.T, ds Datastore) {
+func testSaveQuery(t *testing.T, ds kolide.Datastore) {
 	query := kolide.Query{
 		Name:  "foo",
 		Query: "bar",
@@ -535,7 +541,7 @@ func testSaveQuery(t *testing.T, ds Datastore) {
 	assert.Equal(t, "baz", queryVerify.Query)
 }
 
-func testDeleteQuery(t *testing.T, ds Datastore) {
+func testDeleteQuery(t *testing.T, ds kolide.Datastore) {
 	query := kolide.Query{
 		Name:  "foo",
 		Query: "bar",
@@ -552,7 +558,7 @@ func testDeleteQuery(t *testing.T, ds Datastore) {
 	assert.NotNil(t, err)
 }
 
-func testDeletePack(t *testing.T, ds Datastore) {
+func testDeletePack(t *testing.T, ds kolide.Datastore) {
 	pack := &kolide.Pack{
 		Name: "foo",
 	}
@@ -571,7 +577,7 @@ func testDeletePack(t *testing.T, ds Datastore) {
 	assert.NotNil(t, err)
 }
 
-func testAddAndRemoveQueryFromPack(t *testing.T, ds Datastore) {
+func testAddAndRemoveQueryFromPack(t *testing.T, ds kolide.Datastore) {
 	pack := &kolide.Pack{
 		Name: "foo",
 	}

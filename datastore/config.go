@@ -1,11 +1,14 @@
 package datastore
 
-import "github.com/Sirupsen/logrus"
+import (
+	"github.com/Sirupsen/logrus"
+	"github.com/kolide/kolide-ose/kolide"
+)
 
 const (
 	// TODO @marpaia fix/document default values
 	defaultSessionKeySize  int     = 24
-	defaultSessionLifespan float64 = 0
+	defaultSessionLifespan float64 = 10
 	defaultMaxAttempts     int     = 15
 )
 
@@ -20,7 +23,7 @@ type sessionConfig struct {
 type dbOptions struct {
 	// maxAttempts configures the number of retries to connect to the DB
 	maxAttempts int
-	db          Datastore
+	db          kolide.Datastore
 	debug       bool // gorm debug
 	logger      *logrus.Logger
 	sessionConfig
@@ -72,7 +75,7 @@ func Debug() DBOption {
 
 // datastore allows you to pass your own datastore
 // this option can be used to pass a specific testing implementation
-func datastore(db Datastore) DBOption {
+func datastore(db kolide.Datastore) DBOption {
 	return func(o *dbOptions) error {
 		o.db = db
 		return nil
