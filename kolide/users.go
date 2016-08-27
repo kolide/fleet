@@ -9,31 +9,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// Datastore combines all the interfaces in the Kolide DAL
-type Datastore interface {
-	UserStore
-	OsqueryStore
-	EmailStore
-	SessionStore
-	Name() string
-	Drop() error
-	Migrate() error
-}
-
-// UserStore contains methods for managing users in a datastore
-type UserStore interface {
-	NewUser(user *User) (*User, error)
-	User(username string) (*User, error)
-	UserByID(id uint) (*User, error)
-	SaveUser(user *User) error
-}
-
-// UserService has methods for working with users
-type UserService interface {
-	UserStore
-	SetPassword(userID uint, password string) error
-}
-
 // User is the model struct which represents a kolide user
 type User struct {
 	ID                 uint `gorm:"primary_key"`
@@ -47,54 +22,6 @@ type User struct {
 	Admin              bool   `gorm:"not null"`
 	Enabled            bool   `gorm:"not null"`
 	NeedsPasswordReset bool
-}
-
-type service struct {
-	bcryptCost  int
-	saltKeySize int
-	db          Datastore
-}
-
-func (svc service) NewUser(user *User) (*User, error) {
-	err := user.setPassword(string(user.Password), svc.saltKeySize, svc.bcryptCost)
-	if err != nil {
-		return nil, err
-	}
-
-	user, err = svc.db.NewUser(user)
-	if err != nil {
-		return nil, err
-	}
-	return user, nil
-}
-
-func (svc service) User(username string) (*User, error) {
-	return svc.db.User(username)
-}
-
-func (svc service) UserByID(id uint) (*User, error) {
-	return svc.db.UserByID(id)
-}
-
-func (svc service) SaveUser(user *User) error {
-	return svc.db.SaveUser(user)
-}
-
-func (svc service) SetPassword(userID uint, password string) error {
-	user, err := svc.UserByID(userID)
-	if err != nil {
-		return err
-	}
-
-	err = user.setPassword(password, svc.saltKeySize, svc.bcryptCost)
-	if err != nil {
-		return err
-	}
-	err = svc.SaveUser(user)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 // ValidatePassword accepts a potential password for a given user and attempts

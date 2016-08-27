@@ -12,3 +12,9 @@ func NewService(ds Datastore) Service {
 		db:          ds,
 	}
 }
+
+type service struct {
+	bcryptCost  int
+	saltKeySize int
+	db          Datastore
+}
