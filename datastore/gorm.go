@@ -9,12 +9,18 @@ import (
 	"strings"
 	"time"
 
+	stderr "errors"
+
 	_ "github.com/go-sql-driver/mysql" // db driver
 	_ "github.com/mattn/go-sqlite3"    // db driver
 
 	"github.com/jinzhu/gorm"
 	"github.com/kolide/kolide-ose/errors"
 	"github.com/kolide/kolide-ose/kolide"
+)
+
+var (
+	ErrNotFound = stderr.New("resource not found")
 )
 
 var tables = [...]interface{}{
@@ -88,41 +94,6 @@ func openGORM(driver, conn string, maxAttempts int) (*gorm.DB, error) {
 		return nil, fmt.Errorf("failed to connect to mysql backend, err = %v", err)
 	}
 	return db, nil
-}
-
-// NewUser creates a new user in the gorm backend
-func (orm gormDB) NewUser(user *kolide.User) (*kolide.User, error) {
-	err := orm.DB.Create(user).Error
-	if err != nil {
-		return nil, err
-	}
-	return user, nil
-}
-
-// User returns a specific user in the gorm backend
-func (orm gormDB) User(username string) (*kolide.User, error) {
-	user := &kolide.User{
-		Username: username,
-	}
-	err := orm.DB.Where("username = ?", username).First(user).Error
-	if err != nil {
-		return nil, err
-	}
-	return user, nil
-}
-
-// UserByID returns a datastore user given a user ID
-func (orm gormDB) UserByID(id uint) (*kolide.User, error) {
-	user := &kolide.User{ID: id}
-	err := orm.DB.Where(user).First(user).Error
-	if err != nil {
-		return nil, err
-	}
-	return user, nil
-}
-
-func (orm gormDB) SaveUser(user *kolide.User) error {
-	return orm.DB.Save(user).Error
 }
 
 func generateRandomText(keySize int) (string, error) {

@@ -67,6 +67,13 @@ func New(driver, conn string, opts ...DBOption) (kolide.Datastore, error) {
 			return nil, errors.DatabaseError(err)
 		}
 		return ds, nil
+	case "mock":
+		ds := &mockDB{
+			Driver:          "mock",
+			sessionKeySize:  opt.sessionKeySize,
+			sessionLifespan: opt.sessionLifespan,
+		}
+		return ds, nil
 	default:
 		return nil, errors.New("unsupported datastore driver %s", driver)
 	}
