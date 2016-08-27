@@ -107,7 +107,7 @@ func createTestPacksAndQueries(t *testing.T, ds kolide.Datastore) kolide.Datasto
 }
 
 func createTestUsers(t *testing.T, ds kolide.Datastore) kolide.Datastore {
-	svc := kolide.NewService(ds)
+	svc, _ := kolide.NewService(ds)
 	type NewUserParams struct {
 		Username           string
 		Password           string

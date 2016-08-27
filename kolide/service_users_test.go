@@ -9,7 +9,7 @@ import (
 
 func TestUserService(t *testing.T) {
 	ds, _ := datastore.New("mock", "")
-	svc := kolide.NewService(ds)
+	svc, _ := kolide.NewService(ds)
 
 	userTests := []struct {
 		user       *kolide.User

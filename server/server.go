@@ -54,7 +54,7 @@ func GetSVC(c *gin.Context) kolide.Service {
 // DatabaseMiddleware ...
 func DatabaseMiddleware(db kolide.Datastore) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		svc := kolide.NewService(db)
+		svc, _ := kolide.NewService(db)
 		c.Set("DB", db)
 		c.Set("SVC", svc)
 		c.Next()
