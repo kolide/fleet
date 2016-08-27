@@ -72,6 +72,7 @@ func New(driver, conn string, opts ...DBOption) (kolide.Datastore, error) {
 			Driver:          "mock",
 			sessionKeySize:  opt.sessionKeySize,
 			sessionLifespan: opt.sessionLifespan,
+			users:           make(map[uint]*kolide.User),
 		}
 		return ds, nil
 	default:
