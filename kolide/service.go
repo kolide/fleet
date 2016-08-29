@@ -12,4 +12,6 @@ type UserService interface {
 	User(ctx context.Context, id uint) (*User, error)
 	ChangePassword(ctx context.Context, userID uint, old, new string) error
 	Authenticate(ctx context.Context, username, password string) (*User, error)
+	UpdateAdminRole(ctx context.Context, userID uint, isAdmin bool) error
+	UpdateUserStatus(ctx context.Context, userID uint, password string, enabled bool) error
 }
