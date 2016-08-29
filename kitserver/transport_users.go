@@ -20,34 +20,77 @@ func decodeCreateUserRequest(_ context.Context, r *http.Request) (interface{}, e
 }
 
 func decodeGetUserRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	vars := mux.Vars(r)
-	id, ok := vars["id"]
-	if !ok {
-		return nil, errBadRoute
-	}
-	uid, err := strconv.Atoi(id)
+	uid, err := userIDFromRequest(r)
 	if err != nil {
 		return nil, err
 	}
-	return getUserRequest{ID: uint(uid)}, nil
+	if err != nil {
+		return nil, err
+	}
+	return getUserRequest{ID: uid}, nil
+}
+
+func decodeChangePasswordRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	uid, err := userIDFromRequest(r)
+	if err != nil {
+		return nil, err
+	}
+	var req changePasswordRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+	req.UserID = uid
+	return req, nil
+}
+
+func decodeUpdateAdminRoleRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	uid, err := userIDFromRequest(r)
+	if err != nil {
+		return nil, err
+	}
+	var req updateAdminRoleRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+	req.UserID = uid
+	return req, nil
+}
+
+func decodeUpdateUserStatusRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	uid, err := userIDFromRequest(r)
+	if err != nil {
+		return nil, err
+	}
+	var req updateUserStatusRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+	req.UserID = uid
+	return req, nil
 }
 
 func decodeModifyUserRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	uid, err := userIDFromRequest(r)
+	if err != nil {
+		return nil, err
+	}
 	var req modifyUserRequest
 	if err := json.NewDecoder(r.Body).Decode(&req.payload); err != nil {
 		return nil, err
 	}
+	req.ID = uid
+	return req, nil
+}
 
+func userIDFromRequest(r *http.Request) (uint, error) {
 	vars := mux.Vars(r)
 	id, ok := vars["id"]
 	if !ok {
-		return nil, errBadRoute
+		return 0, errBadRoute
 	}
 	uid, err := strconv.Atoi(id)
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
-	req.ID = uint(uid)
-
-	return req, nil
+	return uint(uid), nil
 }

@@ -30,8 +30,45 @@ func MakeHandler(ctx context.Context, svc kolide.Service, logger kitlog.Logger) 
 		opts...,
 	)
 
+	getUserHandler := kithttp.NewServer(
+		ctx,
+		makeGetUserEndpoint(svc),
+		decodeGetUserRequest,
+		encodeResponse,
+		opts...,
+	)
+
+	changePasswordHandler := kithttp.NewServer(
+		ctx,
+		makeChangePasswordEndpoint(svc),
+		decodeChangePasswordRequest,
+		encodeResponse,
+		opts...,
+	)
+
+	updateAdminRoleHandler := kithttp.NewServer(
+		ctx,
+		makeUpdateAdminRoleEndpoint(svc),
+		decodeUpdateAdminRoleRequest,
+		encodeResponse,
+		opts...,
+	)
+
+	updateUserStatusHandler := kithttp.NewServer(
+		ctx,
+		makeUpdateUserStatusEndpoint(svc),
+		decodeUpdateUserStatusRequest,
+		encodeResponse,
+		opts...,
+	)
+
 	api := mux.NewRouter()
 	api.Handle("/api/v1/kolide/users", createUserHandler).Methods("POST")
+	api.Handle("/api/v1/kolide/users/{id}", getUserHandler).Methods("GET")
+	api.Handle("/api/v1/kolide/users/{id}/password", changePasswordHandler).Methods("POST")
+	api.Handle("/api/v1/kolide/users/{id}/role", updateAdminRoleHandler).Methods("POST")
+	api.Handle("/api/v1/kolide/users/{id}/status", updateUserStatusHandler).Methods("POST")
+
 	r := mux.NewRouter()
 
 	r.PathPrefix("/api/v1/kolide").Handler(authMiddleware(api))
