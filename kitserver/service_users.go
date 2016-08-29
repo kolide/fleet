@@ -28,7 +28,7 @@ func (s service) User(ctx context.Context, id uint) (*kolide.User, error) {
 	// a user is loaded for almost every request...
 	// consider loading the user from an in memory cache for most read operations
 	// and possibly only query the DB if the user is being queried for a write operation
-	// could be a calling context
+	// caching can be done by wrapping the service in a middleware and overriding the read methods.
 	return s.ds.UserByID(id)
 }
 
@@ -77,11 +77,13 @@ func (s service) UpdateAdminRole(ctx context.Context, userID uint, isAdmin bool)
 	return s.saveUser(user)
 }
 
-func (s service) UpdateStatus(ctx context.Context, userID uint, enabled bool) error {
+func (s service) UpdateUserStatus(ctx context.Context, userID uint, password string, enabled bool) error {
 	user, err := s.User(ctx, userID)
 	if err != nil {
 		return err
 	}
+	// TODO @groob
+	// password validation
 	user.Enabled = enabled
 	return s.saveUser(user)
 }
