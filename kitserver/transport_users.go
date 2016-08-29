@@ -24,9 +24,6 @@ func decodeGetUserRequest(_ context.Context, r *http.Request) (interface{}, erro
 	if err != nil {
 		return nil, err
 	}
-	if err != nil {
-		return nil, err
-	}
 	return getUserRequest{ID: uid}, nil
 }
 

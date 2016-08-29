@@ -26,7 +26,7 @@ func (e invalidArgumentError) Error() string {
 	if e.required {
 		req = "required"
 	}
-	return fmt.Sprintf("%s argument invalid or missing: %q", req, e.field)
+	return fmt.Sprintf("%s argument invalid or missing: %s", req, e.field)
 }
 
 func encodeResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {
@@ -57,10 +57,12 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 	})
 }
 
+const unprocessableEntity int = 422
+
 func typeErrsStatus(err error) int {
 	switch err.(type) {
 	case invalidArgumentError:
-		return http.StatusBadRequest
+		return unprocessableEntity
 	case authError:
 		return http.StatusUnauthorized
 	default:

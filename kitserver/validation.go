@@ -13,15 +13,15 @@ type validationMiddleware struct {
 func (mw validationMiddleware) NewUser(ctx context.Context, p kolide.UserPayload) (*kolide.User, error) {
 	// check required params
 	if p.Username == nil {
-		return nil, invalidArgumentError{field: "username"}
+		return nil, invalidArgumentError{field: "username", required: true}
 	}
 
 	if p.Password == nil {
-		return nil, invalidArgumentError{field: "password"}
+		return nil, invalidArgumentError{field: "password", required: true}
 	}
 
 	if p.Email == nil {
-		return nil, invalidArgumentError{field: "email"}
+		return nil, invalidArgumentError{field: "email", required: true}
 	}
 
 	return mw.Service.NewUser(ctx, p)
