@@ -10,6 +10,8 @@ import (
 type Service interface {
 	UserService
 	AuthService
+	OsqueryServerService
+	OsqueryConfigService
 }
 
 type UserService interface {

@@ -16,3 +16,6 @@ server/bindata.go
 
 # operating system artifacts
 .DS_Store
+
+# editor configurations
+.vscode

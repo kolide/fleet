@@ -1,17 +1,12 @@
 package kolide
 
-import "time"
+import (
+	"time"
 
-// HostStore enrolls hosts in the datastore
-type OsqueryStore interface {
-	// Host methods
-	EnrollHost(uuid, hostname, ip, platform string, nodeKeySize int) (*Host, error)
-	AuthenticateHost(nodeKey string) (*Host, error)
-	SaveHost(host *Host) error
-	MarkHostSeen(host *Host, t time.Time) error
-	LabelQueriesForHost(host *Host, cutoff time.Time) (map[string]string, error)
-	RecordLabelQueryExecutions(host *Host, results map[string]bool, t time.Time) error
+	"golang.org/x/net/context"
+)
 
+type OsqueryConfigStore interface {
 	// Query methods
 	NewQuery(query *Query) error
 	SaveQuery(query *Query) error
@@ -35,15 +30,36 @@ type OsqueryStore interface {
 	RemoveQueryFromPack(query *Query, pack *Pack) error
 }
 
-type Host struct {
-	ID        uint `gorm:"primary_key"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	NodeKey   string `gorm:"unique_index:idx_host_unique_nodekey"`
-	HostName  string
-	UUID      string `gorm:"unique_index:idx_host_unique_uuid"`
-	IPAddress string
-	Platform  string
+type OsqueryConfigService interface {
+	GetAllQueries(ctx context.Context) ([]*Query, error)
+	GetQuery(ctx context.Context, id uint) (*Query, error)
+	CreateQuery(ctx context.Context, p QueryPayload) error
+	ModifyQuery(ctx context.Context, id uint, p QueryPayload) (*Query, error)
+	DeleteQuery(ctx context.Context, id uint) error
+
+	GetAllPacks(ctx context.Context) ([]*Pack, error)
+	GetPack(ctx context.Context, id uint) (*Pack, error)
+	CreatePack(ctx context.Context, p PackPayload) error
+	ModifyPack(ctx context.Context, id uint, p PackPayload) (*Pack, error)
+	DeletePack(ctx context.Context, id uint) error
+
+	AddQueryToPack(ctx context.Context, qid, pid uint) error
+	RemoveQueryFromPack(ctx context.Context, qid, pid uint) error
+}
+
+type QueryPayload struct {
+	Name         *string
+	Query        *string
+	Interval     *uint
+	Snapshot     *bool
+	Differential *bool
+	Platform     *string
+	Version      *string
+}
+
+type PackPayload struct {
+	Name     *string
+	Platform *string
 }
 
 type Query struct {
@@ -178,12 +194,4 @@ type Decorator struct {
 	Type      DecoratorType `gorm:"not null"`
 	Interval  int
 	Query     string
-}
-
-// LabelQueriesForHost calculates the appropriate update cutoff (given
-// interval) and uses the datastore to retrieve the label queries for the
-// provided host.
-func LabelQueriesForHost(store OsqueryStore, host *Host, interval time.Duration) (map[string]string, error) {
-	cutoff := time.Now().Add(-interval)
-	return store.LabelQueriesForHost(host, cutoff)
 }
