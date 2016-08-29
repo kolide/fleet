@@ -24,7 +24,7 @@ func TestCreateUser(t *testing.T) {
 		{
 			Username: stringPtr("admin1"),
 			Password: stringPtr("foobar"),
-			Err:      errInvalidArgument,
+			Err:      invalidArgumentError{},
 		},
 		{
 			Username:           stringPtr("admin1"),
@@ -45,11 +45,12 @@ func TestCreateUser(t *testing.T) {
 			NeedsPasswordReset: tt.NeedsPasswordReset,
 		}
 		user, err := svc.NewUser(ctx, payload)
-		if err != nil {
-			if err != tt.Err {
-				t.Fatalf("got %q, want %q", err, tt.Err)
-			}
+		switch err.(type) {
+		case nil:
+		case invalidArgumentError:
 			continue
+		default:
+			t.Fatalf("got %q, want %q", err, tt.Err)
 		}
 
 		if user.ID == 0 {
