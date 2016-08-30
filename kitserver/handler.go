@@ -15,6 +15,9 @@ import (
 // MakeHandler creates an http handler for the Kolide API
 func MakeHandler(ctx context.Context, svc kolide.Service, logger kitlog.Logger) http.Handler {
 	opts := []kithttp.ServerOption{
+		kithttp.ServerBefore(
+			setViewerContext(svc, logger),
+		),
 		kithttp.ServerErrorLogger(logger),
 		kithttp.ServerAfter(
 			kithttp.SetContentType("application/json; charset=utf-8"),
@@ -70,8 +73,32 @@ func MakeHandler(ctx context.Context, svc kolide.Service, logger kitlog.Logger) 
 
 	r := mux.NewRouter()
 
-	r.PathPrefix("/api/v1/kolide").Handler(authMiddleware(api))
+	r.PathPrefix("/api/v1/kolide").Handler(authMiddleware(svc, logger, api))
 	r.Handle("/login", login(svc, logger)).Methods("POST")
 	r.Handle("/logout", logout(svc, logger)).Methods("GET")
 	return r
+}
+
+// setViewerContext updates the context with a viewerContext,
+// which holds the currently logged in user
+func setViewerContext(svc kolide.Service, logger kitlog.Logger) kithttp.RequestFunc {
+	return func(ctx context.Context, r *http.Request) context.Context {
+		sm := svc.NewSessionManager(ctx, nil, r)
+		session, err := sm.Session()
+		if err != nil {
+			logger.Log("err", err, "error-source", "setViewerContext")
+			return ctx
+		}
+
+		user, err := svc.User(ctx, session.UserID)
+		if err != nil {
+			logger.Log("err", err, "error-source", "setViewerContext")
+			return ctx
+		}
+
+		ctx = context.WithValue(ctx, "viewerContext", &viewerContext{
+			user: user,
+		})
+		return ctx
+	}
 }

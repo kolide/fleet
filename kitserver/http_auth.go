@@ -12,7 +12,7 @@ import (
 	"github.com/kolide/kolide-ose/kolide"
 )
 
-func login(svc kolide.UserService, logger kitlog.Logger) http.HandlerFunc {
+func login(svc kolide.Service, logger kitlog.Logger) http.HandlerFunc {
 	ctx := context.Background()
 	logger = kitlog.NewContext(logger).With("method", "login")
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -41,7 +41,27 @@ func login(svc kolide.UserService, logger kitlog.Logger) http.HandlerFunc {
 			logger.Log("err", err, "user", username)
 			return
 		}
+
 		// create session here
+		sm := svc.NewSessionManager(ctx, w, r)
+
+		// TODO it feels awkward to create and then save the session in two steps.
+		// the session manager should just call Save on it's own?
+		if err := sm.MakeSessionForUserID(user.ID); err != nil {
+			encodeResponse(ctx, w, getUserResponse{
+				Err: errors.New("error creating new user session"),
+			})
+			logger.Log("err", err, "user", username)
+			return
+		}
+
+		if err := sm.Save(); err != nil {
+			encodeResponse(ctx, w, getUserResponse{
+				Err: errors.New("error saving new user session"),
+			})
+			logger.Log("err", err, "user", username)
+			return
+		}
 
 		encodeResponse(ctx, w, getUserResponse{
 			ID:                 user.ID,
@@ -58,22 +78,50 @@ func login(svc kolide.UserService, logger kitlog.Logger) http.HandlerFunc {
 
 const noAuthRedirect = "/"
 
-func logout(svc kolide.UserService, logger kitlog.Logger) http.HandlerFunc {
+func logout(svc kolide.Service, logger kitlog.Logger) http.HandlerFunc {
 	logger = kitlog.NewContext(logger).With("method", "logout")
+	ctx := context.Background()
 	return func(w http.ResponseWriter, r *http.Request) {
-		// delete session first
-		var username string
-		var user kolide.User
-		// TODO
+		sm := svc.NewSessionManager(ctx, w, r)
+		if err := sm.Destroy(); err != nil {
+			encodeResponse(ctx, w, getUserResponse{
+				Err: errors.New("error deleting session"),
+			})
+			logger.Log("err", err)
+			return
+		}
 
 		// redirect
 		http.Redirect(w, r, noAuthRedirect, http.StatusFound)
-		logger.Log("msg", "loggedout", "user", username, "id", user.ID)
 	}
 }
 
-func authMiddleware(next http.Handler) http.Handler {
+func authMiddleware(svc kolide.Service, logger kitlog.Logger, next http.Handler) http.Handler {
+	logger = kitlog.NewContext(logger).With("method", "authMiddleware")
+	ctx := context.Background()
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		sm := svc.NewSessionManager(ctx, w, r)
+		session, err := sm.Session()
+		if err != nil {
+			http.Error(w,
+				"failed to retrieve user session. is there a user logged in?",
+				http.StatusUnauthorized)
+			logger.Log("err", err)
+			return
+		}
+
+		user, err := svc.User(ctx, session.UserID)
+		if err != nil {
+			http.Error(w,
+				"failed to get user from db", http.StatusUnauthorized)
+			logger.Log("err", err, "user", session.UserID)
+			return
+		}
+
+		if !user.Enabled {
+			http.Error(w, "user disabled", http.StatusUnauthorized)
+
+		}
 
 		// all good to pass
 		next.ServeHTTP(w, r)

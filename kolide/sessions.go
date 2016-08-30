@@ -73,10 +73,12 @@ type Session struct {
 // SessionManager is a management object which helps with the administration of
 // sessions within the application. Use NewSessionManager to create an instance
 type SessionManager struct {
-	Store   SessionStore
-	Request *http.Request
-	Writer  http.ResponseWriter
-	session *Session
+	Store      SessionStore
+	Request    *http.Request
+	Writer     http.ResponseWriter
+	session    *Session
+	CookieName string
+	JwtKey     string
 }
 
 func (sm *SessionManager) Session() (*Session, error) {

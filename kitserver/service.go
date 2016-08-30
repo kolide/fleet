@@ -4,8 +4,9 @@ import "github.com/kolide/kolide-ose/kolide"
 
 // configuration defaults
 const (
-	defaultBcryptCost  int = 12
-	defaultSaltKeySize int = 24
+	defaultBcryptCost  int    = 12
+	defaultSaltKeySize int    = 24
+	defaultCookieName  string = "KolideSession"
 )
 
 func NewService(ds kolide.Datastore) (kolide.Service, error) {
@@ -22,5 +23,7 @@ func NewService(ds kolide.Datastore) (kolide.Service, error) {
 type service struct {
 	bcryptCost  int
 	saltKeySize int
+	cookieName  string
+	jwtKey      string
 	ds          kolide.Datastore
 }
