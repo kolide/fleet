@@ -73,7 +73,6 @@ func login(svc kolide.Service, logger kitlog.Logger) http.HandlerFunc {
 		})
 
 	}
-
 }
 
 const noAuthRedirect = "/"
@@ -120,7 +119,6 @@ func authMiddleware(svc kolide.Service, logger kitlog.Logger, next http.Handler)
 
 		if !user.Enabled {
 			http.Error(w, "user disabled", http.StatusUnauthorized)
-
 		}
 
 		// all good to pass
