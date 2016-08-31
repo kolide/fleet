@@ -14,6 +14,7 @@ import (
 	kitlog "github.com/go-kit/kit/log"
 	"github.com/kolide/kolide-ose/datastore"
 	"github.com/kolide/kolide-ose/kolide"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestLogin(t *testing.T) {
@@ -29,7 +30,6 @@ func TestLogin(t *testing.T) {
 	}))
 
 	server := httptest.NewServer(r)
-
 	var loginTests = []struct {
 		username string
 		status   int
@@ -62,6 +62,13 @@ func TestLogin(t *testing.T) {
 				Admin:    boolPtr(true),
 			}
 		}
+
+		// test sessions
+		testUser, err := ds.User(tt.username)
+		if err != nil && err != datastore.ErrNotFound {
+			t.Fatal(err)
+		}
+
 		v := url.Values{}
 		{
 			v.Set("username", tt.username)
@@ -102,6 +109,39 @@ func TestLogin(t *testing.T) {
 			t.Errorf("have %v, want %v", have, want)
 		}
 
+		// ensure that a non-empty cookie was in-fact set
+		cookie := resp.Header.Get("Set-Cookie")
+		assert.NotEmpty(t, cookie)
+
+		// ensure that a session was created for our test user and stored
+		sessions, err := ds.FindAllSessionsForUser(testUser.ID)
+		assert.Nil(t, err)
+		assert.Len(t, sessions, 1)
+
+		// ensure the session key is not blank
+		assert.NotEqual(t, "", sessions[0].Key)
+
+		// test logout
+		req, _ := http.NewRequest("GET", server.URL+"/logout", nil)
+		req.Header.Set("Cookie", cookie)
+		client := &http.Client{}
+		resp, err = client.Do(req)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if have, want := resp.StatusCode, http.StatusOK; have != want {
+			t.Errorf("have %d, want %d", have, want)
+		}
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if have, want := string(body), "index"; have != want {
+			t.Errorf("have %q, want %q", have, want)
+		}
+		// ensure that our user's session was deleted from the store
+		sessions, err = ds.FindAllSessionsForUser(testUser.ID)
+		assert.Len(t, sessions, 0)
 	}
 
 	var unauthenticated = []struct {
