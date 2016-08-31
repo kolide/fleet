@@ -13,6 +13,7 @@ func TestCreateUser(t *testing.T) {
 	ds, _ := datastore.New("mock", "")
 	svc, _ := NewService(testConfig(ds))
 
+	ctx := context.Background()
 	var createUserTests = []struct {
 		Username           *string
 		Password           *string
@@ -35,7 +36,6 @@ func TestCreateUser(t *testing.T) {
 		},
 	}
 
-	ctx := context.Background()
 	for _, tt := range createUserTests {
 		payload := kolide.UserPayload{
 			Username:           tt.Username,
@@ -88,7 +88,7 @@ func TestCreateUser(t *testing.T) {
 func TestChangeUserPassword(t *testing.T) {
 	ds, _ := datastore.New("mock", "")
 	svc, _ := NewService(testConfig(ds))
-	createTestUsers(t, svc)
+	createTestUsers(t, ds)
 
 	var passwordChangeTests = []struct {
 		username        string

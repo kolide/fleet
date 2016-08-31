@@ -65,6 +65,8 @@ func typeErrsStatus(err error) int {
 		return unprocessableEntity
 	case authError:
 		return http.StatusUnauthorized
+	case forbiddenError:
+		return http.StatusForbidden
 	default:
 		return http.StatusInternalServerError
 	}

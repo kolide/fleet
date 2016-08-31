@@ -20,7 +20,7 @@ import (
 func TestLogin(t *testing.T) {
 	ds, _ := datastore.New("mock", "")
 	svc, _ := NewService(testConfig(ds))
-	createTestUsers(t, svc)
+	createTestUsers(t, ds)
 
 	r := http.NewServeMux()
 	r.Handle("/logout", logout(svc, kitlog.NewNopLogger()))
@@ -182,7 +182,8 @@ func TestLogin(t *testing.T) {
 	}
 }
 
-func createTestUsers(t *testing.T, svc kolide.UserService) {
+func createTestUsers(t *testing.T, ds kolide.Datastore) {
+	svc := svcWithNoValidation(testConfig(ds))
 	ctx := context.Background()
 	for _, tt := range testUsers {
 		payload := kolide.UserPayload{
@@ -197,6 +198,22 @@ func createTestUsers(t *testing.T, svc kolide.UserService) {
 			t.Fatal(err)
 		}
 	}
+}
+
+func svcWithNoValidation(config ServiceConfig) kolide.Service {
+	var svc kolide.Service
+	svc = service{
+		ds:                  config.Datastore,
+		logger:              config.Logger,
+		saltKeySize:         config.SaltKeySize,
+		bcryptCost:          config.BcryptCost,
+		jwtKey:              config.JWTKey,
+		cookieName:          config.SessionCookieName,
+		OsqueryEnrollSecret: config.OsqueryEnrollSecret,
+		OsqueryNodeKeySize:  config.OsqueryNodeKeySize,
+	}
+
+	return svc
 }
 
 func testConfig(ds kolide.Datastore) ServiceConfig {

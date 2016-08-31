@@ -126,11 +126,24 @@ func authMiddleware(svc kolide.Service, logger kitlog.Logger, next http.Handler)
 	})
 }
 
+// authentication error
 type authError struct {
 	message string
 }
 
 func (e authError) Error() string {
+	if e.message == "" {
+		return "unauthorized"
+	}
+	return fmt.Sprintf("unauthorized: %s", e.message)
+}
+
+// forbidden, set when user is authenticated, but not allowd to perform action
+type forbiddenError struct {
+	message string
+}
+
+func (e forbiddenError) Error() string {
 	if e.message == "" {
 		return "unauthorized"
 	}
