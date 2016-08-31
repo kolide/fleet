@@ -2,6 +2,7 @@ package kitserver
 
 import (
 	"net/http"
+	"strings"
 
 	"golang.org/x/net/context"
 
@@ -24,9 +25,23 @@ func MakeHandler(ctx context.Context, svc kolide.Service, logger kitlog.Logger) 
 		),
 	}
 
+	// make all the endpoints
+	// the endpoints are wrapped in middleware with correct permissions
+	// this is a bit simplistic, but so are the permissions
+	// the reason's it's not a Service interface wrapper instead:
+	// - the permissions are too simple to justify it. having 3-4 endpoint Middleware vs wrapping each service method individually.
+	// - service API is still not stable yet
+	var (
+		createUserEndpoint       = mustBeAdmin(makeCreateUserEndpoint(svc))
+		getUserEndpoint          = canReadUser(makeGetUserEndpoint(svc))
+		changePasswordEndpoint   = canModifyUser(makeChangePasswordEndpoint(svc))
+		updateAdminRoleEndpoint  = mustBeAdmin(makeUpdateAdminRoleEndpoint(svc))
+		updateUserStatusEndpoint = canModifyUser(makeUpdateUserStatusEndpoint(svc))
+	)
+
 	createUserHandler := kithttp.NewServer(
 		ctx,
-		mustBeAdmin(makeCreateUserEndpoint(svc)),
+		createUserEndpoint,
 		decodeCreateUserRequest,
 		encodeResponse,
 		opts...,
@@ -34,7 +49,7 @@ func MakeHandler(ctx context.Context, svc kolide.Service, logger kitlog.Logger) 
 
 	getUserHandler := kithttp.NewServer(
 		ctx,
-		makeGetUserEndpoint(svc),
+		getUserEndpoint,
 		decodeGetUserRequest,
 		encodeResponse,
 		opts...,
@@ -42,7 +57,7 @@ func MakeHandler(ctx context.Context, svc kolide.Service, logger kitlog.Logger) 
 
 	changePasswordHandler := kithttp.NewServer(
 		ctx,
-		makeChangePasswordEndpoint(svc),
+		changePasswordEndpoint,
 		decodeChangePasswordRequest,
 		encodeResponse,
 		opts...,
@@ -50,7 +65,7 @@ func MakeHandler(ctx context.Context, svc kolide.Service, logger kitlog.Logger) 
 
 	updateAdminRoleHandler := kithttp.NewServer(
 		ctx,
-		makeUpdateAdminRoleEndpoint(svc),
+		updateAdminRoleEndpoint,
 		decodeUpdateAdminRoleRequest,
 		encodeResponse,
 		opts...,
@@ -58,7 +73,7 @@ func MakeHandler(ctx context.Context, svc kolide.Service, logger kitlog.Logger) 
 
 	updateUserStatusHandler := kithttp.NewServer(
 		ctx,
-		makeUpdateUserStatusEndpoint(svc),
+		updateUserStatusEndpoint,
 		decodeUpdateUserStatusRequest,
 		encodeResponse,
 		opts...,
@@ -100,6 +115,15 @@ func setViewerContext(svc kolide.Service, logger kitlog.Logger) kithttp.RequestF
 			user: user,
 		})
 		logger.Log("msg", "viewer context set", "user", user.ID)
+		// get the user-id for request
+		if strings.Contains(r.URL.Path, "users/") {
+			ctx = withUserIDFromRequest(r, ctx)
+		}
 		return ctx
 	}
+}
+
+func withUserIDFromRequest(r *http.Request, ctx context.Context) context.Context {
+	uid, _ := userIDFromRequest(r)
+	return context.WithValue(ctx, "request-uid", uid)
 }

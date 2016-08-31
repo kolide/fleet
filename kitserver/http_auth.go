@@ -192,14 +192,14 @@ func (vc *ViewerContext) CanPerformActions() bool {
 
 // CanPerformReadActionsOnUser returns a bool indicating the current user's
 // ability to perform read actions on the given user
-func (vc *ViewerContext) CanPerformReadActionOnUser(u *kolide.User) bool {
-	return vc.CanPerformActions() || (vc.IsLoggedIn() && vc.IsUserID(u.ID))
+func (vc *ViewerContext) CanPerformReadActionOnUser(uid uint) bool {
+	return vc.CanPerformActions() || (vc.IsLoggedIn() && vc.IsUserID(uid))
 }
 
 // CanPerformWriteActionOnUser returns a bool indicating the current user's
 // ability to perform write actions on the given user
-func (vc *ViewerContext) CanPerformWriteActionOnUser(u *kolide.User) bool {
-	return vc.CanPerformActions() && (vc.IsUserID(u.ID) || vc.IsAdmin())
+func (vc *ViewerContext) CanPerformWriteActionOnUser(uid uint) bool {
+	return vc.CanPerformActions() && (vc.IsUserID(uid) || vc.IsAdmin())
 }
 
 // IsUserID returns true if the given user id the same as the user which is

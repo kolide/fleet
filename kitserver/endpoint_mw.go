@@ -8,6 +8,8 @@ import (
 	"golang.org/x/net/context"
 )
 
+var errNoContext = errors.New("no viewer context set")
+
 func mustBeAdmin(next endpoint.Endpoint) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		vc, err := viewerFromContext(ctx)
@@ -21,10 +23,46 @@ func mustBeAdmin(next endpoint.Endpoint) endpoint.Endpoint {
 	}
 }
 
+func canReadUser(next endpoint.Endpoint) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		vc, err := viewerFromContext(ctx)
+		if err != nil {
+			return nil, err
+		}
+		uid := requestUserIDFromContext(ctx)
+		if !vc.CanPerformReadActionOnUser(uid) {
+			return nil, forbiddenError{message: "not read permissions on user"}
+		}
+		return next(ctx, request)
+	}
+}
+
+func canModifyUser(next endpoint.Endpoint) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		vc, err := viewerFromContext(ctx)
+		if err != nil {
+			return nil, err
+		}
+		uid := requestUserIDFromContext(ctx)
+		if !vc.CanPerformReadActionOnUser(uid) {
+			return nil, forbiddenError{message: "not read permissions on user"}
+		}
+		return next(ctx, request)
+	}
+}
+
+func requestUserIDFromContext(ctx context.Context) uint {
+	userID, ok := ctx.Value("viewerContext").(uint)
+	if !ok {
+		return 0
+	}
+	return userID
+}
+
 func viewerFromContext(ctx context.Context) (*ViewerContext, error) {
 	vc, ok := ctx.Value("viewerContext").(*ViewerContext)
 	if !ok {
-		return nil, errors.New("no viewer context set")
+		return nil, errNoContext
 	}
 	return vc, nil
 }
