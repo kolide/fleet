@@ -114,10 +114,11 @@ func TestLogin(t *testing.T) {
 			endpoint: "/login",
 			bodyType: "application/x-www-form-urlencoded",
 		},
-		{
-			method:   "GET",
-			endpoint: "/logout",
-		},
+		// @groob TODO need to test logout with a cookie set
+		// {
+		// 	method:   "GET",
+		// 	endpoint: "/logout",
+		// },
 	}
 
 	for _, tt := range unauthenticated {
