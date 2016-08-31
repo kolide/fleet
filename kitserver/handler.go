@@ -26,7 +26,7 @@ func MakeHandler(ctx context.Context, svc kolide.Service, logger kitlog.Logger) 
 
 	createUserHandler := kithttp.NewServer(
 		ctx,
-		makeCreateUserEndpoint(svc),
+		mustBeAdmin(makeCreateUserEndpoint(svc)),
 		decodeCreateUserRequest,
 		encodeResponse,
 		opts...,
@@ -96,9 +96,10 @@ func setViewerContext(svc kolide.Service, logger kitlog.Logger) kithttp.RequestF
 			return ctx
 		}
 
-		ctx = context.WithValue(ctx, "viewerContext", &viewerContext{
+		ctx = context.WithValue(ctx, "viewerContext", &ViewerContext{
 			user: user,
 		})
+		logger.Log("msg", "viewer context set", "user", user.ID)
 		return ctx
 	}
 }

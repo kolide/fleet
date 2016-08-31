@@ -203,14 +203,12 @@ func createTestUsers(t *testing.T, ds kolide.Datastore) {
 func svcWithNoValidation(config ServiceConfig) kolide.Service {
 	var svc kolide.Service
 	svc = service{
-		ds:                  config.Datastore,
-		logger:              config.Logger,
-		saltKeySize:         config.SaltKeySize,
-		bcryptCost:          config.BcryptCost,
-		jwtKey:              config.JWTKey,
-		cookieName:          config.SessionCookieName,
-		OsqueryEnrollSecret: config.OsqueryEnrollSecret,
-		OsqueryNodeKeySize:  config.OsqueryNodeKeySize,
+		ds:          config.Datastore,
+		logger:      config.Logger,
+		saltKeySize: config.SaltKeySize,
+		bcryptCost:  config.BcryptCost,
+		jwtKey:      config.JWTKey,
+		cookieName:  config.SessionCookieName,
 	}
 
 	return svc
@@ -218,7 +216,10 @@ func svcWithNoValidation(config ServiceConfig) kolide.Service {
 
 func testConfig(ds kolide.Datastore) ServiceConfig {
 	return ServiceConfig{
-		Datastore: ds,
-		Logger:    kitlog.NewNopLogger(),
+		Datastore:         ds,
+		Logger:            kitlog.NewNopLogger(),
+		BcryptCost:        12,
+		SaltKeySize:       24,
+		SessionCookieName: "KolideSession",
 	}
 }

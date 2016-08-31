@@ -14,6 +14,7 @@ import (
 
 	"github.com/kolide/kolide-ose/datastore"
 	"github.com/kolide/kolide-ose/kitserver"
+	"github.com/kolide/kolide-ose/kolide"
 )
 
 // this main is temporary. testing the new MakeHandler from kitserver
@@ -28,7 +29,38 @@ func main() {
 	logger = kitlog.NewContext(logger).With("ts", kitlog.DefaultTimestampUTC)
 
 	ds, _ := datastore.New("mock", "")
-	svc, _ := kitserver.NewService(ds)
+	svcConfig := kitserver.ServiceConfig{
+		Datastore:         ds,
+		SessionCookieName: "KolideSession",
+		BcryptCost:        12,
+		SaltKeySize:       24,
+	}
+	var svc kolide.Service
+	{ // temp create an admin user
+		svc, _ = kitserver.NewService(svcConfig)
+		var (
+			name     = "admin"
+			username = "admin"
+			password = "secret"
+			email    = "admin@kolide.co"
+			enabled  = true
+			isAdmin  = true
+		)
+		admin := kolide.UserPayload{
+			Name:     &name,
+			Username: &username,
+			Password: &password,
+			Email:    &email,
+			Enabled:  &enabled,
+			Admin:    &isAdmin,
+		}
+		_, err := svc.NewUser(ctx, admin)
+		if err != nil {
+			logger.Log("err", err)
+			os.Exit(1)
+		}
+		svc = kitserver.ValidatingService(svc)
+	}
 
 	httpLogger := kitlog.NewContext(logger).With("component", "http")
 
