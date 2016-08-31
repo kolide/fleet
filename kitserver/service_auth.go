@@ -21,9 +21,14 @@ func (svc service) Authenticate(ctx context.Context, username, password string) 
 	default:
 		return nil, err
 	}
+	if !user.Enabled {
+		return nil, authError{
+			message: fmt.Sprintf("account disabled %s", username),
+		}
+	}
 	if err := user.ValidatePassword(password); err != nil {
 		return nil, authError{
-			message: fmt.Sprintf("unauthorized: invalid password for user %s", username),
+			message: fmt.Sprintf("invalid password for user %s", username),
 		}
 	}
 	return user, nil
