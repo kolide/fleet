@@ -125,5 +125,5 @@ func setViewerContext(svc kolide.Service, logger kitlog.Logger) kithttp.RequestF
 
 func withUserIDFromRequest(r *http.Request, ctx context.Context) context.Context {
 	uid, _ := userIDFromRequest(r)
-	return context.WithValue(ctx, "request-uid", uid)
+	return context.WithValue(ctx, "request-id", uid)
 }

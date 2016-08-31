@@ -30,8 +30,9 @@ func canReadUser(next endpoint.Endpoint) endpoint.Endpoint {
 			return nil, err
 		}
 		uid := requestUserIDFromContext(ctx)
+		// TODO discuss the semantics of this check
 		if !vc.CanPerformReadActionOnUser(uid) {
-			return nil, forbiddenError{message: "not read permissions on user"}
+			return nil, forbiddenError{message: "no read permissions on user"}
 		}
 		return next(ctx, request)
 	}
@@ -44,15 +45,15 @@ func canModifyUser(next endpoint.Endpoint) endpoint.Endpoint {
 			return nil, err
 		}
 		uid := requestUserIDFromContext(ctx)
-		if !vc.CanPerformReadActionOnUser(uid) {
-			return nil, forbiddenError{message: "not read permissions on user"}
+		if !vc.CanPerformWriteActionOnUser(uid) {
+			return nil, forbiddenError{message: "no write permissions on user"}
 		}
 		return next(ctx, request)
 	}
 }
 
 func requestUserIDFromContext(ctx context.Context) uint {
-	userID, ok := ctx.Value("viewerContext").(uint)
+	userID, ok := ctx.Value("request-id").(uint)
 	if !ok {
 		return 0
 	}

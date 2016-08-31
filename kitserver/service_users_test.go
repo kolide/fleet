@@ -131,6 +131,11 @@ var testUsers = map[string]kolide.UserPayload{
 		Password: stringPtr("foobar"),
 		Email:    stringPtr("user1@example.com"),
 	},
+	"user2": {
+		Username: stringPtr("user2"),
+		Password: stringPtr("bazfoo"),
+		Email:    stringPtr("user2@example.com"),
+	},
 }
 
 func stringPtr(s string) *string {
