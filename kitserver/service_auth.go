@@ -34,7 +34,7 @@ func (svc service) NewSessionManager(ctx context.Context, w http.ResponseWriter,
 		Request:    r,
 		Writer:     w,
 		Store:      svc.ds,
-		JwtKey:     svc.jwtKey,
+		JWTKey:     svc.jwtKey,
 		CookieName: svc.cookieName,
 	}
 }

@@ -6,6 +6,7 @@ import (
 )
 
 // configuration defaults
+// TODO move to main?
 const (
 	defaultBcryptCost  int    = 12
 	defaultSaltKeySize int    = 24
