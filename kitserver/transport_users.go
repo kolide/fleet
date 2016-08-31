@@ -10,7 +10,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-func decodeCreateUserRequest(_ context.Context, r *http.Request) (interface{}, error) {
+func decodeCreateUserRequest(ctx context.Context, r *http.Request) (interface{}, error) {
 	var req createUserRequest
 	if err := json.NewDecoder(r.Body).Decode(&req.payload); err != nil {
 		return nil, err
@@ -19,7 +19,7 @@ func decodeCreateUserRequest(_ context.Context, r *http.Request) (interface{}, e
 	return req, nil
 }
 
-func decodeGetUserRequest(_ context.Context, r *http.Request) (interface{}, error) {
+func decodeGetUserRequest(ctx context.Context, r *http.Request) (interface{}, error) {
 	uid, err := userIDFromRequest(r)
 	if err != nil {
 		return nil, err
@@ -27,7 +27,7 @@ func decodeGetUserRequest(_ context.Context, r *http.Request) (interface{}, erro
 	return getUserRequest{ID: uid}, nil
 }
 
-func decodeChangePasswordRequest(_ context.Context, r *http.Request) (interface{}, error) {
+func decodeChangePasswordRequest(ctx context.Context, r *http.Request) (interface{}, error) {
 	uid, err := userIDFromRequest(r)
 	if err != nil {
 		return nil, err
@@ -40,7 +40,7 @@ func decodeChangePasswordRequest(_ context.Context, r *http.Request) (interface{
 	return req, nil
 }
 
-func decodeUpdateAdminRoleRequest(_ context.Context, r *http.Request) (interface{}, error) {
+func decodeUpdateAdminRoleRequest(ctx context.Context, r *http.Request) (interface{}, error) {
 	uid, err := userIDFromRequest(r)
 	if err != nil {
 		return nil, err
@@ -53,7 +53,7 @@ func decodeUpdateAdminRoleRequest(_ context.Context, r *http.Request) (interface
 	return req, nil
 }
 
-func decodeUpdateUserStatusRequest(_ context.Context, r *http.Request) (interface{}, error) {
+func decodeUpdateUserStatusRequest(ctx context.Context, r *http.Request) (interface{}, error) {
 	uid, err := userIDFromRequest(r)
 	if err != nil {
 		return nil, err
@@ -66,7 +66,7 @@ func decodeUpdateUserStatusRequest(_ context.Context, r *http.Request) (interfac
 	return req, nil
 }
 
-func decodeModifyUserRequest(_ context.Context, r *http.Request) (interface{}, error) {
+func decodeModifyUserRequest(ctx context.Context, r *http.Request) (interface{}, error) {
 	uid, err := userIDFromRequest(r)
 	if err != nil {
 		return nil, err
