@@ -11,7 +11,7 @@ import (
 
 func TestCreateUser(t *testing.T) {
 	ds, _ := datastore.New("mock", "")
-	svc, _ := NewService(ds)
+	svc, _ := NewService(testConfig(ds))
 
 	var createUserTests = []struct {
 		Username           *string
@@ -87,7 +87,7 @@ func TestCreateUser(t *testing.T) {
 
 func TestChangeUserPassword(t *testing.T) {
 	ds, _ := datastore.New("mock", "")
-	svc, _ := NewService(ds)
+	svc, _ := NewService(testConfig(ds))
 	createTestUsers(t, svc)
 
 	var passwordChangeTests = []struct {

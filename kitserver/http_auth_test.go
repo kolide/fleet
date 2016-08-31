@@ -18,7 +18,7 @@ import (
 
 func TestLogin(t *testing.T) {
 	ds, _ := datastore.New("mock", "")
-	svc, _ := NewService(ds)
+	svc, _ := NewService(testConfig(ds))
 	createTestUsers(t, svc)
 
 	r := http.NewServeMux()
@@ -156,5 +156,12 @@ func createTestUsers(t *testing.T, svc kolide.UserService) {
 		if err != nil {
 			t.Fatal(err)
 		}
+	}
+}
+
+func testConfig(ds kolide.Datastore) ServiceConfig {
+	return ServiceConfig{
+		Datastore: ds,
+		Logger:    kitlog.NewNopLogger(),
 	}
 }
