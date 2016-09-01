@@ -35,6 +35,7 @@ func main() {
 		BcryptCost:        12,
 		SaltKeySize:       24,
 	}
+	svcLogger := kitlog.NewContext(logger).With("component", "service")
 	var svc kolide.Service
 	{ // temp create an admin user
 		svc, _ = kitserver.NewService(svcConfig)
@@ -59,6 +60,7 @@ func main() {
 			logger.Log("err", err)
 			os.Exit(1)
 		}
+		svc = kitserver.NewLoggingService(svc, svcLogger)
 	}
 
 	httpLogger := kitlog.NewContext(logger).With("component", "http")
