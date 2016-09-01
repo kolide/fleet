@@ -19,8 +19,8 @@ func (mw loggingMiddleware) NewUser(ctx context.Context, p kolide.UserPayload) (
 		_ = mw.logger.Log(
 			"method", "NewUser",
 			"user", username,
-			"err", err,
 			"created_by", vc.user.Username,
+			"err", err,
 			"took", time.Since(begin),
 		)
 	}(time.Now())
@@ -50,5 +50,26 @@ func (mw loggingMiddleware) User(ctx context.Context, id uint) (user *kolide.Use
 	if user != nil {
 		username = user.Username
 	}
+	return
+}
+
+func (mw loggingMiddleware) ChangePassword(ctx context.Context, userID uint, old, new string) (err error) {
+
+	vc, err := viewerContextFromContext(ctx)
+	if err != nil {
+		return err
+	}
+
+	defer func(begin time.Time) {
+		_ = mw.logger.Log(
+			"method", "ChangePassword",
+			"user_id", userID,
+			"modified_by", vc.user.Username,
+			"err", err,
+			"took", time.Since(begin),
+		)
+	}(time.Now())
+
+	err = mw.Service.ChangePassword(ctx, userID, old, new)
 	return
 }
