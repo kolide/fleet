@@ -11,7 +11,7 @@ var errNoContext = errors.New("no viewer context set")
 
 func mustBeAdmin(next endpoint.Endpoint) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		vc, err := viewerFromContext(ctx)
+		vc, err := viewerContextFromContext(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -24,7 +24,7 @@ func mustBeAdmin(next endpoint.Endpoint) endpoint.Endpoint {
 
 func canReadUser(next endpoint.Endpoint) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		vc, err := viewerFromContext(ctx)
+		vc, err := viewerContextFromContext(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -39,7 +39,7 @@ func canReadUser(next endpoint.Endpoint) endpoint.Endpoint {
 
 func canModifyUser(next endpoint.Endpoint) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		vc, err := viewerFromContext(ctx)
+		vc, err := viewerContextFromContext(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -59,7 +59,7 @@ func requestUserIDFromContext(ctx context.Context) uint {
 	return userID
 }
 
-func viewerFromContext(ctx context.Context) (*ViewerContext, error) {
+func viewerContextFromContext(ctx context.Context) (*ViewerContext, error) {
 	vc, ok := ctx.Value("viewerContext").(*ViewerContext)
 	if !ok {
 		return nil, errNoContext

@@ -36,7 +36,7 @@ func (mw validationMiddleware) ChangePassword(ctx context.Context, userID uint, 
 
 func (mw validationMiddleware) UpdateUserStatus(ctx context.Context, userID uint, password string, enabled bool) error {
 	// validate password if user is disabling self
-	vc, err := viewerFromContext(ctx)
+	vc, err := viewerContextFromContext(ctx)
 	if err != nil {
 		return err
 	}

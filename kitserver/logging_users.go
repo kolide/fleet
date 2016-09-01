@@ -9,7 +9,7 @@ import (
 )
 
 func (mw loggingMiddleware) NewUser(ctx context.Context, p kolide.UserPayload) (user *kolide.User, err error) {
-	vc, err := viewerFromContext(ctx)
+	vc, err := viewerContextFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
