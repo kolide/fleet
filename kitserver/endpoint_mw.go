@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"github.com/go-kit/kit/endpoint"
-
 	"golang.org/x/net/context"
 )
 
