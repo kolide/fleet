@@ -1,6 +1,7 @@
 package kitserver
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -16,11 +17,25 @@ func login(svc kolide.Service, logger kitlog.Logger) http.HandlerFunc {
 	ctx := context.Background()
 	logger = kitlog.NewContext(logger).With("method", "login")
 	return func(w http.ResponseWriter, r *http.Request) {
-		username := r.FormValue("username")
-		password := r.FormValue("password")
-		if username == "" || password == "" {
-			http.Redirect(w, r, "/", http.StatusFound)
+		var loginRequest = struct {
+			Username *string
+			Password *string
+		}{}
+		if err := json.NewDecoder(r.Body).Decode(&loginRequest); err != nil {
+			encodeResponse(ctx, w, getUserResponse{
+				Err: err,
+			})
+			logger.Log("err", err)
 			return
+		}
+		var username, password string
+		{
+			if loginRequest.Username != nil {
+				username = *loginRequest.Username
+			}
+			if loginRequest.Password != nil {
+				password = *loginRequest.Password
+			}
 		}
 
 		// retrieve user or respond with error

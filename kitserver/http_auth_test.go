@@ -1,12 +1,13 @@
 package kitserver
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
 	"testing"
 
 	"golang.org/x/net/context"
@@ -23,8 +24,8 @@ func TestLogin(t *testing.T) {
 	createTestUsers(t, ds)
 
 	r := http.NewServeMux()
-	r.Handle("/logout", logout(svc, kitlog.NewNopLogger()))
-	r.Handle("/login", login(svc, kitlog.NewNopLogger()))
+	r.Handle("/api/logout", logout(svc, kitlog.NewNopLogger()))
+	r.Handle("/api/login", login(svc, kitlog.NewNopLogger()))
 	r.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "index")
 	}))
@@ -69,16 +70,22 @@ func TestLogin(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		v := url.Values{}
-		{
-			v.Set("username", tt.username)
-			v.Set("password", tt.password)
+		var loginRequest = struct {
+			Username string `json:"username"`
+			Password string `json:"password"`
+		}{
+			Username: tt.username,
+			Password: tt.password,
 		}
-		resp, err := http.PostForm(server.URL+"/login", v)
+		j, err := json.Marshal(&loginRequest)
 		if err != nil {
 			t.Fatal(err)
 		}
-
+		requestBody := &nopCloser{bytes.NewBuffer(j)}
+		resp, err := http.Post(server.URL+"/api/login", "application/json", requestBody)
+		if err != nil {
+			t.Fatal(err)
+		}
 		if have, want := resp.StatusCode, tt.status; have != want {
 			t.Errorf("have %d, want %d", have, want)
 		}
@@ -122,7 +129,7 @@ func TestLogin(t *testing.T) {
 		assert.NotEqual(t, "", sessions[0].Key)
 
 		// test logout
-		req, _ := http.NewRequest("GET", server.URL+"/logout", nil)
+		req, _ := http.NewRequest("GET", server.URL+"/api/logout", nil)
 		req.Header.Set("Cookie", cookie)
 		client := &http.Client{}
 		resp, err = client.Do(req)
@@ -223,3 +230,10 @@ func testConfig(ds kolide.Datastore) ServiceConfig {
 		SessionCookieName: "KolideSession",
 	}
 }
+
+// an io.ReadCloser for new request body
+type nopCloser struct {
+	io.Reader
+}
+
+func (nopCloser) Close() error { return nil }
