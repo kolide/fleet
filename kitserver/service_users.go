@@ -37,7 +37,7 @@ func (svc service) ChangePassword(ctx context.Context, userID uint, old, new str
 		return err
 	}
 	if err := user.ValidatePassword(old); err != nil {
-		return fmt.Errorf("old password validation failed: %v", err)
+		return fmt.Errorf("current password validation failed: %v", err)
 	}
 	hashed, salt, err := hashPassword(new, svc.saltKeySize, svc.bcryptCost)
 	if err != nil {
@@ -62,8 +62,6 @@ func (svc service) UpdateUserStatus(ctx context.Context, userID uint, password s
 	if err != nil {
 		return err
 	}
-	// TODO @groob
-	// password validation
 	user.Enabled = enabled
 	return svc.saveUser(user)
 }

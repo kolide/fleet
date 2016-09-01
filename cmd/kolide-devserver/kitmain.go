@@ -59,7 +59,6 @@ func main() {
 			logger.Log("err", err)
 			os.Exit(1)
 		}
-		svc = kitserver.ValidatingService(svc)
 	}
 
 	httpLogger := kitlog.NewContext(logger).With("component", "http")
