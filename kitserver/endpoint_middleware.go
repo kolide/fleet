@@ -59,8 +59,8 @@ func requestUserIDFromContext(ctx context.Context) uint {
 	return userID
 }
 
-func viewerContextFromContext(ctx context.Context) (*ViewerContext, error) {
-	vc, ok := ctx.Value("viewerContext").(*ViewerContext)
+func viewerContextFromContext(ctx context.Context) (*viewerContext, error) {
+	vc, ok := ctx.Value("viewerContext").(*viewerContext)
 	if !ok {
 		return nil, errNoContext
 	}

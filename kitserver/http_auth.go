@@ -171,13 +171,13 @@ func (e forbiddenError) Error() string {
 // variety of other execution contexts as well (script, test, etc). The main
 // purpose of a ViewerContext is to assist in the authorization of sensitive
 // actions.
-type ViewerContext struct {
+type viewerContext struct {
 	user *kolide.User
 }
 
 // IsAdmin indicates whether or not the current user can perform administrative
 // actions.
-func (vc *ViewerContext) IsAdmin() bool {
+func (vc *viewerContext) IsAdmin() bool {
 	if vc.user != nil {
 		return vc.user.Admin && vc.user.Enabled
 	}
@@ -186,7 +186,7 @@ func (vc *ViewerContext) IsAdmin() bool {
 
 // UserID is a helper that enables quick access to the user ID of the current
 // user.
-func (vc *ViewerContext) UserID() uint {
+func (vc *viewerContext) UserID() uint {
 	if vc.user != nil {
 		return vc.user.ID
 	}
@@ -195,31 +195,31 @@ func (vc *ViewerContext) UserID() uint {
 
 // IsLoggedIn determines whether or not the current VC is attached to a user
 // account
-func (vc *ViewerContext) IsLoggedIn() bool {
+func (vc *viewerContext) IsLoggedIn() bool {
 	return vc.user != nil && vc.user.Enabled
 }
 
 // CanPerformActions returns a bool indicating the current user's ability to
 // perform the most basic actions on the site
-func (vc *ViewerContext) CanPerformActions() bool {
+func (vc *viewerContext) CanPerformActions() bool {
 	return vc.IsLoggedIn() && !vc.user.NeedsPasswordReset
 }
 
 // CanPerformReadActionsOnUser returns a bool indicating the current user's
 // ability to perform read actions on the given user
-func (vc *ViewerContext) CanPerformReadActionOnUser(uid uint) bool {
+func (vc *viewerContext) CanPerformReadActionOnUser(uid uint) bool {
 	return vc.CanPerformActions() || (vc.IsLoggedIn() && vc.IsUserID(uid))
 }
 
 // CanPerformWriteActionOnUser returns a bool indicating the current user's
 // ability to perform write actions on the given user
-func (vc *ViewerContext) CanPerformWriteActionOnUser(uid uint) bool {
+func (vc *viewerContext) CanPerformWriteActionOnUser(uid uint) bool {
 	return vc.CanPerformActions() && (vc.IsUserID(uid) || vc.IsAdmin())
 }
 
 // IsUserID returns true if the given user id the same as the user which is
 // represented by this ViewerContext
-func (vc *ViewerContext) IsUserID(id uint) bool {
+func (vc *viewerContext) IsUserID(id uint) bool {
 	if vc.UserID() == id {
 		return true
 	}
@@ -227,22 +227,22 @@ func (vc *ViewerContext) IsUserID(id uint) bool {
 }
 
 // newViewerContext generates a ViewerContext given a user struct
-func newViewerContext(user *kolide.User) *ViewerContext {
-	return &ViewerContext{
+func newViewerContext(user *kolide.User) *viewerContext {
+	return &viewerContext{
 		user: user,
 	}
 }
 
 // EmptyVC is a utility which generates an empty ViewerContext. This is often
 // used to represent users which are not logged in.
-func emptyVC() *ViewerContext {
-	return &ViewerContext{}
+func emptyVC() *viewerContext {
+	return &viewerContext{}
 }
 
-func vcFromID(ds kolide.UserStore, id uint) (*ViewerContext, error) {
+func vcFromID(ds kolide.UserStore, id uint) (*viewerContext, error) {
 	user, err := ds.UserByID(id)
 	if err != nil {
 		return nil, err
 	}
-	return &ViewerContext{user: user}, nil
+	return &viewerContext{user: user}, nil
 }

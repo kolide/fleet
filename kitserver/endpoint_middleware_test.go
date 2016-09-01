@@ -26,7 +26,7 @@ func TestEndpointPermissions(t *testing.T) {
 	var endpointTests = []struct {
 		endpoint endpoint.Endpoint
 		// who is making the request
-		vc *ViewerContext
+		vc *viewerContext
 		// what resource are we editing
 		requestID uint
 		// what error to expect
@@ -46,36 +46,36 @@ func TestEndpointPermissions(t *testing.T) {
 		},
 		{
 			endpoint: mustBeAdmin(e),
-			vc:       &ViewerContext{user: admin1},
+			vc:       &viewerContext{user: admin1},
 		},
 		{
 			endpoint: mustBeAdmin(e),
-			vc:       &ViewerContext{user: user1},
+			vc:       &viewerContext{user: user1},
 			wantErr:  "must be an admin",
 		},
 		{
 			endpoint: canModifyUser(e),
-			vc:       &ViewerContext{user: admin1},
+			vc:       &viewerContext{user: admin1},
 		},
 		{
 			endpoint: canModifyUser(e),
-			vc:       &ViewerContext{user: user1},
+			vc:       &viewerContext{user: user1},
 			wantErr:  "no write permissions",
 		},
 		{
 			endpoint:  canModifyUser(e),
-			vc:        &ViewerContext{user: user1},
+			vc:        &viewerContext{user: user1},
 			requestID: admin1.ID,
 			wantErr:   "no write permissions",
 		},
 		{
 			endpoint:  canReadUser(e),
-			vc:        &ViewerContext{user: user1},
+			vc:        &viewerContext{user: user1},
 			requestID: admin1.ID,
 		},
 		{
 			endpoint:  canReadUser(e),
-			vc:        &ViewerContext{user: user2},
+			vc:        &viewerContext{user: user2},
 			requestID: admin1.ID,
 			wantErr:   "no read permissions",
 		},

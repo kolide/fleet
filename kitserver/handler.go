@@ -111,7 +111,7 @@ func setViewerContext(svc kolide.Service, logger kitlog.Logger) kithttp.RequestF
 			return ctx
 		}
 
-		ctx = context.WithValue(ctx, "viewerContext", &ViewerContext{
+		ctx = context.WithValue(ctx, "viewerContext", &viewerContext{
 			user: user,
 		})
 		logger.Log("msg", "viewer context set", "user", user.ID)
