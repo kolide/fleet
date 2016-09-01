@@ -1,3 +1,5 @@
+// Package kitserver holds the implementation of the kolide service interface and the HTTP endpoints
+// for the API
 package kitserver
 
 import (
