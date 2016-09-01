@@ -26,12 +26,8 @@ func NewService(config ServiceConfig) (kolide.Service, error) {
 		OsqueryEnrollSecret: config.OsqueryEnrollSecret,
 		OsqueryNodeKeySize:  config.OsqueryNodeKeySize,
 	}
-	return svc, nil
-}
-
-func ValidatingService(svc kolide.Service) kolide.Service {
 	svc = validationMiddleware{svc}
-	return svc
+	return svc, nil
 }
 
 type service struct {
