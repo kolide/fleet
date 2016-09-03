@@ -7,6 +7,52 @@ import (
 )
 
 ////////////////////////////////////////////////////////////////////////////////
+// Get Query
+////////////////////////////////////////////////////////////////////////////////
+
+type getQueryRequest struct {
+	ID uint
+}
+
+type getQueryResponse struct {
+	ID           uint   `json:"id"`
+	Name         string `json:"name"`
+	Query        string `json:"query"`
+	Interval     uint   `json:"interval"`
+	Snapshot     bool   `json:"snapshot"`
+	Differential bool   `json:"differential"`
+	Platform     string `json:"platform"`
+	Version      string `json:"version"`
+	Err          error  `json:"error, omitempty"`
+}
+
+func (r getQueryResponse) error() error { return r.Err }
+
+func makeGetQueryEndpoint(svc kolide.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(getQueryRequest)
+		query, err := svc.GetQuery(ctx, req.ID)
+		if err != nil {
+			return getQueryResponse{Err: err}, nil
+		}
+		return getQueryResponse{
+			ID:           query.ID,
+			Name:         query.Name,
+			Query:        query.Query,
+			Interval:     query.Interval,
+			Snapshot:     query.Snapshot,
+			Differential: query.Differential,
+			Platform:     query.Platform,
+			Version:      query.Version,
+		}, nil
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get All Queries
+////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////
 // Create Query
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -115,11 +161,3 @@ func makeDeleteQueryEndpoint(svc kolide.Service) endpoint.Endpoint {
 		return deleteQueryResponse{}, nil
 	}
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// Get Query
-////////////////////////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////////////////////////
-// Get All Queries
-////////////////////////////////////////////////////////////////////////////////

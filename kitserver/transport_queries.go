@@ -37,3 +37,13 @@ func decodeDeleteQueryRequest(ctx context.Context, r *http.Request) (interface{}
 	req.ID = id
 	return req, nil
 }
+
+func decodeGetQueryRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	id, err := idFromRequest(r)
+	if err != nil {
+		return nil, err
+	}
+	var req getQueryRequest
+	req.ID = id
+	return req, nil
+}

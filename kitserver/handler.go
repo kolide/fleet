@@ -36,10 +36,12 @@ func MakeHandler(ctx context.Context, svc kolide.Service, logger kitlog.Logger) 
 		updateAdminRoleEndpoint  = mustBeAdmin(makeUpdateAdminRoleEndpoint(svc))
 		updateUserStatusEndpoint = canModifyUser(makeUpdateUserStatusEndpoint(svc))
 
+		getQueryEndpoint    = makeGetQueryEndpoint(svc)
 		createQueryEndpoint = makeCreateQueryEndpoint(svc)
 		modifyQueryEndpoint = makeModifyQueryEndpoint(svc)
 		deleteQueryEndpoint = makeDeleteQueryEndpoint(svc)
 
+		getPackEndpoint    = makeGetPackEndpoint(svc)
 		createPackEndpoint = makeCreatePackEndpoint(svc)
 		modifyPackEndpoint = makeModifyPackEndpoint(svc)
 		deletePackEdnpoint = makeDeletePackEndpoint(svc)
@@ -85,6 +87,14 @@ func MakeHandler(ctx context.Context, svc kolide.Service, logger kitlog.Logger) 
 		opts...,
 	)
 
+	getQueryHandler := kithttp.NewServer(
+		ctx,
+		getQueryEndpoint,
+		decodeGetQueryRequest,
+		encodeResponse,
+		opts...,
+	)
+
 	createQueryHandler := kithttp.NewServer(
 		ctx,
 		createQueryEndpoint,
@@ -105,6 +115,14 @@ func MakeHandler(ctx context.Context, svc kolide.Service, logger kitlog.Logger) 
 		ctx,
 		deleteQueryEndpoint,
 		decodeDeleteQueryRequest,
+		encodeResponse,
+		opts...,
+	)
+
+	getPackHandler := kithttp.NewServer(
+		ctx,
+		getPackEndpoint,
+		decodeGetPackRequest,
 		encodeResponse,
 		opts...,
 	)
@@ -141,10 +159,12 @@ func MakeHandler(ctx context.Context, svc kolide.Service, logger kitlog.Logger) 
 	api.Handle("/api/v1/kolide/users/{id}/role", updateAdminRoleHandler).Methods("POST")
 	api.Handle("/api/v1/kolide/users/{id}/status", updateUserStatusHandler).Methods("POST")
 
+	api.Handle("/api/v1/kolide/queries/{id}", getQueryHandler).Methods("GET")
 	api.Handle("/api/v1/kolide/queries", createQueryHandler).Methods("POST")
 	api.Handle("/api/v1/kolide/queries/{id}", modifyQueryHandler).Methods("PATCH")
 	api.Handle("/api/v1/kolide/queries/{id}", deleteQueryHandler).Methods("DELETE")
 
+	api.Handle("/api/v1/kolide/packs/{id}", getPackHandler).Methods("GET")
 	api.Handle("/api/v1/kolide/packs", createPackHandler).Methods("POST")
 	api.Handle("/api/v1/kolide/packs/{id}", modifyPackHandler).Methods("PATCH")
 	api.Handle("/api/v1/kolide/packs/{id}", deletePackHandler).Methods("DELETE")

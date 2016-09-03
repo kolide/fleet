@@ -38,3 +38,13 @@ func decodeDeletePackRequest(ctx context.Context, r *http.Request) (interface{},
 	req.ID = id
 	return req, nil
 }
+
+func decodeGetPackRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	id, err := idFromRequest(r)
+	if err != nil {
+		return nil, err
+	}
+	var req getPackRequest
+	req.ID = id
+	return req, nil
+}
