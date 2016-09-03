@@ -97,12 +97,15 @@ func MakeHandler(ctx context.Context, svc kolide.Service, logger kitlog.Logger) 
 	)
 
 	api := mux.NewRouter()
+
 	api.Handle("/api/v1/kolide/users", createUserHandler).Methods("POST")
 	api.Handle("/api/v1/kolide/users/{id}", getUserHandler).Methods("GET")
 	api.Handle("/api/v1/kolide/users/{id}/password", changePasswordHandler).Methods("POST")
 	api.Handle("/api/v1/kolide/users/{id}/role", updateAdminRoleHandler).Methods("POST")
 	api.Handle("/api/v1/kolide/users/{id}/status", updateUserStatusHandler).Methods("POST")
+
 	api.Handle("/api/v1/kolide/queries", createQueryHandler).Methods("POST")
+
 	api.Handle("/api/v1/kolide/packs", createPackHandler).Methods("POST")
 
 	r := mux.NewRouter()
