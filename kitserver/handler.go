@@ -37,7 +37,10 @@ func MakeHandler(ctx context.Context, svc kolide.Service, logger kitlog.Logger) 
 		updateUserStatusEndpoint = canModifyUser(makeUpdateUserStatusEndpoint(svc))
 
 		createQueryEndpoint = makeCreateQueryEndpoint(svc)
-		createPackEndpoint  = makeCreatePackEndpoint(svc)
+		modifyQueryEndpoint = makeModifyQueryEndpoint(svc)
+
+		createPackEndpoint = makeCreatePackEndpoint(svc)
+		modifyPackEndpoint = makeModifyPackEndpoint(svc)
 	)
 
 	createUserHandler := kithttp.NewServer(
@@ -88,10 +91,26 @@ func MakeHandler(ctx context.Context, svc kolide.Service, logger kitlog.Logger) 
 		opts...,
 	)
 
+	modifyQueryHandler := kithttp.NewServer(
+		ctx,
+		modifyQueryEndpoint,
+		decodeModifyQueryRequest,
+		encodeResponse,
+		opts...,
+	)
+
 	createPackHandler := kithttp.NewServer(
 		ctx,
 		createPackEndpoint,
 		decodeCreatePackRequest,
+		encodeResponse,
+		opts...,
+	)
+
+	modifyPackHandler := kithttp.NewServer(
+		ctx,
+		modifyPackEndpoint,
+		decodeModifyPackRequest,
 		encodeResponse,
 		opts...,
 	)
@@ -105,8 +124,10 @@ func MakeHandler(ctx context.Context, svc kolide.Service, logger kitlog.Logger) 
 	api.Handle("/api/v1/kolide/users/{id}/status", updateUserStatusHandler).Methods("POST")
 
 	api.Handle("/api/v1/kolide/queries", createQueryHandler).Methods("POST")
+	api.Handle("/api/v1/kolide/queries/{id}", modifyQueryHandler).Methods("PATCH")
 
 	api.Handle("/api/v1/kolide/packs", createPackHandler).Methods("POST")
+	api.Handle("/api/v1/kolide/packs/{id}", modifyPackHandler).Methods("PATCH")
 
 	r := mux.NewRouter()
 
@@ -146,6 +167,6 @@ func setViewerContext(svc kolide.Service, logger kitlog.Logger) kithttp.RequestF
 }
 
 func withUserIDFromRequest(r *http.Request, ctx context.Context) context.Context {
-	uid, _ := userIDFromRequest(r)
+	uid, _ := idFromRequest(r)
 	return context.WithValue(ctx, "request-id", uid)
 }

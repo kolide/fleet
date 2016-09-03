@@ -12,6 +12,18 @@ func decodeCreateQueryRequest(ctx context.Context, r *http.Request) (interface{}
 	if err := json.NewDecoder(r.Body).Decode(&req.payload); err != nil {
 		return nil, err
 	}
+	return req, nil
+}
 
+func decodeModifyQueryRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	id, err := idFromRequest(r)
+	if err != nil {
+		return nil, err
+	}
+	var req modifyQueryRequest
+	if err := json.NewDecoder(r.Body).Decode(&req.payload); err != nil {
+		return nil, err
+	}
+	req.ID = id
 	return req, nil
 }

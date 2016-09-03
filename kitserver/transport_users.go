@@ -3,9 +3,7 @@ package kitserver
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
 
-	"github.com/gorilla/mux"
 	"golang.org/x/net/context"
 )
 
@@ -19,7 +17,7 @@ func decodeCreateUserRequest(ctx context.Context, r *http.Request) (interface{},
 }
 
 func decodeGetUserRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	uid, err := userIDFromRequest(r)
+	uid, err := idFromRequest(r)
 	if err != nil {
 		return nil, err
 	}
@@ -27,7 +25,7 @@ func decodeGetUserRequest(ctx context.Context, r *http.Request) (interface{}, er
 }
 
 func decodeChangePasswordRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	uid, err := userIDFromRequest(r)
+	uid, err := idFromRequest(r)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +38,7 @@ func decodeChangePasswordRequest(ctx context.Context, r *http.Request) (interfac
 }
 
 func decodeUpdateAdminRoleRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	uid, err := userIDFromRequest(r)
+	uid, err := idFromRequest(r)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +51,7 @@ func decodeUpdateAdminRoleRequest(ctx context.Context, r *http.Request) (interfa
 }
 
 func decodeUpdateUserStatusRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	uid, err := userIDFromRequest(r)
+	uid, err := idFromRequest(r)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +64,7 @@ func decodeUpdateUserStatusRequest(ctx context.Context, r *http.Request) (interf
 }
 
 func decodeModifyUserRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	uid, err := userIDFromRequest(r)
+	uid, err := idFromRequest(r)
 	if err != nil {
 		return nil, err
 	}
@@ -76,17 +74,4 @@ func decodeModifyUserRequest(ctx context.Context, r *http.Request) (interface{},
 	}
 	req.ID = uid
 	return req, nil
-}
-
-func userIDFromRequest(r *http.Request) (uint, error) {
-	vars := mux.Vars(r)
-	id, ok := vars["id"]
-	if !ok {
-		return 0, errBadRoute
-	}
-	uid, err := strconv.Atoi(id)
-	if err != nil {
-		return 0, err
-	}
-	return uint(uid), nil
 }

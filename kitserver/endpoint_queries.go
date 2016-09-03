@@ -52,6 +52,45 @@ func makeCreateQueryEndpoint(svc kolide.Service) endpoint.Endpoint {
 // Modify Query
 ////////////////////////////////////////////////////////////////////////////////
 
+type modifyQueryRequest struct {
+	ID      uint
+	payload kolide.QueryPayload
+}
+
+type modifyQueryResponse struct {
+	ID           uint   `json:"id"`
+	Name         string `json:"name"`
+	Query        string `json:"query"`
+	Interval     uint   `json:"interval"`
+	Snapshot     bool   `json:"snapshot"`
+	Differential bool   `json:"differential"`
+	Platform     string `json:"platform"`
+	Version      string `json:"version"`
+	Err          error  `json:"error, omitempty"`
+}
+
+func (r modifyQueryResponse) error() error { return r.Err }
+
+func makeModifyQueryEndpoint(svc kolide.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(modifyQueryRequest)
+		query, err := svc.ModifyQuery(ctx, req.ID, req.payload)
+		if err != nil {
+			return modifyQueryResponse{Err: err}, nil
+		}
+		return modifyQueryResponse{
+			ID:           query.ID,
+			Name:         query.Name,
+			Query:        query.Query,
+			Interval:     query.Interval,
+			Snapshot:     query.Snapshot,
+			Differential: query.Differential,
+			Platform:     query.Platform,
+			Version:      query.Version,
+		}, nil
+	}
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Delete Query
 ////////////////////////////////////////////////////////////////////////////////
