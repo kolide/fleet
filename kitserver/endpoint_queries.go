@@ -52,6 +52,36 @@ func makeGetQueryEndpoint(svc kolide.Service) endpoint.Endpoint {
 // Get All Queries
 ////////////////////////////////////////////////////////////////////////////////
 
+type getAllQueriesResponse struct {
+	Queries []getQueryResponse `json:"queries"`
+	Err     error              `json:"error, omitempty"`
+}
+
+func (r getAllQueriesResponse) error() error { return r.Err }
+
+func makeGetAllQueriesEndpoint(svc kolide.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		queries, err := svc.GetAllQueries(ctx)
+		if err != nil {
+			return nil, err
+		}
+		var resp getAllQueriesResponse
+		for _, query := range queries {
+			resp.Queries = append(resp.Queries, getQueryResponse{
+				ID:           query.ID,
+				Name:         query.Name,
+				Query:        query.Query,
+				Interval:     query.Interval,
+				Snapshot:     query.Snapshot,
+				Differential: query.Differential,
+				Platform:     query.Platform,
+				Version:      query.Version,
+			})
+		}
+		return resp, nil
+	}
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Create Query
 ////////////////////////////////////////////////////////////////////////////////

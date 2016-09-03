@@ -36,15 +36,17 @@ func MakeHandler(ctx context.Context, svc kolide.Service, logger kitlog.Logger) 
 		updateAdminRoleEndpoint  = mustBeAdmin(makeUpdateAdminRoleEndpoint(svc))
 		updateUserStatusEndpoint = canModifyUser(makeUpdateUserStatusEndpoint(svc))
 
-		getQueryEndpoint    = makeGetQueryEndpoint(svc)
-		createQueryEndpoint = makeCreateQueryEndpoint(svc)
-		modifyQueryEndpoint = makeModifyQueryEndpoint(svc)
-		deleteQueryEndpoint = makeDeleteQueryEndpoint(svc)
+		getQueryEndpoint      = makeGetQueryEndpoint(svc)
+		getAllQueriesEndpoint = makeGetAllQueriesEndpoint(svc)
+		createQueryEndpoint   = makeCreateQueryEndpoint(svc)
+		modifyQueryEndpoint   = makeModifyQueryEndpoint(svc)
+		deleteQueryEndpoint   = makeDeleteQueryEndpoint(svc)
 
-		getPackEndpoint    = makeGetPackEndpoint(svc)
-		createPackEndpoint = makeCreatePackEndpoint(svc)
-		modifyPackEndpoint = makeModifyPackEndpoint(svc)
-		deletePackEdnpoint = makeDeletePackEndpoint(svc)
+		getPackEndpoint     = makeGetPackEndpoint(svc)
+		getAllPacksEndpoint = makeGetAllPacksEndpoint(svc)
+		createPackEndpoint  = makeCreatePackEndpoint(svc)
+		modifyPackEndpoint  = makeModifyPackEndpoint(svc)
+		deletePackEdnpoint  = makeDeletePackEndpoint(svc)
 	)
 
 	createUserHandler := kithttp.NewServer(
@@ -95,6 +97,14 @@ func MakeHandler(ctx context.Context, svc kolide.Service, logger kitlog.Logger) 
 		opts...,
 	)
 
+	getAllQueriesHandler := kithttp.NewServer(
+		ctx,
+		getAllQueriesEndpoint,
+		decodeNoParamsRequest,
+		encodeResponse,
+		opts...,
+	)
+
 	createQueryHandler := kithttp.NewServer(
 		ctx,
 		createQueryEndpoint,
@@ -123,6 +133,14 @@ func MakeHandler(ctx context.Context, svc kolide.Service, logger kitlog.Logger) 
 		ctx,
 		getPackEndpoint,
 		decodeGetPackRequest,
+		encodeResponse,
+		opts...,
+	)
+
+	getAllPacksHandler := kithttp.NewServer(
+		ctx,
+		getAllPacksEndpoint,
+		decodeNoParamsRequest,
 		encodeResponse,
 		opts...,
 	)
@@ -160,11 +178,13 @@ func MakeHandler(ctx context.Context, svc kolide.Service, logger kitlog.Logger) 
 	api.Handle("/api/v1/kolide/users/{id}/status", updateUserStatusHandler).Methods("POST")
 
 	api.Handle("/api/v1/kolide/queries/{id}", getQueryHandler).Methods("GET")
+	api.Handle("/api/v1/kolide/queries", getAllQueriesHandler).Methods("GET")
 	api.Handle("/api/v1/kolide/queries", createQueryHandler).Methods("POST")
 	api.Handle("/api/v1/kolide/queries/{id}", modifyQueryHandler).Methods("PATCH")
 	api.Handle("/api/v1/kolide/queries/{id}", deleteQueryHandler).Methods("DELETE")
 
 	api.Handle("/api/v1/kolide/packs/{id}", getPackHandler).Methods("GET")
+	api.Handle("/api/v1/kolide/packs", getAllPacksHandler).Methods("GET")
 	api.Handle("/api/v1/kolide/packs", createPackHandler).Methods("POST")
 	api.Handle("/api/v1/kolide/packs/{id}", modifyPackHandler).Methods("PATCH")
 	api.Handle("/api/v1/kolide/packs/{id}", deletePackHandler).Methods("DELETE")

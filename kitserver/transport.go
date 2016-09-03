@@ -86,3 +86,7 @@ func idFromRequest(r *http.Request) (uint, error) {
 	}
 	return uint(uid), nil
 }
+
+func decodeNoParamsRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	return nil, nil
+}
