@@ -35,6 +35,9 @@ func MakeHandler(ctx context.Context, svc kolide.Service, logger kitlog.Logger) 
 		changePasswordEndpoint   = canModifyUser(makeChangePasswordEndpoint(svc))
 		updateAdminRoleEndpoint  = mustBeAdmin(makeUpdateAdminRoleEndpoint(svc))
 		updateUserStatusEndpoint = canModifyUser(makeUpdateUserStatusEndpoint(svc))
+
+		createQueryEndpoint = makeCreateQueryEndpoint(svc)
+		createPackEndpoint  = makeCreatePackEndpoint(svc)
 	)
 
 	createUserHandler := kithttp.NewServer(
@@ -77,12 +80,30 @@ func MakeHandler(ctx context.Context, svc kolide.Service, logger kitlog.Logger) 
 		opts...,
 	)
 
+	createQueryHandler := kithttp.NewServer(
+		ctx,
+		createQueryEndpoint,
+		decodeCreateQueryRequest,
+		encodeResponse,
+		opts...,
+	)
+
+	createPackHandler := kithttp.NewServer(
+		ctx,
+		createPackEndpoint,
+		decodeCreatePackRequest,
+		encodeResponse,
+		opts...,
+	)
+
 	api := mux.NewRouter()
 	api.Handle("/api/v1/kolide/users", createUserHandler).Methods("POST")
 	api.Handle("/api/v1/kolide/users/{id}", getUserHandler).Methods("GET")
 	api.Handle("/api/v1/kolide/users/{id}/password", changePasswordHandler).Methods("POST")
 	api.Handle("/api/v1/kolide/users/{id}/role", updateAdminRoleHandler).Methods("POST")
 	api.Handle("/api/v1/kolide/users/{id}/status", updateUserStatusHandler).Methods("POST")
+	api.Handle("/api/v1/kolide/queries", createQueryHandler).Methods("POST")
+	api.Handle("/api/v1/kolide/packs", createPackHandler).Methods("POST")
 
 	r := mux.NewRouter()
 

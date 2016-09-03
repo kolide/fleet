@@ -1,10 +1,9 @@
 package kitserver
 
 import (
-	"golang.org/x/net/context"
-
 	"github.com/go-kit/kit/endpoint"
 	"github.com/kolide/kolide-ose/kolide"
+	"golang.org/x/net/context"
 )
 
 type createUserRequest struct {

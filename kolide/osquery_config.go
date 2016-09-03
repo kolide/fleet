@@ -33,13 +33,13 @@ type OsqueryConfigStore interface {
 type OsqueryConfigService interface {
 	GetAllQueries(ctx context.Context) ([]*Query, error)
 	GetQuery(ctx context.Context, id uint) (*Query, error)
-	CreateQuery(ctx context.Context, p QueryPayload) error
+	NewQuery(ctx context.Context, p QueryPayload) (*Query, error)
 	ModifyQuery(ctx context.Context, id uint, p QueryPayload) (*Query, error)
 	DeleteQuery(ctx context.Context, id uint) error
 
 	GetAllPacks(ctx context.Context) ([]*Pack, error)
 	GetPack(ctx context.Context, id uint) (*Pack, error)
-	CreatePack(ctx context.Context, p PackPayload) error
+	NewPack(ctx context.Context, p PackPayload) (*Pack, error)
 	ModifyPack(ctx context.Context, id uint, p PackPayload) (*Pack, error)
 	DeletePack(ctx context.Context, id uint) error
 

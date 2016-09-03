@@ -13,8 +13,8 @@ func (svc service) GetQuery(ctx context.Context, id uint) (*kolide.Query, error)
 	return svc.ds.Query(id)
 }
 
-func (svc service) CreateQuery(ctx context.Context, p kolide.QueryPayload) error {
-	return svc.ds.NewQuery(&kolide.Query{
+func (svc service) NewQuery(ctx context.Context, p kolide.QueryPayload) (*kolide.Query, error) {
+	query := &kolide.Query{
 		Name:         *p.Name,
 		Query:        *p.Query,
 		Interval:     *p.Interval,
@@ -22,7 +22,12 @@ func (svc service) CreateQuery(ctx context.Context, p kolide.QueryPayload) error
 		Differential: *p.Differential,
 		Platform:     *p.Platform,
 		Version:      *p.Version,
-	})
+	}
+	err := svc.ds.NewQuery(query)
+	if err != nil {
+		return nil, err
+	}
+	return query, nil
 }
 
 func (svc service) ModifyQuery(ctx context.Context, id uint, p kolide.QueryPayload) (*kolide.Query, error) {
@@ -89,11 +94,16 @@ func (svc service) GetPack(ctx context.Context, id uint) (*kolide.Pack, error) {
 	return svc.ds.Pack(id)
 }
 
-func (svc service) CreatePack(ctx context.Context, p kolide.PackPayload) error {
-	return svc.ds.NewPack(&kolide.Pack{
+func (svc service) NewPack(ctx context.Context, p kolide.PackPayload) (*kolide.Pack, error) {
+	pack := &kolide.Pack{
 		Name:     *p.Name,
 		Platform: *p.Platform,
-	})
+	}
+	err := svc.ds.NewPack(pack)
+	if err != nil {
+		return nil, err
+	}
+	return pack, nil
 }
 
 func (svc service) ModifyPack(ctx context.Context, id uint, p kolide.PackPayload) (*kolide.Pack, error) {
