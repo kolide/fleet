@@ -95,6 +95,27 @@ func makeModifyQueryEndpoint(svc kolide.Service) endpoint.Endpoint {
 // Delete Query
 ////////////////////////////////////////////////////////////////////////////////
 
+type deleteQueryRequest struct {
+	ID uint
+}
+
+type deleteQueryResponse struct {
+	Err error `json:"error, omitempty"`
+}
+
+func (r deleteQueryResponse) error() error { return r.Err }
+
+func makeDeleteQueryEndpoint(svc kolide.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(deleteQueryRequest)
+		err := svc.DeleteQuery(ctx, req.ID)
+		if err != nil {
+			return deleteQueryResponse{Err: err}, nil
+		}
+		return deleteQueryResponse{}, nil
+	}
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Get Query
 ////////////////////////////////////////////////////////////////////////////////

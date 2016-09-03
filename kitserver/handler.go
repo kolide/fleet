@@ -38,9 +38,11 @@ func MakeHandler(ctx context.Context, svc kolide.Service, logger kitlog.Logger) 
 
 		createQueryEndpoint = makeCreateQueryEndpoint(svc)
 		modifyQueryEndpoint = makeModifyQueryEndpoint(svc)
+		deleteQueryEndpoint = makeDeleteQueryEndpoint(svc)
 
 		createPackEndpoint = makeCreatePackEndpoint(svc)
 		modifyPackEndpoint = makeModifyPackEndpoint(svc)
+		deletePackEdnpoint = makeDeletePackEndpoint(svc)
 	)
 
 	createUserHandler := kithttp.NewServer(
@@ -99,6 +101,14 @@ func MakeHandler(ctx context.Context, svc kolide.Service, logger kitlog.Logger) 
 		opts...,
 	)
 
+	deleteQueryHandler := kithttp.NewServer(
+		ctx,
+		deleteQueryEndpoint,
+		decodeDeleteQueryRequest,
+		encodeResponse,
+		opts...,
+	)
+
 	createPackHandler := kithttp.NewServer(
 		ctx,
 		createPackEndpoint,
@@ -115,6 +125,14 @@ func MakeHandler(ctx context.Context, svc kolide.Service, logger kitlog.Logger) 
 		opts...,
 	)
 
+	deletePackHandler := kithttp.NewServer(
+		ctx,
+		deletePackEdnpoint,
+		decodeDeletePackRequest,
+		encodeResponse,
+		opts...,
+	)
+
 	api := mux.NewRouter()
 
 	api.Handle("/api/v1/kolide/users", createUserHandler).Methods("POST")
@@ -125,9 +143,11 @@ func MakeHandler(ctx context.Context, svc kolide.Service, logger kitlog.Logger) 
 
 	api.Handle("/api/v1/kolide/queries", createQueryHandler).Methods("POST")
 	api.Handle("/api/v1/kolide/queries/{id}", modifyQueryHandler).Methods("PATCH")
+	api.Handle("/api/v1/kolide/queries/{id}", deleteQueryHandler).Methods("DELETE")
 
 	api.Handle("/api/v1/kolide/packs", createPackHandler).Methods("POST")
 	api.Handle("/api/v1/kolide/packs/{id}", modifyPackHandler).Methods("PATCH")
+	api.Handle("/api/v1/kolide/packs/{id}", deletePackHandler).Methods("DELETE")
 
 	r := mux.NewRouter()
 
