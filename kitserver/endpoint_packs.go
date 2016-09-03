@@ -161,6 +161,50 @@ func makeDeletePackEndpoint(svc kolide.Service) endpoint.Endpoint {
 // Add Query To Pack
 ////////////////////////////////////////////////////////////////////////////////
 
+type addQueryToPackRequest struct {
+	QueryID uint
+	PackID  uint
+}
+
+type addQueryToPackResponse struct {
+	Err error `json:"error, omitempty"`
+}
+
+func (r addQueryToPackResponse) error() error { return r.Err }
+
+func makeAddQueryToPackEndpoint(svc kolide.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(addQueryToPackRequest)
+		err := svc.AddQueryToPack(ctx, req.QueryID, req.PackID)
+		if err != nil {
+			return nil, err
+		}
+		return addQueryToPackResponse{}, nil
+	}
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Delete Query From Pack
 ////////////////////////////////////////////////////////////////////////////////
+
+type deleteQueryFromPackRequest struct {
+	QueryID uint
+	PackID  uint
+}
+
+type deleteQueryFromPackResponse struct {
+	Err error `json:"error, omitempty"`
+}
+
+func (r deleteQueryFromPackResponse) error() error { return r.Err }
+
+func makeDeleteQueryFromPackEndpoint(svc kolide.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(deleteQueryFromPackRequest)
+		err := svc.RemoveQueryFromPack(ctx, req.QueryID, req.PackID)
+		if err != nil {
+			return nil, err
+		}
+		return deleteQueryFromPackResponse{}, nil
+	}
+}

@@ -17,15 +17,15 @@ func decodeCreateUserRequest(ctx context.Context, r *http.Request) (interface{},
 }
 
 func decodeGetUserRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	uid, err := idFromRequest(r)
+	id, err := idFromRequest(r, "id")
 	if err != nil {
 		return nil, err
 	}
-	return getUserRequest{ID: uid}, nil
+	return getUserRequest{ID: id}, nil
 }
 
 func decodeChangePasswordRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	uid, err := idFromRequest(r)
+	id, err := idFromRequest(r, "id")
 	if err != nil {
 		return nil, err
 	}
@@ -33,12 +33,12 @@ func decodeChangePasswordRequest(ctx context.Context, r *http.Request) (interfac
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, err
 	}
-	req.UserID = uid
+	req.UserID = id
 	return req, nil
 }
 
 func decodeUpdateAdminRoleRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	uid, err := idFromRequest(r)
+	id, err := idFromRequest(r, "id")
 	if err != nil {
 		return nil, err
 	}
@@ -46,12 +46,12 @@ func decodeUpdateAdminRoleRequest(ctx context.Context, r *http.Request) (interfa
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, err
 	}
-	req.UserID = uid
+	req.UserID = id
 	return req, nil
 }
 
 func decodeUpdateUserStatusRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	uid, err := idFromRequest(r)
+	id, err := idFromRequest(r, "id")
 	if err != nil {
 		return nil, err
 	}
@@ -59,12 +59,12 @@ func decodeUpdateUserStatusRequest(ctx context.Context, r *http.Request) (interf
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, err
 	}
-	req.UserID = uid
+	req.UserID = id
 	return req, nil
 }
 
 func decodeModifyUserRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	uid, err := idFromRequest(r)
+	id, err := idFromRequest(r, "id")
 	if err != nil {
 		return nil, err
 	}
@@ -72,6 +72,6 @@ func decodeModifyUserRequest(ctx context.Context, r *http.Request) (interface{},
 	if err := json.NewDecoder(r.Body).Decode(&req.payload); err != nil {
 		return nil, err
 	}
-	req.ID = uid
+	req.ID = id
 	return req, nil
 }

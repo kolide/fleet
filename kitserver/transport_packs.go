@@ -17,7 +17,7 @@ func decodeCreatePackRequest(ctx context.Context, r *http.Request) (interface{},
 }
 
 func decodeModifyPackRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	id, err := idFromRequest(r)
+	id, err := idFromRequest(r, "id")
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +30,7 @@ func decodeModifyPackRequest(ctx context.Context, r *http.Request) (interface{},
 }
 
 func decodeDeletePackRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	id, err := idFromRequest(r)
+	id, err := idFromRequest(r, "id")
 	if err != nil {
 		return nil, err
 	}
@@ -40,11 +40,41 @@ func decodeDeletePackRequest(ctx context.Context, r *http.Request) (interface{},
 }
 
 func decodeGetPackRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	id, err := idFromRequest(r)
+	id, err := idFromRequest(r, "id")
 	if err != nil {
 		return nil, err
 	}
 	var req getPackRequest
 	req.ID = id
+	return req, nil
+}
+
+func decodeAddQueryToPackRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	qid, err := idFromRequest(r, "qid")
+	if err != nil {
+		return nil, err
+	}
+	pid, err := idFromRequest(r, "pid")
+	if err != nil {
+		return nil, err
+	}
+	var req addQueryToPackRequest
+	req.PackID = pid
+	req.QueryID = qid
+	return req, nil
+}
+
+func decodeDeleteQueryFromPackRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	qid, err := idFromRequest(r, "qid")
+	if err != nil {
+		return nil, err
+	}
+	pid, err := idFromRequest(r, "pid")
+	if err != nil {
+		return nil, err
+	}
+	var req deleteQueryFromPackRequest
+	req.PackID = pid
+	req.QueryID = qid
 	return req, nil
 }

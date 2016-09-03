@@ -16,7 +16,7 @@ func decodeCreateQueryRequest(ctx context.Context, r *http.Request) (interface{}
 }
 
 func decodeModifyQueryRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	id, err := idFromRequest(r)
+	id, err := idFromRequest(r, "id")
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +29,7 @@ func decodeModifyQueryRequest(ctx context.Context, r *http.Request) (interface{}
 }
 
 func decodeDeleteQueryRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	id, err := idFromRequest(r)
+	id, err := idFromRequest(r, "id")
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +39,7 @@ func decodeDeleteQueryRequest(ctx context.Context, r *http.Request) (interface{}
 }
 
 func decodeGetQueryRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	id, err := idFromRequest(r)
+	id, err := idFromRequest(r, "id")
 	if err != nil {
 		return nil, err
 	}

@@ -42,11 +42,13 @@ func MakeHandler(ctx context.Context, svc kolide.Service, logger kitlog.Logger) 
 		modifyQueryEndpoint   = makeModifyQueryEndpoint(svc)
 		deleteQueryEndpoint   = makeDeleteQueryEndpoint(svc)
 
-		getPackEndpoint     = makeGetPackEndpoint(svc)
-		getAllPacksEndpoint = makeGetAllPacksEndpoint(svc)
-		createPackEndpoint  = makeCreatePackEndpoint(svc)
-		modifyPackEndpoint  = makeModifyPackEndpoint(svc)
-		deletePackEdnpoint  = makeDeletePackEndpoint(svc)
+		getPackEndpoint             = makeGetPackEndpoint(svc)
+		getAllPacksEndpoint         = makeGetAllPacksEndpoint(svc)
+		createPackEndpoint          = makeCreatePackEndpoint(svc)
+		modifyPackEndpoint          = makeModifyPackEndpoint(svc)
+		deletePackEndpoint          = makeDeletePackEndpoint(svc)
+		addQueryToPackEndpoint      = makeAddQueryToPackEndpoint(svc)
+		deleteQueryFromPackEndpoint = makeDeleteQueryFromPackEndpoint(svc)
 	)
 
 	createUserHandler := kithttp.NewServer(
@@ -163,8 +165,24 @@ func MakeHandler(ctx context.Context, svc kolide.Service, logger kitlog.Logger) 
 
 	deletePackHandler := kithttp.NewServer(
 		ctx,
-		deletePackEdnpoint,
+		deletePackEndpoint,
 		decodeDeletePackRequest,
+		encodeResponse,
+		opts...,
+	)
+
+	addQueryToPackHandler := kithttp.NewServer(
+		ctx,
+		addQueryToPackEndpoint,
+		decodeAddQueryToPackRequest,
+		encodeResponse,
+		opts...,
+	)
+
+	deleteQueryFromPackHandler := kithttp.NewServer(
+		ctx,
+		deleteQueryFromPackEndpoint,
+		decodeDeleteQueryFromPackRequest,
 		encodeResponse,
 		opts...,
 	)
@@ -188,6 +206,8 @@ func MakeHandler(ctx context.Context, svc kolide.Service, logger kitlog.Logger) 
 	api.Handle("/api/v1/kolide/packs", createPackHandler).Methods("POST")
 	api.Handle("/api/v1/kolide/packs/{id}", modifyPackHandler).Methods("PATCH")
 	api.Handle("/api/v1/kolide/packs/{id}", deletePackHandler).Methods("DELETE")
+	api.Handle("/api/v1/kolide/packs/{pid}/queries/{qid}", addQueryToPackHandler).Methods("GET")
+	api.Handle("/api/v1/kolide/packs/{pid}/queries/{qid}", deleteQueryFromPackHandler).Methods("DELETE")
 
 	r := mux.NewRouter()
 
@@ -227,6 +247,6 @@ func setViewerContext(svc kolide.Service, logger kitlog.Logger) kithttp.RequestF
 }
 
 func withUserIDFromRequest(r *http.Request, ctx context.Context) context.Context {
-	uid, _ := idFromRequest(r)
-	return context.WithValue(ctx, "request-id", uid)
+	id, _ := idFromRequest(r, "id")
+	return context.WithValue(ctx, "request-id", id)
 }

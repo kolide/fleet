@@ -74,9 +74,9 @@ func typeErrsStatus(err error) int {
 	}
 }
 
-func idFromRequest(r *http.Request) (uint, error) {
+func idFromRequest(r *http.Request, name string) (uint, error) {
 	vars := mux.Vars(r)
-	id, ok := vars["id"]
+	id, ok := vars[name]
 	if !ok {
 		return 0, errBadRoute
 	}
