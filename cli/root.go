@@ -7,14 +7,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	ConfigFile string
-)
-
-func init() {
-	rootCmd.PersistentFlags().StringVar(&ConfigFile, "config", "", "Path to a configuration file")
-}
-
 func Launch() {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
