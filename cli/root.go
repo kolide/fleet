@@ -4,8 +4,13 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/kolide/kolide-ose/config"
 	"github.com/spf13/cobra"
 )
+
+func init() {
+	rootCmd.PersistentFlags().StringVar(&config.File, "config", "", "Path to a configuration file")
+}
 
 func Launch() {
 	if err := rootCmd.Execute(); err != nil {

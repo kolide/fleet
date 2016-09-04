@@ -9,6 +9,11 @@ import (
 	"github.com/spf13/viper"
 )
 
+var (
+	// File may or may not contain the path to the config file
+	File string
+)
+
 func init() {
 	cobra.OnInitialize(initConfig)
 }
@@ -34,6 +39,9 @@ func setDefaultConfigValue(key string, value interface{}) {
 }
 
 func initConfig() {
+	if File != "" {
+		viper.SetConfigFile(File)
+	}
 	viper.SetConfigName("kolide")
 	viper.AddConfigPath(".")
 	viper.AddConfigPath("$HOME")
