@@ -3,7 +3,6 @@ package kitserver
 import (
 	"testing"
 
-	_ "github.com/kolide/kolide-ose/config"
 	"github.com/kolide/kolide-ose/datastore"
 	"github.com/kolide/kolide-ose/kolide"
 	"github.com/stretchr/testify/assert"

@@ -14,15 +14,21 @@ func (svc service) GetPack(ctx context.Context, id uint) (*kolide.Pack, error) {
 }
 
 func (svc service) NewPack(ctx context.Context, p kolide.PackPayload) (*kolide.Pack, error) {
-	pack := &kolide.Pack{
-		Name:     *p.Name,
-		Platform: *p.Platform,
+	var pack kolide.Pack
+
+	if p.Name != nil {
+		pack.Name = *p.Name
 	}
-	err := svc.ds.NewPack(pack)
+
+	if p.Platform != nil {
+		pack.Platform = *p.Platform
+	}
+
+	err := svc.ds.NewPack(&pack)
 	if err != nil {
 		return nil, err
 	}
-	return pack, nil
+	return &pack, nil
 }
 
 func (svc service) ModifyPack(ctx context.Context, id uint, p kolide.PackPayload) (*kolide.Pack, error) {
