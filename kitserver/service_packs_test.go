@@ -162,6 +162,38 @@ func TestAddQueryToPack(t *testing.T) {
 	assert.Len(t, queries, 1)
 }
 
+func TestGetQueriesInPack(t *testing.T) {
+	ds, err := datastore.New("gorm-sqlite3", ":memory:")
+	assert.Nil(t, err)
+
+	svc, err := NewService(testConfig(ds))
+	assert.Nil(t, err)
+
+	ctx := context.Background()
+
+	pack := &kolide.Pack{
+		Name: "foo",
+	}
+	err = ds.NewPack(pack)
+	assert.Nil(t, err)
+	assert.NotZero(t, pack.ID)
+
+	query := &kolide.Query{
+		Name:  "bar",
+		Query: "select * from time;",
+	}
+	err = ds.NewQuery(query)
+	assert.Nil(t, err)
+	assert.NotZero(t, query.ID)
+
+	err = ds.AddQueryToPack(query, pack)
+	assert.Nil(t, err)
+
+	queries, err := svc.GetQueriesInPack(ctx, pack.ID)
+	assert.Nil(t, err)
+	assert.Len(t, queries, 1)
+}
+
 func TestRemoveQueryFromPack(t *testing.T) {
 	ds, err := datastore.New("gorm-sqlite3", ":memory:")
 	assert.Nil(t, err)

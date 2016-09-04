@@ -104,6 +104,22 @@ func TestDecodeAddQueryToPackRequest(t *testing.T) {
 	)
 }
 
+func TestDecodeGetQueriesInPackRequest(t *testing.T) {
+	router := mux.NewRouter()
+	router.HandleFunc("/api/v1/kolide/packs/{id}/queries", func(writer http.ResponseWriter, request *http.Request) {
+		r, err := decodeGetQueriesInPackRequest(context.Background(), request)
+		assert.Nil(t, err)
+
+		params := r.(getQueriesInPackRequest)
+		assert.Equal(t, uint(1), params.ID)
+	}).Methods("GET")
+
+	router.ServeHTTP(
+		httptest.NewRecorder(),
+		httptest.NewRequest("GET", "/api/v1/kolide/packs/1/queries", nil),
+	)
+}
+
 func TestDecodeDeleteQueryFromPackRequest(t *testing.T) {
 	router := mux.NewRouter()
 	router.HandleFunc("/api/v1/kolide/packs/{pid}/queries/{qid}", func(writer http.ResponseWriter, request *http.Request) {

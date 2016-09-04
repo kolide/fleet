@@ -184,6 +184,46 @@ func makeAddQueryToPackEndpoint(svc kolide.Service) endpoint.Endpoint {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Get Queries In Pack
+////////////////////////////////////////////////////////////////////////////////
+
+type getQueriesInPackRequest struct {
+	ID uint
+}
+
+type getQueriesInPackResponse struct {
+	Queries []getQueryResponse
+	Err     error `json:"error, omitempty"`
+}
+
+func (r getQueriesInPackResponse) error() error { return r.Err }
+
+func makeGetQueriesInPackEndpoint(svc kolide.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(getQueriesInPackRequest)
+		queries, err := svc.GetQueriesInPack(ctx, req.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		var resp getQueriesInPackResponse
+		for _, query := range queries {
+			resp.Queries = append(resp.Queries, getQueryResponse{
+				ID:           query.ID,
+				Name:         query.Name,
+				Query:        query.Query,
+				Interval:     query.Interval,
+				Snapshot:     query.Snapshot,
+				Differential: query.Differential,
+				Platform:     query.Platform,
+				Version:      query.Version,
+			})
+		}
+		return resp, nil
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Delete Query From Pack
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -64,6 +64,16 @@ func decodeAddQueryToPackRequest(ctx context.Context, r *http.Request) (interfac
 	return req, nil
 }
 
+func decodeGetQueriesInPackRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	id, err := idFromRequest(r, "id")
+	if err != nil {
+		return nil, err
+	}
+	var req getQueriesInPackRequest
+	req.ID = id
+	return req, nil
+}
+
 func decodeDeleteQueryFromPackRequest(ctx context.Context, r *http.Request) (interface{}, error) {
 	qid, err := idFromRequest(r, "qid")
 	if err != nil {

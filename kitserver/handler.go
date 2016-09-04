@@ -185,6 +185,16 @@ func MakeHandler(ctx context.Context, svc kolide.Service, logger kitlog.Logger) 
 		),
 	).Methods("GET")
 
+	api.Handle("/packs/{id}/queries",
+		kithttp.NewServer(
+			ctx,
+			makeGetQueriesInPackEndpoint(svc),
+			decodeGetQueriesInPackRequest,
+			encodeResponse,
+			opts...,
+		),
+	).Methods("GET")
+
 	api.Handle("/packs/{pid}/queries/{qid}",
 		kithttp.NewServer(
 			ctx,

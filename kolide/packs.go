@@ -28,7 +28,7 @@ type PackService interface {
 	DeletePack(ctx context.Context, id uint) error
 
 	AddQueryToPack(ctx context.Context, qid, pid uint) error
-	// GetQueriesInPack(ctx context.Context, pid uint) ([]*Queries, error)
+	GetQueriesInPack(ctx context.Context, id uint) ([]*Query, error)
 	RemoveQueryFromPack(ctx context.Context, qid, pid uint) error
 }
 

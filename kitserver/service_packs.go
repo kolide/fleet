@@ -86,6 +86,20 @@ func (svc service) AddQueryToPack(ctx context.Context, qid, pid uint) error {
 	return nil
 }
 
+func (svc service) GetQueriesInPack(ctx context.Context, id uint) ([]*kolide.Query, error) {
+	pack, err := svc.ds.Pack(id)
+	if err != nil {
+		return nil, err
+	}
+
+	queries, err := svc.ds.GetQueriesInPack(pack)
+	if err != nil {
+		return nil, err
+	}
+
+	return queries, nil
+}
+
 func (svc service) RemoveQueryFromPack(ctx context.Context, qid, pid uint) error {
 	pack, err := svc.ds.Pack(pid)
 	if err != nil {
