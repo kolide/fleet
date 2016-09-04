@@ -23,191 +23,177 @@ func MakeHandler(ctx context.Context, svc kolide.Service, logger kitlog.Logger) 
 		),
 	}
 
-	// make all the endpoints
-	// the endpoints are wrapped in middleware with correct permissions
-	// this is a bit simplistic, but so are the permissions
-	// the reason's it's not a Service interface wrapper instead:
-	// - the permissions are too simple to justify it. having 3-4 endpoint Middleware vs wrapping each service method individually.
-	// - service API is still not stable yet
-	var (
-		createUserEndpoint       = mustBeAdmin(makeCreateUserEndpoint(svc))
-		getUserEndpoint          = canReadUser(makeGetUserEndpoint(svc))
-		changePasswordEndpoint   = canModifyUser(makeChangePasswordEndpoint(svc))
-		updateAdminRoleEndpoint  = mustBeAdmin(makeUpdateAdminRoleEndpoint(svc))
-		updateUserStatusEndpoint = canModifyUser(makeUpdateUserStatusEndpoint(svc))
-
-		getQueryEndpoint      = makeGetQueryEndpoint(svc)
-		getAllQueriesEndpoint = makeGetAllQueriesEndpoint(svc)
-		createQueryEndpoint   = makeCreateQueryEndpoint(svc)
-		modifyQueryEndpoint   = makeModifyQueryEndpoint(svc)
-		deleteQueryEndpoint   = makeDeleteQueryEndpoint(svc)
-
-		getPackEndpoint             = makeGetPackEndpoint(svc)
-		getAllPacksEndpoint         = makeGetAllPacksEndpoint(svc)
-		createPackEndpoint          = makeCreatePackEndpoint(svc)
-		modifyPackEndpoint          = makeModifyPackEndpoint(svc)
-		deletePackEndpoint          = makeDeletePackEndpoint(svc)
-		addQueryToPackEndpoint      = makeAddQueryToPackEndpoint(svc)
-		deleteQueryFromPackEndpoint = makeDeleteQueryFromPackEndpoint(svc)
-	)
-
-	createUserHandler := kithttp.NewServer(
-		ctx,
-		createUserEndpoint,
-		decodeCreateUserRequest,
-		encodeResponse,
-		opts...,
-	)
-
-	getUserHandler := kithttp.NewServer(
-		ctx,
-		getUserEndpoint,
-		decodeGetUserRequest,
-		encodeResponse,
-		opts...,
-	)
-
-	changePasswordHandler := kithttp.NewServer(
-		ctx,
-		changePasswordEndpoint,
-		decodeChangePasswordRequest,
-		encodeResponse,
-		opts...,
-	)
-
-	updateAdminRoleHandler := kithttp.NewServer(
-		ctx,
-		updateAdminRoleEndpoint,
-		decodeUpdateAdminRoleRequest,
-		encodeResponse,
-		opts...,
-	)
-
-	updateUserStatusHandler := kithttp.NewServer(
-		ctx,
-		updateUserStatusEndpoint,
-		decodeUpdateUserStatusRequest,
-		encodeResponse,
-		opts...,
-	)
-
-	getQueryHandler := kithttp.NewServer(
-		ctx,
-		getQueryEndpoint,
-		decodeGetQueryRequest,
-		encodeResponse,
-		opts...,
-	)
-
-	getAllQueriesHandler := kithttp.NewServer(
-		ctx,
-		getAllQueriesEndpoint,
-		decodeNoParamsRequest,
-		encodeResponse,
-		opts...,
-	)
-
-	createQueryHandler := kithttp.NewServer(
-		ctx,
-		createQueryEndpoint,
-		decodeCreateQueryRequest,
-		encodeResponse,
-		opts...,
-	)
-
-	modifyQueryHandler := kithttp.NewServer(
-		ctx,
-		modifyQueryEndpoint,
-		decodeModifyQueryRequest,
-		encodeResponse,
-		opts...,
-	)
-
-	deleteQueryHandler := kithttp.NewServer(
-		ctx,
-		deleteQueryEndpoint,
-		decodeDeleteQueryRequest,
-		encodeResponse,
-		opts...,
-	)
-
-	getPackHandler := kithttp.NewServer(
-		ctx,
-		getPackEndpoint,
-		decodeGetPackRequest,
-		encodeResponse,
-		opts...,
-	)
-
-	getAllPacksHandler := kithttp.NewServer(
-		ctx,
-		getAllPacksEndpoint,
-		decodeNoParamsRequest,
-		encodeResponse,
-		opts...,
-	)
-
-	createPackHandler := kithttp.NewServer(
-		ctx,
-		createPackEndpoint,
-		decodeCreatePackRequest,
-		encodeResponse,
-		opts...,
-	)
-
-	modifyPackHandler := kithttp.NewServer(
-		ctx,
-		modifyPackEndpoint,
-		decodeModifyPackRequest,
-		encodeResponse,
-		opts...,
-	)
-
-	deletePackHandler := kithttp.NewServer(
-		ctx,
-		deletePackEndpoint,
-		decodeDeletePackRequest,
-		encodeResponse,
-		opts...,
-	)
-
-	addQueryToPackHandler := kithttp.NewServer(
-		ctx,
-		addQueryToPackEndpoint,
-		decodeAddQueryToPackRequest,
-		encodeResponse,
-		opts...,
-	)
-
-	deleteQueryFromPackHandler := kithttp.NewServer(
-		ctx,
-		deleteQueryFromPackEndpoint,
-		decodeDeleteQueryFromPackRequest,
-		encodeResponse,
-		opts...,
-	)
-
 	api := mux.NewRouter()
 
-	api.Handle("/api/v1/kolide/users", createUserHandler).Methods("POST")
-	api.Handle("/api/v1/kolide/users/{id}", getUserHandler).Methods("GET")
-	api.Handle("/api/v1/kolide/users/{id}/password", changePasswordHandler).Methods("POST")
-	api.Handle("/api/v1/kolide/users/{id}/role", updateAdminRoleHandler).Methods("POST")
-	api.Handle("/api/v1/kolide/users/{id}/status", updateUserStatusHandler).Methods("POST")
+	api.Handle("/users",
+		kithttp.NewServer(
+			ctx,
+			mustBeAdmin(makeCreateUserEndpoint(svc)),
+			decodeCreateUserRequest,
+			encodeResponse,
+			opts...,
+		),
+	).Methods("POST")
 
-	api.Handle("/api/v1/kolide/queries/{id}", getQueryHandler).Methods("GET")
-	api.Handle("/api/v1/kolide/queries", getAllQueriesHandler).Methods("GET")
-	api.Handle("/api/v1/kolide/queries", createQueryHandler).Methods("POST")
-	api.Handle("/api/v1/kolide/queries/{id}", modifyQueryHandler).Methods("PATCH")
-	api.Handle("/api/v1/kolide/queries/{id}", deleteQueryHandler).Methods("DELETE")
+	api.Handle("/users/{id}",
+		kithttp.NewServer(
+			ctx,
+			canReadUser(makeGetUserEndpoint(svc)),
+			decodeGetUserRequest,
+			encodeResponse,
+			opts...,
+		),
+	).Methods("GET")
 
-	api.Handle("/api/v1/kolide/packs/{id}", getPackHandler).Methods("GET")
-	api.Handle("/api/v1/kolide/packs", getAllPacksHandler).Methods("GET")
-	api.Handle("/api/v1/kolide/packs", createPackHandler).Methods("POST")
-	api.Handle("/api/v1/kolide/packs/{id}", modifyPackHandler).Methods("PATCH")
-	api.Handle("/api/v1/kolide/packs/{id}", deletePackHandler).Methods("DELETE")
-	api.Handle("/api/v1/kolide/packs/{pid}/queries/{qid}", addQueryToPackHandler).Methods("GET")
-	api.Handle("/api/v1/kolide/packs/{pid}/queries/{qid}", deleteQueryFromPackHandler).Methods("DELETE")
+	api.Handle("/users/{id}/password",
+		kithttp.NewServer(
+			ctx,
+			canModifyUser(makeChangePasswordEndpoint(svc)),
+			decodeChangePasswordRequest,
+			encodeResponse,
+			opts...,
+		),
+	).Methods("POST")
+
+	api.Handle("/users/{id}/role",
+		kithttp.NewServer(
+			ctx,
+			mustBeAdmin(makeUpdateAdminRoleEndpoint(svc)),
+			decodeUpdateAdminRoleRequest,
+			encodeResponse,
+			opts...,
+		),
+	).Methods("POST")
+
+	api.Handle("/users/{id}/status",
+		kithttp.NewServer(
+			ctx,
+			canModifyUser(makeUpdateUserStatusEndpoint(svc)),
+			decodeUpdateUserStatusRequest,
+			encodeResponse,
+			opts...,
+		),
+	).Methods("POST")
+
+	api.Handle("/queries/{id}",
+		kithttp.NewServer(
+			ctx,
+			makeGetQueryEndpoint(svc),
+			decodeGetQueryRequest,
+			encodeResponse,
+			opts...,
+		),
+	).Methods("GET")
+
+	api.Handle("/queries",
+		kithttp.NewServer(
+			ctx,
+			makeGetAllQueriesEndpoint(svc),
+			decodeNoParamsRequest,
+			encodeResponse,
+			opts...,
+		),
+	).Methods("GET")
+
+	api.Handle("/queries",
+		kithttp.NewServer(
+			ctx,
+			makeCreateQueryEndpoint(svc),
+			decodeCreateQueryRequest,
+			encodeResponse,
+			opts...,
+		),
+	).Methods("POST")
+
+	api.Handle("/queries/{id}",
+		kithttp.NewServer(
+			ctx,
+			makeModifyQueryEndpoint(svc),
+			decodeModifyQueryRequest,
+			encodeResponse,
+			opts...,
+		),
+	).Methods("PATCH")
+
+	api.Handle("/queries/{id}",
+		kithttp.NewServer(
+			ctx,
+			makeDeleteQueryEndpoint(svc),
+			decodeDeleteQueryRequest,
+			encodeResponse,
+			opts...,
+		),
+	).Methods("DELETE")
+
+	api.Handle("/packs/{id}",
+		kithttp.NewServer(
+			ctx,
+			makeGetPackEndpoint(svc),
+			decodeGetPackRequest,
+			encodeResponse,
+			opts...,
+		),
+	).Methods("GET")
+
+	api.Handle("/packs",
+		kithttp.NewServer(
+			ctx,
+			makeGetAllPacksEndpoint(svc),
+			decodeNoParamsRequest,
+			encodeResponse,
+			opts...,
+		),
+	).Methods("GET")
+
+	api.Handle("/packs",
+		kithttp.NewServer(
+			ctx,
+			makeCreatePackEndpoint(svc),
+			decodeCreatePackRequest,
+			encodeResponse,
+			opts...,
+		),
+	).Methods("POST")
+
+	api.Handle("/packs/{id}",
+		kithttp.NewServer(
+			ctx,
+			makeModifyPackEndpoint(svc),
+			decodeModifyPackRequest,
+			encodeResponse,
+			opts...,
+		),
+	).Methods("PATCH")
+
+	api.Handle("/packs/{id}",
+		kithttp.NewServer(
+			ctx,
+			makeDeletePackEndpoint(svc),
+			decodeDeletePackRequest,
+			encodeResponse,
+			opts...,
+		),
+	).Methods("DELETE")
+
+	api.Handle("/packs/{pid}/queries/{qid}",
+		kithttp.NewServer(
+			ctx,
+			makeAddQueryToPackEndpoint(svc),
+			decodeAddQueryToPackRequest,
+			encodeResponse,
+			opts...,
+		),
+	).Methods("GET")
+
+	api.Handle("/packs/{pid}/queries/{qid}",
+		kithttp.NewServer(
+			ctx,
+			makeDeleteQueryFromPackEndpoint(svc),
+			decodeDeleteQueryFromPackRequest,
+			encodeResponse,
+			opts...,
+		),
+	).Methods("DELETE")
 
 	r := mux.NewRouter()
 
