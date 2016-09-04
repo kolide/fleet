@@ -357,7 +357,7 @@ func TestLabelQueries(t *testing.T) {
 	testLabelQueries(t, db)
 }
 
-func testLabelQueries(t *testing.T, db kolide.OsqueryStore) {
+func testLabelQueries(t *testing.T, db kolide.Datastore) {
 	var host *kolide.Host
 	var err error
 	for i := 0; i < 10; i++ {

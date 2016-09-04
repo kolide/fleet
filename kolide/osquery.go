@@ -7,16 +7,18 @@ import (
 	"golang.org/x/net/context"
 )
 
-type OsqueryServerStore interface {
+type OsqueryStore interface {
 	EnrollHost(uuid, hostname, ip, platform string, nodeKeySize int) (*Host, error)
 	AuthenticateHost(nodeKey string) (*Host, error)
 	SaveHost(host *Host) error
 	MarkHostSeen(host *Host, t time.Time) error
+
 	LabelQueriesForHost(host *Host, cutoff time.Time) (map[string]string, error)
 	RecordLabelQueryExecutions(host *Host, results map[string]bool, t time.Time) error
+	NewLabel(label *Label) error
 }
 
-type OsqueryServerService interface {
+type OsqueryService interface {
 	EnrollAgent(ctx context.Context, enrollSecret, hostIdentifier string) (string, error)
 	GetClientConfig(ctx context.Context, action string, data *json.RawMessage) (*OsqueryConfig, error)
 	Log(ctx context.Context, logType string, data *json.RawMessage) error
@@ -45,7 +47,7 @@ type OsqueryConfig struct {
 // LabelQueriesForHost calculates the appropriate update cutoff (given
 // interval) and uses the datastore to retrieve the label queries for the
 // provided host.
-func LabelQueriesForHost(store OsqueryServerStore, host *Host, interval time.Duration) (map[string]string, error) {
+func LabelQueriesForHost(store OsqueryStore, host *Host, interval time.Duration) (map[string]string, error) {
 	cutoff := time.Now().Add(-interval)
 	return store.LabelQueriesForHost(host, cutoff)
 }

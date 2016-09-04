@@ -161,7 +161,7 @@ func OsqueryEnroll(c *gin.Context) {
 		})
 }
 
-func (h *OsqueryHandler) handleConfigDetail(db kolide.OsqueryServerStore, host *kolide.Host, data json.RawMessage) (map[string]string, error) {
+func (h *OsqueryHandler) handleConfigDetail(db kolide.OsqueryStore, host *kolide.Host, data json.RawMessage) (map[string]string, error) {
 	var detail OsqueryConfigDetail
 	if err := json.Unmarshal(data, &detail); err != nil {
 		return nil, errors.NewFromError(err, http.StatusBadRequest, "JSON parse error")
@@ -181,7 +181,7 @@ func (h *OsqueryHandler) handleConfigDetail(db kolide.OsqueryServerStore, host *
 	return kolide.LabelQueriesForHost(db, host, h.LabelQueryInterval)
 }
 
-func (h *OsqueryHandler) handleConfigQueryResults(db kolide.OsqueryServerStore, host *kolide.Host, data json.RawMessage) error {
+func (h *OsqueryHandler) handleConfigQueryResults(db kolide.OsqueryStore, host *kolide.Host, data json.RawMessage) error {
 	var results OsqueryConfigQueryResults
 	if err := json.Unmarshal(data, &results); err != nil {
 		return errors.NewFromError(err, http.StatusBadRequest, "JSON parse error")

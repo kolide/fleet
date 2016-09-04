@@ -6,45 +6,21 @@ import (
 	"golang.org/x/net/context"
 )
 
-type OsqueryConfigStore interface {
+type QueryStore interface {
 	// Query methods
 	NewQuery(query *Query) error
 	SaveQuery(query *Query) error
 	DeleteQuery(query *Query) error
 	Query(id uint) (*Query, error)
 	Queries() ([]*Query, error)
-
-	// Label methods
-	NewLabel(label *Label) error
-
-	// Pack methods
-	NewPack(pack *Pack) error
-	SavePack(pack *Pack) error
-	DeletePack(pack *Pack) error
-	Pack(id uint) (*Pack, error)
-	Packs() ([]*Pack, error)
-
-	// Modifying the queries in packs
-	AddQueryToPack(query *Query, pack *Pack) error
-	GetQueriesInPack(pack *Pack) ([]*Query, error)
-	RemoveQueryFromPack(query *Query, pack *Pack) error
 }
 
-type OsqueryConfigService interface {
+type QueryService interface {
 	GetAllQueries(ctx context.Context) ([]*Query, error)
 	GetQuery(ctx context.Context, id uint) (*Query, error)
 	NewQuery(ctx context.Context, p QueryPayload) (*Query, error)
 	ModifyQuery(ctx context.Context, id uint, p QueryPayload) (*Query, error)
 	DeleteQuery(ctx context.Context, id uint) error
-
-	GetAllPacks(ctx context.Context) ([]*Pack, error)
-	GetPack(ctx context.Context, id uint) (*Pack, error)
-	NewPack(ctx context.Context, p PackPayload) (*Pack, error)
-	ModifyPack(ctx context.Context, id uint, p PackPayload) (*Pack, error)
-	DeletePack(ctx context.Context, id uint) error
-
-	AddQueryToPack(ctx context.Context, qid, pid uint) error
-	RemoveQueryFromPack(ctx context.Context, qid, pid uint) error
 }
 
 type QueryPayload struct {
@@ -105,28 +81,6 @@ type Target struct {
 	Type      TargetType
 	TargetID  uint
 	QueryID   uint
-}
-
-type Pack struct {
-	ID        uint `gorm:"primary_key"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	Name      string `gorm:"not null;unique_index:idx_pack_unique_name"`
-	Platform  string
-}
-
-type PackQuery struct {
-	ID        uint `gorm:"primary_key"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	PackID    uint
-	QueryID   uint
-}
-
-type PackTarget struct {
-	ID       uint `gorm:"primary_key"`
-	PackID   uint
-	TargetID uint
 }
 
 type DistributedQueryStatus int
