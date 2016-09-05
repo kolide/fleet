@@ -43,7 +43,7 @@ func (svc service) NewSessionManager(ctx context.Context, w http.ResponseWriter,
 	}
 }
 
-func (svc service) GetInfoAboutSessionForUser(ctx context.Context, id uint) ([]*kolide.Session, error) {
+func (svc service) GetInfoAboutSessionsForUser(ctx context.Context, id uint) ([]*kolide.Session, error) {
 	return svc.ds.FindAllSessionsForUser(id)
 }
 
