@@ -8,11 +8,6 @@ import (
 )
 
 type OsqueryStore interface {
-	EnrollHost(uuid, hostname, ip, platform string, nodeKeySize int) (*Host, error)
-	AuthenticateHost(nodeKey string) (*Host, error)
-	SaveHost(host *Host) error
-	MarkHostSeen(host *Host, t time.Time) error
-
 	LabelQueriesForHost(host *Host, cutoff time.Time) (map[string]string, error)
 	RecordLabelQueryExecutions(host *Host, results map[string]bool, t time.Time) error
 	NewLabel(label *Label) error
@@ -26,24 +21,13 @@ type OsqueryService interface {
 	LogDistributedQueryResults(ctx context.Context, queries map[string][]map[string]string) error
 }
 
-type Host struct {
-	ID        uint `gorm:"primary_key"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	NodeKey   string `gorm:"unique_index:idx_host_unique_nodekey"`
-	HostName  string
-	UUID      string `gorm:"unique_index:idx_host_unique_uuid"`
-	IPAddress string
-	Platform  string
-}
-
 type OsqueryConfig struct {
 	Packs    []Pack
 	Schedule []Query
 	Options  map[string]interface{}
 }
 
-// TODO: move this to just use OsqueryServerStore.LabelQueriesForHot
+// TODO: move this to just use LabelQueriesForHot
 // LabelQueriesForHost calculates the appropriate update cutoff (given
 // interval) and uses the datastore to retrieve the label queries for the
 // provided host.
