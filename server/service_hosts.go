@@ -36,7 +36,7 @@ func (svc service) NewHost(ctx context.Context, p kolide.HostPayload) (*kolide.H
 		host.UUID = *p.UUID
 	}
 
-	err := svc.ds.NewHost(&host)
+	_, err := svc.ds.NewHost(&host)
 	if err != nil {
 		return nil, err
 	}

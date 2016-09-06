@@ -7,7 +7,7 @@ import (
 )
 
 type HostStore interface {
-	NewHost(host *Host) error
+	NewHost(host *Host) (*Host, error)
 	SaveHost(host *Host) error
 	DeleteHost(host *Host) error
 	Host(id uint) (*Host, error)

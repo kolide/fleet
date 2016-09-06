@@ -22,7 +22,7 @@ func TestGetAllHosts(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Len(t, hosts, 0)
 
-	err = ds.NewHost(&kolide.Host{
+	_, err = ds.NewHost(&kolide.Host{
 		HostName: "foo",
 	})
 	assert.Nil(t, err)
@@ -41,10 +41,9 @@ func TestGetHost(t *testing.T) {
 
 	ctx := context.Background()
 
-	host := &kolide.Host{
+	host, err := ds.NewHost(&kolide.Host{
 		HostName: "foo",
-	}
-	err = ds.NewHost(host)
+	})
 	assert.Nil(t, err)
 	assert.NotZero(t, host.ID)
 
@@ -84,10 +83,9 @@ func TestModifyHost(t *testing.T) {
 
 	ctx := context.Background()
 
-	host := &kolide.Host{
+	host, err := ds.NewHost(&kolide.Host{
 		HostName: "foo",
-	}
-	err = ds.NewHost(host)
+	})
 	assert.Nil(t, err)
 	assert.NotZero(t, host.ID)
 
@@ -110,10 +108,9 @@ func TestDeleteHost(t *testing.T) {
 
 	ctx := context.Background()
 
-	host := &kolide.Host{
+	host, err := ds.NewHost(&kolide.Host{
 		HostName: "foo",
-	}
-	err = ds.NewHost(host)
+	})
 	assert.Nil(t, err)
 	assert.NotZero(t, host.ID)
 

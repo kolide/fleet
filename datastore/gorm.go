@@ -199,14 +199,18 @@ func (orm gormDB) Hosts() ([]*kolide.Host, error) {
 	return hosts, nil
 }
 
-func (orm gormDB) NewHost(host *kolide.Host) error {
+func (orm gormDB) NewHost(host *kolide.Host) (*kolide.Host, error) {
 	if host == nil {
-		return errors.New(
+		return nil, errors.New(
 			"error creating host",
 			"nil pointer passed to NewHost",
 		)
 	}
-	return orm.DB.Create(host).Error
+	err := orm.DB.Create(host).Error
+	if err != nil {
+		return nil, err
+	}
+	return host, err
 }
 
 func (orm gormDB) MarkHostSeen(host *kolide.Host, t time.Time) error {

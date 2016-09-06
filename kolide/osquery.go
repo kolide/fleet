@@ -15,16 +15,36 @@ type OsqueryStore interface {
 
 type OsqueryService interface {
 	EnrollAgent(ctx context.Context, enrollSecret, hostIdentifier string) (string, error)
-	GetClientConfig(ctx context.Context, action string, data *json.RawMessage) (*OsqueryConfig, error)
-	Log(ctx context.Context, logType string, data *json.RawMessage) error
+	GetClientConfig(ctx context.Context, action string, data json.RawMessage) (OsqueryConfig, error)
 	GetDistributedQueries(ctx context.Context) (map[string]string, error)
-	LogDistributedQueryResults(ctx context.Context, queries map[string][]map[string]string) error
+	SubmitDistributedQueryResults(ctx context.Context, results OsqueryDistributedQueryResults) error
+	SubmitStatusLogs(ctx context.Context, logs []OsqueryResultLog) error
+	SubmitResultsLogs(ctx context.Context, logs []OsqueryStatusLog) error
 }
+
+type OsqueryDistributedQueryResults map[string][]map[string]string
 
 type OsqueryConfig struct {
 	Packs    []Pack
 	Schedule []Query
-	Options  map[string]interface{}
+}
+
+type OsqueryResultLog struct {
+	Name           string            `json:"name"`
+	HostIdentifier string            `json:"hostIdentifier"`
+	UnixTime       string            `json:"unixTime"`
+	CalendarTime   string            `json:"calendarTime"`
+	Columns        map[string]string `json:"columns"`
+	Action         string            `json:"action"`
+}
+
+type OsqueryStatusLog struct {
+	Severity    string            `json:"severity"`
+	Filename    string            `json:"filename"`
+	Line        string            `json:"line"`
+	Message     string            `json:"message"`
+	Version     string            `json:"version"`
+	Decorations map[string]string `json:"decorations"`
 }
 
 // TODO: move this to just use LabelQueriesForHot

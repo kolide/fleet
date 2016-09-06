@@ -25,11 +25,16 @@ func (svc service) EnrollAgent(ctx context.Context, enrollSecret, hostIdentifier
 	return host.NodeKey, nil
 }
 
-func (svc service) GetClientConfig(ctx context.Context, action string, data *json.RawMessage) (*kolide.OsqueryConfig, error) {
-	return nil, nil
+func (svc service) GetClientConfig(ctx context.Context, action string, data json.RawMessage) (kolide.OsqueryConfig, error) {
+	var config kolide.OsqueryConfig
+	return config, nil
 }
 
-func (svc service) Log(ctx context.Context, logType string, data *json.RawMessage) error {
+func (svc service) SubmitStatusLogs(ctx context.Context, logs []kolide.OsqueryResultLog) error {
+	return nil
+}
+
+func (svc service) SubmitResultsLogs(ctx context.Context, logs []kolide.OsqueryStatusLog) error {
 	return nil
 }
 
@@ -41,6 +46,6 @@ func (svc service) GetDistributedQueries(ctx context.Context) (map[string]string
 	return queries, nil
 }
 
-func (svc service) LogDistributedQueryResults(ctx context.Context, queries map[string][]map[string]string) error {
+func (svc service) SubmitDistributedQueryResults(ctx context.Context, results kolide.OsqueryDistributedQueryResults) error {
 	return nil
 }
