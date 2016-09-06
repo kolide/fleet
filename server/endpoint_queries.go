@@ -63,7 +63,7 @@ func makeGetAllQueriesEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		queries, err := svc.GetAllQueries(ctx)
 		if err != nil {
-			return nil, err
+			return getAllQueriesResponse{Err: err}, nil
 		}
 		var resp getAllQueriesResponse
 		for _, query := range queries {

@@ -53,7 +53,7 @@ func makeGetAllPacksEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		packs, err := svc.GetAllPacks(ctx)
 		if err != nil {
-			return nil, err
+			return getPackResponse{Err: err}, nil
 		}
 		var resp getAllPacksResponse
 		for _, pack := range packs {
@@ -177,7 +177,7 @@ func makeAddQueryToPackEndpoint(svc kolide.Service) endpoint.Endpoint {
 		req := request.(addQueryToPackRequest)
 		err := svc.AddQueryToPack(ctx, req.QueryID, req.PackID)
 		if err != nil {
-			return nil, err
+			return addQueryToPackResponse{Err: err}, nil
 		}
 		return addQueryToPackResponse{}, nil
 	}
@@ -203,7 +203,7 @@ func makeGetQueriesInPackEndpoint(svc kolide.Service) endpoint.Endpoint {
 		req := request.(getQueriesInPackRequest)
 		queries, err := svc.GetQueriesInPack(ctx, req.ID)
 		if err != nil {
-			return nil, err
+			return getQueriesInPackResponse{Err: err}, nil
 		}
 
 		var resp getQueriesInPackResponse
@@ -243,7 +243,7 @@ func makeDeleteQueryFromPackEndpoint(svc kolide.Service) endpoint.Endpoint {
 		req := request.(deleteQueryFromPackRequest)
 		err := svc.RemoveQueryFromPack(ctx, req.QueryID, req.PackID)
 		if err != nil {
-			return nil, err
+			return deleteQueryFromPackResponse{Err: err}, nil
 		}
 		return deleteQueryFromPackResponse{}, nil
 	}
