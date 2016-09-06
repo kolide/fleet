@@ -11,7 +11,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-func attachAPIRoutes(router *mux.Router, ctx context.Context, svc kolide.Service, opts []kithttp.ServerOption) {
+func attachKolideRoutes(router *mux.Router, ctx context.Context, svc kolide.Service, opts []kithttp.ServerOption) {
 	router.Handle("/api/v1/kolide/users",
 		kithttp.NewServer(
 			ctx,
@@ -231,25 +231,44 @@ func attachAPIRoutes(router *mux.Router, ctx context.Context, svc kolide.Service
 			opts...,
 		),
 	).Methods("DELETE")
+
+}
+
+func attachOsqueryRoutes(router *mux.Router, ctx context.Context, svc kolide.Service, opts []kithttp.ServerOption) {
+	router.Handle("/api/v1/osquery/enroll",
+		kithttp.NewServer(
+			ctx,
+			makeEnrollOsqueryEndpoint(svc),
+			decodeEnrollOsqueryRequest,
+			encodeResponse,
+			opts...,
+		),
+	).Methods("POST")
 }
 
 // MakeHandler creates an http handler for the Kolide API
 func MakeHandler(ctx context.Context, svc kolide.Service, logger kitlog.Logger) http.Handler {
 	opts := []kithttp.ServerOption{
-		kithttp.ServerBefore(
-			setViewerContext(svc, logger),
-		),
 		kithttp.ServerErrorLogger(logger),
 		kithttp.ServerAfter(
 			kithttp.SetContentType("application/json; charset=utf-8"),
 		),
 	}
 
+	// options specific to the kolide client
+	kolideOpts := append([]kithttp.ServerOption{
+		kithttp.ServerBefore(
+			setViewerContext(svc, logger),
+		),
+	}, opts...)
+
 	api := mux.NewRouter()
-	attachAPIRoutes(api, ctx, svc, opts)
+	attachKolideRoutes(api, ctx, svc, kolideOpts)
+	attachOsqueryRoutes(api, ctx, svc, opts)
 
 	r := mux.NewRouter()
 	r.PathPrefix("/api/v1/kolide").Handler(authMiddleware(svc, logger, api))
+	r.PathPrefix("/api/v1/osquery").Handler(api)
 	r.Handle("/api/login", login(svc, logger)).Methods("POST")
 	r.Handle("/api/logout", logout(svc, logger)).Methods("GET")
 	r.PathPrefix("/assets").Handler(http.StripPrefix("/assets", http.FileServer(newBinaryFileSystem("/build"))))
