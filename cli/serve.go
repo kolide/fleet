@@ -45,10 +45,11 @@ the way that the kolide server works.
 
 		ds, _ := datastore.New("mock", "")
 		svcConfig := server.ServiceConfig{
-			Datastore:         ds,
-			SessionCookieName: "KolideSession",
-			BcryptCost:        12,
-			SaltKeySize:       24,
+			Datastore:          ds,
+			SessionCookieName:  "KolideSession",
+			BcryptCost:         12,
+			SaltKeySize:        24,
+			OsqueryNodeKeySize: 24,
 		}
 		svcLogger := kitlog.NewContext(logger).With("component", "service")
 		var svc kolide.Service
