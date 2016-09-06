@@ -18,7 +18,7 @@ type getPackResponse struct {
 	ID       uint   `json:"id"`
 	Name     string `json:"name"`
 	Platform string `json:"platform"`
-	Err      error  `json:"error, omitempty"`
+	Err      error  `json:"error,omitempty"`
 }
 
 func (r getPackResponse) error() error { return r.Err }
@@ -44,7 +44,7 @@ func makeGetPackEndpoint(svc kolide.Service) endpoint.Endpoint {
 
 type getAllPacksResponse struct {
 	Packs []getPackResponse `json:"packs"`
-	Err   error             `json:"error, omitempty"`
+	Err   error             `json:"error,omitempty"`
 }
 
 func (r getAllPacksResponse) error() error { return r.Err }
@@ -79,7 +79,7 @@ type createPackResponse struct {
 	ID       uint   `json:"id"`
 	Name     string `json:"name"`
 	Platform string `json:"platform"`
-	Err      error  `json:"error, omitempty"`
+	Err      error  `json:"error,omitempty"`
 }
 
 func (r createPackResponse) error() error { return r.Err }
@@ -112,7 +112,7 @@ type modifyPackResponse struct {
 	ID       uint   `json:"id"`
 	Name     string `json:"name"`
 	Platform string `json:"platform"`
-	Err      error  `json:"error, omitempty"`
+	Err      error  `json:"error,omitempty"`
 }
 
 func (r modifyPackResponse) error() error { return r.Err }
@@ -141,7 +141,7 @@ type deletePackRequest struct {
 }
 
 type deletePackResponse struct {
-	Err error `json:"error, omitempty"`
+	Err error `json:"error,omitempty"`
 }
 
 func (r deletePackResponse) error() error { return r.Err }
@@ -167,7 +167,7 @@ type addQueryToPackRequest struct {
 }
 
 type addQueryToPackResponse struct {
-	Err error `json:"error, omitempty"`
+	Err error `json:"error,omitempty"`
 }
 
 func (r addQueryToPackResponse) error() error { return r.Err }
@@ -193,7 +193,7 @@ type getQueriesInPackRequest struct {
 
 type getQueriesInPackResponse struct {
 	Queries []getQueryResponse
-	Err     error `json:"error, omitempty"`
+	Err     error `json:"error,omitempty"`
 }
 
 func (r getQueriesInPackResponse) error() error { return r.Err }
@@ -233,7 +233,7 @@ type deleteQueryFromPackRequest struct {
 }
 
 type deleteQueryFromPackResponse struct {
-	Err error `json:"error, omitempty"`
+	Err error `json:"error,omitempty"`
 }
 
 func (r deleteQueryFromPackResponse) error() error { return r.Err }

@@ -23,7 +23,7 @@ type getQueryResponse struct {
 	Differential bool   `json:"differential"`
 	Platform     string `json:"platform"`
 	Version      string `json:"version"`
-	Err          error  `json:"error, omitempty"`
+	Err          error  `json:"error,omitempty"`
 }
 
 func (r getQueryResponse) error() error { return r.Err }
@@ -54,7 +54,7 @@ func makeGetQueryEndpoint(svc kolide.Service) endpoint.Endpoint {
 
 type getAllQueriesResponse struct {
 	Queries []getQueryResponse `json:"queries"`
-	Err     error              `json:"error, omitempty"`
+	Err     error              `json:"error,omitempty"`
 }
 
 func (r getAllQueriesResponse) error() error { return r.Err }
@@ -99,7 +99,7 @@ type createQueryResponse struct {
 	Differential bool   `json:"differential"`
 	Platform     string `json:"platform"`
 	Version      string `json:"version"`
-	Err          error  `json:"error, omitempty"`
+	Err          error  `json:"error,omitempty"`
 }
 
 func (r createQueryResponse) error() error { return r.Err }
@@ -142,7 +142,7 @@ type modifyQueryResponse struct {
 	Differential bool   `json:"differential"`
 	Platform     string `json:"platform"`
 	Version      string `json:"version"`
-	Err          error  `json:"error, omitempty"`
+	Err          error  `json:"error,omitempty"`
 }
 
 func (r modifyQueryResponse) error() error { return r.Err }
@@ -176,7 +176,7 @@ type deleteQueryRequest struct {
 }
 
 type deleteQueryResponse struct {
-	Err error `json:"error, omitempty"`
+	Err error `json:"error,omitempty"`
 }
 
 func (r deleteQueryResponse) error() error { return r.Err }
