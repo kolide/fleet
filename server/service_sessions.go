@@ -39,7 +39,7 @@ func (svc service) Login(ctx context.Context, username, password string) (*kolid
 }
 
 func (svc service) Logout(ctx context.Context) error {
-	// this should return an error if the user wasn't logged in
+	// this should not return an error if the user wasn't logged in
 	return svc.DestroySession(ctx)
 }
 

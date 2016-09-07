@@ -180,7 +180,7 @@ func setViewerContext(svc kolide.Service, ds kolide.Datastore, jwtKey string, lo
 		user, err := svc.User(ctx, session.UserID)
 		if err != nil {
 			logger.Log("err", err, "error-source", "setViewerContext")
-			return ctx
+			return context.WithValue(ctx, "viewerContext", emptyVC())
 		}
 
 		ctx = context.WithValue(ctx, "viewerContext", newViewerContext(user, session))
