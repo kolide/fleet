@@ -13,11 +13,13 @@ import (
 	"github.com/kolide/kolide-ose/kolide"
 	"github.com/kolide/kolide-ose/server"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"golang.org/x/net/context"
 )
 
 func init() {
 	rootCmd.AddCommand(serveCmd)
+	serveCmd.PersistentFlags().Bool("tls", false, "serve over https")
 }
 
 var serveCmd = &cobra.Command{
@@ -43,10 +45,11 @@ the way that the kolide server works.
 
 		ds, _ := datastore.New("mock", "")
 		svcConfig := server.ServiceConfig{
-			Datastore:         ds,
-			SessionCookieName: "KolideSession",
-			BcryptCost:        12,
-			SaltKeySize:       24,
+			Datastore:          ds,
+			SessionCookieName:  "KolideSession",
+			BcryptCost:         12,
+			SaltKeySize:        24,
+			OsqueryNodeKeySize: 24,
 		}
 		svcLogger := kitlog.NewContext(logger).With("component", "service")
 		var svc kolide.Service
@@ -80,12 +83,22 @@ the way that the kolide server works.
 
 		apiHandler := server.MakeHandler(ctx, svc, httpLogger)
 		http.Handle("/", accessControl(apiHandler))
-
 		errs := make(chan error, 2)
-		go func() {
-			logger.Log("transport", "http", "address", *httpAddr, "msg", "listening")
-			errs <- http.ListenAndServe(*httpAddr, nil)
-		}()
+		serveTLS, _ := cmd.Flags().GetBool("tls")
+		if serveTLS {
+			go func() {
+				logger.Log("transport", "https", "address", *httpAddr, "msg", "listening")
+				errs <- http.ListenAndServeTLS(*httpAddr,
+					viper.GetString("server.cert"),
+					viper.GetString("server.key"),
+					nil)
+			}()
+		} else {
+			go func() {
+				logger.Log("transport", "http", "address", *httpAddr, "msg", "listening")
+				errs <- http.ListenAndServe(*httpAddr, nil)
+			}()
+		}
 		go func() {
 			c := make(chan os.Signal)
 			signal.Notify(c, syscall.SIGINT)

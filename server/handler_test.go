@@ -20,7 +20,7 @@ func TestAPIRoutes(t *testing.T) {
 	ctx := context.Background()
 
 	r := mux.NewRouter()
-	attachAPIRoutes(r, ctx, svc, nil)
+	attachKolideRoutes(r, ctx, svc, nil)
 	handler := mux.NewRouter()
 	handler.PathPrefix("/api/v1/kolide").Handler(r)
 

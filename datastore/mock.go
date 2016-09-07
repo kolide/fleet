@@ -14,6 +14,7 @@ type mockDB struct {
 	mtx             sync.RWMutex
 	users           map[uint]*kolide.User
 	sessions        map[uint]*kolide.Session
+	hosts           map[uint]*kolide.Host
 }
 
 func (orm *mockDB) Name() string {
@@ -29,5 +30,6 @@ func (orm *mockDB) Drop() error {
 	defer orm.mtx.Unlock()
 	orm.users = make(map[uint]*kolide.User)
 	orm.sessions = make(map[uint]*kolide.Session)
+	orm.hosts = make(map[uint]*kolide.Host)
 	return nil
 }
