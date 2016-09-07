@@ -62,16 +62,3 @@ func decodeUpdateUserStatusRequest(ctx context.Context, r *http.Request) (interf
 	req.UserID = id
 	return req, nil
 }
-
-func decodeModifyUserRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	id, err := idFromRequest(r, "id")
-	if err != nil {
-		return nil, err
-	}
-	var req modifyUserRequest
-	if err := json.NewDecoder(r.Body).Decode(&req.payload); err != nil {
-		return nil, err
-	}
-	req.ID = id
-	return req, nil
-}

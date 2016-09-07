@@ -121,27 +121,3 @@ func TestDecodeUpdateUserStatusRequest(t *testing.T) {
 		httptest.NewRequest("POST", "/api/v1/kolide/users/1/status", &body),
 	)
 }
-
-func TestDecodeModifyUserRequest(t *testing.T) {
-	router := mux.NewRouter()
-	router.HandleFunc("/api/v1/kolide/users/{id}", func(writer http.ResponseWriter, request *http.Request) {
-		r, err := decodeModifyUserRequest(context.Background(), request)
-		assert.Nil(t, err)
-
-		params := r.(modifyUserRequest)
-		assert.Equal(t, "foo", *params.payload.Name)
-		assert.Equal(t, "foo@kolide.co", *params.payload.Email)
-		assert.Equal(t, uint(1), params.ID)
-	}).Methods("PATCH")
-
-	var body bytes.Buffer
-	body.Write([]byte(`{
-        "name": "foo",
-        "email": "foo@kolide.co"
-    }`))
-
-	router.ServeHTTP(
-		httptest.NewRecorder(),
-		httptest.NewRequest("PATCH", "/api/v1/kolide/users/1", &body),
-	)
-}
