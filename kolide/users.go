@@ -25,6 +25,7 @@ type UserService interface {
 	ChangePassword(ctx context.Context, userID uint, old, new string) error
 	UpdateAdminRole(ctx context.Context, userID uint, isAdmin bool) error
 	UpdateUserStatus(ctx context.Context, userID uint, password string, enabled bool) error
+	RequestPasswordReset(ctx context.Context, username, email string) error
 }
 
 // User is the model struct which represents a kolide user

@@ -31,6 +31,16 @@ func attachAPIRoutes(router *mux.Router, ctx context.Context, svc kolide.Service
 		),
 	).Methods("POST")
 
+	router.Handle("/api/v1/kolide/passwordreset",
+		kithttp.NewServer(
+			ctx,
+			makePasswordResetEndpoint(svc),
+			decodePasswordResetRequest,
+			encodeResponse,
+			opts...,
+		),
+	).Methods("POST")
+
 	router.Handle("/api/v1/kolide/users",
 		kithttp.NewServer(
 			ctx,

@@ -50,7 +50,7 @@ func makeCreateUserEndpoint(svc kolide.Service) endpoint.Endpoint {
 ////////////////////////////////////////////////////////////////////////////////
 
 type getUserRequest struct {
-	ID uint `json:"id"`
+	ID uint `json:"user_id"`
 }
 
 type getUserResponse struct {
@@ -153,5 +153,28 @@ func makeUpdateUserStatusEndpoint(svc kolide.Service) endpoint.Endpoint {
 		req := request.(updateUserStatusRequest)
 		err := svc.UpdateUserStatus(ctx, req.UserID, req.CurrentPassword, req.Enabled)
 		return updateUserStatusResponse{Err: err}, nil
+	}
+}
+
+type passwordResetRequest struct {
+	Username string `json:"username"`
+	Email    string `json:"email"`
+}
+
+type passwordResetResponse struct {
+	Err error `json:"error,omitempty"`
+}
+
+func (r passwordResetResponse) error() error { return r.Err }
+
+func makePasswordResetEndpoint(svc kolide.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(passwordResetRequest)
+		err := svc.RequestPasswordReset(ctx, req.Username, req.Email)
+		if err != nil {
+			return passwordResetResponse{Err: err}, nil
+		}
+		// TODO make call to service
+		return passwordResetResponse{}, nil
 	}
 }
