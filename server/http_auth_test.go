@@ -1,22 +1,15 @@
 package server
 
 import (
-	"bytes"
-	"encoding/json"
-	"fmt"
 	"io"
-	"io/ioutil"
-	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	kitlog "github.com/go-kit/kit/log"
-	"github.com/kolide/kolide-ose/datastore"
 	"github.com/kolide/kolide-ose/kolide"
-	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
 )
 
+/*
 func TestLogin(t *testing.T) {
 	ds, _ := datastore.New("mock", "")
 	svc, _ := NewService(testConfig(ds))
@@ -187,6 +180,7 @@ func TestLogin(t *testing.T) {
 		}
 	}
 }
+*/
 
 func createTestUsers(t *testing.T, ds kolide.Datastore) {
 	svc := svcWithNoValidation(testConfig(ds))
