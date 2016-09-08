@@ -50,7 +50,7 @@ func makeCreateUserEndpoint(svc kolide.Service) endpoint.Endpoint {
 ////////////////////////////////////////////////////////////////////////////////
 
 type getUserRequest struct {
-	ID uint `json:"id"`
+	ID uint `json:"user_id"`
 }
 
 type getUserResponse struct {
@@ -156,46 +156,25 @@ func makeUpdateUserStatusEndpoint(svc kolide.Service) endpoint.Endpoint {
 	}
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Modify User
-////////////////////////////////////////////////////////////////////////////////
-
-type modifyUserRequest struct {
-	ID      uint
-	payload kolide.UserPayload
+type passwordResetRequest struct {
+	Username string `json:"username"`
+	Email    string `json:"email"`
 }
 
-type modifyUserResponse struct {
-	ID                 uint   `json:"id"`
-	Username           string `json:"username"`
-	Email              string `json:"email"`
-	Name               string `json:"name"`
-	Admin              bool   `json:"admin"`
-	Enabled            bool   `json:"enabled"`
-	NeedsPasswordReset bool   `json:"needs_password_reset"`
-	Err                error  `json:"error,omitempty"`
+type passwordResetResponse struct {
+	Err error `json:"error,omitempty"`
 }
 
-func (r modifyUserResponse) error() error { return r.Err }
+func (r passwordResetResponse) error() error { return r.Err }
 
-func makeModifyUserEndpoint(svc kolide.Service) endpoint.Endpoint {
+func makePasswordResetEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(modifyUserRequest)
-
-		// TODO call Service with UserPayload
-
-		var user *kolide.User
-		var err error
-		_ = req
-
-		return modifyUserResponse{
-			ID:                 user.ID,
-			Username:           user.Username,
-			Email:              user.Email,
-			Admin:              user.Admin,
-			Enabled:            user.Enabled,
-			NeedsPasswordReset: user.NeedsPasswordReset,
-			Err:                err,
-		}, nil
+		req := request.(passwordResetRequest)
+		err := svc.RequestPasswordReset(ctx, req.Username, req.Email)
+		if err != nil {
+			return passwordResetResponse{Err: err}, nil
+		}
+		// TODO make call to service
+		return passwordResetResponse{}, nil
 	}
 }
