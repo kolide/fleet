@@ -41,6 +41,7 @@ type User struct {
 	Enabled                  bool   `gorm:"not null"`
 	AdminForcedPasswordReset bool
 	GravatarURL              string
+	Position                 string // job role
 }
 
 // UserPayload is used to modify an existing user
@@ -56,6 +57,7 @@ type UserPayload struct {
 	CurrentPassword *string `json:"current_password"`
 	NewPassword     *string `json:"new_password"`
 	GravatarURL     *string `json:"gravatar_url"`
+	Position        *string `json:"position"`
 }
 
 // NewUser is a wrapper around the creation of a new user.
