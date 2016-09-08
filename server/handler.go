@@ -1,9 +1,12 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
+	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/dgrijalva/jwt-go/request"
 	kitlog "github.com/go-kit/kit/log"
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
@@ -237,7 +240,7 @@ func attachAPIRoutes(router *mux.Router, ctx context.Context, svc kolide.Service
 func MakeHandler(ctx context.Context, svc kolide.Service, logger kitlog.Logger) http.Handler {
 	opts := []kithttp.ServerOption{
 		kithttp.ServerBefore(
-			setViewerContext(svc, logger),
+			setViewerContextT(svc, logger),
 		),
 		kithttp.ServerErrorLogger(logger),
 		kithttp.ServerAfter(
@@ -249,8 +252,9 @@ func MakeHandler(ctx context.Context, svc kolide.Service, logger kitlog.Logger) 
 	attachAPIRoutes(api, ctx, svc, opts)
 
 	r := mux.NewRouter()
-	r.PathPrefix("/api/v1/kolide").Handler(authMiddleware(svc, logger, api))
-	r.Handle("/api/login", login(svc, logger)).Methods("POST")
+	r.PathPrefix("/api/v1/kolide").Handler(authMiddlewareT(svc, logger, api))
+	r.Handle("/api/login", loginT(svc, logger)).Methods("POST")
+	r.Handle("/api/v1/token/refresh", refresh(svc, logger)).Methods("POST")
 	r.Handle("/api/logout", logout(svc, logger)).Methods("GET")
 
 	return r
@@ -268,6 +272,36 @@ func setViewerContext(svc kolide.Service, logger kitlog.Logger) kithttp.RequestF
 		}
 
 		user, err := svc.User(ctx, session.UserID)
+		if err != nil {
+			logger.Log("err", err, "error-source", "setViewerContext")
+			return ctx
+		}
+
+		ctx = context.WithValue(ctx, "viewerContext", &viewerContext{
+			user: user,
+		})
+		logger.Log("msg", "viewer context set", "user", user.ID)
+		// get the user-id for request
+		if strings.Contains(r.URL.Path, "users/") {
+			ctx = withUserIDFromRequest(r, ctx)
+		}
+		return ctx
+	}
+}
+
+func setViewerContextT(svc kolide.Service, logger kitlog.Logger) kithttp.RequestFunc {
+	var (
+		secret = []byte("insecure-jwt-key")
+	)
+	return func(ctx context.Context, r *http.Request) context.Context {
+		claims := &kolideClaims{}
+		_, err := request.ParseFromRequestWithClaims(r, request.AuthorizationHeaderExtractor, claims, func(token *jwt.Token) (interface{}, error) {
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+			}
+			return secret, nil
+		})
+		user, err := svc.User(ctx, claims.UserID)
 		if err != nil {
 			logger.Log("err", err, "error-source", "setViewerContext")
 			return ctx
