@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import radium from 'radium';
 import KolideLoginBackground from './svg/KolideLoginBackground';
 import KolideText from './svg/KolideText';
+import User from './svg/User';
 
 class Icon extends Component {
   static propTypes = {
@@ -14,6 +15,7 @@ class Icon extends Component {
   static iconNames = {
     kolideLoginBackground: KolideLoginBackground,
     kolideText: KolideText,
+    user: User,
   };
 
   render () {
