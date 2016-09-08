@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import componentStyles from './styles';
+import Icon from '../../components/icons/Icon';
 import { loadBackground, resizeBackground } from '../../utilities/backgroundImage';
+import LoginForm from '../../components/forms/LoginForm';
 
 export class LoginPage extends Component {
   componentWillMount () {
@@ -10,12 +12,21 @@ export class LoginPage extends Component {
     window.onresize = resizeBackground;
   }
 
+  onSubmit = (formData) => {
+    console.log('formData', formData);
+  }
+
   render () {
-    const { containerStyles } = componentStyles;
+    const { containerStyles, formWrapperStyles, whiteTabStyles } = componentStyles;
+    const { onSubmit } = this;
 
     return (
       <div style={containerStyles}>
-        <h1>Login page</h1>
+        <div style={formWrapperStyles}>
+          <Icon name="kolideText" />
+          <div style={whiteTabStyles} />
+          <LoginForm onSubmit={onSubmit} />
+        </div>
       </div>
     );
   }
