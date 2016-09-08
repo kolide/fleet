@@ -28,5 +28,6 @@ export default {
   },
   '#bg': {
     position: 'absolute',
+    zIndex: '-1',
   },
 };
