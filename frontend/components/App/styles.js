@@ -1,6 +1,9 @@
 export default {
   containerStyles: {
-    flex: 1,
     minHeight: '100vh',
+  },
+  childWrapperStyles: {
+    minHeight: '100vh',
+    marginBottom: '-74px',
   },
 };
