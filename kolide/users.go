@@ -40,6 +40,7 @@ type User struct {
 	Admin                    bool   `gorm:"not null"`
 	Enabled                  bool   `gorm:"not null"`
 	AdminForcedPasswordReset bool
+	GravatarURL              string
 }
 
 // UserPayload is used to modify an existing user
@@ -54,6 +55,7 @@ type UserPayload struct {
 	// modify params
 	CurrentPassword *string `json:"current_password"`
 	NewPassword     *string `json:"new_password"`
+	GravatarURL     *string `json:"gravatar_url"`
 }
 
 // NewUser is a wrapper around the creation of a new user.
