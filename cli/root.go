@@ -9,17 +9,16 @@ import (
 )
 
 func Launch() {
+	cobra.OnInitialize(config.InitConfig)
+
 	rootCmd := createRootCmd()
 
-	confManager := config.ConfigManager{Command: rootCmd}
+	confManager := config.NewConfigManager(rootCmd)
 	confManager.AttachConfigs()
 
 	rootCmd.AddCommand(createPrepareCmd())
 	rootCmd.AddCommand(createServeCmd())
 	rootCmd.AddCommand(createTestCmd(confManager))
-
-	// rootCmd.PersistentFlags().String("mysql.address", "", "Port to run Application server on")
-	// viper.BindPFlag("mysql.address", rootCmd.PersistentFlags().Lookup("mysql.address"))
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)

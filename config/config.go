@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -79,10 +80,6 @@ var (
 	// File may or may not contain the path to the config file
 	File string
 )
-
-func init() {
-	cobra.OnInitialize(initConfig)
-}
 
 // Due to a deficiency in viper (https://github.com/spf13/viper/issues/71), one
 // can not set the default values of nested config elements. For example, if the
@@ -160,68 +157,98 @@ func recurseConfigValue(fun structLeafFunc, root reflect.StructField, prefix str
 	}
 }
 
-type ConfigReader struct {
-	EnvKeyReplacer *strings.Replacer
-}
-
-func NewConfigReader() ConfigReader {
-	return ConfigReader{
-		EnvKeyReplacer: strings.NewReplacer(".", "_"),
-	}
-}
-
 func envVarNameFromConfigKey(key string) string {
 	return envPrefix + "_" + strings.ToUpper(strings.Replace(key, ".", "_", -1))
 }
 
+func flagNameFromConfigKey(key string) string {
+	return strings.Replace(key, ".", "_", -1)
+}
+
 type ConfigManager struct {
-	Command  *cobra.Command
+	command  *cobra.Command
 	defaults map[string]interface{}
 }
 
-// AddConfigString Adds a string config to the config options
+// NewConfigManager initializes a ConfigManager wrapping the provided cobra
+// command. All config flags will be attached to that command (and inherited by
+// the subcommands). Typically this should be called just once, with the root
+// command.
+func NewConfigManager(command *cobra.Command) ConfigManager {
+	return ConfigManager{
+		command:  command,
+		defaults: map[string]interface{}{},
+	}
+}
+
+// addDefault will check for duplication, then add a default value to the
+// defaults map
+func (man ConfigManager) addDefault(key string, defVal interface{}) {
+	if _, exists := man.defaults[key]; exists {
+		panic("Trying to add duplicate config for key " + key)
+	}
+
+	man.defaults[key] = defVal
+}
+
+// getInterfaceVal is a helper function used by the GetConfig* functions to
+// retrieve the config value as interface{}, which will then be cast to the
+// appropriate type by the GetConfig* function.
+func (man ConfigManager) getInterfaceVal(key string) interface{} {
+	interfaceVal := viper.Get(key)
+	if interfaceVal == nil {
+		var ok bool
+		interfaceVal, ok = man.defaults[key]
+		if !ok {
+			panic("Tried to look up default value for nonexistent config option: " + key)
+		}
+	}
+	return interfaceVal
+}
+
+// AddConfigString adds a string config to the config options
 func (man ConfigManager) AddConfigString(key string, defVal string) {
-	man.Command.PersistentFlags().String(key, defVal, "Env: "+envVarNameFromConfigKey(key))
-	viper.BindPFlag(key, man.Command.PersistentFlags().Lookup(key))
+	man.command.PersistentFlags().String(flagNameFromConfigKey(key), defVal, "Env: "+envVarNameFromConfigKey(key))
+	viper.BindPFlag(key, man.command.PersistentFlags().Lookup(flagNameFromConfigKey(key)))
 	viper.BindEnv(key, envVarNameFromConfigKey(key))
-	// Look up default from defaults map
-	// if defaults.
+
+	// Add default
+	man.addDefault(key, defVal)
 }
 
-// GetConfigString Retrieves a string from the loaded config
+// GetConfigString retrieves a string from the loaded config
 func (man ConfigManager) GetConfigString(key string) string {
-	if viper.Get(key) == nil {
-		// Flag did not appear in config, try to use default
-		flag := man.Command.PersistentFlags().Lookup(key)
-		if flag == nil {
-			panic("Tried to look up default value for nonexistent config option " + key)
-		}
-		return flag.DefValue
+	interfaceVal := man.getInterfaceVal(key)
+	stringVal, err := cast.ToStringE(interfaceVal)
+	if err != nil {
+		panic("Unable to cast to string for key " + key + ": " + err.Error())
 	}
-	return viper.GetString(key)
+
+	return stringVal
 }
 
-// AddConfigInt Adds an int config to the config options
+// AddConfigInt adds a int config to the config options
 func (man ConfigManager) AddConfigInt(key string, defVal int) {
-	man.Command.PersistentFlags().Int(key, defVal, "Env: "+envVarNameFromConfigKey(key))
-	viper.BindPFlag(key, man.Command.PersistentFlags().Lookup(key))
+	man.command.PersistentFlags().Int(flagNameFromConfigKey(key), defVal, "Env: "+envVarNameFromConfigKey(key))
+	viper.BindPFlag(key, man.command.PersistentFlags().Lookup(flagNameFromConfigKey(key)))
 	viper.BindEnv(key, envVarNameFromConfigKey(key))
+
+	// Add default
+	man.addDefault(key, defVal)
 }
 
-// GetConfigString Retrieves a string from the loaded config
+// GetConfigInt retrieves a int from the loaded config
 func (man ConfigManager) GetConfigInt(key string) int {
-	if viper.Get(key) == nil {
-		// Flag did not appear in config, try to use default
-		flag := man.Command.PersistentFlags().Lookup(key)
-		if flag == nil {
-			panic("Tried to look up default value for nonexistent config option " + key)
-		}
-		return 0 // TODO return actual defaults value
+	interfaceVal := man.getInterfaceVal(key)
+	intVal, err := cast.ToIntE(interfaceVal)
+	if err != nil {
+		panic("Unable to cast to int for key " + key + ": " + err.Error())
 	}
-	return viper.GetInt(key)
+
+	return intVal
 }
 
-func initConfig() {
+func InitConfig() {
 	if File != "" {
 		viper.SetConfigFile(File)
 	} else {
@@ -241,10 +268,10 @@ func initConfig() {
 
 	logrus.Info("Using config file: ", viper.ConfigFileUsed())
 
-	setDefaultConfigValue("mysql.address", "foo:3306")
-	setDefaultConfigValue("mysql.username", "kolide")
-	setDefaultConfigValue("mysql.password", "kolide")
-	setDefaultConfigValue("mysql.database", "kolide")
+	// setDefaultConfigValue("mysql.address", "foo:3306")
+	// setDefaultConfigValue("mysql.username", "kolide")
+	// setDefaultConfigValue("mysql.password", "kolide")
+	// setDefaultConfigValue("mysql.database", "kolide")
 
 	setDefaultConfigValue("server.address", "0.0.0.0:8080")
 
