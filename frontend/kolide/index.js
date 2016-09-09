@@ -1,8 +1,9 @@
 import fetch from 'isomorphic-fetch';
-import config from '../../config';
+import config from '../config';
 import endpoints from './endpoints';
+import local from '../utilities/local';
 
-class APIClient {
+class Kolide {
   constructor () {
     this.baseURL = this.setBaseURL();
   }
@@ -39,10 +40,23 @@ class APIClient {
       .then(response => {
         return response.json()
           .then(user => {
-            return this.setBearerToken(user.token);
+            if (response.ok) {
+              const { token } = user;
+
+              local.setItem('auth_token', token);
+              this.setBearerToken(token);
+
+              return user;
+            }
+
+            const error = new Error(response.statusText);
+            error.response = response;
+            error.message = user.error;
+
+            throw error;
           });
       });
   }
 }
 
-export default new APIClient();
+export default new Kolide();

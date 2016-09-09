@@ -142,9 +142,15 @@ export const loadBackground = () => {
   refresh();
 };
 
+export const removeBackground = () => {
+  if (document.querySelector('#bg svg')) {
+    document.querySelector('#bg svg').remove();
+    clearTimeout(refreshTimeout);
+  }
+};
+
 export const resizeBackground = () => {
-  document.querySelector('#bg svg').remove();
-  clearTimeout(refreshTimeout);
+  removeBackground();
   loadBackground();
 };
 

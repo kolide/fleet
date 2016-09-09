@@ -1,4 +1,4 @@
-import APIClient from '../../../utilities/api';
+import Kolide from '../../../kolide';
 
 export const LOGIN_REQUEST = 'LOGIN_REQUEST';
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
@@ -27,7 +27,7 @@ export const loginUser = (formData) => {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
       dispatch(loginRequest);
-      APIClient.loginUser(formData)
+      Kolide.loginUser(formData)
         .then(user => {
           dispatch(loginSuccess(user));
           return resolve(user);

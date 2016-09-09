@@ -14,7 +14,7 @@ class LoginForm extends Component {
 
     this.state = {
       formData: {
-        email: null,
+        username: null,
         password: null,
       },
     };
@@ -34,7 +34,9 @@ class LoginForm extends Component {
     };
   }
 
-  onFormSubmit = () => {
+  onFormSubmit = (evt) => {
+    evt.preventDefault();
+
     const { formData } = this.state;
     const { onSubmit } = this.props;
 
@@ -44,17 +46,17 @@ class LoginForm extends Component {
   render () {
     const { containerStyles, submitButtonStyles, userIconStyles } = componentStyles;
     const { onInputChange, onFormSubmit } = this;
-    const { formData } = this.state;
-    const canSubmit = formData.email && formData.password;
+    const { formData: { username, password } } = this.state;
+    const canSubmit = username && password;
 
     return (
-      <div>
+      <form onSubmit={onFormSubmit}>
         <div style={containerStyles}>
           <Icon name="user" variant="circle" style={userIconStyles} />
           <InputFieldWithIcon
             iconName="user"
-            name="email"
-            onChange={onInputChange('email')}
+            name="username"
+            onChange={onInputChange('username')}
             placeholder="Username or Email"
           />
           <InputFieldWithIcon
@@ -67,12 +69,12 @@ class LoginForm extends Component {
         </div>
         <button
           disabled={!canSubmit}
-          onClick={onFormSubmit}
           style={submitButtonStyles(canSubmit)}
+          type="submit"
         >
           Login
         </button>
-      </div>
+      </form>
     );
   }
 }

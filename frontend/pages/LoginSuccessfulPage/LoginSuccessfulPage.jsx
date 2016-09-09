@@ -1,10 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { push } from 'react-router-redux';
 import componentStyles from './styles';
 import Icon from '../../components/icons/Icon';
 import { removeBackground } from '../../utilities/backgroundImage';
-import local from '../../utilities/local';
 
 export class LoginSuccessfulPage extends Component {
   static propTypes = {
