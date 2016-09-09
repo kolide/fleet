@@ -133,44 +133,44 @@ func (man ConfigManager) addConfigs() {
 // LoadConfig will load the config variables into a fully initialized AppConfig struct
 func (man ConfigManager) LoadConfig() KolideConfig {
 	return KolideConfig{
-		Mysql: mysqlConfig{
+		Mysql: MysqlConfig{
 			Address:  man.getConfigString("mysql.address"),
 			Username: man.getConfigString("mysql.username"),
 			Password: man.getConfigString("mysql.password"),
 			Database: man.getConfigString("mysql.database"),
 		},
-		Server: serverConfig{
+		Server: ServerConfig{
 			Address: man.getConfigString("server.address"),
 			Cert:    man.getConfigString("server.cert"),
 			Key:     man.getConfigString("server.key"),
 		},
-		Auth: authConfig{
+		Auth: AuthConfig{
 			JwtKey:      man.getConfigString("auth.jwt_key"),
 			BcryptCost:  man.getConfigInt("auth.bcrypt_cost"),
 			SaltKeySize: man.getConfigInt("auth.salt_key_size"),
 		},
-		App: appConfig{
+		App: AppConfig{
 			WebAddress: man.getConfigString("app.web_address"),
 		},
-		Smtp: smtpConfig{
+		Smtp: SmtpConfig{
 			Server:          man.getConfigString("smtp.server"),
 			Username:        man.getConfigString("smtp.username"),
 			Password:        man.getConfigString("smtp.password"),
 			PoolConnections: man.getConfigInt("smtp.pool_connections"),
 			TokenKeySize:    man.getConfigInt("smtp.token_key_size"),
 		},
-		Session: sessionConfig{
+		Session: SessionConfig{
 			KeySize:           man.getConfigInt("session.key_size"),
 			ExpirationSeconds: man.getConfigInt("session.expiration_seconds"),
 			CookieName:        man.getConfigString("session.cookie_name"),
 		},
-		Osquery: osqueryConfig{
+		Osquery: OsqueryConfig{
 			EnrollSecret:  man.getConfigString("osquery.enroll_secret"),
 			NodeKeySize:   man.getConfigInt("osquery.node_key_size"),
 			StatusLogFile: man.getConfigString("osquery.status_log_file"),
 			ResultLogFile: man.getConfigString("osquery.result_log_file"),
 		},
-		Logging: loggingConfig{
+		Logging: LoggingConfig{
 			Debug:         man.getConfigBool("logging.debug"),
 			DisableBanner: man.getConfigBool("logging.disable_banner"),
 		},
