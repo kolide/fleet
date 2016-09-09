@@ -3,7 +3,7 @@ import expect, { createSpy, restoreSpies } from 'expect';
 import { mount } from 'enzyme';
 import { noop } from 'lodash';
 import LoginForm from './LoginForm';
-import { fillInFormInput } from '../../../utilities/testHelpers.js';
+import { fillInFormInput } from '../../../test/helpers.js';
 
 describe('LoginForm - component', () => {
   afterEach(restoreSpies);
