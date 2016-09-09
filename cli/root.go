@@ -8,22 +8,32 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func init() {
-	rootCmd.PersistentFlags().StringVar(&config.File, "config", "", "Path to a configuration file")
-}
-
 func Launch() {
+	rootCmd := createRootCmd()
+
+	confManager := config.ConfigManager{Command: rootCmd}
+	confManager.AttachConfigs()
+
+	rootCmd.AddCommand(createPrepareCmd())
+	rootCmd.AddCommand(createServeCmd())
+	rootCmd.AddCommand(createTestCmd(confManager))
+
+	// rootCmd.PersistentFlags().String("mysql.address", "", "Port to run Application server on")
+	// viper.BindPFlag("mysql.address", rootCmd.PersistentFlags().Lookup("mysql.address"))
+
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(-1)
 	}
 }
 
-// RootCmd represents the base command when called without any subcommands
-var rootCmd = &cobra.Command{
-	Use:   "kolide",
-	Short: "osquery management and orchestration",
-	Long: `
+func createRootCmd() *cobra.Command {
+
+	// RootCmd represents the base command when called without any subcommands
+	var rootCmd = &cobra.Command{
+		Use:   "kolide",
+		Short: "osquery management and orchestration",
+		Long: `
 osquery management and orchestration
 
 Configurable Options:
@@ -69,4 +79,9 @@ Available Configurations:
       debug              (bool)    (KOLIDE_LOGGING_DEBUG)
       disable_banner     (bool)    (KOLIDE_LOGGING_DISABLE_BANNER)
 `,
+	}
+
+	rootCmd.PersistentFlags().StringVar(&config.File, "config", "", "Path to a configuration file")
+
+	return rootCmd
 }
