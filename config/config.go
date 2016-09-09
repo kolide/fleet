@@ -1,10 +1,7 @@
 package config
 
 import (
-	"fmt"
-	"reflect"
 	"strings"
-	"time"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/spf13/cast"
@@ -16,155 +13,184 @@ const (
 	envPrefix = "KOLIDE"
 )
 
+// MysqlConfig defines configs related to MySQL
+type MysqlConfig struct {
+	Address  string
+	Username string
+	Password string
+	Database string
+}
+
+// ServerConfig defines configs related to the Kolide server
+type ServerConfig struct {
+	Address string
+	Cert    string
+	Key     string
+}
+
+// AuthConfig defines configs related to user authorization
+type AuthConfig struct {
+	JwtKey      string
+	BcryptCost  int
+	SaltKeySize int
+}
+
+// AppConfig defines configs related to HTTP
 type AppConfig struct {
-	Mysql struct {
-		Address  string
-		Username string
-		Password string
-		Database string
-	}
-	Server struct {
-		Address string
-		Cert    string
-		Key     string
-	}
-	Auth struct {
-		JwtKey      string
-		BcryptCost  int
-		SaltKeySize int
-	}
+	WebAddress string
+}
+
+// SmtpConfig defines configs related to SMTP email
+type SmtpConfig struct {
+	Server          string
+	Username        string
+	Password        string
+	PoolConnections int
+	TokenKeySize    int
+}
+
+// SessionConfig defines configs related to user sessions
+type SessionConfig struct {
+	KeySize           int
+	ExpirationSeconds int
+	CookieName        string
+}
+
+// OsqueryConfig defines configs related to osquery
+type OsqueryConfig struct {
+	EnrollSecret  string
+	NodeKeySize   int
+	StatusLogFile string
+	ResultLogFile string
+}
+
+// LoggingConfig defines configs related to logging
+type LoggingConfig struct {
+	Debug         bool
+	DisableBanner bool
+}
+
+// KolideConfig stores the application configuration. Each subcategory is
+// broken up into it's own struct, defined above. When editing any of these
+// structs, ConfigManager.addConfigs and ConfigManager.LoadConfig should be
+// updated to set and retrieve the configurations as appropriate.
+type KolideConfig struct {
+	Mysql   MysqlConfig
+	Server  ServerConfig
+	Auth    AuthConfig
+	App     AppConfig
+	Smtp    SmtpConfig
+	Session SessionConfig
+	Osquery OsqueryConfig
+	Logging LoggingConfig
+}
+
+// addConfigs adds the configuration keys and default values that will be
+// filled into the KolideConfig struct
+func (man ConfigManager) addConfigs() {
+	// MySQL
+	man.addConfigString("mysql.address", "localhost:3306")
+	man.addConfigString("mysql.username", "kolide")
+	man.addConfigString("mysql.password", "kolide")
+	man.addConfigString("mysql.database", "kolide")
+
+	// Server
+	man.addConfigString("server.address", "0.0.0.0:8080")
+	man.addConfigString("server.cert", "./tools/osquery/kolide.crt")
+	man.addConfigString("server.key", "./tools/osquery/kolide.key")
+
+	// Auth
+	man.addConfigString("auth.jwt_key", "CHANGEME")
+	man.addConfigInt("auth.bcrypt_cost", 12)
+	man.addConfigInt("auth.salt_key_size", 24)
+
+	// App
+	man.addConfigString("app.web_address", "0.0.0.0:8080")
+
+	// SMTP
+	man.addConfigString("smtp.server", "")
+	man.addConfigString("smtp.username", "")
+	man.addConfigString("smtp.password", "")
+	man.addConfigInt("smtp.pool_connections", 4)
+	man.addConfigInt("smtp.token_key_size", 24)
+
+	// Session
+	man.addConfigInt("session.key_size", 64)
+	man.addConfigInt("session.expiration_seconds", 60*60*24*90)
+	man.addConfigString("session.cookie_name", "KolideSession")
+
+	// Osquery
+	man.addConfigString("osquery.enroll_secret", "")
+	man.addConfigInt("osquery.node_key_size", 24)
+	man.addConfigString("osquery.status_log_file", "/tmp/osquery_status")
+	man.addConfigString("osquery.result_log_file", "/tmp/osquery_result")
+
+	// Logging
+	man.addConfigBool("logging.debug", false)
+	man.addConfigBool("logging.disable_banner", false)
 }
 
 // LoadConfig will load the config variables into a fully initialized AppConfig struct
-func (man ConfigManager) LoadConfig() AppConfig {
-	var config AppConfig
-
-	// MySQL
-	config.Mysql.Address = man.GetConfigString("mysql.address")
-	config.Mysql.Username = man.GetConfigString("mysql.username")
-	config.Mysql.Password = man.GetConfigString("mysql.password")
-	config.Mysql.Database = man.GetConfigString("mysql.database")
-
-	// Server
-	config.Server.Address = man.GetConfigString("server.address")
-	config.Server.Cert = man.GetConfigString("server.cert")
-	config.Server.Key = man.GetConfigString("server.key")
-
-	// Auth
-	config.Auth.JwtKey = man.GetConfigString("auth.jwt_key")
-	config.Auth.BcryptCost = man.GetConfigInt("auth.bcrypt_cost")
-	config.Auth.SaltKeySize = man.GetConfigInt("auth.salt_key_size")
-
-	return config
-}
-
-func (man ConfigManager) AttachConfigs() {
-	// MySQL
-	man.AddConfigString("mysql.address", "localhost:3306")
-	man.AddConfigString("mysql.username", "kolide")
-	man.AddConfigString("mysql.password", "kolide")
-	man.AddConfigString("mysql.database", "kolide")
-
-	// Server
-	man.AddConfigString("server.address", "localhost:8080")
-	man.AddConfigString("server.cert", "./tools/osquery/kolide.crt")
-	man.AddConfigString("server.key", "./tools/osquery/kolide.key")
-
-	// Auth
-	man.AddConfigString("auth.jwt_key", "CHANGEME")
-	man.AddConfigInt("auth.bcrypt_cost", 12)
-	man.AddConfigInt("auth.salt_key_size", 24)
-}
-
-var (
-	// File may or may not contain the path to the config file
-	File string
-)
-
-// Due to a deficiency in viper (https://github.com/spf13/viper/issues/71), one
-// can not set the default values of nested config elements. For example, if the
-// "mysql" section of the config allows a user to define "username", "password",
-// and "database", but the only wants to override the default for "username".
-// they should be able to create a config which looks like:
-//
-//   mysql:
-//     username: foobar
-//
-// In viper, that would nullify the default values of all other config keys in
-// the mysql section ("mysql.*"). To get around this, instead of using the
-// provided API for setting default values, after we've read the config and env,
-// we manually check to see if the value has been set and, if it hasn't, we set
-// it manually.
-func setDefaultConfigValue(key string, value interface{}) {
-	if viper.Get(key) == nil {
-		viper.Set(key, value)
+func (man ConfigManager) LoadConfig() KolideConfig {
+	return KolideConfig{
+		Mysql: mysqlConfig{
+			Address:  man.getConfigString("mysql.address"),
+			Username: man.getConfigString("mysql.username"),
+			Password: man.getConfigString("mysql.password"),
+			Database: man.getConfigString("mysql.database"),
+		},
+		Server: serverConfig{
+			Address: man.getConfigString("server.address"),
+			Cert:    man.getConfigString("server.cert"),
+			Key:     man.getConfigString("server.key"),
+		},
+		Auth: authConfig{
+			JwtKey:      man.getConfigString("auth.jwt_key"),
+			BcryptCost:  man.getConfigInt("auth.bcrypt_cost"),
+			SaltKeySize: man.getConfigInt("auth.salt_key_size"),
+		},
+		App: appConfig{
+			WebAddress: man.getConfigString("app.web_address"),
+		},
+		Smtp: smtpConfig{
+			Server:          man.getConfigString("smtp.server"),
+			Username:        man.getConfigString("smtp.username"),
+			Password:        man.getConfigString("smtp.password"),
+			PoolConnections: man.getConfigInt("smtp.pool_connections"),
+			TokenKeySize:    man.getConfigInt("smtp.token_key_size"),
+		},
+		Session: sessionConfig{
+			KeySize:           man.getConfigInt("session.key_size"),
+			ExpirationSeconds: man.getConfigInt("session.expiration_seconds"),
+			CookieName:        man.getConfigString("session.cookie_name"),
+		},
+		Osquery: osqueryConfig{
+			EnrollSecret:  man.getConfigString("osquery.enroll_secret"),
+			NodeKeySize:   man.getConfigInt("osquery.node_key_size"),
+			StatusLogFile: man.getConfigString("osquery.status_log_file"),
+			ResultLogFile: man.getConfigString("osquery.result_log_file"),
+		},
+		Logging: loggingConfig{
+			Debug:         man.getConfigBool("logging.debug"),
+			DisableBanner: man.getConfigBool("logging.disable_banner"),
+		},
 	}
 }
 
-func recurseConfig(config AppConfig) {
-	refType := reflect.TypeOf(&config).Elem()
-	numFields := refType.NumField()
-	for i := 0; i < numFields; i++ {
-		field := refType.Field(i)
-		recurseConfigValue(func(leaf reflect.StructField, prefix string) { reflect.ValueOf(leaf).SetString(prefix) }, field, "")
-	}
-}
-
-/*
-func recurseConfig2(config AppConfig) {
-	refType := reflect.TypeOf(&config).Elem()
-	refVal := reflect.ValueOf(&config).Elem()
-	numFields := refType.NumField()
-	for i := 0; i < numFields; i++ {
-		field := refType.Field(i)
-		recurseConfigValue2(func(leaf reflect.StructField, prefix string) { reflect.ValueOf(leaf).SetString(prefix) }, field, "")
-	}
-}
-*/
-
-type structLeafFunc func(leaf reflect.StructField, prefix string)
-
-/*
-func recurseConfigValue2(fun structLeafFunc, field reflect.StructField, val reflect.Value, prefix string) {
-	switch root.Type().Kind() {
-	case reflect.Struct:
-		fmt.Println("Got struct")
-		tag := root.Tag.Get("config")
-		numFields := root.Type.NumField()
-		for i := 0; i < numFields; i++ {
-			field := root.Type.Field(i)
-			recurseConfigValue(fun, field, prefix+tag+".")
-		}
-
-	}
-}
-*/
-
-func recurseConfigValue(fun structLeafFunc, root reflect.StructField, prefix string) {
-
-	switch root.Type.Kind() {
-	case reflect.Struct:
-		fmt.Println("Got struct")
-		tag := root.Tag.Get("config")
-		numFields := root.Type.NumField()
-		for i := 0; i < numFields; i++ {
-			field := root.Type.Field(i)
-			recurseConfigValue(fun, field, prefix+tag+".")
-		}
-	default:
-		fmt.Println("Got other: ", root.Type.Kind(), prefix+root.Tag.Get("config"))
-		fun(root, prefix)
-	}
-}
-
-func envVarNameFromConfigKey(key string) string {
+// envNameFromConfigKey converts a config key into the corresponding
+// environment variable name
+func envNameFromConfigKey(key string) string {
 	return envPrefix + "_" + strings.ToUpper(strings.Replace(key, ".", "_", -1))
 }
 
+// flagNameFromConfigKey converts a config key into the corresponding flag name
 func flagNameFromConfigKey(key string) string {
 	return strings.Replace(key, ".", "_", -1)
 }
 
+// ConfigManager manages the addition and retrieval of config values for Kolide
+// configs. It's only public API method is LoadConfig, which will return the
+// populated KolideConfig struct.
 type ConfigManager struct {
 	command  *cobra.Command
 	defaults map[string]interface{}
@@ -175,10 +201,12 @@ type ConfigManager struct {
 // the subcommands). Typically this should be called just once, with the root
 // command.
 func NewConfigManager(command *cobra.Command) ConfigManager {
-	return ConfigManager{
+	man := ConfigManager{
 		command:  command,
 		defaults: map[string]interface{}{},
 	}
+	man.addConfigs()
+	return man
 }
 
 // addDefault will check for duplication, then add a default value to the
@@ -191,9 +219,9 @@ func (man ConfigManager) addDefault(key string, defVal interface{}) {
 	man.defaults[key] = defVal
 }
 
-// getInterfaceVal is a helper function used by the GetConfig* functions to
+// getInterfaceVal is a helper function used by the getConfig* functions to
 // retrieve the config value as interface{}, which will then be cast to the
-// appropriate type by the GetConfig* function.
+// appropriate type by the getConfig* function.
 func (man ConfigManager) getInterfaceVal(key string) interface{} {
 	interfaceVal := viper.Get(key)
 	if interfaceVal == nil {
@@ -206,18 +234,18 @@ func (man ConfigManager) getInterfaceVal(key string) interface{} {
 	return interfaceVal
 }
 
-// AddConfigString adds a string config to the config options
-func (man ConfigManager) AddConfigString(key string, defVal string) {
-	man.command.PersistentFlags().String(flagNameFromConfigKey(key), defVal, "Env: "+envVarNameFromConfigKey(key))
+// addConfigString adds a string config to the config options
+func (man ConfigManager) addConfigString(key string, defVal string) {
+	man.command.PersistentFlags().String(flagNameFromConfigKey(key), defVal, "Env: "+envNameFromConfigKey(key))
 	viper.BindPFlag(key, man.command.PersistentFlags().Lookup(flagNameFromConfigKey(key)))
-	viper.BindEnv(key, envVarNameFromConfigKey(key))
+	viper.BindEnv(key, envNameFromConfigKey(key))
 
 	// Add default
 	man.addDefault(key, defVal)
 }
 
-// GetConfigString retrieves a string from the loaded config
-func (man ConfigManager) GetConfigString(key string) string {
+// getConfigString retrieves a string from the loaded config
+func (man ConfigManager) getConfigString(key string) string {
 	interfaceVal := man.getInterfaceVal(key)
 	stringVal, err := cast.ToStringE(interfaceVal)
 	if err != nil {
@@ -227,18 +255,18 @@ func (man ConfigManager) GetConfigString(key string) string {
 	return stringVal
 }
 
-// AddConfigInt adds a int config to the config options
-func (man ConfigManager) AddConfigInt(key string, defVal int) {
-	man.command.PersistentFlags().Int(flagNameFromConfigKey(key), defVal, "Env: "+envVarNameFromConfigKey(key))
+// addConfigInt adds a int config to the config options
+func (man ConfigManager) addConfigInt(key string, defVal int) {
+	man.command.PersistentFlags().Int(flagNameFromConfigKey(key), defVal, "Env: "+envNameFromConfigKey(key))
 	viper.BindPFlag(key, man.command.PersistentFlags().Lookup(flagNameFromConfigKey(key)))
-	viper.BindEnv(key, envVarNameFromConfigKey(key))
+	viper.BindEnv(key, envNameFromConfigKey(key))
 
 	// Add default
 	man.addDefault(key, defVal)
 }
 
-// GetConfigInt retrieves a int from the loaded config
-func (man ConfigManager) GetConfigInt(key string) int {
+// getConfigInt retrieves a int from the loaded config
+func (man ConfigManager) getConfigInt(key string) int {
 	interfaceVal := man.getInterfaceVal(key)
 	intVal, err := cast.ToIntE(interfaceVal)
 	if err != nil {
@@ -248,62 +276,49 @@ func (man ConfigManager) GetConfigInt(key string) int {
 	return intVal
 }
 
-func InitConfig() {
-	if File != "" {
-		viper.SetConfigFile(File)
-	} else {
-		viper.SetConfigName("kolide")
-		viper.AddConfigPath(".")
-		viper.AddConfigPath("$HOME")
-		viper.AddConfigPath("./tools/app")
-		viper.AddConfigPath("/etc/kolide")
-	}
+// addConfigBool adds a bool config to the config options
+func (man ConfigManager) addConfigBool(key string, defVal bool) {
+	man.command.PersistentFlags().Bool(flagNameFromConfigKey(key), defVal, "Env: "+envNameFromConfigKey(key))
+	viper.BindPFlag(key, man.command.PersistentFlags().Lookup(flagNameFromConfigKey(key)))
+	viper.BindEnv(key, envNameFromConfigKey(key))
 
-	viper.SetConfigType("yaml")
+	// Add default
+	man.addDefault(key, defVal)
+}
 
-	err := viper.ReadInConfig()
+// getConfigBool retrieves a bool from the loaded config
+func (man ConfigManager) getConfigBool(key string) bool {
+	interfaceVal := man.getInterfaceVal(key)
+	boolVal, err := cast.ToBoolE(interfaceVal)
 	if err != nil {
-		logrus.Fatalf("Error reading config file: %s", viper.ConfigFileUsed())
+		panic("Unable to cast to bool for key " + key + ": " + err.Error())
 	}
 
-	logrus.Info("Using config file: ", viper.ConfigFileUsed())
+	return boolVal
+}
 
-	// setDefaultConfigValue("mysql.address", "foo:3306")
-	// setDefaultConfigValue("mysql.username", "kolide")
-	// setDefaultConfigValue("mysql.password", "kolide")
-	// setDefaultConfigValue("mysql.database", "kolide")
+// InitConfig handles the loading of the config file. It should only be used
+// outside this package to be hooked into cobra.OnInitialize.
+func InitConfig(command *cobra.Command) func() {
+	return func() {
+		configFile := command.PersistentFlags().Lookup("config").Value.String()
+		if configFile != "" {
+			viper.SetConfigFile(configFile)
+		} else {
+			viper.SetConfigName("kolide")
+			viper.AddConfigPath(".")
+			viper.AddConfigPath("$HOME")
+			viper.AddConfigPath("./tools/app")
+			viper.AddConfigPath("/etc/kolide")
+		}
 
-	setDefaultConfigValue("server.address", "0.0.0.0:8080")
+		viper.SetConfigType("yaml")
 
-	setDefaultConfigValue("app.web_address", "0.0.0.0:8080")
+		err := viper.ReadInConfig()
+		if err != nil {
+			logrus.Fatalf("Error reading config file: %s", viper.ConfigFileUsed())
+		}
 
-	setDefaultConfigValue("auth.jwt_key", "CHANGEME")
-	setDefaultConfigValue("auth.bcrypt_cost", 12)
-	setDefaultConfigValue("auth.salt_key_size", 24)
-
-	setDefaultConfigValue("smtp.token_key_size", 24)
-	setDefaultConfigValue("smtp.address", "localhost:1025")
-	setDefaultConfigValue("smtp.pool_connections", 4)
-
-	setDefaultConfigValue("session.key_size", 64)
-	setDefaultConfigValue("session.expiration_seconds", 60*60*24*90)
-	setDefaultConfigValue("session.cookie_name", "KolideSession")
-
-	setDefaultConfigValue("osquery.node_key_size", 24)
-	setDefaultConfigValue("osquery.status_log_file", "/tmp/osquery_status")
-	setDefaultConfigValue("osquery.result_log_file", "/tmp/osquery_result")
-	setDefaultConfigValue("osquery.label_up_interval", 1*time.Minute)
-
-	setDefaultConfigValue("logging.debug", false)
-	setDefaultConfigValue("logging.disable_banner", false)
-
-	if viper.GetBool("logging.debug") {
-		logrus.SetLevel(logrus.DebugLevel)
-	} else {
-		logrus.SetLevel(logrus.WarnLevel)
-	}
-
-	if viper.GetBool("logs.json") {
-		logrus.SetFormatter(&logrus.JSONFormatter{})
+		logrus.Info("Using config file: ", viper.ConfigFileUsed())
 	}
 }

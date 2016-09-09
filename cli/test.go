@@ -3,38 +3,36 @@ package cli
 import (
 	"fmt"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/kolide/kolide-ose/config"
+
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+	"gopkg.in/yaml.v2"
 )
 
-// TODO: This should probably be killed once we are done developing the config
-// patterns (or turned into something more user friendly)
+func createConfigDumpCmd(confManager config.ConfigManager) *cobra.Command {
+	var configDumpCmd = &cobra.Command{
+		Use:   "config_dump",
+		Short: "Dump the parsed configuration in yaml format",
+		Long: `
+Dump the parsed configuration in yaml format.
 
-func createTestCmd(confManager config.ConfigManager) *cobra.Command {
+Kolide retrieves configuration options from many locations, and it can be
+useful to see the result of merging those configs.
 
-	var testCmd = &cobra.Command{
-		Use:   "test",
-		Short: "Test",
-		Long:  `Subcommand for debug testing`,
+The following precedence is used when reading configs:
+1. CLI flags
+2. Environment Variables
+3. Config File
+4. Default Values
+`,
 		Run: func(cmd *cobra.Command, args []string) {
-			cmd.Help()
-		},
-	}
+			buf, err := yaml.Marshal(confManager.LoadConfig())
+			if err != nil {
+				logrus.Fatal("Error marshalling config to yaml")
+			}
+			fmt.Println(string(buf))
+		}}
 
-	var configCmd = &cobra.Command{
-		Use:   "config",
-		Short: "Config",
-		Long:  `Spit out the config values`,
-		Run: func(cmd *cobra.Command, args []string) {
-			viper.Debug()
-			fmt.Println(viper.AllSettings())
-			fmt.Println(viper.AllKeys())
-			fmt.Println(confManager.LoadConfig())
-		},
-	}
-
-	testCmd.AddCommand(configCmd)
-
-	return testCmd
+	return configDumpCmd
 }

@@ -4,13 +4,13 @@ import (
 	"fmt"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/kolide/kolide-ose/config"
 	"github.com/kolide/kolide-ose/datastore"
 	"github.com/kolide/kolide-ose/kolide"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
-func createPrepareCmd() *cobra.Command {
+func createPrepareCmd(confManager config.ConfigManager) *cobra.Command {
 
 	var prepareCmd = &cobra.Command{
 		Use:   "prepare",
@@ -30,12 +30,13 @@ To setup kolide infrastructure, use one of the available commands.
 		Short: "Given correct database configurations, prepare the databases for use",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
+			config := confManager.LoadConfig()
 			connString := fmt.Sprintf(
 				"%s:%s@(%s)/%s?charset=utf8&parseTime=True&loc=Local",
-				viper.GetString("mysql.username"),
-				viper.GetString("mysql.password"),
-				viper.GetString("mysql.address"),
-				viper.GetString("mysql.database"),
+				config.Mysql.Username,
+				config.Mysql.Password,
+				config.Mysql.Address,
+				config.Mysql.Database,
 			)
 			ds, err := datastore.New("gorm-mysql", connString)
 			if err != nil {
