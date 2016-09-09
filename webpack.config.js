@@ -29,8 +29,8 @@ var config  = {
     bundle: path.join(repo, 'frontend/index.jsx')
   },
   output: {
-    path: path.join(repo, 'assets'),
-    publicPath: "/assets/",
+    path: path.join(repo, 'assets/build/'),
+    publicPath: "/assets/build/",
     filename: '[name].js'
   },
   plugins: plugins,

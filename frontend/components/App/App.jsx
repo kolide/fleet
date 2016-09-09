@@ -11,14 +11,11 @@ export class App extends Component {
 
   render () {
     const { children } = this.props;
-    const { containerStyles, childWrapperStyles } = componentStyles;
 
     return (
-      <div style={containerStyles}>
+      <div>
         <Style rules={globalStyles} />
-        <div style={childWrapperStyles}>
-          {children}
-        </div>
+        {children}
         <Footer />
       </div>
     );

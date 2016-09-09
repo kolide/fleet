@@ -1,4 +1,4 @@
-const grey = '#333333';
+const grey = '#66696f';
 
 export default {
   brightPurple: '#AE6DDF',
@@ -8,6 +8,6 @@ export default {
   lightGrey: '#B4B4B4',
   logoPurple: '#9651CA',
   primary: grey,
-  purple: '#B8C2E3',
-  white: '#FDFDFD',
+  purple: '#c38dec',
+  white: '#FFF',
 };

@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import radium from 'radium';
 import componentStyles from './styles';
-import Icon from '../../icons/Icon';
+import avatar from './avatar.svg';
 import InputFieldWithIcon from '../fields/InputFieldWithIcon';
 
 class LoginForm extends Component {
@@ -44,15 +44,14 @@ class LoginForm extends Component {
   }
 
   render () {
-    const { containerStyles, submitButtonStyles, userIconStyles } = componentStyles;
+    const { containerStyles, submitButtonStyles, userIconStyles, formStyles } = componentStyles;
     const { onInputChange, onFormSubmit } = this;
     const { formData: { username, password } } = this.state;
-    const canSubmit = username && password;
 
     return (
-      <form onSubmit={onFormSubmit}>
+      <form onSubmit={onFormSubmit} style={formStyles}>
         <div style={containerStyles}>
-          <Icon name="user" variant="circle" style={userIconStyles} />
+          <img src={avatar} />
           <InputFieldWithIcon
             iconName="user"
             name="username"
@@ -68,8 +67,7 @@ class LoginForm extends Component {
           />
         </div>
         <button
-          disabled={!canSubmit}
-          style={submitButtonStyles(canSubmit)}
+          style={submitButtonStyles}
           type="submit"
         >
           Login

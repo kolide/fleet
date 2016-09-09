@@ -18,7 +18,7 @@ export class LoginSuccessfulPage extends Component {
 
     return (
       <div style={containerStyles}>
-        <Icon name="kolideText" />
+        <img src="/assets/images/kolide-logo-text.svg" />
         <div style={whiteBoxStyles}>
           <Icon name="check" />
           <p style={loginSuccessStyles}>Login successful</p>
