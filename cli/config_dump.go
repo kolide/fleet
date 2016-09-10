@@ -10,7 +10,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-func createConfigDumpCmd(confManager config.ConfigManager) *cobra.Command {
+func createConfigDumpCmd(confManager config.Manager) *cobra.Command {
 	var configDumpCmd = &cobra.Command{
 		Use:   "config_dump",
 		Short: "Dump the parsed configuration in yaml format",

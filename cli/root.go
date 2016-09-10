@@ -8,12 +8,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// Launch is the entrypoint that sets up and runs the Kolide commands.
 func Launch() {
 	rootCmd := createRootCmd()
 
-	confManager := config.NewConfigManager(rootCmd)
-
-	cobra.OnInitialize(confManager.InitConfig)
+	confManager := config.NewManager(rootCmd)
 
 	rootCmd.AddCommand(createPrepareCmd(confManager))
 	rootCmd.AddCommand(createServeCmd())
@@ -26,7 +25,6 @@ func Launch() {
 }
 
 func createRootCmd() *cobra.Command {
-
 	// RootCmd represents the base command when called without any subcommands
 	var rootCmd = &cobra.Command{
 		Use:   "kolide",

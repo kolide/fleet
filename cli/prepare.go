@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func createPrepareCmd(confManager config.ConfigManager) *cobra.Command {
+func createPrepareCmd(confManager config.Manager) *cobra.Command {
 
 	var prepareCmd = &cobra.Command{
 		Use:   "prepare",

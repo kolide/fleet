@@ -40,8 +40,8 @@ type AppConfig struct {
 	WebAddress string
 }
 
-// SmtpConfig defines configs related to SMTP email
-type SmtpConfig struct {
+// SMTPConfig defines configs related to SMTP email
+type SMTPConfig struct {
 	Server          string
 	Username        string
 	Password        string
@@ -72,14 +72,14 @@ type LoggingConfig struct {
 
 // KolideConfig stores the application configuration. Each subcategory is
 // broken up into it's own struct, defined above. When editing any of these
-// structs, ConfigManager.addConfigs and ConfigManager.LoadConfig should be
+// structs, Manager.addConfigs and Manager.LoadConfig should be
 // updated to set and retrieve the configurations as appropriate.
 type KolideConfig struct {
 	Mysql   MysqlConfig
 	Server  ServerConfig
 	Auth    AuthConfig
 	App     AppConfig
-	Smtp    SmtpConfig
+	SMTP    SMTPConfig
 	Session SessionConfig
 	Osquery OsqueryConfig
 	Logging LoggingConfig
@@ -87,7 +87,7 @@ type KolideConfig struct {
 
 // addConfigs adds the configuration keys and default values that will be
 // filled into the KolideConfig struct
-func (man ConfigManager) addConfigs() {
+func (man Manager) addConfigs() {
 	// MySQL
 	man.addConfigString("mysql.address", "localhost:3306")
 	man.addConfigString("mysql.username", "kolide")
@@ -130,8 +130,11 @@ func (man ConfigManager) addConfigs() {
 	man.addConfigBool("logging.disable_banner", false)
 }
 
-// LoadConfig will load the config variables into a fully initialized AppConfig struct
-func (man ConfigManager) LoadConfig() KolideConfig {
+// LoadConfig will load the config variables into a fully initialized
+// KolideConfig struct
+func (man Manager) LoadConfig() KolideConfig {
+	man.loadConfigFile()
+
 	return KolideConfig{
 		Mysql: MysqlConfig{
 			Address:  man.getConfigString("mysql.address"),
@@ -152,7 +155,7 @@ func (man ConfigManager) LoadConfig() KolideConfig {
 		App: AppConfig{
 			WebAddress: man.getConfigString("app.web_address"),
 		},
-		Smtp: SmtpConfig{
+		SMTP: SMTPConfig{
 			Server:          man.getConfigString("smtp.server"),
 			Username:        man.getConfigString("smtp.username"),
 			Password:        man.getConfigString("smtp.password"),
@@ -188,21 +191,21 @@ func flagNameFromConfigKey(key string) string {
 	return strings.Replace(key, ".", "_", -1)
 }
 
-// ConfigManager manages the addition and retrieval of config values for Kolide
+// Manager manages the addition and retrieval of config values for Kolide
 // configs. It's only public API method is LoadConfig, which will return the
 // populated KolideConfig struct.
-type ConfigManager struct {
+type Manager struct {
 	viper    *viper.Viper
 	command  *cobra.Command
 	defaults map[string]interface{}
 }
 
-// NewConfigManager initializes a ConfigManager wrapping the provided cobra
+// NewManager initializes a Manager wrapping the provided cobra
 // command. All config flags will be attached to that command (and inherited by
 // the subcommands). Typically this should be called just once, with the root
 // command.
-func NewConfigManager(command *cobra.Command) ConfigManager {
-	man := ConfigManager{
+func NewManager(command *cobra.Command) Manager {
+	man := Manager{
 		viper:    viper.New(),
 		command:  command,
 		defaults: map[string]interface{}{},
@@ -213,7 +216,7 @@ func NewConfigManager(command *cobra.Command) ConfigManager {
 
 // addDefault will check for duplication, then add a default value to the
 // defaults map
-func (man ConfigManager) addDefault(key string, defVal interface{}) {
+func (man Manager) addDefault(key string, defVal interface{}) {
 	if _, exists := man.defaults[key]; exists {
 		panic("Trying to add duplicate config for key " + key)
 	}
@@ -224,7 +227,7 @@ func (man ConfigManager) addDefault(key string, defVal interface{}) {
 // getInterfaceVal is a helper function used by the getConfig* functions to
 // retrieve the config value as interface{}, which will then be cast to the
 // appropriate type by the getConfig* function.
-func (man ConfigManager) getInterfaceVal(key string) interface{} {
+func (man Manager) getInterfaceVal(key string) interface{} {
 	interfaceVal := man.viper.Get(key)
 	if interfaceVal == nil {
 		var ok bool
@@ -237,7 +240,7 @@ func (man ConfigManager) getInterfaceVal(key string) interface{} {
 }
 
 // addConfigString adds a string config to the config options
-func (man ConfigManager) addConfigString(key string, defVal string) {
+func (man Manager) addConfigString(key string, defVal string) {
 	man.command.PersistentFlags().String(flagNameFromConfigKey(key), defVal, "Env: "+envNameFromConfigKey(key))
 	man.viper.BindPFlag(key, man.command.PersistentFlags().Lookup(flagNameFromConfigKey(key)))
 	man.viper.BindEnv(key, envNameFromConfigKey(key))
@@ -247,7 +250,7 @@ func (man ConfigManager) addConfigString(key string, defVal string) {
 }
 
 // getConfigString retrieves a string from the loaded config
-func (man ConfigManager) getConfigString(key string) string {
+func (man Manager) getConfigString(key string) string {
 	interfaceVal := man.getInterfaceVal(key)
 	stringVal, err := cast.ToStringE(interfaceVal)
 	if err != nil {
@@ -258,7 +261,7 @@ func (man ConfigManager) getConfigString(key string) string {
 }
 
 // addConfigInt adds a int config to the config options
-func (man ConfigManager) addConfigInt(key string, defVal int) {
+func (man Manager) addConfigInt(key string, defVal int) {
 	man.command.PersistentFlags().Int(flagNameFromConfigKey(key), defVal, "Env: "+envNameFromConfigKey(key))
 	man.viper.BindPFlag(key, man.command.PersistentFlags().Lookup(flagNameFromConfigKey(key)))
 	man.viper.BindEnv(key, envNameFromConfigKey(key))
@@ -268,7 +271,7 @@ func (man ConfigManager) addConfigInt(key string, defVal int) {
 }
 
 // getConfigInt retrieves a int from the loaded config
-func (man ConfigManager) getConfigInt(key string) int {
+func (man Manager) getConfigInt(key string) int {
 	interfaceVal := man.getInterfaceVal(key)
 	intVal, err := cast.ToIntE(interfaceVal)
 	if err != nil {
@@ -279,7 +282,7 @@ func (man ConfigManager) getConfigInt(key string) int {
 }
 
 // addConfigBool adds a bool config to the config options
-func (man ConfigManager) addConfigBool(key string, defVal bool) {
+func (man Manager) addConfigBool(key string, defVal bool) {
 	man.command.PersistentFlags().Bool(flagNameFromConfigKey(key), defVal, "Env: "+envNameFromConfigKey(key))
 	man.viper.BindPFlag(key, man.command.PersistentFlags().Lookup(flagNameFromConfigKey(key)))
 	man.viper.BindEnv(key, envNameFromConfigKey(key))
@@ -289,7 +292,7 @@ func (man ConfigManager) addConfigBool(key string, defVal bool) {
 }
 
 // getConfigBool retrieves a bool from the loaded config
-func (man ConfigManager) getConfigBool(key string) bool {
+func (man Manager) getConfigBool(key string) bool {
 	interfaceVal := man.getInterfaceVal(key)
 	boolVal, err := cast.ToBoolE(interfaceVal)
 	if err != nil {
@@ -299,9 +302,8 @@ func (man ConfigManager) getConfigBool(key string) bool {
 	return boolVal
 }
 
-// InitConfig handles the loading of the config file. It should only be used
-// outside this package to be hooked into cobra.OnInitialize.
-func (man ConfigManager) InitConfig() {
+// loadConfigFile handles the loading of the config file.
+func (man Manager) loadConfigFile() {
 	configFile := man.command.PersistentFlags().Lookup("config").Value.String()
 	if configFile != "" {
 		man.viper.SetConfigFile(configFile)
