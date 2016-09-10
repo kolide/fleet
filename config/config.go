@@ -1,9 +1,9 @@
 package config
 
 import (
+	"fmt"
 	"strings"
 
-	"github.com/Sirupsen/logrus"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -318,9 +318,11 @@ func (man Manager) loadConfigFile() {
 	man.viper.SetConfigType("yaml")
 
 	err := man.viper.ReadInConfig()
+
+	fmt.Println("Using config file: ", man.viper.ConfigFileUsed())
+
 	if err != nil {
-		logrus.Fatalf("Error reading config file: %s", man.viper.ConfigFileUsed())
+		panic("Error reading config: " + err.Error())
 	}
 
-	logrus.Info("Using config file: ", man.viper.ConfigFileUsed())
 }
