@@ -192,6 +192,7 @@ func flagNameFromConfigKey(key string) string {
 // configs. It's only public API method is LoadConfig, which will return the
 // populated KolideConfig struct.
 type ConfigManager struct {
+	viper    *viper.Viper
 	command  *cobra.Command
 	defaults map[string]interface{}
 }
@@ -202,6 +203,7 @@ type ConfigManager struct {
 // command.
 func NewConfigManager(command *cobra.Command) ConfigManager {
 	man := ConfigManager{
+		viper:    viper.New(),
 		command:  command,
 		defaults: map[string]interface{}{},
 	}
@@ -223,7 +225,7 @@ func (man ConfigManager) addDefault(key string, defVal interface{}) {
 // retrieve the config value as interface{}, which will then be cast to the
 // appropriate type by the getConfig* function.
 func (man ConfigManager) getInterfaceVal(key string) interface{} {
-	interfaceVal := viper.Get(key)
+	interfaceVal := man.viper.Get(key)
 	if interfaceVal == nil {
 		var ok bool
 		interfaceVal, ok = man.defaults[key]
@@ -237,8 +239,8 @@ func (man ConfigManager) getInterfaceVal(key string) interface{} {
 // addConfigString adds a string config to the config options
 func (man ConfigManager) addConfigString(key string, defVal string) {
 	man.command.PersistentFlags().String(flagNameFromConfigKey(key), defVal, "Env: "+envNameFromConfigKey(key))
-	viper.BindPFlag(key, man.command.PersistentFlags().Lookup(flagNameFromConfigKey(key)))
-	viper.BindEnv(key, envNameFromConfigKey(key))
+	man.viper.BindPFlag(key, man.command.PersistentFlags().Lookup(flagNameFromConfigKey(key)))
+	man.viper.BindEnv(key, envNameFromConfigKey(key))
 
 	// Add default
 	man.addDefault(key, defVal)
@@ -258,8 +260,8 @@ func (man ConfigManager) getConfigString(key string) string {
 // addConfigInt adds a int config to the config options
 func (man ConfigManager) addConfigInt(key string, defVal int) {
 	man.command.PersistentFlags().Int(flagNameFromConfigKey(key), defVal, "Env: "+envNameFromConfigKey(key))
-	viper.BindPFlag(key, man.command.PersistentFlags().Lookup(flagNameFromConfigKey(key)))
-	viper.BindEnv(key, envNameFromConfigKey(key))
+	man.viper.BindPFlag(key, man.command.PersistentFlags().Lookup(flagNameFromConfigKey(key)))
+	man.viper.BindEnv(key, envNameFromConfigKey(key))
 
 	// Add default
 	man.addDefault(key, defVal)
@@ -279,8 +281,8 @@ func (man ConfigManager) getConfigInt(key string) int {
 // addConfigBool adds a bool config to the config options
 func (man ConfigManager) addConfigBool(key string, defVal bool) {
 	man.command.PersistentFlags().Bool(flagNameFromConfigKey(key), defVal, "Env: "+envNameFromConfigKey(key))
-	viper.BindPFlag(key, man.command.PersistentFlags().Lookup(flagNameFromConfigKey(key)))
-	viper.BindEnv(key, envNameFromConfigKey(key))
+	man.viper.BindPFlag(key, man.command.PersistentFlags().Lookup(flagNameFromConfigKey(key)))
+	man.viper.BindEnv(key, envNameFromConfigKey(key))
 
 	// Add default
 	man.addDefault(key, defVal)
@@ -299,26 +301,24 @@ func (man ConfigManager) getConfigBool(key string) bool {
 
 // InitConfig handles the loading of the config file. It should only be used
 // outside this package to be hooked into cobra.OnInitialize.
-func InitConfig(command *cobra.Command) func() {
-	return func() {
-		configFile := command.PersistentFlags().Lookup("config").Value.String()
-		if configFile != "" {
-			viper.SetConfigFile(configFile)
-		} else {
-			viper.SetConfigName("kolide")
-			viper.AddConfigPath(".")
-			viper.AddConfigPath("$HOME")
-			viper.AddConfigPath("./tools/app")
-			viper.AddConfigPath("/etc/kolide")
-		}
-
-		viper.SetConfigType("yaml")
-
-		err := viper.ReadInConfig()
-		if err != nil {
-			logrus.Fatalf("Error reading config file: %s", viper.ConfigFileUsed())
-		}
-
-		logrus.Info("Using config file: ", viper.ConfigFileUsed())
+func (man ConfigManager) InitConfig() {
+	configFile := man.command.PersistentFlags().Lookup("config").Value.String()
+	if configFile != "" {
+		man.viper.SetConfigFile(configFile)
+	} else {
+		man.viper.SetConfigName("kolide")
+		man.viper.AddConfigPath(".")
+		man.viper.AddConfigPath("$HOME")
+		man.viper.AddConfigPath("./tools/app")
+		man.viper.AddConfigPath("/etc/kolide")
 	}
+
+	man.viper.SetConfigType("yaml")
+
+	err := man.viper.ReadInConfig()
+	if err != nil {
+		logrus.Fatalf("Error reading config file: %s", man.viper.ConfigFileUsed())
+	}
+
+	logrus.Info("Using config file: ", man.viper.ConfigFileUsed())
 }

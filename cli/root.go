@@ -10,9 +10,10 @@ import (
 
 func Launch() {
 	rootCmd := createRootCmd()
-	cobra.OnInitialize(config.InitConfig(rootCmd))
 
 	confManager := config.NewConfigManager(rootCmd)
+
+	cobra.OnInitialize(confManager.InitConfig)
 
 	rootCmd.AddCommand(createPrepareCmd(confManager))
 	rootCmd.AddCommand(createServeCmd())
