@@ -31,6 +31,19 @@ func (orm *inmem) User(username string) (*kolide.User, error) {
 	return nil, ErrNotFound
 }
 
+func (orm *inmem) UserByEmail(email string) (*kolide.User, error) {
+	orm.mtx.Lock()
+	defer orm.mtx.Unlock()
+
+	for _, user := range orm.users {
+		if user.Email == email {
+			return user, nil
+		}
+	}
+
+	return nil, ErrNotFound
+}
+
 func (orm *inmem) UserByID(id uint) (*kolide.User, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()

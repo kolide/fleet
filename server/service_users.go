@@ -63,7 +63,6 @@ func (svc service) RequestPasswordReset(ctx context.Context, username, email str
 
 	// TODO: queue email send
 	return nil
-
 }
 
 func (svc service) UpdateAdminRole(ctx context.Context, userID uint, isAdmin bool) error {

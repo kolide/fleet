@@ -15,6 +15,7 @@ import (
 type UserStore interface {
 	NewUser(user *User) (*User, error)
 	User(username string) (*User, error)
+	UserByEmail(email string) (*User, error)
 	UserByID(id uint) (*User, error)
 	SaveUser(user *User) error
 }
