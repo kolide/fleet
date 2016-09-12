@@ -10,7 +10,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-func createConfigDumpCmd(confManager config.Manager) *cobra.Command {
+func createConfigDumpCmd(configManager config.Manager) *cobra.Command {
 	var configDumpCmd = &cobra.Command{
 		Use:   "config_dump",
 		Short: "Dump the parsed configuration in yaml format",
@@ -27,7 +27,7 @@ The following precedence is used when reading configs:
 4. Default Values
 `,
 		Run: func(cmd *cobra.Command, args []string) {
-			buf, err := yaml.Marshal(confManager.LoadConfig())
+			buf, err := yaml.Marshal(configManager.LoadConfig())
 			if err != nil {
 				logrus.Fatal("Error marshalling config to yaml")
 			}

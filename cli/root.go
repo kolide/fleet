@@ -12,11 +12,11 @@ import (
 func Launch() {
 	rootCmd := createRootCmd()
 
-	confManager := config.NewManager(rootCmd)
+	configManager := config.NewManager(rootCmd)
 
-	rootCmd.AddCommand(createPrepareCmd(confManager))
-	rootCmd.AddCommand(createServeCmd())
-	rootCmd.AddCommand(createConfigDumpCmd(confManager))
+	rootCmd.AddCommand(createPrepareCmd(configManager))
+	rootCmd.AddCommand(createServeCmd(configManager))
+	rootCmd.AddCommand(createConfigDumpCmd(configManager))
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)

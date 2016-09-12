@@ -9,6 +9,7 @@ import (
 	"syscall"
 
 	kitlog "github.com/go-kit/kit/log"
+	"github.com/kolide/kolide-ose/config"
 	"github.com/kolide/kolide-ose/datastore"
 	"github.com/kolide/kolide-ose/kolide"
 	"github.com/kolide/kolide-ose/server"
@@ -16,7 +17,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-func createServeCmd() *cobra.Command {
+func createServeCmd(configManager config.Manager) *cobra.Command {
 	return &cobra.Command{
 		Use:   "serve",
 		Short: "Launch the kolide server",

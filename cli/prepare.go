@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func createPrepareCmd(confManager config.Manager) *cobra.Command {
+func createPrepareCmd(configManager config.Manager) *cobra.Command {
 
 	var prepareCmd = &cobra.Command{
 		Use:   "prepare",
@@ -30,7 +30,7 @@ To setup kolide infrastructure, use one of the available commands.
 		Short: "Given correct database configurations, prepare the databases for use",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			config := confManager.LoadConfig()
+			config := configManager.LoadConfig()
 			connString := fmt.Sprintf(
 				"%s:%s@(%s)/%s?charset=utf8&parseTime=True&loc=Local",
 				config.Mysql.Username,
