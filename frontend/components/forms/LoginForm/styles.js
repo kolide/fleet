@@ -16,6 +16,16 @@ export default {
     width: FORM_WIDTH,
     minHeight: '350px',
   },
+  forgotPasswordStyles: {
+    fontSize: font.medium,
+    textDecoration: 'none',
+    color: color.lightGrey,
+  },
+  forgotPasswordWrapperStyles: {
+    marginTop: padding.base,
+    textAlign: 'right',
+    width: '378px',
+  },
   formStyles: {
     boxShadow: '0 5px 30px 0 rgba(0,0,0,0.30)',
   },

@@ -1,7 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import radium from 'radium';
-import componentStyles from './styles';
 import avatar from './avatar.svg';
+import componentStyles from './styles';
+import GradientButton from '../../buttons/GradientButton';
 import InputFieldWithIcon from '../fields/InputFieldWithIcon';
 
 class LoginForm extends Component {
@@ -54,7 +55,13 @@ class LoginForm extends Component {
   }
 
   render () {
-    const { containerStyles, submitButtonStyles, formStyles } = componentStyles;
+    const {
+      containerStyles,
+      forgotPasswordStyles,
+      forgotPasswordWrapperStyles,
+      formStyles
+      submitButtonStyles,
+    } = componentStyles;
     const { onInputChange, onFormSubmit } = this;
     const canSubmit = this.canSubmit();
 
@@ -76,12 +83,13 @@ class LoginForm extends Component {
             type="password"
           />
         </div>
-        <button
+        <GradientButton
+          disabled={!canSubmit}
+          onClick={onFormSubmit}
           style={submitButtonStyles(canSubmit)}
+          text="Login"
           type="submit"
-        >
-          Login
-        </button>
+        />
       </form>
     );
   }
