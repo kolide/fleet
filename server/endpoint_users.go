@@ -218,7 +218,6 @@ func makePasswordResetEndpoint(svc kolide.Service) endpoint.Endpoint {
 		if err != nil {
 			return passwordResetResponse{Err: err}, nil
 		}
-		// TODO make call to service
 		return passwordResetResponse{}, nil
 	}
 }

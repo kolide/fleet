@@ -75,7 +75,7 @@ func (mw loggingMiddleware) ChangePassword(ctx context.Context, userID uint, old
 
 func (mw loggingMiddleware) RequestPasswordReset(ctx context.Context, username, email string) (err error) {
 
-	requestedBy := "logged_out"
+	requestedBy := "unauthenticated"
 
 	vc, err := viewerContextFromContext(ctx)
 	if err != nil {
