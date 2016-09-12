@@ -33,7 +33,12 @@ func testPasswordResetRequests(t *testing.T, db kolide.Datastore) {
 	}
 
 	for _, tt := range passwordResetTests {
-		req, err := db.CreatePassworResetRequest(tt.userID, tt.expires, tt.token)
+		r := &kolide.PasswordResetRequest{
+			UserID:    tt.userID,
+			ExpiresAt: tt.expires,
+			Token:     tt.token,
+		}
+		req, err := db.SavePasswordResetRequest(r)
 		assert.Nil(t, err)
 		assert.Equal(t, tt.userID, req.UserID)
 	}

@@ -12,7 +12,7 @@ import (
 
 // CampaignStore manages email campaigns in the database
 type EmailStore interface {
-	CreatePassworResetRequest(userID uint, expires time.Time, token string) (*PasswordResetRequest, error)
+	SavePasswordResetRequest(req *PasswordResetRequest) (*PasswordResetRequest, error)
 	DeletePasswordResetRequest(req *PasswordResetRequest) error
 	FindPassswordResetByID(id uint) (*PasswordResetRequest, error)
 	FindPassswordResetsByUserID(id uint) ([]*PasswordResetRequest, error)
@@ -123,23 +123,4 @@ type PasswordResetRequest struct {
 	ExpiresAt time.Time
 	UserID    uint
 	Token     string `gorm:"size:1024"`
-}
-
-// NewPasswordResetRequest creates a password reset email campaign
-func NewPasswordResetRequest(db EmailStore, userID uint, expires time.Time) (*PasswordResetRequest, error) {
-	keySize := viper.GetInt("smtp.token_key_size")
-	if keySize == 0 {
-		keySize = 24
-	}
-	token, err := generateRandomText(keySize)
-	if err != nil {
-		return nil, err
-	}
-
-	request, err := db.CreatePassworResetRequest(userID, expires, token)
-	if err != nil {
-		return nil, err
-	}
-
-	return request, nil
 }
