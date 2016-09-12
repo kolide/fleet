@@ -75,3 +75,11 @@ func decodeModifyUserRequest(ctx context.Context, r *http.Request) (interface{},
 	req.ID = id
 	return req, nil
 }
+
+func decodePasswordResetRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	var req passwordResetRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+	return req, nil
+}

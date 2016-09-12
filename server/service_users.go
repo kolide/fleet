@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
+	"time"
 
 	"github.com/kolide/kolide-ose/kolide"
 	"golang.org/x/crypto/bcrypt"
@@ -41,6 +42,28 @@ func (svc service) ChangePassword(ctx context.Context, userID uint, old, new str
 	user.Salt = salt
 	user.Password = hashed
 	return svc.saveUser(user)
+}
+
+func (svc service) RequestPasswordReset(ctx context.Context, username, email string) error {
+	token, err := generateRandomText(svc.smtpTokenKeySize)
+	if err != nil {
+		return err
+	}
+	request := &kolide.PasswordResetRequest{
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		ExpiresAt: time.Now().Add(time.Hour * 24),
+		Token:     token,
+	}
+
+	request, err = svc.ds.SavePasswordResetRequest(request)
+	if err != nil {
+		return err
+	}
+
+	// TODO: queue email send
+	return nil
+
 }
 
 func (svc service) UpdateAdminRole(ctx context.Context, userID uint, isAdmin bool) error {

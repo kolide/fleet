@@ -23,6 +23,7 @@ type UserService interface {
 	NewUser(ctx context.Context, p UserPayload) (*User, error)
 	User(ctx context.Context, id uint) (*User, error)
 	ChangePassword(ctx context.Context, userID uint, old, new string) error
+	RequestPasswordReset(ctx context.Context, username, email string) error
 	UpdateAdminRole(ctx context.Context, userID uint, isAdmin bool) error
 	UpdateUserStatus(ctx context.Context, userID uint, password string, enabled bool) error
 }

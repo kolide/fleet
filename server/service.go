@@ -14,11 +14,12 @@ import (
 // configuration defaults
 // TODO move to main?
 const (
-	defaultBcryptCost   int    = 12
-	defaultSaltKeySize  int    = 24
-	defaultCookieName   string = "KolideSession"
-	defaultEnrollSecret string = "xxx change me"
-	defaultNodeKeySize  int    = 24
+	defaultBcryptCost       int    = 12
+	defaultSaltKeySize      int    = 24
+	defaultCookieName       string = "KolideSession"
+	defaultEnrollSecret     string = "xxx change me"
+	defaultNodeKeySize      int    = 24
+	defaultSMTPTokenKeySize int    = 24
 )
 
 // NewService creates a new service from the config struct
