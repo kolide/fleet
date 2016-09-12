@@ -7,7 +7,6 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"github.com/kolide/kolide-ose/kolide"
-	"github.com/spf13/viper"
 )
 
 func (orm gormDB) FindSessionByID(id uint) (*kolide.Session, error) {
@@ -23,11 +22,6 @@ func (orm gormDB) FindSessionByID(id uint) (*kolide.Session, error) {
 		default:
 			return nil, err
 		}
-	}
-
-	err = orm.validateSession(session)
-	if err != nil {
-		return nil, err
 	}
 
 	return session, nil
@@ -49,11 +43,6 @@ func (orm gormDB) FindSessionByKey(key string) (*kolide.Session, error) {
 		}
 	}
 
-	err = orm.validateSession(session)
-	if err != nil {
-		return nil, err
-	}
-
 	return session, nil
 }
 
@@ -64,7 +53,8 @@ func (orm gormDB) FindAllSessionsForUser(id uint) ([]*kolide.Session, error) {
 }
 
 func (orm gormDB) CreateSessionForUserID(userID uint) (*kolide.Session, error) {
-	sessionKeySize := viper.GetInt("session.key_size")
+	// move to service_sessions.go
+	sessionKeySize := 24 // TODO load this from config
 	if sessionKeySize == 0 {
 		sessionKeySize = 24
 	}
@@ -78,6 +68,7 @@ func (orm gormDB) CreateSessionForUserID(userID uint) (*kolide.Session, error) {
 		UserID: userID,
 		Key:    base64.StdEncoding.EncodeToString(key),
 	}
+	// end move
 
 	err = orm.DB.Create(&session).Error
 	if err != nil {
@@ -105,12 +96,11 @@ func (orm gormDB) MarkSessionAccessed(session *kolide.Session) error {
 	return orm.DB.Save(session).Error
 }
 
-func (orm gormDB) validateSession(session *kolide.Session) error {
-	sessionLifeSpan := viper.GetFloat64("session.expiration_seconds")
+func (orm gormDB) validateSession(session *kolide.Session, sessionLifeSpan time.Duration) error {
 	if sessionLifeSpan == 0 {
 		return nil
 	}
-	if time.Since(session.AccessedAt).Seconds() >= sessionLifeSpan {
+	if time.Since(session.AccessedAt) >= time.Duration(sessionLifeSpan)*time.Second {
 		err := orm.DB.Delete(session).Error
 		if err != nil {
 			return err

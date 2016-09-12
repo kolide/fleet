@@ -6,6 +6,7 @@ import (
 	"io"
 
 	kitlog "github.com/go-kit/kit/log"
+	"github.com/kolide/kolide-ose/config"
 	"github.com/kolide/kolide-ose/kolide"
 	lumberjack "gopkg.in/natefinch/lumberjack.v2"
 )
@@ -52,6 +53,7 @@ func NewService(config ServiceConfig) (kolide.Service, error) {
 type service struct {
 	ds     kolide.Datastore
 	logger kitlog.Logger
+	config config.KolideConfig
 
 	saltKeySize int
 	bcryptCost  int

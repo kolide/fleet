@@ -72,7 +72,7 @@ To setup kolide infrastructure, use one of the available commands.
 				logrus.WithError(err).Fatal("error creating db connection")
 			}
 
-			admin, err := kolide.NewUser("admin", "admin", "admin@kolide.co", true, false)
+			admin, err := kolide.NewUser("admin", "admin", "admin@kolide.co", true, false, config.Auth.BcryptCost)
 			if err != nil {
 				logrus.WithError(err).Fatal("Could not create new user object")
 			}

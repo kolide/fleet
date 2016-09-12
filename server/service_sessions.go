@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/kolide/kolide-ose/datastore"
 	"github.com/kolide/kolide-ose/kolide"
@@ -89,4 +90,25 @@ func (svc service) DeleteSession(ctx context.Context, id uint) error {
 		return err
 	}
 	return svc.ds.DestroySession(session)
+}
+
+func (svc service) validateSession(session *kolide.Session) error {
+	if session == nil {
+		return kolide.ErrNoActiveSession
+	}
+
+	sessionLifeSpan := svc.config.Session.ExpirationSeconds
+	if sessionLifeSpan == 0 {
+		return nil
+	}
+
+	if time.Since(session.AccessedAt) >= time.Duration(sessionLifeSpan)*time.Second {
+		err := svc.ds.DestroySession(session)
+		if err != nil {
+			return err
+		}
+		return kolide.ErrSessionExpired
+	}
+
+	return svc.ds.MarkSessionAccessed(session)
 }

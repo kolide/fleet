@@ -13,6 +13,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"    // db driver
 
 	"github.com/jinzhu/gorm"
+	"github.com/kolide/kolide-ose/config"
 	"github.com/kolide/kolide-ose/errors"
 	"github.com/kolide/kolide-ose/kolide"
 )
@@ -40,6 +41,7 @@ type gormDB struct {
 	Driver          string
 	sessionKeySize  int
 	sessionLifespan float64
+	config          config.KolideConfig
 }
 
 func (orm gormDB) Name() string {

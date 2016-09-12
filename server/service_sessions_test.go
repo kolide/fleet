@@ -9,6 +9,8 @@ import (
 	"golang.org/x/net/context"
 )
 
+const bcryptCost = 6
+
 func TestAuthenticate(t *testing.T) {
 	ds, err := datastore.New("gorm-sqlite3", ":memory:")
 	assert.Nil(t, err)
@@ -18,7 +20,7 @@ func TestAuthenticate(t *testing.T) {
 
 	ctx := context.Background()
 
-	user, err := kolide.NewUser("foo", "bar", "foo@kolide.co", false, false)
+	user, err := kolide.NewUser("foo", "bar", "foo@kolide.co", false, false, bcryptCost)
 	assert.Nil(t, err)
 	user, err = ds.NewUser(user)
 	assert.Nil(t, err)
