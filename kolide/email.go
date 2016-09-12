@@ -2,8 +2,8 @@ package kolide
 
 import "time"
 
-// CampaignStore manages email campaigns in the database
-type EmailStore interface {
+// PasswordResetStore manages password resets in the Datastore
+type PasswordResetStore interface {
 	SavePasswordResetRequest(req *PasswordResetRequest) (*PasswordResetRequest, error)
 	DeletePasswordResetRequest(req *PasswordResetRequest) error
 	FindPassswordResetByID(id uint) (*PasswordResetRequest, error)
@@ -17,6 +17,16 @@ type EmailStore interface {
 // can be marshalled into an email body
 type Campaign interface {
 	Message() ([]byte, error)
+}
+
+type Email struct {
+	To   []string
+	From string
+	msg  Campaign
+}
+
+type MailService interface {
+	SendEmail(e Email) error
 }
 
 // PasswordResetRequest represents a database table for
