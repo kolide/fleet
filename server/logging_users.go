@@ -73,7 +73,7 @@ func (mw loggingMiddleware) ChangePassword(ctx context.Context, userID uint, old
 	return
 }
 
-func (mw loggingMiddleware) RequestPasswordReset(ctx context.Context, username, email string) (err error) {
+func (mw loggingMiddleware) RequestPasswordReset(ctx context.Context, email string) (err error) {
 
 	requestedBy := "unauthenticated"
 
@@ -89,13 +89,13 @@ func (mw loggingMiddleware) RequestPasswordReset(ctx context.Context, username, 
 	defer func(begin time.Time) {
 		_ = mw.logger.Log(
 			"method", "RequestPasswordReset",
-			"user", username,
+			"email", email,
 			"err", err,
 			"requested_by", requestedBy,
 			"took", time.Since(begin),
 		)
 	}(time.Now())
 
-	err = mw.Service.RequestPasswordReset(ctx, username, email)
+	err = mw.Service.RequestPasswordReset(ctx, email)
 	return
 }

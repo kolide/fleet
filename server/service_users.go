@@ -44,7 +44,7 @@ func (svc service) ChangePassword(ctx context.Context, userID uint, old, new str
 	return svc.saveUser(user)
 }
 
-func (svc service) RequestPasswordReset(ctx context.Context, username, email string) error {
+func (svc service) RequestPasswordReset(ctx context.Context, email string) error {
 	token, err := generateRandomText(svc.smtpTokenKeySize)
 	if err != nil {
 		return err

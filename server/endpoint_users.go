@@ -201,8 +201,7 @@ func makeModifyUserEndpoint(svc kolide.Service) endpoint.Endpoint {
 }
 
 type passwordResetRequest struct {
-	Username string `json:"username"`
-	Email    string `json:"email"`
+	Email string `json:"email"`
 }
 
 type passwordResetResponse struct {
@@ -214,7 +213,7 @@ func (r passwordResetResponse) error() error { return r.Err }
 func makePasswordResetEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(passwordResetRequest)
-		err := svc.RequestPasswordReset(ctx, req.Username, req.Email)
+		err := svc.RequestPasswordReset(ctx, req.Email)
 		if err != nil {
 			return passwordResetResponse{Err: err}, nil
 		}
