@@ -32,17 +32,3 @@ func (mw validationMiddleware) ChangePassword(ctx context.Context, userID uint, 
 	}
 	return mw.Service.ChangePassword(ctx, userID, old, new)
 }
-
-func (mw validationMiddleware) UpdateUserStatus(ctx context.Context, userID uint, password string, enabled bool) error {
-	// validate password if user is disabling self
-	vc, err := viewerContextFromContext(ctx)
-	if err != nil {
-		return err
-	}
-	if vc.IsUserID(userID) {
-		if err := vc.user.ValidatePassword(password); err != nil {
-			return err
-		}
-	}
-	return mw.Service.UpdateUserStatus(ctx, userID, password, enabled)
-}

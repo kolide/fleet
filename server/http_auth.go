@@ -35,6 +35,7 @@ func (e authError) Error() string {
 // forbidden, set when user is authenticated, but not allowd to perform action
 type forbiddenError struct {
 	message string
+	fields  []string
 }
 
 func (e forbiddenError) Error() string {

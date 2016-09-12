@@ -23,8 +23,53 @@ func (svc service) NewUser(ctx context.Context, p kolide.UserPayload) (*kolide.U
 	return user, nil
 }
 
-func (svc service) ModifyUser(ctx context.Context, id uint, p kolide.UserPayload) (*kolide.User, error) {
-	return nil, nil
+func (svc service) ModifyUser(ctx context.Context, userID uint, p kolide.UserPayload) (*kolide.User, error) {
+	user, err := svc.User(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	// the method assumes that the correct authorization
+	// has been validated higher up the stack
+	if p.Username != nil {
+		user.Username = *p.Username
+	}
+
+	if p.Name != nil {
+		user.Name = *p.Name
+	}
+
+	if p.Admin != nil {
+		user.Admin = *p.Admin
+	}
+
+	if p.Email != nil {
+		user.Email = *p.Email
+	}
+
+	if p.Enabled != nil {
+		user.Enabled = *p.Enabled
+	}
+
+	if p.AdminForcedPasswordReset != nil {
+		user.AdminForcedPasswordReset = *p.AdminForcedPasswordReset
+	}
+
+	if p.Position != nil {
+		user.Position = *p.Position
+	}
+
+	if p.GravatarURL != nil {
+		user.GravatarURL = *p.GravatarURL
+	}
+
+	err = svc.ds.SaveUser(user)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+
 }
 
 func (svc service) User(ctx context.Context, id uint) (*kolide.User, error) {
@@ -67,24 +112,6 @@ func (svc service) RequestPasswordReset(ctx context.Context, email string) error
 
 	// TODO: queue email send
 	return nil
-}
-
-func (svc service) UpdateAdminRole(ctx context.Context, userID uint, isAdmin bool) error {
-	user, err := svc.User(ctx, userID)
-	if err != nil {
-		return err
-	}
-	user.Admin = isAdmin
-	return svc.saveUser(user)
-}
-
-func (svc service) UpdateUserStatus(ctx context.Context, userID uint, password string, enabled bool) error {
-	user, err := svc.User(ctx, userID)
-	if err != nil {
-		return err
-	}
-	user.Enabled = enabled
-	return svc.saveUser(user)
 }
 
 // saves user in datastore.

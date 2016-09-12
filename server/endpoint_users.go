@@ -110,53 +110,6 @@ func makeChangePasswordEndpoint(svc kolide.Service) endpoint.Endpoint {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Update Admin Role
-////////////////////////////////////////////////////////////////////////////////
-
-type updateAdminRoleRequest struct {
-	UserID uint `json:"user_id"`
-	Admin  bool `json:"admin"`
-}
-
-type updateAdminRoleResponse struct {
-	Err error `json:"error,omitempty"`
-}
-
-func (r updateAdminRoleResponse) error() error { return r.Err }
-
-func makeUpdateAdminRoleEndpoint(svc kolide.Service) endpoint.Endpoint {
-	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(updateAdminRoleRequest)
-		err := svc.UpdateAdminRole(ctx, req.UserID, req.Admin)
-		return updateAdminRoleResponse{Err: err}, nil
-	}
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Update User Status
-////////////////////////////////////////////////////////////////////////////////
-
-type updateUserStatusRequest struct {
-	UserID          uint   `json:"user_id"`
-	Enabled         bool   `json:"enabled"`
-	CurrentPassword string `json:"current_password"`
-}
-
-type updateUserStatusResponse struct {
-	Err error `json:"error,omitempty"`
-}
-
-func (r updateUserStatusResponse) error() error { return r.Err }
-
-func makeUpdateUserStatusEndpoint(svc kolide.Service) endpoint.Endpoint {
-	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(updateUserStatusRequest)
-		err := svc.UpdateUserStatus(ctx, req.UserID, req.CurrentPassword, req.Enabled)
-		return updateUserStatusResponse{Err: err}, nil
-	}
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // Modify User
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -181,12 +134,10 @@ func (r modifyUserResponse) error() error { return r.Err }
 func makeModifyUserEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(modifyUserRequest)
-
-		// TODO call Service with UserPayload
-
-		var user *kolide.User
-		var err error
-		_ = req
+		user, err := svc.ModifyUser(ctx, req.ID, req.payload)
+		if err != nil {
+			return modifyUserResponse{Err: err}, nil
+		}
 
 		return modifyUserResponse{
 			ID:                       user.ID,

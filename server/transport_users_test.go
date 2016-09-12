@@ -76,52 +76,6 @@ func TestDecodeChangePasswordRequest(t *testing.T) {
 	)
 }
 
-func TestDecodeUpdateAdminRoleRequest(t *testing.T) {
-	router := mux.NewRouter()
-	router.HandleFunc("/api/v1/kolide/users/{id}/admin", func(writer http.ResponseWriter, request *http.Request) {
-		r, err := decodeUpdateAdminRoleRequest(context.Background(), request)
-		assert.Nil(t, err)
-
-		params := r.(updateAdminRoleRequest)
-		assert.Equal(t, true, params.Admin)
-		assert.Equal(t, uint(1), params.UserID)
-	}).Methods("POST")
-
-	var body bytes.Buffer
-	body.Write([]byte(`{
-        "admin": true
-    }`))
-
-	router.ServeHTTP(
-		httptest.NewRecorder(),
-		httptest.NewRequest("POST", "/api/v1/kolide/users/1/admin", &body),
-	)
-}
-
-func TestDecodeUpdateUserStatusRequest(t *testing.T) {
-	router := mux.NewRouter()
-	router.HandleFunc("/api/v1/kolide/users/{id}/status", func(writer http.ResponseWriter, request *http.Request) {
-		r, err := decodeUpdateUserStatusRequest(context.Background(), request)
-		assert.Nil(t, err)
-
-		params := r.(updateUserStatusRequest)
-		assert.Equal(t, true, params.Enabled)
-		assert.Equal(t, "foo", params.CurrentPassword)
-		assert.Equal(t, uint(1), params.UserID)
-	}).Methods("POST")
-
-	var body bytes.Buffer
-	body.Write([]byte(`{
-        "enabled": true,
-        "current_password": "foo"
-    }`))
-
-	router.ServeHTTP(
-		httptest.NewRecorder(),
-		httptest.NewRequest("POST", "/api/v1/kolide/users/1/status", &body),
-	)
-}
-
 func TestDecodeModifyUserRequest(t *testing.T) {
 	router := mux.NewRouter()
 	router.HandleFunc("/api/v1/kolide/users/{id}", func(writer http.ResponseWriter, request *http.Request) {

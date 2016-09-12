@@ -37,32 +37,6 @@ func decodeChangePasswordRequest(ctx context.Context, r *http.Request) (interfac
 	return req, nil
 }
 
-func decodeUpdateAdminRoleRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	id, err := idFromRequest(r, "id")
-	if err != nil {
-		return nil, err
-	}
-	var req updateAdminRoleRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		return nil, err
-	}
-	req.UserID = id
-	return req, nil
-}
-
-func decodeUpdateUserStatusRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	id, err := idFromRequest(r, "id")
-	if err != nil {
-		return nil, err
-	}
-	var req updateUserStatusRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		return nil, err
-	}
-	req.UserID = id
-	return req, nil
-}
-
 func decodeModifyUserRequest(ctx context.Context, r *http.Request) (interface{}, error) {
 	id, err := idFromRequest(r, "id")
 	if err != nil {

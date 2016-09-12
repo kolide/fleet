@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/go-kit/kit/endpoint"
+	"github.com/kolide/kolide-ose/kolide"
 	"golang.org/x/net/context"
 )
 
@@ -62,6 +63,77 @@ func canModifyUser(next endpoint.Endpoint) endpoint.Endpoint {
 		}
 		return next(ctx, request)
 	}
+}
+
+type permission int
+
+const (
+	anyone permission = iota
+	self
+	admin
+)
+
+func validateModifyUserRequest(next endpoint.Endpoint) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		r := request.(modifyUserRequest)
+		vc, err := viewerContextFromContext(ctx)
+		if err != nil {
+			return nil, err
+		}
+		uid := requestUserIDFromContext(ctx)
+		p := r.payload
+		must := requireRole(p)
+
+		// check for admin required fields
+		if fields, ok := must[admin]; ok {
+			if !vc.IsAdmin() {
+				return nil, forbiddenError{message: "must be an admin", fields: fields}
+			}
+		}
+
+		// check if any fields which the user can update themselves were set
+		if fields, ok := must[self]; ok {
+			if !vc.CanPerformWriteActionOnUser(uid) {
+				return nil, forbiddenError{message: "no write permissiosn on user", fields: fields}
+			}
+		}
+
+		return next(ctx, request)
+	}
+}
+
+// checks if fields were set in a user payload
+// returns a map of updated fields for each role required
+func requireRole(p kolide.UserPayload) map[permission][]string {
+	must := make(map[permission][]string)
+	adminFields := []string{}
+	if p.Enabled != nil {
+		adminFields = append(adminFields, "enabled")
+	}
+	if p.Admin != nil {
+		adminFields = append(adminFields, "admin")
+	}
+	if p.AdminForcedPasswordReset != nil {
+		adminFields = append(adminFields, "force_password_reset")
+	}
+	if len(adminFields) != 0 {
+		must[admin] = adminFields
+	}
+
+	selfFields := []string{}
+	if p.Username != nil {
+		selfFields = append(selfFields, "username")
+	}
+	if p.GravatarURL != nil {
+		selfFields = append(selfFields, "gravatar_url")
+	}
+	if p.Position != nil {
+		selfFields = append(selfFields, "position")
+	}
+	if len(selfFields) != 0 {
+		must[self] = selfFields
+	}
+	return must
 }
 
 func requestUserIDFromContext(ctx context.Context) uint {

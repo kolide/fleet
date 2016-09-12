@@ -81,26 +81,6 @@ func attachAPIRoutes(router *mux.Router, ctx context.Context, svc kolide.Service
 		),
 	).Methods("POST")
 
-	router.Handle("/api/v1/kolide/users/{id}/role",
-		kithttp.NewServer(
-			ctx,
-			authenticated(mustBeAdmin(makeUpdateAdminRoleEndpoint(svc))),
-			decodeUpdateAdminRoleRequest,
-			encodeResponse,
-			opts...,
-		),
-	).Methods("POST")
-
-	router.Handle("/api/v1/kolide/users/{id}/status",
-		kithttp.NewServer(
-			ctx,
-			authenticated(canModifyUser(makeUpdateUserStatusEndpoint(svc))),
-			decodeUpdateUserStatusRequest,
-			encodeResponse,
-			opts...,
-		),
-	).Methods("POST")
-
 	router.Handle("/api/v1/kolide/users/{id}/sessions",
 		kithttp.NewServer(
 			ctx,
