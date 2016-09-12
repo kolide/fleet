@@ -23,6 +23,10 @@ func (svc service) NewUser(ctx context.Context, p kolide.UserPayload) (*kolide.U
 	return user, nil
 }
 
+func (svc service) ModifyUser(ctx context.Context, id uint, p kolide.UserPayload) (*kolide.User, error) {
+	return nil, nil
+}
+
 func (svc service) User(ctx context.Context, id uint) (*kolide.User, error) {
 	return svc.ds.UserByID(id)
 }
