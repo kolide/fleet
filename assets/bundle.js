@@ -20883,19 +20883,27 @@
 
 	var _App2 = _interopRequireDefault(_App);
 
-	var _HomePage = __webpack_require__(340);
+	var _ForgotPasswordPage = __webpack_require__(340);
+
+	var _ForgotPasswordPage2 = _interopRequireDefault(_ForgotPasswordPage);
+
+	var _HomePage = __webpack_require__(365);
 
 	var _HomePage2 = _interopRequireDefault(_HomePage);
 
-	var _LoginPage = __webpack_require__(342);
+	var _LoginPage = __webpack_require__(367);
 
 	var _LoginPage2 = _interopRequireDefault(_LoginPage);
 
-	var _LoginSuccessfulPage = __webpack_require__(373);
+	var _LoginSuccessfulPage = __webpack_require__(386);
 
 	var _LoginSuccessfulPage2 = _interopRequireDefault(_LoginSuccessfulPage);
 
-	var _store = __webpack_require__(376);
+	var _LoginRoutes = __webpack_require__(389);
+
+	var _LoginRoutes2 = _interopRequireDefault(_LoginRoutes);
+
+	var _store = __webpack_require__(392);
 
 	var _store2 = _interopRequireDefault(_store);
 
@@ -20913,8 +20921,13 @@
 	      _reactRouter.Route,
 	      { path: '/', component: (0, _radium2.default)(_App2.default) },
 	      _react2.default.createElement(_reactRouter.IndexRoute, { component: (0, _radium2.default)(_HomePage2.default) }),
-	      _react2.default.createElement(_reactRouter.Route, { path: 'login', component: (0, _radium2.default)(_LoginPage2.default) }),
-	      _react2.default.createElement(_reactRouter.Route, { path: 'login_successful', component: (0, _radium2.default)(_LoginSuccessfulPage2.default) })
+	      _react2.default.createElement(
+	        _reactRouter.Route,
+	        { component: (0, _radium2.default)(_LoginRoutes2.default) },
+	        _react2.default.createElement(_reactRouter.Route, { path: 'login', component: (0, _radium2.default)(_LoginPage2.default) }),
+	        _react2.default.createElement(_reactRouter.Route, { path: 'login_successful', component: (0, _radium2.default)(_LoginSuccessfulPage2.default) }),
+	        _react2.default.createElement(_reactRouter.Route, { path: 'forgot_password', component: (0, _radium2.default)(_ForgotPasswordPage2.default) })
+	      )
 	    )
 	  )
 	);
@@ -33203,6 +33216,9 @@
 	exports.default = {
 	  radius: {
 	    base: '4px'
+	  },
+	  shadow: {
+	    blur: '0 0 30px 0 rgba(0,0,0,0.30)'
 	  }
 	};
 
@@ -33224,8 +33240,11 @@
 	  grey: grey,
 	  lightGrey: '#B4B4B4',
 	  logoPurple: '#9651CA',
+	  mediumGrey: '#6F737F',
 	  primary: grey,
 	  purple: '#c38dec',
+	  purpleGrey: '#858495',
+	  red: '#FF5850',
 	  white: '#FFF'
 	};
 
@@ -50058,6 +50077,7 @@
 
 	exports.default = {
 	  auto: 'auto',
+	  medium: (0, _helpers.pxToRem)(16),
 	  base: (0, _helpers.pxToRem)(18),
 	  half: (0, _helpers.pxToRem)(9),
 	  none: 0,
@@ -50298,13 +50318,13 @@
 	});
 	exports.default = undefined;
 
-	var _HomePage = __webpack_require__(341);
+	var _ForgotPasswordPage = __webpack_require__(341);
 
-	var _HomePage2 = _interopRequireDefault(_HomePage);
+	var _ForgotPasswordPage2 = _interopRequireDefault(_ForgotPasswordPage);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	exports.default = _HomePage2.default;
+	exports.default = _ForgotPasswordPage2.default;
 
 /***/ },
 /* 341 */
@@ -50315,7 +50335,6 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.HomePage = undefined;
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -50323,94 +50342,13 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var HomePage = exports.HomePage = function (_Component) {
-	  _inherits(HomePage, _Component);
-
-	  function HomePage() {
-	    _classCallCheck(this, HomePage);
-
-	    return _possibleConstructorReturn(this, (HomePage.__proto__ || Object.getPrototypeOf(HomePage)).apply(this, arguments));
-	  }
-
-	  _createClass(HomePage, [{
-	    key: 'render',
-	    value: function render() {
-	      return _react2.default.createElement(
-	        'div',
-	        null,
-	        'Home page'
-	      );
-	    }
-	  }]);
-
-	  return HomePage;
-	}(_react.Component);
-
-	exports.default = HomePage;
-
-/***/ },
-/* 342 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = undefined;
-
-	var _LoginPage = __webpack_require__(343);
-
-	var _LoginPage2 = _interopRequireDefault(_LoginPage);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	exports.default = _LoginPage2.default;
-
-/***/ },
-/* 343 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.LoginPage = undefined;
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _react = __webpack_require__(167);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _reactRedux = __webpack_require__(236);
-
-	var _reactRouterRedux = __webpack_require__(320);
-
-	var _styles = __webpack_require__(344);
+	var _styles = __webpack_require__(342);
 
 	var _styles2 = _interopRequireDefault(_styles);
 
-	var _backgroundImage = __webpack_require__(345);
+	var _ForgotPasswordForm = __webpack_require__(343);
 
-	var _local = __webpack_require__(346);
-
-	var _local2 = _interopRequireDefault(_local);
-
-	var _LoginForm = __webpack_require__(351);
-
-	var _LoginForm2 = _interopRequireDefault(_LoginForm);
-
-	var _actions = __webpack_require__(368);
+	var _ForgotPasswordForm2 = _interopRequireDefault(_ForgotPasswordForm);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -50420,99 +50358,67 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var LoginPage = exports.LoginPage = function (_Component) {
-	  _inherits(LoginPage, _Component);
+	var ForgotPasswordPage = function (_Component) {
+	  _inherits(ForgotPasswordPage, _Component);
 
-	  function LoginPage() {
+	  function ForgotPasswordPage() {
 	    var _ref;
 
 	    var _temp, _this, _ret;
 
-	    _classCallCheck(this, LoginPage);
+	    _classCallCheck(this, ForgotPasswordPage);
 
 	    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
 	      args[_key] = arguments[_key];
 	    }
 
-	    return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = LoginPage.__proto__ || Object.getPrototypeOf(LoginPage)).call.apply(_ref, [this].concat(args))), _this), _this.onSubmit = function (formData) {
-	      var dispatch = _this.props.dispatch;
-
-	      return dispatch((0, _actions.loginUser)(formData)).then(function () {
-	        return dispatch((0, _reactRouterRedux.push)('/login_successful'));
-	      });
+	    return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = ForgotPasswordPage.__proto__ || Object.getPrototypeOf(ForgotPasswordPage)).call.apply(_ref, [this].concat(args))), _this), _this.onSubmit = function (formData) {
+	      console.log('ForgotPasswordPage formData', formData);
 	    }, _temp), _possibleConstructorReturn(_this, _ret);
 	  }
 
-	  _createClass(LoginPage, [{
-	    key: 'componentWillMount',
-	    value: function componentWillMount() {
-	      var dispatch = this.props.dispatch;
-	      var _global = global;
-	      var window = _global.window;
-
-
-	      if (_local2.default.getItem('auth_token')) {
-	        return dispatch((0, _reactRouterRedux.push)('/'));
-	      }
-
-	      (0, _backgroundImage.loadBackground)();
-	      window.onresize = _backgroundImage.resizeBackground;
-
-	      return false;
-	    }
-	  }, {
+	  _createClass(ForgotPasswordPage, [{
 	    key: 'render',
 	    value: function render() {
 	      var containerStyles = _styles2.default.containerStyles;
-	      var formWrapperStyles = _styles2.default.formWrapperStyles;
+	      var forgotPasswordStyles = _styles2.default.forgotPasswordStyles;
+	      var headerStyles = _styles2.default.headerStyles;
+	      var smallWhiteTabStyles = _styles2.default.smallWhiteTabStyles;
+	      var textStyles = _styles2.default.textStyles;
 	      var whiteTabStyles = _styles2.default.whiteTabStyles;
-	      var onSubmit = this.onSubmit;
 
 
 	      return _react2.default.createElement(
 	        'div',
 	        { style: containerStyles },
+	        _react2.default.createElement('div', { style: smallWhiteTabStyles }),
+	        _react2.default.createElement('div', { style: whiteTabStyles }),
 	        _react2.default.createElement(
 	          'div',
-	          { style: formWrapperStyles },
-	          _react2.default.createElement('img', { alt: 'Kolide text logo', src: '/assets/images/kolide-logo-text.svg' }),
-	          _react2.default.createElement('div', { style: whiteTabStyles }),
-	          _react2.default.createElement(_LoginForm2.default, { onSubmit: onSubmit })
+	          { style: forgotPasswordStyles },
+	          _react2.default.createElement(
+	            'p',
+	            { style: headerStyles },
+	            'Forgot Password'
+	          ),
+	          _react2.default.createElement(
+	            'p',
+	            { style: textStyles },
+	            'If you’ve forgotten your password enter your email below and we will email you a link so that you can reset your password.'
+	          ),
+	          _react2.default.createElement(_ForgotPasswordForm2.default, { onSubmit: this.onSubmit })
 	        )
 	      );
 	    }
 	  }]);
 
-	  return LoginPage;
+	  return ForgotPasswordPage;
 	}(_react.Component);
 
-	LoginPage.propTypes = {
-	  dispatch: _react.PropTypes.func,
-	  error: _react.PropTypes.string,
-	  loading: _react.PropTypes.bool,
-	  user: _react.PropTypes.object
-	};
-
-
-	var mapStateToProps = function mapStateToProps(state) {
-	  var _state$auth = state.auth;
-	  var error = _state$auth.error;
-	  var loading = _state$auth.loading;
-	  var user = _state$auth.user;
-
-
-	  return {
-	    error: error,
-	    loading: loading,
-	    user: user
-	  };
-	};
-
-	exports.default = (0, _reactRedux.connect)(mapStateToProps)(LoginPage);
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+	exports.default = ForgotPasswordPage;
 
 /***/ },
-/* 344 */
+/* 342 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -50527,338 +50433,62 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	var border = _styles2.default.border;
 	var color = _styles2.default.color;
+	var font = _styles2.default.font;
 	var padding = _styles2.default.padding;
 	exports.default = {
 	  containerStyles: {
 	    alignItems: 'center',
 	    display: 'flex',
-	    flexDirection: 'column',
-	    paddingTop: '80px'
-	  },
-	  formWrapperStyles: {
-	    alignItems: 'center',
-	    display: 'flex',
 	    justifyContent: 'center',
 	    flexDirection: 'column'
 	  },
+	  forgotPasswordStyles: {
+	    alignItems: 'center',
+	    backgroundColor: color.white,
+	    borderTopLeftRadius: border.radius.base,
+	    borderTopRightRadius: border.radius.base,
+	    boxShadow: border.shadow.blur,
+	    boxSizing: 'border-box',
+	    display: 'flex',
+	    flexDirection: 'column',
+	    padding: padding.base,
+	    width: '522px'
+	  },
+	  headerStyles: {
+	    fontFamily: "'Oxygen', sans-serif",
+	    fontSize: font.large,
+	    fontWeight: '300',
+	    color: color.mediumGrey,
+	    lineHeight: '32px',
+	    textTransform: 'uppercase'
+	  },
+	  smallWhiteTabStyles: {
+	    backgroundColor: color.white,
+	    borderTopLeftRadius: border.radius.base,
+	    borderTopRightRadius: border.radius.base,
+	    boxShadow: border.shadow.blur,
+	    height: '20px',
+	    marginTop: padding.base,
+	    width: '400px'
+	  },
+	  textStyles: {
+	    color: color.purpleGrey,
+	    fontSize: font.medium
+	  },
 	  whiteTabStyles: {
 	    backgroundColor: color.white,
-	    height: '30px',
-	    marginTop: padding.base,
-	    borderTopLeftRadius: '4px',
-	    borderTopRightRadius: '4px',
-	    boxShadow: '0 5px 30px 0 rgba(0,0,0,0.3)',
-	    width: '400px'
+	    borderTopLeftRadius: border.radius.base,
+	    borderTopRightRadius: border.radius.base,
+	    boxShadow: border.shadow.blur,
+	    height: '20px',
+	    width: '460px'
 	  }
 	};
 
 /***/ },
-/* 345 */
-/***/ function(module, exports) {
-
-	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	/* eslint-disable no-mixed-operators */
-	var _global = global;
-	var document = _global.document;
-	var window = _global.window;
-
-	var refreshDuration = 10000;
-	var SHAPE_DENSITY = 20;
-
-	var numPointsX = void 0;
-	var numPointsY = void 0;
-	var points = void 0;
-	var refreshTimeout = void 0;
-	var unitHeight = void 0;
-	var unitWidth = void 0;
-
-	var randomize = function randomize() {
-	  var _points = points;
-	  var pointsLength = _points.length;
-
-
-	  for (var i = 0; i < pointsLength; i++) {
-	    var _points$i = points[i];
-	    var originX = _points$i.originX;
-	    var originY = _points$i.originY;
-
-
-	    if (originX !== 0 && originX !== unitWidth * (numPointsX - 1)) {
-	      points[i].x = originX + Math.random() * unitWidth - unitWidth / 2;
-	    }
-
-	    if (originY !== 0 && originY !== unitHeight * (numPointsY - 1)) {
-	      points[i].y = originY + Math.random() * unitHeight - unitHeight / 2;
-	    }
-	  }
-	};
-
-	var refresh = function refresh() {
-	  randomize();
-
-	  var svgElement = document.querySelector('#bg svg');
-	  var childNodes = svgElement.childNodes;
-
-	  for (var i = 0; i < childNodes.length; i++) {
-	    var polygon = childNodes[i];
-	    var animate = polygon.childNodes[0];
-	    var point1 = points[polygon.point1];
-	    var point2 = points[polygon.point2];
-	    var point3 = points[polygon.point3];
-
-	    if (animate.getAttribute('to')) {
-	      animate.setAttribute('from', animate.getAttribute('to'));
-	    }
-
-	    animate.setAttribute('to', point1.x + ',' + point1.y + ' ' + point2.x + ',' + point2.y + ' ' + point3.x + ',' + point3.y);
-	    animate.beginElement();
-	  }
-
-	  refreshTimeout = setTimeout(refresh, refreshDuration);
-	};
-
-	var loadBackground = exports.loadBackground = function loadBackground() {
-	  var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-	  var appElement = document.querySelector('#bg');
-	  var innerWidth = window.innerWidth;
-
-	  var innerHeight = window.innerHeight;
-	  var unitSize = (innerWidth + innerHeight) / SHAPE_DENSITY;
-	  svg.setAttribute('width', innerWidth);
-	  svg.setAttribute('height', innerHeight);
-	  appElement.appendChild(svg);
-
-	  numPointsX = Math.ceil(innerWidth / unitSize) + 1;
-	  numPointsY = Math.ceil(innerHeight / unitSize) + 1;
-	  unitWidth = Math.ceil(innerWidth / (numPointsX - 1));
-	  unitHeight = Math.ceil(innerHeight / (numPointsY - 1));
-
-	  points = [];
-
-	  for (var y = 0; y < numPointsY; y++) {
-	    for (var x = 0; x < numPointsX; x++) {
-	      var originX = unitWidth * x;
-	      var originY = unitHeight * y;
-
-	      points.push({
-	        x: originX,
-	        y: originY,
-	        originX: originX,
-	        originY: originY
-	      });
-	    }
-	  }
-
-	  randomize();
-
-	  var _points2 = points;
-	  var pointsLength = _points2.length;
-
-
-	  for (var i = 0; i < pointsLength; i++) {
-	    var _points$i2 = points[i];
-	    var _originX = _points$i2.originX;
-	    var _originY = _points$i2.originY;
-
-
-	    if (_originX !== unitWidth * (numPointsX - 1) && _originY !== unitHeight * (numPointsY - 1)) {
-	      var _points$i3 = points[i];
-	      var topLeftX = _points$i3.x;
-	      var topLeftY = _points$i3.y;
-	      var _points3 = points[i + 1];
-	      var topRightX = _points3.x;
-	      var topRightY = _points3.y;
-	      var _points4 = points[i + numPointsX];
-	      var bottomLeftX = _points4.x;
-	      var bottomLeftY = _points4.y;
-	      var _points5 = points[i + numPointsX + 1];
-	      var bottomRightX = _points5.x;
-	      var bottomRightY = _points5.y;
-
-
-	      var rando = Math.floor(Math.random() * 2);
-
-	      for (var n = 0; n < 2; n++) {
-	        var polygon = document.createElementNS(svg.namespaceURI, 'polygon');
-
-	        if (rando === 0) {
-	          if (n === 0) {
-	            polygon.point1 = i;
-	            polygon.point2 = i + numPointsX;
-	            polygon.point3 = i + numPointsX + 1;
-	            polygon.setAttribute('points', topLeftX + ',' + topLeftY + ' ' + bottomLeftX + ',' + bottomLeftY + ' ' + bottomRightX + ',' + bottomRightY);
-	          } else if (n === 1) {
-	            polygon.point1 = i;
-	            polygon.point2 = i + 1;
-	            polygon.point3 = i + numPointsX + 1;
-	            polygon.setAttribute('points', topLeftX + ',' + topLeftY + ' ' + topRightX + ',' + topRightY + ' ' + bottomRightX + ',' + bottomRightY);
-	          }
-	        } else if (rando === 1) {
-	          if (n === 0) {
-	            polygon.point1 = i;
-	            polygon.point2 = i + numPointsX;
-	            polygon.point3 = i + 1;
-	            polygon.setAttribute('points', topLeftX + ',' + topLeftY + ' ' + bottomLeftX + ',' + bottomLeftY + ' ' + topRightX + ',' + topRightY);
-	          } else if (n === 1) {
-	            polygon.point1 = i + numPointsX;
-	            polygon.point2 = i + 1;
-	            polygon.point3 = i + numPointsX + 1;
-	            polygon.setAttribute('points', bottomLeftX + ',' + bottomLeftY + ' ' + topRightX + ',' + topRightY + ' ' + bottomRightX + ',' + bottomRightY);
-	          }
-	        }
-
-	        polygon.setAttribute('fill', 'rgba(0, 0, 0, ' + Math.random() / 3 + ')');
-
-	        var animate = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
-
-	        animate.setAttribute('fill', 'freeze');
-	        animate.setAttribute('attributeName', 'points');
-	        animate.setAttribute('dur', refreshDuration + 'ms');
-	        animate.setAttribute('calcMode', 'linear');
-	        polygon.appendChild(animate);
-	        svg.appendChild(polygon);
-	      }
-	    }
-	  }
-
-	  refresh();
-	};
-
-	var removeBackground = exports.removeBackground = function removeBackground() {
-	  if (document.querySelector('#bg svg')) {
-	    document.querySelector('#bg svg').remove();
-	    clearTimeout(refreshTimeout);
-	  }
-	};
-
-	var resizeBackground = exports.resizeBackground = function resizeBackground() {
-	  removeBackground();
-	  loadBackground();
-	};
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
-
-/***/ },
-/* 346 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _config = __webpack_require__(347);
-
-	var _config2 = _interopRequireDefault(_config);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	var _global = global;
-	var window = _global.window;
-	var settings = _config2.default.settings;
-	exports.default = {
-	  getItem: function getItem(itemName) {
-	    var localStorage = window.localStorage;
-	    var env = settings.env;
-
-
-	    return localStorage.getItem('KOLIDE-' + env + '::' + itemName);
-	  },
-	  setItem: function setItem(itemName, value) {
-	    var localStorage = window.localStorage;
-	    var env = settings.env;
-
-
-	    return localStorage.setItem('KOLIDE-' + env + '::' + itemName, value);
-	  }
-	};
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
-
-/***/ },
-/* 347 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	var environments = exports.environments = {
-	  development: 'DEV',
-	  production: 'PROD'
-	};
-	var env = process.env.NODE_ENV || environments.development;
-	var configFileLocation = './config.' + env + '.js';
-	var settings = __webpack_require__(348)(configFileLocation).default;
-
-	exports.default = { environments: environments, settings: settings };
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
-
-/***/ },
-/* 348 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var map = {
-		"./config.DEV": 349,
-		"./config.DEV.js": 349,
-		"./config.PROD": 350,
-		"./config.PROD.js": 350,
-		"./index": 347,
-		"./index.js": 347
-	};
-	function webpackContext(req) {
-		return __webpack_require__(webpackContextResolve(req));
-	};
-	function webpackContextResolve(req) {
-		return map[req] || (function() { throw new Error("Cannot find module '" + req + "'.") }());
-	};
-	webpackContext.keys = function webpackContextKeys() {
-		return Object.keys(map);
-	};
-	webpackContext.resolve = webpackContextResolve;
-	module.exports = webpackContext;
-	webpackContext.id = 348;
-
-
-/***/ },
-/* 349 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _index = __webpack_require__(347);
-
-	exports.default = {
-	  env: _index.environments.development
-	};
-
-/***/ },
-/* 350 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _index = __webpack_require__(347);
-
-	exports.default = {
-	  env: _index.environments.production
-	};
-
-/***/ },
-/* 351 */
+/* 343 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -50868,16 +50498,16 @@
 	});
 	exports.default = undefined;
 
-	var _LoginForm = __webpack_require__(352);
+	var _ForgotPasswordForm = __webpack_require__(344);
 
-	var _LoginForm2 = _interopRequireDefault(_LoginForm);
+	var _ForgotPasswordForm2 = _interopRequireDefault(_ForgotPasswordForm);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	exports.default = _LoginForm2.default;
+	exports.default = _ForgotPasswordForm2.default;
 
 /***/ },
-/* 352 */
+/* 344 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -50885,8 +50515,6 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -50898,21 +50526,23 @@
 
 	var _radium2 = _interopRequireDefault(_radium);
 
-	var _styles = __webpack_require__(353);
+	var _styles = __webpack_require__(345);
 
 	var _styles2 = _interopRequireDefault(_styles);
 
-	var _avatar = __webpack_require__(354);
+	var _email_regex = __webpack_require__(346);
 
-	var _avatar2 = _interopRequireDefault(_avatar);
+	var _email_regex2 = _interopRequireDefault(_email_regex);
 
-	var _InputFieldWithIcon = __webpack_require__(355);
+	var _GradientButton = __webpack_require__(347);
+
+	var _GradientButton2 = _interopRequireDefault(_GradientButton);
+
+	var _InputFieldWithIcon = __webpack_require__(350);
 
 	var _InputFieldWithIcon2 = _interopRequireDefault(_InputFieldWithIcon);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -50920,113 +50550,254 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var LoginForm = function (_Component) {
-	  _inherits(LoginForm, _Component);
+	var ForgotPasswordForm = function (_Component) {
+	  _inherits(ForgotPasswordForm, _Component);
 
-	  function LoginForm(props) {
-	    _classCallCheck(this, LoginForm);
+	  function ForgotPasswordForm(props) {
+	    _classCallCheck(this, ForgotPasswordForm);
 
-	    var _this = _possibleConstructorReturn(this, (LoginForm.__proto__ || Object.getPrototypeOf(LoginForm)).call(this, props));
+	    var _this = _possibleConstructorReturn(this, (ForgotPasswordForm.__proto__ || Object.getPrototypeOf(ForgotPasswordForm)).call(this, props));
 
-	    _this.onInputChange = function (formField) {
-	      return function (_ref) {
-	        var target = _ref.target;
-	        var formData = _this.state.formData;
-	        var value = target.value;
+	    _this.onInputFieldChange = function (evt) {
+	      var value = evt.target.value;
 
 
-	        _this.setState({
-	          formData: _extends({}, formData, _defineProperty({}, formField, value))
-	        });
-	      };
+	      _this.setState({
+	        error: null,
+	        formData: {
+	          email: value
+	        }
+	      });
+
+	      return false;
 	    };
 
 	    _this.onFormSubmit = function (evt) {
 	      evt.preventDefault();
 
-	      if (_this.canSubmit()) {
-	        var formData = _this.state.formData;
-	        var onSubmit = _this.props.onSubmit;
+	      var validEmail = _this.validateEmail();
+	      var formData = _this.state.formData;
+	      var onSubmit = _this.props.onSubmit;
 
 
+	      if (validEmail) {
 	        return onSubmit(formData);
 	      }
 
 	      return false;
 	    };
 
-	    _this.canSubmit = function () {
-	      var _this$state$formData = _this.state.formData;
-	      var username = _this$state$formData.username;
-	      var password = _this$state$formData.password;
+	    _this.validateEmail = function () {
+	      var email = _this.state.formData.email;
 
 
-	      return username && password;
+	      if (_email_regex2.default.test(email)) {
+	        return true;
+	      }
+
+	      _this.setState({
+	        error: email + ' is not a valid email'
+	      });
+
+	      return false;
 	    };
 
 	    _this.state = {
 	      formData: {
-	        username: null,
-	        password: null
+	        email: null
 	      }
 	    };
 	    return _this;
 	  }
 
-	  _createClass(LoginForm, [{
+	  _createClass(ForgotPasswordForm, [{
 	    key: 'render',
 	    value: function render() {
-	      var containerStyles = _styles2.default.containerStyles;
-	      var submitButtonStyles = _styles2.default.submitButtonStyles;
+	      var _state = this.state;
+	      var error = _state.error;
+	      var email = _state.formData.email;
 	      var formStyles = _styles2.default.formStyles;
-	      var onInputChange = this.onInputChange;
+	      var inputStyles = _styles2.default.inputStyles;
+	      var submitButtonStyles = _styles2.default.submitButtonStyles;
 	      var onFormSubmit = this.onFormSubmit;
+	      var onInputFieldChange = this.onInputFieldChange;
 
-	      var canSubmit = this.canSubmit();
+	      var disabled = !email;
 
 	      return _react2.default.createElement(
 	        'form',
 	        { onSubmit: onFormSubmit, style: formStyles },
-	        _react2.default.createElement(
-	          'div',
-	          { style: containerStyles },
-	          _react2.default.createElement('img', { alt: 'Avatar', src: _avatar2.default }),
-	          _react2.default.createElement(_InputFieldWithIcon2.default, {
-	            iconName: 'user',
-	            name: 'username',
-	            onChange: onInputChange('username'),
-	            placeholder: 'Username or Email'
-	          }),
-	          _react2.default.createElement(_InputFieldWithIcon2.default, {
-	            iconName: 'lock',
-	            name: 'password',
-	            onChange: onInputChange('password'),
-	            placeholder: 'Password',
-	            type: 'password'
-	          })
-	        ),
-	        _react2.default.createElement(
-	          'button',
-	          {
-	            style: submitButtonStyles(canSubmit),
-	            type: 'submit'
-	          },
-	          'Login'
-	        )
+	        _react2.default.createElement(_InputFieldWithIcon2.default, {
+	          error: error,
+	          iconName: 'envelope',
+	          name: 'email',
+	          onChange: onInputFieldChange,
+	          placeholder: 'Email Address',
+	          style: inputStyles
+	        }),
+	        _react2.default.createElement(_GradientButton2.default, {
+	          disabled: disabled,
+	          type: 'submit',
+	          style: submitButtonStyles,
+	          text: 'Reset Password'
+	        })
 	      );
 	    }
 	  }]);
 
-	  return LoginForm;
+	  return ForgotPasswordForm;
 	}(_react.Component);
 
-	LoginForm.propTypes = {
+	ForgotPasswordForm.propTypes = {
 	  onSubmit: _react.PropTypes.func
 	};
-	exports.default = (0, _radium2.default)(LoginForm);
+	exports.default = (0, _radium2.default)(ForgotPasswordForm);
 
 /***/ },
-/* 353 */
+/* 345 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _styles = __webpack_require__(329);
+
+	var _styles2 = _interopRequireDefault(_styles);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var border = _styles2.default.border;
+	var padding = _styles2.default.padding;
+	exports.default = {
+	  formStyles: {
+	    width: '100%'
+	  },
+	  inputStyles: {
+	    width: '100%'
+	  },
+	  submitButtonStyles: {
+	    borderTopLeftRadius: border.radius.base,
+	    borderTopRightRadius: border.radius.base,
+	    marginTop: padding.base,
+	    padding: padding.medium
+	  }
+	};
+
+/***/ },
+/* 346 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = /\S+@\S+\.\S+/;
+
+/***/ },
+/* 347 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = undefined;
+
+	var _GradientButton = __webpack_require__(348);
+
+	var _GradientButton2 = _interopRequireDefault(_GradientButton);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = _GradientButton2.default;
+
+/***/ },
+/* 348 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(167);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _radium = __webpack_require__(258);
+
+	var _radium2 = _interopRequireDefault(_radium);
+
+	var _styles = __webpack_require__(349);
+
+	var _styles2 = _interopRequireDefault(_styles);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var GradientButton = function (_Component) {
+	  _inherits(GradientButton, _Component);
+
+	  function GradientButton() {
+	    _classCallCheck(this, GradientButton);
+
+	    return _possibleConstructorReturn(this, (GradientButton.__proto__ || Object.getPrototypeOf(GradientButton)).apply(this, arguments));
+	  }
+
+	  _createClass(GradientButton, [{
+	    key: 'render',
+	    value: function render() {
+	      var _props = this.props;
+	      var disabled = _props.disabled;
+	      var onClick = _props.onClick;
+	      var style = _props.style;
+	      var text = _props.text;
+	      var type = _props.type;
+
+
+	      return _react2.default.createElement(
+	        'button',
+	        {
+	          disabled: disabled,
+	          onClick: onClick,
+	          style: [(0, _styles2.default)(disabled), style],
+	          type: type
+	        },
+	        text
+	      );
+	    }
+	  }]);
+
+	  return GradientButton;
+	}(_react.Component);
+
+	GradientButton.propTypes = {
+	  disabled: _react.PropTypes.bool,
+	  onClick: _react.PropTypes.func,
+	  style: _react.PropTypes.object,
+	  text: _react.PropTypes.string,
+	  type: _react.PropTypes.string
+	};
+	GradientButton.defaultProps = {
+	  style: {}
+	};
+	exports.default = (0, _radium2.default)(GradientButton);
+
+/***/ },
+/* 349 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -51046,62 +50817,37 @@
 	var font = _styles2.default.font;
 	var padding = _styles2.default.padding;
 
-	var FORM_WIDTH = '460px';
+	exports.default = function (disabled) {
+	  var cursor = disabled ? 'not-allowed' : 'pointer';
 
-	exports.default = {
-	  containerStyles: {
-	    alignItems: 'center',
-	    backgroundColor: color.white,
-	    borderTopLeftRadius: border.radius.base,
-	    borderTopRightRadius: border.radius.base,
+	  return {
+	    backgroundImage: 'linear-gradient(134deg, #7166D9 0%, #C86DD7 100%)',
+	    border: 'none',
+	    cursor: cursor,
+	    borderBottomLeftRadius: border.radius.base,
+	    borderBottomRightRadius: border.radius.base,
 	    boxSizing: 'border-box',
-	    display: 'flex',
-	    flexDirection: 'column',
+	    color: color.white,
+	    fontSize: font.large,
+	    letterSpacing: '4px',
 	    padding: padding.base,
-	    width: FORM_WIDTH,
-	    minHeight: '350px'
-	  },
-	  formStyles: {
-	    boxShadow: '0 5px 30px 0 rgba(0,0,0,0.30)'
-	  },
-	  submitButtonStyles: function submitButtonStyles(canSubmit) {
-	    var cursor = canSubmit ? 'pointer' : 'not-allowed';
-
-	    return {
-	      backgroundImage: 'linear-gradient(134deg, #7166D9 0%, #C86DD7 100%)',
-	      border: 'none',
-	      cursor: cursor,
-	      borderBottomLeftRadius: border.radius.base,
-	      borderBottomRightRadius: border.radius.base,
-	      boxSizing: 'border-box',
-	      color: color.white,
-	      fontSize: font.large,
-	      letterSpacing: '4px',
-	      padding: padding.base,
-	      fontWeight: '300',
-	      textTransform: 'uppercase',
-	      width: FORM_WIDTH,
-	      boxShadow: '0 3px 0 #734893',
-	      position: 'relative',
-	      ':active': {
-	        top: '2px',
-	        boxShadow: '0 1px 0 #734893, 0 -2px 0 #D1D9E9'
-	      },
-	      ':focus': {
-	        outline: 'none'
-	      }
-	    };
-	  }
+	    fontWeight: '300',
+	    textTransform: 'uppercase',
+	    width: '100%',
+	    boxShadow: '0 3px 0 #734893',
+	    position: 'relative',
+	    ':active': {
+	      top: '2px',
+	      boxShadow: '0 1px 0 #734893, 0 -2px 0 #D1D9E9'
+	    },
+	    ':focus': {
+	      outline: 'none'
+	    }
+	  };
 	};
 
 /***/ },
-/* 354 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = __webpack_require__.p + "avatar@b3cfa572c321bac1e0bb50bfc9181d5f.svg";
-
-/***/ },
-/* 355 */
+/* 350 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -51111,7 +50857,7 @@
 	});
 	exports.default = undefined;
 
-	var _InputFieldWithIcon = __webpack_require__(356);
+	var _InputFieldWithIcon = __webpack_require__(351);
 
 	var _InputFieldWithIcon2 = _interopRequireDefault(_InputFieldWithIcon);
 
@@ -51120,7 +50866,7 @@
 	exports.default = _InputFieldWithIcon2.default;
 
 /***/ },
-/* 356 */
+/* 351 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -51139,11 +50885,11 @@
 
 	var _radium2 = _interopRequireDefault(_radium);
 
-	var _Icon = __webpack_require__(357);
+	var _Icon = __webpack_require__(352);
 
 	var _Icon2 = _interopRequireDefault(_Icon);
 
-	var _styles = __webpack_require__(367);
+	var _styles = __webpack_require__(364);
 
 	var _styles2 = _interopRequireDefault(_styles);
 
@@ -51164,12 +50910,50 @@
 	    var _this = _possibleConstructorReturn(this, (InputFieldWithIcon.__proto__ || Object.getPrototypeOf(InputFieldWithIcon)).call(this, props));
 
 	    _this.onInputChange = function (evt) {
+	      evt.preventDefault();
+
 	      var value = evt.target.value;
 	      var onChange = _this.props.onChange;
 
 
 	      _this.setState({ value: value });
 	      return onChange(evt);
+	    };
+
+	    _this.iconVariant = function () {
+	      var error = _this.props.error;
+	      var value = _this.state.value;
+
+
+	      if (error) return 'error';
+
+	      if (value) return 'colored';
+
+	      return 'default';
+	    };
+
+	    _this.renderHeading = function () {
+	      var _this$props = _this.props;
+	      var error = _this$props.error;
+	      var placeholder = _this$props.placeholder;
+	      var value = _this.state.value;
+	      var errorStyles = _styles2.default.errorStyles;
+	      var placeholderStyles = _styles2.default.placeholderStyles;
+
+
+	      if (error) {
+	        return _react2.default.createElement(
+	          'div',
+	          { style: errorStyles },
+	          error
+	        );
+	      }
+
+	      return _react2.default.createElement(
+	        'div',
+	        { style: placeholderStyles(value) },
+	        placeholder
+	      );
 	    };
 
 	    _this.state = { value: null };
@@ -51180,35 +50964,33 @@
 	    key: 'render',
 	    value: function render() {
 	      var _props = this.props;
+	      var error = _props.error;
 	      var iconName = _props.iconName;
 	      var name = _props.name;
 	      var placeholder = _props.placeholder;
+	      var style = _props.style;
 	      var type = _props.type;
 	      var containerStyles = _styles2.default.containerStyles;
 	      var iconStyles = _styles2.default.iconStyles;
+	      var inputErrorStyles = _styles2.default.inputErrorStyles;
 	      var inputStyles = _styles2.default.inputStyles;
-	      var placeholderStyles = _styles2.default.placeholderStyles;
 	      var value = this.state.value;
+	      var iconVariant = this.iconVariant;
 	      var onInputChange = this.onInputChange;
 
-	      var iconVariant = value ? 'colored' : 'default';
 
 	      return _react2.default.createElement(
 	        'div',
 	        { style: containerStyles },
-	        _react2.default.createElement(
-	          'div',
-	          { style: placeholderStyles(value) },
-	          placeholder
-	        ),
+	        this.renderHeading(),
 	        _react2.default.createElement('input', {
 	          name: name,
 	          onChange: onInputChange,
 	          placeholder: placeholder,
-	          style: inputStyles(value),
+	          style: [inputStyles(value), inputErrorStyles(error), style],
 	          type: type
 	        }),
-	        _react2.default.createElement(_Icon2.default, { name: iconName, style: iconStyles, variant: iconVariant })
+	        _react2.default.createElement(_Icon2.default, { name: iconName, style: iconStyles, variant: iconVariant() })
 	      );
 	    }
 	  }]);
@@ -51217,19 +50999,22 @@
 	}(_react.Component);
 
 	InputFieldWithIcon.propTypes = {
+	  error: _react.PropTypes.string,
 	  iconName: _react.PropTypes.string,
 	  name: _react.PropTypes.string,
 	  onChange: _react.PropTypes.func,
 	  placeholder: _react.PropTypes.string,
+	  style: _react.PropTypes.object,
 	  type: _react.PropTypes.string
 	};
 	InputFieldWithIcon.defaultProps = {
+	  style: {},
 	  type: 'text'
 	};
 	exports.default = (0, _radium2.default)(InputFieldWithIcon);
 
 /***/ },
-/* 357 */
+/* 352 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -51248,19 +51033,23 @@
 
 	var _radium2 = _interopRequireDefault(_radium);
 
-	var _Check = __webpack_require__(358);
+	var _Check = __webpack_require__(353);
 
 	var _Check2 = _interopRequireDefault(_Check);
 
-	var _KolideLoginBackground = __webpack_require__(361);
+	var _Envelope = __webpack_require__(356);
+
+	var _Envelope2 = _interopRequireDefault(_Envelope);
+
+	var _KolideLoginBackground = __webpack_require__(358);
 
 	var _KolideLoginBackground2 = _interopRequireDefault(_KolideLoginBackground);
 
-	var _Lock = __webpack_require__(363);
+	var _Lock = __webpack_require__(360);
 
 	var _Lock2 = _interopRequireDefault(_Lock);
 
-	var _User = __webpack_require__(365);
+	var _User = __webpack_require__(362);
 
 	var _User2 = _interopRequireDefault(_User);
 
@@ -51301,6 +51090,7 @@
 	};
 	Icon.iconNames = {
 	  check: _Check2.default,
+	  envelope: _Envelope2.default,
 	  kolideLoginBackground: _KolideLoginBackground2.default,
 	  lock: _Lock2.default,
 	  user: _User2.default
@@ -51308,7 +51098,7 @@
 	exports.default = (0, _radium2.default)(Icon);
 
 /***/ },
-/* 358 */
+/* 353 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -51318,7 +51108,7 @@
 	});
 	exports.default = undefined;
 
-	var _CheckSvg = __webpack_require__(359);
+	var _CheckSvg = __webpack_require__(354);
 
 	var _CheckSvg2 = _interopRequireDefault(_CheckSvg);
 
@@ -51327,7 +51117,7 @@
 	exports.default = _CheckSvg2.default;
 
 /***/ },
-/* 359 */
+/* 354 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -51344,7 +51134,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _base = __webpack_require__(360);
+	var _base = __webpack_require__(355);
 
 	var _base2 = _interopRequireDefault(_base);
 
@@ -51419,7 +51209,7 @@
 	exports.default = (0, _base2.default)(Check);
 
 /***/ },
-/* 360 */
+/* 355 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -51489,7 +51279,7 @@
 	};
 
 /***/ },
-/* 361 */
+/* 356 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -51499,7 +51289,140 @@
 	});
 	exports.default = undefined;
 
-	var _KolideLoginBackgroundSvg = __webpack_require__(362);
+	var _EnvelopeSvg = __webpack_require__(357);
+
+	var _EnvelopeSvg2 = _interopRequireDefault(_EnvelopeSvg);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = _EnvelopeSvg2.default;
+
+/***/ },
+/* 357 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(167);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _base = __webpack_require__(355);
+
+	var _base2 = _interopRequireDefault(_base);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Envelope = function (_Component) {
+	  _inherits(Envelope, _Component);
+
+	  function Envelope() {
+	    _classCallCheck(this, Envelope);
+
+	    return _possibleConstructorReturn(this, (Envelope.__proto__ || Object.getPrototypeOf(Envelope)).apply(this, arguments));
+	  }
+
+	  _createClass(Envelope, [{
+	    key: 'render',
+	    value: function render() {
+	      var _props = this.props;
+	      var alt = _props.alt;
+	      var style = _props.style;
+	      var variant = _props.variant;
+
+	      var color = Envelope.variants[variant];
+
+	      return _react2.default.createElement(
+	        'svg',
+	        {
+	          width: '11px',
+	          height: '9px',
+	          viewBox: '0 0 11 09',
+	          alt: alt,
+	          style: style
+	        },
+	        _react2.default.createElement(
+	          'g',
+	          null,
+	          _react2.default.createElement(
+	            'defs',
+	            null,
+	            _react2.default.createElement('rect', { id: 'path-1', x: '0', y: '0', width: '11', height: '8' }),
+	            _react2.default.createElement(
+	              'mask',
+	              { id: 'mask-2', maskContentUnits: 'userSpaceOnUse', maskUnits: 'objectBoundingBox', x: '0', y: '0', width: '11', height: '8', fill: 'white' },
+	              _react2.default.createElement('use', { xlinkHref: '#path-1' })
+	            )
+	          ),
+	          _react2.default.createElement(
+	            'g',
+	            { stroke: 'none', strokeWidth: '1', fill: 'none', fillRule: 'evenodd' },
+	            _react2.default.createElement(
+	              'g',
+	              { transform: 'translate(-714.000000, -594.000000)', stroke: color.stroke },
+	              _react2.default.createElement(
+	                'g',
+	                { transform: 'translate(241.000000, 370.000000)' },
+	                _react2.default.createElement(
+	                  'g',
+	                  { transform: 'translate(473.000000, 225.000000)' },
+	                  _react2.default.createElement('use', { mask: 'url(#mask-2)', strokeWidth: '2', fill: color.fill, xlinkHref: '#path-1' }),
+	                  _react2.default.createElement('polyline', { points: '0.533320551 0.599345964 5.52216436 3.65714135 10.5638681 0.475880292' })
+	                )
+	              )
+	            )
+	          )
+	        )
+	      );
+	    }
+	  }]);
+
+	  return Envelope;
+	}(_react.Component);
+
+	Envelope.propTypes = _extends({}, _base.basePropTypes);
+	Envelope.variants = {
+	  default: {
+	    fill: '#EAEEFB',
+	    stroke: '#B9C2E4'
+	  },
+	  colored: {
+	    fill: '#EED6FF',
+	    stroke: '#C48DED'
+	  },
+	  error: {
+	    fill: '#FFB5B2',
+	    stroke: '#FF5850'
+	  }
+	};
+	exports.default = (0, _base2.default)(Envelope);
+
+/***/ },
+/* 358 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = undefined;
+
+	var _KolideLoginBackgroundSvg = __webpack_require__(359);
 
 	var _KolideLoginBackgroundSvg2 = _interopRequireDefault(_KolideLoginBackgroundSvg);
 
@@ -51508,7 +51431,7 @@
 	exports.default = _KolideLoginBackgroundSvg2.default;
 
 /***/ },
-/* 362 */
+/* 359 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -51526,7 +51449,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _base = __webpack_require__(360);
+	var _base = __webpack_require__(355);
 
 	var _base2 = _interopRequireDefault(_base);
 
@@ -51850,7 +51773,7 @@
 	exports.default = (0, _base2.default)(KolideLoginBackground);
 
 /***/ },
-/* 363 */
+/* 360 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -51860,7 +51783,7 @@
 	});
 	exports.default = undefined;
 
-	var _LockSvg = __webpack_require__(364);
+	var _LockSvg = __webpack_require__(361);
 
 	var _LockSvg2 = _interopRequireDefault(_LockSvg);
 
@@ -51869,7 +51792,7 @@
 	exports.default = _LockSvg2.default;
 
 /***/ },
-/* 364 */
+/* 361 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -51886,7 +51809,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _base = __webpack_require__(360);
+	var _base = __webpack_require__(355);
 
 	var _base2 = _interopRequireDefault(_base);
 
@@ -51988,7 +51911,7 @@
 	exports.default = (0, _base2.default)(Lock);
 
 /***/ },
-/* 365 */
+/* 362 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -51998,7 +51921,7 @@
 	});
 	exports.default = undefined;
 
-	var _UserSvg = __webpack_require__(366);
+	var _UserSvg = __webpack_require__(363);
 
 	var _UserSvg2 = _interopRequireDefault(_UserSvg);
 
@@ -52007,7 +51930,7 @@
 	exports.default = _UserSvg2.default;
 
 /***/ },
-/* 366 */
+/* 363 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -52025,7 +51948,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _base = __webpack_require__(360);
+	var _base = __webpack_require__(355);
 
 	var _base2 = _interopRequireDefault(_base);
 
@@ -52142,7 +52065,7 @@
 	exports.default = (0, _base2.default)(User);
 
 /***/ },
-/* 367 */
+/* 364 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -52167,10 +52090,24 @@
 	    marginTop: padding.base,
 	    position: 'relative'
 	  },
+	  errorStyles: {
+	    color: color.red,
+	    fontSize: font.small,
+	    textTransform: 'lowercase'
+	  },
 	  iconStyles: {
 	    position: 'absolute',
 	    right: '6px',
 	    top: '29px'
+	  },
+	  inputErrorStyles: function inputErrorStyles(error) {
+	    if (error) {
+	      return {
+	        borderBottomColor: color.red
+	      };
+	    }
+
+	    return {};
 	  },
 	  inputStyles: function inputStyles(value) {
 	    var baseStyles = {
@@ -52207,7 +52144,828 @@
 	};
 
 /***/ },
+/* 365 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = undefined;
+
+	var _HomePage = __webpack_require__(366);
+
+	var _HomePage2 = _interopRequireDefault(_HomePage);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = _HomePage2.default;
+
+/***/ },
+/* 366 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.HomePage = undefined;
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(167);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var HomePage = exports.HomePage = function (_Component) {
+	  _inherits(HomePage, _Component);
+
+	  function HomePage() {
+	    _classCallCheck(this, HomePage);
+
+	    return _possibleConstructorReturn(this, (HomePage.__proto__ || Object.getPrototypeOf(HomePage)).apply(this, arguments));
+	  }
+
+	  _createClass(HomePage, [{
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement(
+	        'div',
+	        null,
+	        'Home page'
+	      );
+	    }
+	  }]);
+
+	  return HomePage;
+	}(_react.Component);
+
+	exports.default = HomePage;
+
+/***/ },
+/* 367 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = undefined;
+
+	var _LoginPage = __webpack_require__(368);
+
+	var _LoginPage2 = _interopRequireDefault(_LoginPage);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = _LoginPage2.default;
+
+/***/ },
 /* 368 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.LoginPage = undefined;
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(167);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactRedux = __webpack_require__(236);
+
+	var _reactRouterRedux = __webpack_require__(320);
+
+	var _styles = __webpack_require__(369);
+
+	var _styles2 = _interopRequireDefault(_styles);
+
+	var _backgroundImage = __webpack_require__(370);
+
+	var _local = __webpack_require__(371);
+
+	var _local2 = _interopRequireDefault(_local);
+
+	var _LoginForm = __webpack_require__(376);
+
+	var _LoginForm2 = _interopRequireDefault(_LoginForm);
+
+	var _actions = __webpack_require__(381);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var LoginPage = exports.LoginPage = function (_Component) {
+	  _inherits(LoginPage, _Component);
+
+	  function LoginPage() {
+	    var _ref;
+
+	    var _temp, _this, _ret;
+
+	    _classCallCheck(this, LoginPage);
+
+	    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+	      args[_key] = arguments[_key];
+	    }
+
+	    return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = LoginPage.__proto__ || Object.getPrototypeOf(LoginPage)).call.apply(_ref, [this].concat(args))), _this), _this.onSubmit = function (formData) {
+	      var dispatch = _this.props.dispatch;
+
+	      return dispatch((0, _actions.loginUser)(formData)).then(function () {
+	        return dispatch((0, _reactRouterRedux.push)('/login_successful'));
+	      });
+	    }, _temp), _possibleConstructorReturn(_this, _ret);
+	  }
+
+	  _createClass(LoginPage, [{
+	    key: 'componentWillMount',
+	    value: function componentWillMount() {
+	      var dispatch = this.props.dispatch;
+	      var _global = global;
+	      var window = _global.window;
+
+
+	      if (_local2.default.getItem('auth_token')) {
+	        return dispatch((0, _reactRouterRedux.push)('/'));
+	      }
+
+	      (0, _backgroundImage.loadBackground)();
+	      window.onresize = _backgroundImage.resizeBackground;
+
+	      return false;
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var formWrapperStyles = _styles2.default.formWrapperStyles;
+	      var whiteTabStyles = _styles2.default.whiteTabStyles;
+	      var onSubmit = this.onSubmit;
+
+
+	      return _react2.default.createElement(
+	        'div',
+	        { style: formWrapperStyles },
+	        _react2.default.createElement('div', { style: whiteTabStyles }),
+	        _react2.default.createElement(_LoginForm2.default, { onSubmit: onSubmit })
+	      );
+	    }
+	  }]);
+
+	  return LoginPage;
+	}(_react.Component);
+
+	LoginPage.propTypes = {
+	  dispatch: _react.PropTypes.func,
+	  error: _react.PropTypes.string,
+	  loading: _react.PropTypes.bool,
+	  user: _react.PropTypes.object
+	};
+
+
+	var mapStateToProps = function mapStateToProps(state) {
+	  var _state$auth = state.auth;
+	  var error = _state$auth.error;
+	  var loading = _state$auth.loading;
+	  var user = _state$auth.user;
+
+
+	  return {
+	    error: error,
+	    loading: loading,
+	    user: user
+	  };
+	};
+
+	exports.default = (0, _reactRedux.connect)(mapStateToProps)(LoginPage);
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 369 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _styles = __webpack_require__(329);
+
+	var _styles2 = _interopRequireDefault(_styles);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var color = _styles2.default.color;
+	var padding = _styles2.default.padding;
+	exports.default = {
+	  formWrapperStyles: {
+	    alignItems: 'center',
+	    display: 'flex',
+	    justifyContent: 'center',
+	    flexDirection: 'column'
+	  },
+	  whiteTabStyles: {
+	    backgroundColor: color.white,
+	    height: '30px',
+	    marginTop: padding.base,
+	    borderTopLeftRadius: '4px',
+	    borderTopRightRadius: '4px',
+	    boxShadow: '0 5px 30px 0 rgba(0,0,0,0.3)',
+	    width: '400px'
+	  }
+	};
+
+/***/ },
+/* 370 */
+/***/ function(module, exports) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	/* eslint-disable no-mixed-operators */
+	var _global = global;
+	var document = _global.document;
+	var window = _global.window;
+
+	var refreshDuration = 10000;
+	var SHAPE_DENSITY = 20;
+
+	var numPointsX = void 0;
+	var numPointsY = void 0;
+	var points = void 0;
+	var refreshTimeout = void 0;
+	var unitHeight = void 0;
+	var unitWidth = void 0;
+
+	var randomize = function randomize() {
+	  var _points = points;
+	  var pointsLength = _points.length;
+
+
+	  for (var i = 0; i < pointsLength; i++) {
+	    var _points$i = points[i];
+	    var originX = _points$i.originX;
+	    var originY = _points$i.originY;
+
+
+	    if (originX !== 0 && originX !== unitWidth * (numPointsX - 1)) {
+	      points[i].x = originX + Math.random() * unitWidth - unitWidth / 2;
+	    }
+
+	    if (originY !== 0 && originY !== unitHeight * (numPointsY - 1)) {
+	      points[i].y = originY + Math.random() * unitHeight - unitHeight / 2;
+	    }
+	  }
+	};
+
+	var refresh = function refresh() {
+	  randomize();
+
+	  var svgElement = document.querySelector('#bg svg');
+	  var childNodes = svgElement.childNodes;
+
+	  for (var i = 0; i < childNodes.length; i++) {
+	    var polygon = childNodes[i];
+	    var animate = polygon.childNodes[0];
+	    var point1 = points[polygon.point1];
+	    var point2 = points[polygon.point2];
+	    var point3 = points[polygon.point3];
+
+	    if (animate.getAttribute('to')) {
+	      animate.setAttribute('from', animate.getAttribute('to'));
+	    }
+
+	    animate.setAttribute('to', point1.x + ',' + point1.y + ' ' + point2.x + ',' + point2.y + ' ' + point3.x + ',' + point3.y);
+	    animate.beginElement();
+	  }
+
+	  refreshTimeout = setTimeout(refresh, refreshDuration);
+	};
+
+	var loadBackground = exports.loadBackground = function loadBackground() {
+	  var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+	  var appElement = document.querySelector('#bg');
+	  var innerWidth = window.innerWidth;
+
+	  var innerHeight = window.innerHeight;
+	  var unitSize = (innerWidth + innerHeight) / SHAPE_DENSITY;
+	  svg.setAttribute('width', innerWidth);
+	  svg.setAttribute('height', innerHeight);
+	  appElement.appendChild(svg);
+
+	  numPointsX = Math.ceil(innerWidth / unitSize) + 1;
+	  numPointsY = Math.ceil(innerHeight / unitSize) + 1;
+	  unitWidth = Math.ceil(innerWidth / (numPointsX - 1));
+	  unitHeight = Math.ceil(innerHeight / (numPointsY - 1));
+
+	  points = [];
+
+	  for (var y = 0; y < numPointsY; y++) {
+	    for (var x = 0; x < numPointsX; x++) {
+	      var originX = unitWidth * x;
+	      var originY = unitHeight * y;
+
+	      points.push({
+	        x: originX,
+	        y: originY,
+	        originX: originX,
+	        originY: originY
+	      });
+	    }
+	  }
+
+	  randomize();
+
+	  var _points2 = points;
+	  var pointsLength = _points2.length;
+
+
+	  for (var i = 0; i < pointsLength; i++) {
+	    var _points$i2 = points[i];
+	    var _originX = _points$i2.originX;
+	    var _originY = _points$i2.originY;
+
+
+	    if (_originX !== unitWidth * (numPointsX - 1) && _originY !== unitHeight * (numPointsY - 1)) {
+	      var _points$i3 = points[i];
+	      var topLeftX = _points$i3.x;
+	      var topLeftY = _points$i3.y;
+	      var _points3 = points[i + 1];
+	      var topRightX = _points3.x;
+	      var topRightY = _points3.y;
+	      var _points4 = points[i + numPointsX];
+	      var bottomLeftX = _points4.x;
+	      var bottomLeftY = _points4.y;
+	      var _points5 = points[i + numPointsX + 1];
+	      var bottomRightX = _points5.x;
+	      var bottomRightY = _points5.y;
+
+
+	      var rando = Math.floor(Math.random() * 2);
+
+	      for (var n = 0; n < 2; n++) {
+	        var polygon = document.createElementNS(svg.namespaceURI, 'polygon');
+
+	        if (rando === 0) {
+	          if (n === 0) {
+	            polygon.point1 = i;
+	            polygon.point2 = i + numPointsX;
+	            polygon.point3 = i + numPointsX + 1;
+	            polygon.setAttribute('points', topLeftX + ',' + topLeftY + ' ' + bottomLeftX + ',' + bottomLeftY + ' ' + bottomRightX + ',' + bottomRightY);
+	          } else if (n === 1) {
+	            polygon.point1 = i;
+	            polygon.point2 = i + 1;
+	            polygon.point3 = i + numPointsX + 1;
+	            polygon.setAttribute('points', topLeftX + ',' + topLeftY + ' ' + topRightX + ',' + topRightY + ' ' + bottomRightX + ',' + bottomRightY);
+	          }
+	        } else if (rando === 1) {
+	          if (n === 0) {
+	            polygon.point1 = i;
+	            polygon.point2 = i + numPointsX;
+	            polygon.point3 = i + 1;
+	            polygon.setAttribute('points', topLeftX + ',' + topLeftY + ' ' + bottomLeftX + ',' + bottomLeftY + ' ' + topRightX + ',' + topRightY);
+	          } else if (n === 1) {
+	            polygon.point1 = i + numPointsX;
+	            polygon.point2 = i + 1;
+	            polygon.point3 = i + numPointsX + 1;
+	            polygon.setAttribute('points', bottomLeftX + ',' + bottomLeftY + ' ' + topRightX + ',' + topRightY + ' ' + bottomRightX + ',' + bottomRightY);
+	          }
+	        }
+
+	        polygon.setAttribute('fill', 'rgba(0, 0, 0, ' + Math.random() / 3 + ')');
+
+	        var animate = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
+
+	        animate.setAttribute('fill', 'freeze');
+	        animate.setAttribute('attributeName', 'points');
+	        animate.setAttribute('dur', refreshDuration + 'ms');
+	        animate.setAttribute('calcMode', 'linear');
+	        polygon.appendChild(animate);
+	        svg.appendChild(polygon);
+	      }
+	    }
+	  }
+
+	  refresh();
+	};
+
+	var removeBackground = exports.removeBackground = function removeBackground() {
+	  if (document.querySelector('#bg svg')) {
+	    document.querySelector('#bg svg').remove();
+	    clearTimeout(refreshTimeout);
+	  }
+	};
+
+	var resizeBackground = exports.resizeBackground = function resizeBackground() {
+	  removeBackground();
+	  loadBackground();
+	};
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 371 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _config = __webpack_require__(372);
+
+	var _config2 = _interopRequireDefault(_config);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var _global = global;
+	var window = _global.window;
+	var settings = _config2.default.settings;
+	exports.default = {
+	  getItem: function getItem(itemName) {
+	    var localStorage = window.localStorage;
+	    var env = settings.env;
+
+
+	    return localStorage.getItem('KOLIDE-' + env + '::' + itemName);
+	  },
+	  setItem: function setItem(itemName, value) {
+	    var localStorage = window.localStorage;
+	    var env = settings.env;
+
+
+	    return localStorage.setItem('KOLIDE-' + env + '::' + itemName, value);
+	  }
+	};
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 372 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var environments = exports.environments = {
+	  development: 'DEV',
+	  production: 'PROD'
+	};
+	var env = process.env.NODE_ENV || environments.development;
+	var configFileLocation = './config.' + env + '.js';
+	var settings = __webpack_require__(373)(configFileLocation).default;
+
+	exports.default = { environments: environments, settings: settings };
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+
+/***/ },
+/* 373 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var map = {
+		"./config.DEV": 374,
+		"./config.DEV.js": 374,
+		"./config.PROD": 375,
+		"./config.PROD.js": 375,
+		"./index": 372,
+		"./index.js": 372
+	};
+	function webpackContext(req) {
+		return __webpack_require__(webpackContextResolve(req));
+	};
+	function webpackContextResolve(req) {
+		return map[req] || (function() { throw new Error("Cannot find module '" + req + "'.") }());
+	};
+	webpackContext.keys = function webpackContextKeys() {
+		return Object.keys(map);
+	};
+	webpackContext.resolve = webpackContextResolve;
+	module.exports = webpackContext;
+	webpackContext.id = 373;
+
+
+/***/ },
+/* 374 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _index = __webpack_require__(372);
+
+	exports.default = {
+	  env: _index.environments.development
+	};
+
+/***/ },
+/* 375 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _index = __webpack_require__(372);
+
+	exports.default = {
+	  env: _index.environments.production
+	};
+
+/***/ },
+/* 376 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = undefined;
+
+	var _LoginForm = __webpack_require__(377);
+
+	var _LoginForm2 = _interopRequireDefault(_LoginForm);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = _LoginForm2.default;
+
+/***/ },
+/* 377 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(167);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactRouter = __webpack_require__(173);
+
+	var _radium = __webpack_require__(258);
+
+	var _radium2 = _interopRequireDefault(_radium);
+
+	var _avatar = __webpack_require__(378);
+
+	var _avatar2 = _interopRequireDefault(_avatar);
+
+	var _styles = __webpack_require__(379);
+
+	var _styles2 = _interopRequireDefault(_styles);
+
+	var _GradientButton = __webpack_require__(347);
+
+	var _GradientButton2 = _interopRequireDefault(_GradientButton);
+
+	var _InputFieldWithIcon = __webpack_require__(350);
+
+	var _InputFieldWithIcon2 = _interopRequireDefault(_InputFieldWithIcon);
+
+	var _paths = __webpack_require__(380);
+
+	var _paths2 = _interopRequireDefault(_paths);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var LoginForm = function (_Component) {
+	  _inherits(LoginForm, _Component);
+
+	  function LoginForm(props) {
+	    _classCallCheck(this, LoginForm);
+
+	    var _this = _possibleConstructorReturn(this, (LoginForm.__proto__ || Object.getPrototypeOf(LoginForm)).call(this, props));
+
+	    _this.onInputChange = function (formField) {
+	      return function (_ref) {
+	        var target = _ref.target;
+	        var formData = _this.state.formData;
+	        var value = target.value;
+
+
+	        _this.setState({
+	          formData: _extends({}, formData, _defineProperty({}, formField, value))
+	        });
+	      };
+	    };
+
+	    _this.onFormSubmit = function (evt) {
+	      evt.preventDefault();
+
+	      if (_this.canSubmit()) {
+	        var formData = _this.state.formData;
+	        var onSubmit = _this.props.onSubmit;
+
+
+	        return onSubmit(formData);
+	      }
+
+	      return false;
+	    };
+
+	    _this.canSubmit = function () {
+	      var _this$state$formData = _this.state.formData;
+	      var username = _this$state$formData.username;
+	      var password = _this$state$formData.password;
+
+
+	      return username && password;
+	    };
+
+	    _this.state = {
+	      formData: {
+	        username: null,
+	        password: null
+	      }
+	    };
+	    return _this;
+	  }
+
+	  _createClass(LoginForm, [{
+	    key: 'render',
+	    value: function render() {
+	      var containerStyles = _styles2.default.containerStyles;
+	      var forgotPasswordStyles = _styles2.default.forgotPasswordStyles;
+	      var forgotPasswordWrapperStyles = _styles2.default.forgotPasswordWrapperStyles;
+	      var formStyles = _styles2.default.formStyles;
+	      var submitButtonStyles = _styles2.default.submitButtonStyles;
+	      var onInputChange = this.onInputChange;
+	      var onFormSubmit = this.onFormSubmit;
+
+	      var canSubmit = this.canSubmit();
+
+	      return _react2.default.createElement(
+	        'form',
+	        { onSubmit: onFormSubmit, style: formStyles },
+	        _react2.default.createElement(
+	          'div',
+	          { style: containerStyles },
+	          _react2.default.createElement('img', { alt: 'Avatar', src: _avatar2.default }),
+	          _react2.default.createElement(_InputFieldWithIcon2.default, {
+	            iconName: 'user',
+	            name: 'username',
+	            onChange: onInputChange('username'),
+	            placeholder: 'Username or Email'
+	          }),
+	          _react2.default.createElement(_InputFieldWithIcon2.default, {
+	            iconName: 'lock',
+	            name: 'password',
+	            onChange: onInputChange('password'),
+	            placeholder: 'Password',
+	            type: 'password'
+	          }),
+	          _react2.default.createElement(
+	            'div',
+	            { style: forgotPasswordWrapperStyles },
+	            _react2.default.createElement(
+	              _reactRouter.Link,
+	              { style: forgotPasswordStyles, to: _paths2.default.FORGOT_PASSWORD },
+	              'Forgot Password?'
+	            )
+	          )
+	        ),
+	        _react2.default.createElement(_GradientButton2.default, {
+	          disabled: !canSubmit,
+	          onClick: onFormSubmit,
+	          style: submitButtonStyles,
+	          text: 'Login',
+	          type: 'submit'
+	        })
+	      );
+	    }
+	  }]);
+
+	  return LoginForm;
+	}(_react.Component);
+
+	LoginForm.propTypes = {
+	  onSubmit: _react.PropTypes.func
+	};
+	exports.default = (0, _radium2.default)(LoginForm);
+
+/***/ },
+/* 378 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = __webpack_require__.p + "avatar@b3cfa572c321bac1e0bb50bfc9181d5f.svg";
+
+/***/ },
+/* 379 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _styles = __webpack_require__(329);
+
+	var _styles2 = _interopRequireDefault(_styles);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var border = _styles2.default.border;
+	var color = _styles2.default.color;
+	var font = _styles2.default.font;
+	var padding = _styles2.default.padding;
+
+	var FORM_WIDTH = '460px';
+
+	exports.default = {
+	  containerStyles: {
+	    alignItems: 'center',
+	    backgroundColor: color.white,
+	    borderTopLeftRadius: border.radius.base,
+	    borderTopRightRadius: border.radius.base,
+	    boxSizing: 'border-box',
+	    display: 'flex',
+	    flexDirection: 'column',
+	    padding: padding.base,
+	    width: FORM_WIDTH,
+	    minHeight: '350px'
+	  },
+	  forgotPasswordStyles: {
+	    fontSize: font.medium,
+	    textDecoration: 'none',
+	    color: color.lightGrey
+	  },
+	  forgotPasswordWrapperStyles: {
+	    marginTop: padding.base,
+	    textAlign: 'right',
+	    width: '378px'
+	  },
+	  formStyles: {
+	    boxShadow: '0 5px 30px 0 rgba(0,0,0,0.30)'
+	  },
+	  submitButtonStyles: {
+	    width: FORM_WIDTH
+	  }
+	};
+
+/***/ },
+/* 380 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = {
+	  FORGOT_PASSWORD: '/forgot_password',
+	  HOME: '/',
+	  LOGIN: '/login'
+	};
+
+/***/ },
+/* 381 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -52217,7 +52975,7 @@
 	});
 	exports.loginUser = exports.loginFailure = exports.loginSuccess = exports.loginRequest = exports.LOGIN_FAILURE = exports.LOGIN_SUCCESS = exports.LOGIN_REQUEST = undefined;
 
-	var _kolide = __webpack_require__(369);
+	var _kolide = __webpack_require__(382);
 
 	var _kolide2 = _interopRequireDefault(_kolide);
 
@@ -52262,7 +53020,7 @@
 	};
 
 /***/ },
-/* 369 */
+/* 382 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -52273,19 +53031,19 @@
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _isomorphicFetch = __webpack_require__(370);
+	var _isomorphicFetch = __webpack_require__(383);
 
 	var _isomorphicFetch2 = _interopRequireDefault(_isomorphicFetch);
 
-	var _config = __webpack_require__(347);
+	var _config = __webpack_require__(372);
 
 	var _config2 = _interopRequireDefault(_config);
 
-	var _endpoints = __webpack_require__(372);
+	var _endpoints = __webpack_require__(385);
 
 	var _endpoints2 = _interopRequireDefault(_endpoints);
 
-	var _local = __webpack_require__(346);
+	var _local = __webpack_require__(371);
 
 	var _local2 = _interopRequireDefault(_local);
 
@@ -52364,19 +53122,19 @@
 	exports.default = new Kolide();
 
 /***/ },
-/* 370 */
+/* 383 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// the whatwg-fetch polyfill installs the fetch() function
 	// on the global object (window or self)
 	//
 	// Return that as the export for use in Webpack, Browserify etc.
-	__webpack_require__(371);
+	__webpack_require__(384);
 	module.exports = self.fetch.bind(self);
 
 
 /***/ },
-/* 371 */
+/* 384 */
 /***/ function(module, exports) {
 
 	(function(self) {
@@ -52775,7 +53533,7 @@
 
 
 /***/ },
-/* 372 */
+/* 385 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -52788,7 +53546,7 @@
 	};
 
 /***/ },
-/* 373 */
+/* 386 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -52798,7 +53556,7 @@
 	});
 	exports.default = undefined;
 
-	var _LoginSuccessfulPage = __webpack_require__(374);
+	var _LoginSuccessfulPage = __webpack_require__(387);
 
 	var _LoginSuccessfulPage2 = _interopRequireDefault(_LoginSuccessfulPage);
 
@@ -52807,7 +53565,7 @@
 	exports.default = _LoginSuccessfulPage2.default;
 
 /***/ },
-/* 374 */
+/* 387 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -52825,15 +53583,15 @@
 
 	var _reactRedux = __webpack_require__(236);
 
-	var _styles = __webpack_require__(375);
+	var _styles = __webpack_require__(388);
 
 	var _styles2 = _interopRequireDefault(_styles);
 
-	var _Icon = __webpack_require__(357);
+	var _Icon = __webpack_require__(352);
 
 	var _Icon2 = _interopRequireDefault(_Icon);
 
-	var _backgroundImage = __webpack_require__(345);
+	var _backgroundImage = __webpack_require__(370);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -52898,7 +53656,7 @@
 	exports.default = (0, _reactRedux.connect)()(LoginSuccessfulPage);
 
 /***/ },
-/* 375 */
+/* 388 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -52946,7 +53704,119 @@
 	};
 
 /***/ },
-/* 376 */
+/* 389 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = undefined;
+
+	var _LoginRoutes = __webpack_require__(390);
+
+	var _LoginRoutes2 = _interopRequireDefault(_LoginRoutes);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = _LoginRoutes2.default;
+
+/***/ },
+/* 390 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.LoginRoutes = undefined;
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(167);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _styles = __webpack_require__(391);
+
+	var _styles2 = _interopRequireDefault(_styles);
+
+	var _backgroundImage = __webpack_require__(370);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var LoginRoutes = exports.LoginRoutes = function (_Component) {
+	  _inherits(LoginRoutes, _Component);
+
+	  function LoginRoutes() {
+	    _classCallCheck(this, LoginRoutes);
+
+	    return _possibleConstructorReturn(this, (LoginRoutes.__proto__ || Object.getPrototypeOf(LoginRoutes)).apply(this, arguments));
+	  }
+
+	  _createClass(LoginRoutes, [{
+	    key: 'componentWillMount',
+	    value: function componentWillMount() {
+	      var _global = global;
+	      var window = _global.window;
+
+
+	      (0, _backgroundImage.loadBackground)();
+	      window.onresize = _backgroundImage.resizeBackground;
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var containerStyles = _styles2.default.containerStyles;
+	      var children = this.props.children;
+
+
+	      return _react2.default.createElement(
+	        'div',
+	        { style: containerStyles },
+	        _react2.default.createElement('img', { alt: 'Kolide text logo', src: '/assets/images/kolide-logo-text.svg' }),
+	        children
+	      );
+	    }
+	  }]);
+
+	  return LoginRoutes;
+	}(_react.Component);
+
+	LoginRoutes.propTypes = {
+	  children: _react.PropTypes.element
+	};
+	exports.default = LoginRoutes;
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 391 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = {
+	  containerStyles: {
+	    alignItems: 'center',
+	    display: 'flex',
+	    flexDirection: 'column',
+	    paddingTop: '80px'
+	  }
+	};
+
+/***/ },
+/* 392 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -52957,7 +53827,7 @@
 
 	var _redux = __webpack_require__(243);
 
-	var _reduxThunk = __webpack_require__(377);
+	var _reduxThunk = __webpack_require__(393);
 
 	var _reduxThunk2 = _interopRequireDefault(_reduxThunk);
 
@@ -52965,7 +53835,7 @@
 
 	var _reactRouterRedux = __webpack_require__(320);
 
-	var _reducers = __webpack_require__(378);
+	var _reducers = __webpack_require__(394);
 
 	var _reducers2 = _interopRequireDefault(_reducers);
 
@@ -52979,7 +53849,7 @@
 	exports.default = store;
 
 /***/ },
-/* 377 */
+/* 393 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -53007,7 +53877,7 @@
 	exports['default'] = thunk;
 
 /***/ },
-/* 378 */
+/* 394 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -53020,11 +53890,11 @@
 
 	var _reactRouterRedux = __webpack_require__(320);
 
-	var _reducer = __webpack_require__(379);
+	var _reducer = __webpack_require__(395);
 
 	var _reducer2 = _interopRequireDefault(_reducer);
 
-	var _reducer3 = __webpack_require__(380);
+	var _reducer3 = __webpack_require__(396);
 
 	var _reducer4 = _interopRequireDefault(_reducer3);
 
@@ -53037,7 +53907,7 @@
 	});
 
 /***/ },
-/* 379 */
+/* 395 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -53054,7 +53924,7 @@
 	exports.default = reducer;
 
 /***/ },
-/* 380 */
+/* 396 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -53066,7 +53936,7 @@
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-	var _actions = __webpack_require__(368);
+	var _actions = __webpack_require__(381);
 
 	var initialState = exports.initialState = {
 	  loading: false,

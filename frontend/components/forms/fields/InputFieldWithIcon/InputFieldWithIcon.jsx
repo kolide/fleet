@@ -24,6 +24,16 @@ class InputFieldWithIcon extends Component {
     this.state = { value: null };
   }
 
+  onInputChange = (evt) => {
+    evt.preventDefault();
+
+    const { value } = evt.target;
+    const { onChange } = this.props;
+
+    this.setState({ value });
+    return onChange(evt);
+  }
+
   iconVariant = () => {
     const { error } = this.props;
     const { value } = this.state;
@@ -33,16 +43,6 @@ class InputFieldWithIcon extends Component {
     if (value) return 'colored';
 
     return 'default';
-  }
-
-  onInputChange = (evt) => {
-    evt.preventDefault();
-
-    const { value } = evt.target;
-    const { onChange } = this.props;
-
-    this.setState({ value });
-    return onChange(evt);
   }
 
   renderHeading = () => {

@@ -1,9 +1,11 @@
 import React, { Component, PropTypes } from 'react';
+import { Link } from 'react-router';
 import radium from 'radium';
 import avatar from './avatar.svg';
 import componentStyles from './styles';
 import GradientButton from '../../buttons/GradientButton';
 import InputFieldWithIcon from '../fields/InputFieldWithIcon';
+import paths from '../../../router/paths';
 
 class LoginForm extends Component {
   static propTypes = {
@@ -59,7 +61,7 @@ class LoginForm extends Component {
       containerStyles,
       forgotPasswordStyles,
       forgotPasswordWrapperStyles,
-      formStyles
+      formStyles,
       submitButtonStyles,
     } = componentStyles;
     const { onInputChange, onFormSubmit } = this;
@@ -82,11 +84,14 @@ class LoginForm extends Component {
             placeholder="Password"
             type="password"
           />
+          <div style={forgotPasswordWrapperStyles}>
+            <Link style={forgotPasswordStyles} to={paths.FORGOT_PASSWORD}>Forgot Password?</Link>
+          </div>
         </div>
         <GradientButton
           disabled={!canSubmit}
           onClick={onFormSubmit}
-          style={submitButtonStyles(canSubmit)}
+          style={submitButtonStyles}
           text="Login"
           type="submit"
         />
