@@ -11,7 +11,7 @@ import (
 )
 
 func NewService(config config.SMTPConfig) kolide.MailService {
-	var auth smtp.Auth
+	auth := smtp.PlainAuth("", config.Username, config.Password, config.Server)
 	conn := fmt.Sprintf("%s:%s", config.Server, strconv.Itoa(587))
 	return simple{Auth: auth, Conn: conn}
 }

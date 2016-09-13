@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	kitlog "github.com/go-kit/kit/log"
 	"github.com/kolide/kolide-ose/config"
 	"github.com/kolide/kolide-ose/datastore"
 	"github.com/kolide/kolide-ose/kolide"
@@ -72,7 +73,6 @@ To setup kolide infrastructure, use one of the available commands.
 			if err != nil {
 				initFatal(err, "creating db connection")
 			}
-			svc, err := server.NewService(server.ServiceConfig{Datastore: ds})
 			if err != nil {
 				initFatal(err, "creating new service")
 			}
@@ -92,6 +92,7 @@ To setup kolide infrastructure, use one of the available commands.
 				Enabled:  &enabled,
 				Admin:    &isAdmin,
 			}
+			svc, _ := server.NewService(ds, kitlog.NewNopLogger(), config, nil)
 			_, err = svc.NewUser(context.Background(), admin)
 			if err != nil {
 				initFatal(err, "saving new user")
