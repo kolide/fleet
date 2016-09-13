@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/kolide/kolide-ose/datastore"
 	"github.com/kolide/kolide-ose/kolide"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/net/context"
@@ -125,19 +126,37 @@ func (svc service) RequestPasswordReset(ctx context.Context, email string) error
 	if err != nil {
 		return err
 	}
-	request := &kolide.PasswordResetRequest{
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-		ExpiresAt: time.Now().Add(time.Hour * 24),
-		Token:     token,
-	}
 
-	request, err = svc.ds.NewPasswordResetRequest(request)
-	if err != nil {
+	request, err := svc.ds.FindPassswordResetsByUserID(user.ID)
+	switch err {
+	case nil:
+		// exits, update token and save
+		request.Token = token
+		request.UpdatedAt = time.Now()
+		err = svc.ds.SavePasswordResetRequest(request)
+		if err != nil {
+			return err
+		}
+	case datastore.ErrNotFound:
+		// create new
+		r := &kolide.PasswordResetRequest{
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			ExpiresAt: time.Now().Add(time.Hour * 24),
+			Token:     token,
+		}
+		request, err = svc.ds.NewPasswordResetRequest(r)
+		if err != nil {
+			return err
+		}
+		err = nil
+	default:
 		return err
 	}
 
 	// TODO: queue email send
+	_ = request
+
 	return nil
 }
 

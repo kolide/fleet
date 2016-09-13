@@ -11,6 +11,18 @@ func (orm *inmem) NewPasswordResetRequest(req *kolide.PasswordResetRequest) (*ko
 	return req, nil
 }
 
+func (orm *inmem) SavePasswordResetRequest(req *kolide.PasswordResetRequest) error {
+	orm.mtx.Lock()
+	defer orm.mtx.Unlock()
+
+	if _, ok := orm.passwordResets[req.ID]; !ok {
+		return ErrNotFound
+	}
+
+	orm.passwordResets[req.ID] = req
+	return nil
+}
+
 func (orm *inmem) DeletePasswordResetRequest(req *kolide.PasswordResetRequest) error {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
@@ -34,22 +46,18 @@ func (orm *inmem) FindPassswordResetByID(id uint) (*kolide.PasswordResetRequest,
 	return nil, ErrNotFound
 }
 
-func (orm *inmem) FindPassswordResetsByUserID(userID uint) ([]*kolide.PasswordResetRequest, error) {
+func (orm *inmem) FindPassswordResetsByUserID(userID uint) (*kolide.PasswordResetRequest, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
-	resets := make([]*kolide.PasswordResetRequest, 0)
 
 	for _, pr := range orm.passwordResets {
 		if pr.UserID == userID {
-			resets = append(resets, pr)
+			return pr, nil
 		}
 	}
 
-	if len(resets) == 0 {
-		return nil, ErrNotFound
-	}
+	return nil, ErrNotFound
 
-	return resets, nil
 }
 
 func (orm *inmem) FindPassswordResetByToken(token string) (*kolide.PasswordResetRequest, error) {

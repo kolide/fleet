@@ -10,6 +10,10 @@ func (orm gormDB) NewPasswordResetRequest(req *kolide.PasswordResetRequest) (*ko
 	return req, nil
 }
 
+func (orm gormDB) SavePasswordResetRequest(req *kolide.PasswordResetRequest) error {
+	return orm.DB.Save(req).Error
+}
+
 func (orm gormDB) DeletePasswordResetRequest(req *kolide.PasswordResetRequest) error {
 	err := orm.DB.Delete(req).Error
 	return err
@@ -23,13 +27,12 @@ func (orm gormDB) FindPassswordResetByID(id uint) (*kolide.PasswordResetRequest,
 	return reset, err
 }
 
-func (orm gormDB) FindPassswordResetsByUserID(id uint) ([]*kolide.PasswordResetRequest, error) {
+func (orm gormDB) FindPassswordResetsByUserID(id uint) (*kolide.PasswordResetRequest, error) {
 	reset := &kolide.PasswordResetRequest{
 		UserID: id,
 	}
-	var resets []*kolide.PasswordResetRequest
-	err := orm.DB.Find(reset).First(&resets).Error
-	return resets, err
+	err := orm.DB.Find(reset).First(reset).Error
+	return reset, err
 }
 
 func (orm gormDB) FindPassswordResetByToken(token string) (*kolide.PasswordResetRequest, error) {
