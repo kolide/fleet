@@ -24,7 +24,7 @@ type Campaign interface {
 type Email struct {
 	To   []string
 	From string
-	msg  Campaign
+	Msg  Campaign
 }
 
 type MailService interface {

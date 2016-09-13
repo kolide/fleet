@@ -151,7 +151,16 @@ func (svc service) RequestPasswordReset(ctx context.Context, email string) error
 		return err
 	}
 
-	// TODO: queue email send
+	campaign := kolide.Email{
+		From: "no-reply@kolide.co",
+		To:   []string{user.Email},
+		Msg:  request,
+	}
+
+	err = svc.mailService.SendEmail(campaign)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

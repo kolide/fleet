@@ -23,7 +23,7 @@ const (
 )
 
 // NewService creates a new service from the config struct
-func NewService(ds kolide.Datastore, logger kitlog.Logger, kolideConfig config.KolideConfig) (kolide.Service, error) {
+func NewService(ds kolide.Datastore, logger kitlog.Logger, kolideConfig config.KolideConfig, mailService kolide.MailService) (kolide.Service, error) {
 	var svc kolide.Service
 
 	logFile := func(path string) io.Writer {
@@ -42,6 +42,7 @@ func NewService(ds kolide.Datastore, logger kitlog.Logger, kolideConfig config.K
 
 		osqueryStatusLogWriter:  logFile(kolideConfig.Osquery.StatusLogFile),
 		osqueryResultsLogWriter: logFile(kolideConfig.Osquery.ResultLogFile),
+		mailService:             mailService,
 	}
 	svc = validationMiddleware{svc}
 	return svc, nil
@@ -54,4 +55,6 @@ type service struct {
 
 	osqueryStatusLogWriter  io.Writer
 	osqueryResultsLogWriter io.Writer
+
+	mailService kolide.MailService
 }
