@@ -133,9 +133,9 @@ func requireRole(p kolide.UserPayload) map[permission][]string {
 	if p.Email != nil {
 		selfFields = append(selfFields, "email")
 	}
-	if len(selfFields) != 0 {
-		must[self] = selfFields
-	}
+	// self is always a must, otherwise
+	// anyone can edit the field, and we don't have that requirement
+	must[self] = selfFields
 	return must
 }
 
