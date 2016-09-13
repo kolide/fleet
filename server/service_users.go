@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/kolide/kolide-ose/datastore"
 	"github.com/kolide/kolide-ose/kolide"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/net/context"
@@ -113,8 +112,8 @@ func (svc service) RequestPasswordReset(ctx context.Context, email string) error
 		return err
 	}
 
-	// if user is an admin, but not the admin requesting their own password reset
-	if vc.IsAdmin() && vc.user.ID != user.ID {
+	// if user is an admin
+	if vc.IsAdmin() {
 		user.AdminForcedPasswordReset = true
 		if err := svc.saveUser(user); err != nil {
 			return err
@@ -131,35 +130,21 @@ func (svc service) RequestPasswordReset(ctx context.Context, email string) error
 		return err
 	}
 
-	request, err := svc.ds.FindPassswordResetsByUserID(user.ID)
-	switch err {
-	case nil:
-		// exits, update token and save
-		request.Token = token
-		request.UpdatedAt = time.Now()
-		err = svc.ds.SavePasswordResetRequest(request)
-		if err != nil {
-			return err
-		}
-	case datastore.ErrNotFound:
-		// create new
-		r := &kolide.PasswordResetRequest{
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
-			ExpiresAt: time.Now().Add(time.Hour * 24),
-			Token:     token,
-		}
-		request, err = svc.ds.NewPasswordResetRequest(r)
-		if err != nil {
-			return err
-		}
-		err = nil
-	default:
+	request := &kolide.PasswordResetRequest{
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		ExpiresAt: time.Now().Add(time.Hour * 24),
+		Token:     token,
+	}
+	request, err = svc.ds.NewPasswordResetRequest(request)
+	if err != nil {
+		return err
+	}
+	if err := svc.DeleteSessionsForUser(ctx, user.ID); err != nil {
 		return err
 	}
 
 	// TODO: queue email send
-	_ = request
 
 	return nil
 }

@@ -7,8 +7,9 @@ type PasswordResetStore interface {
 	NewPasswordResetRequest(req *PasswordResetRequest) (*PasswordResetRequest, error)
 	SavePasswordResetRequest(req *PasswordResetRequest) error
 	DeletePasswordResetRequest(req *PasswordResetRequest) error
+	DeletePasswordResetRequestsForUser(userID uint) error
 	FindPassswordResetByID(id uint) (*PasswordResetRequest, error)
-	FindPassswordResetsByUserID(id uint) (*PasswordResetRequest, error)
+	FindPassswordResetsByUserID(id uint) ([]*PasswordResetRequest, error)
 	FindPassswordResetByToken(token string) (*PasswordResetRequest, error)
 	FindPassswordResetByTokenAndUserID(token string, id uint) (*PasswordResetRequest, error)
 }
