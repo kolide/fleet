@@ -107,10 +107,14 @@ func (svc service) RequestPasswordReset(ctx context.Context, email string) error
 	if err != nil {
 		return err
 	}
+
 	// if user is an admin, but not the admin requesting their own password reset
 	if vc.IsAdmin() && vc.user.ID != user.ID {
 		user.AdminForcedPasswordReset = true
 		if err := svc.saveUser(user); err != nil {
+			return err
+		}
+		if err := svc.DeleteSessionsForUser(ctx, user.ID); err != nil {
 			return err
 		}
 		return nil
