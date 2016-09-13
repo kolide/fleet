@@ -85,6 +85,35 @@ func makeGetUserEndpoint(svc kolide.Service) endpoint.Endpoint {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// List Users
+////////////////////////////////////////////////////////////////////////////////
+
+type listUsersResponse struct {
+	Users []getUserResponse `json:"users"`
+	Err   error             `json:"error,omitempty"`
+}
+
+func (r listUsersResponse) error() error { return r.Err }
+
+func makeListUsersEndpoint(svc kolide.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		var users []*kolide.User
+		var resp listUsersResponse
+		for _, user := range users {
+			resp.Users = append(resp.Users, getUserResponse{
+				ID:                       user.ID,
+				Username:                 user.Username,
+				Email:                    user.Email,
+				Admin:                    user.Admin,
+				Enabled:                  user.Enabled,
+				AdminForcedPasswordReset: user.AdminForcedPasswordReset,
+			})
+		}
+		return resp, nil
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Change Password
 ////////////////////////////////////////////////////////////////////////////////
 

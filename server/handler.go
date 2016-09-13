@@ -44,6 +44,16 @@ func attachAPIRoutes(router *mux.Router, ctx context.Context, svc kolide.Service
 	router.Handle("/api/v1/kolide/users",
 		kithttp.NewServer(
 			ctx,
+			authenticated(canPerformActions(makeListUsersEndpoint(svc))),
+			decodeNoParamsRequest,
+			encodeResponse,
+			opts...,
+		),
+	).Methods("GET")
+
+	router.Handle("/api/v1/kolide/users",
+		kithttp.NewServer(
+			ctx,
 			authenticated(mustBeAdmin(makeCreateUserEndpoint(svc))),
 			decodeCreateUserRequest,
 			encodeResponse,

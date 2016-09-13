@@ -36,6 +36,19 @@ func mustBeAdmin(next endpoint.Endpoint) endpoint.Endpoint {
 	}
 }
 
+func canPerformActions(next endpoint.Endpoint) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		vc, err := viewerContextFromContext(ctx)
+		if err != nil {
+			return nil, err
+		}
+		if !vc.CanPerformActions() {
+			return nil, forbiddenError{message: "no read permissions"}
+		}
+		return next(ctx, request)
+	}
+}
+
 func canReadUser(next endpoint.Endpoint) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		vc, err := viewerContextFromContext(ctx)
