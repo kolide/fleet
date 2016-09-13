@@ -80,21 +80,28 @@ func (svc service) Users(ctx context.Context) ([]*kolide.User, error) {
 	return svc.ds.Users()
 }
 
-func (svc service) ChangePassword(ctx context.Context, userID uint, old, new string) error {
+func (svc service) ChangePassword(ctx context.Context, userID uint, token, password string) error {
 	user, err := svc.User(ctx, userID)
 	if err != nil {
 		return err
 	}
-	if err := user.ValidatePassword(old); err != nil {
-		return fmt.Errorf("current password validation failed: %v", err)
-	}
-	hashed, salt, err := hashPassword(new, svc.config.Auth.SaltKeySize, svc.config.Auth.BcryptCost)
+
+	hashed, salt, err := hashPassword(password, svc.config.Auth.SaltKeySize, svc.config.Auth.BcryptCost)
 	if err != nil {
 		return err
 	}
 	user.Salt = salt
 	user.Password = hashed
-	return svc.saveUser(user)
+	if err := svc.saveUser(user); err != nil {
+		return err
+	}
+
+	// delete password reset tokens for user
+	if err := svc.ds.DeletePasswordResetRequestsForUser(user.ID); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (svc service) RequestPasswordReset(ctx context.Context, email string) error {

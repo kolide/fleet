@@ -26,9 +26,18 @@ func (mw validationMiddleware) NewUser(ctx context.Context, p kolide.UserPayload
 	return mw.Service.NewUser(ctx, p)
 }
 
-func (mw validationMiddleware) ChangePassword(ctx context.Context, userID uint, old, new string) error {
-	if old == "" || new == "" {
+func (mw validationMiddleware) ChangePassword(ctx context.Context, userID uint, token, password string) error {
+
+	vc, err := viewerContextFromContext(ctx)
+	if err != nil {
+		return err
+	}
+	if token == "" && !vc.user.AdminForcedPasswordReset {
+		return invalidArgumentError{field: "token", required: true}
+	}
+
+	if password == "" {
 		return invalidArgumentError{field: "password", required: true}
 	}
-	return mw.Service.ChangePassword(ctx, userID, old, new)
+	return mw.Service.ChangePassword(ctx, userID, token, password)
 }
