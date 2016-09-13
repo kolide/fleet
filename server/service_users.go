@@ -63,7 +63,7 @@ func (svc service) ModifyUser(ctx context.Context, userID uint, p kolide.UserPay
 		user.GravatarURL = *p.GravatarURL
 	}
 
-	err = svc.ds.SaveUser(user)
+	err = svc.saveUser(user)
 	if err != nil {
 		return nil, err
 	}
@@ -94,6 +94,29 @@ func (svc service) ChangePassword(ctx context.Context, userID uint, old, new str
 }
 
 func (svc service) RequestPasswordReset(ctx context.Context, email string) error {
+	// the password reset is different depending on wether performed by an admin
+	// or a user
+	// if an admin requests a password reset, then no token is
+	// generated, instead the AdminForcedPasswordReset flag is set
+	vc, err := viewerContextFromContext(ctx)
+	if err != nil {
+		return err
+	}
+
+	user, err := svc.ds.UserByEmail(email)
+	if err != nil {
+		return err
+	}
+	// if user is an admin, but not the admin requesting their own password reset
+	if vc.IsAdmin() && vc.user.ID != user.ID {
+		user.AdminForcedPasswordReset = true
+		if err := svc.saveUser(user); err != nil {
+			return err
+		}
+		return nil
+	}
+
+	// self or logged out user
 	token, err := generateRandomText(svc.smtpTokenKeySize)
 	if err != nil {
 		return err
