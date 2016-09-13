@@ -130,6 +130,9 @@ func requireRole(p kolide.UserPayload) map[permission][]string {
 	if p.Position != nil {
 		selfFields = append(selfFields, "position")
 	}
+	if p.Email != nil {
+		selfFields = append(selfFields, "email")
+	}
 	if len(selfFields) != 0 {
 		must[self] = selfFields
 	}
