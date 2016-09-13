@@ -3,6 +3,7 @@ package server
 import (
 	"testing"
 
+	kitlog "github.com/go-kit/kit/log"
 	"github.com/kolide/kolide-ose/config"
 	"github.com/kolide/kolide-ose/datastore"
 	"github.com/kolide/kolide-ose/kolide"
@@ -16,7 +17,7 @@ func TestAuthenticate(t *testing.T) {
 	ds, err := datastore.New("gorm-sqlite3", ":memory:")
 	assert.Nil(t, err)
 
-	svc, err := NewService(testConfig(ds), config.TestConfig())
+	svc, err := NewService(ds, kitlog.NewNopLogger(), config.TestConfig())
 	assert.Nil(t, err)
 
 	ctx := context.Background()

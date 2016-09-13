@@ -22,7 +22,7 @@ const (
 )
 
 // NewService creates a new service from the config struct
-func NewService(config ServiceConfig, kolideConfig config.KolideConfig) (kolide.Service, error) {
+func NewService(ds kolide.Datastore, logger kitlog.Logger, kolideConfig config.KolideConfig) (kolide.Service, error) {
 	var svc kolide.Service
 
 	logFile := func(path string) io.Writer {
@@ -35,8 +35,8 @@ func NewService(config ServiceConfig, kolideConfig config.KolideConfig) (kolide.
 	}
 
 	svc = service{
-		ds:     config.Datastore,
-		logger: config.Logger,
+		ds:     ds,
+		logger: logger,
 		config: kolideConfig,
 
 		osqueryStatusLogWriter:  logFile(kolideConfig.Osquery.StatusLogFile),
@@ -53,24 +53,4 @@ type service struct {
 
 	osqueryStatusLogWriter  io.Writer
 	osqueryResultsLogWriter io.Writer
-}
-
-// ServiceConfig holds the parameters for creating a Service
-type ServiceConfig struct {
-	Datastore kolide.Datastore
-	Logger    kitlog.Logger
-
-	// password config
-	SaltKeySize int
-	BcryptCost  int
-
-	// session config
-	JWTKey            string
-	SessionCookieName string
-
-	// osquery config
-	OsqueryEnrollSecret   string
-	OsqueryNodeKeySize    int
-	OsqueryStatusLogPath  string
-	OsqueryResultsLogPath string
 }

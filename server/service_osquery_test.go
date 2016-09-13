@@ -14,18 +14,9 @@ func TestEnrollAgent(t *testing.T) {
 	ds, err := datastore.New("gorm-sqlite3", ":memory:")
 	assert.Nil(t, err)
 
-	svcConfig := ServiceConfig{
-		Datastore:           ds,
-		Logger:              kitlog.NewNopLogger(),
-		BcryptCost:          12,
-		SaltKeySize:         24,
-		SessionCookieName:   "KolideSession",
-		OsqueryNodeKeySize:  12,
-		OsqueryEnrollSecret: "foobar",
-	}
 	conf := config.TestConfig()
 	conf.Osquery.EnrollSecret = "foobar"
-	svc, err := NewService(svcConfig, conf)
+	svc, err := NewService(ds, kitlog.NewNopLogger(), conf)
 	assert.Nil(t, err)
 
 	ctx := context.Background()
@@ -47,16 +38,9 @@ func TestEnrollAgentIncorrectEnrollSecret(t *testing.T) {
 	ds, err := datastore.New("gorm-sqlite3", ":memory:")
 	assert.Nil(t, err)
 
-	svcConfig := ServiceConfig{
-		Datastore:           ds,
-		Logger:              kitlog.NewNopLogger(),
-		BcryptCost:          12,
-		SaltKeySize:         24,
-		SessionCookieName:   "KolideSession",
-		OsqueryNodeKeySize:  12,
-		OsqueryEnrollSecret: "foobar",
-	}
-	svc, err := NewService(svcConfig, config.TestConfig())
+	conf := config.TestConfig()
+	conf.Osquery.EnrollSecret = "foobar"
+	svc, err := NewService(ds, kitlog.NewNopLogger(), conf)
 	assert.Nil(t, err)
 
 	ctx := context.Background()

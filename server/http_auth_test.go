@@ -23,7 +23,7 @@ import (
 
 func TestLogin(t *testing.T) {
 	ds, _ := datastore.New("inmem", "")
-	svc, _ := NewService(testConfig(ds), config.TestConfig())
+	svc, _ := NewService(ds, kitlog.NewNopLogger(), config.TestConfig())
 	createTestUsers(t, ds)
 	logger := kitlog.NewLogfmtLogger(os.Stdout)
 
@@ -155,7 +155,7 @@ func TestLogin(t *testing.T) {
 }
 
 func createTestUsers(t *testing.T, ds kolide.Datastore) {
-	svc := svcWithNoValidation(testConfig(ds))
+	svc := svcWithNoValidation(ds, kitlog.NewNopLogger())
 	ctx := context.Background()
 	for _, tt := range testUsers {
 		payload := kolide.UserPayload{
@@ -172,25 +172,15 @@ func createTestUsers(t *testing.T, ds kolide.Datastore) {
 	}
 }
 
-func svcWithNoValidation(conf ServiceConfig) kolide.Service {
+func svcWithNoValidation(ds kolide.Datastore, logger kitlog.Logger) kolide.Service {
 	var svc kolide.Service
 	svc = service{
-		ds:     conf.Datastore,
-		logger: conf.Logger,
+		ds:     ds,
+		logger: logger,
 		config: config.TestConfig(),
 	}
 
 	return svc
-}
-
-func testConfig(ds kolide.Datastore) ServiceConfig {
-	return ServiceConfig{
-		Datastore:         ds,
-		Logger:            kitlog.NewNopLogger(),
-		BcryptCost:        12,
-		SaltKeySize:       24,
-		SessionCookieName: "KolideSession",
-	}
 }
 
 // an io.ReadCloser for new request body
