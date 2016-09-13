@@ -9,7 +9,6 @@ import (
 	"github.com/kolide/kolide-ose/kolide"
 	"github.com/kolide/kolide-ose/server"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 func createPrepareCmd(configManager config.Manager) *cobra.Command {
@@ -61,12 +60,13 @@ To setup kolide infrastructure, use one of the available commands.
 		Short: "Generate test data",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, arg []string) {
+			config := configManager.LoadConfig()
 			connString := fmt.Sprintf(
 				"%s:%s@(%s)/%s?charset=utf8&parseTime=True&loc=Local",
-				viper.GetString("mysql.username"),
-				viper.GetString("mysql.password"),
-				viper.GetString("mysql.address"),
-				viper.GetString("mysql.database"),
+				config.Mysql.Username,
+				config.Mysql.Password,
+				config.Mysql.Address,
+				config.Mysql.Database,
 			)
 			ds, err := datastore.New("gorm-mysql", connString)
 			if err != nil {
