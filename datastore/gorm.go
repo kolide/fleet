@@ -39,7 +39,6 @@ var tables = [...]interface{}{
 type gormDB struct {
 	DB              *gorm.DB
 	Driver          string
-	sessionKeySize  int
 	sessionLifespan float64
 	config          config.KolideConfig
 }

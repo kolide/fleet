@@ -22,7 +22,6 @@ func New(driver, conn string, opts ...DBOption) (kolide.Datastore, error) {
 	opt := &dbOptions{
 		maxAttempts:     defaultMaxAttempts,
 		sessionLifespan: defaultSessionLifespan,
-		sessionKeySize:  defaultSessionKeySize,
 	}
 	for _, option := range opts {
 		if err := option(opt); err != nil {
@@ -43,7 +42,6 @@ func New(driver, conn string, opts ...DBOption) (kolide.Datastore, error) {
 		ds := gormDB{
 			DB:              db,
 			Driver:          "mysql",
-			sessionKeySize:  opt.sessionKeySize,
 			sessionLifespan: opt.sessionLifespan,
 		}
 		// configure logger
@@ -63,7 +61,6 @@ func New(driver, conn string, opts ...DBOption) (kolide.Datastore, error) {
 		ds := gormDB{
 			DB:              db,
 			Driver:          "sqlite3",
-			sessionKeySize:  opt.sessionKeySize,
 			sessionLifespan: opt.sessionLifespan,
 		}
 		// configure logger
@@ -78,7 +75,6 @@ func New(driver, conn string, opts ...DBOption) (kolide.Datastore, error) {
 	case "inmem":
 		ds := &inmem{
 			Driver:          "inmem",
-			sessionKeySize:  opt.sessionKeySize,
 			sessionLifespan: opt.sessionLifespan,
 			users:           make(map[uint]*kolide.User),
 			sessions:        make(map[uint]*kolide.Session),

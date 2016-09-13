@@ -21,16 +21,7 @@ type dbOptions struct {
 	db              kolide.Datastore
 	debug           bool // gorm debug
 	logger          *logrus.Logger
-	sessionKeySize  int
 	sessionLifespan float64
-}
-
-// SessionKeySize configures the session key size
-func SessionKeySize(keySize int) DBOption {
-	return func(o *dbOptions) error {
-		o.sessionKeySize = keySize
-		return nil
-	}
 }
 
 // SessionLifespan sets a custom session lifespan
