@@ -77,6 +77,10 @@ func (svc service) User(ctx context.Context, id uint) (*kolide.User, error) {
 	return svc.ds.UserByID(id)
 }
 
+func (svc service) Users(ctx context.Context) ([]*kolide.User, error) {
+	return svc.ds.Users()
+}
+
 func (svc service) ChangePassword(ctx context.Context, userID uint, old, new string) error {
 	user, err := svc.User(ctx, userID)
 	if err != nil {

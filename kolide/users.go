@@ -12,6 +12,7 @@ import (
 type UserStore interface {
 	NewUser(user *User) (*User, error)
 	User(username string) (*User, error)
+	Users() ([]*User, error)
 	UserByEmail(email string) (*User, error)
 	UserByID(id uint) (*User, error)
 	SaveUser(user *User) error
@@ -24,6 +25,9 @@ type UserService interface {
 
 	// User returns a valid User given a User ID
 	User(ctx context.Context, id uint) (*User, error)
+
+	// Users returns all users
+	Users(ctx context.Context) ([]*User, error)
 
 	// ChangePassword updates a User's password if the old password matches
 	ChangePassword(ctx context.Context, userID uint, old, new string) error

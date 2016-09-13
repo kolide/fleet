@@ -23,6 +23,15 @@ func (orm gormDB) User(username string) (*kolide.User, error) {
 	return user, nil
 }
 
+func (orm gormDB) Users() ([]*kolide.User, error) {
+	var users []*kolide.User
+	err := orm.DB.Find(&users).Error
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+
 func (orm gormDB) UserByEmail(email string) (*kolide.User, error) {
 	user := &kolide.User{
 		Email: email,

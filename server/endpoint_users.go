@@ -97,7 +97,11 @@ func (r listUsersResponse) error() error { return r.Err }
 
 func makeListUsersEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		var users []*kolide.User
+		users, err := svc.Users(ctx)
+		if err != nil {
+			return listUsersResponse{Err: err}, nil
+		}
+
 		var resp listUsersResponse
 		for _, user := range users {
 			resp.Users = append(resp.Users, getUserResponse{
