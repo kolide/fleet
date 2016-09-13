@@ -31,7 +31,7 @@ func (svc service) Login(ctx context.Context, username, password string) (*kolid
 		}
 	}
 
-	token, err := svc.MakeSession(ctx, user.ID)
+	token, err := svc.makeSession(user.ID)
 	if err != nil {
 		return nil, "", err
 	}
@@ -39,12 +39,8 @@ func (svc service) Login(ctx context.Context, username, password string) (*kolid
 	return user, token, nil
 }
 
-func (svc service) Logout(ctx context.Context) error {
-	// this should not return an error if the user wasn't logged in
-	return svc.DestroySession(ctx)
-}
-
-func (svc service) MakeSession(ctx context.Context, id uint) (string, error) {
+// makeSession is a helper that creates a new session after authentication
+func (svc service) makeSession(id uint) (string, error) {
 	session, err := svc.ds.CreateSessionForUserID(id)
 	if err != nil {
 		return "", err
@@ -56,6 +52,11 @@ func (svc service) MakeSession(ctx context.Context, id uint) (string, error) {
 	}
 
 	return tokenString, nil
+}
+
+func (svc service) Logout(ctx context.Context) error {
+	// this should not return an error if the user wasn't logged in
+	return svc.DestroySession(ctx)
 }
 
 func (svc service) DestroySession(ctx context.Context) error {
@@ -97,12 +98,12 @@ func (svc service) validateSession(session *kolide.Session) error {
 		return kolide.ErrNoActiveSession
 	}
 
-	sessionLifeSpan := svc.config.Session.ExpirationSeconds
-	if sessionLifeSpan == 0 {
+	sessionDuration := svc.config.Session.Duration
+	if sessionDuration == 0 {
 		return nil
 	}
 
-	if time.Since(session.AccessedAt) >= time.Duration(sessionLifeSpan)*time.Second {
+	if time.Since(session.AccessedAt) >= sessionDuration {
 		err := svc.ds.DestroySession(session)
 		if err != nil {
 			return err

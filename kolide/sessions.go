@@ -58,7 +58,6 @@ type SessionStore interface {
 type SessionService interface {
 	Login(ctx context.Context, username, password string) (*User, string, error)
 	Logout(ctx context.Context) error
-	MakeSession(ctx context.Context, id uint) (string, error)
 	DestroySession(ctx context.Context) error
 	GetInfoAboutSessionsForUser(ctx context.Context, id uint) ([]*Session, error)
 	DeleteSessionsForUser(ctx context.Context, id uint) error
