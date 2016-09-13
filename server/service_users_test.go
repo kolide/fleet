@@ -78,24 +78,31 @@ func TestChangeUserPassword(t *testing.T) {
 	createTestUsers(t, ds)
 
 	var passwordChangeTests = []struct {
-		username        string
-		currentPassword string
-		newPassword     string
-		err             error
+		username    string
+		token       string
+		newPassword string
+		err         error
 	}{
 		{
-			username:        "admin1",
-			currentPassword: *testUsers["admin1"].Password,
-			newPassword:     "123cat!",
+			username:    "admin1",
+			token:       "abcd",
+			newPassword: "123cat!",
 		},
 	}
 
 	ctx := context.Background()
+	vc := &viewerContext{
+		user: &kolide.User{
+			Username:                 "admin",
+			AdminForcedPasswordReset: true,
+		},
+	}
+	ctx = context.WithValue(ctx, "viewerContext", vc)
 	for _, tt := range passwordChangeTests {
 		user, err := ds.User(tt.username)
 		assert.Nil(t, err)
 
-		err = svc.ChangePassword(ctx, user.ID, tt.currentPassword, tt.newPassword)
+		err = svc.ChangePassword(ctx, user.ID, tt.token, tt.newPassword)
 		assert.Nil(t, err)
 	}
 }
