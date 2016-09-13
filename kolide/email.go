@@ -1,6 +1,10 @@
 package kolide
 
-import "time"
+import (
+	"bytes"
+	"html/template"
+	"time"
+)
 
 // PasswordResetStore manages password resets in the Datastore
 type PasswordResetStore interface {
@@ -42,8 +46,18 @@ type PasswordResetRequest struct {
 	Token     string `gorm:"size:1024"`
 }
 
+const passwordResetTemplate = `
+Your password reset token is {{.Token}}`
+
 func (r PasswordResetRequest) Message() ([]byte, error) {
-	// TODO: marshal error into the correct body
-	msg := []byte("temporary")
-	return msg, nil
+	var msg bytes.Buffer
+	var err error
+	t := template.New(passwordResetTemplate)
+	if t, err = t.Parse(passwordResetTemplate); err != nil {
+		return nil, err
+	}
+	if err = t.Execute(&msg, r); err != nil {
+		return nil, err
+	}
+	return msg.Bytes(), nil
 }

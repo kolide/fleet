@@ -5,6 +5,7 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 
 	"github.com/gorilla/mux"
@@ -64,14 +65,18 @@ func TestDecodeChangePasswordRequest(t *testing.T) {
 
 	var body bytes.Buffer
 	body.Write([]byte(`{
-        "current_password": "foo",
-        "new_password": "bar",
-        "password_reset_token": "baz"
+        "new_password": "bar"
     }`))
+
+	request := httptest.NewRequest("POST", "/api/v1/kolide/users/1/password", &body)
+	v := url.Values{}
+	v.Add("token", "baz")
+	q := v.Encode()
+	request.URL.RawQuery = q
 
 	router.ServeHTTP(
 		httptest.NewRecorder(),
-		httptest.NewRequest("POST", "/api/v1/kolide/users/1/password", &body),
+		request,
 	)
 }
 
@@ -93,8 +98,9 @@ func TestDecodeModifyUserRequest(t *testing.T) {
         "email": "foo@kolide.co"
     }`))
 
+	request := httptest.NewRequest("PATCH", "/api/v1/kolide/users/1", &body)
 	router.ServeHTTP(
 		httptest.NewRecorder(),
-		httptest.NewRequest("PATCH", "/api/v1/kolide/users/1", &body),
+		request,
 	)
 }

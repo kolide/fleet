@@ -122,9 +122,8 @@ func makeListUsersEndpoint(svc kolide.Service) endpoint.Endpoint {
 ////////////////////////////////////////////////////////////////////////////////
 
 type changePasswordRequest struct {
-	UserID             uint   `json:"user_id"`
-	Token              string `json:"token"`
-	PasswordResetToken string `json:"password_reset_token"`
+	UserID             uint `json:"user_id"`
+	PasswordResetToken string
 	NewPassword        string `json:"new_password"`
 }
 
@@ -137,7 +136,7 @@ func (r changePasswordResponse) error() error { return r.Err }
 func makeChangePasswordEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(changePasswordRequest)
-		err := svc.ChangePassword(ctx, req.UserID, req.Token, req.NewPassword)
+		err := svc.ChangePassword(ctx, req.UserID, req.PasswordResetToken, req.NewPassword)
 		return changePasswordResponse{Err: err}, nil
 	}
 }
