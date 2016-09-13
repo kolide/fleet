@@ -23,7 +23,9 @@ func TestEnrollAgent(t *testing.T) {
 		OsqueryNodeKeySize:  12,
 		OsqueryEnrollSecret: "foobar",
 	}
-	svc, err := NewService(svcConfig, config.TestConfig())
+	conf := config.TestConfig()
+	conf.Osquery.EnrollSecret = "foobar"
+	svc, err := NewService(svcConfig, conf)
 	assert.Nil(t, err)
 
 	ctx := context.Background()

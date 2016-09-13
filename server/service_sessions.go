@@ -60,7 +60,7 @@ func (svc service) makeSession(id uint) (string, error) {
 		return "", err
 	}
 
-	tokenString, err := kolide.GenerateJWT(session.Key, svc.jwtKey)
+	tokenString, err := kolide.GenerateJWT(session.Key, svc.config.Auth.JwtKey)
 	if err != nil {
 		return "", err
 	}

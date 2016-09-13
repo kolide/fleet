@@ -172,15 +172,12 @@ func createTestUsers(t *testing.T, ds kolide.Datastore) {
 	}
 }
 
-func svcWithNoValidation(config ServiceConfig) kolide.Service {
+func svcWithNoValidation(conf ServiceConfig) kolide.Service {
 	var svc kolide.Service
 	svc = service{
-		ds:          config.Datastore,
-		logger:      config.Logger,
-		saltKeySize: config.SaltKeySize,
-		bcryptCost:  config.BcryptCost,
-		jwtKey:      config.JWTKey,
-		cookieName:  config.SessionCookieName,
+		ds:     conf.Datastore,
+		logger: conf.Logger,
+		config: config.TestConfig(),
 	}
 
 	return svc

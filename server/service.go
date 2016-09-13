@@ -39,14 +39,8 @@ func NewService(config ServiceConfig, kolideConfig config.KolideConfig) (kolide.
 		logger: config.Logger,
 		config: kolideConfig,
 
-		saltKeySize:             config.SaltKeySize,
-		bcryptCost:              config.BcryptCost,
-		jwtKey:                  config.JWTKey,
-		cookieName:              config.SessionCookieName,
-		osqueryEnrollSecret:     config.OsqueryEnrollSecret,
-		osqueryNodeKeySize:      config.OsqueryNodeKeySize,
-		osqueryStatusLogWriter:  logFile(config.OsqueryStatusLogPath),
-		osqueryResultsLogWriter: logFile(config.OsqueryResultsLogPath),
+		osqueryStatusLogWriter:  logFile(kolideConfig.Osquery.StatusLogFile),
+		osqueryResultsLogWriter: logFile(kolideConfig.Osquery.ResultLogFile),
 	}
 	svc = validationMiddleware{svc}
 	return svc, nil
@@ -57,14 +51,6 @@ type service struct {
 	logger kitlog.Logger
 	config config.KolideConfig
 
-	saltKeySize int
-	bcryptCost  int
-
-	jwtKey     string
-	cookieName string
-
-	osqueryEnrollSecret     string
-	osqueryNodeKeySize      int
 	osqueryStatusLogWriter  io.Writer
 	osqueryResultsLogWriter io.Writer
 }
