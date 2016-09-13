@@ -12,7 +12,7 @@ export default {
   ...normalize,
   html: {
     position: 'relative',
-    minHeight: '100%'
+    minHeight: '100%',
   },
   body: {
     color: color.primary,
@@ -35,6 +35,6 @@ export default {
     top: 0,
     bottom: 0,
     zIndex: '-1',
-    opacity: '0.4'
+    opacity: '0.4',
   },
 };

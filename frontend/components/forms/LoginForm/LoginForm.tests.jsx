@@ -44,7 +44,9 @@ describe('LoginForm - component', () => {
 
     submitBtn.simulate('click');
 
-    expect(submitBtn.prop('disabled')).toEqual(true);
+    expect(submitBtn.prop('style')).toInclude({
+      cursor: 'not-allowed',
+    });
     expect(submitSpy).toNotHaveBeenCalled();
   });
 

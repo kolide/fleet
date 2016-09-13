@@ -1,6 +1,7 @@
 import styles from '../../styles';
 
-const {color} = styles;
+const { color } = styles;
+
 export default {
   footerStyles: {
     alignItems: 'center',
@@ -11,6 +12,6 @@ export default {
     paddingTop: '15px',
     left: '0',
     right: '0',
-    bottom: '0'
-  }
+    bottom: '0',
+  },
 };

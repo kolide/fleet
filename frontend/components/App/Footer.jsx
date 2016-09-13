@@ -1,15 +1,14 @@
 import React from 'react';
 import radium from 'radium';
 import componentStyles from './styles';
-import footerLogo from './footer-logo.svg'
+import footerLogo from './footer-logo.svg';
 
 const { footerStyles } = componentStyles;
 
 const Footer = () => {
-
   return (
     <footer style={footerStyles}>
-      <img src={footerLogo}/>
+      <img alt="Kolide logo" src={footerLogo} />
     </footer>
   );
 };

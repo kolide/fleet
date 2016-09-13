@@ -25,13 +25,15 @@ export class LoginPage extends Component {
 
     loadBackground();
     window.onresize = resizeBackground;
+
+    return false;
   }
 
   onSubmit = (formData) => {
     const { dispatch } = this.props;
-    dispatch(loginUser(formData))
+    return dispatch(loginUser(formData))
       .then(() => {
-        dispatch(push('/login_successful'));
+        return dispatch(push('/login_successful'));
       });
   }
 
@@ -42,7 +44,7 @@ export class LoginPage extends Component {
     return (
       <div style={containerStyles}>
         <div style={formWrapperStyles}>
-          <img src="/assets/images/kolide-logo-text.svg" />
+          <img alt="Kolide text logo" src="/assets/images/kolide-logo-text.svg" />
           <div style={whiteTabStyles} />
           <LoginForm onSubmit={onSubmit} />
         </div>

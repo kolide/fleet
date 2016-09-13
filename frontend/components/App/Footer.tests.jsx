@@ -5,6 +5,6 @@ import Footer from './Footer';
 
 describe('Footer - component', () => {
   it('renders', () => {
-    expect(component).toExist();
+    expect(mount(<Footer />)).toExist();
   });
 });

@@ -37,21 +37,31 @@ class LoginForm extends Component {
   onFormSubmit = (evt) => {
     evt.preventDefault();
 
-    const { formData } = this.state;
-    const { onSubmit } = this.props;
+    if (this.canSubmit()) {
+      const { formData } = this.state;
+      const { onSubmit } = this.props;
 
-    return onSubmit(formData);
+      return onSubmit(formData);
+    }
+
+    return false;
+  }
+
+  canSubmit = () => {
+    const { formData: { username, password } } = this.state;
+
+    return username && password;
   }
 
   render () {
-    const { containerStyles, submitButtonStyles, userIconStyles, formStyles } = componentStyles;
+    const { containerStyles, submitButtonStyles, formStyles } = componentStyles;
     const { onInputChange, onFormSubmit } = this;
-    const { formData: { username, password } } = this.state;
+    const canSubmit = this.canSubmit();
 
     return (
       <form onSubmit={onFormSubmit} style={formStyles}>
         <div style={containerStyles}>
-          <img src={avatar} />
+          <img alt="Avatar" src={avatar} />
           <InputFieldWithIcon
             iconName="user"
             name="username"
@@ -67,7 +77,7 @@ class LoginForm extends Component {
           />
         </div>
         <button
-          style={submitButtonStyles}
+          style={submitButtonStyles(canSubmit)}
           type="submit"
         >
           Login

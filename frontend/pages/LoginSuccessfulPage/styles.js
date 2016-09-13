@@ -5,14 +5,14 @@ const { color, font, padding } = styles;
 export default {
   containerStyles: {
     paddingTop: '100px',
-    textAlign: 'center'
+    textAlign: 'center',
   },
   loginSuccessStyles: {
     color: color.green,
     textTransform: 'uppercase',
     fontSize: font.large,
     letterSpacing: '2px',
-    fontWeight: '300'
+    fontWeight: '300',
   },
   subtextStyles: {
     fontSize: font.medium,

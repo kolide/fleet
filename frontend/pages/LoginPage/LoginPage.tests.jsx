@@ -22,14 +22,6 @@ describe('LoginPage - component', () => {
 
       expect(page.find('LoginForm').length).toEqual(1);
     });
-
-    it('render the Kolide Text logo', () => {
-      const page = mount(connectedComponent(LoginPage, { mockStore }));
-
-      expect(page.find('Icon').first().props()).toInclude({
-        name: 'kolideText',
-      });
-    });
   });
 
   context('when the user is logged in', () => {
