@@ -64,11 +64,10 @@ type UserPayload struct {
 	Enabled                  *bool   `json:"enabled"`
 	AdminForcedPasswordReset *bool   `json:"force_password_reset"`
 	Password                 *string `json:"password"`
-	// modify params
-	CurrentPassword *string `json:"current_password"`
-	NewPassword     *string `json:"new_password"`
-	GravatarURL     *string `json:"gravatar_url"`
-	Position        *string `json:"position"`
+	CurrentPassword          *string `json:"current_password"`
+	NewPassword              *string `json:"new_password"`
+	GravatarURL              *string `json:"gravatar_url"`
+	Position                 *string `json:"position"`
 }
 
 // ValidatePassword accepts a potential password for a given user and attempts
