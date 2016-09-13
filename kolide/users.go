@@ -17,11 +17,24 @@ type UserStore interface {
 	SaveUser(user *User) error
 }
 
+// UserService contains methods for managing a Kolide User
 type UserService interface {
+	// NewUser creates a new User from a request Payload
 	NewUser(ctx context.Context, p UserPayload) (*User, error)
+
+	// User returns a valid User given a User ID
 	User(ctx context.Context, id uint) (*User, error)
+
+	// ChangePassword updates a User's password if the old password matches
 	ChangePassword(ctx context.Context, userID uint, old, new string) error
+
+	// RequestPasswordReset generates a password reset request for
+	// a user. The request results in a token emailed to the user.
+	// If the person making the request is an admin the AdminForcedPasswordReset
+	// parameter is enabled instead of sending an email with a password reset token
 	RequestPasswordReset(ctx context.Context, email string) error
+
+	// ModifyUser updates a user's parameters given a UserPayload
 	ModifyUser(ctx context.Context, userID uint, p UserPayload) (*User, error)
 }
 
