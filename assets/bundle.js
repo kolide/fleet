@@ -50530,10 +50530,6 @@
 
 	var _styles2 = _interopRequireDefault(_styles);
 
-	var _email_regex = __webpack_require__(346);
-
-	var _email_regex2 = _interopRequireDefault(_email_regex);
-
 	var _GradientButton = __webpack_require__(347);
 
 	var _GradientButton2 = _interopRequireDefault(_GradientButton);
@@ -50541,6 +50537,10 @@
 	var _InputFieldWithIcon = __webpack_require__(350);
 
 	var _InputFieldWithIcon2 = _interopRequireDefault(_InputFieldWithIcon);
+
+	var _valid_email = __webpack_require__(397);
+
+	var _valid_email2 = _interopRequireDefault(_valid_email);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -50575,23 +50575,22 @@
 	    _this.onFormSubmit = function (evt) {
 	      evt.preventDefault();
 
-	      var validEmail = _this.validateEmail();
 	      var formData = _this.state.formData;
 	      var onSubmit = _this.props.onSubmit;
 
 
-	      if (validEmail) {
+	      if (_this.validate()) {
 	        return onSubmit(formData);
 	      }
 
 	      return false;
 	    };
 
-	    _this.validateEmail = function () {
+	    _this.validate = function () {
 	      var email = _this.state.formData.email;
 
 
-	      if (_email_regex2.default.test(email)) {
+	      if ((0, _valid_email2.default)(email)) {
 	        return true;
 	      }
 
@@ -50687,17 +50686,7 @@
 	};
 
 /***/ },
-/* 346 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = /\S+@\S+\.\S+/;
-
-/***/ },
+/* 346 */,
 /* 347 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -53969,6 +53958,25 @@
 	};
 
 	exports.default = reducer;
+
+/***/ },
+/* 397 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var EMAIL_REGEX = /\S+@\S+\.\S+/;
+
+	exports.default = function (email) {
+	  if (EMAIL_REGEX.test(email)) {
+	    return true;
+	  }
+
+	  return false;
+	};
 
 /***/ }
 /******/ ])));

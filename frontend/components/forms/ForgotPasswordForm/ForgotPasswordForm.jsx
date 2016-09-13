@@ -1,9 +1,9 @@
 import React, { Component, PropTypes } from 'react';
 import radium from 'radium';
 import componentStyles from './styles';
-import EMAIL_REGEX from '../../../utilities/email_regex';
 import GradientButton from '../../buttons/GradientButton';
 import InputFieldWithIcon from '../fields/InputFieldWithIcon';
+import validEmail from '../validators/valid_email';
 
 class ForgotPasswordForm extends Component {
   static propTypes = {
@@ -36,21 +36,20 @@ class ForgotPasswordForm extends Component {
   onFormSubmit = (evt) => {
     evt.preventDefault();
 
-    const validEmail = this.validateEmail();
     const { formData } = this.state;
     const { onSubmit } = this.props;
 
-    if (validEmail) {
+    if (this.validate()) {
       return onSubmit(formData);
     }
 
     return false;
   }
 
-  validateEmail = () => {
+  validate = () => {
     const { formData: { email } } = this.state;
 
-    if (EMAIL_REGEX.test(email)) {
+    if (validEmail(email)) {
       return true;
     }
 
