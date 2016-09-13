@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/gorilla/mux"
+	"github.com/kolide/kolide-ose/config"
 	"github.com/kolide/kolide-ose/datastore"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
@@ -14,7 +15,7 @@ func TestAPIRoutes(t *testing.T) {
 	ds, err := datastore.New("gorm-sqlite3", ":memory:")
 	assert.Nil(t, err)
 
-	svc, err := NewService(testConfig(ds))
+	svc, err := NewService(testConfig(ds), config.TestConfig())
 	assert.Nil(t, err)
 
 	ctx := context.Background()

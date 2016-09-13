@@ -348,3 +348,30 @@ func (man Manager) loadConfigFile() {
 	}
 
 }
+
+// TestConfig returns a barebones configuration suitable for use in tests.
+// Individual tests may want to override some of the values provided.
+func TestConfig() KolideConfig {
+	return KolideConfig{
+		Auth: AuthConfig{
+			JwtKey:      "CHANGEME",
+			BcryptCost:  6, // Low cost keeps tests fast
+			SaltKeySize: 24,
+		},
+		Session: SessionConfig{
+			KeySize:    64,
+			Duration:   24 * 90 * time.Hour,
+			CookieName: "KolideSession",
+		},
+		Osquery: OsqueryConfig{
+			EnrollSecret:  "",
+			NodeKeySize:   24,
+			StatusLogFile: "",
+			ResultLogFile: "",
+		},
+		Logging: LoggingConfig{
+			Debug:         true,
+			DisableBanner: true,
+		},
+	}
+}

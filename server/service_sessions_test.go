@@ -3,6 +3,7 @@ package server
 import (
 	"testing"
 
+	"github.com/kolide/kolide-ose/config"
 	"github.com/kolide/kolide-ose/datastore"
 	"github.com/kolide/kolide-ose/kolide"
 	"github.com/stretchr/testify/assert"
@@ -15,7 +16,7 @@ func TestAuthenticate(t *testing.T) {
 	ds, err := datastore.New("gorm-sqlite3", ":memory:")
 	assert.Nil(t, err)
 
-	svc, err := NewService(testConfig(ds))
+	svc, err := NewService(testConfig(ds), config.TestConfig())
 	assert.Nil(t, err)
 
 	ctx := context.Background()
@@ -30,4 +31,28 @@ func TestAuthenticate(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, user.ID, loggedIn.ID)
 	assert.NotEmpty(t, token)
+}
+
+func TestExpiration(t *testing.T) {
+	ds, err := datastore.New("gorm-sqlite3", ":memory:")
+	assert.Nil(t, err)
+
+	svc, err := NewService(testConfig(ds), config.TestConfig())
+	assert.Nil(t, err)
+
+	ctx := context.Background()
+
+	// Create user and session
+	user, err := kolide.NewUser("foo", "bar", "foo@kolide.co", false, false, bcryptCost)
+	assert.Nil(t, err)
+	user, err = ds.NewUser(user)
+	assert.Nil(t, err)
+	assert.NotZero(t, user.ID)
+
+	loggedIn, token, err := svc.Login(ctx, "foo", "bar")
+	assert.Nil(t, err)
+	assert.Equal(t, user.ID, loggedIn.ID)
+	assert.NotEmpty(t, token)
+
+	// TODO complete this test
 }

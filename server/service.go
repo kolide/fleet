@@ -22,7 +22,7 @@ const (
 )
 
 // NewService creates a new service from the config struct
-func NewService(config ServiceConfig) (kolide.Service, error) {
+func NewService(config ServiceConfig, kolideConfig config.KolideConfig) (kolide.Service, error) {
 	var svc kolide.Service
 
 	logFile := func(path string) io.Writer {
@@ -35,8 +35,10 @@ func NewService(config ServiceConfig) (kolide.Service, error) {
 	}
 
 	svc = service{
-		ds:                      config.Datastore,
-		logger:                  config.Logger,
+		ds:     config.Datastore,
+		logger: config.Logger,
+		config: kolideConfig,
+
 		saltKeySize:             config.SaltKeySize,
 		bcryptCost:              config.BcryptCost,
 		jwtKey:                  config.JWTKey,

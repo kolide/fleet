@@ -1,6 +1,8 @@
 package server
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"fmt"
 	"time"
 
@@ -41,7 +43,19 @@ func (svc service) Login(ctx context.Context, username, password string) (*kolid
 
 // makeSession is a helper that creates a new session after authentication
 func (svc service) makeSession(id uint) (string, error) {
-	session, err := svc.ds.CreateSessionForUserID(id)
+	sessionKeySize := svc.config.Session.KeySize
+	key := make([]byte, sessionKeySize)
+	_, err := rand.Read(key)
+	if err != nil {
+		return "", err
+	}
+
+	session := &kolide.Session{
+		UserID: id,
+		Key:    base64.StdEncoding.EncodeToString(key),
+	}
+
+	session, err = svc.ds.NewSession(session)
 	if err != nil {
 		return "", err
 	}
@@ -74,7 +88,20 @@ func (svc service) DestroySession(ctx context.Context) error {
 }
 
 func (svc service) GetInfoAboutSessionsForUser(ctx context.Context, id uint) ([]*kolide.Session, error) {
-	return svc.ds.FindAllSessionsForUser(id)
+	var validatedSessions []*kolide.Session
+
+	sessions, err := svc.ds.FindAllSessionsForUser(id)
+	if err != nil {
+		return validatedSessions, err
+	}
+
+	for _, session := range sessions {
+		if svc.validateSession(session) == nil {
+			validatedSessions = append(validatedSessions, session)
+		}
+	}
+
+	return validatedSessions, nil
 }
 
 func (svc service) DeleteSessionsForUser(ctx context.Context, id uint) error {
@@ -82,7 +109,31 @@ func (svc service) DeleteSessionsForUser(ctx context.Context, id uint) error {
 }
 
 func (svc service) GetInfoAboutSession(ctx context.Context, id uint) (*kolide.Session, error) {
-	return svc.ds.FindSessionByID(id)
+	session, err := svc.ds.FindSessionByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	err = svc.validateSession(session)
+	if err != nil {
+		return nil, err
+	}
+
+	return session, nil
+}
+
+func (svc service) GetSessionByKey(ctx context.Context, key string) (*kolide.Session, error) {
+	session, err := svc.ds.FindSessionByKey(key)
+	if err != nil {
+		return nil, err
+	}
+
+	err = svc.validateSession(session)
+	if err != nil {
+		return nil, err
+	}
+
+	return session, nil
 }
 
 func (svc service) DeleteSession(ctx context.Context, id uint) error {
@@ -99,11 +150,8 @@ func (svc service) validateSession(session *kolide.Session) error {
 	}
 
 	sessionDuration := svc.config.Session.Duration
-	if sessionDuration == 0 {
-		return nil
-	}
-
-	if time.Since(session.AccessedAt) >= sessionDuration {
+	// duration 0 = unlimited
+	if sessionDuration != 0 && time.Since(session.AccessedAt) >= sessionDuration {
 		err := svc.ds.DestroySession(session)
 		if err != nil {
 			return err

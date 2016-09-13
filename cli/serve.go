@@ -50,8 +50,7 @@ the way that the kolide server works.
 			svcLogger := kitlog.NewContext(logger).With("component", "service")
 			var svc kolide.Service
 			{ // temp create an admin user
-				svc, _ = server.NewService(svcConfig)
-				svc, _ = server.NewService(svcConfig)
+				svc, _ = server.NewService(svcConfig, config.TestConfig()) // TODO pass real config
 				var (
 					name     = "admin"
 					username = "admin"

@@ -14,6 +14,7 @@ import (
 	kitlog "github.com/go-kit/kit/log"
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
+	"github.com/kolide/kolide-ose/config"
 	"github.com/kolide/kolide-ose/datastore"
 	"github.com/kolide/kolide-ose/kolide"
 	"github.com/stretchr/testify/assert"
@@ -22,7 +23,7 @@ import (
 
 func TestLogin(t *testing.T) {
 	ds, _ := datastore.New("inmem", "")
-	svc, _ := NewService(testConfig(ds))
+	svc, _ := NewService(testConfig(ds), config.TestConfig())
 	createTestUsers(t, ds)
 	logger := kitlog.NewLogfmtLogger(os.Stdout)
 

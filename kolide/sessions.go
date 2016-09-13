@@ -42,8 +42,8 @@ type SessionStore interface {
 	// Find all of the active sessions for a given user
 	FindAllSessionsForUser(id uint) ([]*Session, error)
 
-	// Create a session object tied to the given user ID
-	CreateSessionForUserID(userID uint) (*Session, error)
+	// Store a new session struct
+	NewSession(session *Session) (*Session, error)
 
 	// Destroy the currently tracked session
 	DestroySession(session *Session) error
@@ -62,6 +62,7 @@ type SessionService interface {
 	GetInfoAboutSessionsForUser(ctx context.Context, id uint) ([]*Session, error)
 	DeleteSessionsForUser(ctx context.Context, id uint) error
 	GetInfoAboutSession(ctx context.Context, id uint) (*Session, error)
+	GetSessionByKey(ctx context.Context, key string) (*Session, error)
 	DeleteSession(ctx context.Context, id uint) error
 }
 
