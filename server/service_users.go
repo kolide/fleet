@@ -117,7 +117,7 @@ func (svc service) RequestPasswordReset(ctx context.Context, email string) error
 	}
 
 	// self or logged out user
-	token, err := generateRandomText(svc.smtpTokenKeySize)
+	token, err := generateRandomText(svc.config.SMTP.TokenKeySize)
 	if err != nil {
 		return err
 	}

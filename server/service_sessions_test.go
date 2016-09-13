@@ -22,9 +22,13 @@ func TestAuthenticate(t *testing.T) {
 
 	ctx := context.Background()
 
-	user, err := kolide.NewUser("foo", "bar", "foo@kolide.co", false, false, bcryptCost)
-	assert.Nil(t, err)
-	user, err = ds.NewUser(user)
+	payload := kolide.UserPayload{
+		Username: stringPtr("foo"),
+		Password: stringPtr("bar"),
+		Email:    stringPtr("foo@kolide.co"),
+		Admin:    boolPtr(false),
+	}
+	user, err := svc.NewUser(ctx, payload)
 	assert.Nil(t, err)
 	assert.NotZero(t, user.ID)
 

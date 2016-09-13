@@ -1,12 +1,15 @@
 package cli
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/kolide/kolide-ose/config"
 	"github.com/kolide/kolide-ose/datastore"
 	"github.com/kolide/kolide-ose/kolide"
+	"github.com/kolide/kolide-ose/server"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 func createPrepareCmd(configManager config.Manager) *cobra.Command {
@@ -58,24 +61,38 @@ To setup kolide infrastructure, use one of the available commands.
 		Short: "Generate test data",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, arg []string) {
-			config := configManager.LoadConfig()
 			connString := fmt.Sprintf(
 				"%s:%s@(%s)/%s?charset=utf8&parseTime=True&loc=Local",
-				config.Mysql.Username,
-				config.Mysql.Password,
-				config.Mysql.Address,
-				config.Mysql.Database,
+				viper.GetString("mysql.username"),
+				viper.GetString("mysql.password"),
+				viper.GetString("mysql.address"),
+				viper.GetString("mysql.database"),
 			)
 			ds, err := datastore.New("gorm-mysql", connString)
 			if err != nil {
 				initFatal(err, "creating db connection")
 			}
-
-			admin, err := kolide.NewUser("admin", "admin", "admin@kolide.co", true, false, config.Auth.BcryptCost)
+			svc, err := server.NewService(server.ServiceConfig{Datastore: ds})
 			if err != nil {
-				initFatal(err, "creating new user")
+				initFatal(err, "creating new service")
 			}
-			_, err = ds.NewUser(admin)
+			var (
+				name     = "admin"
+				username = "admin"
+				password = "secret"
+				email    = "admin@kolide.co"
+				enabled  = true
+				isAdmin  = true
+			)
+			admin := kolide.UserPayload{
+				Name:     &name,
+				Username: &username,
+				Password: &password,
+				Email:    &email,
+				Enabled:  &enabled,
+				Admin:    &isAdmin,
+			}
+			_, err = svc.NewUser(context.Background(), admin)
 			if err != nil {
 				initFatal(err, "saving new user")
 			}

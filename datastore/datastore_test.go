@@ -157,9 +157,13 @@ func testCreateUser(t *testing.T, db kolide.UserStore) {
 	}
 
 	for _, tt := range createTests {
-		u, err := kolide.NewUser(tt.username, tt.password, tt.email, tt.isAdmin, tt.passwordReset, bcryptCost)
-		assert.Nil(t, err)
-
+		u := &kolide.User{
+			Username: tt.username,
+			Password: []byte(tt.password),
+			Admin:    tt.isAdmin,
+			AdminForcedPasswordReset: tt.passwordReset,
+			Email: tt.email,
+		}
 		user, err := db.NewUser(u)
 		assert.Nil(t, err)
 
@@ -204,8 +208,13 @@ func createTestUsers(t *testing.T, db kolide.UserStore) []*kolide.User {
 
 	var users []*kolide.User
 	for _, tt := range createTests {
-		u, err := kolide.NewUser(tt.username, tt.password, tt.email, tt.isAdmin, tt.passwordReset, bcryptCost)
-		assert.Nil(t, err)
+		u := &kolide.User{
+			Username: tt.username,
+			Password: []byte(tt.password),
+			Admin:    tt.isAdmin,
+			AdminForcedPasswordReset: tt.passwordReset,
+			Email: tt.email,
+		}
 
 		user, err := db.NewUser(u)
 		assert.Nil(t, err)
