@@ -37,10 +37,9 @@ var tables = [...]interface{}{
 }
 
 type gormDB struct {
-	DB              *gorm.DB
-	Driver          string
-	sessionLifespan float64
-	config          config.KolideConfig
+	DB     *gorm.DB
+	Driver string
+	config config.KolideConfig
 }
 
 func (orm gormDB) Name() string {

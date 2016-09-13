@@ -7,9 +7,7 @@ import (
 
 const (
 	// TODO @marpaia fix/document default values
-	defaultSessionKeySize  int     = 24
-	defaultSessionLifespan float64 = 10
-	defaultMaxAttempts     int     = 15
+	defaultMaxAttempts int = 15
 )
 
 // DBOption is used to pass optional arguments to a database connection
@@ -17,19 +15,10 @@ type DBOption func(o *dbOptions) error
 
 type dbOptions struct {
 	// maxAttempts configures the number of retries to connect to the DB
-	maxAttempts     int
-	db              kolide.Datastore
-	debug           bool // gorm debug
-	logger          *logrus.Logger
-	sessionLifespan float64
-}
-
-// SessionLifespan sets a custom session lifespan
-func SessionLifespan(lifespan float64) DBOption {
-	return func(o *dbOptions) error {
-		o.sessionLifespan = lifespan
-		return nil
-	}
+	maxAttempts int
+	db          kolide.Datastore
+	debug       bool // gorm debug
+	logger      *logrus.Logger
 }
 
 // Logger adds a logger to the datastore
