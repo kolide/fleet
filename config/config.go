@@ -52,9 +52,8 @@ type SMTPConfig struct {
 
 // SessionConfig defines configs related to user sessions
 type SessionConfig struct {
-	KeySize    int
-	Duration   time.Duration
-	CookieName string
+	KeySize  int
+	Duration time.Duration
 }
 
 // OsqueryConfig defines configs related to osquery
@@ -118,7 +117,6 @@ func (man Manager) addConfigs() {
 	// Session
 	man.addConfigInt("session.key_size", 64)
 	man.addConfigDuration("session.duration", 24*90*time.Hour)
-	man.addConfigString("session.cookie_name", "KolideSession")
 
 	// Osquery
 	man.addConfigString("osquery.enroll_secret", "")
@@ -164,9 +162,8 @@ func (man Manager) LoadConfig() KolideConfig {
 			TokenKeySize:    man.getConfigInt("smtp.token_key_size"),
 		},
 		Session: SessionConfig{
-			KeySize:    man.getConfigInt("session.key_size"),
-			Duration:   man.getConfigDuration("session.duration"),
-			CookieName: man.getConfigString("session.cookie_name"),
+			KeySize:  man.getConfigInt("session.key_size"),
+			Duration: man.getConfigDuration("session.duration"),
 		},
 		Osquery: OsqueryConfig{
 			EnrollSecret:  man.getConfigString("osquery.enroll_secret"),
@@ -359,9 +356,8 @@ func TestConfig() KolideConfig {
 			SaltKeySize: 24,
 		},
 		Session: SessionConfig{
-			KeySize:    64,
-			Duration:   24 * 90 * time.Hour,
-			CookieName: "KolideSession",
+			KeySize:  64,
+			Duration: 24 * 90 * time.Hour,
 		},
 		Osquery: OsqueryConfig{
 			EnrollSecret:  "",

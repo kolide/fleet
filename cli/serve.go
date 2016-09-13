@@ -44,7 +44,7 @@ the way that the kolide server works.
 
 			ds, err := datastore.New("inmem", "")
 			if err != nil {
-				panic("Could not create datastore: " + err.Error())
+				initFatal(err, "initializing datastore")
 			}
 
 			svcLogger := kitlog.NewContext(logger).With("component", "service")
@@ -69,8 +69,7 @@ the way that the kolide server works.
 				}
 				_, err := svc.NewUser(ctx, admin)
 				if err != nil {
-					logger.Log("err", err)
-					os.Exit(1)
+					initFatal(err, "creating bootstrap user")
 				}
 				svc = server.NewLoggingService(svc, svcLogger)
 			}
