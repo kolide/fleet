@@ -82,7 +82,7 @@ func validateModifyUserRequest(next endpoint.Endpoint) endpoint.Endpoint {
 		}
 		uid := requestUserIDFromContext(ctx)
 		p := r.payload
-		must := requireRole(p)
+		must := requireRoleForUserModification(p)
 
 		// check for admin required fields
 		if fields, ok := must[admin]; ok {
@@ -104,7 +104,7 @@ func validateModifyUserRequest(next endpoint.Endpoint) endpoint.Endpoint {
 
 // checks if fields were set in a user payload
 // returns a map of updated fields for each role required
-func requireRole(p kolide.UserPayload) map[permission][]string {
+func requireRoleForUserModification(p kolide.UserPayload) map[permission][]string {
 	must := make(map[permission][]string)
 	adminFields := []string{}
 	if p.Enabled != nil {
