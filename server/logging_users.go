@@ -32,6 +32,33 @@ func (mw loggingMiddleware) NewUser(ctx context.Context, p kolide.UserPayload) (
 	return
 }
 
+func (mw loggingMiddleware) ModifyUser(ctx context.Context, userID uint, p kolide.UserPayload) (user *kolide.User, err error) {
+
+	vc, err := viewerContextFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var username = "none"
+
+	defer func(begin time.Time) {
+		_ = mw.logger.Log(
+			"method", "ModifyUser",
+			"user", username,
+			"modified_by", vc.user.Username,
+			"err", err,
+			"took", time.Since(begin),
+		)
+	}(time.Now())
+
+	user, err = mw.Service.ModifyUser(ctx, userID, p)
+
+	if user != nil {
+		username = user.Username
+	}
+
+	return
+}
+
 func (mw loggingMiddleware) User(ctx context.Context, id uint) (user *kolide.User, err error) {
 	var username = "none"
 
