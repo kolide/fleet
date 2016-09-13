@@ -2,7 +2,7 @@ package datastore
 
 import "github.com/kolide/kolide-ose/kolide"
 
-func (orm *inmem) SavePasswordResetRequest(req *kolide.PasswordResetRequest) (*kolide.PasswordResetRequest, error) {
+func (orm *inmem) NewPasswordResetRequest(req *kolide.PasswordResetRequest) (*kolide.PasswordResetRequest, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 

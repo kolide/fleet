@@ -4,7 +4,7 @@ import "time"
 
 // PasswordResetStore manages password resets in the Datastore
 type PasswordResetStore interface {
-	SavePasswordResetRequest(req *PasswordResetRequest) (*PasswordResetRequest, error)
+	NewPasswordResetRequest(req *PasswordResetRequest) (*PasswordResetRequest, error)
 	DeletePasswordResetRequest(req *PasswordResetRequest) error
 	FindPassswordResetByID(id uint) (*PasswordResetRequest, error)
 	FindPassswordResetsByUserID(id uint) ([]*PasswordResetRequest, error)

@@ -2,7 +2,7 @@ package datastore
 
 import "github.com/kolide/kolide-ose/kolide"
 
-func (orm gormDB) SavePasswordResetRequest(req *kolide.PasswordResetRequest) (*kolide.PasswordResetRequest, error) {
+func (orm gormDB) NewPasswordResetRequest(req *kolide.PasswordResetRequest) (*kolide.PasswordResetRequest, error) {
 	err := orm.DB.Create(req).Error
 	if err != nil {
 		return nil, err
