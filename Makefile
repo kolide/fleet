@@ -10,17 +10,17 @@ else
 endif
 
 ifeq ($(OS), Windows_NT)
-OUTPUT := build/kolide.exe
+OUTPUT 			= build/kolide.exe
 else
-OUTPUT := build/kolide
+OUTPUT 			= build/kolide
 endif
 
-VERSION		  := 0.0.0-development
-BRANCH        := $(shell git rev-parse --abbrev-ref HEAD)
-REVISION 	  := $(shell git rev-parse HEAD)
-GOVERSION 	  := $(shell go version | awk '{print $$3}')
-NOW			  := $(shell date +"%Y%m%d-%T")
-USER		  := $(shell whoami)
+VERSION			= 0.0.0-development
+BRANCH			= $(shell git rev-parse --abbrev-ref HEAD)
+REVISION		= $(shell git rev-parse HEAD)
+GOVERSION		= $(shell go version | awk '{print $$3}')
+NOW				= $(shell date +"%Y%m%d-%T")
+USER			= $(shell whoami)
 
 build: .prefix
 	go build -o ${OUTPUT} -ldflags "\
