@@ -8,7 +8,7 @@ import (
 )
 
 // info vars
-// set at runtime with ldflags
+// set at build time with ldflags
 // example:
 // go build -ldflags "-X github.com/kolide/kolide-ose/version.version=1.0.0-development"
 var (
@@ -57,9 +57,11 @@ func PrintFull() {
 	fmt.Printf("  go version: \t%s\n", v.GoVersion)
 }
 
+// Handler provides an HTTP Handler which returns JSON formatted version info
 func Handler() http.Handler {
 	v := Version()
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		enc := json.NewEncoder(w)
 		enc.SetIndent("", "  ")
 		enc.Encode(v)
