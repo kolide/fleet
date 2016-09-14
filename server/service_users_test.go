@@ -25,8 +25,9 @@ func TestRequestPasswordReset(t *testing.T) {
 	var errEmailFn = func(e kolide.Email) error {
 		return errors.New("test err")
 	}
-	svc := service{ds: ds,
-		smtpTokenKeySize: 10,
+	svc := service{
+		ds:     ds,
+		config: config.TestConfig(),
 	}
 
 	var requestPasswordResetTests = []struct {
@@ -94,7 +95,7 @@ func TestRequestPasswordReset(t *testing.T) {
 
 func TestCreateUser(t *testing.T) {
 	ds, _ := datastore.New("inmem", "")
-	svc, _ := NewService(ds, kitlog.NewNopLogger(), config.TestConfig())
+	svc, _ := NewService(ds, kitlog.NewNopLogger(), config.TestConfig(), nil)
 	ctx := context.Background()
 
 	var createUserTests = []struct {
@@ -155,7 +156,7 @@ func TestCreateUser(t *testing.T) {
 
 func TestChangeUserPassword(t *testing.T) {
 	ds, _ := datastore.New("inmem", "")
-	svc, _ := NewService(ds, kitlog.NewNopLogger(), config.TestConfig())
+	svc, _ := NewService(ds, kitlog.NewNopLogger(), config.TestConfig(), nil)
 	createTestUsers(t, ds)
 	// admin1, _ := ds.User("admin1")
 	user1, _ := ds.User("user1")

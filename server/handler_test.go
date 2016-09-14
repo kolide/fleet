@@ -16,7 +16,7 @@ func TestAPIRoutes(t *testing.T) {
 	ds, err := datastore.New("gorm-sqlite3", ":memory:")
 	assert.Nil(t, err)
 
-	svc, err := NewService(ds, kitlog.NewNopLogger(), config.TestConfig())
+	svc, err := NewService(ds, kitlog.NewNopLogger(), config.TestConfig(), nil)
 	assert.Nil(t, err)
 
 	ctx := context.Background()
