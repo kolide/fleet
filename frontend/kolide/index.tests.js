@@ -1,6 +1,6 @@
 import expect from 'expect';
 import Kolide from './index';
-import { validLoginRequest } from '../test/mocks';
+import { validLoginRequest, validUser } from '../test/mocks';
 
 describe('Kolide - API client', () => {
   describe('defaults', () => {
@@ -10,16 +10,16 @@ describe('Kolide - API client', () => {
   });
 
   describe('#loginUser', () => {
-    it('sets the bearer token', (done) => {
+    it('calls the appropriate endpoint with the correct parameters', (done) => {
       const request = validLoginRequest();
 
       Kolide.loginUser({
         username: 'admin',
         password: 'secret',
       })
-        .then(() => {
+        .then((user) => {
+          expect(user).toEqual(validUser);
           expect(request.isDone()).toEqual(true);
-          expect(Kolide.bearerToken).toEqual('auth_token');
           done();
         })
         .catch(done);
