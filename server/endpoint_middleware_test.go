@@ -119,21 +119,25 @@ func TestEndpointPermissions(t *testing.T) {
 		},
 	}
 
-	for i, tt := range endpointTests {
-		ctx := context.Background()
-		if tt.vc != nil {
-			ctx = context.WithValue(ctx, "viewerContext", tt.vc)
-		}
-		if tt.requestID != 0 {
-			ctx = context.WithValue(ctx, "request-id", tt.requestID)
-		}
-		var request interface{}
-		if tt.request != nil {
-			request = tt.request
-		} else {
-			request = req
-		}
-		_, eerr := tt.endpoint(ctx, request)
-		assert.Equal(t, tt.wantErr, eerr)
+	for _, tt := range endpointTests {
+		tt := tt
+		t.Run("", func(st *testing.T) {
+			st.Parallel()
+			ctx := context.Background()
+			if tt.vc != nil {
+				ctx = context.WithValue(ctx, "viewerContext", tt.vc)
+			}
+			if tt.requestID != 0 {
+				ctx = context.WithValue(ctx, "request-id", tt.requestID)
+			}
+			var request interface{}
+			if tt.request != nil {
+				request = tt.request
+			} else {
+				request = req
+			}
+			_, eerr := tt.endpoint(ctx, request)
+			assert.Equal(st, tt.wantErr, eerr)
+		})
 	}
 }
