@@ -1,10 +1,23 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
+import { noop } from 'lodash';
 import componentStyles from './styles';
+import { forgotPasswordAction } from '../../redux/nodes/components/ForgotPasswordPage/actions';
 import ForgotPasswordForm from '../../components/forms/ForgotPasswordForm';
 
 class ForgotPasswordPage extends Component {
+  static propTypes = {
+    dispatch: PropTypes.func,
+  };
+
+  static defaultProps = {
+    dispatch: noop,
+  };
+
   onSubmit = (formData) => {
-    console.log('ForgotPasswordPage formData', formData);
+    const { dispatch } = this.props;
+
+    return dispatch(forgotPasswordAction(formData));
   }
 
   render () {
@@ -31,4 +44,8 @@ class ForgotPasswordPage extends Component {
   }
 }
 
-export default ForgotPasswordPage;
+const mapStateToProps = (state) => {
+  return state.components.ForgotPasswordPage;
+};
+
+export default connect(mapStateToProps)(ForgotPasswordPage);
