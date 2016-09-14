@@ -2,6 +2,7 @@ package server
 
 import (
 	"testing"
+	"time"
 
 	kitlog "github.com/go-kit/kit/log"
 	"github.com/kolide/kolide-ose/config"
@@ -93,13 +94,28 @@ func TestChangeUserPassword(t *testing.T) {
 	ctx := context.Background()
 	vc := &viewerContext{
 		user: &kolide.User{
-			Username:                 "admin",
+			Username: "admin1",
+			Enabled:  true,
+			Admin:    true,
 			AdminForcedPasswordReset: true,
 		},
 	}
 	ctx = context.WithValue(ctx, "viewerContext", vc)
 	for _, tt := range passwordChangeTests {
+		token, err := generateRandomText(10)
+		if err != nil {
+			t.Fatal(err)
+		}
 		user, err := ds.User(tt.username)
+		assert.Nil(t, err)
+		request := &kolide.PasswordResetRequest{
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			ExpiresAt: time.Now().Add(time.Hour * 24),
+			UserID:    user.ID,
+			Token:     token,
+		}
+		_, err = ds.NewPasswordResetRequest(request)
 		assert.Nil(t, err)
 
 		err = svc.ChangePassword(ctx, user.ID, tt.token, tt.newPassword)
