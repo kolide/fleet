@@ -94,12 +94,14 @@ func TestEndpointPermissions(t *testing.T) {
 		},
 		{
 			endpoint: canResetPassword(e),
+			vc:       emptyVC(),
 			request:  changePasswordRequest{},
 		},
 		{
-			endpoint: canResetPassword(e),
-			vc:       &viewerContext{user: user1},
-			request:  changePasswordRequest{},
+			endpoint:  canResetPassword(e),
+			vc:        &viewerContext{user: user1},
+			requestID: user1.ID,
+			request:   changePasswordRequest{},
 		},
 		{
 			endpoint: canResetPassword(e),

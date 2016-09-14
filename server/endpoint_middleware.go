@@ -78,21 +78,18 @@ func canModifyUser(next endpoint.Endpoint) endpoint.Endpoint {
 	}
 }
 
+// canResetPassword allow request to go through if not logged in
+// otherwise pass to authenticated middleware first
 func canResetPassword(next endpoint.Endpoint) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		_, err := viewerContextFromContext(ctx)
-		switch err {
-		case nil:
-			// authenticated
-			return authenticated(canPerformActions(next))(ctx, request)
-		case errNoContext:
-			// not authenticated
-			return next(ctx, request)
-		default:
-			// something went wrong
+		vc, err := viewerContextFromContext(ctx)
+		if err != nil {
 			return nil, err
-
 		}
+		if vc.user == nil {
+			return next(ctx, request)
+		}
+		return authenticated(canPerformActions(next))(ctx, request)
 	}
 }
 
