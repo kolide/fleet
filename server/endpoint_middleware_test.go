@@ -103,11 +103,19 @@ func TestEndpointPermissions(t *testing.T) {
 			requestID: user1.ID,
 			request:   changePasswordRequest{},
 		},
-		{
-			endpoint: canResetPassword(e),
-			vc:       &viewerContext{user: user2},
-			request:  changePasswordRequest{},
-			wantErr:  "must be logged in",
+		{ // user1 shouldn't have permissions to update user2
+			endpoint:  canResetPassword(e),
+			requestID: user2.ID,
+			vc:        &viewerContext{user: user1},
+			request:   changePasswordRequest{},
+			wantErr:   "unauthorized: can only reset own password",
+		},
+		{ // check with disabled user
+			endpoint:  canResetPassword(e),
+			requestID: user2.ID,
+			vc:        &viewerContext{user: user2},
+			request:   changePasswordRequest{},
+			wantErr:   "must be logged in",
 		},
 	}
 

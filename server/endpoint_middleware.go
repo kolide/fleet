@@ -89,6 +89,10 @@ func canResetPassword(next endpoint.Endpoint) endpoint.Endpoint {
 		if vc.user == nil {
 			return next(ctx, request)
 		}
+		uid := requestUserIDFromContext(ctx)
+		if vc.user.ID != uid {
+			return nil, forbiddenError{message: "can only reset own password"}
+		}
 		return authenticated(canPerformActions(next))(ctx, request)
 	}
 }

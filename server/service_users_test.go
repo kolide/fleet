@@ -77,45 +77,83 @@ func TestChangeUserPassword(t *testing.T) {
 	ds, _ := datastore.New("inmem", "")
 	svc, _ := NewService(ds, kitlog.NewNopLogger(), config.TestConfig())
 	createTestUsers(t, ds)
+	// admin1, _ := ds.User("admin1")
+	user1, _ := ds.User("user1")
+	user2, _ := ds.User("user2")
+	request := &kolide.PasswordResetRequest{
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		ExpiresAt: time.Now().Add(time.Hour * 24),
+		UserID:    user1.ID,
+		Token:     "abcd",
+	}
+	_, err := ds.NewPasswordResetRequest(request)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	var passwordChangeTests = []struct {
-		username    string
 		token       string
 		newPassword string
-		err         error
+		vc          *viewerContext
+		wantErr     interface{}
+		user        *kolide.User
+		// what resource are we editing
+		requestID uint
 	}{
-		{
-			username:    "admin1",
+		{ // all good
+			requestID:   user1.ID,
 			token:       "abcd",
+			vc:          emptyVC(),
+			newPassword: "123cat!",
+		},
+		{ // bad token
+			requestID:   user1.ID,
+			token:       "dcba",
+			vc:          emptyVC(),
+			newPassword: "123cat!",
+			wantErr:     "resource not found",
+		},
+		{ // missing token
+			requestID:   user1.ID,
+			vc:          emptyVC(),
+			newPassword: "123cat!",
+			wantErr:     "argument invalid or missing: token",
+		},
+		{
+			requestID:   user1.ID,
+			vc:          &viewerContext{user: user1},
+			newPassword: "123cat!",
+		},
+		{ // missing password
+			requestID: user2.ID,
+			vc:        &viewerContext{user: user2},
+			wantErr:   "argument invalid or missing: password",
+		},
+		{ // no such user
+			requestID:   999,
+			vc:          emptyVC(),
+			token:       "abcd",
+			wantErr:     "resource not found",
 			newPassword: "123cat!",
 		},
 	}
 
-	ctx := context.Background()
-	vc := &viewerContext{
-		user: &kolide.User{
-			Username: "admin1",
-			Enabled:  true,
-			Admin:    true,
-			AdminForcedPasswordReset: true,
-		},
-	}
-	ctx = context.WithValue(ctx, "viewerContext", vc)
 	for _, tt := range passwordChangeTests {
-		user, err := ds.User(tt.username)
-		assert.Nil(t, err)
+		ctx := context.Background()
+		ctx = context.WithValue(ctx, "viewerContext", tt.vc)
 		request := &kolide.PasswordResetRequest{
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 			ExpiresAt: time.Now().Add(time.Hour * 24),
-			UserID:    user.ID,
+			UserID:    tt.ID,
 			Token:     tt.token,
 		}
 		_, err = ds.NewPasswordResetRequest(request)
 		assert.Nil(t, err)
 
-		err = svc.ChangePassword(ctx, user.ID, tt.token, tt.newPassword)
-		assert.Nil(t, err)
+		serr := svc.ChangePassword(ctx, tt.requestID, tt.token, tt.newPassword)
+		assert.Equal(t, tt.wantErr, serr)
 	}
 }
 

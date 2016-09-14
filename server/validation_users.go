@@ -34,7 +34,7 @@ func (mw validationMiddleware) ChangePassword(ctx context.Context, userID uint, 
 	}
 
 	// require token unless an admin forced the password reset
-	if token == "" && !vc.user.AdminForcedPasswordReset {
+	if token == "" && vc.user == nil {
 		return invalidArgumentError{field: "token", required: true}
 	}
 
