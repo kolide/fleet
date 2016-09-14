@@ -84,7 +84,7 @@ func attachAPIRoutes(router *mux.Router, ctx context.Context, svc kolide.Service
 	router.Handle("/api/v1/kolide/users/{id}/password",
 		kithttp.NewServer(
 			ctx,
-			authenticated(canModifyUser(makeChangePasswordEndpoint(svc))),
+			canResetPassword(makeChangePasswordEndpoint(svc)),
 			decodeChangePasswordRequest,
 			encodeResponse,
 			opts...,

@@ -47,7 +47,10 @@ type PasswordResetRequest struct {
 }
 
 const passwordResetTemplate = `
-Your password reset token is {{.Token}}`
+Your requested a password reset, 
+Follow the link below to reset your password:
+http://localhost:8080/passwordreset?user_id={{.UserID}}&token={{.Token}}
+`
 
 func (r PasswordResetRequest) Message() ([]byte, error) {
 	var msg bytes.Buffer

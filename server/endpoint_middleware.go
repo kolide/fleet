@@ -78,6 +78,26 @@ func canModifyUser(next endpoint.Endpoint) endpoint.Endpoint {
 	}
 }
 
+func canResetPassword(next endpoint.Endpoint) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		r := request.(changePasswordRequest)
+		vc, err := viewerContextFromContext(ctx)
+		if err != nil {
+			return nil, err
+		}
+		// is logged in, must be able to perform actions
+		if vc.IsLoggedIn() {
+			return authenticated(canPerformActions(next))(ctx, request)
+		}
+		// unauthenticated and no token
+		if !vc.IsLoggedIn() && r.PasswordResetToken == "" {
+			return nil, forbiddenError{message: "no token in password reset request"}
+		}
+		// unauthenticated but token is preset
+		return next(ctx, request)
+	}
+}
+
 type permission int
 
 const (

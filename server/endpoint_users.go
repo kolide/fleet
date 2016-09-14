@@ -122,8 +122,8 @@ func makeListUsersEndpoint(svc kolide.Service) endpoint.Endpoint {
 ////////////////////////////////////////////////////////////////////////////////
 
 type changePasswordRequest struct {
-	UserID             uint `json:"user_id"`
-	PasswordResetToken string
+	UserID             uint   `json:"user_id"`
+	PasswordResetToken string `json:"password_reset_token"`
 	NewPassword        string `json:"new_password"`
 }
 

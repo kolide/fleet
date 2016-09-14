@@ -27,7 +27,6 @@ func (mw validationMiddleware) NewUser(ctx context.Context, p kolide.UserPayload
 }
 
 func (mw validationMiddleware) ChangePassword(ctx context.Context, userID uint, token, password string) error {
-
 	vc, err := viewerContextFromContext(ctx)
 	if err != nil {
 		return err
