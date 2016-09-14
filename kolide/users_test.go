@@ -23,7 +23,7 @@ func TestValidatePassword(t *testing.T) {
 	for _, tt := range passwordTests {
 		user := newTestUser(t, tt.Username, tt.Password, tt.Email)
 
-		err = user.ValidatePassword(tt.Password)
+		err := user.ValidatePassword(tt.Password)
 		assert.Nil(t, err)
 
 		err = user.ValidatePassword("different")

@@ -60,7 +60,7 @@ func TestRequestPasswordReset(t *testing.T) {
 			emailFn: errEmailFn,
 			user:    user1,
 			vc:      emptyVC(),
-			wantErr: "test err",
+			wantErr: errors.New("test err"),
 		},
 	}
 
@@ -76,8 +76,7 @@ func TestRequestPasswordReset(t *testing.T) {
 			svc.mailService = mailer
 
 			serviceErr := svc.RequestPasswordReset(ctx, tt.email)
-			err := matchErr(serviceErr, tt.wantErr)
-			assert.NoError(st, err)
+			assert.Equal(t, tt.wantErr, serviceErr)
 			if tt.vc.IsAdmin() {
 				assert.False(st, mailer.Invoked, "email should not be sent if reset requested by admin")
 				assert.True(st, tt.user.AdminForcedPasswordReset, "AdminForcedPasswordReset should be true if reset requested by admin")
@@ -85,7 +84,7 @@ func TestRequestPasswordReset(t *testing.T) {
 				assert.True(st, mailer.Invoked, "email should be sent if vc is not admin")
 				if serviceErr == nil {
 					req, err := ds.FindPassswordResetsByUserID(tt.user.ID)
-					assert.NoError(st, err)
+					assert.Nil(st, err)
 					assert.NotEmpty(st, req, "user should have at least one password reset request")
 				}
 			}
@@ -190,16 +189,16 @@ func TestChangeUserPassword(t *testing.T) {
 		},
 		{ // bad token
 			requestID:   user1.ID,
-			token:       "dcba",
+			token:       "dcbaz",
 			vc:          emptyVC(),
 			newPassword: "123cat!",
-			wantErr:     "resource not found",
+			wantErr:     datastore.ErrNotFound,
 		},
 		{ // missing token
 			requestID:   user1.ID,
 			vc:          emptyVC(),
 			newPassword: "123cat!",
-			wantErr:     "argument invalid or missing: token",
+			wantErr:     invalidArgumentError{field: "token", required: true},
 		},
 		{
 			requestID:   user1.ID,
@@ -209,13 +208,13 @@ func TestChangeUserPassword(t *testing.T) {
 		{ // missing password
 			requestID: user2.ID,
 			vc:        &viewerContext{user: user2},
-			wantErr:   "argument invalid or missing: password",
+			wantErr:   invalidArgumentError{field: "password", required: true},
 		},
 		{ // no such user
 			requestID:   999,
 			vc:          emptyVC(),
 			token:       "abcd",
-			wantErr:     "resource not found",
+			wantErr:     datastore.ErrNotFound,
 			newPassword: "123cat!",
 		},
 	}
@@ -227,8 +226,8 @@ func TestChangeUserPassword(t *testing.T) {
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 			ExpiresAt: time.Now().Add(time.Hour * 24),
-			UserID:    tt.ID,
-			Token:     tt.token,
+			UserID:    tt.requestID,
+			Token:     "abcd",
 		}
 		_, err = ds.NewPasswordResetRequest(request)
 		assert.Nil(t, err)

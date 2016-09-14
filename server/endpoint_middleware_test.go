@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/drone/drone/store/datastore"
 	"github.com/go-kit/kit/endpoint"
+	"github.com/kolide/kolide-ose/datastore"
 	"github.com/kolide/kolide-ose/kolide"
 	"github.com/stretchr/testify/assert"
 )
@@ -53,7 +53,7 @@ func TestEndpointPermissions(t *testing.T) {
 		{
 			endpoint: mustBeAdmin(e),
 			vc:       &viewerContext{user: user1},
-			wantErr:  forbiddenError{"must be an admin"},
+			wantErr:  forbiddenError{message: "must be an admin"},
 		},
 		{
 			endpoint: canModifyUser(e),
@@ -90,7 +90,7 @@ func TestEndpointPermissions(t *testing.T) {
 			endpoint: validateModifyUserRequest(e),
 			request:  modifyUserRequest{payload: kolide.UserPayload{Enabled: boolPtr(true)}},
 			vc:       &viewerContext{user: user1},
-			wantErr:  "must be an admin",
+			wantErr:  forbiddenError{message: "must be an admin"},
 		},
 		{
 			endpoint: canResetPassword(e),
@@ -108,14 +108,14 @@ func TestEndpointPermissions(t *testing.T) {
 			requestID: user2.ID,
 			vc:        &viewerContext{user: user1},
 			request:   changePasswordRequest{},
-			wantErr:   "unauthorized: can only reset own password",
+			wantErr:   forbiddenError{message: "can only reset own password"},
 		},
 		{ // check with disabled user
 			endpoint:  canResetPassword(e),
 			requestID: user2.ID,
 			vc:        &viewerContext{user: user2},
 			request:   changePasswordRequest{},
-			wantErr:   "must be logged in",
+			wantErr:   forbiddenError{message: "must be logged in"},
 		},
 	}
 
@@ -137,7 +137,10 @@ func TestEndpointPermissions(t *testing.T) {
 				request = req
 			}
 			_, eerr := tt.endpoint(ctx, request)
-			assert.Equal(st, tt.wantErr, eerr)
+			assert.IsType(t, tt.wantErr, eerr)
+			if ferr, ok := eerr.(forbiddenError); ok {
+				assert.Equal(t, tt.wantErr.(forbiddenError).message, ferr.message)
+			}
 		})
 	}
 }
