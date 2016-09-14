@@ -27,12 +27,16 @@ func (mw validationMiddleware) NewUser(ctx context.Context, p kolide.UserPayload
 }
 
 func (mw validationMiddleware) ChangePassword(ctx context.Context, userID uint, token, password string) error {
-	vc, err := viewerContextFromContext(ctx)
-	if err != nil {
-		return err
-	}
-	if token == "" && !vc.user.AdminForcedPasswordReset {
-		return invalidArgumentError{field: "token", required: true}
+
+	if token == "" {
+		// if token was not provided check that this is a logged in user
+		vc, err := viewerContextFromContext(ctx)
+		if err != nil {
+			return err
+		}
+		if !vc.user.AdminForcedPasswordReset {
+			return invalidArgumentError{field: "token", required: true}
+		}
 	}
 
 	if password == "" {

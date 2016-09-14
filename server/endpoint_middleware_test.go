@@ -1,19 +1,19 @@
 package server
 
 import (
+	"context"
 	"testing"
 
+	"github.com/drone/drone/store/datastore"
 	"github.com/go-kit/kit/endpoint"
-	"github.com/kolide/kolide-ose/datastore"
+	"github.com/kolide/kolide-ose/kolide"
 	"github.com/stretchr/testify/assert"
-	"golang.org/x/net/context"
 )
 
 // TestEndpointPermissions tests that
 // the endpoint.Middleware correctly grants or denies
 // permissions to access or modify resources
 func TestEndpointPermissions(t *testing.T) {
-	ctx := context.Background()
 	req := struct{}{}
 	ds, _ := datastore.New("inmem", "")
 	createTestUsers(t, ds)
@@ -31,6 +31,8 @@ func TestEndpointPermissions(t *testing.T) {
 		requestID uint
 		// what error to expect
 		wantErr interface{}
+		// custom request struct
+		request interface{}
 	}{
 		{
 			endpoint: mustBeAdmin(e),
@@ -79,16 +81,49 @@ func TestEndpointPermissions(t *testing.T) {
 			requestID: admin1.ID,
 			wantErr:   forbiddenError{message: "no read permissions on user"},
 		},
+		{
+			endpoint: validateModifyUserRequest(e),
+			request:  modifyUserRequest{},
+			wantErr:  errNoContext,
+		},
+		{
+			endpoint: validateModifyUserRequest(e),
+			request:  modifyUserRequest{payload: kolide.UserPayload{Enabled: boolPtr(true)}},
+			vc:       &viewerContext{user: user1},
+			wantErr:  "must be an admin",
+		},
+		{
+			endpoint: canResetPassword(e),
+			request:  changePasswordRequest{},
+		},
+		{
+			endpoint: canResetPassword(e),
+			vc:       &viewerContext{user: user1},
+			request:  changePasswordRequest{},
+		},
+		{
+			endpoint: canResetPassword(e),
+			vc:       &viewerContext{user: user2},
+			request:  changePasswordRequest{},
+			wantErr:  "must be logged in",
+		},
 	}
 
-	for _, tt := range endpointTests {
+	for i, tt := range endpointTests {
+		ctx := context.Background()
 		if tt.vc != nil {
 			ctx = context.WithValue(ctx, "viewerContext", tt.vc)
 		}
 		if tt.requestID != 0 {
 			ctx = context.WithValue(ctx, "request-id", tt.requestID)
 		}
-		_, eerr := tt.endpoint(ctx, req)
+		var request interface{}
+		if tt.request != nil {
+			request = tt.request
+		} else {
+			request = req
+		}
+		_, eerr := tt.endpoint(ctx, request)
 		assert.Equal(t, tt.wantErr, eerr)
 	}
 }

@@ -85,13 +85,9 @@ func (svc service) ChangePassword(ctx context.Context, userID uint, token, passw
 	if err != nil {
 		return err
 	}
-	vc, err := viewerContextFromContext(ctx)
-	if err != nil {
-		return err
-	}
 
 	// check that the token exists in the datastore
-	if token != "" && !vc.IsLoggedIn() {
+	if token != "" {
 		_, err := svc.ds.FindPassswordResetByTokenAndUserID(token, userID)
 		if err != nil {
 			return err

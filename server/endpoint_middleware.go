@@ -80,21 +80,19 @@ func canModifyUser(next endpoint.Endpoint) endpoint.Endpoint {
 
 func canResetPassword(next endpoint.Endpoint) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		r := request.(changePasswordRequest)
-		vc, err := viewerContextFromContext(ctx)
-		if err != nil {
-			return nil, err
-		}
-		// is logged in, must be able to perform actions
-		if vc.IsLoggedIn() {
+		_, err := viewerContextFromContext(ctx)
+		switch err {
+		case nil:
+			// authenticated
 			return authenticated(canPerformActions(next))(ctx, request)
+		case errNoContext:
+			// not authenticated
+			return next(ctx, request)
+		default:
+			// something went wrong
+			return nil, err
+
 		}
-		// unauthenticated and no token
-		if !vc.IsLoggedIn() && r.PasswordResetToken == "" {
-			return nil, forbiddenError{message: "no token in password reset request"}
-		}
-		// unauthenticated but token is preset
-		return next(ctx, request)
 	}
 }
 
@@ -127,7 +125,7 @@ func validateModifyUserRequest(next endpoint.Endpoint) endpoint.Endpoint {
 		// check if any fields which the user can update themselves were set
 		if fields, ok := must[self]; ok {
 			if !vc.CanPerformWriteActionOnUser(uid) {
-				return nil, forbiddenError{message: "no write permissiosn on user", fields: fields}
+				return nil, forbiddenError{message: "no write permission on user", fields: fields}
 			}
 		}
 

@@ -102,10 +102,6 @@ func TestChangeUserPassword(t *testing.T) {
 	}
 	ctx = context.WithValue(ctx, "viewerContext", vc)
 	for _, tt := range passwordChangeTests {
-		token, err := generateRandomText(10)
-		if err != nil {
-			t.Fatal(err)
-		}
 		user, err := ds.User(tt.username)
 		assert.Nil(t, err)
 		request := &kolide.PasswordResetRequest{
@@ -113,7 +109,7 @@ func TestChangeUserPassword(t *testing.T) {
 			UpdatedAt: time.Now(),
 			ExpiresAt: time.Now().Add(time.Hour * 24),
 			UserID:    user.ID,
-			Token:     token,
+			Token:     tt.token,
 		}
 		_, err = ds.NewPasswordResetRequest(request)
 		assert.Nil(t, err)
