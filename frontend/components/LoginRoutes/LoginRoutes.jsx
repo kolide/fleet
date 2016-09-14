@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import componentStyles from './styles';
-import { loadBackground, resizeBackground } from '../../utilities/backgroundImage';
+import { loadBackground, removeBackground, resizeBackground } from '../../utilities/backgroundImage';
 
 export class LoginRoutes extends Component {
   static propTypes = {
@@ -12,6 +12,10 @@ export class LoginRoutes extends Component {
 
     loadBackground();
     window.onresize = resizeBackground;
+  }
+
+  componentWillUnmount () {
+    removeBackground();
   }
 
   render () {
