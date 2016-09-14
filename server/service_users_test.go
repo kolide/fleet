@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"testing"
 	"time"
 
@@ -11,6 +12,92 @@ import (
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
 )
+
+func TestRequestPasswordReset(t *testing.T) {
+	ds, _ := datastore.New("inmem", "")
+	createTestUsers(t, ds)
+	admin1, _ := ds.User("admin1")
+	user1, _ := ds.User("user1")
+	// user2, _ := ds.User("user2")
+	var defaultEmailFn = func(e kolide.Email) error {
+		return nil
+	}
+	var errEmailFn = func(e kolide.Email) error {
+		return errors.New("test err")
+	}
+	svc := service{ds: ds,
+		smtpTokenKeySize: 10,
+	}
+
+	var requestPasswordResetTests = []struct {
+		email   string
+		emailFn func(e kolide.Email) error
+		wantErr interface{}
+		user    *kolide.User
+		vc      *viewerContext
+	}{
+		{
+			email:   admin1.Email,
+			emailFn: defaultEmailFn,
+			user:    admin1,
+			vc:      &viewerContext{user: admin1},
+		},
+		{
+			email:   admin1.Email,
+			emailFn: defaultEmailFn,
+			user:    admin1,
+			vc:      emptyVC(),
+		},
+		{
+			email:   user1.Email,
+			emailFn: defaultEmailFn,
+			user:    user1,
+			vc:      &viewerContext{user: admin1},
+		},
+		{
+			email:   admin1.Email,
+			emailFn: errEmailFn,
+			user:    user1,
+			vc:      emptyVC(),
+			wantErr: "test err",
+		},
+	}
+
+	for i, tt := range requestPasswordResetTests {
+		ctx := context.Background()
+		if tt.vc != nil {
+			ctx = context.WithValue(ctx, "viewerContext", tt.vc)
+		}
+		mailer := &mockMailSvc{SendEmailFn: tt.emailFn}
+		svc.mailService = mailer
+		serr := svc.RequestPasswordReset(ctx, tt.email)
+		if err := matchErr(serr, tt.wantErr); err != nil {
+			t.Errorf("test id %d failed with %v", i, err)
+		}
+		if tt.vc.IsAdmin() {
+			if have, want := mailer.Invoked, false; have != want {
+				t.Errorf("test id %d sentEmail: have: %v, want: %v", i, have, want)
+			}
+			if have, want := tt.user.AdminForcedPasswordReset, true; have != want {
+				t.Errorf("test id %d AdminForcedPasswordReset: have: %v, want: %v", i, have, want)
+			}
+		} else {
+			if have, want := mailer.Invoked, true; have != want {
+				t.Errorf("test id %d sentEmail: have: %v, want: %v", i, have, want)
+			}
+
+			if serr == nil {
+				req, err := ds.FindPassswordResetsByUserID(tt.user.ID)
+				if err != nil {
+					t.Fatalf("expected password reset request, got err: %q", err)
+				}
+				if len(req) == 0 {
+					t.Errorf("expected at least one password request token, got 0")
+				}
+			}
+		}
+	}
+}
 
 func TestCreateUser(t *testing.T) {
 	ds, _ := datastore.New("inmem", "")
@@ -155,6 +242,16 @@ func TestChangeUserPassword(t *testing.T) {
 		serr := svc.ChangePassword(ctx, tt.requestID, tt.token, tt.newPassword)
 		assert.Equal(t, tt.wantErr, serr)
 	}
+}
+
+type mockMailSvc struct {
+	SendEmailFn func(e kolide.Email) error
+	Invoked     bool
+}
+
+func (svc *mockMailSvc) SendEmail(e kolide.Email) error {
+	svc.Invoked = true
+	return svc.SendEmailFn(e)
 }
 
 var testUsers = map[string]kolide.UserPayload{
