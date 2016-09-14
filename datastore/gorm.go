@@ -42,6 +42,16 @@ type gormDB struct {
 	config config.KolideConfig
 }
 
+func GetMysqlConnectionString(conf config.MysqlConfig) string {
+	return fmt.Sprintf(
+		"%s:%s@(%s)/%s?charset=utf8&parseTime=True&loc=Local",
+		conf.Username,
+		conf.Password,
+		conf.Address,
+		conf.Database,
+	)
+}
+
 func (orm gormDB) Name() string {
 	return "gorm"
 }
