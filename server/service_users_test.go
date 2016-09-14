@@ -63,39 +63,32 @@ func TestRequestPasswordReset(t *testing.T) {
 		},
 	}
 
-	for i, tt := range requestPasswordResetTests {
-		ctx := context.Background()
-		if tt.vc != nil {
-			ctx = context.WithValue(ctx, "viewerContext", tt.vc)
-		}
-		mailer := &mockMailSvc{SendEmailFn: tt.emailFn}
-		svc.mailService = mailer
-		serr := svc.RequestPasswordReset(ctx, tt.email)
-		if err := matchErr(serr, tt.wantErr); err != nil {
-			t.Errorf("test id %d failed with %v", i, err)
-		}
-		if tt.vc.IsAdmin() {
-			if have, want := mailer.Invoked, false; have != want {
-				t.Errorf("test id %d sentEmail: have: %v, want: %v", i, have, want)
+	for _, tt := range requestPasswordResetTests {
+		tt := tt
+		t.Run("", func(st *testing.T) {
+			st.Parallel()
+			ctx := context.Background()
+			if tt.vc != nil {
+				ctx = context.WithValue(ctx, "viewerContext", tt.vc)
 			}
-			if have, want := tt.user.AdminForcedPasswordReset, true; have != want {
-				t.Errorf("test id %d AdminForcedPasswordReset: have: %v, want: %v", i, have, want)
-			}
-		} else {
-			if have, want := mailer.Invoked, true; have != want {
-				t.Errorf("test id %d sentEmail: have: %v, want: %v", i, have, want)
-			}
+			mailer := &mockMailSvc{SendEmailFn: tt.emailFn}
+			svc.mailService = mailer
 
-			if serr == nil {
-				req, err := ds.FindPassswordResetsByUserID(tt.user.ID)
-				if err != nil {
-					t.Fatalf("expected password reset request, got err: %q", err)
-				}
-				if len(req) == 0 {
-					t.Errorf("expected at least one password request token, got 0")
+			serviceErr := svc.RequestPasswordReset(ctx, tt.email)
+			err := matchErr(serviceErr, tt.wantErr)
+			assert.NoError(st, err)
+			if tt.vc.IsAdmin() {
+				assert.False(st, mailer.Invoked, "email should not be sent if reset requested by admin")
+				assert.True(st, tt.user.AdminForcedPasswordReset, "AdminForcedPasswordReset should be true if reset requested by admin")
+			} else {
+				assert.True(st, mailer.Invoked, "email should be sent if vc is not admin")
+				if serviceErr == nil {
+					req, err := ds.FindPassswordResetsByUserID(tt.user.ID)
+					assert.NoError(st, err)
+					assert.NotEmpty(st, req, "user should have at least one password reset request")
 				}
 			}
-		}
+		})
 	}
 }
 
