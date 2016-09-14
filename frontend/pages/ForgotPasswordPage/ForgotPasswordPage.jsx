@@ -4,10 +4,12 @@ import { noop } from 'lodash';
 import componentStyles from './styles';
 import { forgotPasswordAction } from '../../redux/nodes/components/ForgotPasswordPage/actions';
 import ForgotPasswordForm from '../../components/forms/ForgotPasswordForm';
+import Icon from '../../components/icons/Icon';
 
-class ForgotPasswordPage extends Component {
+export class ForgotPasswordPage extends Component {
   static propTypes = {
     dispatch: PropTypes.func,
+    email: PropTypes.string,
   };
 
   static defaultProps = {
@@ -18,6 +20,37 @@ class ForgotPasswordPage extends Component {
     const { dispatch } = this.props;
 
     return dispatch(forgotPasswordAction(formData));
+  }
+
+  renderContent = () => {
+    const { email } = this.props;
+    const {
+      emailSentButtonWrapperStyles,
+      emailSentIconStyles,
+      emailSentTextStyles,
+      emailSentTextWrapperStyles,
+      emailTextStyles,
+    } = componentStyles;
+
+    if (email) {
+      return (
+        <div>
+          <div style={emailSentTextWrapperStyles}>
+            <p style={emailSentTextStyles}>
+              An email was sent to
+              <span style={emailTextStyles}> {email}</span>.
+               Click the link on the email to proceed with the password reset process.
+            </p>
+          </div>
+          <div style={emailSentButtonWrapperStyles}>
+            <Icon name="check" style={emailSentIconStyles} />
+            EMAIL SENT
+          </div>
+        </div>
+      );
+    }
+
+    return <ForgotPasswordForm onSubmit={this.onSubmit} />;
   }
 
   render () {
@@ -37,7 +70,7 @@ class ForgotPasswordPage extends Component {
         <div style={forgotPasswordStyles}>
           <p style={headerStyles}>Forgot Password</p>
           <p style={textStyles}>If you’ve forgotten your password enter your email below and we will email you a link so that you can reset your password.</p>
-          <ForgotPasswordForm onSubmit={this.onSubmit} />
+          {this.renderContent()}
         </div>
       </div>
     );
