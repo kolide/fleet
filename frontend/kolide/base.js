@@ -41,14 +41,19 @@ class Base {
       body,
     })
       .then(response => {
-        if (response.ok) {
-          return response.json();
-        }
+        return response.json()
+          .then(jsonResponse => {
+            if (response.ok) {
+              return jsonResponse;
+            }
 
-        const error = new Error(response.statusText);
-        error.response = response;
+            const error = new Error(response.statusText);
+            error.response = jsonResponse;
+            error.message = jsonResponse;
+            error.error = jsonResponse.error;
 
-        throw error;
+            throw error;
+          });
       });
   }
 }
