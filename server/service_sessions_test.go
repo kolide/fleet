@@ -42,7 +42,7 @@ func TestAuthenticate(t *testing.T) {
 
 }
 
-var setupLoginTests = func(t *testing.T) (kolide.Service, kolide.UserPayload, kolide.User) {
+func setupLoginTests(t *testing.T) (kolide.Service, kolide.UserPayload, kolide.User) {
 	ds, err := datastore.New("gorm-sqlite3", ":memory:")
 	assert.Nil(t, err)
 
