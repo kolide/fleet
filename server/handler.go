@@ -54,7 +54,7 @@ func attachAPIRoutes(router *mux.Router, ctx context.Context, svc kolide.Service
 	router.Handle("/api/v1/kolide/me",
 		kithttp.NewServer(
 			ctx,
-			makeGetSessionOwnerAccount(),
+			makeGetSessionOwner(),
 			decodeNoParamsRequest,
 			encodeResponse,
 			opts...,
