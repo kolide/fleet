@@ -78,25 +78,6 @@ func canModifyUser(next endpoint.Endpoint) endpoint.Endpoint {
 	}
 }
 
-// canResetPassword allow request to go through if not logged in
-// otherwise pass to authenticated middleware first
-func canResetPassword(next endpoint.Endpoint) endpoint.Endpoint {
-	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		vc, err := viewerContextFromContext(ctx)
-		if err != nil {
-			return nil, err
-		}
-		if vc.user == nil {
-			return next(ctx, request)
-		}
-		uid := requestUserIDFromContext(ctx)
-		if vc.user.ID != uid {
-			return nil, forbiddenError{message: "can only reset own password"}
-		}
-		return authenticated(canPerformActions(next))(ctx, request)
-	}
-}
-
 type permission int
 
 const (
@@ -127,6 +108,17 @@ func validateModifyUserRequest(next endpoint.Endpoint) endpoint.Endpoint {
 		if fields, ok := must[self]; ok {
 			if !vc.CanPerformWriteActionOnUser(uid) {
 				return nil, forbiddenError{message: "no write permission on user", fields: fields}
+			}
+		}
+
+		// check password reset permissions
+		// must be either self or an admin
+		if p.Password != nil {
+			if vc.IsUserID(uid) || vc.IsAdmin() {
+				return nil, forbiddenError{
+					message: "must be your own account or an admin",
+					fields:  []string{"password"},
+				}
 			}
 		}
 

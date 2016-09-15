@@ -56,10 +56,9 @@ func TestDecodeChangePasswordRequest(t *testing.T) {
 		r, err := decodeChangePasswordRequest(context.Background(), request)
 		assert.Nil(t, err)
 
-		params := r.(changePasswordRequest)
+		params := r.(resetPasswordRequest)
 		assert.Equal(t, "bar", params.NewPassword)
 		assert.Equal(t, "baz", params.PasswordResetToken)
-		assert.Equal(t, uint(1), params.UserID)
 	}).Methods("POST")
 
 	var body bytes.Buffer

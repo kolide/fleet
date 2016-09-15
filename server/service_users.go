@@ -51,16 +51,32 @@ func (svc service) ModifyUser(ctx context.Context, userID uint, p kolide.UserPay
 		user.Enabled = *p.Enabled
 	}
 
-	if p.AdminForcedPasswordReset != nil {
-		user.AdminForcedPasswordReset = *p.AdminForcedPasswordReset
-	}
-
 	if p.Position != nil {
 		user.Position = *p.Position
 	}
 
 	if p.GravatarURL != nil {
 		user.GravatarURL = *p.GravatarURL
+	}
+
+	if p.AdminForcedPasswordReset != nil {
+		err = svc.RequestPasswordReset(ctx, user.Email)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if p.Password != nil {
+		hashed, salt, err := hashPassword(
+			*p.Password,
+			svc.config.Auth.SaltKeySize,
+			svc.config.Auth.BcryptCost,
+		)
+		if err != nil {
+			return nil, err
+		}
+		user.Password = hashed
+		user.Salt = salt
 	}
 
 	err = svc.saveUser(user)
@@ -80,18 +96,14 @@ func (svc service) Users(ctx context.Context) ([]*kolide.User, error) {
 	return svc.ds.Users()
 }
 
-func (svc service) ChangePassword(ctx context.Context, userID uint, token, password string) error {
-	user, err := svc.User(ctx, userID)
+func (svc service) ResetPassword(ctx context.Context, token, password string) error {
+	reset, err := svc.ds.FindPassswordResetByToken(token)
 	if err != nil {
 		return err
 	}
-
-	// check that the token exists in the datastore
-	if token != "" {
-		_, err := svc.ds.FindPassswordResetByTokenAndUserID(token, userID)
-		if err != nil {
-			return err
-		}
+	user, err := svc.User(ctx, reset.UserID)
+	if err != nil {
+		return err
 	}
 
 	hashed, salt, err := hashPassword(password, svc.config.Auth.SaltKeySize, svc.config.Auth.BcryptCost)
@@ -127,7 +139,6 @@ func (svc service) RequestPasswordReset(ctx context.Context, email string) error
 		return err
 	}
 
-	// if user is an admin
 	if vc.IsAdmin() {
 		user.AdminForcedPasswordReset = true
 		if err := svc.saveUser(user); err != nil {
@@ -139,7 +150,6 @@ func (svc service) RequestPasswordReset(ctx context.Context, email string) error
 		return nil
 	}
 
-	// self or logged out user
 	token, err := generateRandomText(svc.config.SMTP.TokenKeySize)
 	if err != nil {
 		return err

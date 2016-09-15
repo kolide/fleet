@@ -29,15 +29,15 @@ type UserService interface {
 	// Users returns all users
 	Users(ctx context.Context) ([]*User, error)
 
-	// ChangePassword updates a User's password if the old password using either
-	// a password change token or an old password
-	ChangePassword(ctx context.Context, userID uint, token, password string) error
-
 	// RequestPasswordReset generates a password reset request for
 	// a user. The request results in a token emailed to the user.
 	// If the person making the request is an admin the AdminForcedPasswordReset
 	// parameter is enabled instead of sending an email with a password reset token
 	RequestPasswordReset(ctx context.Context, email string) error
+
+	// ResetPassword validate a password reset token and updates
+	// a user's password
+	ResetPassword(ctx context.Context, token, password string) error
 
 	// ModifyUser updates a user's parameters given a UserPayload
 	ModifyUser(ctx context.Context, userID uint, p UserPayload) (*User, error)

@@ -118,26 +118,25 @@ func makeListUsersEndpoint(svc kolide.Service) endpoint.Endpoint {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Change Password
+// Reset Password
 ////////////////////////////////////////////////////////////////////////////////
 
-type changePasswordRequest struct {
-	UserID             uint   `json:"user_id"`
+type resetPasswordRequest struct {
 	PasswordResetToken string `json:"password_reset_token"`
 	NewPassword        string `json:"new_password"`
 }
 
-type changePasswordResponse struct {
+type resetPasswordResponse struct {
 	Err error `json:"error,omitempty"`
 }
 
-func (r changePasswordResponse) error() error { return r.Err }
+func (r resetPasswordResponse) error() error { return r.Err }
 
-func makeChangePasswordEndpoint(svc kolide.Service) endpoint.Endpoint {
+func makeResetPasswordEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(changePasswordRequest)
-		err := svc.ChangePassword(ctx, req.UserID, req.PasswordResetToken, req.NewPassword)
-		return changePasswordResponse{Err: err}, nil
+		req := request.(resetPasswordRequest)
+		err := svc.ResetPassword(ctx, req.PasswordResetToken, req.NewPassword)
+		return resetPasswordResponse{Err: err}, nil
 	}
 }
 
@@ -183,23 +182,27 @@ func makeModifyUserEndpoint(svc kolide.Service) endpoint.Endpoint {
 	}
 }
 
-type passwordResetRequest struct {
+////////////////////////////////////////////////////////////////////////////////
+// Forgot Password
+////////////////////////////////////////////////////////////////////////////////
+
+type forgotPasswordRequest struct {
 	Email string `json:"email"`
 }
 
-type passwordResetResponse struct {
+type forgotPasswordResponse struct {
 	Err error `json:"error,omitempty"`
 }
 
-func (r passwordResetResponse) error() error { return r.Err }
+func (r forgotPasswordResponse) error() error { return r.Err }
 
-func makePasswordResetEndpoint(svc kolide.Service) endpoint.Endpoint {
+func makeForgotPasswordEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(passwordResetRequest)
+		req := request.(forgotPasswordRequest)
 		err := svc.RequestPasswordReset(ctx, req.Email)
 		if err != nil {
-			return passwordResetResponse{Err: err}, nil
+			return forgotPasswordResponse{Err: err}, nil
 		}
-		return passwordResetResponse{}, nil
+		return forgotPasswordResponse{}, nil
 	}
 }

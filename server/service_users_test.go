@@ -2,6 +2,7 @@ package server
 
 import (
 	"errors"
+	"strconv"
 	"testing"
 	"time"
 
@@ -18,7 +19,6 @@ func TestRequestPasswordReset(t *testing.T) {
 	createTestUsers(t, ds)
 	admin1, _ := ds.User("admin1")
 	user1, _ := ds.User("user1")
-	// user2, _ := ds.User("user2")
 	var defaultEmailFn = func(e kolide.Email) error {
 		return nil
 	}
@@ -157,83 +157,44 @@ func TestChangeUserPassword(t *testing.T) {
 	ds, _ := datastore.New("inmem", "")
 	svc, _ := NewService(ds, kitlog.NewNopLogger(), config.TestConfig(), nil)
 	createTestUsers(t, ds)
-	// admin1, _ := ds.User("admin1")
-	user1, _ := ds.User("user1")
-	user2, _ := ds.User("user2")
-	request := &kolide.PasswordResetRequest{
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-		ExpiresAt: time.Now().Add(time.Hour * 24),
-		UserID:    user1.ID,
-		Token:     "abcd",
-	}
-	_, err := ds.NewPasswordResetRequest(request)
-	if err != nil {
-		t.Fatal(err)
-	}
-
 	var passwordChangeTests = []struct {
 		token       string
 		newPassword string
-		vc          *viewerContext
 		wantErr     interface{}
-		user        *kolide.User
-		// what resource are we editing
-		requestID uint
 	}{
 		{ // all good
-			requestID:   user1.ID,
 			token:       "abcd",
-			vc:          emptyVC(),
 			newPassword: "123cat!",
 		},
 		{ // bad token
-			requestID:   user1.ID,
 			token:       "dcbaz",
-			vc:          emptyVC(),
 			newPassword: "123cat!",
 			wantErr:     datastore.ErrNotFound,
 		},
 		{ // missing token
-			requestID:   user1.ID,
-			vc:          emptyVC(),
 			newPassword: "123cat!",
 			wantErr:     invalidArgumentError{field: "token", required: true},
 		},
-		{
-			requestID:   user1.ID,
-			vc:          &viewerContext{user: user1},
-			newPassword: "123cat!",
-		},
 		{ // missing password
-			requestID: user2.ID,
-			vc:        &viewerContext{user: user2},
-			wantErr:   invalidArgumentError{field: "password", required: true},
-		},
-		{ // no such user
-			requestID:   999,
-			vc:          emptyVC(),
-			token:       "abcd",
-			wantErr:     datastore.ErrNotFound,
-			newPassword: "123cat!",
+			token:   "abcd",
+			wantErr: invalidArgumentError{field: "password", required: true},
 		},
 	}
 
-	for _, tt := range passwordChangeTests {
+	for i, tt := range passwordChangeTests {
 		ctx := context.Background()
-		ctx = context.WithValue(ctx, "viewerContext", tt.vc)
 		request := &kolide.PasswordResetRequest{
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 			ExpiresAt: time.Now().Add(time.Hour * 24),
-			UserID:    tt.requestID,
+			UserID:    1,
 			Token:     "abcd",
 		}
-		_, err = ds.NewPasswordResetRequest(request)
+		_, err := ds.NewPasswordResetRequest(request)
 		assert.Nil(t, err)
 
-		serr := svc.ChangePassword(ctx, tt.requestID, tt.token, tt.newPassword)
-		assert.Equal(t, tt.wantErr, serr)
+		serr := svc.ResetPassword(ctx, tt.token, tt.newPassword)
+		assert.Equal(t, tt.wantErr, serr, strconv.Itoa(i))
 	}
 }
 

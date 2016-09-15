@@ -36,11 +36,27 @@ func TestAPIRoutes(t *testing.T) {
 		},
 		{
 			verb: "GET",
+			uri:  "/api/v1/kolide/users",
+		},
+		{
+			verb: "GET",
+			uri:  "/api/v1/kolide/users/1",
+		},
+		{
+			verb: "PATCH",
 			uri:  "/api/v1/kolide/users/1",
 		},
 		{
 			verb: "POST",
-			uri:  "/api/v1/kolide/users/1/password",
+			uri:  "/api/v1/kolide/login",
+		},
+		{
+			verb: "POST",
+			uri:  "/api/v1/kolide/forgot_password",
+		},
+		{
+			verb: "POST",
+			uri:  "/api/v1/kolide/reset_password",
 		},
 		{
 			verb: "GET",

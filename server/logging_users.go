@@ -79,18 +79,17 @@ func (mw loggingMiddleware) User(ctx context.Context, id uint) (user *kolide.Use
 	return
 }
 
-func (mw loggingMiddleware) ChangePassword(ctx context.Context, userID uint, token, password string) (err error) {
+func (mw loggingMiddleware) ResetPassword(ctx context.Context, token, password string) (err error) {
 
 	defer func(begin time.Time) {
 		_ = mw.logger.Log(
 			"method", "ChangePassword",
-			"user_id", userID,
 			"err", err,
 			"took", time.Since(begin),
 		)
 	}(time.Now())
 
-	err = mw.Service.ChangePassword(ctx, userID, token, password)
+	err = mw.Service.ResetPassword(ctx, token, password)
 	return
 }
 

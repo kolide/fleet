@@ -92,31 +92,6 @@ func TestEndpointPermissions(t *testing.T) {
 			vc:       &viewerContext{user: user1},
 			wantErr:  forbiddenError{message: "must be an admin"},
 		},
-		{
-			endpoint: canResetPassword(e),
-			vc:       emptyVC(),
-			request:  changePasswordRequest{},
-		},
-		{
-			endpoint:  canResetPassword(e),
-			vc:        &viewerContext{user: user1},
-			requestID: user1.ID,
-			request:   changePasswordRequest{},
-		},
-		{ // user1 shouldn't have permissions to update user2
-			endpoint:  canResetPassword(e),
-			requestID: user2.ID,
-			vc:        &viewerContext{user: user1},
-			request:   changePasswordRequest{},
-			wantErr:   forbiddenError{message: "can only reset own password"},
-		},
-		{ // check with disabled user
-			endpoint:  canResetPassword(e),
-			requestID: user2.ID,
-			vc:        &viewerContext{user: user2},
-			request:   changePasswordRequest{},
-			wantErr:   forbiddenError{message: "must be logged in"},
-		},
 	}
 
 	for _, tt := range endpointTests {
