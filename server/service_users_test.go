@@ -11,6 +11,7 @@ import (
 	"github.com/kolide/kolide-ose/datastore"
 	"github.com/kolide/kolide-ose/kolide"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
 )
 
@@ -111,7 +112,7 @@ func TestCreateUser(t *testing.T) {
 		{
 			Username: stringPtr("admin1"),
 			Password: stringPtr("foobar"),
-			wantErr:  invalidArgumentError{},
+			wantErr:  invalidArgumentError{field: "email", required: true},
 		},
 		{
 			Username:           stringPtr("admin1"),
@@ -134,7 +135,7 @@ func TestCreateUser(t *testing.T) {
 			Email:              stringPtr("admin1@example.com"),
 			NeedsPasswordReset: boolPtr(true),
 			Admin:              boolPtr(false),
-			wantErr:            invalidArgumentError{},
+			wantErr:            invalidArgumentError{field: "username", required: true},
 		},
 	}
 
@@ -147,8 +148,10 @@ func TestCreateUser(t *testing.T) {
 			AdminForcedPasswordReset: tt.NeedsPasswordReset,
 		}
 		user, err := svc.NewUser(ctx, payload)
+		require.Equal(t, tt.wantErr, err)
 		if err != nil {
-			assert.IsType(t, tt.wantErr, err)
+			// you'd think that require would t.Fatal the test here,
+			// but it does not and the test panics
 			continue
 		}
 
