@@ -86,6 +86,27 @@ func makeGetUserEndpoint(svc kolide.Service) endpoint.Endpoint {
 	}
 }
 
+// returns back the account of the viewer context
+func makeGetSessionOwnerAccount() endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		vc, err := viewerContextFromContext(ctx)
+		if err != nil {
+			return nil, err
+		}
+		if !vc.IsLoggedIn() {
+			return getUserResponse{Err: forbiddenError{message: "must be logged in"}}, nil
+		}
+		return getUserResponse{
+			ID:                       vc.user.ID,
+			Username:                 vc.user.Username,
+			Email:                    vc.user.Email,
+			Admin:                    vc.user.Admin,
+			Enabled:                  vc.user.Enabled,
+			AdminForcedPasswordReset: vc.user.AdminForcedPasswordReset,
+		}, nil
+	}
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // List Users
 ////////////////////////////////////////////////////////////////////////////////
