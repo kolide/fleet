@@ -42,17 +42,17 @@ func TestAuthenticate(t *testing.T) {
 			assert.NotEmpty(st, token)
 
 			sessions, err := svc.GetInfoAboutSessionsForUser(ctx, user.ID)
-			require.Nil(t, err)
-			require.Len(t, sessions, 1, "user should have one session")
+			require.Nil(st, err)
+			require.Len(st, sessions, 1, "user should have one session")
 			session := sessions[0]
-			assert.Equal(t, user.ID, session.UserID)
-			assert.WithinDuration(t, time.Now(), session.AccessedAt, 3*time.Second,
+			assert.Equal(st, user.ID, session.UserID)
+			assert.WithinDuration(st, time.Now(), session.AccessedAt, 3*time.Second,
 				"access time should be set with current time at session creation")
 			oldAccessTime := session.AccessedAt
 
 			session, err = svc.GetSessionByKey(ctx, session.Key)
-			require.Nil(t, err)
-			assert.True(t, session.AccessedAt.After(oldAccessTime), "session access time should be updated")
+			require.Nil(st, err)
+			assert.True(st, session.AccessedAt.After(oldAccessTime), "session access time should be updated")
 
 		})
 	}
