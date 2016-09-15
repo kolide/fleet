@@ -150,8 +150,7 @@ func TestCreateUser(t *testing.T) {
 		user, err := svc.NewUser(ctx, payload)
 		require.Equal(t, tt.wantErr, err)
 		if err != nil {
-			// you'd think that require would t.Fatal the test here,
-			// but it does not and the test panics
+			// skip rest of the test if error is not nil
 			continue
 		}
 
