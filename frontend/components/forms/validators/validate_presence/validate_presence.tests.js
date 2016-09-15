@@ -14,7 +14,7 @@ const invalidInputs = [
   null,
 ];
 
-describe.only('validatePresence - validator', () => {
+describe('validatePresence - validator', () => {
   it('returns true for valid inputs', () => {
     validInputs.forEach(input => {
       expect(validatePresence(input)).toEqual(true);
