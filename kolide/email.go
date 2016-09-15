@@ -18,17 +18,17 @@ type PasswordResetStore interface {
 	FindPassswordResetByTokenAndUserID(token string, id uint) (*PasswordResetRequest, error)
 }
 
-// Campaign is an email campaign
+// Mailer is an email campaign
 // Types which implement the Campaign interface
 // can be marshalled into an email body
-type Campaign interface {
+type Mailer interface {
 	Message() ([]byte, error)
 }
 
 type Email struct {
 	To   []string
 	From string
-	Msg  Campaign
+	Msg  Mailer
 }
 
 type MailService interface {
@@ -49,7 +49,7 @@ type PasswordResetRequest struct {
 const passwordResetTemplate = `
 Your requested a password reset, 
 Follow the link below to reset your password:
-http://localhost:8080/passwordreset?user_id={{.UserID}}&token={{.Token}}
+http://localhost:8080/reset_password?user_id={{.UserID}}&token={{.Token}}
 `
 
 func (r PasswordResetRequest) Message() ([]byte, error) {

@@ -7,12 +7,17 @@ import (
 	"golang.org/x/net/context"
 )
 
-func (mw loggingMiddleware) NewUser(ctx context.Context, p kolide.UserPayload) (user *kolide.User, err error) {
+func (mw loggingMiddleware) NewUser(ctx context.Context, p kolide.UserPayload) (*kolide.User, error) {
+	var (
+		user     *kolide.User
+		err      error
+		username = "none"
+	)
+
 	vc, err := viewerContextFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
-	var username = "none"
 
 	defer func(begin time.Time) {
 		_ = mw.logger.Log(
@@ -29,16 +34,20 @@ func (mw loggingMiddleware) NewUser(ctx context.Context, p kolide.UserPayload) (
 	if user != nil {
 		username = user.Username
 	}
-	return
+	return user, err
 }
 
-func (mw loggingMiddleware) ModifyUser(ctx context.Context, userID uint, p kolide.UserPayload) (user *kolide.User, err error) {
+func (mw loggingMiddleware) ModifyUser(ctx context.Context, userID uint, p kolide.UserPayload) (*kolide.User, error) {
+	var (
+		user     *kolide.User
+		err      error
+		username = "none"
+	)
 
 	vc, err := viewerContextFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
-	var username = "none"
 
 	defer func(begin time.Time) {
 		_ = mw.logger.Log(
@@ -56,11 +65,15 @@ func (mw loggingMiddleware) ModifyUser(ctx context.Context, userID uint, p kolid
 		username = user.Username
 	}
 
-	return
+	return user, err
 }
 
-func (mw loggingMiddleware) User(ctx context.Context, id uint) (user *kolide.User, err error) {
-	var username = "none"
+func (mw loggingMiddleware) User(ctx context.Context, id uint) (*kolide.User, error) {
+	var (
+		user     *kolide.User
+		err      error
+		username = "none"
+	)
 
 	defer func(begin time.Time) {
 		_ = mw.logger.Log(
@@ -76,10 +89,11 @@ func (mw loggingMiddleware) User(ctx context.Context, id uint) (user *kolide.Use
 	if user != nil {
 		username = user.Username
 	}
-	return
+	return user, err
 }
 
-func (mw loggingMiddleware) ResetPassword(ctx context.Context, token, password string) (err error) {
+func (mw loggingMiddleware) ResetPassword(ctx context.Context, token, password string) error {
+	var err error
 
 	defer func(begin time.Time) {
 		_ = mw.logger.Log(
@@ -90,18 +104,18 @@ func (mw loggingMiddleware) ResetPassword(ctx context.Context, token, password s
 	}(time.Now())
 
 	err = mw.Service.ResetPassword(ctx, token, password)
-	return
+	return err
 }
 
-func (mw loggingMiddleware) RequestPasswordReset(ctx context.Context, email string) (err error) {
-
-	requestedBy := "unauthenticated"
-
+func (mw loggingMiddleware) RequestPasswordReset(ctx context.Context, email string) error {
+	var (
+		requestedBy = "unauthenticated"
+		err         error
+	)
 	vc, err := viewerContextFromContext(ctx)
 	if err != nil {
 		return err
 	}
-
 	if vc.IsLoggedIn() {
 		requestedBy = vc.user.Username
 	}
@@ -117,5 +131,5 @@ func (mw loggingMiddleware) RequestPasswordReset(ctx context.Context, email stri
 	}(time.Now())
 
 	err = mw.Service.RequestPasswordReset(ctx, email)
-	return
+	return err
 }

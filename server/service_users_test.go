@@ -15,10 +15,13 @@ import (
 )
 
 func TestRequestPasswordReset(t *testing.T) {
-	ds, _ := datastore.New("inmem", "")
+	ds, err := datastore.New("inmem", "")
+	assert.Nil(t, err)
 	createTestUsers(t, ds)
-	admin1, _ := ds.User("admin1")
-	user1, _ := ds.User("user1")
+	admin1, err := ds.User("admin1")
+	assert.Nil(t, err)
+	user1, err := ds.User("user1")
+	assert.Nil(t, err)
 	var defaultEmailFn = func(e kolide.Email) error {
 		return nil
 	}
@@ -72,7 +75,7 @@ func TestRequestPasswordReset(t *testing.T) {
 			if tt.vc != nil {
 				ctx = context.WithValue(ctx, "viewerContext", tt.vc)
 			}
-			mailer := &mockMailSvc{SendEmailFn: tt.emailFn}
+			mailer := &mockMailService{SendEmailFn: tt.emailFn}
 			svc.mailService = mailer
 
 			serviceErr := svc.RequestPasswordReset(ctx, tt.email)
@@ -198,12 +201,12 @@ func TestChangeUserPassword(t *testing.T) {
 	}
 }
 
-type mockMailSvc struct {
+type mockMailService struct {
 	SendEmailFn func(e kolide.Email) error
 	Invoked     bool
 }
 
-func (svc *mockMailSvc) SendEmail(e kolide.Email) error {
+func (svc *mockMailService) SendEmail(e kolide.Email) error {
 	svc.Invoked = true
 	return svc.SendEmailFn(e)
 }

@@ -170,13 +170,13 @@ func (svc service) RequestPasswordReset(ctx context.Context, email string) error
 		return err
 	}
 
-	campaign := kolide.Email{
+	resetEmail := kolide.Email{
 		From: "no-reply@kolide.co",
 		To:   []string{user.Email},
 		Msg:  request,
 	}
 
-	err = svc.mailService.SendEmail(campaign)
+	err = svc.mailService.SendEmail(resetEmail)
 	if err != nil {
 		return err
 	}
