@@ -42,6 +42,8 @@ type gormDB struct {
 	config config.KolideConfig
 }
 
+// GetMysqlConnectionString returns a MySQL connection string using the
+// provided configuration.
 func GetMysqlConnectionString(conf config.MysqlConfig) string {
 	return fmt.Sprintf(
 		"%s:%s@(%s)/%s?charset=utf8&parseTime=True&loc=Local",

@@ -51,7 +51,10 @@ the way that the kolide server works.
 			var ds kolide.Datastore
 			var err error
 			if devMode {
-				fmt.Println("Dev mode enabled, using in-memory DB")
+				fmt.Println(
+					"Dev mode enabled, using in-memory DB.\n",
+					"Warning: Changes will not be saved across process restarts. This should NOT be used in production.",
+				)
 				ds, err = datastore.New("inmem", "")
 				if err != nil {
 					initFatal(err, "initializing datastore")
