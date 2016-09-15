@@ -106,12 +106,12 @@ func TestCreateUser(t *testing.T) {
 		Email              *string
 		NeedsPasswordReset *bool
 		Admin              *bool
-		Err                error
+		wantErr            interface{}
 	}{
 		{
 			Username: stringPtr("admin1"),
 			Password: stringPtr("foobar"),
-			Err:      invalidArgumentError{},
+			wantErr:  invalidArgumentError{},
 		},
 		{
 			Username:           stringPtr("admin1"),
@@ -119,6 +119,22 @@ func TestCreateUser(t *testing.T) {
 			Email:              stringPtr("admin1@example.com"),
 			NeedsPasswordReset: boolPtr(true),
 			Admin:              boolPtr(false),
+		},
+		{
+			Username:           stringPtr("admin1"),
+			Password:           stringPtr("foobar"),
+			Email:              stringPtr("admin1@example.com"),
+			NeedsPasswordReset: boolPtr(true),
+			Admin:              boolPtr(false),
+			wantErr:            datastore.ErrExists,
+		},
+		{
+			Username:           stringPtr("@admin1"),
+			Password:           stringPtr("foobar"),
+			Email:              stringPtr("admin1@example.com"),
+			NeedsPasswordReset: boolPtr(true),
+			Admin:              boolPtr(false),
+			wantErr:            invalidArgumentError{},
 		},
 	}
 
@@ -131,12 +147,9 @@ func TestCreateUser(t *testing.T) {
 			AdminForcedPasswordReset: tt.NeedsPasswordReset,
 		}
 		user, err := svc.NewUser(ctx, payload)
-		switch err.(type) {
-		case nil:
-		case invalidArgumentError:
+		if err != nil {
+			assert.IsType(t, tt.wantErr, err)
 			continue
-		default:
-			t.Fatalf("got %q, want %q", err, tt.Err)
 		}
 
 		assert.NotZero(t, user.ID)
@@ -150,9 +163,6 @@ func TestCreateUser(t *testing.T) {
 		assert.Equal(t, user.AdminForcedPasswordReset, *tt.NeedsPasswordReset)
 		assert.Equal(t, user.Admin, *tt.Admin)
 
-		// check duplicate creation
-		_, err = svc.NewUser(ctx, payload)
-		assert.Equal(t, datastore.ErrExists, err)
 	}
 }
 
