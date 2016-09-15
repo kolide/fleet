@@ -36,7 +36,7 @@ func TestRequestPasswordReset(t *testing.T) {
 	var requestPasswordResetTests = []struct {
 		email   string
 		emailFn func(e kolide.Email) error
-		wantErr interface{}
+		wantErr error
 		user    *kolide.User
 		vc      *viewerContext
 	}{
@@ -106,7 +106,7 @@ func TestCreateUser(t *testing.T) {
 		Email              *string
 		NeedsPasswordReset *bool
 		Admin              *bool
-		wantErr            interface{}
+		wantErr            error
 	}{
 		{
 			Username: stringPtr("admin1"),
@@ -173,7 +173,7 @@ func TestChangeUserPassword(t *testing.T) {
 	var passwordChangeTests = []struct {
 		token       string
 		newPassword string
-		wantErr     interface{}
+		wantErr     error
 	}{
 		{ // all good
 			token:       "abcd",

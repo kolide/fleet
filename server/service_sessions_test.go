@@ -19,7 +19,7 @@ func TestAuthenticate(t *testing.T) {
 	var loginTests = []struct {
 		username string
 		password string
-		wantErr  interface{}
+		wantErr  error
 	}{
 		{
 			username: *payload.Username,
@@ -42,7 +42,7 @@ func TestAuthenticate(t *testing.T) {
 
 }
 
-var setupLoginTests = func(t *testing.T) (kolide.Service, kolide.UserPayload, *kolide.User) {
+var setupLoginTests = func(t *testing.T) (kolide.Service, kolide.UserPayload, kolide.User) {
 	ds, err := datastore.New("gorm-sqlite3", ":memory:")
 	assert.Nil(t, err)
 
@@ -58,5 +58,5 @@ var setupLoginTests = func(t *testing.T) (kolide.Service, kolide.UserPayload, *k
 	user, err := svc.NewUser(ctx, payload)
 	assert.Nil(t, err)
 	assert.NotZero(t, user.ID)
-	return svc, payload, user
+	return svc, payload, *user
 }
