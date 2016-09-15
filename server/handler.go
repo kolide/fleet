@@ -35,7 +35,7 @@ func attachAPIRoutes(router *mux.Router, ctx context.Context, svc kolide.Service
 		kithttp.NewServer(
 			ctx,
 			makeForgotPasswordEndpoint(svc),
-			decodePasswordResetRequest,
+			decodeForgotPasswordRequest,
 			encodeResponse,
 			opts...,
 		),
@@ -45,7 +45,7 @@ func attachAPIRoutes(router *mux.Router, ctx context.Context, svc kolide.Service
 		kithttp.NewServer(
 			ctx,
 			makeResetPasswordEndpoint(svc),
-			decodePasswordResetRequest,
+			decodeResetPasswordRequest,
 			encodeResponse,
 			opts...,
 		),

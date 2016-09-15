@@ -1,6 +1,8 @@
 package server
 
 import (
+	"net/http"
+
 	"github.com/go-kit/kit/endpoint"
 	"github.com/kolide/kolide-ose/kolide"
 	"golang.org/x/net/context"
@@ -195,6 +197,7 @@ type forgotPasswordResponse struct {
 }
 
 func (r forgotPasswordResponse) error() error { return r.Err }
+func (r forgotPasswordResponse) status() int  { return http.StatusAccepted }
 
 func makeForgotPasswordEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {

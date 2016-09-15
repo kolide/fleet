@@ -69,8 +69,6 @@ type UserPayload struct {
 	Enabled                  *bool   `json:"enabled"`
 	AdminForcedPasswordReset *bool   `json:"force_password_reset"`
 	Password                 *string `json:"password"`
-	CurrentPassword          *string `json:"current_password"`
-	NewPassword              *string `json:"new_password"`
 	GravatarURL              *string `json:"gravatar_url"`
 	Position                 *string `json:"position"`
 }
