@@ -87,7 +87,7 @@ func makeGetUserEndpoint(svc kolide.Service) endpoint.Endpoint {
 }
 
 // returns back the account of the viewer context
-func makeGetSessionOwnerAccount() endpoint.Endpoint {
+func makeGetSessionOwner() endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		vc, err := viewerContextFromContext(ctx)
 		if err != nil {
