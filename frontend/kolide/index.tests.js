@@ -69,10 +69,14 @@ describe('Kolide - API client', () => {
     const newPassword = 'p@ssw0rd';
 
     it('calls the appropriate endpoint with the correct parameters when successful', (done) => {
-      const request = validResetPasswordRequest();
       const passwordResetToken = 'password-reset-token';
+      const request = validResetPasswordRequest(newPassword, passwordResetToken);
+      const formData = {
+        new_password: newPassword,
+        password_reset_token: passwordResetToken,
+      };
 
-      Kolide.resetPassword({ newPassword, passwordResetToken })
+      Kolide.resetPassword(formData)
         .then(() => {
           expect(request.isDone()).toEqual(true);
           done();
@@ -82,10 +86,14 @@ describe('Kolide - API client', () => {
 
     it('return errors correctly for unsuccessful requests', (done) => {
       const error = 'Resource not found';
-      const request = invalidResetPasswordRequest(error);
       const passwordResetToken = 'invalid-password-reset-token';
+      const request = invalidResetPasswordRequest(newPassword, passwordResetToken, error);
+      const formData = {
+        new_password: newPassword,
+        password_reset_token: passwordResetToken,
+      };
 
-      Kolide.resetPassword({ newPassword, passwordResetToken })
+      Kolide.resetPassword(formData)
         .then(done)
         .catch(errorResponse => {
           const { response } = errorResponse;

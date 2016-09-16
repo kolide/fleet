@@ -24,15 +24,17 @@ export class ResetPasswordPage extends Component {
     return false;
   }
 
-  onSubmit = ({ newPassword }) => {
+  onSubmit = (formData) => {
     const { dispatch, token } = this.props;
     const resetPasswordData = {
-      new_password: newPassword,
+      ...formData,
       password_reset_token: token,
     };
 
-    console.log('ResetPasswordForm data', newPassword);
-    return dispatch(resetPassword(resetPasswordData));
+    return dispatch(resetPassword(resetPasswordData))
+      .then(() => {
+        return dispatch(push('/login'));
+      });
   }
 
   render () {

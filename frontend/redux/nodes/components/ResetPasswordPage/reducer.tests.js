@@ -67,12 +67,15 @@ describe('ResetPasswordPage - reducer', () => {
   });
 
   describe('resetPassword', () => {
+    const newPassword = 'p@ssw0rd';
+
     it('dispatches the appropriate actions when successful', (done) => {
+      const token = 'valid-password-reset-token';
       const formData = {
-        new_password: 'p@ssw0rd',
-        password_reset_token: 'valid-password-reset-token',
+        new_password: newPassword,
+        password_reset_token: token,
       };
-      const request = validResetPasswordRequest();
+      const request = validResetPasswordRequest(newPassword, token);
       const store = reduxMockStore();
 
       store.dispatch(resetPassword(formData))
@@ -88,12 +91,14 @@ describe('ResetPasswordPage - reducer', () => {
     });
 
     it('dispatches the appropriate actions when unsuccessful', (done) => {
+      const token = 'invalid-password-reset-token';
+
       const formData = {
-        new_password: 'p@ssw0rd',
-        password_reset_token: 'invalid-password-reset-token',
+        new_password: newPassword,
+        password_reset_token: token,
       };
       const error = 'Something went wrong';
-      const invalidRequest = invalidResetPasswordRequest(error);
+      const invalidRequest = invalidResetPasswordRequest(newPassword, token, error);
       const store = reduxMockStore();
 
       store.dispatch(resetPassword(formData))

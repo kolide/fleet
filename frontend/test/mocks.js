@@ -29,15 +29,21 @@ export const invalidForgotPasswordRequest = (error) => {
   .reply(422, { error });
 };
 
-export const validResetPasswordRequest = () => {
+export const validResetPasswordRequest = (password, token) => {
   return nock('http://localhost:8080')
-  .post('/api/v1/kolide/reset_password')
+  .post('/api/v1/kolide/reset_password', JSON.stringify({
+    new_password: password,
+    password_reset_token: token,
+  }))
   .reply(200, validUser);
 };
 
-export const invalidResetPasswordRequest = (error) => {
+export const invalidResetPasswordRequest = (password, token, error) => {
   return nock('http://localhost:8080')
-  .post('/api/v1/kolide/reset_password')
+  .post('/api/v1/kolide/reset_password', JSON.stringify({
+    new_password: password,
+    password_reset_token: token,
+  }))
   .reply(422, { error });
 };
 
