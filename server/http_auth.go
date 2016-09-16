@@ -13,13 +13,6 @@ import (
 	"golang.org/x/net/context"
 )
 
-func authMiddleware(svc kolide.Service, logger kitlog.Logger, next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// all good to pass
-		next.ServeHTTP(w, r)
-	})
-}
-
 // authentication error
 type authError struct {
 	message string
