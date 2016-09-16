@@ -73,11 +73,16 @@ export class ForgotPasswordPage extends Component {
 
   render () {
     const leadText = 'If you’ve forgotten your password enter your email below and we will email you a link so that you can reset your password.';
+    const whiteBoxOverrideStyles = {
+      headerWrapper: { textAlign: 'left' },
+    };
 
     return (
       <StackedWhiteBoxes
         headerText="Forgot Password"
         leadText={leadText}
+        previousLocation="/login"
+        style={whiteBoxOverrideStyles}
       >
         {this.renderContent()}
       </StackedWhiteBoxes>

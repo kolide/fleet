@@ -21,6 +21,14 @@ export default {
     justifyContent: 'center',
     flexDirection: 'column',
   },
+  exStyles: {
+    color: color.lightGrey,
+    textDecoration: 'none',
+  },
+  exWrapperStyles: {
+    textAlign: 'right',
+    width: '100%',
+  },
   headerStyles: {
     fontFamily: "'Oxygen', sans-serif",
     fontSize: font.large,
@@ -30,6 +38,9 @@ export default {
     marginTop: 0,
     marginBottom: 0,
     textTransform: 'uppercase',
+  },
+  headerWrapperStyles: {
+    width: '100%',
   },
   tabStyles: {
     backgroundColor: color.white,
