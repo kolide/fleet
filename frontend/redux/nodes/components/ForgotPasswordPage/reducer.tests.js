@@ -2,6 +2,7 @@ import configureStore from 'redux-mock-store';
 import expect from 'expect';
 import thunk from 'redux-thunk';
 import {
+  clearForgotPasswordErrors,
   forgotPasswordAction,
   forgotPasswordRequestAction,
   forgotPasswordSuccessAction,
@@ -14,6 +15,20 @@ describe('ForgotPasswordPage - reducer', () => {
   describe('initial state', () => {
     it('sets the initial state', () => {
       expect(reducer(undefined, { type: 'FAKE-ACTION' })).toEqual(initialState);
+    });
+  });
+
+  describe('clearForgotPasswordErrors', () => {
+    it('changes the loading state to true', () => {
+      const errorState = {
+        ...initialState,
+        error: 'Something went wrong',
+      };
+
+      expect(reducer(errorState, clearForgotPasswordErrors)).toEqual({
+        ...errorState,
+        error: null,
+      });
     });
   });
 

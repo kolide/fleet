@@ -2,7 +2,10 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { noop } from 'lodash';
 import componentStyles from './styles';
-import { forgotPasswordAction } from '../../redux/nodes/components/ForgotPasswordPage/actions';
+import {
+  clearForgotPasswordErrors,
+  forgotPasswordAction,
+} from '../../redux/nodes/components/ForgotPasswordPage/actions';
 import ForgotPasswordForm from '../../components/forms/ForgotPasswordForm';
 import Icon from '../../components/icons/Icon';
 
@@ -10,6 +13,7 @@ export class ForgotPasswordPage extends Component {
   static propTypes = {
     dispatch: PropTypes.func,
     email: PropTypes.string,
+    error: PropTypes.string,
   };
 
   static defaultProps = {
@@ -22,8 +26,15 @@ export class ForgotPasswordPage extends Component {
     return dispatch(forgotPasswordAction(formData));
   }
 
+  clearErrors = () => {
+    const { dispatch } = this.props;
+
+    return dispatch(clearForgotPasswordErrors);
+  }
+
   renderContent = () => {
-    const { email } = this.props;
+    const { clearErrors } = this;
+    const { email, error } = this.props;
     const {
       emailSentButtonWrapperStyles,
       emailSentIconStyles,
@@ -50,7 +61,13 @@ export class ForgotPasswordPage extends Component {
       );
     }
 
-    return <ForgotPasswordForm onSubmit={this.onSubmit} />;
+    return (
+      <ForgotPasswordForm
+        clearErrors={clearErrors}
+        error={error}
+        onSubmit={this.onSubmit}
+      />
+    );
   }
 
   render () {
