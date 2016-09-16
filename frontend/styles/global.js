@@ -21,7 +21,7 @@ export default {
     fontFamily: 'Oxygen, sans-serif',
     fontSize: font.base,
     lineHeight: 1.6,
-    margin: '0 0 94px',
+    margin: '0 0 94px'
   },
   'h1, h2, h3': {
     lineHeight: 1.2,
