@@ -15,14 +15,22 @@ import (
 
 // authentication error
 type authError struct {
-	message string
+	reason string
+	// client reason is used to provide
+	// a different error message to the client
+	// when security is a concern
+	clientReason string
 }
 
 func (e authError) Error() string {
-	if e.message == "" {
-		return "unauthorized"
+	return e.reason
+}
+
+func (e authError) AuthError() string {
+	if e.clientReason != "" {
+		return e.clientReason
 	}
-	return fmt.Sprintf("unauthorized: %s", e.message)
+	return e.reason
 }
 
 // forbidden, set when user is authenticated, but not allowd to perform action
