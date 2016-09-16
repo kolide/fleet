@@ -16,7 +16,6 @@ export class LoginPage extends Component {
 
   componentWillMount () {
     const { dispatch } = this.props;
-    const { window } = global;
 
     if (local.getItem('auth_token')) {
       return dispatch(push('/'));

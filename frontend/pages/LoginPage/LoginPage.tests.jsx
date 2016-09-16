@@ -1,11 +1,10 @@
+import expect from 'expect';
 import { mount } from 'enzyme';
-import { noop } from 'lodash';
 import { connectedComponent, reduxMockStore } from '../../test/helpers';
 import local from '../../utilities/local';
 import LoginPage from './LoginPage';
 
 describe('LoginPage - component', () => {
-
   context('when the user is not logged in', () => {
     const mockStore = reduxMockStore({ auth: {} });
 

@@ -26,5 +26,5 @@ export default {
   warningLight: '#FFDA8C',
   footerBg: '#202532',
   footerAccent: '#84878E',
-  borderMedium: '#D4D8DF'
+  borderMedium: '#D4D8DF',
 };
