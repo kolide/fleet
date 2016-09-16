@@ -33,7 +33,7 @@ export default {
     fontFamily: "'Oxygen', sans-serif",
     fontSize: font.large,
     fontWeight: '300',
-    color: color.mediumGrey,
+    color: color.textUltradark,
     lineHeight: '32px',
     marginTop: 0,
     marginBottom: 0,
@@ -64,4 +64,3 @@ export default {
     width: '400px',
   },
 };
-
