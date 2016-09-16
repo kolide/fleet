@@ -2,16 +2,11 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import componentStyles from './styles';
 import Icon from '../../components/icons/Icon';
-import { removeBackground } from '../../utilities/backgroundImage';
 
 export class LoginSuccessfulPage extends Component {
   static propTypes = {
     dispatch: PropTypes.func,
   };
-
-  componentWillUnmount () {
-    removeBackground();
-  }
 
   render () {
     const { containerStyles, loginSuccessStyles, subtextStyles, whiteBoxStyles } = componentStyles;

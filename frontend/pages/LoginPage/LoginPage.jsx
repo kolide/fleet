@@ -2,7 +2,6 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
 import componentStyles from './styles';
-import { loadBackground, resizeBackground } from '../../utilities/backgroundImage';
 import local from '../../utilities/local';
 import LoginForm from '../../components/forms/LoginForm';
 import { loginUser } from '../../redux/nodes/auth/actions';
@@ -22,9 +21,6 @@ export class LoginPage extends Component {
     if (local.getItem('auth_token')) {
       return dispatch(push('/'));
     }
-
-    loadBackground();
-    window.onresize = resizeBackground;
 
     return false;
   }

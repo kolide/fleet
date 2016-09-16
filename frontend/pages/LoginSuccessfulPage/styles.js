@@ -8,7 +8,7 @@ export default {
     textAlign: 'center',
   },
   loginSuccessStyles: {
-    color: color.green,
+    color: color.success,
     textTransform: 'uppercase',
     fontSize: font.large,
     letterSpacing: '2px',
@@ -16,7 +16,7 @@ export default {
   },
   subtextStyles: {
     fontSize: font.medium,
-    color: color.lightGrey,
+    color: color.accentText,
   },
   whiteBoxStyles: {
     backgroundColor: color.white,
