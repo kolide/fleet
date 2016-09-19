@@ -28,6 +28,10 @@ class Base {
     return this._authenticatedRequest('GET', endpoint, {}, overrideHeaders);
   }
 
+  authenticatedPost (endpoint, body = {}, overrideHeaders = {}) {
+    return this._authenticatedRequest('POST', endpoint, body, overrideHeaders);
+  }
+
   post (endpoint, body = {}, overrideHeaders = {}) {
     return this._request('POST', endpoint, body, overrideHeaders);
   }

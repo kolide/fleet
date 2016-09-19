@@ -7,6 +7,7 @@ const {
   invalidResetPasswordRequest,
   validForgotPasswordRequest,
   validLoginRequest,
+  validLogoutRequest,
   validMeRequest,
   validResetPasswordRequest,
   validUser,
@@ -45,6 +46,21 @@ describe('Kolide - API client', () => {
       })
         .then((user) => {
           expect(user).toEqual(validUser);
+          expect(request.isDone()).toEqual(true);
+          done();
+        })
+        .catch(done);
+    });
+  });
+
+  describe('#logout', () => {
+    it('calls the appropriate endpoint with the correct parameters', (done) => {
+      const bearerToken = 'ABC123';
+      const request = validLogoutRequest(bearerToken);
+
+      Kolide.setBearerToken(bearerToken);
+      Kolide.logout()
+        .then(() => {
           expect(request.isDone()).toEqual(true);
           done();
         })

@@ -18,6 +18,13 @@ class Kolide extends Base {
     return this.post(loginEndpoint, JSON.stringify({ username, password }));
   }
 
+  logout () {
+    const { LOGOUT } = endpoints;
+    const logoutEndpoint = this.baseURL + LOGOUT;
+
+    return this.authenticatedPost(logoutEndpoint);
+  }
+
   me () {
     const { ME } = endpoints;
     const meEndpoint = this.baseURL + ME;

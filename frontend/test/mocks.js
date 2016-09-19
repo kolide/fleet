@@ -28,6 +28,16 @@ export const validMeRequest = (bearerToken) => {
     .reply(200, validUser);
 };
 
+export const validLogoutRequest = (bearerToken) => {
+  return nock('http://localhost:8080', {
+    reqheaders: {
+      Authorization: `Bearer ${bearerToken}`,
+    },
+  })
+    .post('/api/v1/kolide/logout')
+    .reply(200, {});
+};
+
 export const validForgotPasswordRequest = () => {
   return nock('http://localhost:8080')
   .post('/api/v1/kolide/forgot_password')
@@ -64,6 +74,7 @@ export default {
   invalidResetPasswordRequest,
   validForgotPasswordRequest,
   validLoginRequest,
+  validLogoutRequest,
   validMeRequest,
   validResetPasswordRequest,
   validUser,
