@@ -2,7 +2,9 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { noop } from 'lodash';
 import AuthenticationFormWrapper from '../../components/AuthenticationFormWrapper';
+import debounce from '../../utilities/debounce';
 import LogoutForm from '../../components/forms/LogoutForm';
+import { logoutUser } from '../../redux/nodes/auth/actions';
 
 export class LogoutPage extends Component {
   static propTypes = {
@@ -14,9 +16,11 @@ export class LogoutPage extends Component {
     dispatch: noop,
   };
 
-  onSubmit = (formData) => {
-    console.log('formData', formData);
-  }
+  onSubmit = debounce(() => {
+    const { dispatch } = this.props;
+
+    return dispatch(logoutUser());
+  })
 
   render () {
     const { user } = this.props;

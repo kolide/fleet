@@ -2,7 +2,6 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
 import AuthenticationFormWrapper from '../../components/AuthenticationFormWrapper';
-import componentStyles from './styles';
 import debounce from '../../utilities/debounce';
 import local from '../../utilities/local';
 import LoginForm from '../../components/forms/LoginForm';
