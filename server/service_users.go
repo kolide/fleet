@@ -97,7 +97,7 @@ func (svc service) AuthenticatedUser(ctx context.Context) (*kolide.User, error) 
 	if err != nil {
 		return nil, err
 	}
-	if !vc.IsLoggedIn {
+	if !vc.IsLoggedIn() {
 		return nil, forbiddenError{}
 	}
 	return vc.user, nil
