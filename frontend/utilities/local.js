@@ -4,6 +4,11 @@ const { window } = global;
 const { settings } = config;
 
 const local = {
+  clear: () => {
+    const { localStorage } = window;
+
+    localStorage.clear();
+  },
   getItem: (itemName) => {
     const { localStorage } = window;
     const { env } = settings;
