@@ -1,9 +1,15 @@
 import styles from '../../../styles';
 
-const { border, color, padding } = styles;
+const { border, color, font, padding } = styles;
 const FORM_WIDTH = '460px';
 
 export default {
+  avatarStyles: {
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: color.brand,
+    borderRadius: '50%',
+  },
   containerStyles: {
     alignItems: 'center',
     backgroundColor: color.white,
@@ -21,6 +27,18 @@ export default {
   },
   submitButtonStyles: {
     width: FORM_WIDTH,
+  },
+  subtextStyles: {
+    color: color.textLight,
+    fontSize: font.medium,
+    marginTop: padding.half,
+  },
+  usernameStyles: {
+    color: color.brand,
+    fontSize: font.large,
+    marginBottom: padding.half,
+    marginTop: padding.half,
+    textTransform: 'uppercase',
   },
 };
 

@@ -8,19 +8,36 @@ class LogoutForm extends Component {
     user: PropTypes.object,
   };
 
+  onFormSubmit = (evt) => {
+    evt.preventDefault();
+
+    const { onSubmit } = this.props;
+
+    return onSubmit();
+  }
+
   render () {
-    const { onSubmit, user } = this.props;
-    const { containerStyles, formStyles, submitButtonStyles } = componentStyles;
+    const {
+      avatarStyles,
+      containerStyles,
+      formStyles,
+      submitButtonStyles,
+      subtextStyles,
+      usernameStyles,
+    } = componentStyles;
+    const { user } = this.props;
     const { gravatarURL } = user;
+    const { onFormSubmit } = this;
 
     return (
-      <form onSubmit={onSubmit} style={formStyles}>
+      <form onSubmit={onFormSubmit} style={formStyles}>
         <div style={containerStyles}>
-          <img alt="Avatar" src={gravatarURL} />
-          <h1>{user.username}</h1>
+          <img alt="Avatar" src={gravatarURL} style={avatarStyles} />
+          <p style={usernameStyles}>{user.username}</p>
+          <p style={subtextStyles}>Are you sure you want to log out?</p>
         </div>
         <GradientButton
-          onClick={onSubmit}
+          onClick={onFormSubmit}
           style={submitButtonStyles}
           text="Logout"
           type="submit"
