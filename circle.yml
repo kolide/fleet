@@ -18,6 +18,7 @@ test:
 
 deployment:
   development:
+    branch: /^((?!master).)*$/  # not the master branch
     commands:
       - make docker-build-circle
 
