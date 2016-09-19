@@ -40,7 +40,7 @@ func newBinaryFileSystem(root string) *binaryFileSystem {
 
 func ServeFrontend() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fs := newBinaryFileSystem("/assets")
+		fs := newBinaryFileSystem("/frontend")
 		file, err := fs.Open("templates/react.tmpl")
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
