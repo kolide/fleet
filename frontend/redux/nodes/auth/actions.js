@@ -1,3 +1,4 @@
+import md5 from 'js-md5';
 import Kolide from '../../../kolide';
 
 export const LOGIN_REQUEST = 'LOGIN_REQUEST';
@@ -29,6 +30,10 @@ export const loginUser = (formData) => {
       dispatch(loginRequest);
       return Kolide.loginUser(formData)
         .then(user => {
+          const { email } = user;
+          const emailHash = md5(email.toLowerCase());
+
+          user.gravatarURL = `https://www.gravatar.com/avatar/${emailHash}`;
           dispatch(loginSuccess(user));
           return resolve(user);
         })
