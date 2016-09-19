@@ -22,7 +22,12 @@ GOVERSION		= $(shell go version | awk '{print $$3}')
 NOW				= $(shell date +"%Y%m%d-%T")
 USER			= $(shell whoami)
 DOCKER_IMAGE_NAME = kolide/kolide
-DOCKER_IMAGE_TAG = dev
+
+ifndef CIRCLE_PR_NUMBER
+DOCKER_IMAGE_TAG = dev-unset
+else
+DOCKER_IMAGE_TAG = dev-${CIRCLE_PR_NUMBER}
+endif
 
 build: .prefix
 	go build -o ${OUTPUT} -ldflags "\
