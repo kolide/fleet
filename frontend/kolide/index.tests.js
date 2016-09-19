@@ -7,6 +7,7 @@ const {
   invalidResetPasswordRequest,
   validForgotPasswordRequest,
   validLoginRequest,
+  validMeRequest,
   validResetPasswordRequest,
   validUser,
 } = mocks;
@@ -15,6 +16,22 @@ describe('Kolide - API client', () => {
   describe('defaults', () => {
     it('sets the base URL', () => {
       expect(Kolide.baseURL).toEqual('http://localhost:8080/api');
+    });
+  });
+
+  describe('#me', () => {
+    it('calls the appropriate endpoint with the correct parameters', (done) => {
+      const bearerToken = 'ABC123';
+      const request = validMeRequest(bearerToken);
+
+      Kolide.setBearerToken(bearerToken);
+      Kolide.me()
+        .then((user) => {
+          expect(user).toEqual(validUser);
+          expect(request.isDone()).toEqual(true);
+          done();
+        })
+        .catch(done);
     });
   });
 

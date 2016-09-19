@@ -22,22 +22,33 @@ class Base {
     this.bearerToken = bearerToken;
   }
 
-  post(endpoint, body = {}, overrideHeaders = {}) {
+  authenticatedGet (endpoint, overrideHeaders = {}) {
+    return this._authenticatedRequest('GET', endpoint, {}, overrideHeaders);
+  }
+
+  post (endpoint, body = {}, overrideHeaders = {}) {
     return this._request('POST', endpoint, body, overrideHeaders);
+  }
+
+  _authenticatedRequest(method, endpoint, body, overrideHeaders) {
+    const headers = {
+      ...overrideHeaders,
+      Authorization: `Bearer ${this.bearerToken}`,
+    }
+
+    return this._request(method, endpoint, body, headers);
   }
 
   _request (method, endpoint, body, overrideHeaders) {
     const headers = {
       Accept: 'application/json',
       'Content-Type': 'application/json',
+      ...overrideHeaders,
     };
 
     return fetch(endpoint, {
       method,
-      headers: {
-        ...headers,
-        ...overrideHeaders
-      },
+      headers,
       body,
     })
       .then(response => {
