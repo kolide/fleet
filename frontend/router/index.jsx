@@ -9,6 +9,7 @@ import HomePage from '../pages/HomePage';
 import LoginPage from '../pages/LoginPage';
 import LoginSuccessfulPage from '../pages/LoginSuccessfulPage';
 import LoginRoutes from '../components/LoginRoutes';
+import LogoutPage from '../pages/LogoutPage';
 import ResetPasswordPage from '../pages/ResetPasswordPage';
 import store from '../redux/store';
 
@@ -23,6 +24,7 @@ const routes = (
           <Route path="forgot_password" component={radium(ForgotPasswordPage)} />
           <Route path="login" component={radium(LoginPage)} />
           <Route path="login_successful" component={radium(LoginSuccessfulPage)} />
+          <Route path="logout" component={radium(LogoutPage)} />
           <Route path="reset_password" component={radium(ResetPasswordPage)} />
         </Route>
       </Route>
