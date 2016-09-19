@@ -50,10 +50,35 @@ class LoginForm extends Component {
     return false;
   }
 
-  canSubmit = () => {
-    const { formData: { username, password } } = this.state;
+  validate = () => {
+    const {
+      errors,
+      formData: { username, password },
+    } = this.state;
 
-    return username && password;
+    if (!validatePresence(username)) {
+      this.setState({
+        errors: {
+          ...errors,
+          username: 'Username or email field must be completed',
+        },
+      });
+
+      return false;
+    }
+
+    if (!validatePresence(password)) {
+      this.setState({
+        errors: {
+          ...errors,
+          password: 'Password field must be completed',
+        },
+      });
+
+      return false;
+    }
+
+    return true;
   }
 
   render () {
@@ -90,7 +115,6 @@ class LoginForm extends Component {
           </div>
         </div>
         <GradientButton
-          disabled={!canSubmit}
           onClick={onFormSubmit}
           style={submitButtonStyles}
           text="Login"

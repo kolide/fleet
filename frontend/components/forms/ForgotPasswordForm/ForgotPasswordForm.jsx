@@ -67,10 +67,9 @@ class ForgotPasswordForm extends Component {
 
   render () {
     const { error: serverError } = this.props;
-    const { error: clientError, formData: { email } } = this.state;
+    const { error: clientError } = this.state;
     const { formStyles, inputStyles, submitButtonStyles } = componentStyles;
     const { onFormSubmit, onInputFieldChange } = this;
-    const disabled = !email;
 
     return (
       <form onSubmit={onFormSubmit} style={formStyles}>
@@ -84,7 +83,6 @@ class ForgotPasswordForm extends Component {
           style={inputStyles}
         />
         <GradientButton
-          disabled={disabled}
           type="submit"
           style={submitButtonStyles}
           text="Reset Password"
