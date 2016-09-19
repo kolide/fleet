@@ -71,6 +71,7 @@ distclean:
 docker-build-circle:
 	@echo ">> building docker image"
 	docker build -t "${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}" .
+	docker push "${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
 
 docker:
 	docker pull kolide/kolide-builder:1.7
