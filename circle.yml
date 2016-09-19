@@ -18,3 +18,4 @@ test:
 
 deployment:
       - make docker-build-circle
+
