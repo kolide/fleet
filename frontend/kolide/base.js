@@ -1,8 +1,10 @@
 import config from '../config';
+import local from '../utilities/local';
 
 class Base {
   constructor () {
     this.baseURL = this.setBaseURL();
+    this.bearerToken = local.getItem('auth_token');
   }
 
   setBaseURL () {

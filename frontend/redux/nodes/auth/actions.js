@@ -23,6 +23,24 @@ export const loginFailure = (error) => {
   };
 };
 
+export const fetchCurrentUser = () => {
+  return (dispatch) => {
+    dispatch(loginRequest);
+    return Kolide.me()
+      .then(user => {
+        const { email } = user;
+        const emailHash = md5(email.toLowerCase());
+
+        user.gravatarURL = `https://www.gravatar.com/avatar/${emailHash}`;
+        return dispatch(loginSuccess(user));
+      })
+      .catch(response => {
+        dispatch(loginFailure('Unable to authenticate the current user'));
+        throw response;
+      });
+  };
+};
+
 // formData should be { username: <string>, password: <string> }
 export const loginUser = (formData) => {
   return (dispatch) => {
@@ -37,8 +55,9 @@ export const loginUser = (formData) => {
           dispatch(loginSuccess(user));
           return resolve(user);
         })
-        .catch(error => {
-          dispatch(loginFailure(error.message));
+        .catch(response => {
+          const { error } = response;
+          dispatch(loginFailure(error));
           return reject(error);
         });
     });

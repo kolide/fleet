@@ -3,7 +3,7 @@ import config from '../config';
 const { window } = global;
 const { settings } = config;
 
-export default {
+const local = {
   getItem: (itemName) => {
     const { localStorage } = window;
     const { env } = settings;
@@ -17,3 +17,7 @@ export default {
     return localStorage.setItem(`KOLIDE-${env}::${itemName}`, value);
   },
 };
+
+export const authToken = () => { return local.getItem('auth_token'); };
+
+export default local;
