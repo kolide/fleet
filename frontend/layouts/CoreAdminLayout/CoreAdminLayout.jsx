@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
+import AdminSidePanel from '../../components/AdminSidePanel';
 import paths from '../../router/paths';
 
 export class CoreAdminLayout extends Component {
@@ -15,15 +16,17 @@ export class CoreAdminLayout extends Component {
     const { HOME } = paths;
 
     if (!admin) dispatch(push(HOME));
+
+    return false;
   }
 
   render () {
-    const { children } = this.props;
+    const { children, user } = this.props;
 
     return (
       <div>
-        <div>SidePanel</div>
-        <div>{children}</div>
+        <AdminSidePanel user={user} />
+        <div style={{ marginLeft: '240px' }}>{children}</div>
       </div>
     );
   }
