@@ -7,10 +7,10 @@ import (
 	"github.com/kolide/kolide-ose/kolide"
 )
 
-func NewTestService(ds kolide.Datastore) (kolide.Service, error) {
+func newTestService(ds kolide.Datastore) (kolide.Service, error) {
 	return NewService(ds, kitlog.NewNopLogger(), config.TestConfig(), nil, clock.C)
 }
 
-func NewTestServiceWithClock(ds kolide.Datastore, c clock.Clock) (kolide.Service, error) {
+func newTestServiceWithClock(ds kolide.Datastore, c clock.Clock) (kolide.Service, error) {
 	return NewService(ds, kitlog.NewNopLogger(), config.TestConfig(), nil, c)
 }

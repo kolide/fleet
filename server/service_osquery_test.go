@@ -14,7 +14,7 @@ func TestEnrollAgent(t *testing.T) {
 	ds, err := datastore.New("gorm-sqlite3", ":memory:")
 	assert.Nil(t, err)
 
-	svc, err := NewTestService(ds)
+	svc, err := newTestService(ds)
 	assert.Nil(t, err)
 
 	ctx := context.Background()
@@ -36,7 +36,7 @@ func TestEnrollAgentIncorrectEnrollSecret(t *testing.T) {
 	ds, err := datastore.New("gorm-sqlite3", ":memory:")
 	assert.Nil(t, err)
 
-	svc, err := NewTestService(ds)
+	svc, err := newTestService(ds)
 	assert.Nil(t, err)
 
 	ctx := context.Background()
@@ -60,7 +60,7 @@ func TestGetDistributedQueries(t *testing.T) {
 
 	mockClock := clock.NewMockClock()
 
-	svc, err := NewTestServiceWithClock(ds, mockClock)
+	svc, err := newTestServiceWithClock(ds, mockClock)
 	assert.Nil(t, err)
 
 	ctx := context.Background()

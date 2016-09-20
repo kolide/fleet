@@ -61,7 +61,7 @@ func setupLoginTests(t *testing.T) (kolide.Service, kolide.UserPayload, kolide.U
 	ds, err := datastore.New("gorm-sqlite3", ":memory:")
 	assert.Nil(t, err)
 
-	svc, err := NewTestService(ds)
+	svc, err := newTestService(ds)
 	assert.Nil(t, err)
 	payload := kolide.UserPayload{
 		Username: stringPtr("foo"),

@@ -18,7 +18,7 @@ func TestAuthenticatedUser(t *testing.T) {
 	ds, err := datastore.New("inmem", "")
 	assert.Nil(t, err)
 	createTestUsers(t, ds)
-	svc, err := NewTestService(ds)
+	svc, err := newTestService(ds)
 	assert.Nil(t, err)
 	admin1, err := ds.User("admin1")
 	assert.Nil(t, err)
@@ -113,7 +113,7 @@ func TestRequestPasswordReset(t *testing.T) {
 
 func TestCreateUser(t *testing.T) {
 	ds, _ := datastore.New("inmem", "")
-	svc, _ := NewTestService(ds)
+	svc, _ := newTestService(ds)
 	ctx := context.Background()
 
 	var createUserTests = []struct {
@@ -185,7 +185,7 @@ func TestCreateUser(t *testing.T) {
 
 func TestChangeUserPassword(t *testing.T) {
 	ds, _ := datastore.New("inmem", "")
-	svc, _ := NewTestService(ds)
+	svc, _ := newTestService(ds)
 	createTestUsers(t, ds)
 	var passwordChangeTests = []struct {
 		token       string

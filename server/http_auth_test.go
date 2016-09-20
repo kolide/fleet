@@ -23,7 +23,7 @@ import (
 
 func TestLogin(t *testing.T) {
 	ds, _ := datastore.New("inmem", "")
-	svc, _ := NewTestService(ds)
+	svc, _ := newTestService(ds)
 	createTestUsers(t, ds)
 	logger := kitlog.NewLogfmtLogger(os.Stdout)
 
