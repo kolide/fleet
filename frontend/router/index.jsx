@@ -3,8 +3,10 @@ import { browserHistory, IndexRoute, Route, Router } from 'react-router';
 import { Provider } from 'react-redux';
 import radium from 'radium';
 import { syncHistoryWithStore } from 'react-router-redux';
+import AdminDashboardPage from '../pages/Admin/DashboardPage';
 import App from '../components/App';
 import AuthenticatedRoutes from '../components/AuthenticatedRoutes';
+import CoreAdminLayout from '../layouts/CoreAdminLayout';
 import ForgotPasswordPage from '../pages/ForgotPasswordPage';
 import HomePage from '../pages/HomePage';
 import LoginPage from '../pages/LoginPage';
@@ -31,6 +33,9 @@ const routes = (
         </Route>
         <Route component={AuthenticatedRoutes}>
           <IndexRoute component={radium(HomePage)} />
+          <Route path="admin" component={radium(CoreAdminLayout)}>
+            <IndexRoute component={radium(AdminDashboardPage)} />
+          </Route>
         </Route>
       </Route>
     </Router>
