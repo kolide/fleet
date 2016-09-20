@@ -4,7 +4,7 @@ import componentStyles from './styles';
 import kolideLogo from '../../../assets/images/kolide-logo.svg';
 import navItems from './navItems';
 
-class AdminSidePanel extends Component {
+class SidePanel extends Component {
   static propTypes = {
     user: PropTypes.object,
   };
@@ -100,11 +100,13 @@ class AdminSidePanel extends Component {
   renderNavItems = () => {
     const { renderNavItem } = this;
     const { navItemListStyles } = componentStyles;
+    const { user: { admin } } = this.props;
+    const userNavItems = navItems(admin);
 
     return (
       <ul style={navItemListStyles}>
-        {navItems.map((navItem, index, collection) => {
-          const lastChild = isEqual(navItem, last(collection));
+        {userNavItems.map((navItem, index, collection) => {
+          const lastChild = admin && isEqual(navItem, last(collection));
           return renderNavItem(navItem, lastChild);
         })}
       </ul>
@@ -164,4 +166,4 @@ class AdminSidePanel extends Component {
   }
 }
 
-export default AdminSidePanel;
+export default SidePanel;
