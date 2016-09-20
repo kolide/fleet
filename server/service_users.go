@@ -210,11 +210,13 @@ func userFromPayload(p kolide.UserPayload, keySize, cost int) (*kolide.User, err
 
 	return &kolide.User{
 		Username: *p.Username,
+		Name:     *p.Name,
 		Email:    *p.Email,
 		Admin:    falseIfNil(p.Admin),
 		AdminForcedPasswordReset: falseIfNil(p.AdminForcedPasswordReset),
 		Salt:     salt,
 		Enabled:  true,
+		Position: *p.Position,
 		Password: hashed,
 	}, nil
 }
