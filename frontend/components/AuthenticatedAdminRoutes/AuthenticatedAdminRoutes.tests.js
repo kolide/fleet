@@ -1,9 +1,9 @@
 import expect from 'expect';
 import { mount } from 'enzyme';
-import ConnectedCoreAdminLayout from './CoreAdminLayout';
+import ConnectedAdminRoutes from './AuthenticatedAdminRoutes';
 import { connectedComponent, reduxMockStore } from '../../test/helpers';
 
-describe('CoreAdminLayout - layout', () => {
+describe('AuthenticatedAdminRoutes - layout', () => {
   const redirectToHomeAction = {
     type: '@@router/CALL_HISTORY_METHOD',
     payload: {
@@ -17,7 +17,7 @@ describe('CoreAdminLayout - layout', () => {
     const storeWithoutAdminUser = { auth: { user } };
     const mockStore = reduxMockStore(storeWithoutAdminUser);
     mount(
-      connectedComponent(ConnectedCoreAdminLayout, { mockStore })
+      connectedComponent(ConnectedAdminRoutes, { mockStore })
     );
 
     expect(mockStore.getActions()).toInclude(redirectToHomeAction);
@@ -28,7 +28,7 @@ describe('CoreAdminLayout - layout', () => {
     const storeWithAdminUser = { auth: { user } };
     const mockStore = reduxMockStore(storeWithAdminUser);
     mount(
-      connectedComponent(ConnectedCoreAdminLayout, { mockStore })
+      connectedComponent(ConnectedAdminRoutes, { mockStore })
     );
 
     expect(mockStore.getActions()).toNotInclude(redirectToHomeAction);

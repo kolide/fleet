@@ -1,10 +1,9 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
-import AdminSidePanel from '../../components/AdminSidePanel';
 import paths from '../../router/paths';
 
-export class CoreAdminLayout extends Component {
+export class AuthenticatedAdminRoutes extends Component {
   static propTypes = {
     children: PropTypes.node,
     dispatch: PropTypes.func,
@@ -23,10 +22,11 @@ export class CoreAdminLayout extends Component {
   render () {
     const { children, user } = this.props;
 
+    if (!user) return false;
+
     return (
       <div>
-        <AdminSidePanel user={user} />
-        <div style={{ marginLeft: '240px' }}>{children}</div>
+        {children}
       </div>
     );
   }
@@ -38,4 +38,4 @@ const mapStateToProps = (state) => {
   return { user };
 };
 
-export default connect(mapStateToProps)(CoreAdminLayout);
+export default connect(mapStateToProps)(AuthenticatedAdminRoutes);
