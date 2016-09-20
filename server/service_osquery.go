@@ -64,6 +64,17 @@ func (svc service) GetDistributedQueries(ctx context.Context) (map[string]string
 
 	queries["id1"] = "select * from osquery_info"
 
+	host, err := osqueryHostFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if host.NeedsDetailUpdate() {
+		// If the host details need to be updated, we should do so
+		// before checking for any other queries
+		return host.GetDetailQueries(), nil
+	}
+
 	return queries, nil
 }
 

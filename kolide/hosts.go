@@ -43,3 +43,21 @@ type Host struct {
 	IPAddress string
 	Platform  string
 }
+
+// NeedsDetailUpdate determines whether the host context (IP, platform, etc.)
+// needs to be updated
+func (h Host) NeedsDetailUpdate() bool {
+	// Currently we only attempt to update platform
+	return h.Platform == ""
+}
+
+const hostDetailQueryPrefix = "kolide_detail_query_"
+const hostLabelQueryPrefix = "kolide_label_query_"
+
+// GetDetailQueries returns the map of queries that should be executed by
+// osqueryd to fill in the host details
+func (h Host) GetDetailQueries() map[string]string {
+	return map[string]string{
+		hostDetailQueryPrefix + "platform": "select build_platform from osquery_info;",
+	}
+}
