@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { isEqual, last } from 'lodash';
 import componentStyles from './styles';
+import kolideLogo from '../../../assets/images/kolide-logo.svg';
 import navItems from './navItems';
 
 class AdminSidePanel extends Component {
@@ -54,10 +55,10 @@ class AdminSidePanel extends Component {
       <header style={headerStyles}>
         <img
           alt="Company logo"
-          src="http://2a0d7e1b.ngrok.io/assets/ge-logo-6d786c8e9079010a195f208d34ffb9d67e77ceff8c468c5c1e7fb739b086060f.png"
+          src={kolideLogo}
           style={companyLogoStyles}
         />
-        <h1 style={orgNameStyles}>General Electric</h1>
+        <h1 style={orgNameStyles}>Kolide, Inc.</h1>
         <div style={userStatusStyles(enabled)} />
         <h2 style={usernameStyles}>{username}</h2>
       </header>
