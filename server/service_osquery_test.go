@@ -4,8 +4,10 @@ import (
 	"context"
 	"testing"
 
+	"github.com/WatchBeam/clock"
 	"github.com/kolide/kolide-ose/datastore"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestEnrollAgent(t *testing.T) {
@@ -50,4 +52,46 @@ func TestEnrollAgentIncorrectEnrollSecret(t *testing.T) {
 	hosts, err = ds.Hosts()
 	assert.Nil(t, err)
 	assert.Len(t, hosts, 0)
+}
+
+func TestGetDistributedQueries(t *testing.T) {
+	ds, err := datastore.New("gorm-sqlite3", ":memory:")
+	assert.Nil(t, err)
+
+	mockClock := clock.NewMockClock()
+
+	svc, err := NewTestServiceWithClock(ds, mockClock)
+	assert.Nil(t, err)
+
+	ctx := context.Background()
+
+	_, err = svc.EnrollAgent(ctx, "", "host123")
+	assert.Nil(t, err)
+
+	hosts, err := ds.Hosts()
+	require.Nil(t, err)
+	require.Len(t, hosts, 1)
+	host := hosts[0]
+
+	ctx = context.WithValue(ctx, "osqueryHost", host)
+
+	// With no platform set, we should get the details query
+	queries, err := svc.GetDistributedQueries(ctx)
+	assert.Nil(t, err)
+	assert.Len(t, queries, 1)
+	assert.Contains(t, queries, "kolide_detail_query_platform")
+	assert.Equal(t,
+		"select build_platform from osquery_info;",
+		queries["kolide_detail_query_platform"],
+	)
+
+	host.Platform = "darwin"
+
+	ctx = context.WithValue(ctx, "osqueryHost", host)
+
+	// With the platform set, we should get the label queries (but none
+	// exist yet)
+	queries, err = svc.GetDistributedQueries(ctx)
+	assert.Nil(t, err)
+	assert.Len(t, queries, 0)
 }

@@ -59,10 +59,13 @@ func (svc service) SubmitResultsLogs(ctx context.Context, logs []kolide.OsqueryS
 	return nil
 }
 
+// hostLabelQueryPrefix is appended before the query name when a query is
+// provided as a label query. This allows the results to be retrieved when
+// osqueryd writes the distributed query results.
+const hostLabelQueryPrefix = "kolide_label_query_"
+
 func (svc service) GetDistributedQueries(ctx context.Context) (map[string]string, error) {
 	var queries map[string]string
-
-	queries["id1"] = "select * from osquery_info"
 
 	host, err := osqueryHostFromContext(ctx)
 	if err != nil {
@@ -74,6 +77,19 @@ func (svc service) GetDistributedQueries(ctx context.Context) (map[string]string
 		// before checking for any other queries
 		return host.GetDetailQueries(), nil
 	}
+
+	// Retrieve the label queries that should be updated
+	cutoff := svc.clock.Now().Add(-svc.config.Osquery.LabelUpdateInterval)
+	labelQueries, err := svc.ds.LabelQueriesForHost(host, cutoff)
+	if err != nil {
+		return nil, err
+	}
+
+	for name, query := range labelQueries {
+		queries[hostLabelQueryPrefix+name] = query
+	}
+
+	// TODO: retrieve the active distributed queries for this host
 
 	return queries, nil
 }

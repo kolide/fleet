@@ -51,8 +51,9 @@ func (h Host) NeedsDetailUpdate() bool {
 	return h.Platform == ""
 }
 
+// hostDetailQueryPrefix is appended before the query name when a query is
+// provided as a detail query.
 const hostDetailQueryPrefix = "kolide_detail_query_"
-const hostLabelQueryPrefix = "kolide_label_query_"
 
 // GetDetailQueries returns the map of queries that should be executed by
 // osqueryd to fill in the host details
