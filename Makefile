@@ -1,6 +1,10 @@
 .PHONY: build
 
 export PATH := $(GOPATH)/bin:$(shell npm bin):$(PATH)
+ifeq ($(shell uname), Darwin)
+SHELL=/bin/bash
+PATH := $(GOPATH)/bin:$(shell npm bin):$(PATH)
+endif
 
 ifeq ($(OS), Windows_NT)
 	OUTPUT = build/kolide.exe
