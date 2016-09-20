@@ -13,13 +13,6 @@ import (
 	"golang.org/x/net/context"
 )
 
-func authMiddleware(svc kolide.Service, logger kitlog.Logger, next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// all good to pass
-		next.ServeHTTP(w, r)
-	})
-}
-
 // authentication error
 type authError struct {
 	message string
@@ -126,6 +119,14 @@ func newViewerContext(user *kolide.User, session *kolide.Session) *viewerContext
 // used to represent users which are not logged in.
 func emptyVC() *viewerContext {
 	return &viewerContext{}
+}
+
+func osqueryHostFromContext(ctx context.Context) (*kolide.Host, error) {
+	host, ok := ctx.Value("osqueryHost").(*kolide.Host)
+	if !ok {
+		return nil, errNoContext
+	}
+	return host, nil
 }
 
 func viewerContextFromContext(ctx context.Context) (*viewerContext, error) {

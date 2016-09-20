@@ -10,6 +10,14 @@ import (
 	"golang.org/x/net/context"
 )
 
+type osqueryError struct {
+	message string
+}
+
+func (e osqueryError) Error() string {
+	return e.message
+}
+
 func (svc service) EnrollAgent(ctx context.Context, enrollSecret, hostIdentifier string) (string, error) {
 	if enrollSecret != svc.config.Osquery.EnrollSecret {
 		return "", errors.New(
