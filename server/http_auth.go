@@ -30,7 +30,7 @@ func (e authError) AuthError() string {
 	if e.clientReason != "" {
 		return e.clientReason
 	}
-	return e.reason
+	return "authorization error"
 }
 
 // forbidden, set when user is authenticated, but not allowd to perform action
