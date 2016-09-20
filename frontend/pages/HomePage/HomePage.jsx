@@ -14,7 +14,7 @@ export class HomePage extends Component {
 
     return (
       <div>
-        <i className="kolidecon-username"></i>
+        <i className="kolidecon-username"/>
         Home page
         {user && <Link to={LOGOUT}>Logout</Link>}
       </div>
