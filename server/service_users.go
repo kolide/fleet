@@ -208,17 +208,25 @@ func userFromPayload(p kolide.UserPayload, keySize, cost int) (*kolide.User, err
 		return nil, err
 	}
 
-	return &kolide.User{
+	user := &kolide.User{
 		Username: *p.Username,
-		Name:     *p.Name,
 		Email:    *p.Email,
 		Admin:    falseIfNil(p.Admin),
 		AdminForcedPasswordReset: falseIfNil(p.AdminForcedPasswordReset),
 		Salt:     salt,
 		Enabled:  true,
-		Position: *p.Position,
 		Password: hashed,
-	}, nil
+	}
+
+	// add optional fields
+	if p.Name != nil {
+		user.Name = *p.Name
+	}
+	if p.Position != nil {
+		user.Position = *p.Position
+	}
+
+	return user, nil
 }
 
 func hashPassword(plaintext string, keySize, cost int) ([]byte, string, error) {
