@@ -2,7 +2,14 @@ import React, { Component, PropTypes } from 'react';
 import { isEqual, last } from 'lodash';
 import componentStyles from './styles';
 import kolideLogo from '../../../assets/images/kolide-logo.svg';
+import debounce from '../../utilities/debounce';
 import navItems from './navItems';
+
+const NAV_BREAKPOINT = 1000;
+const NAV_STYLES = {
+  FULL: 'full',
+  SKINNY: 'skinny',
+};
 
 class SidePanel extends Component {
   static propTypes = {
@@ -12,11 +19,37 @@ class SidePanel extends Component {
   constructor (props) {
     super(props);
 
+    const { FULL, SKINNY } = NAV_STYLES;
+    const { innerWidth } = global.window;
+    const navStyle = innerWidth <= NAV_BREAKPOINT ? SKINNY : FULL;
+
     this.state = {
       activeTab: 'Hosts',
       activeSubItem: 'Add Hosts',
+      navStyle,
     };
   }
+
+  componentDidMount () {
+    global.window.addEventListener('resize', this.handleResize);
+  }
+
+  componentWillUnmount () {
+    global.window.removeEventListener('resize', this.handleResize);
+  }
+
+  handleResize = debounce(() => {
+    const { FULL, SKINNY } = NAV_STYLES;
+    const { navStyle } = this.state;
+
+    if (innerWidth <= NAV_BREAKPOINT && navStyle !== SKINNY) {
+      this.setState({ navStyle: SKINNY });
+    }
+
+    if (innerWidth > NAV_BREAKPOINT && navStyle !== FULL) {
+      this.setState({ navStyle: FULL });
+    }
+  }, { leading: false, trailing: true, timeout: 300 })
 
   setActiveTab = (activeTab) => {
     return (evt) => {
