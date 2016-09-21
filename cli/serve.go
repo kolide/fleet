@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/WatchBeam/clock"
 	kitlog "github.com/go-kit/kit/log"
 	"github.com/kolide/kolide-ose/config"
 	"github.com/kolide/kolide-ose/datastore"
@@ -73,35 +74,46 @@ the way that the kolide server works.
 				}
 			}
 
-			svc, err := server.NewService(ds, logger, config, mailService)
+			svc, err := server.NewService(ds, logger, config, mailService, clock.C)
 			if err != nil {
 				initFatal(err, "initializing service")
 			}
 
 			if devMode {
-				// bootstrap an admin user when using the
-				// in-memory database
-				var (
-					name     = "Admin User"
-					username = "admin"
-					password = "admin"
-					email    = "admin@kolide.co"
-					position = "Head of Security"
-					enabled  = true
-					isAdmin  = true
-				)
-				admin := kolide.UserPayload{
-					Name:     &name,
-					Username: &username,
-					Password: &password,
-					Email:    &email,
-					Enabled:  &enabled,
-					Position: &position,
-					Admin:    &isAdmin,
+				// Bootstrap a few users when using the in-memory database.
+				// Each user's default password will just be their username.
+				users := []kolide.User{
+					kolide.User{
+						Name:     "Admin User",
+						Username: "admin",
+						Email:    "admin@kolide.co",
+						Position: "Director of Security",
+						Admin:    true,
+						Enabled:  true,
+					},
+					kolide.User{
+						Name:     "Normal User",
+						Username: "user",
+						Email:    "user@kolide.co",
+						Position: "Security Engineer",
+						Admin:    false,
+						Enabled:  true,
+					},
 				}
-				_, err := svc.NewUser(ctx, admin)
-				if err != nil {
-					initFatal(err, "creating bootstrap user")
+
+				for _, user := range users {
+					_, err := svc.NewUser(ctx, kolide.UserPayload{
+						Name:     &user.Name,
+						Username: &user.Username,
+						Password: &user.Username,
+						Email:    &user.Email,
+						Enabled:  &user.Enabled,
+						Position: &user.Position,
+						Admin:    &user.Admin,
+					})
+					if err != nil {
+						initFatal(err, "creating bootstrap user")
+					}
 				}
 			}
 
