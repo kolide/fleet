@@ -64,18 +64,33 @@ func (svc service) SubmitResultsLogs(ctx context.Context, logs []kolide.OsqueryS
 // osqueryd writes the distributed query results.
 const hostLabelQueryPrefix = "kolide_label_query_"
 
+// hostDetailQueryPrefix is appended before the query name when a query is
+// provided as a detail query.
+const hostDetailQueryPrefix = "kolide_detail_query_"
+
+// hostDetailQueries returns the map of queries that should be executed by
+// osqueryd to fill in the host details
+func hostDetailQueries(host kolide.Host) map[string]string {
+	queries := make(map[string]string)
+	if host.Platform == "" {
+		queries[hostDetailQueryPrefix+"platform"] = "select build_platform from osquery_info;"
+	}
+	return queries
+}
+
 func (svc service) GetDistributedQueries(ctx context.Context) (map[string]string, error) {
-	var queries map[string]string
+	queries := make(map[string]string)
 
 	host, err := osqueryHostFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	if host.NeedsDetailUpdate() {
+	queries = hostDetailQueries(*host)
+	if len(queries) > 0 {
 		// If the host details need to be updated, we should do so
 		// before checking for any other queries
-		return host.GetDetailQueries(), nil
+		return queries, nil
 	}
 
 	// Retrieve the label queries that should be updated

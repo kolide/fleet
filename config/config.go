@@ -360,10 +360,11 @@ func TestConfig() KolideConfig {
 			Duration: 24 * 90 * time.Hour,
 		},
 		Osquery: OsqueryConfig{
-			EnrollSecret:  "",
-			NodeKeySize:   24,
-			StatusLogFile: "",
-			ResultLogFile: "",
+			EnrollSecret:        "",
+			NodeKeySize:         24,
+			StatusLogFile:       "",
+			ResultLogFile:       "",
+			LabelUpdateInterval: 1 * time.Hour,
 		},
 		Logging: LoggingConfig{
 			Debug:         true,
