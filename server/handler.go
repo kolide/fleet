@@ -155,7 +155,7 @@ func attachAPIRoutes(router *mux.Router, ctx context.Context, svc kolide.Service
 		kithttp.NewServer(
 			ctx,
 			authenticated(mustBeAdmin(makeModifyAppConfigRequest(svc))),
-			decodeNoParamsRequest,
+			decodeModifyAppConfigRequest,
 			encodeResponse,
 			opts...,
 		),

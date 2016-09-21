@@ -33,13 +33,13 @@ func makeGetAppConfigEndpoint(svc kolide.Service) endpoint.Endpoint {
 }
 
 type modifyAppConfigRequest struct {
-	orgPayload kolide.OrgInfoPayload
+	OrgPayload kolide.OrgInfoPayload `json:"org_info"`
 }
 
 func makeModifyAppConfigRequest(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(modifyAppConfigRequest)
-		info, err := svc.ModifyOrgInfo(ctx, req.orgPayload)
+		info, err := svc.ModifyOrgInfo(ctx, req.OrgPayload)
 		if err != nil {
 			return getAppConfigResponse{Err: err}, nil
 		}

@@ -29,6 +29,6 @@ type OrgInfo struct {
 // OrgInfoPayload is used to accept
 // OrgInfo modifications by a client
 type OrgInfoPayload struct {
-	OrgName    *string
-	OrgLogoURL *string
+	OrgName    *string `json:"org_name"`
+	OrgLogoURL *string `json:"org_logo_url"`
 }
