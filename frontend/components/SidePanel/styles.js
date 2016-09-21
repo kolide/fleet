@@ -234,7 +234,7 @@ const componentStyles = (navStyle) => {
     },
     subItemListStyles: (expanded) => {
       const skinnyNavStyles = {
-        borderRight: '1px solid #eaeaea',
+        borderRight: '1px solid rgba(0,0,0,0.16)',
         display: 'inline-block',
         padding: 0,
         textAlign: 'left',
