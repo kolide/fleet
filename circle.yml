@@ -16,11 +16,9 @@ dependencies:
     - "vendor"
     - "node_modules"
 
-
-
 test:
   override:
-      - docker run -v $(pwd):/go/src/github.com/kolide/kolide-ose -v /home/ubuntu/.go_workspace/pkg:/go/pkg kolide/kolide-builder:dev -N
+      - docker run -v $(pwd):/go/src/github.com/kolide/kolide-ose -v /home/ubuntu/.go_workspace/pkg:/go/pkg kolide/kolide-builder:dev --build
 
 deployment:
   development:
