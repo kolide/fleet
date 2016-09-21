@@ -75,8 +75,6 @@ const componentStyles = {
       fontSize: font.small,
       textTransform: 'uppercase',
       paddingTop: padding.half,
-      WebkitTransition: 'all 0.2s ease-in-out',
-      MozTransition: 'all 0.2s ease-in-out',
       transition: 'all 0.2s ease-in-out',
       '@media (max-width: 760px)': {
         textAlign: 'center',
@@ -184,8 +182,6 @@ const componentStyles = {
       paddingLeft: padding.most,
       paddingTop: padding.xSmall,
       position: 'relative',
-      WebkitTransition: 'all 0.2s ease-in-out',
-      MozTransition: 'all 0.2s ease-in-out',
       textTransform: 'none',
       transition: 'all 0.2s ease-in-out',
     };
@@ -210,6 +206,7 @@ const componentStyles = {
       paddingTop: padding.half,
       marginLeft: '-24px',
       marginTop: padding.medium,
+      transition: 'width 0.1s ease-in-out',
       '@media (max-width: 760px)': {
         bottom: '-8px',
         left: '54px',
@@ -227,7 +224,7 @@ const componentStyles = {
         display: expanded ? 'inline-block' : 'none',
         padding: 0,
         textAlign: 'left',
-        width: '84%',
+        width: '211px',
       },
     };
   },
