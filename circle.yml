@@ -12,6 +12,11 @@ dependencies:
   override:
     - docker pull kolide/kolide-builder:dev
     - docker run -v $(pwd):/go/src/github.com/kolide/kolide-ose -v /home/ubuntu/.go_workspace/pkg:/go/pkg kolide/kolide-builder:dev --deps
+  cache_directories:
+    - "vendor"
+    - "node_modules"
+
+
 
 test:
   override:
