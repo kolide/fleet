@@ -1,15 +1,9 @@
 import React, { Component, PropTypes } from 'react';
+import radium from 'radium';
 import { isEqual, last } from 'lodash';
-import componentStylesFunc from './styles';
+import componentStyles from './styles';
 import kolideLogo from '../../../assets/images/kolide-logo.svg';
-import debounce from '../../utilities/debounce';
 import navItems from './navItems';
-
-const NAV_BREAKPOINT = 760;
-export const NAV_STYLES = {
-  FULL: 'full',
-  SKINNY: 'skinny',
-};
 
 class SidePanel extends Component {
   static propTypes = {
@@ -19,26 +13,11 @@ class SidePanel extends Component {
   constructor (props) {
     super(props);
 
-    const { FULL, SKINNY } = NAV_STYLES;
-    const { innerWidth } = global.window;
-    const navStyle = innerWidth <= NAV_BREAKPOINT ? SKINNY : FULL;
-
-    this.componentStyles = componentStylesFunc(navStyle);
-
     this.state = {
       activeTab: 'Hosts',
       activeSubItem: 'Add Hosts',
-      navStyle,
-      subItemsExpanded: false,
+      showSubItems: false,
     };
-  }
-
-  componentDidMount () {
-    global.window.addEventListener('resize', this.handleResize);
-  }
-
-  componentWillUnmount () {
-    global.window.removeEventListener('resize', this.handleResize);
   }
 
   setActiveSubItem = (activeSubItem) => {
@@ -62,29 +41,11 @@ class SidePanel extends Component {
     };
   }
 
-  handleResize = debounce(() => {
-    const { FULL, SKINNY } = NAV_STYLES;
-    const { innerWidth } = global.window;
-    const { navStyle } = this.state;
-
-    if (innerWidth <= NAV_BREAKPOINT && navStyle !== SKINNY) {
-      this.componentStyles = componentStylesFunc(SKINNY);
-      this.setState({ navStyle: SKINNY });
-    }
-
-    if (innerWidth > NAV_BREAKPOINT && navStyle !== FULL) {
-      this.componentStyles = componentStylesFunc(FULL);
-      this.setState({ navStyle: FULL });
-    }
-  }, { leading: false, trailing: true, timeout: 300 })
-
-  toggleSubItemsCollapse = (showSubItems) => {
+  toggleShowSubItems = (showSubItems) => {
     return (evt) => {
       evt.preventDefault();
 
-      this.setState({
-        subItemsExpanded: showSubItems,
-      });
+      this.setState({ showSubItems });
 
       return false;
     };
@@ -103,18 +64,18 @@ class SidePanel extends Component {
       orgNameStyles,
       usernameStyles,
       userStatusStyles,
-    } = this.componentStyles;
+    } = componentStyles;
 
     return (
       <header style={headerStyles}>
         <img
           alt="Company logo"
           src={kolideLogo}
-          style={companyLogoStyles()}
+          style={companyLogoStyles}
         />
-        <h1 style={orgNameStyles()}>Kolide, Inc.</h1>
+        <h1 style={orgNameStyles}>Kolide, Inc.</h1>
         <div style={userStatusStyles(enabled)} />
-        <h2 style={usernameStyles()}>{username}</h2>
+        <h2 style={usernameStyles}>{username}</h2>
       </header>
     );
   }
@@ -129,19 +90,19 @@ class SidePanel extends Component {
       navItemNameStyles,
       navItemStyles,
       navItemWrapperStyles,
-    } = this.componentStyles;
+    } = componentStyles;
     const { renderSubItems, setActiveTab } = this;
 
     return (
       <div style={navItemWrapperStyles(lastChild)} key={`nav-item-${name}`}>
-        {active && <div style={navItemBeforeStyles()} />}
+        {active && <div style={navItemBeforeStyles} />}
         <li
           onClick={setActiveTab(name)}
           style={navItemStyles(active)}
         >
           <div style={{ position: 'relative' }}>
-            <i className={icon} style={iconStyles()} />
-            <span style={navItemNameStyles()}>
+            <i className={icon} style={iconStyles} />
+            <span style={navItemNameStyles}>
               {name}
             </span>
           </div>
@@ -153,7 +114,7 @@ class SidePanel extends Component {
 
   renderNavItems = () => {
     const { renderNavItem } = this;
-    const { navItemListStyles } = this.componentStyles;
+    const { navItemListStyles } = componentStyles;
     const { user: { admin } } = this.props;
     const userNavItems = navItems(admin);
 
@@ -176,7 +137,7 @@ class SidePanel extends Component {
       subItemBeforeStyles,
       subItemStyles,
       subItemLinkStyles,
-    } = this.componentStyles;
+    } = componentStyles;
 
     return (
       <div
@@ -195,15 +156,15 @@ class SidePanel extends Component {
   }
 
   renderSubItems = (subItems) => {
-    const { subItemListStyles, subItemsStyles } = this.componentStyles;
+    const { subItemListStyles, subItemsStyles } = componentStyles;
     const { renderCollapseSubItems, renderSubItem } = this;
-    const { subItemsExpanded } = this.state;
+    const { showSubItems } = this.state;
 
     if (!subItems.length) return false;
 
     return (
-      <div style={subItemsStyles(subItemsExpanded)}>
-        <ul style={subItemListStyles(subItemsExpanded)}>
+      <div style={subItemsStyles(showSubItems)}>
+        <ul style={subItemListStyles(showSubItems)}>
           {subItems.map(subItem => {
             return renderSubItem(subItem);
           })}
@@ -214,27 +175,24 @@ class SidePanel extends Component {
   }
 
   renderCollapseSubItems = () => {
-    const { navStyle } = this.state;
-    const { FULL } = NAV_STYLES;
-    const { toggleSubItemsCollapse } = this;
-    const { subItemsExpanded } = this.state;
-    const { collapseSubItemsWrapper } = this.componentStyles;
-    const iconName = subItemsExpanded ? 'kolidecon-chevron-bold-left' : 'kolidecon-chevron-bold-right';
-    if (navStyle === FULL) return false;
+    const { toggleShowSubItems } = this;
+    const { showSubItems } = this.state;
+    const { collapseSubItemsWrapper } = componentStyles;
+    const iconName = showSubItems ? 'kolidecon-chevron-bold-left' : 'kolidecon-chevron-bold-right';
 
     return (
       <div style={collapseSubItemsWrapper}>
-        <i className={iconName} style={{ color: '#FFF' }} onClick={toggleSubItemsCollapse(!subItemsExpanded)} />
+        <i className={iconName} style={{ color: '#FFF' }} onClick={toggleShowSubItems(!showSubItems)} />
       </div>
     );
   }
 
   render () {
-    const { navStyles } = this.componentStyles;
+    const { navStyles } = componentStyles;
     const { renderHeader, renderNavItems } = this;
 
     return (
-      <nav style={navStyles()}>
+      <nav style={navStyles}>
         {renderHeader()}
         {renderNavItems()}
       </nav>
@@ -242,4 +200,4 @@ class SidePanel extends Component {
   }
 }
 
-export default SidePanel;
+export default radium(SidePanel);
