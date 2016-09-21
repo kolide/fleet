@@ -66,6 +66,10 @@ func TestAPIRoutes(t *testing.T) {
 			uri:  "/api/v1/kolide/config",
 		},
 		{
+			verb: "PATCH",
+			uri:  "/api/v1/kolide/config",
+		},
+		{
 			verb: "GET",
 			uri:  "/api/v1/kolide/queries/1",
 		},
