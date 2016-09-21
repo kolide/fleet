@@ -11,7 +11,7 @@ dependencies:
     - docker login -e $DOCKER_HUB_EMAIL -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
   override:
     - docker pull kolide/kolide-builder:dev
-    - docker run -v $(pwd):/go/src/github.com/kolide/kolide-ose -v /home/ubuntu/.go_workspace/pkg:/go/pkg kolide/kolide-builder:dev -D
+    - docker run -v $(pwd):/go/src/github.com/kolide/kolide-ose -v /home/ubuntu/.go_workspace/pkg:/go/pkg kolide/kolide-builder:dev --deps
 
 test:
   override:
