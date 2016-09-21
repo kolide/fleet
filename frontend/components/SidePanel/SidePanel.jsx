@@ -1,12 +1,12 @@
 import React, { Component, PropTypes } from 'react';
 import { isEqual, last } from 'lodash';
-import componentStyles from './styles';
+import componentStylesFunc from './styles';
 import kolideLogo from '../../../assets/images/kolide-logo.svg';
 import debounce from '../../utilities/debounce';
 import navItems from './navItems';
 
-const NAV_BREAKPOINT = 1000;
-const NAV_STYLES = {
+const NAV_BREAKPOINT = 760;
+export const NAV_STYLES = {
   FULL: 'full',
   SKINNY: 'skinny',
 };
@@ -23,10 +23,13 @@ class SidePanel extends Component {
     const { innerWidth } = global.window;
     const navStyle = innerWidth <= NAV_BREAKPOINT ? SKINNY : FULL;
 
+    this.componentStyles = componentStylesFunc(navStyle);
+
     this.state = {
       activeTab: 'Hosts',
       activeSubItem: 'Add Hosts',
       navStyle,
+      subItemsExpanded: false,
     };
   }
 
@@ -38,33 +41,51 @@ class SidePanel extends Component {
     global.window.removeEventListener('resize', this.handleResize);
   }
 
-  handleResize = debounce(() => {
-    const { FULL, SKINNY } = NAV_STYLES;
-    const { navStyle } = this.state;
-
-    if (innerWidth <= NAV_BREAKPOINT && navStyle !== SKINNY) {
-      this.setState({ navStyle: SKINNY });
-    }
-
-    if (innerWidth > NAV_BREAKPOINT && navStyle !== FULL) {
-      this.setState({ navStyle: FULL });
-    }
-  }, { leading: false, trailing: true, timeout: 300 })
-
-  setActiveTab = (activeTab) => {
-    return (evt) => {
-      evt.preventDefault();
-
-      this.setState({ activeTab });
-      return false;
-    };
-  }
-
   setActiveSubItem = (activeSubItem) => {
     return (evt) => {
       evt.preventDefault();
 
       this.setState({ activeSubItem });
+      return false;
+    };
+  }
+
+  setActiveTab = (activeTab) => {
+    return (evt) => {
+      evt.preventDefault();
+
+      this.setState({
+        activeTab,
+      });
+
+      return false;
+    };
+  }
+
+  handleResize = debounce(() => {
+    const { FULL, SKINNY } = NAV_STYLES;
+    const { innerWidth } = global.window;
+    const { navStyle } = this.state;
+
+    if (innerWidth <= NAV_BREAKPOINT && navStyle !== SKINNY) {
+      this.componentStyles = componentStylesFunc(SKINNY);
+      this.setState({ navStyle: SKINNY });
+    }
+
+    if (innerWidth > NAV_BREAKPOINT && navStyle !== FULL) {
+      this.componentStyles = componentStylesFunc(FULL);
+      this.setState({ navStyle: FULL });
+    }
+  }, { leading: false, trailing: true, timeout: 300 })
+
+  toggleSubItemsCollapse = (showSubItems) => {
+    return (evt) => {
+      evt.preventDefault();
+
+      this.setState({
+        subItemsExpanded: showSubItems,
+      });
+
       return false;
     };
   }
@@ -82,18 +103,18 @@ class SidePanel extends Component {
       orgNameStyles,
       usernameStyles,
       userStatusStyles,
-    } = componentStyles;
+    } = this.componentStyles;
 
     return (
       <header style={headerStyles}>
         <img
           alt="Company logo"
           src={kolideLogo}
-          style={companyLogoStyles}
+          style={companyLogoStyles()}
         />
-        <h1 style={orgNameStyles}>Kolide, Inc.</h1>
+        <h1 style={orgNameStyles()}>Kolide, Inc.</h1>
         <div style={userStatusStyles(enabled)} />
-        <h2 style={usernameStyles}>{username}</h2>
+        <h2 style={usernameStyles()}>{username}</h2>
       </header>
     );
   }
@@ -108,19 +129,19 @@ class SidePanel extends Component {
       navItemNameStyles,
       navItemStyles,
       navItemWrapperStyles,
-    } = componentStyles;
+    } = this.componentStyles;
     const { renderSubItems, setActiveTab } = this;
 
     return (
       <div style={navItemWrapperStyles(lastChild)} key={`nav-item-${name}`}>
-        {active && <div style={navItemBeforeStyles} />}
+        {active && <div style={navItemBeforeStyles()} />}
         <li
           onClick={setActiveTab(name)}
           style={navItemStyles(active)}
         >
           <div style={{ position: 'relative' }}>
-            <i className={icon} style={iconStyles} />
-            <span style={navItemNameStyles}>
+            <i className={icon} style={iconStyles()} />
+            <span style={navItemNameStyles()}>
               {name}
             </span>
           </div>
@@ -132,7 +153,7 @@ class SidePanel extends Component {
 
   renderNavItems = () => {
     const { renderNavItem } = this;
-    const { navItemListStyles } = componentStyles;
+    const { navItemListStyles } = this.componentStyles;
     const { user: { admin } } = this.props;
     const userNavItems = navItems(admin);
 
@@ -155,7 +176,7 @@ class SidePanel extends Component {
       subItemBeforeStyles,
       subItemStyles,
       subItemLinkStyles,
-    } = componentStyles;
+    } = this.componentStyles;
 
     return (
       <div
@@ -174,24 +195,46 @@ class SidePanel extends Component {
   }
 
   renderSubItems = (subItems) => {
-    const { subItemsStyles } = componentStyles;
-    const { renderSubItem } = this;
+    const { subItemListStyles, subItemsStyles } = this.componentStyles;
+    const { renderCollapseSubItems, renderSubItem } = this;
+    const { subItemsExpanded } = this.state;
+
+    if (!subItems.length) return false;
 
     return (
-      <ul style={subItemsStyles}>
-        {subItems.map(subItem => {
-          return renderSubItem(subItem);
-        })}
-      </ul>
+      <div style={subItemsStyles(subItemsExpanded)}>
+        <ul style={subItemListStyles(subItemsExpanded)}>
+          {subItems.map(subItem => {
+            return renderSubItem(subItem);
+          })}
+        </ul>
+        {renderCollapseSubItems()}
+      </div>
+    );
+  }
+
+  renderCollapseSubItems = () => {
+    const { navStyle } = this.state;
+    const { FULL } = NAV_STYLES;
+    const { toggleSubItemsCollapse } = this;
+    const { subItemsExpanded } = this.state;
+    const { collapseSubItemsWrapper } = this.componentStyles;
+    const iconName = subItemsExpanded ? 'kolidecon-chevron-bold-left' : 'kolidecon-chevron-bold-right';
+    if (navStyle === FULL) return false;
+
+    return (
+      <div style={collapseSubItemsWrapper}>
+        <i className={iconName} style={{ color: '#FFF' }} onClick={toggleSubItemsCollapse(!subItemsExpanded)} />
+      </div>
     );
   }
 
   render () {
-    const { navStyles } = componentStyles;
+    const { navStyles } = this.componentStyles;
     const { renderHeader, renderNavItems } = this;
 
     return (
-      <nav style={navStyles}>
+      <nav style={navStyles()}>
         {renderHeader()}
         {renderNavItems()}
       </nav>
