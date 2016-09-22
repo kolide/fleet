@@ -3,7 +3,6 @@ export default {
     width: '100%',
   },
   submitButtonStyles: {
-    borderTop: 'none',
     ':active': {
       boxShadow: '0 1px 0 #734893',
     },
