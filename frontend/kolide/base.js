@@ -9,6 +9,10 @@ class Base {
     this.bearerToken = local.getItem('auth_token');
   }
 
+  endpoint (pathname) {
+    return this.baseURL + pathname;
+  }
+
   setBearerToken (bearerToken) {
     this.bearerToken = bearerToken;
   }

@@ -12,6 +12,16 @@ export const validUser = {
   gravatarURL: 'https://www.gravatar.com/avatar/7157f4758f8423b59aaee869d919f6b9',
 };
 
+export const validGetUsersRequest = (bearerToken) => {
+  return nock('http://localhost:8080', {
+    reqHeaders: {
+      Authorization: `Bearer ${bearerToken}`,
+    },
+  })
+    .get('/api/v1/kolide/users')
+    .reply(200, { users: [validUser] });
+};
+
 export const validLoginRequest = () => {
   return nock('http://localhost:8080')
   .post('/api/v1/kolide/login')
@@ -73,6 +83,7 @@ export default {
   invalidForgotPasswordRequest,
   invalidResetPasswordRequest,
   validForgotPasswordRequest,
+  validGetUsersRequest,
   validLoginRequest,
   validLogoutRequest,
   validMeRequest,
