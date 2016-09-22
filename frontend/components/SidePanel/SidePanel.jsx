@@ -18,6 +18,7 @@ class SidePanel extends Component {
 
   constructor (props) {
     super(props);
+
     const { pathname, user: { admin } } = this.props;
 
     this.userNavItems = navItems(admin);
