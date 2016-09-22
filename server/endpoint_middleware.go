@@ -2,32 +2,76 @@ package server
 
 import (
 	"errors"
+	"fmt"
 
+	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/go-kit/kit/endpoint"
 	"github.com/kolide/kolide-ose/kolide"
+	"github.com/kolide/kolide-ose/server/contexts/token"
+	"github.com/kolide/kolide-ose/server/contexts/viewer"
 	"golang.org/x/net/context"
 )
 
-var errNoContext = errors.New("no viewer context set")
+var errNoContext = errors.New("context key not set")
 
-func authenticated(next endpoint.Endpoint) endpoint.Endpoint {
+func authenticated(jwtKey string, svc kolide.Service, next endpoint.Endpoint) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		vc, err := viewerContextFromContext(ctx)
+		// first check if already succesfuly set
+		if _, ok := viewer.FromContext(ctx); ok {
+			return next(ctx, request)
+		}
+		// if not succesful, try again this time with errors
+		v, err := viewerFromTokenContext(ctx, jwtKey, svc)
 		if err != nil {
 			return nil, err
 		}
-		if !vc.IsLoggedIn() {
-			return nil, authError{reason: "must be logged in", clientReason: "must be logged in"}
-		}
+		ctx = viewer.NewContext(ctx, *v)
 		return next(ctx, request)
 	}
 }
 
+func viewerFromTokenContext(ctx context.Context, jwtKey string, svc kolide.Service) (*viewer.Viewer, error) {
+	tokenString, ok := token.FromContext(ctx)
+	if !ok {
+		return nil, authError{reason: "no auth token"}
+	}
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(jwtKey), nil
+	})
+	if err != nil {
+		return nil, authError{reason: err.Error(), clientReason: "bad credentials"}
+	}
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return nil, authError{reason: "no jwt claims", clientReason: "bad credentials"}
+	}
+	sessionKeyClaim, ok := claims["session_key"]
+	if !ok {
+		return nil, authError{reason: "no session_key in JWT claims", clientReason: "bad credentials"}
+	}
+	sessionKey, ok := sessionKeyClaim.(string)
+	if !ok {
+		return nil, authError{reason: "non-string key in sessionClaim", clientReason: "bad credentials"}
+	}
+	session, err := svc.GetSessionByKey(ctx, sessionKey)
+	if err != nil {
+		return nil, authError{reason: err.Error(), clientReason: "bad credentials"}
+	}
+	user, err := svc.User(ctx, session.UserID)
+	if err != nil {
+		return nil, authError{reason: err.Error(), clientReason: "bad credentials"}
+	}
+	return &viewer.Viewer{User: user, Session: session}, nil
+}
+
 func mustBeAdmin(next endpoint.Endpoint) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		vc, err := viewerContextFromContext(ctx)
-		if err != nil {
-			return nil, err
+		vc, ok := viewer.FromContext(ctx)
+		if !ok {
+			return nil, errNoContext
 		}
 		if !vc.IsAdmin() {
 			return nil, permissionError{message: "must be an admin"}
@@ -38,9 +82,9 @@ func mustBeAdmin(next endpoint.Endpoint) endpoint.Endpoint {
 
 func canPerformActions(next endpoint.Endpoint) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		vc, err := viewerContextFromContext(ctx)
-		if err != nil {
-			return nil, err
+		vc, ok := viewer.FromContext(ctx)
+		if !ok {
+			return nil, errNoContext
 		}
 		if !vc.CanPerformActions() {
 			return nil, permissionError{message: "no read permissions"}
@@ -51,9 +95,9 @@ func canPerformActions(next endpoint.Endpoint) endpoint.Endpoint {
 
 func canReadUser(next endpoint.Endpoint) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		vc, err := viewerContextFromContext(ctx)
-		if err != nil {
-			return nil, err
+		vc, ok := viewer.FromContext(ctx)
+		if !ok {
+			return nil, errNoContext
 		}
 		uid := requestUserIDFromContext(ctx)
 		if !vc.CanPerformReadActionOnUser(uid) {
@@ -65,9 +109,9 @@ func canReadUser(next endpoint.Endpoint) endpoint.Endpoint {
 
 func canModifyUser(next endpoint.Endpoint) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		vc, err := viewerContextFromContext(ctx)
-		if err != nil {
-			return nil, err
+		vc, ok := viewer.FromContext(ctx)
+		if !ok {
+			return nil, errNoContext
 		}
 		uid := requestUserIDFromContext(ctx)
 		if !vc.CanPerformWriteActionOnUser(uid) {
@@ -88,9 +132,9 @@ const (
 func validateModifyUserRequest(next endpoint.Endpoint) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		r := request.(modifyUserRequest)
-		vc, err := viewerContextFromContext(ctx)
-		if err != nil {
-			return nil, err
+		vc, ok := viewer.FromContext(ctx)
+		if !ok {
+			return nil, errNoContext
 		}
 		uid := requestUserIDFromContext(ctx)
 		p := r.payload
