@@ -9,9 +9,12 @@ export default {
     marginRight: 'auto',
   },
   containerStyles: {
-    backgroundColor: '#FFF',
+    backgroundColor: color.white,
     minHeight: '100px',
-    padding: padding.base,
+    paddingBottom: '190px',
+    paddingLeft: padding.base,
+    paddingRight: padding.base,
+    paddingTop: padding.base,
     width: '100%',
   },
   nameStyles: {
