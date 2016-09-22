@@ -26,7 +26,7 @@ export default {
     position: 'absolute',
     top: '30px',
     right: '30px',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   exWrapperStyles: {
     textAlign: 'right',

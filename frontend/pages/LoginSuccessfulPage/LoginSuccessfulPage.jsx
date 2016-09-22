@@ -10,7 +10,7 @@ const REDIRECT_TIME = 1200;
 
 class LoginSuccessfulPage extends Component {
   static propTypes = {
-    dispatch: PropTypes.func.isRequired
+    dispatch: PropTypes.func.isRequired,
   };
 
   constructor (props) {
@@ -32,7 +32,7 @@ class LoginSuccessfulPage extends Component {
 
     setTimeout(() => {
       return dispatch(push(HOME));
-    }, redirectTime)
+    }, redirectTime);
   }
 
   render () {

@@ -28,7 +28,9 @@ const componentStyles = {
     top: '4px',
     left: 0,
     '@media (max-width: 760px)': {
-      left: '5px',
+      display: 'block',
+      textAlign: 'center',
+      marginRight: 0,
     },
   },
   navItemBeforeStyles: {
@@ -36,7 +38,7 @@ const componentStyles = {
     width: '6px',
     height: '50px',
     position: 'absolute',
-    left: '-24px',
+    left: '-16px',
     top: '2px',
     bottom: 0,
     backgroundColor: '#9a61c6',
@@ -62,8 +64,7 @@ const componentStyles = {
       borderBottom: 'none',
       transition: 'none',
       '@media (max-width: 760px)': {
-        borderBottom: '8px solid #9a61c6',
-        textAlign: 'center',
+        borderBottom: '6px solid #9a61c6',
       },
     };
 
@@ -76,9 +77,6 @@ const componentStyles = {
       textTransform: 'uppercase',
       paddingTop: padding.half,
       transition: 'all 0.2s ease-in-out',
-      '@media (max-width: 760px)': {
-        textAlign: 'center',
-      },
     };
 
     if (active) {
@@ -122,7 +120,7 @@ const componentStyles = {
     bottom: 0,
     boxShadow: '2px 0 8px 0 rgba(0, 0, 0, 0.1)',
     left: 0,
-    paddingLeft: padding.large,
+    paddingLeft: '16px',
     paddingTop: padding.large,
     position: 'fixed',
     top: 0,
@@ -199,39 +197,48 @@ const componentStyles = {
     return {
       backgroundColor: color.brand,
       boxShadow: 'inset 0 5px 8px 0 rgba(0, 0, 0, 0.12), inset 0 -5px 8px 0 rgba(0, 0, 0, 0.12)',
-      marginBottom: 0,
       marginRight: 0,
-      minHeight: '87px',
-      paddingBottom: padding.half,
-      paddingTop: padding.half,
-      marginLeft: '-24px',
-      marginTop: padding.medium,
+      marginBottom: '6px',
+      paddingBottom: '3px',
+      paddingTop: '3px',
+      marginLeft: '-16px',
+      position: 'relative',
+      top: '10px',
       transition: 'width 0.1s ease-in-out',
       '@media (max-width: 760px)': {
+        minHeight: '84px',
+        borderTopRightRadius: '3px',
+        borderBottomRightRadius: '3px',
+        boxShadow: '2px 2px 8px rgba(0,0,0,0.1)',
         bottom: '-8px',
         left: '54px',
         marginLeft: 0,
         position: 'absolute',
-        width: expanded ? '251px' : '18px',
+        width: expanded ? '186px' : '18px',
       },
     };
   },
   subItemListStyles: (expanded) => {
     return {
       listStyle: 'none',
+      paddingLeft: '16px',
       '@media (max-width: 760px)': {
         borderRight: '1px solid rgba(0,0,0,0.16)',
         display: expanded ? 'inline-block' : 'none',
         padding: 0,
         textAlign: 'left',
-        width: '211px',
+        width: '166px',
       },
     };
   },
   collapseSubItemsWrapper: {
     position: 'absolute',
     right: '3px',
-    top: '41%',
+    top: '0',
+    bottom: '0',
+    lineHeight: '95px',
+    color: '#fff',
+
     '@media (min-width: 761px)': {
       display: 'none',
     },

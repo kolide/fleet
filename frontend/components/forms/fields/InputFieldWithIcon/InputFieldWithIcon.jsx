@@ -1,6 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import radium, { Style } from 'radium'
-import Icon from '../../../icons/Icon';
+import radium from 'radium';
 import componentStyles from './styles';
 
 
@@ -62,7 +61,7 @@ class InputFieldWithIcon extends Component {
     const { error, iconName, name, placeholder, style, type } = this.props;
     const { containerStyles, iconStyles, iconErrorStyles, inputErrorStyles, inputStyles } = componentStyles;
     const { value } = this.state;
-    const { iconVariant, onInputChange } = this;
+    const { onInputChange } = this;
 
     return (
       <div style={containerStyles}>

@@ -160,8 +160,6 @@ class SidePanel extends Component {
     const { renderCollapseSubItems, renderSubItem } = this;
     const { showSubItems } = this.state;
 
-    if (!subItems.length) return false;
-
     return (
       <div style={subItemsStyles(showSubItems)}>
         <ul style={subItemListStyles(showSubItems)}>
@@ -181,8 +179,8 @@ class SidePanel extends Component {
     const iconName = showSubItems ? 'kolidecon-chevron-bold-left' : 'kolidecon-chevron-bold-right';
 
     return (
-      <div style={collapseSubItemsWrapper}>
-        <i className={iconName} style={{ color: '#FFF' }} onClick={toggleShowSubItems(!showSubItems)} />
+      <div style={collapseSubItemsWrapper} onClick={toggleShowSubItems(!showSubItems)} >
+        <i className={iconName} />
       </div>
     );
   }

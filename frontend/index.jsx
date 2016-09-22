@@ -1,6 +1,6 @@
 import ReactDOM from 'react-dom';
 import routes from './router';
-import "./index.scss"; 
+import './index.scss';
 
 if (typeof window !== 'undefined') {
   const { document } = global;

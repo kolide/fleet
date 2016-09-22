@@ -20,22 +20,24 @@ export default {
       top: '28px',
       fontSize: '20px',
       color: color.accentText,
-    }
+    };
     if (value) {
       return {
         ...baseStyles,
         color: color.brand,
-      }
+      };
     }
 
     return baseStyles;
   },
+
   iconErrorStyles: (error) => {
     if (error) {
       return {
         color: color.alert,
       };
     }
+    return false;
   },
   inputErrorStyles: (error) => {
     if (error) {
@@ -67,12 +69,12 @@ export default {
       },
     };
 
-    if (type == "password" && value) {
+    if (type === 'password' && value) {
       return {
         ...baseStyles,
         letterSpacing: '7px',
         color: color.textUltradark,
-      }
+      };
     }
 
     if (value) {
