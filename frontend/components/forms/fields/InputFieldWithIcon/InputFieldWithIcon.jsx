@@ -1,7 +1,8 @@
 import React, { Component, PropTypes } from 'react';
-import radium from 'radium';
+import radium, { Style } from 'radium'
 import Icon from '../../../icons/Icon';
 import componentStyles from './styles';
+
 
 class InputFieldWithIcon extends Component {
   static propTypes = {
@@ -45,17 +46,6 @@ class InputFieldWithIcon extends Component {
     return onChange(evt);
   }
 
-  iconVariant = () => {
-    const { error } = this.props;
-    const { value } = this.state;
-
-    if (error) return 'error';
-
-    if (value) return 'colored';
-
-    return 'default';
-  }
-
   renderHeading = () => {
     const { error, placeholder } = this.props;
     const { value } = this.state;
@@ -70,7 +60,7 @@ class InputFieldWithIcon extends Component {
 
   render () {
     const { error, iconName, name, placeholder, style, type } = this.props;
-    const { containerStyles, iconStyles, inputErrorStyles, inputStyles } = componentStyles;
+    const { containerStyles, iconStyles, iconErrorStyles, inputErrorStyles, inputStyles } = componentStyles;
     const { value } = this.state;
     const { iconVariant, onInputChange } = this;
 
@@ -80,12 +70,13 @@ class InputFieldWithIcon extends Component {
         <input
           name={name}
           onChange={onInputChange}
+          className="input-with-icon"
           placeholder={placeholder}
           ref={(r) => { this.input = r; }}
-          style={[inputStyles(value), inputErrorStyles(error), style]}
+          style={[inputStyles(value, type), inputErrorStyles(error), style]}
           type={type}
         />
-        <Icon name={iconName} style={iconStyles} variant={iconVariant()} />
+        <i className={iconName} style={[iconStyles(value), iconErrorStyles(error), style]} />
       </div>
     );
   }
