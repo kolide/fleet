@@ -3,15 +3,13 @@ package server
 import (
 	"testing"
 
-	"github.com/kolide/kolide-ose/datastore"
 	"github.com/kolide/kolide-ose/kolide"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
 )
 
 func TestGetAllPacks(t *testing.T) {
-	ds, err := datastore.New("gorm-sqlite3", ":memory:")
-	assert.Nil(t, err)
+	ds := setup(t)
 
 	svc, err := newTestService(ds)
 	assert.Nil(t, err)
@@ -33,8 +31,7 @@ func TestGetAllPacks(t *testing.T) {
 }
 
 func TestGetPack(t *testing.T) {
-	ds, err := datastore.New("gorm-sqlite3", ":memory:")
-	assert.Nil(t, err)
+	ds := setup(t)
 
 	svc, err := newTestService(ds)
 	assert.Nil(t, err)
@@ -55,8 +52,7 @@ func TestGetPack(t *testing.T) {
 }
 
 func TestNewPack(t *testing.T) {
-	ds, err := datastore.New("gorm-sqlite3", ":memory:")
-	assert.Nil(t, err)
+	ds := setup(t)
 
 	svc, err := newTestService(ds)
 	assert.Nil(t, err)
@@ -76,8 +72,7 @@ func TestNewPack(t *testing.T) {
 }
 
 func TestModifyPack(t *testing.T) {
-	ds, err := datastore.New("gorm-sqlite3", ":memory:")
-	assert.Nil(t, err)
+	ds := setup(t)
 
 	svc, err := newTestService(ds)
 	assert.Nil(t, err)
@@ -102,8 +97,7 @@ func TestModifyPack(t *testing.T) {
 }
 
 func TestDeletePack(t *testing.T) {
-	ds, err := datastore.New("gorm-sqlite3", ":memory:")
-	assert.Nil(t, err)
+	ds := setup(t)
 
 	svc, err := newTestService(ds)
 	assert.Nil(t, err)
@@ -127,8 +121,7 @@ func TestDeletePack(t *testing.T) {
 }
 
 func TestAddQueryToPack(t *testing.T) {
-	ds, err := datastore.New("gorm-sqlite3", ":memory:")
-	assert.Nil(t, err)
+	ds := setup(t)
 
 	svc, err := newTestService(ds)
 	assert.Nil(t, err)
@@ -163,8 +156,7 @@ func TestAddQueryToPack(t *testing.T) {
 }
 
 func TestGetQueriesInPack(t *testing.T) {
-	ds, err := datastore.New("gorm-sqlite3", ":memory:")
-	assert.Nil(t, err)
+	ds := setup(t)
 
 	svc, err := newTestService(ds)
 	assert.Nil(t, err)
@@ -195,8 +187,7 @@ func TestGetQueriesInPack(t *testing.T) {
 }
 
 func TestRemoveQueryFromPack(t *testing.T) {
-	ds, err := datastore.New("gorm-sqlite3", ":memory:")
-	assert.Nil(t, err)
+	ds := setup(t)
 
 	svc, err := newTestService(ds)
 	assert.Nil(t, err)

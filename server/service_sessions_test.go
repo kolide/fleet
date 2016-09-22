@@ -4,7 +4,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kolide/kolide-ose/datastore"
 	"github.com/kolide/kolide-ose/kolide"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -58,8 +57,7 @@ func TestAuthenticate(t *testing.T) {
 }
 
 func setupLoginTests(t *testing.T) (kolide.Service, kolide.UserPayload, kolide.User) {
-	ds, err := datastore.New("gorm-sqlite3", ":memory:")
-	assert.Nil(t, err)
+	ds := setup(t)
 
 	svc, err := newTestService(ds)
 	assert.Nil(t, err)

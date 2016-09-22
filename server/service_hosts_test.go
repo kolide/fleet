@@ -6,12 +6,12 @@ import (
 	"github.com/kolide/kolide-ose/datastore"
 	"github.com/kolide/kolide-ose/kolide"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
 )
 
 func TestGetAllHosts(t *testing.T) {
-	ds, err := datastore.New("gorm-sqlite3", ":memory:")
-	assert.Nil(t, err)
+	ds := setup(t)
 
 	svc, err := newTestService(ds)
 	assert.Nil(t, err)
@@ -33,8 +33,7 @@ func TestGetAllHosts(t *testing.T) {
 }
 
 func TestGetHost(t *testing.T) {
-	ds, err := datastore.New("gorm-sqlite3", ":memory:")
-	assert.Nil(t, err)
+	ds := setup(t)
 
 	svc, err := newTestService(ds)
 	assert.Nil(t, err)
@@ -54,8 +53,7 @@ func TestGetHost(t *testing.T) {
 }
 
 func TestNewHost(t *testing.T) {
-	ds, err := datastore.New("gorm-sqlite3", ":memory:")
-	assert.Nil(t, err)
+	ds := setup(t)
 
 	svc, err := newTestService(ds)
 	assert.Nil(t, err)
@@ -75,8 +73,7 @@ func TestNewHost(t *testing.T) {
 }
 
 func TestModifyHost(t *testing.T) {
-	ds, err := datastore.New("gorm-sqlite3", ":memory:")
-	assert.Nil(t, err)
+	ds := setup(t)
 
 	svc, err := newTestService(ds)
 	assert.Nil(t, err)
@@ -100,8 +97,7 @@ func TestModifyHost(t *testing.T) {
 }
 
 func TestDeleteHost(t *testing.T) {
-	ds, err := datastore.New("gorm-sqlite3", ":memory:")
-	assert.Nil(t, err)
+	ds := setup(t)
 
 	svc, err := newTestService(ds)
 	assert.Nil(t, err)
@@ -121,4 +117,13 @@ func TestDeleteHost(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Len(t, hosts, 0)
 
+}
+
+func setup(t *testing.T) kolide.Datastore {
+	ds, err := datastore.New("gorm-sqlite3", ":memory:")
+	require.Nil(t, err)
+
+	err = ds.Migrate()
+	require.Nil(t, err)
+	return ds
 }
