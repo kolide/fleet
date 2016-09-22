@@ -31,7 +31,7 @@ endif
 DOCKER_IMAGE_NAME = kolide/kolide
 
 ifndef CIRCLE_PR_NUMBER
-	DOCKER_IMAGE_TAG = dev-unset
+	DOCKER_IMAGE_TAG = latest
 else
 	DOCKER_IMAGE_TAG = dev-${CIRCLE_PR_NUMBER}
 endif
@@ -103,6 +103,9 @@ generate: .prefix
 		-o=server/bindata.go \
 		frontend/templates/ assets/...
 
+# we first generate the webpack bundle so that bindata knows to watch the
+# output bundle file. then, generate debug bindata source file. finally, we
+# run webpack in watch mode to continuously re-generate the bundle
 generate-dev: .prefix
 	webpack --progress --colors
 	go-bindata -debug -pkg=server \
