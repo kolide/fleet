@@ -223,7 +223,7 @@ class SidePanel extends Component {
 
     return (
       <div style={collapseSubItemsWrapper} onClick={toggleShowSubItems(!showSubItems)}>
-        <i className={iconName} style={{ color: '#FFF' }} />
+        <i className={iconName} />
       </div>
     );
   }

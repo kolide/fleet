@@ -263,13 +263,14 @@ const componentStyles = {
     };
   },
   collapseSubItemsWrapper: {
-    boxSizing: 'border-box',
     cursor: 'pointer',
-    height: '100%',
     position: 'absolute',
+    right: '4px',
     bottom: '0',
+    top: '0',
+    cursor: 'pointer',
     lineHeight: '95px',
-    color: '#fff',
+    color: color.white,
     '@media (min-width: 761px)': {
       display: 'none',
     },
