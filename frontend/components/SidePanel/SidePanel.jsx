@@ -203,6 +203,8 @@ class SidePanel extends Component {
     const { renderCollapseSubItems, renderSubItem, setSubNavClass } = this;
     const { showSubItems } = this.state;
 
+    if (!subItems.length) return false;
+
     return (
       <div className={setSubNavClass(showSubItems)} style={subItemsStyles}>
         <ul style={subItemListStyles(showSubItems)}>

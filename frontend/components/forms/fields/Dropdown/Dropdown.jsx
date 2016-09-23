@@ -19,18 +19,17 @@ class Dropdown extends Component {
   };
 
   static defaultProps = {
-    initialOption: {},
     onSelect: noop,
   };
 
   constructor (props) {
     super(props);
 
-    const { initialOption } = props;
+    const { initialOption, options } = props;
 
     this.state = {
       expanded: false,
-      selectedOption: initialOption,
+      selectedOption: initialOption || options[0],
     };
   }
 

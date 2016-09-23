@@ -105,8 +105,7 @@ class UserManagementPage extends Component {
           <span style={filterTextStyles}>Filter</span>
           <Dropdown
             fieldName="filter"
-            options={[{ text: 'Active Users', value: 'active' }]}
-            initialOption={{ text: 'All Users' }}
+            options={[{ text: 'All Users', value: 'all' }, { text: 'Active Users', value: 'active' }]}
             onSelect={this.onUserActionSelect}
             containerStyles={{ display: 'inline-block', marginLeft: '10px', width: '200px' }}
           />
