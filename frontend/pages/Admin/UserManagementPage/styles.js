@@ -12,10 +12,8 @@ export default {
     backgroundColor: color.white,
     minHeight: '100px',
     paddingBottom: '190px',
-    paddingLeft: padding.base,
-    paddingRight: padding.base,
+    paddingRight: padding.most,
     paddingTop: padding.base,
-    width: '100%',
   },
   nameStyles: {
     fontWeight: font.weight.bold,
@@ -24,7 +22,12 @@ export default {
     padding: 0,
   },
   numUsersStyles: {
+    borderBottom: '1px solid #EFF0F4',
+    color: color.textMedium,
     fontSize: font.large,
+    marginLeft: padding.most,
+    paddingBottom: padding.half,
+    width: '370px',
   },
   userHeaderStyles: {
     backgroundColor: color.brand,
@@ -76,12 +79,10 @@ export default {
     boxShadow: border.shadow.blur,
     display: 'inline-block',
     height: '390px',
+    marginLeft: padding.most,
+    marginTop: padding.most,
     width: '239px',
   },
   usersWrapperStyles: {
-    display: 'flex',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-around',
   },
 };
