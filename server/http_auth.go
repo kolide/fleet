@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strings"
 
-	kitlog "github.com/go-kit/kit/log"
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/kolide/kolide-ose/kolide"
 	"github.com/kolide/kolide-ose/server/contexts/token"
@@ -75,7 +74,7 @@ func (e permissionError) PermissionError() []map[string]string {
 }
 
 // setRequestsContexts updates the request with necessary context values for a request
-func setRequestsContexts(svc kolide.Service, ds kolide.Datastore, jwtKey string, logger kitlog.Logger) kithttp.RequestFunc {
+func setRequestsContexts(svc kolide.Service, jwtKey string) kithttp.RequestFunc {
 	return func(ctx context.Context, r *http.Request) context.Context {
 		ctx = token.NewContext(ctx, r)
 		v, err := viewerFromTokenContext(ctx, jwtKey, svc)

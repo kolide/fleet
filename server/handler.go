@@ -145,10 +145,10 @@ func makeKolideKitHandlers(ctx context.Context, e KolideEndpoints, opts []kithtt
 }
 
 // MakeHandler creates an HTTP handler for the Kolide server endpoints.
-func MakeHandler(ctx context.Context, svc kolide.Service, jwtKey string, ds kolide.Datastore, logger kitlog.Logger) http.Handler {
+func MakeHandler(ctx context.Context, svc kolide.Service, jwtKey string, logger kitlog.Logger) http.Handler {
 	kolideAPIOptions := []kithttp.ServerOption{
 		kithttp.ServerBefore(
-			setRequestsContexts(svc, ds, jwtKey, logger),
+			setRequestsContexts(svc, jwtKey),
 		),
 		kithttp.ServerErrorLogger(logger),
 		kithttp.ServerErrorEncoder(encodeError),

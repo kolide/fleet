@@ -31,7 +31,7 @@ func TestLogin(t *testing.T) {
 
 	opts := []kithttp.ServerOption{
 		kithttp.ServerBefore(
-			setRequestsContexts(svc, ds, "CHANGEME", logger),
+			setRequestsContexts(svc, "CHANGEME"),
 		),
 		kithttp.ServerErrorLogger(logger),
 		kithttp.ServerAfter(
