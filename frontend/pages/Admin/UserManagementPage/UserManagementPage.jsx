@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Avatar from '../../../components/Avatar';
+import GradientButton from '../../../components/buttons/GradientButton';
 import componentStyles from './styles';
 import Dropdown from '../../../components/forms/fields/Dropdown';
 import entityGetter from '../../../redux/entityGetter';
@@ -88,7 +89,10 @@ class UserManagementPage extends Component {
 
   render () {
     const {
+      addUserButtonStyles,
       containerStyles,
+      filterUsersStyles,
+      filterTextStyles,
       numUsersStyles,
       usersWrapperStyles,
     } = componentStyles;
@@ -96,7 +100,21 @@ class UserManagementPage extends Component {
 
     return (
       <div style={containerStyles}>
-        <p style={numUsersStyles}>Listing {users.length} users</p>
+        <span style={numUsersStyles}>Listing {users.length} users</span>
+        <div style={filterUsersStyles}>
+          <span style={filterTextStyles}>Filter</span>
+          <Dropdown
+            fieldName="filter"
+            options={[{ text: 'Active Users', value: 'active' }]}
+            initialOption={{ text: 'All Users' }}
+            onSelect={this.onUserActionSelect}
+            containerStyles={{ display: 'inline-block', marginLeft: '10px', width: '200px' }}
+          />
+          <GradientButton
+            style={addUserButtonStyles}
+            text="Add User"
+          />
+        </div>
         <div style={usersWrapperStyles}>
           {users.map(user => {
             return this.renderUserBlock(user);

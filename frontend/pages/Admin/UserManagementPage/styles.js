@@ -3,6 +3,18 @@ import Styles from '../../../styles';
 const { border, color, font, padding } = Styles;
 
 export default {
+  addUserButtonStyles: {
+    backgroundColor: color.brand,
+    backgroundImage: 'none',
+    boxShadow: `0 4px 0 ${color.brandLight}`,
+    fontSize: font.medium,
+    height: '38px',
+    letterSpacing: 'normal',
+    marginTop: 0,
+    marginLeft: padding.half,
+    padding: 0,
+    width: '145px',
+  },
   avatarStyles: {
     display: 'block',
     marginLeft: 'auto',
@@ -15,6 +27,14 @@ export default {
     paddingRight: padding.most,
     paddingTop: padding.base,
   },
+  filterTextStyles: {
+    color: color.textMedium,
+    fontSize: font.small,
+  },
+  filterUsersStyles: {
+    float: 'right',
+    width: '400px',
+  },
   nameStyles: {
     fontWeight: font.weight.bold,
     lineHeight: '51px',
@@ -24,10 +44,11 @@ export default {
   numUsersStyles: {
     borderBottom: '1px solid #EFF0F4',
     color: color.textMedium,
+    display: 'inline-block',
     fontSize: font.large,
     marginLeft: padding.most,
     paddingBottom: padding.half,
-    width: '370px',
+    width: '260px',
   },
   userHeaderStyles: {
     backgroundColor: color.brand,

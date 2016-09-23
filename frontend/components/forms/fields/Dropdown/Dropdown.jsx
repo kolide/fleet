@@ -70,7 +70,7 @@ class Dropdown extends Component {
   }
 
   render () {
-    const { options } = this.props;
+    const { containerStyles, options } = this.props;
     const { expanded, selectedOption } = this.state;
     const { text } = selectedOption;
     const {
@@ -82,7 +82,7 @@ class Dropdown extends Component {
     } = componentStyles;
 
     return (
-      <div style={{ position: 'relative' }}>
+      <div style={[{ position: 'relative' }, containerStyles]}>
         <div onClick={this.toggleShowOptions} style={selectedOptionStyles}>
           <span style={selectedTextStyles}>{text}</span>
           <div style={chevronWrapperStyles}><i className="kolidecon-chevron-bold-down" style={chevronStyles} /></div>
