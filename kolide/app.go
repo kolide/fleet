@@ -1,6 +1,6 @@
 package kolide
 
-import "context"
+import "golang.org/x/net/context"
 
 // AppConfigStore contains method for saving and retrieving
 // application configuration

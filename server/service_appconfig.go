@@ -1,7 +1,7 @@
 package server
 
 import (
-	"context"
+	"golang.org/x/net/context"
 
 	"github.com/kolide/kolide-ose/kolide"
 )
