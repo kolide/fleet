@@ -45,7 +45,7 @@ class InputFieldWithIcon extends InputField {
           style={[inputStyles(value, type), inputErrorStyles(error), style]}
           type={type}
         />
-        <i className={iconName} style={[iconStyles(value), iconErrorStyles(error), style]} />
+        {iconName && <i className={iconName} style={[iconStyles(value), iconErrorStyles(error), style]} />}
       </div>
     );
   }
