@@ -13,14 +13,23 @@ class UserManagementPage extends Component {
     users: PropTypes.arrayOf(PropTypes.object),
   };
 
-  static userActionOptions = [
-    { text: 'Actions...', value: '' },
-    { text: 'Disable Account', value: 'disable_account' },
-    { text: 'Demote User', value: 'demote_user' },
-    { text: 'Change Password', value: 'change_password' },
-    { text: 'Require Password Reset', value: 'reset_password' },
-    { text: 'Modify Details', value: 'modify_details' },
-  ];
+  static userActionOptions = (user) => {
+    const userEnableAction = user.enabled
+      ? { text: 'Disable Account', value: 'disable_account' }
+      : { text: 'Enable Account', value: 'enable_account' };
+    const userPromotionAction = user.admin
+      ? { text: 'Demote User', value: 'demote_user' }
+      : { text: 'Promote User', value: 'promote_user' };
+
+    return [
+      { text: 'Actions...', value: '' },
+      userEnableAction,
+      userPromotionAction,
+      { text: 'Change Password', value: 'change_password' },
+      { text: 'Require Password Reset', value: 'reset_password' },
+      { text: 'Modify Details', value: 'modify_details' },
+    ];
+  }
 
   componentWillMount () {
     const { dispatch, users } = this.props;
@@ -31,9 +40,29 @@ class UserManagementPage extends Component {
     return false;
   }
 
-  onUserActionSelect = (value) => {
-    console.log(value);
-    return false;
+  onUserActionSelect = (user) => {
+    return (formData) => {
+      const { dispatch } = this.props;
+
+      if (formData.user_actions) {
+        switch (formData.user_actions) {
+          case 'demote_user':
+            return dispatch(userActions.update(user, { admin: false }));
+          case 'disable_account':
+            return dispatch(userActions.update(user, { enabled: false }));
+          case 'enable_account':
+            return dispatch(userActions.update(user, { enabled: true }));
+          case 'promote_user':
+            return dispatch(userActions.update(user, { admin: true }));
+          case 'reset_password':
+            return dispatch(userActions.update(user, { force_password_reset: true }));
+          default:
+            return false;
+        }
+      }
+
+      return false;
+    };
   }
 
   renderUserBlock = (user) => {
@@ -60,7 +89,7 @@ class UserManagementPage extends Component {
     } = user;
     const userLabel = admin ? 'Admin' : 'User';
     const activeLabel = enabled ? 'Active' : 'Disabled';
-    const userActionOptions = UserManagementPage.userActionOptions;
+    const userActionOptions = UserManagementPage.userActionOptions(user);
 
     return (
       <div key={email} style={userWrapperStyles}>
@@ -81,7 +110,7 @@ class UserManagementPage extends Component {
             fieldName="user_actions"
             options={userActionOptions}
             initialOption={{ text: 'Actions...' }}
-            onSelect={this.onUserActionSelect}
+            onSelect={this.onUserActionSelect(user)}
           />
         </div>
       </div>

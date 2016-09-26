@@ -19,4 +19,5 @@ export default reduxConfig({
     };
   },
   schema: USERS,
+  updateFunc: Kolide.updateUser,
 });
