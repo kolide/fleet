@@ -7,10 +7,6 @@ class Dropdown extends Component {
   static propTypes = {
     containerStyles: PropTypes.object,
     fieldName: PropTypes.string,
-    initialOption: PropTypes.shape({
-      text: PropTypes.string,
-      value: PropTypes.string,
-    }),
     options: PropTypes.arrayOf(PropTypes.shape({
       text: PropTypes.string,
       value: PropTypes.string,
@@ -22,39 +18,15 @@ class Dropdown extends Component {
     onSelect: noop,
   };
 
-  constructor (props) {
-    super(props);
+  onOptionClick = (evt) => {
+    const { target: { value } } = evt;
+    const { fieldName, onSelect } = this.props;
 
-    const { initialOption, options } = props;
-
-    this.state = {
-      expanded: false,
-      selectedOption: initialOption || options[0],
-    };
-  }
-
-  onOptionClick = (selectedOption) => {
-    return () => {
-      const { fieldName, onSelect } = this.props;
-      const { value } = selectedOption;
-
-      this.setState({ selectedOption });
-      this.toggleShowOptions();
-
-      onSelect({
-        [fieldName]: value,
-      });
-
-      return false;
-    };
-  }
-
-  toggleShowOptions = () => {
-    const { expanded } = this.state;
-
-    this.setState({
-      expanded: !expanded,
+    onSelect({
+      [fieldName]: value,
     });
+
+    return false;
   }
 
   renderOption = (option) => {
@@ -62,37 +34,23 @@ class Dropdown extends Component {
     const { optionWrapperStyles } = componentStyles;
 
     return (
-      <div key={value} onClick={this.onOptionClick(option)} style={optionWrapperStyles}>
+      <option key={value} style={optionWrapperStyles} value={value}>
         {text}
-      </div>
+      </option>
     );
   }
 
   render () {
     const { containerStyles, options } = this.props;
-    const { expanded, selectedOption } = this.state;
-    const { text } = selectedOption;
-    const {
-      chevronStyles,
-      chevronWrapperStyles,
-      optionsWrapperStyles,
-      selectedOptionStyles,
-      selectedTextStyles,
-    } = componentStyles;
+    const { onOptionClick, renderOption } = this;
+    const { selectWrapperStyles } = componentStyles;
 
     return (
-      <div style={[{ position: 'relative' }, containerStyles]}>
-        <div onClick={this.toggleShowOptions} style={selectedOptionStyles}>
-          <span style={selectedTextStyles}>{text}</span>
-          <div style={chevronWrapperStyles}><i className="kolidecon-chevron-bold-down" style={chevronStyles} /></div>
-          <div style={{ clear: 'both' }} />
-        </div>
-        <div style={optionsWrapperStyles(expanded)}>
-          {options.map(option => {
-            return this.renderOption(option);
-          })}
-        </div>
-      </div>
+      <select style={[selectWrapperStyles, containerStyles]} onChange={onOptionClick}>
+        {options.map(option => {
+          return renderOption(option);
+        })}
+      </select>
     );
   }
 }

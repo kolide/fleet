@@ -14,6 +14,7 @@ class UserManagementPage extends Component {
   };
 
   static userActionOptions = [
+    { text: 'Actions...', value: '' },
     { text: 'Disable Account', value: 'disable_account' },
     { text: 'Demote User', value: 'demote_user' },
     { text: 'Change Password', value: 'change_password' },
