@@ -4,7 +4,7 @@ import { normalize, arrayOf } from 'normalizr';
 const initialState = {
   loading: false,
   errors: {},
-  entities: {},
+  data: {},
 };
 
 const reduxConfig = ({
@@ -26,10 +26,10 @@ const reduxConfig = ({
     };
   };
   const loadRequest = { type: actionTypes.LOAD_REQUEST };
-  const loadSuccess = (entities) => {
+  const loadSuccess = (data) => {
     return {
       type: actionTypes.LOAD_SUCCESS,
-      payload: { entities },
+      payload: { data },
     };
   };
 
@@ -75,9 +75,9 @@ const reduxConfig = ({
         return {
           ...state,
           loading: false,
-          entities: {
-            ...state.entities,
-            ...payload.entities[entityName],
+          data: {
+            ...state.data,
+            ...payload.data[entityName],
           },
         };
       case actionTypes.LOAD_FAILURE:
