@@ -78,6 +78,12 @@ export const invalidResetPasswordRequest = (password, token, error) => {
   .reply(422, { error });
 };
 
+export const validUpdateUserRequest = (user, formData) => {
+  return nock('http://localhost:8080')
+  .patch(`/api/v1/kolide/users/${user.id}`, JSON.stringify(formData))
+  .reply(200, validUser);
+};
+
 
 export default {
   invalidForgotPasswordRequest,
@@ -88,5 +94,6 @@ export default {
   validLogoutRequest,
   validMeRequest,
   validResetPasswordRequest,
+  validUpdateUserRequest,
   validUser,
 };

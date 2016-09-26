@@ -21,6 +21,10 @@ class Base {
     return this._authenticatedRequest('GET', endpoint, {}, overrideHeaders);
   }
 
+  authenticatedPatch (endpoint, body = {}, overrideHeaders = {}) {
+    return this._authenticatedRequest('PATCH', endpoint, body, overrideHeaders);
+  }
+
   authenticatedPost (endpoint, body = {}, overrideHeaders = {}) {
     return this._authenticatedRequest('POST', endpoint, body, overrideHeaders);
   }

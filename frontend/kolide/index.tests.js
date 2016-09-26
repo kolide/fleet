@@ -11,6 +11,7 @@ const {
   validLogoutRequest,
   validMeRequest,
   validResetPasswordRequest,
+  validUpdateUserRequest,
   validUser,
 } = mocks;
 
@@ -151,6 +152,20 @@ describe('Kolide - API client', () => {
           expect(request.isDone()).toEqual(true);
           done();
         });
+    });
+  });
+
+  describe('#updateUser', () => {
+    it('calls the appropriate endpoint with the correct parameters', (done) => {
+      const formData = { enabled: false };
+      const request = validUpdateUserRequest(validUser, formData);
+
+      Kolide.updateUser(validUser, formData)
+        .then(() => {
+          expect(request.isDone()).toEqual(true);
+          done();
+        })
+        .catch(done);
     });
   });
 });

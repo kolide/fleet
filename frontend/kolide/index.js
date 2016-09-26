@@ -43,6 +43,13 @@ class Kolide extends Base {
 
     return this.post(resetPasswordEndpoint, JSON.stringify(formData));
   }
+
+  updateUser = (user, formData) => {
+    const { USERS } = endpoints;
+    const updateUserEndpoint = `${this.baseURL}${USERS}/${user.id}`;
+
+    return this.authenticatedPatch(updateUserEndpoint, JSON.stringify(formData));
+  }
 }
 
 export default new Kolide();
