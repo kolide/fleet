@@ -123,7 +123,7 @@ class SidePanel extends Component {
   }
 
   renderNavItem = (navItem, lastChild) => {
-    const { activeTab } = this.state;
+    const { activeTab = {} } = this.state;
     const { icon, name, subItems } = navItem;
     const active = activeTab.name === name;
     const {
