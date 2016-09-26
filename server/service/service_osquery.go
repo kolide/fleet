@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/kolide/kolide-ose/server/contexts/host"
 	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
-	"github.com/kolide/kolide-ose/server/contexts/host"
 	"golang.org/x/net/context"
 )
 

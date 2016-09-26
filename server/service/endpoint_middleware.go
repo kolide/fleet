@@ -14,7 +14,7 @@ import (
 
 var errNoContext = errors.New("context key not set")
 
-func authenticated(jwtKey string, svc kolide.Service, next endpoint.Endpoint) endpoint.Endpoint {
+func authenticatedUser(jwtKey string, svc kolide.Service, next endpoint.Endpoint) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		// first check if already succesfuly set
 		if _, ok := viewer.FromContext(ctx); ok {

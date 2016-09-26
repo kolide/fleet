@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/WatchBeam/clock"
+	hostContext "github.com/kolide/kolide-ose/server/contexts/host"
 	"github.com/kolide/kolide-ose/server/datastore"
 	"github.com/kolide/kolide-ose/server/kolide"
-	hostContext "github.com/kolide/kolide-ose/server/contexts/host"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
