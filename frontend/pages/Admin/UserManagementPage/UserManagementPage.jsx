@@ -25,7 +25,6 @@ class UserManagementPage extends Component {
       { text: 'Actions...', value: '' },
       userEnableAction,
       userPromotionAction,
-      { text: 'Change Password', value: 'change_password' },
       { text: 'Require Password Reset', value: 'reset_password' },
       { text: 'Modify Details', value: 'modify_details' },
     ];
