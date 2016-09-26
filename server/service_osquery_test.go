@@ -7,15 +7,13 @@ import (
 	"time"
 
 	"github.com/WatchBeam/clock"
-	"github.com/kolide/kolide-ose/datastore"
 	"github.com/kolide/kolide-ose/kolide"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestEnrollAgent(t *testing.T) {
-	ds, err := datastore.New("gorm-sqlite3", ":memory:")
-	assert.Nil(t, err)
+	ds := setup(t)
 
 	svc, err := newTestService(ds)
 	assert.Nil(t, err)
@@ -36,8 +34,7 @@ func TestEnrollAgent(t *testing.T) {
 }
 
 func TestEnrollAgentIncorrectEnrollSecret(t *testing.T) {
-	ds, err := datastore.New("gorm-sqlite3", ":memory:")
-	assert.Nil(t, err)
+	ds := setup(t)
 
 	svc, err := newTestService(ds)
 	assert.Nil(t, err)
@@ -83,8 +80,7 @@ func TestHostDetailQueries(t *testing.T) {
 }
 
 func TestGetDistributedQueries(t *testing.T) {
-	ds, err := datastore.New("gorm-sqlite3", ":memory:")
-	assert.Nil(t, err)
+	ds := setup(t)
 
 	mockClock := clock.NewMockClock()
 
