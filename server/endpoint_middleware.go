@@ -21,7 +21,11 @@ func authenticated(jwtKey string, svc kolide.Service, next endpoint.Endpoint) en
 			return next(ctx, request)
 		}
 		// if not succesful, try again this time with errors
-		v, err := viewerFromTokenContext(ctx, jwtKey, svc)
+		bearer, ok := token.FromContext(ctx)
+		if !ok {
+			return nil, authError{reason: "no auth token"}
+		}
+		v, err := authViewer(ctx, jwtKey, bearer, svc)
 		if err != nil {
 			return nil, err
 		}
@@ -30,12 +34,9 @@ func authenticated(jwtKey string, svc kolide.Service, next endpoint.Endpoint) en
 	}
 }
 
-func viewerFromTokenContext(ctx context.Context, jwtKey string, svc kolide.Service) (*viewer.Viewer, error) {
-	tokenString, ok := token.FromContext(ctx)
-	if !ok {
-		return nil, authError{reason: "no auth token"}
-	}
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+// authViewer creates an authenticated viewer by validating a JWT token.
+func authViewer(ctx context.Context, jwtKey string, bearerToken string, svc kolide.Service) (*viewer.Viewer, error) {
+	jwtToken, err := jwt.Parse(bearerToken, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
@@ -44,7 +45,7 @@ func viewerFromTokenContext(ctx context.Context, jwtKey string, svc kolide.Servi
 	if err != nil {
 		return nil, authError{reason: err.Error(), clientReason: "bad credentials"}
 	}
-	claims, ok := token.Claims.(jwt.MapClaims)
+	claims, ok := jwtToken.Claims.(jwt.MapClaims)
 	if !ok {
 		return nil, authError{reason: "no jwt claims", clientReason: "bad credentials"}
 	}

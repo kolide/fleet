@@ -76,8 +76,9 @@ func (e permissionError) PermissionError() []map[string]string {
 // setRequestsContexts updates the request with necessary context values for a request
 func setRequestsContexts(svc kolide.Service, jwtKey string) kithttp.RequestFunc {
 	return func(ctx context.Context, r *http.Request) context.Context {
-		ctx = token.NewContext(ctx, r)
-		v, err := viewerFromTokenContext(ctx, jwtKey, svc)
+		bearer := token.FromHTTPRequest(r)
+		ctx = token.NewContext(ctx, bearer)
+		v, err := authViewer(ctx, jwtKey, bearer, svc)
 		if err == nil {
 			ctx = viewer.NewContext(ctx, *v)
 		}
