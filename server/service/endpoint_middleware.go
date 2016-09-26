@@ -6,7 +6,6 @@ import (
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/go-kit/kit/endpoint"
-	"github.com/kolide/kolide-ose/server/contexts/host"
 	"github.com/kolide/kolide-ose/server/contexts/token"
 	"github.com/kolide/kolide-ose/server/contexts/viewer"
 	"github.com/kolide/kolide-ose/server/kolide"
@@ -14,22 +13,6 @@ import (
 )
 
 var errNoContext = errors.New("context key not set")
-
-// authenticatedHost wraps an endpoint, requires that the osqueryd host is
-// authenticated, and populates the context with the Host struct for that host.
-func authenticatedHost(svc kolide.Service, next endpoint.Endpoint) endpoint.Endpoint {
-	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		if _, ok := host.FromContext(ctx); ok {
-			return next(ctx, request)
-		}
-
-		return next(ctx, request)
-	}
-}
-
-func hostFromRequest(svc kolide.Service, request interface{}) {
-
-}
 
 // authenticatedUser wraps an endpoint, requires that the Kolide user is
 // authenticated, and populates the context with a Viewer struct for that user.
