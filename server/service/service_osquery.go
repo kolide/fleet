@@ -35,12 +35,22 @@ func (svc service) EnrollAgent(ctx context.Context, enrollSecret, hostIdentifier
 	return host.NodeKey, nil
 }
 
-func (svc service) GetClientConfig(ctx context.Context, action string, data json.RawMessage) (*kolide.OsqueryConfig, error) {
+func (svc service) GetClientConfig(ctx context.Context, nodeKey string) (*kolide.OsqueryConfig, error) {
+	_, err := svc.ds.AuthenticateHost(nodeKey)
+	if err != nil {
+		return nil, osqueryError{message: "authentication error", nodeInvalid: true}
+	}
+
 	var config kolide.OsqueryConfig
 	return &config, nil
 }
 
-func (svc service) SubmitStatusLogs(ctx context.Context, logs []kolide.OsqueryResultLog) error {
+func (svc service) SubmitStatusLogs(ctx context.Context, nodeKey string, logs []kolide.OsqueryResultLog) error {
+	_, err := svc.ds.AuthenticateHost(nodeKey)
+	if err != nil {
+		return osqueryError{message: "authentication error", nodeInvalid: true}
+	}
+
 	for _, log := range logs {
 		err := json.NewEncoder(svc.osqueryStatusLogWriter).Encode(log)
 		if err != nil {
@@ -50,7 +60,12 @@ func (svc service) SubmitStatusLogs(ctx context.Context, logs []kolide.OsqueryRe
 	return nil
 }
 
-func (svc service) SubmitResultsLogs(ctx context.Context, logs []kolide.OsqueryStatusLog) error {
+func (svc service) SubmitResultsLogs(ctx context.Context, nodeKey string, logs []kolide.OsqueryStatusLog) error {
+	_, err := svc.ds.AuthenticateHost(nodeKey)
+	if err != nil {
+		return osqueryError{message: "authentication error", nodeInvalid: true}
+	}
+
 	for _, log := range logs {
 		err := json.NewEncoder(svc.osqueryResultsLogWriter).Encode(log)
 		if err != nil {
@@ -110,6 +125,11 @@ func (svc service) GetDistributedQueries(ctx context.Context, nodeKey string) (m
 	return queries, nil
 }
 
-func (svc service) SubmitDistributedQueryResults(ctx context.Context, results kolide.OsqueryDistributedQueryResults) error {
+func (svc service) SubmitDistributedQueryResults(ctx context.Context, nodeKey string, results kolide.OsqueryDistributedQueryResults) error {
+	_, err := svc.ds.AuthenticateHost(nodeKey)
+	if err != nil {
+		return osqueryError{message: "authentication error", nodeInvalid: true}
+	}
+
 	return nil
 }
