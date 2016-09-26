@@ -51,22 +51,6 @@ type Query struct {
 	Version      string
 }
 
-type Label struct {
-	ID        uint `gorm:"primary_key"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	Name      string `gorm:"not null;unique_index:idx_label_unique_name"`
-	QueryID   uint
-}
-
-type LabelQueryExecution struct {
-	ID        uint `gorm:"primary_key"`
-	UpdatedAt time.Time
-	Matches   bool
-	LabelID   uint // Note we manually specify a unique index on these
-	HostID    uint // fields in gormDB.Migrate
-}
-
 type TargetType int
 
 const (

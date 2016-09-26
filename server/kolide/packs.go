@@ -18,6 +18,11 @@ type PackStore interface {
 	AddQueryToPack(query *Query, pack *Pack) error
 	GetQueriesInPack(pack *Pack) ([]*Query, error)
 	RemoveQueryFromPack(query *Query, pack *Pack) error
+
+	// Modifying the labels for packs
+	AddLabelToPack(label *Label, pack *Pack) error
+	GetLabelsForPack(pack *Pack) ([]*Label, error)
+	RemoveLabelFromPack(label *Label, pack *Pack) error
 }
 
 type PackService interface {
@@ -30,6 +35,10 @@ type PackService interface {
 	AddQueryToPack(ctx context.Context, qid, pid uint) error
 	GetQueriesInPack(ctx context.Context, id uint) ([]*Query, error)
 	RemoveQueryFromPack(ctx context.Context, qid, pid uint) error
+
+	AddLabelToPack(ctx context.Context, lid, pid uint) error
+	GetLabelsForPack(ctx context.Context, pid uint) ([]*Label, error)
+	RemoveLabelFromPack(ctx context.Context, lid, pid uint) error
 }
 
 type Pack struct {

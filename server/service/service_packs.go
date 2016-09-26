@@ -118,3 +118,54 @@ func (svc service) RemoveQueryFromPack(ctx context.Context, qid, pid uint) error
 
 	return nil
 }
+func (svc service) AddLabelToPack(ctx context.Context, lid, pid uint) error {
+	pack, err := svc.ds.Pack(pid)
+	if err != nil {
+		return err
+	}
+
+	label, err := svc.ds.Label(lid)
+	if err != nil {
+		return err
+	}
+
+	err = svc.ds.AddLabelToPack(label, pack)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (svc service) GetLabelsForPack(ctx context.Context, pid uint) ([]*kolide.Label, error) {
+	pack, err := svc.ds.Pack(pid)
+	if err != nil {
+		return nil, err
+	}
+
+	labels, err := svc.ds.GetLabelsForPack(pack)
+	if err != nil {
+		return nil, err
+	}
+
+	return labels, nil
+}
+
+func (svc service) RemoveLabelFromPack(ctx context.Context, lid, pid uint) error {
+	pack, err := svc.ds.Pack(pid)
+	if err != nil {
+		return err
+	}
+
+	label, err := svc.ds.Label(lid)
+	if err != nil {
+		return err
+	}
+
+	err = svc.ds.RemoveLabelFromPack(label, pack)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

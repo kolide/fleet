@@ -301,6 +301,43 @@ func (orm gormDB) NewLabel(label *kolide.Label) (*kolide.Label, error) {
 	return label, nil
 }
 
+func (orm gormDB) SaveLabel(label *kolide.Label) error {
+	if label == nil {
+		return errors.New(
+			"error saving label",
+			"nil pointer passed to SaveLabel",
+		)
+	}
+	return orm.DB.Save(label).Error
+}
+
+func (orm gormDB) DeleteLabel(label *kolide.Label) error {
+	if label == nil {
+		return errors.New(
+			"error deleting label",
+			"nil pointer passed to DeleteLabel",
+		)
+	}
+	return orm.DB.Delete(label).Error
+}
+
+func (orm gormDB) Label(id uint) (*kolide.Label, error) {
+	label := &kolide.Label{
+		ID: id,
+	}
+	err := orm.DB.Where(label).First(label).Error
+	if err != nil {
+		return nil, err
+	}
+	return label, nil
+}
+
+func (orm gormDB) Labels() ([]*kolide.Label, error) {
+	var labels []*kolide.Label
+	err := orm.DB.Find(&labels).Error
+	return labels, err
+}
+
 func (orm gormDB) LabelQueriesForHost(host *kolide.Host, cutoff time.Time) (map[string]string, error) {
 	if host == nil {
 		return nil, errors.New(
@@ -554,4 +591,16 @@ func (orm gormDB) RemoveQueryFromPack(query *kolide.Query, pack *kolide.Pack) er
 		PackID:  pack.ID,
 	}
 	return orm.DB.Where(pq).Delete(pq).Error
+}
+
+func (orm gormDB) AddLabelToPack(label *kolide.Label, pack *kolide.Pack) error {
+	return nil
+}
+
+func (orm gormDB) GetLabelsForPack(pack *kolide.Pack) ([]*kolide.Label, error) {
+	return nil, nil
+}
+
+func (orm gormDB) RemoveLabelFromPack(label *kolide.Label, pack *kolide.Pack) error {
+	return nil
 }
