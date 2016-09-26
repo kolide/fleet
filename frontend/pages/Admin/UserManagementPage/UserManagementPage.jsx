@@ -3,6 +3,8 @@ import { connect } from 'react-redux';
 import componentStyles from './styles';
 import entityGetter from '../../../redux/entityGetter';
 import GradientButton from '../../../components/buttons/GradientButton';
+import InviteUserForm from '../../../components/forms/InviteUserForm';
+import Modal from '../../../components/Modal';
 import userActions from '../../../redux/nodes/entities/users/actions';
 import UserBlock from './UserBlock';
 
@@ -11,6 +13,14 @@ class UserManagementPage extends Component {
     dispatch: PropTypes.func,
     users: PropTypes.arrayOf(PropTypes.object),
   };
+
+  constructor (props) {
+    super(props);
+
+    this.state = {
+      showInviteUserModal: false,
+    };
+  }
 
   componentWillMount () {
     const { dispatch, users } = this.props;
@@ -44,6 +54,27 @@ class UserManagementPage extends Component {
     return false;
   }
 
+  onInviteUserSubmit = (formData) => {
+    console.log('user invited', formData);
+    return this.toggleInviteUserModal();
+  }
+
+  onInviteCancel = (evt) => {
+    evt.preventDefault();
+
+    return this.toggleInviteUserModal();
+  }
+
+  toggleInviteUserModal = () => {
+    const { showInviteUserModal } = this.state;
+
+    this.setState({
+      showInviteUserModal: !showInviteUserModal,
+    });
+
+    return false;
+  }
+
   renderUserBlock = (user) => {
     const { onUserActionSelect } = this;
 
@@ -56,6 +87,25 @@ class UserManagementPage extends Component {
     );
   }
 
+  renderModal = () => {
+    const { showInviteUserModal } = this.state;
+    const { onInviteCancel, onInviteUserSubmit, toggleInviteUserModal } = this;
+
+    if (!showInviteUserModal) return false;
+
+    return (
+      <Modal
+        title="Invite new user"
+        onExit={toggleInviteUserModal}
+      >
+        <InviteUserForm
+          onCancel={onInviteCancel}
+          onSubmit={onInviteUserSubmit}
+        />
+      </Modal>
+    );
+  };
+
   render () {
     const {
       addUserButtonStyles,
@@ -64,6 +114,7 @@ class UserManagementPage extends Component {
       numUsersStyles,
       usersWrapperStyles,
     } = componentStyles;
+    const { toggleInviteUserModal } = this;
     const { users } = this.props;
 
     return (
@@ -71,6 +122,7 @@ class UserManagementPage extends Component {
         <span style={numUsersStyles}>Listing {users.length} users</span>
         <div style={addUserWrapperStyles}>
           <GradientButton
+            onClick={toggleInviteUserModal}
             style={addUserButtonStyles}
             text="Add User"
           />
@@ -80,6 +132,7 @@ class UserManagementPage extends Component {
             return this.renderUserBlock(user);
           })}
         </div>
+        {this.renderModal()}
       </div>
     );
   }
