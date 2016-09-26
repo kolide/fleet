@@ -16,8 +16,7 @@ export default {
     width: '145px',
   },
   addUserWrapperStyles: {
-    display: 'inline-block',
-    width: '200px',
+    float: 'right',
   },
   avatarStyles: {
     display: 'block',
