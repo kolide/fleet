@@ -91,9 +91,8 @@ class UserManagementPage extends Component {
   render () {
     const {
       addUserButtonStyles,
+      addUserWrapperStyles,
       containerStyles,
-      filterUsersStyles,
-      filterTextStyles,
       numUsersStyles,
       usersWrapperStyles,
     } = componentStyles;
@@ -102,14 +101,7 @@ class UserManagementPage extends Component {
     return (
       <div style={containerStyles}>
         <span style={numUsersStyles}>Listing {users.length} users</span>
-        <div style={filterUsersStyles}>
-          <span style={filterTextStyles}>Filter</span>
-          <Dropdown
-            fieldName="filter"
-            options={[{ text: 'All Users', value: 'all' }, { text: 'Active Users', value: 'active' }]}
-            onSelect={this.onUserActionSelect}
-            containerStyles={{ display: 'inline-block', marginLeft: '10px', width: '200px' }}
-          />
+        <div style={addUserWrapperStyles}>
           <GradientButton
             style={addUserButtonStyles}
             text="Add User"

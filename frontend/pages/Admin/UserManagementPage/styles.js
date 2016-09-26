@@ -15,6 +15,10 @@ export default {
     padding: 0,
     width: '145px',
   },
+  addUserWrapperStyles: {
+    display: 'inline-block',
+    width: '200px',
+  },
   avatarStyles: {
     display: 'block',
     marginLeft: 'auto',
@@ -26,14 +30,6 @@ export default {
     paddingBottom: '190px',
     paddingRight: padding.most,
     paddingTop: padding.base,
-  },
-  filterTextStyles: {
-    color: color.textMedium,
-    fontSize: font.small,
-  },
-  filterUsersStyles: {
-    float: 'right',
-    width: '400px',
   },
   nameStyles: {
     fontWeight: font.weight.bold,
