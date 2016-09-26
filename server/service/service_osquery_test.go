@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/WatchBeam/clock"
-	hostContext "github.com/kolide/kolide-ose/server/contexts/host"
 	"github.com/kolide/kolide-ose/server/datastore"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"github.com/stretchr/testify/assert"
@@ -102,10 +101,8 @@ func TestGetDistributedQueries(t *testing.T) {
 	require.Len(t, hosts, 1)
 	host := hosts[0]
 
-	ctx = hostContext.NewContext(ctx, *host)
-
 	// With no platform set, we should get the details query
-	queries, err := svc.GetDistributedQueries(ctx)
+	queries, err := svc.GetDistributedQueries(ctx, host.NodeKey)
 	assert.Nil(t, err)
 	assert.Len(t, queries, 1)
 	if assert.Contains(t, queries, "kolide_detail_query_platform") {
@@ -116,12 +113,11 @@ func TestGetDistributedQueries(t *testing.T) {
 	}
 
 	host.Platform = "darwin"
-
-	ctx = hostContext.NewContext(ctx, *host)
+	ds.SaveHost(host)
 
 	// With the platform set, we should get the label queries (but none
 	// exist yet)
-	queries, err = svc.GetDistributedQueries(ctx)
+	queries, err = svc.GetDistributedQueries(ctx, host.NodeKey)
 	assert.Nil(t, err)
 	assert.Len(t, queries, 0)
 
@@ -186,7 +182,7 @@ func TestGetDistributedQueries(t *testing.T) {
 	}
 
 	// Now we should get the label queries
-	queries, err = svc.GetDistributedQueries(ctx)
+	queries, err = svc.GetDistributedQueries(ctx, host.NodeKey)
 	assert.Nil(t, err)
 	assert.Len(t, queries, 3)
 	assert.Equal(t, expectQueries, queries)
@@ -196,7 +192,7 @@ func TestGetDistributedQueries(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Now that query should not be returned
-	queries, err = svc.GetDistributedQueries(ctx)
+	queries, err = svc.GetDistributedQueries(ctx, host.NodeKey)
 	assert.Nil(t, err)
 	assert.Len(t, queries, 2)
 	assert.NotContains(t, queries, "kolide_label_query_1")
@@ -205,7 +201,7 @@ func TestGetDistributedQueries(t *testing.T) {
 	mockClock.AddTime(1*time.Hour + 1*time.Minute)
 
 	// Now we should get all the label queries again
-	queries, err = svc.GetDistributedQueries(ctx)
+	queries, err = svc.GetDistributedQueries(ctx, host.NodeKey)
 	assert.Nil(t, err)
 	assert.Len(t, queries, 3)
 	assert.Equal(t, expectQueries, queries)
@@ -213,7 +209,7 @@ func TestGetDistributedQueries(t *testing.T) {
 	// Record an old query execution -- Shouldn't change the return
 	err = ds.RecordLabelQueryExecutions(host, map[string]bool{"2": true}, mockClock.Now().Add(-10*time.Hour))
 	assert.NoError(t, err)
-	queries, err = svc.GetDistributedQueries(ctx)
+	queries, err = svc.GetDistributedQueries(ctx, host.NodeKey)
 	assert.NoError(t, err)
 	assert.Equal(t, expectQueries, queries)
 
@@ -224,7 +220,7 @@ func TestGetDistributedQueries(t *testing.T) {
 	// Now these should no longer show up in the necessary to run queries
 	delete(expectQueries, "kolide_label_query_2")
 	delete(expectQueries, "kolide_label_query_3")
-	queries, err = svc.GetDistributedQueries(ctx)
+	queries, err = svc.GetDistributedQueries(ctx, host.NodeKey)
 	assert.NoError(t, err)
 	assert.Equal(t, expectQueries, queries)
 }

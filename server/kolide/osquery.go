@@ -31,7 +31,7 @@ type OsqueryStore interface {
 type OsqueryService interface {
 	EnrollAgent(ctx context.Context, enrollSecret, hostIdentifier string) (string, error)
 	GetClientConfig(ctx context.Context, action string, data json.RawMessage) (*OsqueryConfig, error)
-	GetDistributedQueries(ctx context.Context) (map[string]string, error)
+	GetDistributedQueries(ctx context.Context, nodeKey string) (map[string]string, error)
 	SubmitDistributedQueryResults(ctx context.Context, results OsqueryDistributedQueryResults) error
 	SubmitStatusLogs(ctx context.Context, logs []OsqueryResultLog) error
 	SubmitResultsLogs(ctx context.Context, logs []OsqueryStatusLog) error

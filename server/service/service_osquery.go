@@ -5,14 +5,14 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/kolide/kolide-ose/server/contexts/host"
 	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"golang.org/x/net/context"
 )
 
 type osqueryError struct {
-	message string
+	message     string
+	nodeInvalid bool
 }
 
 func (e osqueryError) Error() string {
@@ -79,15 +79,15 @@ func hostDetailQueries(host kolide.Host) map[string]string {
 	return queries
 }
 
-func (svc service) GetDistributedQueries(ctx context.Context) (map[string]string, error) {
+func (svc service) GetDistributedQueries(ctx context.Context, nodeKey string) (map[string]string, error) {
 	queries := make(map[string]string)
 
-	host, ok := host.FromContext(ctx)
-	if !ok {
-		return nil, errNoContext
+	host, err := svc.ds.AuthenticateHost(nodeKey)
+	if err != nil {
+		return nil, osqueryError{message: "authentication error", nodeInvalid: true}
 	}
 
-	queries = hostDetailQueries(host)
+	queries = hostDetailQueries(*host)
 	if len(queries) > 0 {
 		// If the host details need to be updated, we should do so
 		// before checking for any other queries
@@ -96,7 +96,7 @@ func (svc service) GetDistributedQueries(ctx context.Context) (map[string]string
 
 	// Retrieve the label queries that should be updated
 	cutoff := svc.clock.Now().Add(-svc.config.Osquery.LabelUpdateInterval)
-	labelQueries, err := svc.ds.LabelQueriesForHost(&host, cutoff)
+	labelQueries, err := svc.ds.LabelQueriesForHost(host, cutoff)
 	if err != nil {
 		return nil, err
 	}

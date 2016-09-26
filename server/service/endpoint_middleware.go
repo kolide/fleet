@@ -6,6 +6,7 @@ import (
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/go-kit/kit/endpoint"
+	"github.com/kolide/kolide-ose/server/contexts/host"
 	"github.com/kolide/kolide-ose/server/contexts/token"
 	"github.com/kolide/kolide-ose/server/contexts/viewer"
 	"github.com/kolide/kolide-ose/server/kolide"
@@ -14,21 +15,42 @@ import (
 
 var errNoContext = errors.New("context key not set")
 
+// authenticatedHost wraps an endpoint, requires that the osqueryd host is
+// authenticated, and populates the context with the Host struct for that host.
+func authenticatedHost(svc kolide.Service, next endpoint.Endpoint) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		if _, ok := host.FromContext(ctx); ok {
+			return next(ctx, request)
+		}
+
+		return next(ctx, request)
+	}
+}
+
+func hostFromRequest(svc kolide.Service, request interface{}) {
+
+}
+
+// authenticatedUser wraps an endpoint, requires that the Kolide user is
+// authenticated, and populates the context with a Viewer struct for that user.
 func authenticatedUser(jwtKey string, svc kolide.Service, next endpoint.Endpoint) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		// first check if already succesfuly set
 		if _, ok := viewer.FromContext(ctx); ok {
 			return next(ctx, request)
 		}
+
 		// if not succesful, try again this time with errors
 		bearer, ok := token.FromContext(ctx)
 		if !ok {
 			return nil, authError{reason: "no auth token"}
 		}
+
 		v, err := authViewer(ctx, jwtKey, bearer, svc)
 		if err != nil {
 			return nil, err
 		}
+
 		ctx = viewer.NewContext(ctx, *v)
 		return next(ctx, request)
 	}
