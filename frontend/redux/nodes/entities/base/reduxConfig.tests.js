@@ -44,7 +44,7 @@ describe('reduxConfig', () => {
         const loadSuccessAction = {
           type: 'users_LOAD_SUCCESS',
           payload: {
-            entities: {
+            data: {
               users: {
                 [user.id]: user,
               },
@@ -58,7 +58,7 @@ describe('reduxConfig', () => {
         };
         const newState = reducer(initialState, loadSuccessAction);
 
-        expect(newState.entities[user.id]).toEqual(user);
+        expect(newState.data[user.id]).toEqual(user);
       });
     });
 
