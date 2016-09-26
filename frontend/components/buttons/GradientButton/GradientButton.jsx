@@ -8,19 +8,21 @@ class GradientButton extends Component {
     style: PropTypes.object,
     text: PropTypes.string,
     type: PropTypes.string,
+    variant: PropTypes.string,
   };
 
   static defaultProps = {
     style: {},
+    variant: 'default',
   };
 
   render () {
-    const { onClick, style, text, type } = this.props;
+    const { onClick, style, text, type, variant } = this.props;
 
     return (
       <button
         onClick={onClick}
-        style={[componentStyles, style]}
+        style={[componentStyles(variant), style]}
         type={type}
       >
         {text}
