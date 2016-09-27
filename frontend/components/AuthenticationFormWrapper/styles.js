@@ -1,6 +1,6 @@
 import styles from '../../styles';
 
-const { color, padding } = styles;
+const { color } = styles;
 
 export default {
   containerStyles: {
@@ -13,10 +13,10 @@ export default {
   whiteTabStyles: {
     backgroundColor: color.white,
     height: '30px',
-    marginTop: padding.base,
+    marginTop: '12px',
     borderTopLeftRadius: '4px',
     borderTopRightRadius: '4px',
     boxShadow: '0 5px 30px 0 rgba(0,0,0,0.3)',
-    width: '400px',
+    width: '376px',
   },
 };
