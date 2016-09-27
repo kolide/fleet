@@ -34,6 +34,32 @@ func makeEnrollAgentEndpoint(svc kolide.Service) endpoint.Endpoint {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Get Client Config
+////////////////////////////////////////////////////////////////////////////////
+
+type getClientConfigRequest struct {
+	NodeKey string `json:"node_key"`
+}
+
+type getClientConfigResponse struct {
+	Config kolide.OsqueryConfig `json:"config,omitempty"`
+	Err    error                `json:"error,omitempty"`
+}
+
+func (r getClientConfigResponse) error() error { return r.Err }
+
+func makeGetClientConfigEndpoint(svc kolide.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(getClientConfigRequest)
+		config, err := svc.GetClientConfig(ctx, req.NodeKey)
+		if err != nil {
+			return getClientConfigResponse{Err: err}, nil
+		}
+		return getClientConfigResponse{Config: *config}, nil
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Get Distributed Queries
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -56,5 +82,83 @@ func makeGetDistributedQueriesEndpoint(svc kolide.Service) endpoint.Endpoint {
 			return getDistributedQueriesResponse{Err: err}, nil
 		}
 		return getDistributedQueriesResponse{Queries: queries}, nil
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Write Distributed Query Results
+////////////////////////////////////////////////////////////////////////////////
+
+type submitDistributedQueryResultsRequest struct {
+	NodeKey string                                `json:"node_key"`
+	Results kolide.OsqueryDistributedQueryResults `json:"queries"`
+}
+
+type submitDistributedQueryResultsResponse struct {
+	Err error `json:"error,omitempty"`
+}
+
+func (r submitDistributedQueryResultsResponse) error() error { return r.Err }
+
+func makeSubmitDistributedQueryResultsEndpoint(svc kolide.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(submitDistributedQueryResultsRequest)
+		err := svc.SubmitDistributedQueryResults(ctx, req.NodeKey, req.Results)
+		if err != nil {
+			return submitDistributedQueryResultsResponse{Err: err}, nil
+		}
+		return submitDistributedQueryResultsResponse{}, nil
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Submit Status Logs
+////////////////////////////////////////////////////////////////////////////////
+
+type submitStatusLogsRequest struct {
+	NodeKey string `json:"node_key"`
+	Logs    []kolide.OsqueryStatusLog
+}
+
+type submitStatusLogsResponse struct {
+	Err error `json:"error,omitempty"`
+}
+
+func (r submitStatusLogsResponse) error() error { return r.Err }
+
+func makeSubmitStatusLogsEndpoint(svc kolide.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(submitStatusLogsRequest)
+		err := svc.SubmitStatusLogs(ctx, req.NodeKey, req.Logs)
+		if err != nil {
+			return submitStatusLogsResponse{Err: err}, nil
+		}
+		return submitStatusLogsResponse{}, nil
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Submit Result Logs
+////////////////////////////////////////////////////////////////////////////////
+
+type submitResultLogsRequest struct {
+	NodeKey string `json:"node_key"`
+	Logs    []kolide.OsqueryResultLog
+}
+
+type submitResultLogsResponse struct {
+	Err error `json:"error,omitempty"`
+}
+
+func (r submitResultLogsResponse) error() error { return r.Err }
+
+func makeSubmitResultLogsEndpoint(svc kolide.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(submitResultLogsRequest)
+		err := svc.SubmitResultLogs(ctx, req.NodeKey, req.Logs)
+		if err != nil {
+			return submitResultLogsResponse{Err: err}, nil
+		}
+		return submitResultLogsResponse{}, nil
 	}
 }

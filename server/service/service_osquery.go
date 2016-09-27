@@ -45,7 +45,7 @@ func (svc service) GetClientConfig(ctx context.Context, nodeKey string) (*kolide
 	return &config, nil
 }
 
-func (svc service) SubmitStatusLogs(ctx context.Context, nodeKey string, logs []kolide.OsqueryResultLog) error {
+func (svc service) SubmitStatusLogs(ctx context.Context, nodeKey string, logs []kolide.OsqueryStatusLog) error {
 	_, err := svc.ds.AuthenticateHost(nodeKey)
 	if err != nil {
 		return osqueryError{message: "authentication error", nodeInvalid: true}
@@ -60,7 +60,7 @@ func (svc service) SubmitStatusLogs(ctx context.Context, nodeKey string, logs []
 	return nil
 }
 
-func (svc service) SubmitResultsLogs(ctx context.Context, nodeKey string, logs []kolide.OsqueryStatusLog) error {
+func (svc service) SubmitResultLogs(ctx context.Context, nodeKey string, logs []kolide.OsqueryResultLog) error {
 	_, err := svc.ds.AuthenticateHost(nodeKey)
 	if err != nil {
 		return osqueryError{message: "authentication error", nodeInvalid: true}

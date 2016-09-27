@@ -32,8 +32,8 @@ type OsqueryService interface {
 	GetClientConfig(ctx context.Context, nodeKey string) (*OsqueryConfig, error)
 	GetDistributedQueries(ctx context.Context, nodeKey string) (map[string]string, error)
 	SubmitDistributedQueryResults(ctx context.Context, nodeKey string, results OsqueryDistributedQueryResults) error
-	SubmitStatusLogs(ctx context.Context, nodeKey string, logs []OsqueryResultLog) error
-	SubmitResultsLogs(ctx context.Context, nodeKey string, logs []OsqueryStatusLog) error
+	SubmitStatusLogs(ctx context.Context, nodeKey string, logs []OsqueryStatusLog) error
+	SubmitResultLogs(ctx context.Context, nodeKey string, logs []OsqueryResultLog) error
 }
 
 type OsqueryDistributedQueryResults map[string][]map[string]string

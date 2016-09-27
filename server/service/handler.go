@@ -13,39 +13,43 @@ import (
 
 // KolideEndpoints is a collection of RPC endpoints implemented by the Kolide API.
 type KolideEndpoints struct {
-	Login                  endpoint.Endpoint
-	Logout                 endpoint.Endpoint
-	ForgotPassword         endpoint.Endpoint
-	ResetPassword          endpoint.Endpoint
-	Me                     endpoint.Endpoint
-	CreateUser             endpoint.Endpoint
-	GetUser                endpoint.Endpoint
-	ListUsers              endpoint.Endpoint
-	ModifyUser             endpoint.Endpoint
-	GetSessionsForUserInfo endpoint.Endpoint
-	DeleteSessionsForUser  endpoint.Endpoint
-	GetSessionInfo         endpoint.Endpoint
-	DeleteSession          endpoint.Endpoint
-	GetAppConfig           endpoint.Endpoint
-	ModifyAppConfig        endpoint.Endpoint
-	CreateInvite           endpoint.Endpoint
-	ListInvites            endpoint.Endpoint
-	DeleteInvite           endpoint.Endpoint
-	GetQuery               endpoint.Endpoint
-	GetAllQueries          endpoint.Endpoint
-	CreateQuery            endpoint.Endpoint
-	ModifyQuery            endpoint.Endpoint
-	DeleteQuery            endpoint.Endpoint
-	GetPack                endpoint.Endpoint
-	GetAllPacks            endpoint.Endpoint
-	CreatePack             endpoint.Endpoint
-	ModifyPack             endpoint.Endpoint
-	DeletePack             endpoint.Endpoint
-	AddQueryToPack         endpoint.Endpoint
-	GetQueriesInPack       endpoint.Endpoint
-	DeleteQueryFromPack    endpoint.Endpoint
-	EnrollAgent            endpoint.Endpoint
-	GetDistributedQueries  endpoint.Endpoint
+	Login                         endpoint.Endpoint
+	Logout                        endpoint.Endpoint
+	ForgotPassword                endpoint.Endpoint
+	ResetPassword                 endpoint.Endpoint
+	Me                            endpoint.Endpoint
+	CreateUser                    endpoint.Endpoint
+	GetUser                       endpoint.Endpoint
+	ListUsers                     endpoint.Endpoint
+	ModifyUser                    endpoint.Endpoint
+	GetSessionsForUserInfo        endpoint.Endpoint
+	DeleteSessionsForUser         endpoint.Endpoint
+	GetSessionInfo                endpoint.Endpoint
+	DeleteSession                 endpoint.Endpoint
+	GetAppConfig                  endpoint.Endpoint
+	ModifyAppConfig               endpoint.Endpoint
+	CreateInvite                  endpoint.Endpoint
+	ListInvites                   endpoint.Endpoint
+	DeleteInvite                  endpoint.Endpoint
+	GetQuery                      endpoint.Endpoint
+	GetAllQueries                 endpoint.Endpoint
+	CreateQuery                   endpoint.Endpoint
+	ModifyQuery                   endpoint.Endpoint
+	DeleteQuery                   endpoint.Endpoint
+	GetPack                       endpoint.Endpoint
+	GetAllPacks                   endpoint.Endpoint
+	CreatePack                    endpoint.Endpoint
+	ModifyPack                    endpoint.Endpoint
+	DeletePack                    endpoint.Endpoint
+	AddQueryToPack                endpoint.Endpoint
+	GetQueriesInPack              endpoint.Endpoint
+	DeleteQueryFromPack           endpoint.Endpoint
+	EnrollAgent                   endpoint.Endpoint
+	GetClientConfig               endpoint.Endpoint
+	GetDistributedQueries         endpoint.Endpoint
+	SubmitDistributedQueryResults endpoint.Endpoint
+	SubmitStatusLogs              endpoint.Endpoint
+	SubmitResultLogs              endpoint.Endpoint
 }
 
 // MakeKolideServerEndpoints creates the Kolide API endpoints.
@@ -83,45 +87,53 @@ func MakeKolideServerEndpoints(svc kolide.Service, jwtKey string) KolideEndpoint
 		DeleteQueryFromPack:    authenticatedUser(jwtKey, svc, makeDeleteQueryFromPackEndpoint(svc)),
 
 		// Osquery endpoints
-		EnrollAgent:           makeEnrollAgentEndpoint(svc),
-		GetDistributedQueries: makeGetDistributedQueriesEndpoint(svc),
+		EnrollAgent:                   makeEnrollAgentEndpoint(svc),
+		GetClientConfig:               makeGetClientConfigEndpoint(svc),
+		GetDistributedQueries:         makeGetDistributedQueriesEndpoint(svc),
+		SubmitDistributedQueryResults: makeSubmitDistributedQueryResultsEndpoint(svc),
+		SubmitStatusLogs:              makeSubmitStatusLogsEndpoint(svc),
+		SubmitResultLogs:              makeSubmitResultLogsEndpoint(svc),
 	}
 }
 
 type kolideHandlers struct {
-	Login                  *kithttp.Server
-	Logout                 *kithttp.Server
-	ForgotPassword         *kithttp.Server
-	ResetPassword          *kithttp.Server
-	Me                     *kithttp.Server
-	CreateUser             *kithttp.Server
-	GetUser                *kithttp.Server
-	ListUsers              *kithttp.Server
-	ModifyUser             *kithttp.Server
-	GetSessionsForUserInfo *kithttp.Server
-	DeleteSessionsForUser  *kithttp.Server
-	GetSessionInfo         *kithttp.Server
-	DeleteSession          *kithttp.Server
-	GetAppConfig           *kithttp.Server
-	ModifyAppConfig        *kithttp.Server
-	CreateInvite           *kithttp.Server
-	ListInvites            *kithttp.Server
-	DeleteInvite           *kithttp.Server
-	GetQuery               *kithttp.Server
-	GetAllQueries          *kithttp.Server
-	CreateQuery            *kithttp.Server
-	ModifyQuery            *kithttp.Server
-	DeleteQuery            *kithttp.Server
-	GetPack                *kithttp.Server
-	GetAllPacks            *kithttp.Server
-	CreatePack             *kithttp.Server
-	ModifyPack             *kithttp.Server
-	DeletePack             *kithttp.Server
-	AddQueryToPack         *kithttp.Server
-	GetQueriesInPack       *kithttp.Server
-	DeleteQueryFromPack    *kithttp.Server
-	EnrollAgent            *kithttp.Server
-	GetDistributedQueries  *kithttp.Server
+	Login                         *kithttp.Server
+	Logout                        *kithttp.Server
+	ForgotPassword                *kithttp.Server
+	ResetPassword                 *kithttp.Server
+	Me                            *kithttp.Server
+	CreateUser                    *kithttp.Server
+	GetUser                       *kithttp.Server
+	ListUsers                     *kithttp.Server
+	ModifyUser                    *kithttp.Server
+	GetSessionsForUserInfo        *kithttp.Server
+	DeleteSessionsForUser         *kithttp.Server
+	GetSessionInfo                *kithttp.Server
+	DeleteSession                 *kithttp.Server
+	GetAppConfig                  *kithttp.Server
+	ModifyAppConfig               *kithttp.Server
+	CreateInvite                  *kithttp.Server
+	ListInvites                   *kithttp.Server
+	DeleteInvite                  *kithttp.Server
+	GetQuery                      *kithttp.Server
+	GetAllQueries                 *kithttp.Server
+	CreateQuery                   *kithttp.Server
+	ModifyQuery                   *kithttp.Server
+	DeleteQuery                   *kithttp.Server
+	GetPack                       *kithttp.Server
+	GetAllPacks                   *kithttp.Server
+	CreatePack                    *kithttp.Server
+	ModifyPack                    *kithttp.Server
+	DeletePack                    *kithttp.Server
+	AddQueryToPack                *kithttp.Server
+	GetQueriesInPack              *kithttp.Server
+	DeleteQueryFromPack           *kithttp.Server
+	EnrollAgent                   *kithttp.Server
+	GetClientConfig               *kithttp.Server
+	GetDistributedQueries         *kithttp.Server
+	SubmitDistributedQueryResults *kithttp.Server
+	SubmitStatusLogs              *kithttp.Server
+	SubmitResultLogs              *kithttp.Server
 }
 
 func makeKolideKitHandlers(ctx context.Context, e KolideEndpoints, opts []kithttp.ServerOption) kolideHandlers {
@@ -129,39 +141,43 @@ func makeKolideKitHandlers(ctx context.Context, e KolideEndpoints, opts []kithtt
 		return kithttp.NewServer(ctx, e, decodeFn, encodeResponse, opts...)
 	}
 	return kolideHandlers{
-		Login:                  newServer(e.Login, decodeLoginRequest),
-		Logout:                 newServer(e.Logout, decodeNoParamsRequest),
-		ForgotPassword:         newServer(e.ForgotPassword, decodeForgotPasswordRequest),
-		ResetPassword:          newServer(e.ResetPassword, decodeResetPasswordRequest),
-		Me:                     newServer(e.Me, decodeNoParamsRequest),
-		CreateUser:             newServer(e.CreateUser, decodeCreateUserRequest),
-		GetUser:                newServer(e.GetUser, decodeGetUserRequest),
-		ListUsers:              newServer(e.ListUsers, decodeNoParamsRequest),
-		ModifyUser:             newServer(e.ModifyUser, decodeModifyUserRequest),
-		GetSessionsForUserInfo: newServer(e.GetSessionsForUserInfo, decodeGetInfoAboutSessionsForUserRequest),
-		DeleteSessionsForUser:  newServer(e.DeleteSessionsForUser, decodeDeleteSessionsForUserRequest),
-		GetSessionInfo:         newServer(e.GetSessionInfo, decodeGetInfoAboutSessionRequest),
-		DeleteSession:          newServer(e.DeleteSession, decodeDeleteSessionRequest),
-		GetAppConfig:           newServer(e.GetAppConfig, decodeNoParamsRequest),
-		ModifyAppConfig:        newServer(e.ModifyAppConfig, decodeModifyAppConfigRequest),
-		CreateInvite:           newServer(e.CreateInvite, decodeCreateInviteRequest),
-		ListInvites:            newServer(e.ListInvites, decodeNoParamsRequest),
-		DeleteInvite:           newServer(e.DeleteInvite, decodeDeleteInviteRequest),
-		GetQuery:               newServer(e.GetQuery, decodeGetQueryRequest),
-		GetAllQueries:          newServer(e.GetAllQueries, decodeGetQueryRequest),
-		CreateQuery:            newServer(e.CreateQuery, decodeCreateQueryRequest),
-		ModifyQuery:            newServer(e.ModifyQuery, decodeModifyQueryRequest),
-		DeleteQuery:            newServer(e.DeleteQuery, decodeDeleteQueryRequest),
-		GetPack:                newServer(e.GetPack, decodeGetPackRequest),
-		GetAllPacks:            newServer(e.GetAllPacks, decodeNoParamsRequest),
-		CreatePack:             newServer(e.CreatePack, decodeCreatePackRequest),
-		ModifyPack:             newServer(e.ModifyPack, decodeModifyPackRequest),
-		DeletePack:             newServer(e.DeletePack, decodeDeletePackRequest),
-		AddQueryToPack:         newServer(e.AddQueryToPack, decodeAddQueryToPackRequest),
-		GetQueriesInPack:       newServer(e.GetQueriesInPack, decodeGetQueriesInPackRequest),
-		DeleteQueryFromPack:    newServer(e.DeleteQueryFromPack, decodeDeleteQueryFromPackRequest),
-		EnrollAgent:            newServer(e.EnrollAgent, decodeEnrollAgentRequest),
-		GetDistributedQueries:  newServer(e.GetDistributedQueries, decodeGetDistributedQueriesRequest),
+		Login:                         newServer(e.Login, decodeLoginRequest),
+		Logout:                        newServer(e.Logout, decodeNoParamsRequest),
+		ForgotPassword:                newServer(e.ForgotPassword, decodeForgotPasswordRequest),
+		ResetPassword:                 newServer(e.ResetPassword, decodeResetPasswordRequest),
+		Me:                            newServer(e.Me, decodeNoParamsRequest),
+		CreateUser:                    newServer(e.CreateUser, decodeCreateUserRequest),
+		GetUser:                       newServer(e.GetUser, decodeGetUserRequest),
+		ListUsers:                     newServer(e.ListUsers, decodeNoParamsRequest),
+		ModifyUser:                    newServer(e.ModifyUser, decodeModifyUserRequest),
+		GetSessionsForUserInfo:        newServer(e.GetSessionsForUserInfo, decodeGetInfoAboutSessionsForUserRequest),
+		DeleteSessionsForUser:         newServer(e.DeleteSessionsForUser, decodeDeleteSessionsForUserRequest),
+		GetSessionInfo:                newServer(e.GetSessionInfo, decodeGetInfoAboutSessionRequest),
+		DeleteSession:                 newServer(e.DeleteSession, decodeDeleteSessionRequest),
+		GetAppConfig:                  newServer(e.GetAppConfig, decodeNoParamsRequest),
+		ModifyAppConfig:               newServer(e.ModifyAppConfig, decodeModifyAppConfigRequest),
+		CreateInvite:                  newServer(e.CreateInvite, decodeCreateInviteRequest),
+		ListInvites:                   newServer(e.ListInvites, decodeNoParamsRequest),
+		DeleteInvite:                  newServer(e.DeleteInvite, decodeDeleteInviteRequest),
+		GetQuery:                      newServer(e.GetQuery, decodeGetQueryRequest),
+		GetAllQueries:                 newServer(e.GetAllQueries, decodeGetQueryRequest),
+		CreateQuery:                   newServer(e.CreateQuery, decodeCreateQueryRequest),
+		ModifyQuery:                   newServer(e.ModifyQuery, decodeModifyQueryRequest),
+		DeleteQuery:                   newServer(e.DeleteQuery, decodeDeleteQueryRequest),
+		GetPack:                       newServer(e.GetPack, decodeGetPackRequest),
+		GetAllPacks:                   newServer(e.GetAllPacks, decodeNoParamsRequest),
+		CreatePack:                    newServer(e.CreatePack, decodeCreatePackRequest),
+		ModifyPack:                    newServer(e.ModifyPack, decodeModifyPackRequest),
+		DeletePack:                    newServer(e.DeletePack, decodeDeletePackRequest),
+		AddQueryToPack:                newServer(e.AddQueryToPack, decodeAddQueryToPackRequest),
+		GetQueriesInPack:              newServer(e.GetQueriesInPack, decodeGetQueriesInPackRequest),
+		DeleteQueryFromPack:           newServer(e.DeleteQueryFromPack, decodeDeleteQueryFromPackRequest),
+		EnrollAgent:                   newServer(e.EnrollAgent, decodeEnrollAgentRequest),
+		GetClientConfig:               newServer(e.GetClientConfig, decodeGetClientConfigRequest),
+		GetDistributedQueries:         newServer(e.GetDistributedQueries, decodeGetDistributedQueriesRequest),
+		SubmitDistributedQueryResults: newServer(e.SubmitDistributedQueryResults, decodeSubmitDistributedQueryResultsRequest),
+		SubmitStatusLogs:              newServer(e.SubmitStatusLogs, decodeSubmitStatusLogsRequest),
+		SubmitResultLogs:              newServer(e.SubmitResultLogs, decodeSubmitResultLogsRequest),
 	}
 }
 
@@ -225,6 +241,10 @@ func attachKolideAPIRoutes(r *mux.Router, h kolideHandlers) {
 	r.Handle("/api/v1/kolide/packs/{id}/queries", h.GetQueriesInPack).Methods("GET")
 	r.Handle("/api/v1/kolide/packs/{pid}/queries/{qid}", h.DeleteQueryFromPack).Methods("DELETE")
 
-	r.Handle("/api/v1/osquery/distributed/read", h.GetDistributedQueries).Methods("POST")
 	r.Handle("/api/v1/osquery/enroll", h.EnrollAgent).Methods("POST")
+	r.Handle("/api/v1/osquery/config", h.GetClientConfig).Methods("POST")
+	r.Handle("/api/v1/osquery/distributed/read", h.GetDistributedQueries).Methods("POST")
+	r.Handle("/api/v1/osquery/distributed/write", h.SubmitDistributedQueryResults).Methods("POST")
+	r.Handle("/api/v1/osquery/log/status", h.SubmitStatusLogs).Methods("POST")
+	r.Handle("/api/v1/osquery/log/result", h.SubmitResultLogs).Methods("POST")
 }
