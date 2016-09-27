@@ -44,18 +44,21 @@ type KolideEndpoints struct {
 	AddQueryToPack         endpoint.Endpoint
 	GetQueriesInPack       endpoint.Endpoint
 	DeleteQueryFromPack    endpoint.Endpoint
+	EnrollAgent            endpoint.Endpoint
+	GetDistributedQueries  endpoint.Endpoint
 }
 
 // MakeKolideServerEndpoints creates the Kolide API endpoints.
 func MakeKolideServerEndpoints(svc kolide.Service, jwtKey string) KolideEndpoints {
 	return KolideEndpoints{
-		Login:                  makeLoginEndpoint(svc),
-		Logout:                 makeLogoutEndpoint(svc),
-		ForgotPassword:         makeForgotPasswordEndpoint(svc),
-		ResetPassword:          makeResetPasswordEndpoint(svc),
-		CreateUser:             makeCreateUserEndpoint(svc),
+		Login:          makeLoginEndpoint(svc),
+		Logout:         makeLogoutEndpoint(svc),
+		ForgotPassword: makeForgotPasswordEndpoint(svc),
+		ResetPassword:  makeResetPasswordEndpoint(svc),
+		CreateUser:     makeCreateUserEndpoint(svc),
+
+		// Authenticated user endpoints
 		Me:                     authenticatedUser(jwtKey, svc, makeGetSessionUserEndpoint(svc)),
-		CreateUser:             authenticatedUser(jwtKey, svc, mustBeAdmin(makeCreateUserEndpoint(svc))),
 		GetUser:                authenticatedUser(jwtKey, svc, canReadUser(makeGetUserEndpoint(svc))),
 		ListUsers:              authenticatedUser(jwtKey, svc, canPerformActions(makeListUsersEndpoint(svc))),
 		ModifyUser:             authenticatedUser(jwtKey, svc, validateModifyUserRequest(makeModifyUserEndpoint(svc))),
@@ -78,6 +81,10 @@ func MakeKolideServerEndpoints(svc kolide.Service, jwtKey string) KolideEndpoint
 		AddQueryToPack:         authenticatedUser(jwtKey, svc, makeAddQueryToPackEndpoint(svc)),
 		GetQueriesInPack:       authenticatedUser(jwtKey, svc, makeGetQueriesInPackEndpoint(svc)),
 		DeleteQueryFromPack:    authenticatedUser(jwtKey, svc, makeDeleteQueryFromPackEndpoint(svc)),
+
+		// Osquery endpoints
+		EnrollAgent:           makeEnrollAgentEndpoint(svc),
+		GetDistributedQueries: makeGetDistributedQueriesEndpoint(svc),
 	}
 }
 
@@ -113,6 +120,8 @@ type kolideHandlers struct {
 	AddQueryToPack         *kithttp.Server
 	GetQueriesInPack       *kithttp.Server
 	DeleteQueryFromPack    *kithttp.Server
+	EnrollAgent            *kithttp.Server
+	GetDistributedQueries  *kithttp.Server
 }
 
 func makeKolideKitHandlers(ctx context.Context, e KolideEndpoints, opts []kithttp.ServerOption) kolideHandlers {
@@ -151,6 +160,8 @@ func makeKolideKitHandlers(ctx context.Context, e KolideEndpoints, opts []kithtt
 		AddQueryToPack:         newServer(e.AddQueryToPack, decodeAddQueryToPackRequest),
 		GetQueriesInPack:       newServer(e.GetQueriesInPack, decodeGetQueriesInPackRequest),
 		DeleteQueryFromPack:    newServer(e.DeleteQueryFromPack, decodeDeleteQueryFromPackRequest),
+		EnrollAgent:            newServer(e.EnrollAgent, decodeEnrollAgentRequest),
+		GetDistributedQueries:  newServer(e.GetDistributedQueries, decodeGetDistributedQueriesRequest),
 	}
 }
 
@@ -182,24 +193,29 @@ func attachKolideAPIRoutes(r *mux.Router, h kolideHandlers) {
 	r.Handle("/api/v1/kolide/forgot_password", h.ForgotPassword).Methods("POST")
 	r.Handle("/api/v1/kolide/reset_password", h.ResetPassword).Methods("POST")
 	r.Handle("/api/v1/kolide/me", h.Me).Methods("GET")
+
 	r.Handle("/api/v1/kolide/users", h.ListUsers).Methods("GET")
 	r.Handle("/api/v1/kolide/users", h.CreateUser).Methods("POST")
 	r.Handle("/api/v1/kolide/users/{id}", h.GetUser).Methods("GET")
 	r.Handle("/api/v1/kolide/users/{id}", h.ModifyUser).Methods("PATCH")
 	r.Handle("/api/v1/kolide/users/{id}/sessions", h.GetSessionsForUserInfo).Methods("GET")
 	r.Handle("/api/v1/kolide/users/{id}/sessions", h.DeleteSessionsForUser).Methods("DELETE")
+
 	r.Handle("/api/v1/kolide/sessions/{id}", h.GetSessionInfo).Methods("GET")
 	r.Handle("/api/v1/kolide/sessions/{id}", h.DeleteSession).Methods("DELETE")
+
 	r.Handle("/api/v1/kolide/config", h.GetAppConfig).Methods("GET")
 	r.Handle("/api/v1/kolide/config", h.ModifyAppConfig).Methods("PATCH")
 	r.Handle("/api/v1/kolide/invites", h.CreateInvite).Methods("POST")
 	r.Handle("/api/v1/kolide/invites", h.ListInvites).Methods("GET")
 	r.Handle("/api/v1/kolide/invites/{id}", h.DeleteInvite).Methods("DELETE")
+
 	r.Handle("/api/v1/kolide/queries/{id}", h.GetQuery).Methods("GET")
 	r.Handle("/api/v1/kolide/queries", h.GetAllQueries).Methods("GET")
 	r.Handle("/api/v1/kolide/queries", h.CreateQuery).Methods("POST")
 	r.Handle("/api/v1/kolide/queries/{id}", h.ModifyQuery).Methods("PATCH")
 	r.Handle("/api/v1/kolide/queries/{id}", h.DeleteQuery).Methods("DELETE")
+
 	r.Handle("/api/v1/kolide/packs/{id}", h.GetPack).Methods("GET")
 	r.Handle("/api/v1/kolide/packs", h.GetAllPacks).Methods("GET")
 	r.Handle("/api/v1/kolide/packs", h.CreatePack).Methods("POST")
@@ -208,4 +224,7 @@ func attachKolideAPIRoutes(r *mux.Router, h kolideHandlers) {
 	r.Handle("/api/v1/kolide/packs/{pid}/queries/{qid}", h.AddQueryToPack).Methods("POST")
 	r.Handle("/api/v1/kolide/packs/{id}/queries", h.GetQueriesInPack).Methods("GET")
 	r.Handle("/api/v1/kolide/packs/{pid}/queries/{qid}", h.DeleteQueryFromPack).Methods("DELETE")
+
+	r.Handle("/api/v1/osquery/distributed/read", h.GetDistributedQueries).Methods("POST")
+	r.Handle("/api/v1/osquery/enroll", h.EnrollAgent).Methods("POST")
 }

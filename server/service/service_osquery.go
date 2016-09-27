@@ -2,7 +2,6 @@ package service
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/kolide/kolide-ose/server/errors"
@@ -19,17 +18,22 @@ func (e osqueryError) Error() string {
 	return e.message
 }
 
+func (e osqueryError) OsqueryError() string {
+	return e.message
+}
+
+func (e osqueryError) NodeInvalid() bool {
+	return e.nodeInvalid
+}
+
 func (svc service) EnrollAgent(ctx context.Context, enrollSecret, hostIdentifier string) (string, error) {
 	if enrollSecret != svc.config.Osquery.EnrollSecret {
-		return "", errors.New(
-			"Node key invalid",
-			fmt.Sprintf("Invalid node key provided: %s", enrollSecret),
-		)
+		return "", osqueryError{message: "node key invalid", nodeInvalid: true}
 	}
 
 	host, err := svc.ds.EnrollHost(hostIdentifier, "", "", "", svc.config.Osquery.NodeKeySize)
 	if err != nil {
-		return "", err
+		return "", osqueryError{message: "enrollment failed: " + err.Error(), nodeInvalid: true}
 	}
 
 	return host.NodeKey, nil

@@ -71,6 +71,22 @@ func encodeError(ctx context.Context, err error, w http.ResponseWriter) {
 		return
 	}
 
+	type osqueryError interface {
+		OsqueryError() string
+		NodeInvalid() bool
+	}
+	if e, ok := err.(osqueryError); ok {
+		errMap := map[string]interface{}{"error": e.OsqueryError()}
+		if e.NodeInvalid() {
+			w.WriteHeader(http.StatusUnauthorized)
+			errMap["node_invalid"] = true
+		} else {
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+		enc.Encode(errMap)
+		return
+	}
+
 	// Other errors
 	switch domain {
 	case "service":
