@@ -54,7 +54,7 @@ export class LoginRoutes extends Component {
             transform: `scale(${styles.scale})`,
           })}
         >
-        {children}
+          {children}
         </RouteTransition>
       </div>
     );
