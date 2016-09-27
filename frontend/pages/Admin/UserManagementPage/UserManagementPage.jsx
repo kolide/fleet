@@ -7,6 +7,7 @@ import InviteUserForm from '../../../components/forms/InviteUserForm';
 import Modal from '../../../components/Modal';
 import userActions from '../../../redux/nodes/entities/users/actions';
 import UserBlock from './UserBlock';
+import { renderFlash } from '../../../redux/nodes/notifications/actions';
 
 class UserManagementPage extends Component {
   static propTypes = {
@@ -33,19 +34,35 @@ class UserManagementPage extends Component {
 
   onUserActionSelect = (user, formData) => {
     const { dispatch } = this.props;
+    const { update } = userActions;
 
     if (formData.user_actions) {
       switch (formData.user_actions) {
         case 'demote_user':
-          return dispatch(userActions.update(user, { admin: false }));
+          return dispatch(update(user, { admin: false }))
+            .then(() => {
+              return dispatch(renderFlash('success', 'User demoted', update(user, { admin: true })));
+            });
         case 'disable_account':
-          return dispatch(userActions.update(user, { enabled: false }));
+          return dispatch(userActions.update(user, { enabled: false }))
+            .then(() => {
+              return dispatch(renderFlash('success', 'User account disabled', update(user, { enabled: true })));
+            });
         case 'enable_account':
-          return dispatch(userActions.update(user, { enabled: true }));
+          return dispatch(update(user, { enabled: true }))
+            .then(() => {
+              return dispatch(renderFlash('success', 'User account enabled', update(user, { enabled: false })));
+            });
         case 'promote_user':
-          return dispatch(userActions.update(user, { admin: true }));
+          return dispatch(update(user, { admin: true }))
+            .then(() => {
+              return dispatch(renderFlash('success', 'User promoted to admin', update(user, { admin: false })));
+            });
         case 'reset_password':
-          return dispatch(userActions.update(user, { force_password_reset: true }));
+          return dispatch(update(user, { force_password_reset: true }))
+            .then(() => {
+              return dispatch(renderFlash('success', 'User forced to reset password', update(user, { force_password_reset: false })));
+            });
         default:
           return false;
       }
