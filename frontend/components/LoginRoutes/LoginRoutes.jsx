@@ -10,9 +10,9 @@ export class LoginRoutes extends Component {
   static propTypes = {
     children: PropTypes.element,
     dispatch: PropTypes.func,
-    location: {
+    location: PropTypes.shape({
       pathname: PropTypes.string,
-    },
+    }),
   };
 
   componentWillMount () {

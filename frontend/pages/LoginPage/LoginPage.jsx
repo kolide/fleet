@@ -53,10 +53,6 @@ export class LoginPage extends Component {
   render () {
     const { onSubmit } = this;
     const { loginVisible } = this.state;
-    let loginFormComponent;
-    if (loginVisible) {
-      loginFormComponent = <LoginForm onSubmit={onSubmit} visible={loginVisible} />;
-    }
 
     return (
       <div>
@@ -66,7 +62,7 @@ export class LoginPage extends Component {
           transitionEnterTimeout={500}
           transitionLeaveTimeout={300}
         >
-          {loginFormComponent}
+          {loginVisible && <LoginForm onSubmit={onSubmit} visible={loginVisible} />}
         </ReactCSSTransitionGroup>
       </div>
     );
