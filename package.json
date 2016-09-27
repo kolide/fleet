@@ -41,9 +41,9 @@
     "proxy-middleware": "^0.15.0",
     "radium": "^0.18.1",
     "radium-normalize": "^2.0.4",
-    "react": "^15.2.1",
-    "react-addons-css-transition-group": "^15.2.1",
-    "react-dom": "^15.2.1",
+    "react": "^15.3.2",
+    "react-addons-css-transition-group": "^15.3.2",
+    "react-dom": "^15.3.2",
     "react-redux": "^4.4.5",
     "react-router": "^2.7.0",
     "react-router-redux": "^4.0.5",
@@ -85,7 +85,6 @@
     "eslint-plugin-react": "^6.0.0",
     "ignore-styles": "^5.0.1",
     "mocha": "^3.0.2",
-    "react-addons-test-utils": "^15.3.1",
-    "react-dom": "^15.3.1"
+    "react-addons-test-utils": "^15.3.1"
   }
 }
