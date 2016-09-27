@@ -16,9 +16,8 @@ type enrollAgentRequest struct {
 }
 
 type enrollAgentResponse struct {
-	NodeKey     string `json:"node_key,omitempty"`
-	Err         error  `json:"error,omitempty"`
-	NodeInvalid bool   `json:"node_invalid,omitempty"`
+	NodeKey string `json:"node_key,omitempty"`
+	Err     error  `json:"error,omitempty"`
 }
 
 func (r enrollAgentResponse) error() error { return r.Err }
@@ -28,7 +27,7 @@ func makeEnrollAgentEndpoint(svc kolide.Service) endpoint.Endpoint {
 		req := request.(enrollAgentRequest)
 		nodeKey, err := svc.EnrollAgent(ctx, req.EnrollSecret, req.HostIdentifier)
 		if err != nil {
-			return enrollAgentResponse{Err: err, NodeInvalid: true}, nil
+			return enrollAgentResponse{Err: err}, nil
 		}
 		return enrollAgentResponse{NodeKey: nodeKey}, nil
 	}

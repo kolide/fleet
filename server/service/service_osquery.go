@@ -18,10 +18,6 @@ func (e osqueryError) Error() string {
 	return e.message
 }
 
-func (e osqueryError) OsqueryError() string {
-	return e.message
-}
-
 func (e osqueryError) NodeInvalid() bool {
 	return e.nodeInvalid
 }
