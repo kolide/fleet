@@ -33,5 +33,27 @@ export default (showBackgroundImage) => {
     'h1, h2, h3': {
       lineHeight: 1.2,
     },
+    '.ace_osquery-token': {
+      backgroundColor: color.brand,
+      color: color.white,
+      cursor: 'pointer',
+    },
+    '.ace_cursor': {
+      // height: '30px !important',
+    },
+    '.ace_line': {
+      // height: '30px !important',
+      // lineHeight: '30px',
+    },
+    '#query-editor.ace_editor': {
+      zIndex: '-1',
+    },
+    '.ace_gutter-cell': {
+      // height: '30px',
+      // lineHeight: '30px',
+    },
+    '.ace_gutter-active-line': {
+      // height: '30px !important',
+    },
   };
 };

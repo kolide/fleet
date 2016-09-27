@@ -12,7 +12,7 @@ class QueryPageWrapper extends Component {
       <div>
         {children}
       </div>
-    )
+    );
   }
 }
 
