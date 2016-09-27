@@ -8,6 +8,7 @@ export default {
     display: 'flex',
     justifyContent: 'center',
     flexDirection: 'column',
+    marginTop: '13vh',
   },
   whiteTabStyles: {
     backgroundColor: color.white,
