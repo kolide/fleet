@@ -266,7 +266,6 @@ const componentStyles = {
     boxSizing: 'border-box',
     cursor: 'pointer',
     height: '100%',
-    paddingTop: '41px',
     position: 'absolute',
     bottom: '0',
     lineHeight: '95px',
