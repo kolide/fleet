@@ -25,7 +25,7 @@ func TestAPIRoutes(t *testing.T) {
 	kh := makeKolideKitHandlers(ctx, ke, nil)
 	attachKolideAPIRoutes(r, kh)
 	handler := mux.NewRouter()
-	handler.PathPrefix("/api/v1/kolide").Handler(r)
+	handler.PathPrefix("/").Handler(r)
 
 	var routes = []struct {
 		verb string

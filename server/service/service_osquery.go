@@ -24,16 +24,25 @@ func (e osqueryError) NodeInvalid() bool {
 }
 
 func (svc service) AuthenticateHost(ctx context.Context, nodeKey string) (*kolide.Host, error) {
+	if nodeKey == "" {
+		return nil, osqueryError{
+			message:     "authentication error: missing node key",
+			nodeInvalid: true,
+		}
+	}
 	host, err := svc.ds.AuthenticateHost(nodeKey)
 	if err != nil {
-		return nil, osqueryError{message: "authentication error", nodeInvalid: true}
+		return nil, osqueryError{
+			message:     "authentication error: " + err.Error(),
+			nodeInvalid: true,
+		}
 	}
 	return host, nil
 }
 
 func (svc service) EnrollAgent(ctx context.Context, enrollSecret, hostIdentifier string) (string, error) {
 	if enrollSecret != svc.config.Osquery.EnrollSecret {
-		return "", osqueryError{message: "node key invalid", nodeInvalid: true}
+		return "", osqueryError{message: "invalid enroll secret", nodeInvalid: true}
 	}
 
 	host, err := svc.ds.EnrollHost(hostIdentifier, "", "", "", svc.config.Osquery.NodeKeySize)
