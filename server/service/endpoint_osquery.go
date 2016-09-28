@@ -50,8 +50,7 @@ func (r getClientConfigResponse) error() error { return r.Err }
 
 func makeGetClientConfigEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(getClientConfigRequest)
-		config, err := svc.GetClientConfig(ctx, req.NodeKey)
+		config, err := svc.GetClientConfig(ctx)
 		if err != nil {
 			return getClientConfigResponse{Err: err}, nil
 		}
@@ -76,8 +75,7 @@ func (r getDistributedQueriesResponse) error() error { return r.Err }
 
 func makeGetDistributedQueriesEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(getDistributedQueriesRequest)
-		queries, err := svc.GetDistributedQueries(ctx, req.NodeKey)
+		queries, err := svc.GetDistributedQueries(ctx)
 		if err != nil {
 			return getDistributedQueriesResponse{Err: err}, nil
 		}
@@ -103,7 +101,7 @@ func (r submitDistributedQueryResultsResponse) error() error { return r.Err }
 func makeSubmitDistributedQueryResultsEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(submitDistributedQueryResultsRequest)
-		err := svc.SubmitDistributedQueryResults(ctx, req.NodeKey, req.Results)
+		err := svc.SubmitDistributedQueryResults(ctx, req.Results)
 		if err != nil {
 			return submitDistributedQueryResultsResponse{Err: err}, nil
 		}
@@ -129,7 +127,7 @@ func (r submitStatusLogsResponse) error() error { return r.Err }
 func makeSubmitStatusLogsEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(submitStatusLogsRequest)
-		err := svc.SubmitStatusLogs(ctx, req.NodeKey, req.Logs)
+		err := svc.SubmitStatusLogs(ctx, req.Logs)
 		if err != nil {
 			return submitStatusLogsResponse{Err: err}, nil
 		}
@@ -155,7 +153,7 @@ func (r submitResultLogsResponse) error() error { return r.Err }
 func makeSubmitResultLogsEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(submitResultLogsRequest)
-		err := svc.SubmitResultLogs(ctx, req.NodeKey, req.Logs)
+		err := svc.SubmitResultLogs(ctx, req.Logs)
 		if err != nil {
 			return submitResultLogsResponse{Err: err}, nil
 		}

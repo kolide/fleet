@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/kolide/kolide-ose/server/contexts/host"
 	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"golang.org/x/net/context"
@@ -22,6 +23,14 @@ func (e osqueryError) NodeInvalid() bool {
 	return e.nodeInvalid
 }
 
+func (svc service) AuthenticateHost(ctx context.Context, nodeKey string) (*kolide.Host, error) {
+	host, err := svc.ds.AuthenticateHost(nodeKey)
+	if err != nil {
+		return nil, osqueryError{message: "authentication error", nodeInvalid: true}
+	}
+	return host, nil
+}
+
 func (svc service) EnrollAgent(ctx context.Context, enrollSecret, hostIdentifier string) (string, error) {
 	if enrollSecret != svc.config.Osquery.EnrollSecret {
 		return "", osqueryError{message: "node key invalid", nodeInvalid: true}
@@ -35,22 +44,12 @@ func (svc service) EnrollAgent(ctx context.Context, enrollSecret, hostIdentifier
 	return host.NodeKey, nil
 }
 
-func (svc service) GetClientConfig(ctx context.Context, nodeKey string) (*kolide.OsqueryConfig, error) {
-	_, err := svc.ds.AuthenticateHost(nodeKey)
-	if err != nil {
-		return nil, osqueryError{message: "authentication error", nodeInvalid: true}
-	}
-
+func (svc service) GetClientConfig(ctx context.Context) (*kolide.OsqueryConfig, error) {
 	var config kolide.OsqueryConfig
 	return &config, nil
 }
 
-func (svc service) SubmitStatusLogs(ctx context.Context, nodeKey string, logs []kolide.OsqueryStatusLog) error {
-	_, err := svc.ds.AuthenticateHost(nodeKey)
-	if err != nil {
-		return osqueryError{message: "authentication error", nodeInvalid: true}
-	}
-
+func (svc service) SubmitStatusLogs(ctx context.Context, logs []kolide.OsqueryStatusLog) error {
 	for _, log := range logs {
 		err := json.NewEncoder(svc.osqueryStatusLogWriter).Encode(log)
 		if err != nil {
@@ -60,12 +59,7 @@ func (svc service) SubmitStatusLogs(ctx context.Context, nodeKey string, logs []
 	return nil
 }
 
-func (svc service) SubmitResultLogs(ctx context.Context, nodeKey string, logs []kolide.OsqueryResultLog) error {
-	_, err := svc.ds.AuthenticateHost(nodeKey)
-	if err != nil {
-		return osqueryError{message: "authentication error", nodeInvalid: true}
-	}
-
+func (svc service) SubmitResultLogs(ctx context.Context, logs []kolide.OsqueryResultLog) error {
 	for _, log := range logs {
 		err := json.NewEncoder(svc.osqueryResultsLogWriter).Encode(log)
 		if err != nil {
@@ -94,15 +88,15 @@ func hostDetailQueries(host kolide.Host) map[string]string {
 	return queries
 }
 
-func (svc service) GetDistributedQueries(ctx context.Context, nodeKey string) (map[string]string, error) {
+func (svc service) GetDistributedQueries(ctx context.Context) (map[string]string, error) {
 	queries := make(map[string]string)
 
-	host, err := svc.ds.AuthenticateHost(nodeKey)
-	if err != nil {
+	host, ok := host.FromContext(ctx)
+	if !ok {
 		return nil, osqueryError{message: "authentication error", nodeInvalid: true}
 	}
 
-	queries = hostDetailQueries(*host)
+	queries = hostDetailQueries(host)
 	if len(queries) > 0 {
 		// If the host details need to be updated, we should do so
 		// before checking for any other queries
@@ -111,7 +105,7 @@ func (svc service) GetDistributedQueries(ctx context.Context, nodeKey string) (m
 
 	// Retrieve the label queries that should be updated
 	cutoff := svc.clock.Now().Add(-svc.config.Osquery.LabelUpdateInterval)
-	labelQueries, err := svc.ds.LabelQueriesForHost(host, cutoff)
+	labelQueries, err := svc.ds.LabelQueriesForHost(&host, cutoff)
 	if err != nil {
 		return nil, err
 	}
@@ -125,11 +119,6 @@ func (svc service) GetDistributedQueries(ctx context.Context, nodeKey string) (m
 	return queries, nil
 }
 
-func (svc service) SubmitDistributedQueryResults(ctx context.Context, nodeKey string, results kolide.OsqueryDistributedQueryResults) error {
-	_, err := svc.ds.AuthenticateHost(nodeKey)
-	if err != nil {
-		return osqueryError{message: "authentication error", nodeInvalid: true}
-	}
-
+func (svc service) SubmitDistributedQueryResults(ctx context.Context, results kolide.OsqueryDistributedQueryResults) error {
 	return nil
 }

@@ -3,9 +3,11 @@ package service
 import (
 	"errors"
 	"fmt"
+	"reflect"
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/go-kit/kit/endpoint"
+	"github.com/kolide/kolide-ose/server/contexts/host"
 	"github.com/kolide/kolide-ose/server/contexts/token"
 	"github.com/kolide/kolide-ose/server/contexts/viewer"
 	"github.com/kolide/kolide-ose/server/kolide"
@@ -13,12 +15,40 @@ import (
 )
 
 var errNoContext = errors.New("context key not set")
+var osqueryAuthError = osqueryError{message: "authentication error", nodeInvalid: true}
+
+func authenticatedHost(svc kolide.Service, next endpoint.Endpoint) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		// Retrieve node key by reflection (note that our options here
+		// are limited by the fact that request is an interface{})
+		v := reflect.ValueOf(request)
+		if v.Kind() != reflect.Struct {
+			return nil, osqueryAuthError
+		}
+		nodeKeyField := v.FieldByName("NodeKey")
+		if !nodeKeyField.IsValid() {
+			return nil, osqueryAuthError
+		}
+		if nodeKeyField.Kind() != reflect.String {
+			return nil, osqueryAuthError
+		}
+		nodeKey := nodeKeyField.String()
+
+		h, err := svc.AuthenticateHost(ctx, nodeKey)
+		if err != nil {
+			return nil, osqueryAuthError
+		}
+
+		ctx = host.NewContext(ctx, *h)
+		return next(ctx, request)
+	}
+}
 
 // authenticatedUser wraps an endpoint, requires that the Kolide user is
 // authenticated, and populates the context with a Viewer struct for that user.
 func authenticatedUser(jwtKey string, svc kolide.Service, next endpoint.Endpoint) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		// first check if already succesfuly set
+		// first check if already successfully set
 		if _, ok := viewer.FromContext(ctx); ok {
 			return next(ctx, request)
 		}

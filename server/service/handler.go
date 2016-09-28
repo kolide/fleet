@@ -88,11 +88,11 @@ func MakeKolideServerEndpoints(svc kolide.Service, jwtKey string) KolideEndpoint
 
 		// Osquery endpoints
 		EnrollAgent:                   makeEnrollAgentEndpoint(svc),
-		GetClientConfig:               makeGetClientConfigEndpoint(svc),
-		GetDistributedQueries:         makeGetDistributedQueriesEndpoint(svc),
-		SubmitDistributedQueryResults: makeSubmitDistributedQueryResultsEndpoint(svc),
-		SubmitStatusLogs:              makeSubmitStatusLogsEndpoint(svc),
-		SubmitResultLogs:              makeSubmitResultLogsEndpoint(svc),
+		GetClientConfig:               authenticatedHost(svc, makeGetClientConfigEndpoint(svc)),
+		GetDistributedQueries:         authenticatedHost(svc, makeGetDistributedQueriesEndpoint(svc)),
+		SubmitDistributedQueryResults: authenticatedHost(svc, makeSubmitDistributedQueryResultsEndpoint(svc)),
+		SubmitStatusLogs:              authenticatedHost(svc, makeSubmitStatusLogsEndpoint(svc)),
+		SubmitResultLogs:              authenticatedHost(svc, makeSubmitResultLogsEndpoint(svc)),
 	}
 }
 
