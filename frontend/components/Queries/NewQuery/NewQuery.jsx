@@ -20,6 +20,7 @@ import 'brace/theme/tomorrow';
 import 'brace/ext/linking';
 import radium from 'radium';
 import './mode';
+import './theme';
 import componentStyles from './styles';
 import Slider from '../../buttons/Slider';
 import GradientButton from '../../buttons/GradientButton';
@@ -36,7 +37,7 @@ class NewQuery extends Component {
 
     this.state = {
       saveQuery: false,
-      theme: 'tomorrow',
+      theme: 'kolide',
     };
   }
 
@@ -107,6 +108,7 @@ class NewQuery extends Component {
       <div style={themeDropdownStyles}>
         <span style={{ fontSize: '10px' }}>Editor Theme:</span>
         <select onChange={onSelectChange} style={themeDropdownStyles} value={theme}>
+          <option value="kolide">Kolide</option>
           <option value="dreamweaver">Dreamweaver</option>
           <option value="cobalt">Cobalt</option>
           <option value="eclipse">Eclipse</option>
