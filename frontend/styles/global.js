@@ -45,9 +45,6 @@ export default (showBackgroundImage) => {
       // height: '30px !important',
       // lineHeight: '30px',
     },
-    '#query-editor.ace_editor': {
-      zIndex: '-1',
-    },
     '.ace_gutter-cell': {
       // height: '30px',
       // lineHeight: '30px',
