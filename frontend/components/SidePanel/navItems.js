@@ -13,6 +13,7 @@ export default (admin) => {
 
   const userNavItems = [
     {
+      defaultPathname: '/',
       icon: 'kolidecon-hosts',
       name: 'Hosts',
       path: /^\/$/,
