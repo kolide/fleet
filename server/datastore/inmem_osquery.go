@@ -8,7 +8,7 @@ import (
 	"github.com/kolide/kolide-ose/server/kolide"
 )
 
-func (orm *inmem) NewLabel(label *kolide.Label) error {
+func (orm *inmem) NewLabel(label *kolide.Label) (*kolide.Label, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
@@ -16,15 +16,14 @@ func (orm *inmem) NewLabel(label *kolide.Label) error {
 
 	for _, l := range orm.labels {
 		if l.Name == label.Name {
-			return ErrExists
+			return nil, ErrExists
 		}
 	}
 
 	newLabel.ID = uint(len(orm.labels) + 1)
 	orm.labels[newLabel.ID] = &newLabel
-	label.ID = newLabel.ID
 
-	return nil
+	return &newLabel, nil
 }
 
 func (orm *inmem) LabelsForHost(host *kolide.Host) ([]kolide.Label, error) {

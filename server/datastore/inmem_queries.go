@@ -2,7 +2,7 @@ package datastore
 
 import "github.com/kolide/kolide-ose/server/kolide"
 
-func (orm *inmem) NewQuery(query *kolide.Query) error {
+func (orm *inmem) NewQuery(query *kolide.Query) (*kolide.Query, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
@@ -10,15 +10,14 @@ func (orm *inmem) NewQuery(query *kolide.Query) error {
 
 	for _, q := range orm.queries {
 		if query.Name == q.Name {
-			return ErrExists
+			return nil, ErrExists
 		}
 	}
 
 	newQuery.ID = uint(len(orm.queries) + 1)
 	orm.queries[newQuery.ID] = &newQuery
-	query.ID = newQuery.ID
 
-	return nil
+	return &newQuery, nil
 }
 
 func (orm *inmem) SaveQuery(query *kolide.Query) error {
