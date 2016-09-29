@@ -1,7 +1,6 @@
 package service
 
 import (
-	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"golang.org/x/net/context"
 )
@@ -18,10 +17,7 @@ func (svc service) NewLabel(ctx context.Context, p kolide.LabelPayload) (*kolide
 	var label kolide.Label
 
 	if p.Name == nil {
-		return nil, errors.New(
-			"error creating label",
-			"label name not defined",
-		)
+		return nil, newInvalidArgumentError("name", "missing required argument")
 	}
 	label.Name = *p.Name
 
