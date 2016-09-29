@@ -7,14 +7,16 @@ import (
 )
 
 type inmem struct {
-	kolide.Datastore
-	Driver         string
-	mtx            sync.RWMutex
-	users          map[uint]*kolide.User
-	sessions       map[uint]*kolide.Session
-	passwordResets map[uint]*kolide.PasswordResetRequest
-	invites        map[uint]*kolide.Invite
-	orginfo        *kolide.OrgInfo
+	Driver               string
+	mtx                  sync.RWMutex
+	users                map[uint]*kolide.User
+	sessions             map[uint]*kolide.Session
+	passwordResets       map[uint]*kolide.PasswordResetRequest
+	invites              map[uint]*kolide.Invite
+	labels               map[uint]*kolide.Label
+	labelQueryExecutions map[uint]*kolide.LabelQueryExecution
+	queries              map[uint]*kolide.Query
+	orginfo              *kolide.OrgInfo
 }
 
 func (orm *inmem) Name() string {
