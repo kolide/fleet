@@ -318,6 +318,14 @@ func (orm gormDB) DeleteLabel(label *kolide.Label) error {
 			"nil pointer passed to DeleteLabel",
 		)
 	}
+
+	if label.ID == 0 {
+		return errors.New(
+			"error deleting label",
+			"0 ID was passed to DeleteLabel. Would have deleted entire table!",
+		)
+	}
+
 	return orm.DB.Delete(label).Error
 }
 
