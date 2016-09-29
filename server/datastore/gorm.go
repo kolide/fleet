@@ -29,7 +29,6 @@ var tables = [...]interface{}{
 	&kolide.Label{},
 	&kolide.LabelQueryExecution{},
 	&kolide.Option{},
-	&kolide.Target{},
 	&kolide.DistributedQueryCampaign{},
 	&kolide.DistributedQueryCampaignTarget{},
 	&kolide.Query{},
@@ -609,19 +608,10 @@ func (orm gormDB) AddLabelToPack(label *kolide.Label, pack *kolide.Pack) error {
 		)
 	}
 
-	target := &kolide.Target{
-		Type:     kolide.TargetLabel,
-		TargetID: label.ID,
-	}
-
-	err := orm.DB.Where(target).Error
-	if err != nil {
-		return err
-	}
-
 	pt := &kolide.PackTarget{
+		Type:     kolide.TargetLabel,
 		PackID:   pack.ID,
-		TargetID: target.ID,
+		TargetID: label.ID,
 	}
 
 	return orm.DB.Create(pt).Error
@@ -643,14 +633,13 @@ SELECT
 	l.name,
 	l.query_id
 FROM
-	labels l,
-	targets t
+	labels l
 JOIN
 	pack_targets pt
 ON
-	pt.target_id = t.id
+	pt.target_id = l.id
 WHERE
-	t.type = ?
+	pt.type = ?
 		AND
 	pt.pack_id = ?;
 `, kolide.TargetLabel, pack.ID).Rows()
@@ -685,19 +674,10 @@ func (orm gormDB) RemoveLabelFromPack(label *kolide.Label, pack *kolide.Pack) er
 		)
 	}
 
-	target := &kolide.Target{
-		Type:     kolide.TargetLabel,
-		TargetID: label.ID,
-	}
-
-	err := orm.DB.Where(target).Error
-	if err != nil {
-		return err
-	}
-
 	pt := &kolide.PackTarget{
+		Type:     kolide.TargetLabel,
 		PackID:   pack.ID,
-		TargetID: target.ID,
+		TargetID: label.ID,
 	}
 
 	return orm.DB.Delete(pt).Error

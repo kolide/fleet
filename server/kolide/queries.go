@@ -51,22 +51,6 @@ type Query struct {
 	Version      string
 }
 
-type TargetType int
-
-const (
-	TargetLabel TargetType = iota
-	TargetHost  TargetType = iota
-)
-
-type Target struct {
-	ID        uint `gorm:"primary_key"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	Type      TargetType
-	TargetID  uint
-	QueryID   uint
-}
-
 type DistributedQueryStatus int
 
 const (
@@ -87,6 +71,7 @@ type DistributedQueryCampaign struct {
 
 type DistributedQueryCampaignTarget struct {
 	ID                         uint `gorm:"primary_key"`
+	Type                       TargetType
 	DistributedQueryCampaignID uint
 	TargetID                   uint
 }
