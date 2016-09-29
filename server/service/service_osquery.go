@@ -91,14 +91,13 @@ func (svc service) GetClientConfig(ctx context.Context) (*kolide.OsqueryConfig, 
 
 		// o(n) iteration to determine whether or not a pack is enabled
 		// in this case, n is len(labelsForPack)
-		enabled := func() bool {
-			for _, label := range labelsForPack {
-				if labelIDs[label.ID] {
-					return true
-				}
+		enabled := false
+		for _, label := range labelsForPack {
+			if labelIDs[label.ID] {
+				enabled = true
+				break
 			}
-			return false
-		}()
+		}
 
 		// if the pack is enabled, we must add the content of the pack  the
 		// osquery config struct which we will return
