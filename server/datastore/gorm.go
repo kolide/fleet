@@ -594,13 +594,103 @@ func (orm gormDB) RemoveQueryFromPack(query *kolide.Query, pack *kolide.Pack) er
 }
 
 func (orm gormDB) AddLabelToPack(label *kolide.Label, pack *kolide.Pack) error {
-	return nil
+	if label == nil || pack == nil {
+		return errors.New(
+			"error adding label to pack",
+			"nil pointer passed to AddLabelToPack",
+		)
+	}
+
+	target := &kolide.Target{
+		Type:     kolide.TargetLabel,
+		TargetID: label.ID,
+	}
+
+	err := orm.DB.Where(target).Error
+	if err != nil {
+		return err
+	}
+
+	pt := &kolide.PackTarget{
+		PackID:   pack.ID,
+		TargetID: target.ID,
+	}
+
+	return orm.DB.Create(pt).Error
 }
 
 func (orm gormDB) GetLabelsForPack(pack *kolide.Pack) ([]*kolide.Label, error) {
-	return nil, nil
+	var labels []*kolide.Label
+	if pack == nil {
+		return nil, errors.New(
+			"error getting labels for pack",
+			"nil pointer passed to GetLabelsForPack",
+		)
+	}
+	rows, err := orm.DB.Raw(`
+SELECT
+	l.id,
+	l.created_at,
+	l.updated_at,
+	l.name,
+	l.query_id
+FROM
+	labels l,
+	targets t
+JOIN
+	pack_targets pt
+ON
+	pt.target_id = t.id
+WHERE
+	t.type = ?
+		AND
+	pt.pack_id = ?;
+`, kolide.TargetLabel, pack.ID).Rows()
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return nil, errors.DatabaseError(err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		label := new(kolide.Label)
+		err = rows.Scan(
+			&label.ID,
+			&label.CreatedAt,
+			&label.UpdatedAt,
+			&label.Name,
+			&label.QueryID,
+		)
+		if err != nil {
+			return nil, err
+		}
+		labels = append(labels, label)
+	}
+
+	return labels, nil
 }
 
 func (orm gormDB) RemoveLabelFromPack(label *kolide.Label, pack *kolide.Pack) error {
-	return nil
+	if label == nil || pack == nil {
+		return errors.New(
+			"error removing label from pack",
+			"nil pointer passed to RemoveLabelFromPack",
+		)
+	}
+
+	target := &kolide.Target{
+		Type:     kolide.TargetLabel,
+		TargetID: label.ID,
+	}
+
+	err := orm.DB.Where(target).Error
+	if err != nil {
+		return err
+	}
+
+	pt := &kolide.PackTarget{
+		PackID:   pack.ID,
+		TargetID: target.ID,
+	}
+
+	return orm.DB.Delete(pt).Error
 }
