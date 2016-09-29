@@ -21,7 +21,26 @@ describe('SaveQueryForm - component', () => {
 
     const { formData } = form.state();
 
-    expect(formData).toEqual({ queryName });
+    expect(formData).toEqual({
+      queryDescription: null,
+      queryDuration: 'short',
+      queryHosts: 'all',
+      queryHostsPercentage: null,
+      queryName,
+      queryPlatform: 'all',
+      scanInterval: 0,
+    });
+  });
+
+  it('does not submit the form if it is invalid', () => {
+    const onSubmit = createSpy();
+    const form = mount(
+      <SaveQueryForm onSubmit={onSubmit} />
+    );
+
+    form.simulate('submit');
+
+    expect(onSubmit).toNotHaveBeenCalled();
   });
 
   it('calls onSubmit with the formData', () => {
@@ -34,6 +53,17 @@ describe('SaveQueryForm - component', () => {
     fillInFormInput(queryNameInput, queryName);
     form.simulate('submit');
 
-    expect(onSubmit).toHaveBeenCalledWith({ queryName });
+    expect(onSubmit).toHaveBeenCalledWith({
+      runType: 'run',
+      formData: {
+        queryDescription: null,
+        queryDuration: 'short',
+        queryHosts: 'all',
+        queryHostsPercentage: null,
+        queryName,
+        queryPlatform: 'all',
+        scanInterval: 0,
+      },
+    });
   });
 });

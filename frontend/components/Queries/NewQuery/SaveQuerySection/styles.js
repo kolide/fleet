@@ -5,10 +5,8 @@ const { color, font } = Styles;
 export default {
   saveQuerySection: {
     alignItems: 'flex-end',
-    borderBottom: '1px solid #eaeaea',
     display: 'flex',
     justifyContent: 'space-between',
-    paddingBottom: padding.base,
   },
   saveTextWrapper: {
     display: 'inline-block',
