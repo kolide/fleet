@@ -98,10 +98,10 @@ func decodeAddLabelToPackRequest(ctx context.Context, r *http.Request) (interfac
 	if err != nil {
 		return nil, err
 	}
-	var req addLabelToPackRequest
-	req.PackID = pid
-	req.LabelID = lid
-	return req, nil
+	return addLabelToPackRequest{
+		PackID:  pid,
+		LabelID: lid,
+	}, nil
 }
 
 func decodeGetLabelsForPackRequest(ctx context.Context, r *http.Request) (interface{}, error) {
