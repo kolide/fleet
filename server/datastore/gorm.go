@@ -228,12 +228,11 @@ func (orm gormDB) NewHost(host *kolide.Host) (*kolide.Host, error) {
 }
 
 func (orm gormDB) MarkHostSeen(host *kolide.Host, t time.Time) error {
-	updateTime := time.Now()
 	err := orm.DB.Exec("UPDATE hosts SET updated_at=? WHERE node_key=?", t, host.NodeKey).Error
 	if err != nil {
 		return errors.DatabaseError(err)
 	}
-	host.UpdatedAt = updateTime
+	host.UpdatedAt = t
 	return nil
 }
 

@@ -76,6 +76,7 @@ func (orm *inmem) getLabelByIDString(id string) (*kolide.Label, error) {
 		return nil, errors.New("label ID not found: " + string(labelID))
 	}
 
+	return label, nil
 }
 
 func (orm *inmem) RecordLabelQueryExecutions(host *kolide.Host, results map[string]bool, t time.Time) error {
@@ -95,7 +96,7 @@ func (orm *inmem) RecordLabelQueryExecutions(host *kolide.Host, results map[stri
 				// Update existing execution values
 				lqe.UpdatedAt = t
 				lqe.Matches = matches
-				updated := true
+				updated = true
 				break
 			}
 		}

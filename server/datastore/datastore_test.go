@@ -6,10 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jinzhu/gorm"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 const bcryptCost = 6
@@ -434,11 +432,12 @@ func testLabels(t *testing.T, db kolide.Datastore) {
 
 // setup creates a datastore for testing
 func setup(t *testing.T) kolide.Datastore {
-	db, err := gorm.Open("sqlite3", ":memory:")
-	require.Nil(t, err)
+	// db, err := gorm.Open("sqlite3", ":memory:")
+	// require.Nil(t, err)
 
-	ds := gormDB{DB: db, Driver: "sqlite3"}
-	err = ds.Migrate()
+	// ds := gormDB{DB: db, Driver: "sqlite3"}
+	ds := &inmem{}
+	err := ds.Migrate()
 	assert.Nil(t, err)
 	// Log using t.Log so that output only shows up if the test fails
 	//db.SetLogger(&testLogger{t: t})
