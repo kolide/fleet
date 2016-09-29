@@ -61,7 +61,7 @@ type TargetType int
 
 const (
 	TargetLabel TargetType = iota
-	TargetHost  TargetType = iota
+	TargetHost
 )
 
 type PackTarget struct {

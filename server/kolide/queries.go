@@ -79,10 +79,10 @@ type DistributedQueryCampaignTarget struct {
 type DistributedQueryExecutionStatus int
 
 const (
-	ExecutionWaiting   DistributedQueryExecutionStatus = iota
-	ExecutionRequested DistributedQueryExecutionStatus = iota
-	ExecutionSucceeded DistributedQueryExecutionStatus = iota
-	ExecutionFailed    DistributedQueryExecutionStatus = iota
+	ExecutionWaiting DistributedQueryExecutionStatus = iota
+	ExecutionRequested
+	ExecutionSucceeded
+	ExecutionFailed
 )
 
 type DistributedQueryExecution struct {
@@ -105,9 +105,9 @@ type Option struct {
 type DecoratorType int
 
 const (
-	DecoratorLoad     DecoratorType = iota
-	DecoratorAlways   DecoratorType = iota
-	DecoratorInterval DecoratorType = iota
+	DecoratorLoad DecoratorType = iota
+	DecoratorAlways
+	DecoratorInterval
 )
 
 type Decorator struct {
