@@ -1,29 +1,14 @@
 import React, { Component, PropTypes } from 'react';
 import AceEditor from 'react-ace';
-import 'brace/mode/sql';
-import 'brace/theme/dreamweaver';
-import 'brace/theme/cobalt';
-import 'brace/theme/eclipse';
-import 'brace/theme/github';
-import 'brace/theme/idle_fingers';
-import 'brace/theme/iplastic';
-import 'brace/theme/katzenmilch';
-import 'brace/theme/kr_theme';
-import 'brace/theme/kuroir';
-import 'brace/theme/merbivore';
-import 'brace/theme/merbivore_soft';
-import 'brace/theme/mono_industrial';
-import 'brace/theme/monokai';
-import 'brace/theme/solarized_light';
-import 'brace/theme/sqlserver';
-import 'brace/theme/tomorrow';
 import 'brace/ext/linking';
 import radium from 'radium';
 import './mode';
 import './theme';
 import componentStyles from './styles';
-import Slider from '../../buttons/Slider';
 import GradientButton from '../../buttons/GradientButton';
+import SaveQueryForm from '../../forms/queries/SaveQueryForm';
+import SaveQuerySection from './SaveQuerySection';
+import ThemeDropdown from './ThemeDropdown';
 
 class NewQuery extends Component {
   static propTypes = {
@@ -66,7 +51,15 @@ class NewQuery extends Component {
     });
   }
 
-  onSelectChange = (evt) => {
+  onSaveQueryFormSubmit = (formData) => {
+    console.log('SaveQueryForm submitted', formData);
+
+    return false;
+  }
+
+  onThemeSelect = (evt) => {
+    evt.preventDefault();
+
     this.setState({
       theme: evt.target.value,
     });
@@ -109,49 +102,33 @@ class NewQuery extends Component {
     return false;
   };
 
-  renderTextEditorThemeDropdown = () => {
-    const { themeDropdownStyles } = componentStyles;
-    const { theme } = this.state;
-    const { onSelectChange } = this;
+  renderRunQuerySection = () => {
+    const { onRunQuery, onSaveQueryFormSubmit } = this;
+    const { saveQuery } = this.state;
+    const {
+      runQueryButtonStyles,
+      runQuerySectionStyles,
+      runQueryTipStyles,
+    } = componentStyles;
+
+    if (saveQuery) return <SaveQueryForm onSubmit={onSaveQueryFormSubmit} />;
 
     return (
-      <div style={themeDropdownStyles}>
-        <span style={{ fontSize: '10px' }}>Editor Theme:</span>
-        <select onChange={onSelectChange} style={themeDropdownStyles} value={theme}>
-          <option value="kolide">Kolide</option>
-          <option value="dreamweaver">Dreamweaver</option>
-          <option value="cobalt">Cobalt</option>
-          <option value="eclipse">Eclipse</option>
-          <option value="github">Github</option>
-          <option value="idle_fingers">Idle Fingers</option>
-          <option value="iplastic">Iplastic</option>
-          <option value="katzenmilch">Katzenmilch</option>
-          <option value="kr_theme">KR Theme</option>
-          <option value="kuroir">Kuroir</option>
-          <option value="merbivore">Merbivore</option>
-          <option value="merbivore_soft">Merbivore Soft</option>
-          <option value="mono_industrial">Mono Industrial</option>
-          <option value="monokai">Monokai</option>
-          <option value="solarized_light">Solarized Light</option>
-          <option value="sqlserver">SQL Server</option>
-          <option value="tomorrow">Tomorrow</option>
-        </select>
-      </div>
+      <section style={runQuerySectionStyles}>
+        <span style={runQueryTipStyles}>&#8984; + Enter</span>
+        <GradientButton
+          onClick={onRunQuery}
+          style={runQueryButtonStyles}
+          text="Run Query"
+        />
+      </section>
     );
   }
 
   render () {
     const {
       containerStyles,
-      runQueryButtonStyles,
-      runQuerySectionStyles,
-      runQueryTipStyles,
-      saveResultsWrapper,
-      saveQuerySection,
-      saveWrapper,
       selectTargetsHeaderStyles,
-      sliderTextDontSave,
-      sliderTextSave,
       targetsInputStyle,
       titleStyles,
     } = componentStyles;
@@ -160,9 +137,9 @@ class NewQuery extends Component {
     const {
       onBeforeLoad,
       onLoad,
-      onRunQuery,
+      onThemeSelect,
       onToggleSaveQuery,
-      renderTextEditorThemeDropdown,
+      renderRunQuerySection,
     } = this;
 
     return (
@@ -170,7 +147,7 @@ class NewQuery extends Component {
         <p style={titleStyles}>
           New Query Page
         </p>
-        {renderTextEditorThemeDropdown()}
+        <ThemeDropdown onSelectChange={onThemeSelect} theme={theme} />
         <div style={{ marginTop: '20px' }}>
           <AceEditor
             enableBasicAutocompletion
@@ -195,25 +172,8 @@ class NewQuery extends Component {
           <p style={selectTargetsHeaderStyles}>Select Targets</p>
           <input type="text" style={targetsInputStyle} />
         </div>
-        <section style={saveQuerySection}>
-          <div style={saveResultsWrapper}>
-            <p>Save Query & Results For Later?</p>
-            <small>For certain types of queries, like one that targets many hosts or one you plan to reuse frequently, we suggest saving the query & results. This allows you to set some advanced options, view the results later, and share with other users</small>
-          </div>
-          <div style={saveWrapper}>
-            <span style={sliderTextDontSave(saveQuery)}>Dont save</span>
-            <Slider onClick={onToggleSaveQuery} engaged={saveQuery} />
-            <span style={sliderTextSave(saveQuery)}>Save</span>
-          </div>
-        </section>
-        <section style={runQuerySectionStyles}>
-          <span style={runQueryTipStyles}>&#8984; + Enter</span>
-          <GradientButton
-            onClick={onRunQuery}
-            style={runQueryButtonStyles}
-            text="Run Query"
-          />
-        </section>
+        <SaveQuerySection onToggleSaveQuery={onToggleSaveQuery} saveQuery={saveQuery} />
+        {renderRunQuerySection()}
       </div>
     );
   }
