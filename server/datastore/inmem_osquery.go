@@ -12,14 +12,17 @@ func (orm *inmem) NewLabel(label *kolide.Label) error {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
+	newLabel := *label
+
 	for _, l := range orm.labels {
 		if l.Name == label.Name {
 			return ErrExists
 		}
 	}
 
-	label.ID = uint(len(orm.labels) + 1)
-	orm.labels[label.ID] = label
+	newLabel.ID = uint(len(orm.labels) + 1)
+	orm.labels[newLabel.ID] = &newLabel
+	label.ID = newLabel.ID
 
 	return nil
 }
@@ -48,15 +51,21 @@ func (orm *inmem) LabelQueriesForHost(host *kolide.Host, cutoff time.Time) (map[
 	// Get post-cutoff executions for host
 	execedQueryIDs := map[uint]uint{} // Map queryID -> labelID
 	for _, lqe := range orm.labelQueryExecutions {
-		if lqe.HostID == host.ID && lqe.UpdatedAt.After(cutoff) {
+		if lqe.HostID == host.ID && (lqe.UpdatedAt == cutoff || lqe.UpdatedAt.After(cutoff)) {
 			label := orm.labels[lqe.LabelID]
 			execedQueryIDs[label.QueryID] = label.ID
 		}
 	}
 
+	queryToLabel := map[uint]uint{} // Map queryID -> labelID
+	for _, label := range orm.labels {
+		queryToLabel[label.QueryID] = label.ID
+	}
+
 	resQueries := map[string]string{}
 	for _, query := range orm.queries {
-		labelID, execed := execedQueryIDs[query.ID]
+		_, execed := execedQueryIDs[query.ID]
+		labelID := queryToLabel[query.ID]
 		if query.Platform == host.Platform && !execed {
 			resQueries[strconv.Itoa(int(labelID))] = query.Query
 		}
@@ -104,7 +113,7 @@ func (orm *inmem) RecordLabelQueryExecutions(host *kolide.Host, results map[stri
 		if !updated {
 			// Create new execution
 			lqe := kolide.LabelQueryExecution{
-				ID:        uint(len(orm.labels) + 1),
+				ID:        uint(len(orm.labelQueryExecutions) + 1),
 				HostID:    host.ID,
 				LabelID:   label.ID,
 				UpdatedAt: t,

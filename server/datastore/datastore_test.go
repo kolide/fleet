@@ -3,6 +3,7 @@ package datastore
 import (
 	"fmt"
 	"math/rand"
+	"sort"
 	"testing"
 	"time"
 
@@ -412,8 +413,10 @@ func testLabels(t *testing.T, db kolide.Datastore) {
 	labels, err = db.LabelsForHost(host)
 	assert.Nil(t, err)
 	if assert.Len(t, labels, 2) {
-		assert.Equal(t, "label3", labels[0].Name)
-		assert.Equal(t, "label2", labels[1].Name)
+		labelNames := []string{labels[0].Name, labels[1].Name}
+		sort.Strings(labelNames)
+		assert.Equal(t, "label2", labelNames[0])
+		assert.Equal(t, "label3", labelNames[1])
 	}
 
 	// A host that hasn't executed any label queries should still be asked
@@ -432,12 +435,15 @@ func testLabels(t *testing.T, db kolide.Datastore) {
 
 // setup creates a datastore for testing
 func setup(t *testing.T) kolide.Datastore {
-	// db, err := gorm.Open("sqlite3", ":memory:")
-	// require.Nil(t, err)
+	//db, err := gorm.Open("sqlite3", ":memory:")
+	//require.Nil(t, err)
 
-	// ds := gormDB{DB: db, Driver: "sqlite3"}
+	//ds := gormDB{DB: db, Driver: "sqlite3"}
+
 	ds := &inmem{}
-	err := ds.Migrate()
+	var err error
+
+	err = ds.Migrate()
 	assert.Nil(t, err)
 	// Log using t.Log so that output only shows up if the test fails
 	//db.SetLogger(&testLogger{t: t})
@@ -478,7 +484,7 @@ func testSaveQuery(t *testing.T, ds kolide.Datastore) {
 		Name:  "foo",
 		Query: "bar",
 	}
-	err := ds.SaveQuery(&query)
+	err := ds.NewQuery(&query)
 	assert.Nil(t, err)
 	assert.NotEqual(t, 0, query.ID)
 
@@ -496,7 +502,7 @@ func testDeleteQuery(t *testing.T, ds kolide.Datastore) {
 		Name:  "foo",
 		Query: "bar",
 	}
-	err := ds.SaveQuery(&query)
+	err := ds.NewQuery(&query)
 	assert.Nil(t, err)
 	assert.NotEqual(t, query.ID, 0)
 

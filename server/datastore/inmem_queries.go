@@ -6,14 +6,17 @@ func (orm *inmem) NewQuery(query *kolide.Query) error {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
+	newQuery := *query
+
 	for _, q := range orm.queries {
 		if query.Name == q.Name {
 			return ErrExists
 		}
 	}
 
-	query.ID = uint(len(orm.queries) + 1)
-	orm.queries[query.ID] = query
+	newQuery.ID = uint(len(orm.queries) + 1)
+	orm.queries[newQuery.ID] = &newQuery
+	query.ID = newQuery.ID
 
 	return nil
 }
