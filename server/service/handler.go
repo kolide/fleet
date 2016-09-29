@@ -48,8 +48,7 @@ type KolideEndpoints struct {
 	GetClientConfig               endpoint.Endpoint
 	GetDistributedQueries         endpoint.Endpoint
 	SubmitDistributedQueryResults endpoint.Endpoint
-	SubmitStatusLogs              endpoint.Endpoint
-	SubmitResultLogs              endpoint.Endpoint
+	SubmitLogs                    endpoint.Endpoint
 }
 
 // MakeKolideServerEndpoints creates the Kolide API endpoints.
@@ -91,8 +90,7 @@ func MakeKolideServerEndpoints(svc kolide.Service, jwtKey string) KolideEndpoint
 		GetClientConfig:               authenticatedHost(svc, makeGetClientConfigEndpoint(svc)),
 		GetDistributedQueries:         authenticatedHost(svc, makeGetDistributedQueriesEndpoint(svc)),
 		SubmitDistributedQueryResults: authenticatedHost(svc, makeSubmitDistributedQueryResultsEndpoint(svc)),
-		SubmitStatusLogs:              authenticatedHost(svc, makeSubmitStatusLogsEndpoint(svc)),
-		SubmitResultLogs:              authenticatedHost(svc, makeSubmitResultLogsEndpoint(svc)),
+		SubmitLogs:                    authenticatedHost(svc, makeSubmitLogsEndpoint(svc)),
 	}
 }
 
@@ -132,8 +130,7 @@ type kolideHandlers struct {
 	GetClientConfig               *kithttp.Server
 	GetDistributedQueries         *kithttp.Server
 	SubmitDistributedQueryResults *kithttp.Server
-	SubmitStatusLogs              *kithttp.Server
-	SubmitResultLogs              *kithttp.Server
+	SubmitLogs                    *kithttp.Server
 }
 
 func makeKolideKitHandlers(ctx context.Context, e KolideEndpoints, opts []kithttp.ServerOption) kolideHandlers {
@@ -176,8 +173,7 @@ func makeKolideKitHandlers(ctx context.Context, e KolideEndpoints, opts []kithtt
 		GetClientConfig:               newServer(e.GetClientConfig, decodeGetClientConfigRequest),
 		GetDistributedQueries:         newServer(e.GetDistributedQueries, decodeGetDistributedQueriesRequest),
 		SubmitDistributedQueryResults: newServer(e.SubmitDistributedQueryResults, decodeSubmitDistributedQueryResultsRequest),
-		SubmitStatusLogs:              newServer(e.SubmitStatusLogs, decodeSubmitStatusLogsRequest),
-		SubmitResultLogs:              newServer(e.SubmitResultLogs, decodeSubmitResultLogsRequest),
+		SubmitLogs:                    newServer(e.SubmitLogs, decodeSubmitLogsRequest),
 	}
 }
 
@@ -245,6 +241,5 @@ func attachKolideAPIRoutes(r *mux.Router, h kolideHandlers) {
 	r.Handle("/api/v1/osquery/config", h.GetClientConfig).Methods("POST")
 	r.Handle("/api/v1/osquery/distributed/read", h.GetDistributedQueries).Methods("POST")
 	r.Handle("/api/v1/osquery/distributed/write", h.SubmitDistributedQueryResults).Methods("POST")
-	r.Handle("/api/v1/osquery/log/status", h.SubmitStatusLogs).Methods("POST")
-	r.Handle("/api/v1/osquery/log/result", h.SubmitResultLogs).Methods("POST")
+	r.Handle("/api/v1/osquery/log", h.SubmitLogs).Methods("POST")
 }

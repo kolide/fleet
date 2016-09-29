@@ -78,6 +78,35 @@ func (svc service) SubmitResultLogs(ctx context.Context, logs []kolide.OsqueryRe
 	return nil
 }
 
+func (svc service) SubmitLogs(ctx context.Context, logType string, data *json.RawMessage) error {
+	host, ok := host.FromContext(ctx)
+	if !ok {
+		return osqueryError{message: "internal error: missing host from request context"}
+	}
+
+	var err error
+	switch logType {
+	case "status":
+		// TODO: Decode and submit logs
+
+	case "result":
+		// TODO: Decode and submit logs
+
+	default:
+		err = osqueryError{message: "unknown log type: " + logType}
+		svc.logger.Log("method", "SubmitLogs", "err", err)
+	}
+
+	if err != nil {
+		return osqueryError{message: "log ingestion failed: " + err.Error()}
+	}
+
+	// TODO: Update update_time of host
+	_ = host
+
+	return nil
+}
+
 // hostLabelQueryPrefix is appended before the query name when a query is
 // provided as a label query. This allows the results to be retrieved when
 // osqueryd writes the distributed query results.

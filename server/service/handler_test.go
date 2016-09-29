@@ -153,11 +153,7 @@ func TestAPIRoutes(t *testing.T) {
 		},
 		{
 			verb: "POST",
-			uri:  "/api/v1/osquery/log/status",
-		},
-		{
-			verb: "POST",
-			uri:  "/api/v1/osquery/log/result",
+			uri:  "/api/v1/osquery/log",
 		},
 	}
 

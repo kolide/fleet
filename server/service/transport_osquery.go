@@ -43,17 +43,8 @@ func decodeSubmitDistributedQueryResultsRequest(ctx context.Context, r *http.Req
 	return req, nil
 }
 
-func decodeSubmitStatusLogsRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	var req submitStatusLogsRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-func decodeSubmitResultLogsRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	var req submitResultLogsRequest
+func decodeSubmitLogsRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	var req submitLogsRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, err
 	}

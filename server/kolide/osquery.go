@@ -1,6 +1,7 @@
 package kolide
 
 import (
+	"encoding/json"
 	"time"
 
 	"golang.org/x/net/context"
@@ -35,6 +36,7 @@ type OsqueryService interface {
 	SubmitDistributedQueryResults(ctx context.Context, results OsqueryDistributedQueryResults) error
 	SubmitStatusLogs(ctx context.Context, logs []OsqueryStatusLog) error
 	SubmitResultLogs(ctx context.Context, logs []OsqueryResultLog) error
+	SubmitLogs(ctx context.Context, logType string, data *json.RawMessage) error
 }
 
 type OsqueryDistributedQueryResults map[string][]map[string]string

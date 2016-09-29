@@ -1,6 +1,8 @@
 package service
 
 import (
+	"encoding/json"
+
 	"github.com/go-kit/kit/endpoint"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"golang.org/x/net/context"
@@ -110,53 +112,28 @@ func makeSubmitDistributedQueryResultsEndpoint(svc kolide.Service) endpoint.Endp
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Submit Status Logs
+// Submit Logs
 ////////////////////////////////////////////////////////////////////////////////
 
-type submitStatusLogsRequest struct {
-	NodeKey string `json:"node_key"`
-	Logs    []kolide.OsqueryStatusLog
+type submitLogsRequest struct {
+	NodeKey string           `json:"node_key"`
+	LogType string           `json:"log_type"`
+	Data    *json.RawMessage `json:"data"`
 }
 
-type submitStatusLogsResponse struct {
+type submitLogsResponse struct {
 	Err error `json:"error,omitempty"`
 }
 
-func (r submitStatusLogsResponse) error() error { return r.Err }
+func (r submitLogsResponse) error() error { return r.Err }
 
-func makeSubmitStatusLogsEndpoint(svc kolide.Service) endpoint.Endpoint {
+func makeSubmitLogsEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(submitStatusLogsRequest)
-		err := svc.SubmitStatusLogs(ctx, req.Logs)
+		req := request.(submitLogsRequest)
+		err := svc.SubmitLogs(ctx, req.LogType, req.Data)
 		if err != nil {
-			return submitStatusLogsResponse{Err: err}, nil
+			return submitLogsResponse{Err: err}, nil
 		}
-		return submitStatusLogsResponse{}, nil
-	}
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Submit Result Logs
-////////////////////////////////////////////////////////////////////////////////
-
-type submitResultLogsRequest struct {
-	NodeKey string `json:"node_key"`
-	Logs    []kolide.OsqueryResultLog
-}
-
-type submitResultLogsResponse struct {
-	Err error `json:"error,omitempty"`
-}
-
-func (r submitResultLogsResponse) error() error { return r.Err }
-
-func makeSubmitResultLogsEndpoint(svc kolide.Service) endpoint.Endpoint {
-	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(submitResultLogsRequest)
-		err := svc.SubmitResultLogs(ctx, req.Logs)
-		if err != nil {
-			return submitResultLogsResponse{Err: err}, nil
-		}
-		return submitResultLogsResponse{}, nil
+		return submitLogsResponse{}, nil
 	}
 }
