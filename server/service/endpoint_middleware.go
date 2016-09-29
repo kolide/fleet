@@ -7,7 +7,7 @@ import (
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/go-kit/kit/endpoint"
-	"github.com/kolide/kolide-ose/server/contexts/host"
+	hostctx "github.com/kolide/kolide-ose/server/contexts/host"
 	"github.com/kolide/kolide-ose/server/contexts/token"
 	"github.com/kolide/kolide-ose/server/contexts/viewer"
 	"github.com/kolide/kolide-ose/server/kolide"
@@ -26,12 +26,12 @@ func authenticatedHost(svc kolide.Service, next endpoint.Endpoint) endpoint.Endp
 			return nil, err
 		}
 
-		h, err := svc.AuthenticateHost(ctx, nodeKey)
+		host, err := svc.AuthenticateHost(ctx, nodeKey)
 		if err != nil {
 			return nil, err
 		}
 
-		ctx = host.NewContext(ctx, *h)
+		ctx = hostctx.NewContext(ctx, *host)
 		return next(ctx, request)
 	}
 }

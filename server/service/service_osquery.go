@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/kolide/kolide-ose/server/contexts/host"
+	hostctx "github.com/kolide/kolide-ose/server/contexts/host"
 	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"golang.org/x/net/context"
@@ -79,7 +79,7 @@ func (svc service) SubmitResultLogs(ctx context.Context, logs []kolide.OsqueryRe
 }
 
 func (svc service) SubmitLogs(ctx context.Context, logType string, data *json.RawMessage) error {
-	host, ok := host.FromContext(ctx)
+	host, ok := hostctx.FromContext(ctx)
 	if !ok {
 		return osqueryError{message: "internal error: missing host from request context"}
 	}
@@ -129,7 +129,7 @@ func hostDetailQueries(host kolide.Host) map[string]string {
 func (svc service) GetDistributedQueries(ctx context.Context) (map[string]string, error) {
 	queries := make(map[string]string)
 
-	host, ok := host.FromContext(ctx)
+	host, ok := hostctx.FromContext(ctx)
 	if !ok {
 		return nil, osqueryError{message: "internal error: missing host from request context"}
 	}
