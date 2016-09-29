@@ -99,6 +99,16 @@ class NewQuery extends Component {
     return false;
   };
 
+  handleKeydown = (evt) => {
+    const { metaKey, code } = evt;
+
+    if (metaKey && code === 'Enter') {
+      return this.onRunQuery();
+    }
+
+    return false;
+  };
+
   renderTextEditorThemeDropdown = () => {
     const { themeDropdownStyles } = componentStyles;
     const { theme } = this.state;
