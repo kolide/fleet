@@ -173,7 +173,7 @@ func TestAPIRoutes(t *testing.T) {
 		},
 		{
 			verb: "DELETE",
-			uri:  "/api/v1/kolide/queries/1",
+			uri:  "/api/v1/kolide/labels/1",
 		},
 		{
 			verb: "POST",
