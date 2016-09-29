@@ -102,7 +102,7 @@ func (svc service) GetDistributedQueries(ctx context.Context) (map[string]string
 
 	host, ok := host.FromContext(ctx)
 	if !ok {
-		return nil, osqueryError{message: "authentication error", nodeInvalid: true}
+		return nil, osqueryError{message: "internal error: missing host from request context"}
 	}
 
 	queries = hostDetailQueries(host)
