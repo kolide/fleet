@@ -5,7 +5,7 @@ const { color } = Styles;
 export default {
   containerStyles: (saveQuery) => {
     return {
-      backgroundColor: saveQuery ? color.brand : color.accentMedium,
+      backgroundColor: saveQuery ? color.brand : color.textMedium,
       borderTopLeftRadius: '12px',
       borderTopRightRadius: '12px',
       borderBottomRightRadius: '12px',

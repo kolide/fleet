@@ -47,13 +47,20 @@ export default {
     fontSize: font.base,
     color: color.textMedium,
   },
-  sliderText: (saveQuery) => {
+  sliderTextDontSave: (saveQuery) => {
     return {
-      color: saveQuery ? color.textDark : color.textMedium,
+      color: saveQuery ? color.textDark : color.textUltradark,
+      textTransform: 'uppercase',
+      fontSize: font.small,
+      marginRight: '5px',
+    };
+  },
+  sliderTextSave: (saveQuery) => {
+    return {
+      color: saveQuery ? color.brand : color.textMedium,
       textTransform: 'uppercase',
       fontSize: font.small,
       marginLeft: '5px',
-      marginRight: '5px',
     };
   },
   targetsInputStyle: {
