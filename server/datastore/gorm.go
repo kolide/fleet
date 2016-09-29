@@ -618,14 +618,15 @@ func (orm gormDB) AddLabelToPack(label *kolide.Label, pack *kolide.Pack) error {
 }
 
 func (orm gormDB) GetLabelsForPack(pack *kolide.Pack) ([]*kolide.Label, error) {
-	var labels []*kolide.Label
 	if pack == nil {
 		return nil, errors.New(
 			"error getting labels for pack",
 			"nil pointer passed to GetLabelsForPack",
 		)
 	}
-	rows, err := orm.DB.Raw(`
+
+	results := []*kolide.Label{}
+	err := orm.DB.Raw(`
 SELECT
 	l.id,
 	l.created_at,
@@ -642,28 +643,15 @@ WHERE
 	pt.type = ?
 		AND
 	pt.pack_id = ?;
-`, kolide.TargetLabel, pack.ID).Rows()
+
+`,
+		kolide.TargetLabel, pack.ID).Scan(&results).Error
+
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return nil, errors.DatabaseError(err)
 	}
-	defer rows.Close()
 
-	for rows.Next() {
-		label := new(kolide.Label)
-		err = rows.Scan(
-			&label.ID,
-			&label.CreatedAt,
-			&label.UpdatedAt,
-			&label.Name,
-			&label.QueryID,
-		)
-		if err != nil {
-			return nil, err
-		}
-		labels = append(labels, label)
-	}
-
-	return labels, nil
+	return results, nil
 }
 
 func (orm gormDB) RemoveLabelFromPack(label *kolide.Label, pack *kolide.Pack) error {
