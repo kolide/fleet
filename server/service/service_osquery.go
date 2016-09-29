@@ -54,8 +54,90 @@ func (svc service) EnrollAgent(ctx context.Context, enrollSecret, hostIdentifier
 }
 
 func (svc service) GetClientConfig(ctx context.Context) (*kolide.OsqueryConfig, error) {
-	var config kolide.OsqueryConfig
-	return &config, nil
+	host, ok := hostctx.FromContext(ctx)
+	if !ok {
+		return nil, osqueryError{message: "internal error: missing host from request context"}
+	}
+
+	config := new(kolide.OsqueryConfig)
+
+	// we will need to give some subset of packs to this host based on the
+	// labels which this host is known to belond to
+	packs, err := svc.ds.Packs()
+	if err != nil {
+		return nil, osqueryError{message: "database error: " + err.Error()}
+	}
+
+	// pull the labels that this host belongs to
+	labels, err := svc.ds.LabelsForHost(&host)
+	if err != nil {
+		return nil, osqueryError{message: "database error: " + err.Error()}
+	}
+
+	// in order to use o(1) array indexing in an o(n) loop vs a o(n^2) double
+	// for loop iteration, we must create the array which may be indexed below
+	var labelIDs map[uint]bool
+	for _, label := range labels {
+		labelIDs[label.ID] = true
+	}
+
+	for _, pack := range packs {
+		// for each pack, we must know what labels have been assigned to that
+		// pack
+		labelsForPack, err := svc.ds.GetLabelsForPack(pack)
+		if err != nil {
+			return nil, osqueryError{message: "database error: " + err.Error()}
+		}
+
+		// o(n) iteration to determine whether or not a pack is enabled
+		// in this case, n is len(labelsForPack)
+		enabled := func() bool {
+			for _, label := range labelsForPack {
+				if labelIDs[label.ID] {
+					return true
+				}
+			}
+			return false
+		}()
+
+		// if the pack is enabled, we must add the content of the pack  the
+		// osquery config struct which we will return
+		if enabled {
+			// first, we must figure out what queries are in this pack
+			queries, err := svc.ds.GetQueriesInPack(pack)
+			if err != nil {
+				return nil, osqueryError{message: "database error: " + err.Error()}
+			}
+
+			// the serializable osquery config struct expects content in a
+			// particular format, so we do the conversion here
+			var configQueries kolide.Queries
+			for _, query := range queries {
+				configQueries[query.Name] = kolide.QueryContent{
+					Query:    query.Query,
+					Interval: query.Interval,
+					Platform: query.Platform,
+					Version:  query.Version,
+					Snapshot: query.Snapshot,
+				}
+			}
+
+			// finally, we add the pack to the client config struct with all of
+			// the packs queries
+			config.Packs[pack.Name] = kolide.PackContent{
+				Platform: pack.Platform,
+				Queries:  configQueries,
+			}
+		}
+	}
+
+	// add global options to the config struct to be returned
+	config.Options = kolide.Options{
+		PackDelimiter:      "/",
+		DisableDistributed: false,
+	}
+
+	return config, nil
 }
 
 func (svc service) SubmitStatusLogs(ctx context.Context, logs []kolide.OsqueryStatusLog) error {
