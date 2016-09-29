@@ -131,7 +131,7 @@ func (svc service) GetClientConfig(ctx context.Context) (*kolide.OsqueryConfig, 
 	}
 
 	// add global options to the config struct to be returned
-	config.Options = kolide.Options{
+	config.Options = kolide.OsqueryOptions{
 		PackDelimiter:      "/",
 		DisableDistributed: false,
 	}
