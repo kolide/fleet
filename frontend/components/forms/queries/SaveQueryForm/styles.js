@@ -80,10 +80,12 @@ export default {
   },
   dropdownInputStyles: {
     ...formInput,
+    backgroundColor: color.white,
     borderColor: color.brand,
     borderStyle: 'solid',
     borderWidth: '1px',
     height: '30px',
+    textTransform: 'uppercase',
     ':focus': {
       outline: 'none',
     },
@@ -101,5 +103,15 @@ export default {
   },
   queryNameWrapperStyles: {
     ...formSection,
+  },
+  runQuerySectionStyles: {
+    ...formSection,
+    display: 'block',
+    textAlign: 'right',
+  },
+  runQueryTipStyles: {
+    color: color.textLight,
+    fontSize: font.small,
+    marginRight: padding.half,
   },
 };

@@ -5,7 +5,6 @@ import radium from 'radium';
 import './mode';
 import './theme';
 import componentStyles from './styles';
-import GradientButton from '../../buttons/GradientButton';
 import SaveQueryForm from '../../forms/queries/SaveQueryForm';
 import SaveQuerySection from './SaveQuerySection';
 import ThemeDropdown from './ThemeDropdown';
@@ -24,14 +23,6 @@ class NewQuery extends Component {
       saveQuery: false,
       theme: 'kolide',
     };
-  }
-
-  componentWillMount () {
-    global.window.addEventListener('keydown', this.handleKeydown);
-  }
-
-  componentWillUnmount () {
-    global.window.removeEventListener('keydown', this.handleKeydown);
   }
 
   onLoad = (editor) => {
@@ -67,11 +58,6 @@ class NewQuery extends Component {
     return false;
   }
 
-  onRunQuery = () => {
-    console.log('query run');
-    return false;
-  }
-
   onToggleSaveQuery = () => {
     const { saveQuery } = this.state;
 
@@ -80,49 +66,6 @@ class NewQuery extends Component {
     });
 
     return false;
-  }
-
-  handleKeydown = (evt) => {
-    const { metaKey, code } = evt;
-
-    if (metaKey && code === 'Enter') {
-      return this.onRunQuery();
-    }
-
-    return false;
-  };
-
-  handleKeydown = (evt) => {
-    const { metaKey, code } = evt;
-
-    if (metaKey && code === 'Enter') {
-      return this.onRunQuery();
-    }
-
-    return false;
-  };
-
-  renderRunQuerySection = () => {
-    const { onRunQuery, onSaveQueryFormSubmit } = this;
-    const { saveQuery } = this.state;
-    const {
-      runQueryButtonStyles,
-      runQuerySectionStyles,
-      runQueryTipStyles,
-    } = componentStyles;
-
-    if (saveQuery) return <SaveQueryForm onSubmit={onSaveQueryFormSubmit} />;
-
-    return (
-      <section style={runQuerySectionStyles}>
-        <span style={runQueryTipStyles}>&#8984; + Enter</span>
-        <GradientButton
-          onClick={onRunQuery}
-          style={runQueryButtonStyles}
-          text="Run Query"
-        />
-      </section>
-    );
   }
 
   render () {
@@ -137,9 +80,9 @@ class NewQuery extends Component {
     const {
       onBeforeLoad,
       onLoad,
+      onSaveQueryFormSubmit,
       onThemeSelect,
       onToggleSaveQuery,
-      renderRunQuerySection,
     } = this;
 
     return (
@@ -173,7 +116,7 @@ class NewQuery extends Component {
           <input type="text" style={targetsInputStyle} />
         </div>
         <SaveQuerySection onToggleSaveQuery={onToggleSaveQuery} saveQuery={saveQuery} />
-        {renderRunQuerySection()}
+        <SaveQueryForm onSubmit={onSaveQueryFormSubmit} saveQuery={saveQuery} />
       </div>
     );
   }

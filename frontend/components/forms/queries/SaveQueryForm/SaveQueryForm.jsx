@@ -5,9 +5,16 @@ import GradientButton from '../../../buttons/GradientButton';
 import InputField from '../../fields/InputField';
 import validatePresence from '../../validators/validate_presence';
 
+const RUN_TYPES = {
+  RUN: 'RUN',
+  RUN_AND_SAVE: 'RUN_AND_SAVE',
+  SAVE: 'SAVE',
+};
+
 class SaveQueryForm extends Component {
   static propTypes = {
     onSubmit: PropTypes.func,
+    saveQuery: PropTypes.bool,
   };
 
   constructor (props) {
@@ -15,26 +22,33 @@ class SaveQueryForm extends Component {
 
     this.state = {
       errors: {
-        queryName: null,
-        queryDescription: null,
-        queryDuration: null,
-        queryPlatform: null,
-        queryHosts: null,
-        queryHostsPercentage: null,
+        name: null,
+        description: null,
+        duration: null,
+        platforms: null,
+        hosts: null,
+        hostsPercentage: null,
         scanInterval: null,
       },
       formData: {
-        queryName: null,
-        queryDescription: null,
-        queryDuration: 'short',
-        queryPlatform: 'all',
-        queryHosts: 'all',
-        queryHostsPercentage: null,
+        name: null,
+        description: null,
+        duration: 'short',
+        platforms: 'all',
+        hosts: 'all',
+        hostsPercentage: null,
         scanInterval: 0,
       },
-      runType: 'run',
       showMoreOptions: false,
     };
+  }
+
+  componentWillMount () {
+    global.window.addEventListener('keydown', this.handleKeydown);
+  }
+
+  componentWillUnmount () {
+    global.window.removeEventListener('keydown', this.handleKeydown);
   }
 
   onFieldChange = (fieldName) => {
@@ -54,31 +68,50 @@ class SaveQueryForm extends Component {
     };
   }
 
-  onFormSubmit = (evt) => {
-    evt.preventDefault();
+  onFormSubmit = (runType) => {
+    return (evt) => {
+      if (evt) {
+        evt.preventDefault();
+      }
 
-    const { formData, runType } = this.state;
-    const { onSubmit } = this.props;
-    const { validate } = this;
+      const { formData } = this.state;
+      const { onSubmit } = this.props;
+      const { validate } = this;
 
-    if (validate()) return onSubmit({ formData, runType });
+      if (validate(runType)) return onSubmit({ formData, runType });
 
-    return false;
+      return false;
+    };
   }
 
-  validate = () => {
+  handleKeydown = (evt) => {
+    const { metaKey, code } = evt;
+    const { onFormSubmit } = this;
+    const { RUN_AND_SAVE, RUN } = RUN_TYPES;
+    const { saveQuery } = this.props;
+    const runType = saveQuery ? RUN_AND_SAVE : RUN;
+
+    if (metaKey && code === 'Enter') {
+      return onFormSubmit(runType)();
+    }
+
+    return false;
+  };
+
+  validate = (runType) => {
     const {
       errors,
-      formData: {
-        queryName,
-      },
+      formData: { name },
     } = this.state;
+    const { RUN } = RUN_TYPES;
 
-    if (!validatePresence(queryName)) {
+    if (runType === RUN) return true;
+
+    if (!validatePresence(name)) {
       this.setState({
         errors: {
           ...errors,
-          queryName: 'Query Name field must be completed',
+          name: 'Query Name field must be completed',
         },
       });
 
@@ -97,26 +130,6 @@ class SaveQueryForm extends Component {
 
     return false;
   };
-
-  runAndSaveQuery = (evt) => {
-    evt.preventDefault();
-
-    this.setState({
-      runType: 'runAndSave',
-    });
-
-    return this.onFormSubmit(evt);
-  }
-
-  saveQuery = (evt) => {
-    evt.preventDefault();
-
-    this.setState({
-      runType: 'save',
-    });
-
-    return this.onFormSubmit(evt);
-  }
 
   renderMoreOptionsCtaSection = () => {
     const { moreOptionsIconStyles, moreOptionsCtaSectionStyles, moreOptionsTextStyles } = componentStyles;
@@ -148,9 +161,9 @@ class SaveQueryForm extends Component {
     const {
       errors,
       formData: {
-        queryDuration,
-        queryPlatform,
-        queryHosts,
+        duration,
+        platforms,
+        hosts,
       },
       showMoreOptions,
     } = this.state;
@@ -171,11 +184,11 @@ class SaveQueryForm extends Component {
       <div>
         <div style={formSectionStyles}>
           <InputField
-            error={errors.queryDescription}
+            error={errors.description}
             label="Query Description"
             labelStyles={labelStyles}
-            name="queryDescription"
-            onChange={onFieldChange('queryDescription')}
+            name="description"
+            onChange={onFieldChange('description')}
             placeholder="e.g. This query does x, y, & z because n"
             style={queryDescriptionInputStyles}
             type="textarea"
@@ -186,12 +199,12 @@ class SaveQueryForm extends Component {
         </div>
         <div style={formSectionStyles}>
           <div>
-            <label htmlFor="queryDuration" style={labelStyles}>Query Duration</label>
+            <label htmlFor="duration" style={labelStyles}>Query Duration</label>
             <select
-              key="queryDuration"
-              name="queryDuration"
-              value={queryDuration}
-              onChange={onFieldChange('queryDuration')}
+              key="duration"
+              name="duration"
+              value={duration}
+              onChange={onFieldChange('duration')}
               style={dropdownInputStyles}
             >
               <option value="short">Short</option>
@@ -204,12 +217,12 @@ class SaveQueryForm extends Component {
         </div>
         <div style={formSectionStyles}>
           <div>
-            <label htmlFor="queryPlatform" style={labelStyles}>Query Platform</label>
+            <label htmlFor="platforms" style={labelStyles}>Query Platform</label>
             <select
-              key="queryPlatform"
-              name="queryPlatform"
-              value={queryPlatform}
-              onChange={onFieldChange('queryPlatform')}
+              key="platforms"
+              name="platforms"
+              value={platforms}
+              onChange={onFieldChange('platforms')}
               style={dropdownInputStyles}
             >
               <option value="all">ALL PLATFORMS</option>
@@ -222,25 +235,25 @@ class SaveQueryForm extends Component {
         </div>
         <div style={formSectionStyles}>
           <div>
-            <label htmlFor="queryHosts" style={labelStyles}>Run On All Hosts?</label>
+            <label htmlFor="hosts" style={labelStyles}>Run On All Hosts?</label>
             <div>
               <input
-                checked={queryHosts === 'all'}
-                onChange={onFieldChange('queryHosts')}
+                checked={hosts === 'all'}
+                onChange={onFieldChange('hosts')}
                 type="radio"
                 value="all"
               /> Run Query On All Hosts
               <br />
               <input
-                checked={queryHosts === 'percentage'}
-                onChange={onFieldChange('queryHosts')}
+                checked={hosts === 'percentage'}
+                onChange={onFieldChange('hosts')}
                 type="radio"
                 value="percentage"
               /> Run Query On
               <InputField
                 inputWrapperStyles={{ display: 'inline-block' }}
                 inputOptions={{ maxLength: 3 }}
-                onChange={onFieldChange('queryHostsPercentage')}
+                onChange={onFieldChange('hostsPercentage')}
                 style={queryHostsPercentageStyles}
                 type="tel"
               />% Of All Hosts
@@ -269,6 +282,27 @@ class SaveQueryForm extends Component {
     );
   };
 
+  renderRunQuery = () => {
+    const {
+      buttonStyles,
+      runQuerySectionStyles,
+      runQueryTipStyles,
+    } = componentStyles;
+    const { onFormSubmit } = this;
+    const { RUN } = RUN_TYPES;
+
+    return (
+      <form style={runQuerySectionStyles} onSubmit={onFormSubmit(RUN)}>
+        <span style={runQueryTipStyles}>&#8984; + Enter</span>
+        <GradientButton
+          style={buttonStyles}
+          text="Run Query"
+          type="submit"
+        />
+      </form>
+    );
+  }
+
   render () {
     const {
       buttonInvertStyles,
@@ -285,19 +319,22 @@ class SaveQueryForm extends Component {
       onFormSubmit,
       renderMoreOptionsFormFields,
       renderMoreOptionsCtaSection,
-      runAndSaveQuery,
-      saveQuery,
+      renderRunQuery,
     } = this;
+    const { RUN_AND_SAVE, SAVE } = RUN_TYPES;
+    const { saveQuery } = this.props;
+
+    if (!saveQuery) return renderRunQuery();
 
     return (
-      <form onSubmit={onFormSubmit}>
+      <form onSubmit={onFormSubmit(RUN_AND_SAVE)}>
         <div style={queryNameWrapperStyles}>
           <InputField
-            error={errors.queryName}
+            error={errors.name}
             label="Query Name"
             labelStyles={labelStyles}
-            name="queryName"
-            onChange={onFieldChange('queryName')}
+            name="name"
+            onChange={onFieldChange('name')}
             placeholder="e.g. Interesting Query Name"
             style={queryNameInputStyles}
           />
@@ -309,15 +346,16 @@ class SaveQueryForm extends Component {
         {renderMoreOptionsFormFields()}
         <div style={buttonWrapperStyles}>
           <GradientButton
-            onClick={saveQuery}
+            onClick={onFormSubmit(SAVE)}
             style={buttonInvertStyles}
             text="Save Query Only"
           />
 
           <GradientButton
-            onClick={runAndSaveQuery}
+            onClick={onFormSubmit(RUN_AND_SAVE)}
             style={buttonStyles}
             text="Run & Save Query"
+            type="submit"
           />
         </div>
       </form>

@@ -63,19 +63,7 @@ describe('NewQuery - component', () => {
     expect(component.find('ThemeDropdown').length).toEqual(1);
   });
 
-  it('does not render the SaveQueryForm when the user has not selected to save the query', () => {
-    const component = mount(
-      <NewQuery
-        onOsqueryTableSelect={noop}
-        onTextEditorInputChange={noop}
-        textEditorText="Hello world"
-      />
-    );
-
-    expect(component.find('SaveQueryForm').length).toEqual(0);
-  });
-
-  it('renders the SaveQueryForm when the user has selected to save the query', () => {
+  it('renders the SaveQueryForm', () => {
     const component = mount(
       <NewQuery
         onOsqueryTableSelect={noop}

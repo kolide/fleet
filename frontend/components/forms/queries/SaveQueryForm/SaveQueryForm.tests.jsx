@@ -13,21 +13,21 @@ describe('SaveQueryForm - component', () => {
 
   it('handles query name input changes', () => {
     const form = mount(
-      <SaveQueryForm onSubmit={noop} />
+      <SaveQueryForm onSubmit={noop} saveQuery />
     );
-    const queryNameInput = form.find({ name: 'queryName' });
+    const queryNameInput = form.find({ name: 'name' });
 
     fillInFormInput(queryNameInput, queryName);
 
     const { formData } = form.state();
 
     expect(formData).toEqual({
-      queryDescription: null,
-      queryDuration: 'short',
-      queryHosts: 'all',
-      queryHostsPercentage: null,
-      queryName,
-      queryPlatform: 'all',
+      description: null,
+      duration: 'short',
+      hosts: 'all',
+      hostsPercentage: null,
+      name: queryName,
+      platforms: 'all',
       scanInterval: 0,
     });
   });
@@ -35,7 +35,7 @@ describe('SaveQueryForm - component', () => {
   it('does not submit the form if it is invalid', () => {
     const onSubmit = createSpy();
     const form = mount(
-      <SaveQueryForm onSubmit={onSubmit} />
+      <SaveQueryForm onSubmit={onSubmit} saveQuery />
     );
 
     form.simulate('submit');
@@ -43,25 +43,47 @@ describe('SaveQueryForm - component', () => {
     expect(onSubmit).toNotHaveBeenCalled();
   });
 
-  it('calls onSubmit with the formData', () => {
+  it('calls onSubmit with the formData and "RUN_AND_SAVE" runType when the saveQuery prop is present', () => {
     const onSubmit = createSpy();
     const form = mount(
-      <SaveQueryForm onSubmit={onSubmit} />
+      <SaveQueryForm onSubmit={onSubmit} saveQuery />
     );
-    const queryNameInput = form.find({ name: 'queryName' });
+    const queryNameInput = form.find({ name: 'name' });
 
     fillInFormInput(queryNameInput, queryName);
     form.simulate('submit');
 
     expect(onSubmit).toHaveBeenCalledWith({
-      runType: 'run',
+      runType: 'RUN_AND_SAVE',
       formData: {
-        queryDescription: null,
-        queryDuration: 'short',
-        queryHosts: 'all',
-        queryHostsPercentage: null,
-        queryName,
-        queryPlatform: 'all',
+        description: null,
+        duration: 'short',
+        hosts: 'all',
+        hostsPercentage: null,
+        name: queryName,
+        platforms: 'all',
+        scanInterval: 0,
+      },
+    });
+  });
+
+  it('calls onSubmit with the formData and "RUN" runType without the saveQuery prop', () => {
+    const onSubmit = createSpy();
+    const form = mount(
+      <SaveQueryForm onSubmit={onSubmit} />
+    );
+
+    form.simulate('submit');
+
+    expect(onSubmit).toHaveBeenCalledWith({
+      runType: 'RUN',
+      formData: {
+        description: null,
+        duration: 'short',
+        hosts: 'all',
+        hostsPercentage: null,
+        name: null,
+        platforms: 'all',
         scanInterval: 0,
       },
     });
