@@ -24,7 +24,7 @@ class Button extends Component {
         onClick={onClick}
         style={{
           ...componentStyles[variant],
-          ...style
+          ...style,
         }}
         type={type}
       >
