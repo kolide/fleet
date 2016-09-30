@@ -11,6 +11,10 @@ ace.define("ace/theme/kolide",["require","exports","module","ace/lib/dom"], func
   width: 1px;\
     background: #f6f6f6\
 }\
+.ace-kolide .ace_osquery-token{\
+  background-color: #AE6DDF;\
+    color: #FFFFFF\
+}\
 .ace-kolide {\
   background-color: #EAEDFB;\
     color: #4D4D4C\
