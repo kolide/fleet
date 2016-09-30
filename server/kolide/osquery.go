@@ -88,6 +88,7 @@ type OsqueryResultLog struct {
 	CalendarTime   string            `json:"calendarTime"`
 	Columns        map[string]string `json:"columns"`
 	Action         string            `json:"action"`
+	Decorations    map[string]string `json:"decorations"`
 }
 
 type OsqueryStatusLog struct {

@@ -70,7 +70,7 @@ func (svc service) SubmitStatusLogs(ctx context.Context, logs []kolide.OsquerySt
 
 func (svc service) SubmitResultLogs(ctx context.Context, logs []kolide.OsqueryResultLog) error {
 	for _, log := range logs {
-		err := json.NewEncoder(svc.osqueryResultsLogWriter).Encode(log)
+		err := json.NewEncoder(svc.osqueryResultLogWriter).Encode(log)
 		if err != nil {
 			return errors.NewFromError(err, http.StatusInternalServerError, "error writing result log")
 		}

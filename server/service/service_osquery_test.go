@@ -61,18 +61,6 @@ func TestEnrollAgentIncorrectEnrollSecret(t *testing.T) {
 	assert.Len(t, hosts, 0)
 }
 
-// func extractService(svc *kolide.Service) (*service, error) {
-// 	valSvc, ok := (*svc).(validationMiddleware)
-// 	if !ok {
-// 		return nil, errors.New("not validationMiddleware")
-// 	}
-// 	service, ok := (&valSvc.Service).(service)
-// 	if !ok {
-// 		return nil, errors.New("not service")
-// 	}
-// 	return &service, nil
-// }
-
 func TestSubmitStatusLogs(t *testing.T) {
 	ds, err := datastore.New("gorm-sqlite3", ":memory:")
 	assert.Nil(t, err)
@@ -100,6 +88,43 @@ func TestSubmitStatusLogs(t *testing.T) {
 	assert.Nil(t, err)
 
 	resultJSON := statusBuf.String()
+	resultJSON = strings.TrimRight(resultJSON, "\n")
+	resultLines := strings.Split(resultJSON, "\n")
+
+	if assert.Equal(t, len(logs), len(resultLines)) {
+		for i, line := range resultLines {
+			assert.JSONEq(t, logs[i], line)
+		}
+	}
+}
+
+func TestSubmitResultLogs(t *testing.T) {
+	ds, err := datastore.New("gorm-sqlite3", ":memory:")
+	assert.Nil(t, err)
+
+	svc, err := newTestService(ds)
+	assert.Nil(t, err)
+
+	// Hack to get at the service internals and modify the writer
+	serv := ((svc.(validationMiddleware)).Service).(service)
+
+	var resultBuf bytes.Buffer
+	serv.osqueryResultLogWriter = &resultBuf
+
+	logs := []string{
+		`{"name":"system_info","hostIdentifier":"some_uuid","calendarTime":"Fri Sep 30 17:55:15 2016 UTC","unixTime":"1475258115","decorations":{"host_uuid":"some_uuid","username":"zwass"},"columns":{"cpu_brand":"Intel(R) Core(TM) i7-4770HQ CPU @ 2.20GHz","hostname":"hostimus","physical_memory":"17179869184"},"action":"added"}`,
+		`{"name":"encrypted","hostIdentifier":"some_uuid","calendarTime":"Fri Sep 30 21:19:15 2016 UTC","unixTime":"1475270355","decorations":{"host_uuid":"4740D59F-699E-5B29-960B-979AAF9BBEEB","username":"zwass"},"columns":{"encrypted":"1","name":"\/dev\/disk1","type":"AES-XTS","uid":"","user_uuid":"","uuid":"some_uuid"},"action":"added"}`,
+	}
+	logJSON := fmt.Sprintf("[%s]", strings.Join(logs, ","))
+
+	var resultes []kolide.OsqueryResultLog
+	err = json.Unmarshal([]byte(logJSON), &resultes)
+	require.Nil(t, err)
+
+	err = serv.SubmitResultLogs(context.Background(), resultes)
+	assert.Nil(t, err)
+
+	resultJSON := resultBuf.String()
 	resultJSON = strings.TrimRight(resultJSON, "\n")
 	resultLines := strings.Split(resultJSON, "\n")
 
