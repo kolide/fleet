@@ -6,6 +6,7 @@ import InputField from '../InputField';
 class InputFieldWithIcon extends InputField {
   static propTypes = {
     autofocus: PropTypes.bool,
+    defaultValue: PropTypes.string,
     error: PropTypes.string,
     iconName: PropTypes.string,
     name: PropTypes.string,
@@ -14,6 +15,16 @@ class InputFieldWithIcon extends InputField {
     style: PropTypes.object,
     type: PropTypes.string,
   };
+
+  constructor(props) {
+    super(props);
+
+    const { defaultValue } = this.props;
+
+    this.state = {
+      value: defaultValue,
+    };
+  }
 
   renderHeading = () => {
     const { error, placeholder } = this.props;
@@ -28,7 +39,7 @@ class InputFieldWithIcon extends InputField {
   }
 
   render () {
-    const { error, iconName, name, placeholder, style, type } = this.props;
+    const { defaultValue, error, iconName, name, placeholder, style, type } = this.props;
     const { containerStyles, iconStyles, iconErrorStyles, inputErrorStyles, inputStyles } = componentStyles;
     const { value } = this.state;
     const { onInputChange } = this;
@@ -44,6 +55,7 @@ class InputFieldWithIcon extends InputField {
           ref={(r) => { this.input = r; }}
           style={[inputStyles(value, type), inputErrorStyles(error), style]}
           type={type}
+          value={value}
         />
         {iconName && <i className={iconName} style={[iconStyles(value), iconErrorStyles(error), style]} />}
       </div>

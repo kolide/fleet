@@ -1,8 +1,10 @@
 import React, { Component, PropTypes } from 'react';
 import radium from 'radium';
 import Avatar from '../../../../components/Avatar';
+import Button from '../../../../components/buttons/Button';
 import componentStyles from './styles';
 import Dropdown from '../../../../components/forms/fields/Dropdown';
+import EditUserForm from '../../../../components/forms/Admin/EditUserForm';
 
 class UserBlock extends Component {
   static propTypes = {
@@ -27,8 +29,41 @@ class UserBlock extends Component {
     ];
   };
 
+  constructor (props) {
+    super(props);
+
+    this.state = {
+      isEdit: false,
+    };
+  }
+
+  onToggleEditing = (evt) => {
+    evt.preventDefault();
+
+    const { isEdit } = this.state;
+
+    this.setState({
+      isEdit: !isEdit,
+    });
+
+    return false;
+  }
+
+  onEditUserFormSubmit = (formData) => {
+    console.log('EditUserForm submitted', formData);
+    return false;
+  }
+
   onUserActionSelect = (formData) => {
     const { onSelect, user } = this.props;
+
+    if (formData.user_actions === 'modify_details') {
+      this.setState({
+        isEdit: true,
+      });
+
+      return false;
+    }
 
     return onSelect(user, formData);
   }
@@ -59,6 +94,12 @@ class UserBlock extends Component {
     const userLabel = admin ? 'Admin' : 'User';
     const activeLabel = enabled ? 'Active' : 'Disabled';
     const userActionOptions = UserBlock.userActionOptions(user);
+    const { isEdit } = this.state;
+    const { onEditUserFormSubmit, onToggleEditing } = this;
+
+    if (isEdit) {
+      return <EditUserForm onCancel={onToggleEditing} onSubmit={onEditUserFormSubmit} user={user} />
+    };
 
     return (
       <div style={userWrapperStyles}>

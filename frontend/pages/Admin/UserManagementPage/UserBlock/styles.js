@@ -8,6 +8,10 @@ export default {
     marginLeft: 'auto',
     marginRight: 'auto',
   },
+  formButtonStyles: {
+    paddingLeft: padding.medium,
+    paddingRight: padding.medium,
+  },
   nameStyles: {
     fontWeight: font.weight.bold,
     lineHeight: '51px',
