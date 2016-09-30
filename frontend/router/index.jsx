@@ -36,9 +36,10 @@ const routes = (
               <Route path="admin" component={AuthenticatedAdminRoutes}>
                 <IndexRoute component={radium(AdminDashboardPage)} />
                 <Route path="users" component={radium(AdminUserManagementPage)} />
-            </Route>
-            <Route path="queries" component={radium(QueryPageWrapper)}>
-              <Route path="new" component={radium(NewQueryPage)} />
+              </Route>
+              <Route path="queries" component={radium(QueryPageWrapper)}>
+                <Route path="new" component={radium(NewQueryPage)} />
+              </Route>
             </Route>
           </Route>
         </Route>

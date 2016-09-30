@@ -12,7 +12,10 @@ export default {
     letterSpacing: 'normal',
     marginTop: 0,
     marginLeft: padding.half,
-    padding: 0,
+    paddingBottom: 0,
+    paddingLeft: 0,
+    paddingRight: 0,
+    paddingTop: 0,
     width: '145px',
   },
   addUserWrapperStyles: {

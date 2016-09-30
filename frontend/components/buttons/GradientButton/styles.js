@@ -7,15 +7,15 @@ export default (variant) => {
   const backgroundImage = inverse ? 'none' : 'linear-gradient(134deg, #7166D9 0%, #C86DD7 100%)';
   const backgroundColor = inverse ? color.white : 'transparent';
   const boxShadow = inverse ? `0 3px 0 ${color.brandLight}` : '0 3px 0 #734893';
-  const border = inverse ? '1px solid #EDD6FF' : 'none';
+  const borderStyles = inverse ? '1px solid #EDD6FF' : 'none';
 
   return {
     backgroundImage,
     backgroundColor,
-    borderBottom: border,
-    borderLeft: border,
-    borderRight: border,
-    borderTop: border,
+    borderBottom: borderStyles,
+    borderLeft: borderStyles,
+    borderRight: borderStyles,
+    borderTop: borderStyles,
     borderBottomLeftRadius: border.radius.base,
     borderBottomRightRadius: border.radius.base,
     borderTopLeftRadius: border.radius.base,

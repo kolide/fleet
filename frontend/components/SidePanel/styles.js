@@ -263,14 +263,13 @@ const componentStyles = {
     };
   },
   collapseSubItemsWrapper: {
-    cursor: 'pointer',
-    position: 'absolute',
-    right: '4px',
     bottom: '0',
-    top: '0',
+    color: color.white,
     cursor: 'pointer',
     lineHeight: '95px',
-    color: color.white,
+    position: 'absolute',
+    right: '4px',
+    top: '0',
     '@media (min-width: 761px)': {
       display: 'none',
     },
