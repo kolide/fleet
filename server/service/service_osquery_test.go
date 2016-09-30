@@ -1,8 +1,11 @@
 package service
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 
@@ -56,6 +59,55 @@ func TestEnrollAgentIncorrectEnrollSecret(t *testing.T) {
 	hosts, err = ds.Hosts()
 	assert.Nil(t, err)
 	assert.Len(t, hosts, 0)
+}
+
+// func extractService(svc *kolide.Service) (*service, error) {
+// 	valSvc, ok := (*svc).(validationMiddleware)
+// 	if !ok {
+// 		return nil, errors.New("not validationMiddleware")
+// 	}
+// 	service, ok := (&valSvc.Service).(service)
+// 	if !ok {
+// 		return nil, errors.New("not service")
+// 	}
+// 	return &service, nil
+// }
+
+func TestSubmitStatusLogs(t *testing.T) {
+	ds, err := datastore.New("gorm-sqlite3", ":memory:")
+	assert.Nil(t, err)
+
+	svc, err := newTestService(ds)
+	assert.Nil(t, err)
+
+	// Hack to get at the service internals and modify the writer
+	serv := ((svc.(validationMiddleware)).Service).(service)
+
+	var statusBuf bytes.Buffer
+	serv.osqueryStatusLogWriter = &statusBuf
+
+	logs := []string{
+		`{"severity":"0","filename":"tls.cpp","line":"216","message":"some message","version":"1.8.2","decorations":{"host_uuid":"uuid_foobar","username":"zwass"}}`,
+		`{"severity":"1","filename":"buffered.cpp","line":"122","message":"warning!","version":"1.8.2","decorations":{"host_uuid":"uuid_foobar","username":"zwass"}}`,
+	}
+	logJSON := fmt.Sprintf("[%s]", strings.Join(logs, ","))
+
+	var statuses []kolide.OsqueryStatusLog
+	err = json.Unmarshal([]byte(logJSON), &statuses)
+	require.Nil(t, err)
+
+	err = serv.SubmitStatusLogs(context.Background(), statuses)
+	assert.Nil(t, err)
+
+	resultJSON := statusBuf.String()
+	resultJSON = strings.TrimRight(resultJSON, "\n")
+	resultLines := strings.Split(resultJSON, "\n")
+
+	if assert.Equal(t, len(logs), len(resultLines)) {
+		for i, line := range resultLines {
+			assert.JSONEq(t, logs[i], line)
+		}
+	}
 }
 
 func TestHostDetailQueries(t *testing.T) {
