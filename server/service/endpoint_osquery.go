@@ -116,9 +116,9 @@ func makeSubmitDistributedQueryResultsEndpoint(svc kolide.Service) endpoint.Endp
 ////////////////////////////////////////////////////////////////////////////////
 
 type submitLogsRequest struct {
-	NodeKey string           `json:"node_key"`
-	LogType string           `json:"log_type"`
-	Data    *json.RawMessage `json:"data"`
+	NodeKey string          `json:"node_key"`
+	LogType string          `json:"log_type"`
+	Data    json.RawMessage `json:"data"`
 }
 
 type submitLogsResponse struct {

@@ -78,7 +78,7 @@ func (svc service) SubmitResultLogs(ctx context.Context, logs []kolide.OsqueryRe
 	return nil
 }
 
-func (svc service) SubmitLogs(ctx context.Context, logType string, data *json.RawMessage) error {
+func (svc service) SubmitLogs(ctx context.Context, logType string, data json.RawMessage) error {
 	host, ok := hostctx.FromContext(ctx)
 	if !ok {
 		return osqueryError{message: "internal error: missing host from request context"}
@@ -87,22 +87,32 @@ func (svc service) SubmitLogs(ctx context.Context, logType string, data *json.Ra
 	var err error
 	switch logType {
 	case "status":
-		// TODO: Decode and submit logs
+		var statuses []kolide.OsqueryStatusLog
+		if err := json.Unmarshal(data, &statuses); err != nil {
+			return osqueryError{message: "unmarshalling status logs: " + err.Error()}
+		}
+
+		if err := svc.SubmitStatusLogs(ctx, statuses); err != nil {
+			return err
+		}
 
 	case "result":
-		// TODO: Decode and submit logs
+		var results []kolide.OsqueryResultLog
+		if err := json.Unmarshal(data, &results); err != nil {
+			return osqueryError{message: "unmarshalling result logs: " + err.Error()}
+		}
+		if err := svc.SubmitResultLogs(ctx, results); err != nil {
+			return err
+		}
 
 	default:
-		err = osqueryError{message: "unknown log type: " + logType}
-		svc.logger.Log("method", "SubmitLogs", "err", err)
+		return osqueryError{message: "unknown log type: " + logType}
 	}
 
+	err = svc.ds.MarkHostSeen(&host, svc.clock.Now())
 	if err != nil {
-		return osqueryError{message: "log ingestion failed: " + err.Error()}
+		return osqueryError{message: "failed to update host seen: " + err.Error()}
 	}
-
-	// TODO: Update update_time of host
-	_ = host
 
 	return nil
 }
