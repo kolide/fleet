@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import radium from 'radium';
 import componentStyles from './styles';
 
-class GradientButton extends Component {
+class Button extends Component {
   static propTypes = {
     onClick: PropTypes.func,
     style: PropTypes.object,
@@ -22,7 +22,10 @@ class GradientButton extends Component {
     return (
       <button
         onClick={onClick}
-        style={[componentStyles(variant), style]}
+        style={{
+          ...componentStyles[variant],
+          ...style
+        }}
         type={type}
       >
         {text}
@@ -31,4 +34,4 @@ class GradientButton extends Component {
   }
 }
 
-export default radium(GradientButton);
+export default radium(Button);

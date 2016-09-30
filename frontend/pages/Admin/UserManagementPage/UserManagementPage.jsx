@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import componentStyles from './styles';
 import entityGetter from '../../../redux/entityGetter';
-import GradientButton from '../../../components/buttons/GradientButton';
+import Button from '../../../components/buttons/Button';
 import InviteUserForm from '../../../components/forms/InviteUserForm';
 import Modal from '../../../components/Modal';
 import userActions from '../../../redux/nodes/entities/users/actions';
@@ -138,7 +138,7 @@ class UserManagementPage extends Component {
       <div style={containerStyles}>
         <span style={numUsersStyles}>Listing {users.length} users</span>
         <div style={addUserWrapperStyles}>
-          <GradientButton
+          <Button
             onClick={toggleInviteUserModal}
             style={addUserButtonStyles}
             text="Add User"

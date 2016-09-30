@@ -25,8 +25,4 @@ export default {
     fontSize: font.mini,
     marginBottom: 0,
   },
-  submitButtonStyles: {
-    backgroundImage: 'none',
-    backgroundColor: color.brand,
-  },
 };

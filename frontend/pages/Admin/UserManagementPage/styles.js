@@ -4,10 +4,6 @@ const { color, font, padding } = Styles;
 
 export default {
   addUserButtonStyles: {
-    backgroundColor: color.brand,
-    backgroundImage: 'none',
-    boxShadow: `0 4px 0 ${color.brandLight}`,
-    fontSize: font.medium,
     height: '38px',
     letterSpacing: 'normal',
     marginTop: 0,

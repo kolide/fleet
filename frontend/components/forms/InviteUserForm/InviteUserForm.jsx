@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import radium from 'radium';
 import componentStyles from './styles';
-import GradientButton from '../../buttons/GradientButton';
+import Button from '../../buttons/Button';
 import InputFieldWithIcon from '../fields/InputFieldWithIcon';
 import validatePresence from '../validators/validate_presence';
 import validEmail from '../validators/valid_email';
@@ -91,7 +91,7 @@ class InviteUserForm extends Component {
   }
 
   render () {
-    const { buttonStyles, buttonWrapperStyles, radioElementStyles, roleTitleStyles, submitButtonStyles } = componentStyles;
+    const { buttonStyles, buttonWrapperStyles, radioElementStyles, roleTitleStyles } = componentStyles;
     const { errors, formData: { role } } = this.state;
     const { onCancel } = this.props;
     const { onFormSubmit, onInputChange } = this;
@@ -122,14 +122,14 @@ class InviteUserForm extends Component {
           /> ADMIN
         </div>
         <div style={buttonWrapperStyles}>
-          <GradientButton
+          <Button
             onClick={onCancel}
             style={buttonStyles}
             text="Cancel"
             variant="inverse"
           />
-          <GradientButton
-            style={[buttonStyles, submitButtonStyles]}
+          <Button
+            style={buttonStyles}
             text="Invite"
             type="submit"
           />
