@@ -59,57 +59,40 @@ func (svc service) GetClientConfig(ctx context.Context) (*kolide.OsqueryConfig, 
 }
 
 func (svc service) SubmitStatusLogs(ctx context.Context, logs []kolide.OsqueryStatusLog) error {
+	host, ok := hostctx.FromContext(ctx)
+	if !ok {
+		return osqueryError{message: "internal error: missing host from request context"}
+	}
+
 	for _, log := range logs {
 		err := json.NewEncoder(svc.osqueryStatusLogWriter).Encode(log)
 		if err != nil {
 			return errors.NewFromError(err, http.StatusInternalServerError, "error writing status log")
 		}
 	}
+
+	err := svc.ds.MarkHostSeen(&host, svc.clock.Now())
+	if err != nil {
+		return osqueryError{message: "failed to update host seen: " + err.Error()}
+	}
+
 	return nil
 }
 
 func (svc service) SubmitResultLogs(ctx context.Context, logs []kolide.OsqueryResultLog) error {
+	host, ok := hostctx.FromContext(ctx)
+	if !ok {
+		return osqueryError{message: "internal error: missing host from request context"}
+	}
+
 	for _, log := range logs {
 		err := json.NewEncoder(svc.osqueryResultLogWriter).Encode(log)
 		if err != nil {
 			return errors.NewFromError(err, http.StatusInternalServerError, "error writing result log")
 		}
 	}
-	return nil
-}
 
-func (svc service) SubmitLogs(ctx context.Context, logType string, data json.RawMessage) error {
-	host, ok := hostctx.FromContext(ctx)
-	if !ok {
-		return osqueryError{message: "internal error: missing host from request context"}
-	}
-
-	var err error
-	switch logType {
-	case "status":
-		var statuses []kolide.OsqueryStatusLog
-		if err := json.Unmarshal(data, &statuses); err != nil {
-			return osqueryError{message: "unmarshalling status logs: " + err.Error()}
-		}
-
-		if err := svc.SubmitStatusLogs(ctx, statuses); err != nil {
-			return err
-		}
-
-	case "result":
-		var results []kolide.OsqueryResultLog
-		if err := json.Unmarshal(data, &results); err != nil {
-			return osqueryError{message: "unmarshalling result logs: " + err.Error()}
-		}
-		if err := svc.SubmitResultLogs(ctx, results); err != nil {
-			return err
-		}
-
-	default:
-		return osqueryError{message: "unknown log type: " + logType}
-	}
-
-	err = svc.ds.MarkHostSeen(&host, svc.clock.Now())
+	err := svc.ds.MarkHostSeen(&host, svc.clock.Now())
 	if err != nil {
 		return osqueryError{message: "failed to update host seen: " + err.Error()}
 	}
