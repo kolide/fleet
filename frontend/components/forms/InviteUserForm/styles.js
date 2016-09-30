@@ -7,8 +7,15 @@ export default {
     fontSize: font.small,
     height: '38px',
     marginButtom: '5px',
-    padding: 0,
+    paddingBottom: 0,
+    paddingLeft: 0,
+    paddingRight: 0,
+    paddingTop: 0,
     width: '180px',
+  },
+  buttonWrapperStyles: {
+    display: 'flex',
+    justifyContent: 'space-between',
   },
   radioElementStyles: {
     paddingBottom: padding.base,
@@ -17,5 +24,9 @@ export default {
     color: color.brand,
     fontSize: font.mini,
     marginBottom: 0,
+  },
+  submitButtonStyles: {
+    backgroundImage: 'none',
+    backgroundColor: color.brand,
   },
 };

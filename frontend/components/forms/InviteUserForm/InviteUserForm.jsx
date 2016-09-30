@@ -91,7 +91,7 @@ class InviteUserForm extends Component {
   }
 
   render () {
-    const { buttonStyles, radioElementStyles, roleTitleStyles } = componentStyles;
+    const { buttonStyles, buttonWrapperStyles, radioElementStyles, roleTitleStyles, submitButtonStyles } = componentStyles;
     const { errors, formData: { role } } = this.state;
     const { onCancel } = this.props;
     const { onFormSubmit, onInputChange } = this;
@@ -121,17 +121,19 @@ class InviteUserForm extends Component {
             value="admin"
           /> ADMIN
         </div>
-        <GradientButton
-          onClick={onCancel}
-          style={buttonStyles}
-          text="Cancel"
-          variant="inverse"
-        />
-        <GradientButton
-          style={buttonStyles}
-          text="Invite"
-          type="submit"
-        />
+        <div style={buttonWrapperStyles}>
+          <GradientButton
+            onClick={onCancel}
+            style={buttonStyles}
+            text="Cancel"
+            variant="inverse"
+          />
+          <GradientButton
+            style={[buttonStyles, submitButtonStyles]}
+            text="Invite"
+            type="submit"
+          />
+        </div>
       </form>
     );
   }
