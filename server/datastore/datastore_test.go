@@ -573,3 +573,54 @@ func testAddAndRemoveQueryFromPack(t *testing.T, ds kolide.Datastore) {
 	assert.Nil(t, err)
 	assert.Len(t, queries, 1)
 }
+
+func testManagingLabelsOnPacks(t *testing.T, ds kolide.Datastore) {
+	mysqlQuery := &kolide.Query{
+		Name:  "MySQL",
+		Query: "select pid from processes where name = 'mysqld';",
+	}
+	err := ds.NewQuery(mysqlQuery)
+	assert.Nil(t, err)
+
+	osqueryRunningQuery := &kolide.Query{
+		Name:  "Is osquery currently running?",
+		Query: "select pid from processes where name = 'osqueryd';",
+	}
+	err = ds.NewQuery(osqueryRunningQuery)
+	assert.Nil(t, err)
+
+	monitoringPack := &kolide.Pack{
+		Name: "attacks",
+	}
+	err = ds.NewPack(monitoringPack)
+	assert.Nil(t, err)
+
+	mysqlLabel := &kolide.Label{
+		Name:    "MySQL Monitoring",
+		QueryID: mysqlQuery.ID,
+	}
+	err = ds.NewLabel(mysqlLabel)
+	assert.Nil(t, err)
+
+	err = ds.AddLabelToPack(mysqlLabel, monitoringPack)
+	assert.Nil(t, err)
+
+	labels, err := ds.GetLabelsForPack(monitoringPack)
+	assert.Nil(t, err)
+	assert.Len(t, labels, 1)
+	assert.Equal(t, "MySQL Monitoring", labels[0].Name)
+
+	osqueryLabel := &kolide.Label{
+		Name:    "Osquery Monitoring",
+		QueryID: osqueryRunningQuery.ID,
+	}
+	err = ds.NewLabel(osqueryLabel)
+	assert.Nil(t, err)
+
+	err = ds.AddLabelToPack(osqueryLabel, monitoringPack)
+	assert.Nil(t, err)
+
+	labels, err = ds.GetLabelsForPack(monitoringPack)
+	assert.Nil(t, err)
+	assert.Len(t, labels, 2)
+}
