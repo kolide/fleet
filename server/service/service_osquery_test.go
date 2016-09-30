@@ -135,6 +135,56 @@ func TestSubmitResultLogs(t *testing.T) {
 	}
 }
 
+func TestSubmitLogs(t *testing.T) {
+	ds, err := datastore.New("gorm-sqlite3", ":memory:")
+	assert.Nil(t, err)
+
+	mockClock := clock.NewMockClock()
+
+	svc, err := newTestServiceWithClock(ds, mockClock)
+	assert.Nil(t, err)
+
+	ctx := context.Background()
+
+	_, err = svc.EnrollAgent(ctx, "", "host123")
+	assert.Nil(t, err)
+
+	hosts, err := ds.Hosts()
+	require.Nil(t, err)
+	require.Len(t, hosts, 1)
+	host := hosts[0]
+
+	// Error due to missing host
+	err = svc.SubmitLogs(ctx, "status", []byte(""))
+	assert.NotNil(t, err)
+	assert.Contains(t, err.Error(), "missing host")
+
+	ctx = hostctx.NewContext(ctx, *host)
+
+	// Error due to bad log type
+	err = svc.SubmitLogs(ctx, "bad", []byte(""))
+	assert.NotNil(t, err)
+	assert.Contains(t, err.Error(), "unknown log type")
+
+	// Verify that the update time is set appropriately
+	err = svc.SubmitLogs(ctx, "result", []byte("[]"))
+	assert.Nil(t, err)
+
+	checkHost, err := ds.Host(host.ID)
+	assert.Nil(t, err)
+	assert.Equal(t, mockClock.Now(), checkHost.UpdatedAt)
+
+	// Advance clock time and check that time is updated on new logs
+	mockClock.AddTime(1 * time.Minute)
+
+	err = svc.SubmitLogs(ctx, "result", []byte("[]"))
+	assert.Nil(t, err)
+
+	checkHost, err = ds.Host(host.ID)
+	assert.Nil(t, err)
+	assert.Equal(t, mockClock.Now(), checkHost.UpdatedAt)
+}
+
 func TestHostDetailQueries(t *testing.T) {
 	host := kolide.Host{
 		ID:        1,
