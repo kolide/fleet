@@ -41,7 +41,7 @@ type LabelService interface {
 
 type LabelPayload struct {
 	Name    *string
-	QueryID *uint
+	QueryID *uint `json:"query_id"`
 }
 
 type Label struct {
