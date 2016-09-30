@@ -59,7 +59,13 @@ func (svc service) GetClientConfig(ctx context.Context) (*kolide.OsqueryConfig, 
 		return nil, osqueryError{message: "internal error: missing host from request context"}
 	}
 
-	config := new(kolide.OsqueryConfig)
+	config := &kolide.OsqueryConfig{
+		Options: kolide.OsqueryOptions{
+			PackDelimiter:      "/",
+			DisableDistributed: false,
+		},
+		Packs: kolide.Packs{},
+	}
 
 	// we will need to give some subset of packs to this host based on the
 	// labels which this host is known to belond to
@@ -76,7 +82,7 @@ func (svc service) GetClientConfig(ctx context.Context) (*kolide.OsqueryConfig, 
 
 	// in order to use o(1) array indexing in an o(n) loop vs a o(n^2) double
 	// for loop iteration, we must create the array which may be indexed below
-	var labelIDs map[uint]bool
+	labelIDs := map[uint]bool{}
 	for _, label := range labels {
 		labelIDs[label.ID] = true
 	}
@@ -110,7 +116,7 @@ func (svc service) GetClientConfig(ctx context.Context) (*kolide.OsqueryConfig, 
 
 			// the serializable osquery config struct expects content in a
 			// particular format, so we do the conversion here
-			var configQueries kolide.Queries
+			configQueries := kolide.Queries{}
 			for _, query := range queries {
 				configQueries[query.Name] = kolide.QueryContent{
 					Query:    query.Query,
@@ -128,12 +134,6 @@ func (svc service) GetClientConfig(ctx context.Context) (*kolide.OsqueryConfig, 
 				Queries:  configQueries,
 			}
 		}
-	}
-
-	// add global options to the config struct to be returned
-	config.Options = kolide.OsqueryOptions{
-		PackDelimiter:      "/",
-		DisableDistributed: false,
 	}
 
 	return config, nil

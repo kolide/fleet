@@ -590,7 +590,7 @@ func testManagingLabelsOnPacks(t *testing.T, ds kolide.Datastore) {
 	assert.Nil(t, err)
 
 	monitoringPack := &kolide.Pack{
-		Name: "attacks",
+		Name: "monitoring",
 	}
 	err = ds.NewPack(monitoringPack)
 	assert.Nil(t, err)
