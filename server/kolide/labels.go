@@ -8,7 +8,7 @@ import (
 
 type LabelStore interface {
 	// Label methods
-	NewLabel(Label *Label) error
+	NewLabel(Label *Label) (*Label, error)
 	SaveLabel(Label *Label) error
 	DeleteLabel(Label *Label) error
 	Label(id uint) (*Label, error)

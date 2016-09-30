@@ -421,7 +421,7 @@ func TestGetClientConfig(t *testing.T) {
 		Name:  "MySQL",
 		Query: "select pid from processes where name = 'mysqld';",
 	}
-	err = ds.NewQuery(mysqlQuery)
+	mysqlQuery, err = ds.NewQuery(mysqlQuery)
 	assert.Nil(t, err)
 
 	infoQuery := &kolide.Query{
@@ -429,7 +429,7 @@ func TestGetClientConfig(t *testing.T) {
 		Query:    "select * from osquery_info;",
 		Interval: 60,
 	}
-	err = ds.NewQuery(infoQuery)
+	infoQuery, err = ds.NewQuery(infoQuery)
 	assert.Nil(t, err)
 
 	monitoringPack := &kolide.Pack{
@@ -445,7 +445,7 @@ func TestGetClientConfig(t *testing.T) {
 		Name:    "MySQL Monitoring",
 		QueryID: mysqlQuery.ID,
 	}
-	err = ds.NewLabel(mysqlLabel)
+	mysqlLabel, err = ds.NewLabel(mysqlLabel)
 	assert.Nil(t, err)
 
 	err = ds.AddLabelToPack(mysqlLabel, monitoringPack)

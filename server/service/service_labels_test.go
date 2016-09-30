@@ -22,7 +22,7 @@ func TestGetAllLabels(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Len(t, labels, 0)
 
-	err = ds.NewLabel(&kolide.Label{
+	_, err = ds.NewLabel(&kolide.Label{
 		Name:    "foo",
 		QueryID: 1,
 	})
@@ -46,7 +46,7 @@ func TestGetLabel(t *testing.T) {
 		Name:    "foo",
 		QueryID: 1,
 	}
-	err = ds.NewLabel(label)
+	label, err = ds.NewLabel(label)
 	assert.Nil(t, err)
 	assert.NotZero(t, label.ID)
 
@@ -93,7 +93,7 @@ func TestModifyLabel(t *testing.T) {
 		Name:    "foo",
 		QueryID: 1,
 	}
-	err = ds.NewLabel(label)
+	label, err = ds.NewLabel(label)
 	assert.Nil(t, err)
 	assert.NotZero(t, label.ID)
 
@@ -120,7 +120,7 @@ func TestDeleteLabel(t *testing.T) {
 		Name:    "foo",
 		QueryID: 1,
 	}
-	err = ds.NewLabel(label)
+	label, err = ds.NewLabel(label)
 	assert.Nil(t, err)
 	assert.NotZero(t, label.ID)
 

@@ -14,7 +14,7 @@ func (svc service) GetLabel(ctx context.Context, id uint) (*kolide.Label, error)
 }
 
 func (svc service) NewLabel(ctx context.Context, p kolide.LabelPayload) (*kolide.Label, error) {
-	var label kolide.Label
+	label := &kolide.Label{}
 
 	if p.Name == nil {
 		return nil, newInvalidArgumentError("name", "missing required argument")
@@ -25,11 +25,11 @@ func (svc service) NewLabel(ctx context.Context, p kolide.LabelPayload) (*kolide
 		label.QueryID = *p.QueryID
 	}
 
-	err := svc.ds.NewLabel(&label)
+	label, err := svc.ds.NewLabel(label)
 	if err != nil {
 		return nil, err
 	}
-	return &label, nil
+	return label, nil
 }
 
 func (svc service) ModifyLabel(ctx context.Context, id uint, p kolide.LabelPayload) (*kolide.Label, error) {
