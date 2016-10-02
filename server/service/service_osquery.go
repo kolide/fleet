@@ -67,72 +67,36 @@ func (svc service) GetClientConfig(ctx context.Context) (*kolide.OsqueryConfig, 
 		Packs: kolide.Packs{},
 	}
 
-	// we will need to give some subset of packs to this host based on the
-	// labels which this host is known to belong to
-	packs, err := svc.ds.Packs()
+	packs, err := svc.ds.ActivePacksForHost(host.ID)
 	if err != nil {
 		return nil, osqueryError{message: "database error: " + err.Error()}
-	}
-
-	// pull the labels that this host belongs to
-	labels, err := svc.ds.LabelsForHost(&host)
-	if err != nil {
-		return nil, osqueryError{message: "database error: " + err.Error()}
-	}
-
-	// in order to use o(1) array indexing in an o(n) loop vs a o(n^2) double
-	// for loop iteration, we must create the array which may be indexed below
-	labelIDs := map[uint]bool{}
-	for _, label := range labels {
-		labelIDs[label.ID] = true
 	}
 
 	for _, pack := range packs {
-		// for each pack, we must know what labels have been assigned to that
-		// pack
-		labelsForPack, err := svc.ds.GetLabelsForPack(pack)
+		// first, we must figure out what queries are in this pack
+		queries, err := svc.ds.GetQueriesInPack(pack)
 		if err != nil {
 			return nil, osqueryError{message: "database error: " + err.Error()}
 		}
 
-		// o(n) iteration to determine whether or not a pack is enabled
-		// in this case, n is len(labelsForPack)
-		enabled := false
-		for _, label := range labelsForPack {
-			if labelIDs[label.ID] {
-				enabled = true
-				break
+		// the serializable osquery config struct expects content in a
+		// particular format, so we do the conversion here
+		configQueries := kolide.Queries{}
+		for _, query := range queries {
+			configQueries[query.Name] = kolide.QueryContent{
+				Query:    query.Query,
+				Interval: query.Interval,
+				Platform: query.Platform,
+				Version:  query.Version,
+				Snapshot: query.Snapshot,
 			}
 		}
 
-		// if the pack is enabled, we must add the content of the pack  the
-		// osquery config struct which we will return
-		if enabled {
-			// first, we must figure out what queries are in this pack
-			queries, err := svc.ds.GetQueriesInPack(pack)
-			if err != nil {
-				return nil, osqueryError{message: "database error: " + err.Error()}
-			}
-
-			// the serializable osquery config struct expects content in a
-			// particular format, so we do the conversion here
-			configQueries := kolide.Queries{}
-			for _, query := range queries {
-				configQueries[query.Name] = kolide.QueryContent{
-					Query:    query.Query,
-					Interval: query.Interval,
-					Platform: query.Platform,
-					Version:  query.Version,
-					Snapshot: query.Snapshot,
-				}
-			}
-
-			// finally, we add the pack to the client config struct with all of
-			// the packs queries
-			config.Packs[pack.Name] = kolide.PackContent{
-				Platform: pack.Platform,
-				Queries:  configQueries,
-			}
+		// finally, we add the pack to the client config struct with all of
+		// the packs queries
+		config.Packs[pack.Name] = kolide.PackContent{
+			Platform: pack.Platform,
+			Queries:  configQueries,
 		}
 	}
 

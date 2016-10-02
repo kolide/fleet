@@ -23,6 +23,9 @@ type PackStore interface {
 	AddLabelToPack(lid uint, pid uint) error
 	GetLabelsForPack(pack *Pack) ([]*Label, error)
 	RemoveLabelFromPack(label *Label, pack *Pack) error
+
+	// Packs from the host's perspective
+	ActivePacksForHost(hid uint) ([]*Pack, error)
 }
 
 type PackService interface {

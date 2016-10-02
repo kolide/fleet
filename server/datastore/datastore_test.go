@@ -298,7 +298,7 @@ func testLabels(t *testing.T, db kolide.Datastore) {
 	assert.Empty(t, queries)
 
 	// No labels should match
-	labels, err := db.LabelsForHost(host)
+	labels, err := db.LabelsForHost(host.ID)
 	assert.Nil(t, err)
 	assert.Empty(t, labels)
 
@@ -384,7 +384,7 @@ func testLabels(t *testing.T, db kolide.Datastore) {
 	assert.Equal(t, expectQueries, queries)
 
 	// No labels should match with no results yet
-	labels, err = db.LabelsForHost(host)
+	labels, err = db.LabelsForHost(host.ID)
 	assert.Nil(t, err)
 	assert.Empty(t, labels)
 
@@ -417,7 +417,7 @@ func testLabels(t *testing.T, db kolide.Datastore) {
 	assert.Equal(t, expectQueries, queries)
 
 	// Now the two matching labels should be returned
-	labels, err = db.LabelsForHost(host)
+	labels, err = db.LabelsForHost(host.ID)
 	assert.Nil(t, err)
 	if assert.Len(t, labels, 2) {
 		labelNames := []string{labels[0].Name, labels[1].Name}
@@ -435,7 +435,7 @@ func testLabels(t *testing.T, db kolide.Datastore) {
 
 	// There should still be no labels returned for a host that never
 	// executed any label queries
-	labels, err = db.LabelsForHost(&hosts[0])
+	labels, err = db.LabelsForHost(hosts[0].ID)
 	assert.Nil(t, err)
 	assert.Empty(t, labels)
 }

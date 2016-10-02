@@ -28,7 +28,7 @@ type LabelStore interface {
 	RecordLabelQueryExecutions(host *Host, results map[string]bool, t time.Time) error
 
 	// LabelsForHost returns the labels that the given host is in.
-	LabelsForHost(host *Host) ([]Label, error)
+	LabelsForHost(hid uint) ([]Label, error)
 }
 
 type LabelService interface {
