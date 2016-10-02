@@ -332,7 +332,7 @@ func (orm gormDB) Label(id uint) (*kolide.Label, error) {
 	label := &kolide.Label{
 		ID: id,
 	}
-	err := orm.DB.Where(label).First(label).Error
+	err := orm.DB.Where("id = ?", label.ID).First(&label).Error
 	if err != nil {
 		return nil, err
 	}
