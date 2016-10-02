@@ -310,27 +310,18 @@ func (orm gormDB) SaveLabel(label *kolide.Label) error {
 	return orm.DB.Save(label).Error
 }
 
-func (orm gormDB) DeleteLabel(label *kolide.Label) error {
-	if label == nil {
-		return errors.New(
-			"error deleting label",
-			"nil pointer passed to DeleteLabel",
-		)
+func (orm gormDB) DeleteLabel(lid uint) error {
+	err := orm.DB.Where("id = ?", lid).Delete(&kolide.Label{}).Error
+	if err != nil {
+		return err
 	}
 
-	if label.ID == 0 {
-		return errors.New(
-			"error deleting label",
-			"0 ID was passed to DeleteLabel. Would have deleted entire table!",
-		)
-	}
-
-	return orm.DB.Delete(label).Error
+	return orm.DB.Where("target_id = ? and type = ?", lid, kolide.TargetLabel).Delete(&kolide.PackTarget{}).Error
 }
 
-func (orm gormDB) Label(id uint) (*kolide.Label, error) {
+func (orm gormDB) Label(lid uint) (*kolide.Label, error) {
 	label := &kolide.Label{
-		ID: id,
+		ID: lid,
 	}
 	err := orm.DB.Where("id = ?", label.ID).First(&label).Error
 	if err != nil {
@@ -477,29 +468,22 @@ func (orm gormDB) SavePack(pack *kolide.Pack) error {
 	return orm.DB.Save(pack).Error
 }
 
-func (orm gormDB) DeletePack(pack *kolide.Pack) error {
-	if pack == nil {
-		return errors.New(
-			"error deleting pack",
-			"nil pointer passed to DeletePack",
-		)
-	}
-	err := orm.DB.Delete(pack).Error
+func (orm gormDB) DeletePack(pid uint) error {
+	err := orm.DB.Where("id = ?", pid).Delete(&kolide.Pack{}).Error
 	if err != nil {
 		return err
 	}
 
-	err = orm.DB.Where("pack_id = ?", pack.ID).Delete(&kolide.PackQuery{}).Error
+	err = orm.DB.Where("pack_id = ?", pid).Delete(&kolide.PackQuery{}).Error
 	if err != nil {
 		return err
 	}
-
-	return nil
+	return orm.DB.Where("pack_id = ?", pid).Delete(&kolide.PackTarget{}).Error
 }
 
-func (orm gormDB) Pack(id uint) (*kolide.Pack, error) {
+func (orm gormDB) Pack(pid uint) (*kolide.Pack, error) {
 	pack := &kolide.Pack{
-		ID: id,
+		ID: pid,
 	}
 	err := orm.DB.Where(pack).First(pack).Error
 	if err != nil {
@@ -514,16 +498,10 @@ func (orm gormDB) Packs() ([]*kolide.Pack, error) {
 	return packs, err
 }
 
-func (orm gormDB) AddQueryToPack(query *kolide.Query, pack *kolide.Pack) error {
-	if query == nil || pack == nil {
-		return errors.New(
-			"error adding query from pack",
-			"nil pointer passed to AddQueryToPack",
-		)
-	}
+func (orm gormDB) AddQueryToPack(qid uint, pid uint) error {
 	pq := &kolide.PackQuery{
-		QueryID: query.ID,
-		PackID:  pack.ID,
+		QueryID: qid,
+		PackID:  pid,
 	}
 	return orm.DB.Create(pq).Error
 }
@@ -600,18 +578,11 @@ func (orm gormDB) RemoveQueryFromPack(query *kolide.Query, pack *kolide.Pack) er
 	return orm.DB.Where(pq).Delete(pq).Error
 }
 
-func (orm gormDB) AddLabelToPack(label *kolide.Label, pack *kolide.Pack) error {
-	if label == nil || pack == nil {
-		return errors.New(
-			"error adding label to pack",
-			"nil pointer passed to AddLabelToPack",
-		)
-	}
-
+func (orm gormDB) AddLabelToPack(lid uint, pid uint) error {
 	pt := &kolide.PackTarget{
 		Type:     kolide.TargetLabel,
-		PackID:   pack.ID,
-		TargetID: label.ID,
+		PackID:   pid,
+		TargetID: lid,
 	}
 
 	return orm.DB.Create(pt).Error

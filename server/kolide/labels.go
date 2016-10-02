@@ -10,8 +10,8 @@ type LabelStore interface {
 	// Label methods
 	NewLabel(Label *Label) (*Label, error)
 	SaveLabel(Label *Label) error
-	DeleteLabel(Label *Label) error
-	Label(id uint) (*Label, error)
+	DeleteLabel(lid uint) error
+	Label(lid uint) (*Label, error)
 	Labels() ([]*Label, error)
 
 	// LabelQueriesForHost returns the label queries that should be executed

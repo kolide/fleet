@@ -529,7 +529,7 @@ func testDeletePack(t *testing.T, ds kolide.Datastore) {
 	pack, err = ds.Pack(pack.ID)
 	assert.Nil(t, err)
 
-	err = ds.DeletePack(pack)
+	err = ds.DeletePack(pack.ID)
 	assert.Nil(t, err)
 
 	assert.NotEqual(t, pack.ID, 0)
@@ -550,7 +550,7 @@ func testAddAndRemoveQueryFromPack(t *testing.T, ds kolide.Datastore) {
 	}
 	_, err = ds.NewQuery(q1)
 	assert.Nil(t, err)
-	err = ds.AddQueryToPack(q1, pack)
+	err = ds.AddQueryToPack(q1.ID, pack.ID)
 	assert.Nil(t, err)
 
 	q2 := &kolide.Query{
@@ -559,7 +559,7 @@ func testAddAndRemoveQueryFromPack(t *testing.T, ds kolide.Datastore) {
 	}
 	_, err = ds.NewQuery(q2)
 	assert.Nil(t, err)
-	err = ds.AddQueryToPack(q2, pack)
+	err = ds.AddQueryToPack(q2.ID, pack.ID)
 	assert.Nil(t, err)
 
 	queries, err := ds.GetQueriesInPack(pack)
@@ -602,7 +602,7 @@ func testManagingLabelsOnPacks(t *testing.T, ds kolide.Datastore) {
 	mysqlLabel, err = ds.NewLabel(mysqlLabel)
 	assert.Nil(t, err)
 
-	err = ds.AddLabelToPack(mysqlLabel, monitoringPack)
+	err = ds.AddLabelToPack(mysqlLabel.ID, monitoringPack.ID)
 	assert.Nil(t, err)
 
 	labels, err := ds.GetLabelsForPack(monitoringPack)
@@ -617,7 +617,7 @@ func testManagingLabelsOnPacks(t *testing.T, ds kolide.Datastore) {
 	osqueryLabel, err = ds.NewLabel(osqueryLabel)
 	assert.Nil(t, err)
 
-	err = ds.AddLabelToPack(osqueryLabel, monitoringPack)
+	err = ds.AddLabelToPack(osqueryLabel.ID, monitoringPack.ID)
 	assert.Nil(t, err)
 
 	labels, err = ds.GetLabelsForPack(monitoringPack)

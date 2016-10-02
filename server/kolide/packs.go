@@ -10,17 +10,17 @@ type PackStore interface {
 	// Pack methods
 	NewPack(pack *Pack) error
 	SavePack(pack *Pack) error
-	DeletePack(pack *Pack) error
-	Pack(id uint) (*Pack, error)
+	DeletePack(pid uint) error
+	Pack(pid uint) (*Pack, error)
 	Packs() ([]*Pack, error)
 
 	// Modifying the queries in packs
-	AddQueryToPack(query *Query, pack *Pack) error
+	AddQueryToPack(qid uint, pid uint) error
 	GetQueriesInPack(pack *Pack) ([]*Query, error)
 	RemoveQueryFromPack(query *Query, pack *Pack) error
 
 	// Modifying the labels for packs
-	AddLabelToPack(label *Label, pack *Pack) error
+	AddLabelToPack(lid uint, pid uint) error
 	GetLabelsForPack(pack *Pack) ([]*Label, error)
 	RemoveLabelFromPack(label *Label, pack *Pack) error
 }

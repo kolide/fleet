@@ -55,15 +55,5 @@ func (svc service) ModifyLabel(ctx context.Context, id uint, p kolide.LabelPaylo
 }
 
 func (svc service) DeleteLabel(ctx context.Context, id uint) error {
-	label, err := svc.ds.Label(id)
-	if err != nil {
-		return err
-	}
-
-	err = svc.ds.DeleteLabel(label)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return svc.ds.DeleteLabel(id)
 }

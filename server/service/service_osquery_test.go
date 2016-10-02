@@ -438,7 +438,7 @@ func TestGetClientConfig(t *testing.T) {
 	err = ds.NewPack(monitoringPack)
 	assert.Nil(t, err)
 
-	err = ds.AddQueryToPack(infoQuery, monitoringPack)
+	err = ds.AddQueryToPack(infoQuery.ID, monitoringPack.ID)
 	assert.Nil(t, err)
 
 	mysqlLabel := &kolide.Label{
@@ -448,7 +448,7 @@ func TestGetClientConfig(t *testing.T) {
 	mysqlLabel, err = ds.NewLabel(mysqlLabel)
 	assert.Nil(t, err)
 
-	err = ds.AddLabelToPack(mysqlLabel, monitoringPack)
+	err = ds.AddLabelToPack(mysqlLabel.ID, monitoringPack.ID)
 	assert.Nil(t, err)
 
 	err = ds.RecordLabelQueryExecutions(host, map[string]bool{fmt.Sprintf("%d", mysqlQuery.ID): true}, mockClock.Now())
