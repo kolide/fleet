@@ -31,6 +31,7 @@ func TestGetAllLabels(t *testing.T) {
 	labels, err = svc.GetAllLabels(ctx)
 	assert.Nil(t, err)
 	assert.Len(t, labels, 1)
+	assert.Equal(t, "foo", labels[0].Name)
 }
 
 func TestGetLabel(t *testing.T) {
@@ -52,7 +53,6 @@ func TestGetLabel(t *testing.T) {
 
 	labelVerify, err := svc.GetLabel(ctx, label.ID)
 	assert.Nil(t, err)
-
 	assert.Equal(t, label.ID, labelVerify.ID)
 }
 
@@ -78,6 +78,7 @@ func TestNewLabel(t *testing.T) {
 	labels, err := ds.Labels()
 	assert.Nil(t, err)
 	assert.Len(t, labels, 1)
+	assert.Equal(t, "foo", labels[0].Name)
 }
 
 func TestModifyLabel(t *testing.T) {
@@ -102,7 +103,6 @@ func TestModifyLabel(t *testing.T) {
 		Name: &newName,
 	})
 	assert.Nil(t, err)
-
 	assert.Equal(t, label.ID, labelVerify.ID)
 	assert.Equal(t, "bar", labelVerify.Name)
 }
@@ -130,5 +130,4 @@ func TestDeleteLabel(t *testing.T) {
 	labels, err := ds.Labels()
 	assert.Nil(t, err)
 	assert.Len(t, labels, 0)
-
 }
