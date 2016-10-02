@@ -68,7 +68,7 @@ func (svc service) GetClientConfig(ctx context.Context) (*kolide.OsqueryConfig, 
 	}
 
 	// we will need to give some subset of packs to this host based on the
-	// labels which this host is known to belond to
+	// labels which this host is known to belong to
 	packs, err := svc.ds.Packs()
 	if err != nil {
 		return nil, osqueryError{message: "database error: " + err.Error()}
