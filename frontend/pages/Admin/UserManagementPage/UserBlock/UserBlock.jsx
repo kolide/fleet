@@ -1,7 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import radium from 'radium';
 import Avatar from '../../../../components/Avatar';
-import Button from '../../../../components/buttons/Button';
 import componentStyles from './styles';
 import Dropdown from '../../../../components/forms/fields/Dropdown';
 import EditUserForm from '../../../../components/forms/Admin/EditUserForm';
@@ -49,9 +48,18 @@ class UserBlock extends Component {
     return false;
   }
 
-  onEditUserFormSubmit = (formData) => {
-    console.log('EditUserForm submitted', formData);
-    return false;
+  onEditUserFormSubmit = (updatedUser) => {
+    const { user, onSelect } = this.props;
+    const formData = {
+      user_actions: 'edit_user',
+      updated_user: updatedUser,
+    };
+
+    this.setState({
+      isEdit: false,
+    });
+
+    return onSelect(user, formData);
   }
 
   onUserActionSelect = (formData) => {
@@ -98,8 +106,8 @@ class UserBlock extends Component {
     const { onEditUserFormSubmit, onToggleEditing } = this;
 
     if (isEdit) {
-      return <EditUserForm onCancel={onToggleEditing} onSubmit={onEditUserFormSubmit} user={user} />
-    };
+      return <EditUserForm onCancel={onToggleEditing} onSubmit={onEditUserFormSubmit} user={user} />;
+    }
 
     return (
       <div style={userWrapperStyles}>

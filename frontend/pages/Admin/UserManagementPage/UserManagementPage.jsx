@@ -63,6 +63,11 @@ class UserManagementPage extends Component {
             .then(() => {
               return dispatch(renderFlash('success', 'User forced to reset password', update(user, { force_password_reset: false })));
             });
+        case 'edit_user':
+          return dispatch(update(user, formData.updated_user))
+            .then(() => {
+              return dispatch(renderFlash('success', 'User updated', update(user, user)));
+            });
         default:
           return false;
       }

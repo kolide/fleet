@@ -3,10 +3,11 @@ import radium from 'radium';
 import Avatar from '../../../Avatar';
 import Button from '../../../buttons/Button';
 import componentStyles from '../../../../pages/Admin/UserManagementPage/UserBlock/styles';
-import InputFieldWithIcon from '../../fields/InputFieldWithIcon';
+import InputFieldWithLabel from '../../fields/InputFieldWithLabel';
 
 class EditUserForm extends Component {
   static propTypes = {
+    onCancel: PropTypes.func,
     onSubmit: PropTypes.func,
     user: PropTypes.object,
   };
@@ -14,15 +15,24 @@ class EditUserForm extends Component {
   constructor (props) {
     super(props);
 
+    const { user } = props;
+
     this.state = {
-      formData: {},
+      formData: {
+        ...user,
+      },
     };
   }
 
   onInputChange = (fieldName) => {
     return (evt) => {
+      const { formData } = this.state;
+
       this.setState({
-        [fieldName]: evt.target.value,
+        formData: {
+          ...formData,
+          [fieldName]: evt.target.value,
+        },
       });
 
       return false;
@@ -41,22 +51,11 @@ class EditUserForm extends Component {
     const {
       avatarStyles,
       formButtonStyles,
-      nameStyles,
-      userDetailsStyles,
-      userEmailStyles,
-      userHeaderStyles,
-      userLabelStyles,
-      usernameStyles,
-      userPositionStyles,
-      userStatusStyles,
-      userStatusWrapperStyles,
       userWrapperStyles,
     } = componentStyles;
     const { user } = this.props;
     const {
-      admin,
       email,
-      enabled,
       name,
       position,
       username,
@@ -64,27 +63,48 @@ class EditUserForm extends Component {
     const { onFormSubmit, onInputChange } = this;
 
     return (
-      <form style={userWrapperStyles} onSubmit={onFormSubmit}>
-        <InputFieldWithIcon
+      <form style={[userWrapperStyles, { boxSizing: 'border-box', padding: '10px' }]} onSubmit={onFormSubmit}>
+        <InputFieldWithLabel
           defaultValue={name}
+          label="name"
           name="name"
           onChange={onInputChange('name')}
-          style={{ marginTop: 0 }}
+          style={{ container: { marginTop: 0 } }}
         />
-        <div style={userDetailsStyles}>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Button
-              onClick={this.props.onCancel}
-              style={formButtonStyles}
-              text="Cancel"
-              variant="inverse"
-            />
-            <Button
-              style={formButtonStyles}
-              text="Submit"
-              type="submit"
-            />
-          </div>
+        <Avatar user={user} style={avatarStyles} />
+        <InputFieldWithLabel
+          defaultValue={username}
+          label="username"
+          name="username"
+          onChange={onInputChange('username')}
+          style={{ container: { marginTop: 0 }, input: { color: '#AE6DDF' } }}
+        />
+        <InputFieldWithLabel
+          defaultValue={position}
+          label="position"
+          name="position"
+          onChange={onInputChange('position')}
+          style={{ container: { marginTop: 0 } }}
+        />
+        <InputFieldWithLabel
+          defaultValue={email}
+          label="email"
+          name="email"
+          onChange={onInputChange('email')}
+          style={{ container: { marginTop: 0 }, input: { color: '#4A90E2' } }}
+        />
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
+          <Button
+            onClick={this.props.onCancel}
+            style={formButtonStyles}
+            text="Cancel"
+            variant="inverse"
+          />
+          <Button
+            style={formButtonStyles}
+            text="Submit"
+            type="submit"
+          />
         </div>
       </form>
     );
