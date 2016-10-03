@@ -190,6 +190,8 @@ func (man Manager) LoadConfig() KolideConfig {
 	}
 }
 
+// IsSet determines whether a given config key has been explicitly set by any
+// of the configuration sources. If false, the default value is being used.
 func (man Manager) IsSet(key string) bool {
 	return man.viper.IsSet(key)
 }
