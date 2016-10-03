@@ -13,8 +13,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const bcryptCost = 6
-
 func TestPasswordResetRequests(t *testing.T) {
 	db := setup(t)
 	defer teardown(t, db)
@@ -483,6 +481,12 @@ func randomString(strlen int) string {
 	return string(result)
 }
 
+func TestSaveQuery(t *testing.T) {
+	ds := setup(t)
+	defer teardown(t, ds)
+	testSaveQuery(t, ds)
+}
+
 func testSaveQuery(t *testing.T, ds kolide.Datastore) {
 	query := &kolide.Query{
 		Name:  "foo",
@@ -494,11 +498,18 @@ func testSaveQuery(t *testing.T, ds kolide.Datastore) {
 
 	query.Query = "baz"
 	err = ds.SaveQuery(query)
+
 	assert.Nil(t, err)
 
 	queryVerify, err := ds.Query(query.ID)
 	assert.Nil(t, err)
 	assert.Equal(t, "baz", queryVerify.Query)
+}
+
+func TestDeleteQuery(t *testing.T) {
+	ds := setup(t)
+	defer teardown(t, ds)
+	testDeleteQuery(t, ds)
 }
 
 func testDeleteQuery(t *testing.T, ds kolide.Datastore) {
@@ -518,6 +529,12 @@ func testDeleteQuery(t *testing.T, ds kolide.Datastore) {
 	assert.NotNil(t, err)
 }
 
+func TestDeletePack(t *testing.T) {
+	ds := setup(t)
+	defer teardown(t, ds)
+	testDeletePack(t, ds)
+}
+
 func testDeletePack(t *testing.T, ds kolide.Datastore) {
 	pack := &kolide.Pack{
 		Name: "foo",
@@ -535,6 +552,12 @@ func testDeletePack(t *testing.T, ds kolide.Datastore) {
 	assert.NotEqual(t, pack.ID, 0)
 	pack, err = ds.Pack(pack.ID)
 	assert.NotNil(t, err)
+}
+
+func TestAddAndRemoveQueryFromPack(t *testing.T) {
+	ds := setup(t)
+	defer teardown(t, ds)
+	testAddAndRemoveQueryFromPack(t, ds)
 }
 
 func testAddAndRemoveQueryFromPack(t *testing.T, ds kolide.Datastore) {
@@ -572,6 +595,12 @@ func testAddAndRemoveQueryFromPack(t *testing.T, ds kolide.Datastore) {
 	queries, err = ds.GetQueriesInPack(pack)
 	assert.Nil(t, err)
 	assert.Len(t, queries, 1)
+}
+
+func TestManagingLabelsOnPacks(t *testing.T) {
+	ds := setup(t)
+	defer teardown(t, ds)
+	testManagingLabelsOnPacks(t, ds)
 }
 
 func testManagingLabelsOnPacks(t *testing.T, ds kolide.Datastore) {
@@ -623,4 +652,56 @@ func testManagingLabelsOnPacks(t *testing.T, ds kolide.Datastore) {
 	labels, err = ds.GetLabelsForPack(monitoringPack)
 	assert.Nil(t, err)
 	assert.Len(t, labels, 2)
+}
+
+func TestOrgInfo(t *testing.T) {
+	db := setup(t)
+	defer teardown(t, db)
+	testOrgInfo(t, db)
+}
+
+func testOrgInfo(t *testing.T, db kolide.Datastore) {
+	info := &kolide.OrgInfo{
+		OrgName:    "Kolide",
+		OrgLogoURL: "localhost:8080/logo.png",
+	}
+
+	info, err := db.NewOrgInfo(info)
+	assert.Nil(t, err)
+	assert.Equal(t, info.ID, uint(1))
+
+	info2, err := db.OrgInfo()
+	assert.Nil(t, err)
+	assert.Equal(t, info2.ID, uint(1))
+	assert.Equal(t, info2.OrgName, info.OrgName)
+
+	info2.OrgName = "koolide"
+	err = db.SaveOrgInfo(info2)
+	assert.Nil(t, err)
+
+	info3, err := db.OrgInfo()
+	assert.Nil(t, err)
+	assert.Equal(t, info3.OrgName, info2.OrgName)
+
+	info4, err := db.NewOrgInfo(info3)
+	assert.Nil(t, err)
+	assert.Equal(t, info4.ID, uint(1))
+}
+
+func TestCreateInvite(t *testing.T) {
+	db := setup(t)
+	defer teardown(t, db)
+	testCreateInvite(t, db)
+}
+
+func testCreateInvite(t *testing.T, ds kolide.Datastore) {
+	invite := &kolide.Invite{}
+
+	invite, err := ds.NewInvite(invite)
+	assert.Nil(t, err)
+
+	verify, err := ds.InviteByEmail(invite.Email)
+	assert.Nil(t, err)
+	assert.Equal(t, invite.ID, verify.ID)
+	assert.Equal(t, invite.Email, verify.Email)
 }
