@@ -156,10 +156,11 @@ the way that the kolide server works.
 
 			errs := make(chan error, 2)
 			go func() {
-				logger.Log("transport", "http", "address", *httpAddr, "msg", "listening")
-				if config.Server.DisableTLS {
+				if !config.Server.TLS || (devMode && !configManager.IsSet("server.tls")) {
+					logger.Log("transport", "http", "address", *httpAddr, "msg", "listening")
 					errs <- http.ListenAndServe(*httpAddr, nil)
 				} else {
+					logger.Log("transport", "https", "address", *httpAddr, "msg", "listening")
 					errs <- http.ListenAndServeTLS(
 						*httpAddr,
 						config.Server.Cert,
