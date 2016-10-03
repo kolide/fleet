@@ -24,9 +24,10 @@ type MysqlConfig struct {
 
 // ServerConfig defines configs related to the Kolide server
 type ServerConfig struct {
-	Address string
-	Cert    string
-	Key     string
+	Address    string
+	Cert       string
+	Key        string
+	DisableTLS bool
 }
 
 // AuthConfig defines configs related to user authorization
@@ -101,6 +102,7 @@ func (man Manager) addConfigs() {
 	man.addConfigString("server.address", "0.0.0.0:8080")
 	man.addConfigString("server.cert", "./tools/osquery/kolide.crt")
 	man.addConfigString("server.key", "./tools/osquery/kolide.key")
+	man.addConfigBool("server.disable_tls", false)
 
 	// Auth
 	man.addConfigString("auth.jwt_key", "CHANGEME")
@@ -148,9 +150,10 @@ func (man Manager) LoadConfig() KolideConfig {
 			Database: man.getConfigString("mysql.database"),
 		},
 		Server: ServerConfig{
-			Address: man.getConfigString("server.address"),
-			Cert:    man.getConfigString("server.cert"),
-			Key:     man.getConfigString("server.key"),
+			Address:    man.getConfigString("server.address"),
+			Cert:       man.getConfigString("server.cert"),
+			Key:        man.getConfigString("server.key"),
+			DisableTLS: man.getConfigBool("server.disable_tls"),
 		},
 		Auth: AuthConfig{
 			JwtKey:      man.getConfigString("auth.jwt_key"),
