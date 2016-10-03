@@ -16,16 +16,6 @@ class InputFieldWithIcon extends InputField {
     type: PropTypes.string,
   };
 
-  constructor(props) {
-    super(props);
-
-    const { defaultValue } = this.props;
-
-    this.state = {
-      value: defaultValue,
-    };
-  }
-
   renderHeading = () => {
     const { error, placeholder } = this.props;
     const { value } = this.state;
