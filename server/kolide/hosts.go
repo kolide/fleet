@@ -37,8 +37,8 @@ type Host struct {
 	ID               uint `gorm:"primary_key"`
 	CreatedAt        time.Time
 	UpdatedAt        time.Time
-	DetailUpdateTime time.Time
-	NodeKey          string `gorm:"unique_index:idx_host_unique_nodekey"`
+	DetailUpdateTime time.Time // Time that the host details were last updated
+	NodeKey          string    `gorm:"unique_index:idx_host_unique_nodekey"`
 	HostName         string
 	UUID             string `gorm:"unique_index:idx_host_unique_uuid"`
 	IPAddress        string
