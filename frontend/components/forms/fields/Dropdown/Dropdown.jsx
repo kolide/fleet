@@ -46,11 +46,13 @@ class Dropdown extends Component {
     const { selectWrapperStyles } = componentStyles;
 
     return (
-      <select style={[selectWrapperStyles, containerStyles]} onChange={onOptionClick}>
-        {options.map(option => {
-          return renderOption(option);
-        })}
-      </select>
+      <div className="kolide-dropdown-wrapper">
+        <select className="kolide-dropdown" style={[selectWrapperStyles, containerStyles]} onChange={onOptionClick}>
+          {options.map(option => {
+            return renderOption(option);
+          })}
+        </select>
+      </div>
     );
   }
 }
