@@ -170,7 +170,7 @@ var detailQueries = map[string]struct {
 		IngestFunc: func(host *kolide.Host, rows []map[string]string) error {
 			if len(rows) != 1 {
 				return osqueryError{
-					message: fmt.Sprintf("expected 1 row but got %n", len(rows)),
+					message: fmt.Sprintf("expected 1 row but got %d", len(rows)),
 				}
 			}
 
@@ -185,7 +185,7 @@ var detailQueries = map[string]struct {
 		IngestFunc: func(host *kolide.Host, rows []map[string]string) error {
 			if len(rows) != 1 {
 				return osqueryError{
-					message: fmt.Sprintf("expected 1 row but got %n", len(rows)),
+					message: fmt.Sprintf("expected 1 row but got %d", len(rows)),
 				}
 			}
 
@@ -205,7 +205,7 @@ var detailQueries = map[string]struct {
 		IngestFunc: func(host *kolide.Host, rows []map[string]string) error {
 			if len(rows) != 1 {
 				return osqueryError{
-					message: fmt.Sprintf("expected 1 row but got %n", len(rows)),
+					message: fmt.Sprintf("expected 1 row but got %d", len(rows)),
 				}
 			}
 
@@ -225,7 +225,7 @@ var detailQueries = map[string]struct {
 		IngestFunc: func(host *kolide.Host, rows []map[string]string) error {
 			if len(rows) != 1 {
 				return osqueryError{
-					message: fmt.Sprintf("expected 1 row but got %n", len(rows)),
+					message: fmt.Sprintf("expected 1 row but got %d", len(rows)),
 				}
 			}
 
@@ -245,7 +245,7 @@ var detailQueries = map[string]struct {
 		IngestFunc: func(host *kolide.Host, rows []map[string]string) error {
 			if len(rows) != 1 {
 				return osqueryError{
-					message: fmt.Sprintf("expected 1 row but got %n", len(rows)),
+					message: fmt.Sprintf("expected 1 row but got %d", len(rows)),
 				}
 			}
 

@@ -227,7 +227,10 @@ func TestHostDetailQueries(t *testing.T) {
 	queries = svc.hostDetailQueries(host)
 	assert.Len(t, queries, len(detailQueries))
 	for name, _ := range queries {
-		assert.True(t, strings.HasPrefix(hostDetailQueryPrefix, name))
+		assert.True(t,
+			strings.HasPrefix(name, hostDetailQueryPrefix),
+			fmt.Sprintf("%s not prefixed with %s", name, hostDetailQueryPrefix),
+		)
 	}
 }
 
