@@ -4,18 +4,17 @@ import { push } from 'react-router-redux';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import { clearAuthErrors, loginUser } from '../../redux/nodes/auth/actions';
 import debounce from '../../utilities/debounce';
-import local from '../../utilities/local';
 import LoginForm from '../../components/forms/LoginForm';
 import LoginSuccessfulPage from '../LoginSuccessfulPage';
 import paths from '../../router/paths';
 import './styles.scss';
 
 export class LoginPage extends Component {
-
   static propTypes = {
     dispatch: PropTypes.func,
     error: PropTypes.string,
     loading: PropTypes.bool,
+    pathname: PropTypes.string,
     user: PropTypes.object,
   };
 
@@ -27,11 +26,10 @@ export class LoginPage extends Component {
   }
 
   componentWillMount () {
-    const { dispatch } = this.props;
+    const { dispatch, pathname, user } = this.props;
+    const { HOME, LOGIN } = paths;
 
-    if (local.getItem('auth_token')) {
-      return dispatch(push('/'));
-    }
+    if (user && pathname === LOGIN) return dispatch(push(HOME));
 
     return false;
   }

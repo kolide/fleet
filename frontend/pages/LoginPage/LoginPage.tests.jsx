@@ -24,6 +24,7 @@ describe('LoginPage - component', () => {
 
     it('redirects to the home page', () => {
       const mockStore = reduxMockStore({ auth: { user } });
+      const props = { pathname: '/login' };
       const redirectAction = {
         type: '@@router/CALL_HISTORY_METHOD',
         payload: {
@@ -32,7 +33,7 @@ describe('LoginPage - component', () => {
         },
       };
 
-      mount(connectedComponent(LoginPage, { mockStore }));
+      mount(connectedComponent(LoginPage, { props, mockStore }));
       expect(mockStore.getActions()).toInclude(redirectAction);
     });
   });
