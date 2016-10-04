@@ -205,28 +205,30 @@ func TestSubmitResultLogs(t *testing.T) {
 }
 
 func TestHostDetailQueries(t *testing.T) {
+	mockClock := clock.NewMockClock()
 	host := kolide.Host{
-		ID:        1,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-		NodeKey:   "test_key",
-		HostName:  "test_hostname",
-		UUID:      "test_uuid",
+		ID:               1,
+		CreatedAt:        mockClock.Now(),
+		UpdatedAt:        mockClock.Now(),
+		DetailUpdateTime: mockClock.Now(),
+		NodeKey:          "test_key",
+		HostName:         "test_hostname",
+		UUID:             "test_uuid",
 	}
 
-	queries := hostDetailQueries(host)
-	assert.Len(t, queries, 1)
-	if assert.Contains(t, queries, "kolide_detail_query_platform") {
-		assert.Equal(t,
-			"select build_platform from osquery_info;",
-			queries["kolide_detail_query_platform"],
-		)
+	svc := service{clock: mockClock}
+
+	queries := svc.hostDetailQueries(host)
+	assert.Empty(t, queries)
+
+	// Advance the time
+	mockClock.AddTime(1*time.Hour + 1*time.Minute)
+
+	queries = svc.hostDetailQueries(host)
+	assert.Len(t, queries, len(detailQueries))
+	for name, _ := range queries {
+		assert.True(t, strings.HasPrefix(hostDetailQueryPrefix, name))
 	}
-
-	host.Platform = "test_platform"
-
-	queries = hostDetailQueries(host)
-	assert.Len(t, queries, 0)
 }
 
 func TestGetDistributedQueries(t *testing.T) {
@@ -250,29 +252,22 @@ func TestGetDistributedQueries(t *testing.T) {
 
 	ctx = hostctx.NewContext(ctx, *host)
 
-	// With no platform set, we should get the details query
+	// With a new host, we should get the detail queries
 	queries, err := svc.GetDistributedQueries(ctx)
 	assert.Nil(t, err)
-	assert.Len(t, queries, 1)
-	if assert.Contains(t, queries, "kolide_detail_query_platform") {
-		assert.Equal(t,
-			"select build_platform from osquery_info;",
-			queries["kolide_detail_query_platform"],
-		)
-	}
+	assert.Len(t, queries, len(detailQueries))
 
+	// Simulate the detail queries being added
+	host.DetailUpdateTime = mockClock.Now().Add(-1 * time.Minute)
 	host.Platform = "darwin"
 	ds.SaveHost(host)
 	ctx = hostctx.NewContext(ctx, *host)
 
-	// With the platform set, we should get the label queries (but none
-	// exist yet)
 	queries, err = svc.GetDistributedQueries(ctx)
 	assert.Nil(t, err)
 	assert.Len(t, queries, 0)
 
 	// Add some queries and labels to ensure they are returned
-
 	labelQueries := []*kolide.Query{
 		&kolide.Query{
 			ID:       1,
@@ -352,6 +347,11 @@ func TestGetDistributedQueries(t *testing.T) {
 
 	// Advance the time
 	mockClock.AddTime(1*time.Hour + 1*time.Minute)
+
+	// Keep the host details fresh
+	host.DetailUpdateTime = mockClock.Now().Add(-1 * time.Minute)
+	ds.SaveHost(host)
+	ctx = hostctx.NewContext(ctx, *host)
 
 	// Now we should get all the label queries again
 	queries, err = svc.GetDistributedQueries(ctx)
@@ -460,4 +460,40 @@ func TestGetClientConfig(t *testing.T) {
 	require.Nil(t, err)
 	assert.Len(t, config.Packs, 1)
 	assert.Len(t, config.Packs["monitoring"].Queries, 1)
+}
+
+func TestDetailQueries(t *testing.T) {
+	ds, err := datastore.New("gorm-sqlite3", ":memory:")
+	assert.Nil(t, err)
+
+	mockClock := clock.NewMockClock()
+
+	svc, err := newTestServiceWithClock(ds, mockClock)
+	assert.Nil(t, err)
+
+	// Hack to get at the service internals and modify the writer
+	serv := ((svc.(validationMiddleware)).Service).(service)
+
+	ctx := context.Background()
+
+	nodeKey, err := serv.EnrollAgent(ctx, "", "host123")
+	assert.Nil(t, err)
+
+	host, err := ds.AuthenticateHost(nodeKey)
+	require.Nil(t, err)
+
+	ctx = hostctx.NewContext(ctx, *host)
+
+	err = serv.ingestDetailQuery(
+		host,
+		"kolide_detail_query_platform",
+		[]map[string]string{{"platform": "darwin"}},
+	)
+	assert.Nil(t, err)
+	assert.Equal(t, "darwin", host.Platform)
+
+	// Make sure the result saved to the datastore
+	host, err = ds.AuthenticateHost(nodeKey)
+	require.Nil(t, err)
+	assert.Equal(t, "darwin", host.Platform)
 }
