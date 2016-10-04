@@ -7,12 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestDeleteQuery(t *testing.T) {
-	ds := setup(t)
-	defer teardown(t, ds)
-	testDeleteQuery(t, ds)
-}
-
 func testDeleteQuery(t *testing.T, ds kolide.Datastore) {
 	query := &kolide.Query{
 		Name:  "foo",
@@ -28,12 +22,6 @@ func testDeleteQuery(t *testing.T, ds kolide.Datastore) {
 	assert.NotEqual(t, query.ID, 0)
 	_, err = ds.Query(query.ID)
 	assert.NotNil(t, err)
-}
-
-func TestSaveQuery(t *testing.T) {
-	ds := setup(t)
-	defer teardown(t, ds)
-	testSaveQuery(t, ds)
 }
 
 func testSaveQuery(t *testing.T, ds kolide.Datastore) {

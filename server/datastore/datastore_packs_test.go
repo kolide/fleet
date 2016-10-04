@@ -5,13 +5,8 @@ import (
 
 	"github.com/kolide/kolide-ose/server/kolide"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
-
-func TestDeletePack(t *testing.T) {
-	ds := setup(t)
-	defer teardown(t, ds)
-	testDeletePack(t, ds)
-}
 
 func testDeletePack(t *testing.T, ds kolide.Datastore) {
 	pack := &kolide.Pack{
@@ -22,7 +17,7 @@ func testDeletePack(t *testing.T, ds kolide.Datastore) {
 	assert.NotEqual(t, pack.ID, 0)
 
 	pack, err = ds.Pack(pack.ID)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	err = ds.DeletePack(pack.ID)
 	assert.Nil(t, err)
@@ -30,12 +25,6 @@ func testDeletePack(t *testing.T, ds kolide.Datastore) {
 	assert.NotEqual(t, pack.ID, 0)
 	pack, err = ds.Pack(pack.ID)
 	assert.NotNil(t, err)
-}
-
-func TestAddAndRemoveQueryFromPack(t *testing.T) {
-	ds := setup(t)
-	defer teardown(t, ds)
-	testAddAndRemoveQueryFromPack(t, ds)
 }
 
 func testAddAndRemoveQueryFromPack(t *testing.T, ds kolide.Datastore) {

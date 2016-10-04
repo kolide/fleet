@@ -9,13 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestLabelQueries(t *testing.T) {
-	db := setup(t)
-	defer teardown(t, db)
-
-	testLabels(t, db)
-}
-
 func testLabels(t *testing.T, db kolide.Datastore) {
 	hosts := []kolide.Host{}
 	var host *kolide.Host
@@ -174,12 +167,6 @@ func testLabels(t *testing.T, db kolide.Datastore) {
 	labels, err = db.LabelsForHost(hosts[0].ID)
 	assert.Nil(t, err)
 	assert.Empty(t, labels)
-}
-
-func TestManagingLabelsOnPacks(t *testing.T) {
-	ds := setup(t)
-	defer teardown(t, ds)
-	testManagingLabelsOnPacks(t, ds)
 }
 
 func testManagingLabelsOnPacks(t *testing.T, ds kolide.Datastore) {

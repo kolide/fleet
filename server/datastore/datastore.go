@@ -74,12 +74,14 @@ func New(driver, conn string, opts ...DBOption) (kolide.Datastore, error) {
 		return ds, nil
 	case "inmem":
 		ds := &inmem{
-			Driver:         "inmem",
-			users:          make(map[uint]*kolide.User),
-			sessions:       make(map[uint]*kolide.Session),
-			passwordResets: make(map[uint]*kolide.PasswordResetRequest),
-			invites:        make(map[uint]*kolide.Invite),
+			Driver: "inmem",
 		}
+
+		err := ds.Migrate()
+		if err != nil {
+			return nil, err
+		}
+
 		return ds, nil
 	default:
 		return nil, fmt.Errorf("unsupported datastore driver %s", driver)

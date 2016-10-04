@@ -8,23 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// TestUser tests the UserStore interface
-// this test uses the default testing backend
-func TestCreateUser(t *testing.T) {
-	db := setup(t)
-	defer teardown(t, db)
-
-	testCreateUser(t, db)
-}
-
-func TestSaveUser(t *testing.T) {
-	db := setup(t)
-	defer teardown(t, db)
-
-	testSaveUser(t, db)
-}
-
-func testCreateUser(t *testing.T, db kolide.UserStore) {
+func testCreateUser(t *testing.T, ds kolide.Datastore) {
 	var createTests = []struct {
 		username, password, email string
 		isAdmin, passwordReset    bool
@@ -41,10 +25,10 @@ func testCreateUser(t *testing.T, db kolide.UserStore) {
 			AdminForcedPasswordReset: tt.passwordReset,
 			Email: tt.email,
 		}
-		user, err := db.NewUser(u)
+		user, err := ds.NewUser(u)
 		assert.Nil(t, err)
 
-		verify, err := db.User(tt.username)
+		verify, err := ds.User(tt.username)
 		assert.Nil(t, err)
 
 		assert.Equal(t, user.ID, verify.ID)
@@ -54,27 +38,20 @@ func testCreateUser(t *testing.T, db kolide.UserStore) {
 	}
 }
 
-func TestUserByID(t *testing.T) {
-	db := setup(t)
-	defer teardown(t, db)
-
-	testUserByID(t, db)
-}
-
-func testUserByID(t *testing.T, db kolide.UserStore) {
-	users := createTestUsers(t, db)
+func testUserByID(t *testing.T, ds kolide.Datastore) {
+	users := createTestUsers(t, ds)
 	for _, tt := range users {
-		returned, err := db.UserByID(tt.ID)
+		returned, err := ds.UserByID(tt.ID)
 		assert.Nil(t, err)
 		assert.Equal(t, tt.ID, returned.ID)
 	}
 
 	// test missing user
-	_, err := db.UserByID(10000000000)
+	_, err := ds.UserByID(10000000000)
 	assert.NotNil(t, err)
 }
 
-func createTestUsers(t *testing.T, db kolide.UserStore) []*kolide.User {
+func createTestUsers(t *testing.T, ds kolide.Datastore) []*kolide.User {
 	var createTests = []struct {
 		username, password, email string
 		isAdmin, passwordReset    bool
@@ -93,7 +70,7 @@ func createTestUsers(t *testing.T, db kolide.UserStore) []*kolide.User {
 			Email: tt.email,
 		}
 
-		user, err := db.NewUser(u)
+		user, err := ds.NewUser(u)
 		assert.Nil(t, err)
 
 		users = append(users, user)
@@ -102,46 +79,46 @@ func createTestUsers(t *testing.T, db kolide.UserStore) []*kolide.User {
 	return users
 }
 
-func testSaveUser(t *testing.T, db kolide.UserStore) {
-	users := createTestUsers(t, db)
-	testAdminAttribute(t, db, users)
-	testEmailAttribute(t, db, users)
-	testPasswordAttribute(t, db, users)
+func testSaveUser(t *testing.T, ds kolide.Datastore) {
+	users := createTestUsers(t, ds)
+	testAdminAttribute(t, ds, users)
+	testEmailAttribute(t, ds, users)
+	testPasswordAttribute(t, ds, users)
 }
 
-func testPasswordAttribute(t *testing.T, db kolide.UserStore, users []*kolide.User) {
+func testPasswordAttribute(t *testing.T, ds kolide.Datastore, users []*kolide.User) {
 	for _, user := range users {
 		randomText, err := generateRandomText(8)
 		assert.Nil(t, err)
 		user.Password = []byte(randomText)
-		err = db.SaveUser(user)
+		err = ds.SaveUser(user)
 		assert.Nil(t, err)
 
-		verify, err := db.User(user.Username)
+		verify, err := ds.User(user.Username)
 		assert.Nil(t, err)
 		assert.Equal(t, user.Password, verify.Password)
 	}
 }
 
-func testEmailAttribute(t *testing.T, db kolide.UserStore, users []*kolide.User) {
+func testEmailAttribute(t *testing.T, ds kolide.Datastore, users []*kolide.User) {
 	for _, user := range users {
 		user.Email = fmt.Sprintf("test.%s", user.Email)
-		err := db.SaveUser(user)
+		err := ds.SaveUser(user)
 		assert.Nil(t, err)
 
-		verify, err := db.User(user.Username)
+		verify, err := ds.User(user.Username)
 		assert.Nil(t, err)
 		assert.Equal(t, user.Email, verify.Email)
 	}
 }
 
-func testAdminAttribute(t *testing.T, db kolide.UserStore, users []*kolide.User) {
+func testAdminAttribute(t *testing.T, ds kolide.Datastore, users []*kolide.User) {
 	for _, user := range users {
 		user.Admin = false
-		err := db.SaveUser(user)
+		err := ds.SaveUser(user)
 		assert.Nil(t, err)
 
-		verify, err := db.User(user.Username)
+		verify, err := ds.User(user.Username)
 		assert.Nil(t, err)
 		assert.Equal(t, user.Admin, verify.Admin)
 	}

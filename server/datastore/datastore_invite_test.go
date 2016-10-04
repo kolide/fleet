@@ -7,12 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCreateInvite(t *testing.T) {
-	db := setup(t)
-	defer teardown(t, db)
-	testCreateInvite(t, db)
-}
-
 func testCreateInvite(t *testing.T, ds kolide.Datastore) {
 	invite := &kolide.Invite{}
 

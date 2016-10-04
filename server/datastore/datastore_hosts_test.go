@@ -8,22 +8,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestEnrollHost(t *testing.T) {
-	db := setup(t)
-	defer teardown(t, db)
-
-	testEnrollHost(t, db)
-
-}
-
-func TestAuthenticateHost(t *testing.T) {
-	db := setup(t)
-	defer teardown(t, db)
-
-	testAuthenticateHost(t, db)
-
-}
-
 var enrollTests = []struct {
 	uuid, hostname, ip, platform string
 	nodeKeySize                  int
@@ -54,7 +38,7 @@ var enrollTests = []struct {
 	},
 }
 
-func testEnrollHost(t *testing.T, db kolide.HostStore) {
+func testEnrollHost(t *testing.T, db kolide.Datastore) {
 	var hosts []*kolide.Host
 	for _, tt := range enrollTests {
 		h, err := db.EnrollHost(tt.uuid, tt.hostname, tt.ip, tt.platform, tt.nodeKeySize)
@@ -81,7 +65,7 @@ func testEnrollHost(t *testing.T, db kolide.HostStore) {
 
 }
 
-func testAuthenticateHost(t *testing.T, db kolide.HostStore) {
+func testAuthenticateHost(t *testing.T, db kolide.Datastore) {
 	for _, tt := range enrollTests {
 		h, err := db.EnrollHost(tt.uuid, tt.hostname, tt.ip, tt.platform, tt.nodeKeySize)
 		assert.Nil(t, err)

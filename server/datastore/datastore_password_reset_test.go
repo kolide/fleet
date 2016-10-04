@@ -8,13 +8,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestPasswordResetRequests(t *testing.T) {
-	db := setup(t)
-	defer teardown(t, db)
-
-	testPasswordResetRequests(t, db)
-}
-
 func testPasswordResetRequests(t *testing.T, db kolide.Datastore) {
 	createTestUsers(t, db)
 	now := time.Now()

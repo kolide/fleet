@@ -7,12 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestOrgInfo(t *testing.T) {
-	db := setup(t)
-	defer teardown(t, db)
-	testOrgInfo(t, db)
-}
-
 func testOrgInfo(t *testing.T, db kolide.Datastore) {
 	info := &kolide.OrgInfo{
 		OrgName:    "Kolide",
