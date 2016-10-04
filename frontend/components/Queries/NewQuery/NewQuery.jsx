@@ -13,6 +13,7 @@ import ThemeDropdown from './ThemeDropdown';
 
 class NewQuery extends Component {
   static propTypes = {
+    onNewQueryFormSubmit: PropTypes.func,
     onOsqueryTableSelect: PropTypes.func,
     onTextEditorInputChange: PropTypes.func,
     textEditorText: PropTypes.string,
@@ -41,7 +42,7 @@ class NewQuery extends Component {
           label: 'All Macs',
           name: 'macs',
           type: 'label',
-        }
+        },
       ],
       selectedTargets: [],
       theme: 'kolide',
@@ -66,7 +67,13 @@ class NewQuery extends Component {
   }
 
   onSaveQueryFormSubmit = (formData) => {
-    console.log('SaveQueryForm submitted', formData);
+    const { onNewQueryFormSubmit } = this.props;
+    const { selectedTargets } = this.state;
+
+    onNewQueryFormSubmit({
+      ...formData,
+      selectedTargets,
+    });
 
     return false;
   }
