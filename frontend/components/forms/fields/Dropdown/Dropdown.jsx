@@ -6,7 +6,6 @@ import componentStyles from './styles';
 class Dropdown extends Component {
   static propTypes = {
     containerStyles: PropTypes.object,
-    fieldName: PropTypes.string,
     options: PropTypes.arrayOf(PropTypes.shape({
       text: PropTypes.string,
       value: PropTypes.string,
@@ -19,12 +18,11 @@ class Dropdown extends Component {
   };
 
   onOptionClick = (evt) => {
-    const { target: { value } } = evt;
-    const { fieldName, onSelect } = this.props;
+    evt.preventDefault();
 
-    onSelect({
-      [fieldName]: value,
-    });
+    const { onSelect } = this.props;
+
+    onSelect(evt);
 
     return false;
   }
