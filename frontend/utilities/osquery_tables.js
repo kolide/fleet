@@ -1,4 +1,4 @@
-import { flatten, map } from 'lodash';
+import { flatten, map, flatMap } from 'lodash';
 import osqueryTablesJSON from '../osquery_tables';
 
 const appendPlatformKeyToTables = (parsedTables) => {
@@ -18,4 +18,7 @@ export const normalizeTables = (tablesJSON) => {
   return flatten(tablesWithPlatformKey);
 };
 
-export default normalizeTables(osqueryTablesJSON);
+export const osqueryTables = normalizeTables(osqueryTablesJSON);
+export const osqueryTableNames = flatMap(osqueryTables, (table) => {
+  return table.name;
+});

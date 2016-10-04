@@ -4,7 +4,7 @@ import { find } from 'lodash';
 import NewQuery from '../../../components/Queries/NewQuery';
 import QuerySidePanel from '../../../components/Queries/QuerySidePanel';
 import { showRightSidePanel, removeRightSidePanel } from '../../../redux/nodes/app/actions';
-import osqueryTables from '../../../utilities/osquery_tables';
+import { osqueryTables } from '../../../utilities/osquery_tables';
 
 class NewQueryPage extends Component {
   static propTypes = {

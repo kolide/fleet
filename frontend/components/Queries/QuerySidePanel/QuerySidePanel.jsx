@@ -8,7 +8,7 @@ import {
   shouldShowAllColumns,
 } from './helpers';
 import componentStyles from './styles';
-import osqueryTables from '../../../utilities/osquery_tables';
+import { osqueryTables } from '../../../utilities/osquery_tables';
 
 
 class QuerySidePanel extends Component {
