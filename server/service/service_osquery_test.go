@@ -231,7 +231,7 @@ func TestHostDetailQueries(t *testing.T) {
 	}
 }
 
-func TestGetDistributedQueries(t *testing.T) {
+func TestLabelQueries(t *testing.T) {
 	ds, err := datastore.New("gorm-sqlite3", ":memory:")
 	assert.Nil(t, err)
 
@@ -471,12 +471,9 @@ func TestDetailQueries(t *testing.T) {
 	svc, err := newTestServiceWithClock(ds, mockClock)
 	assert.Nil(t, err)
 
-	// Hack to get at the service internals and modify the writer
-	serv := ((svc.(validationMiddleware)).Service).(service)
-
 	ctx := context.Background()
 
-	nodeKey, err := serv.EnrollAgent(ctx, "", "host123")
+	nodeKey, err := svc.EnrollAgent(ctx, "", "host123")
 	assert.Nil(t, err)
 
 	host, err := ds.AuthenticateHost(nodeKey)
@@ -484,16 +481,125 @@ func TestDetailQueries(t *testing.T) {
 
 	ctx = hostctx.NewContext(ctx, *host)
 
-	err = serv.ingestDetailQuery(
-		host,
-		"kolide_detail_query_platform",
-		[]map[string]string{{"platform": "darwin"}},
-	)
+	// With a new host, we should get the detail queries
+	queries, err := svc.GetDistributedQueries(ctx)
 	assert.Nil(t, err)
-	assert.Equal(t, "darwin", host.Platform)
+	assert.Len(t, queries, len(detailQueries))
+
+	resultJSON := `
+{
+"kolide_detail_query_network_interface": [
+    {
+        "address": "192.168.0.1",
+        "broadcast": "192.168.0.255",
+        "ibytes": "1601207629",
+        "ierrors": "0",
+        "interface": "en0",
+        "ipackets": "25698094",
+        "last_change": "1474233476",
+        "mac": "5f:3d:4b:10:25:82",
+        "mask": "255.255.255.0",
+        "metric": "0",
+        "mtu": "1453",
+        "obytes": "2607283152",
+        "oerrors": "0",
+        "opackets": "12264603",
+        "point_to_point": "",
+        "type": "6"
+    }
+],
+"kolide_detail_query_os_version": [
+    {
+        "build": "15G1004",
+        "major": "10",
+        "minor": "10",
+        "name": "Mac OS X",
+        "patch": "6"
+    }
+],
+"kolide_detail_query_osquery_info": [
+    {
+        "build_distro": "10.10",
+        "build_platform": "darwin",
+        "config_hash": "3c6e4537c4d0eb71a7c6dda19d",
+        "config_valid": "1",
+        "extensions": "active",
+        "pid": "38113",
+        "start_time": "1475603155",
+        "version": "1.8.2",
+        "watcher": "38112"
+    }
+],
+"kolide_detail_query_system_info": [
+    {
+        "computer_name": "computer",
+        "cpu_brand": "Intel(R) Core(TM) i7-4770HQ CPU @ 2.20GHz",
+        "cpu_logical_cores": "8",
+        "cpu_physical_cores": "4",
+        "cpu_subtype": "Intel x86-64h Haswell",
+        "cpu_type": "x86_64h",
+        "hardware_model": "MacBookPro11,4",
+        "hardware_serial": "ABCDEFGH",
+        "hardware_vendor": "Apple Inc.",
+        "hardware_version": "1.0",
+        "hostname": "computer.local",
+        "physical_memory": "17179869184",
+        "uuid": "uuid"
+    }
+],
+"kolide_detail_query_uptime": [
+    {
+        "days": "20",
+        "hours": "0",
+        "minutes": "48",
+        "seconds": "13",
+        "total_seconds": "1730893"
+    }
+]
+}
+`
+
+	var results kolide.OsqueryDistributedQueryResults
+	err = json.Unmarshal([]byte(resultJSON), &results)
+	require.Nil(t, err)
+
+	// Verify that results are ingested properly
+	svc.SubmitDistributedQueryResults(ctx, results)
 
 	// Make sure the result saved to the datastore
 	host, err = ds.AuthenticateHost(nodeKey)
 	require.Nil(t, err)
+
+	// osquery_info
 	assert.Equal(t, "darwin", host.Platform)
+	assert.Equal(t, "1.8.2", host.OsqueryVersion)
+
+	// system_info
+	assert.Equal(t, 17179869184, host.PhysicalMemory)
+	assert.Equal(t, "computer.local", host.HostName)
+	assert.Equal(t, "uuid", host.UUID)
+
+	// os_version
+	assert.Equal(t, "Mac OS X 10.10.6", host.OSVersion)
+
+	// uptime
+	assert.Equal(t, 1730893*time.Second, host.Uptime)
+
+	// network_interface
+	assert.Equal(t, "5f:3d:4b:10:25:82", host.PrimaryMAC)
+	assert.Equal(t, "192.168.0.1", host.PrimaryIP)
+
+	ctx = hostctx.NewContext(ctx, *host)
+
+	// Now no detail queries should be required
+	queries, err = svc.GetDistributedQueries(ctx)
+	assert.Nil(t, err)
+	assert.Len(t, queries, 0)
+
+	// Advance clock and queries should exist again
+	mockClock.AddTime(1*time.Hour + 1*time.Minute)
+
+	queries, err = svc.GetDistributedQueries(ctx)
+	assert.Nil(t, err)
+	assert.Len(t, queries, len(detailQueries))
 }
