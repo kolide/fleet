@@ -339,7 +339,6 @@ func (svc service) SubmitDistributedQueryResults(ctx context.Context, results ko
 	}
 
 	labelResults := map[string]bool{}
-
 	for query, rows := range results {
 		switch {
 		case strings.HasPrefix(query, hostDetailQueryPrefix):

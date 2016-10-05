@@ -271,20 +271,20 @@ func TestLabelQueries(t *testing.T) {
 	assert.Len(t, queries, 0)
 
 	// Add some queries and labels to ensure they are returned
-	labelQueries := []*kolide.Query{
-		&kolide.Query{
+	labelQueries := []kolide.Query{
+		kolide.Query{
 			ID:       1,
 			Name:     "query1",
 			Platform: "darwin",
 			Query:    "query1",
 		},
-		&kolide.Query{
+		kolide.Query{
 			ID:       2,
 			Name:     "query2",
 			Platform: "darwin",
 			Query:    "query2",
 		},
-		&kolide.Query{
+		kolide.Query{
 			ID:       3,
 			Name:     "query3",
 			Platform: "darwin",
@@ -295,7 +295,7 @@ func TestLabelQueries(t *testing.T) {
 	expectQueries := make(map[string]string)
 
 	for _, query := range labelQueries {
-		_, err := ds.NewQuery(query)
+		_, err := ds.NewQuery(&query)
 		assert.Nil(t, err)
 		expectQueries[fmt.Sprintf("kolide_label_query_%d", query.ID)] = query.Query
 	}
