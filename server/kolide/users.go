@@ -51,19 +51,19 @@ type UserService interface {
 
 // User is the model struct which represents a kolide user
 type User struct {
-	ID                       uint `gorm:"primary_key"`
-	CreatedAt                time.Time
-	UpdatedAt                time.Time
-	Username                 string `gorm:"not null;unique_index:idx_user_unique_username"`
-	Password                 []byte `gorm:"not null"`
-	Salt                     string `gorm:"not null"`
-	Name                     string
-	Email                    string `gorm:"not null;unique_index:idx_user_unique_email"`
-	Admin                    bool   `gorm:"not null"`
-	Enabled                  bool   `gorm:"not null"`
-	AdminForcedPasswordReset bool
-	GravatarURL              string
-	Position                 string // job role
+	ID                       uint      `gorm:"primary_key" json:"id"`
+	CreatedAt                time.Time `json:"-"`
+	UpdatedAt                time.Time `json:"-"`
+	Username                 string    `gorm:"not null;unique_index:idx_user_unique_username" json:"username"`
+	Password                 []byte    `gorm:"not null" json:"-"`
+	Salt                     string    `gorm:"not null" json:"-"`
+	Name                     string    `json:"name"`
+	Email                    string    `gorm:"not null;unique_index:idx_user_unique_email" json:"email"`
+	Admin                    bool      `gorm:"not null" json:"admin"`
+	Enabled                  bool      `gorm:"not null" json:"enabled"`
+	AdminForcedPasswordReset bool      `json:"force_password_reset"`
+	GravatarURL              string    `json:"gravatar_url"`
+	Position                 string    `json:"position,omitempty"` // job role
 }
 
 // UserPayload is used to modify an existing user
