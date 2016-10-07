@@ -12,6 +12,7 @@ export const initialState = {
   loading: false,
   error: null,
   user: null,
+  token: null,
 };
 
 const reducer = (state = initialState, action) => {
