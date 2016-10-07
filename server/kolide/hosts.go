@@ -23,14 +23,6 @@ type HostService interface {
 	DeleteHost(ctx context.Context, id uint) error
 }
 
-type HostPayload struct {
-	NodeKey   *string
-	HostName  *string
-	UUID      *string
-	IPAddress *string
-	Platform  *string
-}
-
 type Host struct {
 	ID               uint          `json:"id" gorm:"primary_key"`
 	CreatedAt        time.Time     `json:"-"`
