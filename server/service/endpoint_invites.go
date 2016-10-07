@@ -42,7 +42,7 @@ func makeListInvitesEndpoint(svc kolide.Service) endpoint.Endpoint {
 			return listInvitesResponse{Err: err}, nil
 		}
 
-		resp := listInvitesResponse{Invites: []inviteResponse{}}
+		resp := listInvitesResponse{Invites: []kolide.Invite{}}
 		for _, invite := range invites {
 			resp.Invites = append(resp.Invites, *invite)
 		}

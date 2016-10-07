@@ -50,7 +50,7 @@ func makeListQueriesEndpoint(svc kolide.Service) endpoint.Endpoint {
 			return listQueriesResponse{Err: err}, nil
 		}
 
-		resp := listQueriesResponse{Queries: []getQueryResponse{}}
+		resp := listQueriesResponse{Queries: []kolide.Query{}}
 		for _, query := range queries {
 			resp.Queries = append(resp.Queries, *query)
 		}

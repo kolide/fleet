@@ -50,7 +50,7 @@ func makeListLabelsEndpoint(svc kolide.Service) endpoint.Endpoint {
 			return listLabelsResponse{Err: err}, nil
 		}
 
-		resp := listLabelsResponse{Labels: []getLabelResponse{}}
+		resp := listLabelsResponse{Labels: []kolide.Label{}}
 		for _, label := range labels {
 			resp.Labels = append(resp.Labels, *label)
 		}

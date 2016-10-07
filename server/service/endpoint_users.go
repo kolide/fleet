@@ -88,7 +88,7 @@ func makeListUsersEndpoint(svc kolide.Service) endpoint.Endpoint {
 			return listUsersResponse{Err: err}, nil
 		}
 
-		resp := listUsersResponse{Users: []getUserResponse{}}
+		resp := listUsersResponse{Users: []kolide.User{}}
 		for _, user := range users {
 			resp.Users = append(resp.Users, *user)
 		}

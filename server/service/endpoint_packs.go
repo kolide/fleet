@@ -50,7 +50,7 @@ func makeListPacksEndpoint(svc kolide.Service) endpoint.Endpoint {
 			return getPackResponse{Err: err}, nil
 		}
 
-		resp := listPacksResponse{Packs: []getPackResponse{}}
+		resp := listPacksResponse{Packs: []kolide.Pack{}}
 		for _, pack := range packs {
 			resp.Packs = append(resp.Packs, *pack)
 		}
