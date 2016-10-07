@@ -45,6 +45,7 @@ const reducer = (state = initialState, action) => {
         ...state,
         loading: false,
         user: null,
+        token: null,
       };
     case LOGOUT_FAILURE:
       return {
