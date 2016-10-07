@@ -3,6 +3,19 @@ import Styles from '../../../styles';
 const { color, font, padding } = Styles;
 
 export default {
+  clipboardIconStyles: {
+    position: 'absolute',
+    right: '10px',
+    cursor: 'pointer',
+    top: '18px',
+  },
+  clipboardTextStyles: {
+    color: color.brand,
+    fontSize: font.xSmall,
+    position: 'absolute',
+    right: '10px',
+    top: 0,
+  },
   headerStyles: {
     borderBottom: `1px solid ${color.accentLight}`,
     fontSize: font.large,

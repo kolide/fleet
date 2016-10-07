@@ -1,20 +1,75 @@
-import React, { Component } from 'react';
-import { map } from 'lodash';
+import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
+import { map, noop } from 'lodash';
+
 import componentStyles from './styles';
+import { copyText } from './helpers';
+import Icon from '../../../components/icons/Icon';
+import { renderFlash } from '../../../redux/nodes/notifications/actions';
 
 const HOST_TABS = {
   FIRST: 'What Does This Script Do?',
   SECOND: 'Additional Script Options',
 };
 
-class NewHostPage extends Component {
+export class NewHostPage extends Component {
+  static propTypes = {
+    dispatch: PropTypes.func,
+  };
+
+  static defaultProps = {
+    dispatch: noop,
+  };
+
   constructor (props) {
     super(props);
 
     this.state = {
       method1Text: 'curl https://kolide.acme.com/install/osquery.sh | sudo sh',
+      method1TextCopied: false,
       method2Text: 'osqueryd --conﬁg_endpoint="https://kolide.acme.com/api/v1/…',
+      method2TextCopied: false,
       selectedTab: HOST_TABS.FIRST,
+    };
+  }
+
+  onCopyText = (text, elementId) => {
+    return (evt) => {
+      evt.preventDefault();
+
+      const { dispatch } = this.props;
+      const { method1Text, method2Text } = this.state;
+
+      if (copyText(elementId)) {
+        dispatch(renderFlash('success', 'Text copied to clipboard'));
+      } else {
+        dispatch(renderFlash('error', 'Text not copied. Use CMD + C to copy text'));
+      }
+
+      if (text === method1Text) {
+        this.setState({
+          method1TextCopied: true,
+          method2TextCopied: false,
+        });
+      }
+
+      if (text === method2Text) {
+        this.setState({
+          method1TextCopied: false,
+          method2TextCopied: true,
+        });
+      }
+
+      setTimeout(() => {
+        this.setState({
+          method1TextCopied: false,
+          method2TextCopied: false,
+        });
+
+        return false;
+      }, 1500);
+
+      return false;
     };
   }
 
@@ -61,6 +116,8 @@ class NewHostPage extends Component {
 
   render () {
     const {
+      clipboardIconStyles,
+      clipboardTextStyles,
       headerStyles,
       inputStyles,
       textStyles,
@@ -68,14 +125,18 @@ class NewHostPage extends Component {
       selectedTabContentStyles,
       sectionWrapperStyles,
     } = componentStyles;
-    const { method1Text, method2Text } = this.state;
-    const { renderHostTabContent, renderHostTabHeaders } = this;
+    const { method1Text, method1TextCopied, method2Text, method2TextCopied } = this.state;
+    const { onCopyText, renderHostTabContent, renderHostTabHeaders } = this;
 
     return (
       <div>
         <div style={sectionWrapperStyles}>
           <p style={headerStyles}>Method 1 - One Liner</p>
-          <input style={inputStyles} value={method1Text} readOnly />
+          <div style={{ position: 'relative' }}>
+            <input id="method1" style={inputStyles} value={method1Text} readOnly />
+            {method1TextCopied && <span style={clipboardTextStyles}>copied!</span>}
+            <Icon name="clipboard" onClick={onCopyText(method1Text, '#method1')} style={clipboardIconStyles} variant={method1TextCopied ? 'copied' : 'default'} />
+          </div>
           <div style={scriptInfoWrapperStyles}>
             {renderHostTabHeaders()}
             <div style={selectedTabContentStyles}>
@@ -85,7 +146,11 @@ class NewHostPage extends Component {
         </div>
         <div style={sectionWrapperStyles}>
           <p style={[headerStyles, { width: '626px' }]}>Method 2 - Your osqueryd with Kolid config</p>
-          <input style={inputStyles} value={method2Text} readOnly />
+          <div style={{ position: 'relative' }}>
+            <input id="method2" style={inputStyles} value={method2Text} readOnly />
+            {method2TextCopied && <span style={clipboardTextStyles}>copied!</span>}
+            <Icon name="clipboard" onClick={onCopyText(method2Text, '#method2')} style={clipboardIconStyles} variant={method2TextCopied ? 'copied' : 'default'} />
+          </div>
           <p style={textStyles}>This method allows you to configure an existing osqueryd installation to work with Kolide. The <span style={{ color: '#AE6DDf', fontFamily: 'SourceCodePro, Oxygen' }}>--config_endpoints</span> flag allows us to point your osqueryd installation to your Kolide configuration.</p>
         </div>
         <div style={sectionWrapperStyles}>
@@ -97,4 +162,4 @@ class NewHostPage extends Component {
   }
 }
 
-export default NewHostPage;
+export default connect()(NewHostPage);
