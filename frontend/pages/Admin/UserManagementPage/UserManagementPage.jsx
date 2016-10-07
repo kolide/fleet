@@ -114,10 +114,12 @@ class UserManagementPage extends Component {
   }
 
   renderUserBlock = (user) => {
+    const { currentUser } = this.props;
     const { onEditUser, onUserActionSelect } = this;
 
     return (
       <UserBlock
+        currentUser={currentUser}
         key={user.email}
         onEditUser={onEditUser}
         onSelect={onUserActionSelect}
