@@ -10,6 +10,7 @@ class Icon extends Component {
   static propTypes = {
     alt: PropTypes.string,
     name: PropTypes.string.isRequired,
+    onClick: PropTypes.func,
     style: PropTypes.object,
     variant: PropTypes.string,
   };
