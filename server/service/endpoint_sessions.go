@@ -19,7 +19,7 @@ type loginRequest struct {
 
 type loginResponse struct {
 	User  *kolide.User `json:"user,omitempty"`
-	Token string       `json:"token"`
+	Token string       `json:"token,omitempty"`
 	Err   error        `json:"error,omitempty"`
 }
 
@@ -32,7 +32,7 @@ func makeLoginEndpoint(svc kolide.Service) endpoint.Endpoint {
 		if err != nil {
 			return loginResponse{Err: err}, nil
 		}
-		return loginResponse{User: user, Token: token}, nil
+		return loginResponse{user, token, nil}, nil
 	}
 }
 
