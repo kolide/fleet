@@ -93,11 +93,10 @@ class UserBlock extends Component {
       userStatusStyles,
       userStatusWrapperStyles,
       userWrapperStyles,
-    } = componentStyles(invite);
+    } = componentStyles(user, invite);
     const {
       admin,
       email,
-      enabled,
       name,
       position,
       username,
@@ -114,14 +113,14 @@ class UserBlock extends Component {
 
     return (
       <div style={userWrapperStyles}>
-        <div style={userHeaderStyles(admin)}>
+        <div style={userHeaderStyles}>
           <span style={nameStyles}>{name}</span>
         </div>
         <div style={userDetailsStyles}>
           <Avatar user={user} style={avatarStyles} />
           <div style={userStatusWrapperStyles}>
-            <span style={userLabelStyles(admin)}>{userLabel}</span>
-            <span style={userStatusStyles(enabled)}>{statusLabel}</span>
+            <span style={userLabelStyles}>{userLabel}</span>
+            <span style={userStatusStyles}>{statusLabel}</span>
             <div style={{ clear: 'both' }} />
           </div>
           <p style={usernameStyles}>{username}</p>
