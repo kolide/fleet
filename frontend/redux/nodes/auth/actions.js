@@ -38,7 +38,7 @@ export const fetchCurrentUser = () => {
         const emailHash = md5(email.toLowerCase());
 
         user.gravatarURL = `https://www.gravatar.com/avatar/${emailHash}`;
-        return dispatch(loginSuccess(user));
+        return dispatch(loginSuccess({ user }));
       })
       .catch(response => {
         dispatch(loginFailure('Unable to authenticate the current user'));
@@ -59,7 +59,7 @@ export const loginUser = (formData) => {
           const emailHash = md5(email.toLowerCase());
 
           user.gravatarURL = `https://www.gravatar.com/avatar/${emailHash}`;
-          dispatch(loginSuccess(response));
+          dispatch(loginSuccess({ ...response, user }));
           return resolve(user);
         })
         .catch(response => {
