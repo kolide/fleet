@@ -146,7 +146,7 @@ export class NewHostPage extends Component {
           </div>
         </div>
         <div style={sectionWrapperStyles}>
-          <p style={method2HeaderStyles}>Method 2 - Your osqueryd with Kolid config</p>
+          <p style={method2HeaderStyles}>Method 2 - Your osqueryd with Kolide config</p>
           <div style={{ position: 'relative' }}>
             <input id="method2" style={inputStyles} value={method2Text} readOnly />
             {method2TextCopied && <span style={clipboardTextStyles}>copied!</span>}
