@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import radium from 'radium';
 import Button from '../../buttons/Button';
 import {
+  availability,
   columnsToRender,
   displayTypeForDataType,
   numAdditionalColumns,
@@ -143,7 +144,6 @@ class QuerySidePanel extends Component {
       renderSuggestedQueries,
     } = this;
     const { selectedOsqueryTable: { description, platform } } = this.props;
-    const availability = platform === 'utility' ? 'all platforms' : platform;
 
     return (
       <div style={containerStyles}>
@@ -152,7 +152,7 @@ class QuerySidePanel extends Component {
         <p style={tableDescriptionStyles}>{description}</p>
         <div>
           <p style={sectionHeader}>OS Availability</p>
-          <p style={platformsTextStyles}>{availability}</p>
+          <p style={platformsTextStyles}>{availability(platform)}</p>
         </div>
         <div>
           <p style={sectionHeader}>Columns</p>

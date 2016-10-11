@@ -54,7 +54,9 @@ export default {
     color: color.textMedium,
   },
   platformsTextStyles: {
-    textTransform: 'uppercase',
+    color: color.textMedium,
+    fontSize: font.small,
+    textTransform: 'capitalize',
   },
   sectionHeader: {
     fontSize: font.large,
