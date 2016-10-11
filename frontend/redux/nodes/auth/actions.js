@@ -11,11 +11,12 @@ export const LOGOUT_FAILURE = 'LOGOUT_FAILURE';
 
 export const clearAuthErrors = { type: CLEAR_AUTH_ERRORS };
 export const loginRequest = { type: LOGIN_REQUEST };
-export const loginSuccess = (user) => {
+export const loginSuccess = ({ user, token }) => {
   return {
     type: LOGIN_SUCCESS,
     payload: {
-      data: user,
+      user,
+      token,
     },
   };
 };
@@ -74,7 +75,9 @@ export const loginUser = (formData) => {
 export const logoutFailure = (error) => {
   return {
     type: LOGOUT_FAILURE,
-    error,
+    payload: {
+      error,
+    },
   };
 };
 export const logoutRequest = { type: LOGOUT_REQUEST };
