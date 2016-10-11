@@ -27,7 +27,7 @@ export class NewHostPage extends Component {
     this.state = {
       method1Text: 'curl https://kolide.acme.com/install/osquery.sh | sudo sh',
       method1TextCopied: false,
-      method2Text: 'osqueryd --conﬁg_endpoint="https://kolide.acme.com/api/v1/…',
+      method2Text: 'osqueryd --config_endpoint="https://kolide.acme.com/api/v1/osquery/autoconfigure"',
       method2TextCopied: false,
       selectedTab: HOST_TABS.FIRST,
     };
