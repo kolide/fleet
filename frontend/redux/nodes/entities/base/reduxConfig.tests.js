@@ -212,4 +212,106 @@ describe('reduxConfig', () => {
       });
     });
   });
+
+  describe('dispatching the loadAll action', () => {
+    describe('successful load call', () => {
+      const mockStore = reduxMockStore(store);
+      const loadAllFunc = createSpy().andCall(() => {
+        return Promise.resolve([user]);
+      });
+
+      const config = reduxConfig({
+        entityName: 'users',
+        loadAllFunc,
+        schema: schemas.USERS,
+      });
+      const { actions, reducer } = config;
+
+      it('calls the loadAllFunc', () => {
+        mockStore.dispatch(actions.loadAll());
+
+        expect(loadAllFunc).toHaveBeenCalled();
+      });
+
+      it('dispatches the correct actions', () => {
+        mockStore.dispatch(actions.loadAll());
+
+        const dispatchedActions = mockStore.getActions();
+        const dispatchedActionTypes = dispatchedActions.map(action => { return action.type; });
+
+        expect(dispatchedActionTypes).toInclude('users_LOAD_REQUEST');
+        expect(dispatchedActionTypes).toInclude('users_LOAD_SUCCESS');
+        expect(dispatchedActionTypes).toNotInclude('users_LOAD_FAILURE');
+      });
+
+      it('adds the returned user to state', () => {
+        const loadSuccessAction = {
+          type: 'users_LOAD_SUCCESS',
+          payload: {
+            data: {
+              users: {
+                [user.id]: user,
+              },
+            },
+          },
+        };
+        const initialState = {
+          loading: false,
+          entities: {},
+          errors: {},
+        };
+        const newState = reducer(initialState, loadSuccessAction);
+
+        expect(newState.data[user.id]).toEqual(user);
+      });
+    });
+
+    describe('unsuccessful loadAll call', () => {
+      const mockStore = reduxMockStore(store);
+      const errors = { base: 'Unable to load users' };
+      const loadAllFunc = createSpy().andCall(() => {
+        return Promise.reject({ errors });
+      });
+      const config = reduxConfig({
+        entityName: 'users',
+        loadAllFunc,
+        schema: schemas.USERS,
+      });
+      const { actions, reducer } = config;
+
+      it('calls the loadAllFunc', () => {
+        mockStore.dispatch(actions.loadAll());
+
+        expect(loadAllFunc).toHaveBeenCalled();
+      });
+
+      it('dispatches the correct actions', () => {
+        mockStore.dispatch(actions.loadAll());
+
+        const dispatchedActions = mockStore.getActions();
+        const dispatchedActionTypes = dispatchedActions.map(action => { return action.type; });
+
+        expect(dispatchedActionTypes).toInclude('users_LOAD_REQUEST');
+        expect(dispatchedActionTypes).toNotInclude('users_LOAD_SUCCESS');
+        expect(dispatchedActionTypes).toInclude('users_LOAD_FAILURE');
+      });
+
+      it('adds the returned errors to state', () => {
+        const loadAllFailureAction = {
+          type: 'users_LOAD_FAILURE',
+          payload: {
+            errors,
+          },
+        };
+        const initialState = {
+          loading: false,
+          entities: {},
+          errors: {},
+        };
+        const newState = reducer(initialState, loadAllFailureAction);
+
+        expect(newState.errors).toEqual(errors);
+      });
+    });
+  });
 });

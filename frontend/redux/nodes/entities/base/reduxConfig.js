@@ -10,6 +10,7 @@ const initialState = {
 const reduxConfig = ({
   createFunc = noop,
   entityName,
+  loadAllFunc,
   loadFunc,
   parseFunc,
   schema,
@@ -122,6 +123,27 @@ const reduxConfig = ({
     };
   };
 
+  const loadAll = (...args) => {
+    return (dispatch) => {
+      dispatch(loadRequest);
+
+      return loadAllFunc(...args)
+        .then(response => {
+          if (!response) return [];
+
+          const { entities } = normalize(parsedResponse(response), arrayOf(schema));
+
+          return dispatch(loadSuccess(entities));
+        })
+        .catch(response => {
+          const { errors } = response;
+
+          dispatch(loadFailure(errors));
+          throw response;
+        });
+    };
+  };
+
   const update = (...args) => {
     return (dispatch) => {
       dispatch(updateRequest);
@@ -145,6 +167,7 @@ const reduxConfig = ({
   const actions = {
     create,
     load,
+    loadAll,
     update,
   };
 
