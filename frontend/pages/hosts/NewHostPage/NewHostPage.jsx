@@ -127,6 +127,7 @@ export class NewHostPage extends Component {
     } = componentStyles;
     const { method1Text, method1TextCopied, method2Text, method2TextCopied } = this.state;
     const { onCopyText, renderHostTabContent, renderHostTabHeaders } = this;
+    const method2HeaderStyles = { ...headerStyles, width: '626px' };
 
     return (
       <div>
@@ -145,7 +146,7 @@ export class NewHostPage extends Component {
           </div>
         </div>
         <div style={sectionWrapperStyles}>
-          <p style={[headerStyles, { width: '626px' }]}>Method 2 - Your osqueryd with Kolid config</p>
+          <p style={method2HeaderStyles}>Method 2 - Your osqueryd with Kolid config</p>
           <div style={{ position: 'relative' }}>
             <input id="method2" style={inputStyles} value={method2Text} readOnly />
             {method2TextCopied && <span style={clipboardTextStyles}>copied!</span>}
