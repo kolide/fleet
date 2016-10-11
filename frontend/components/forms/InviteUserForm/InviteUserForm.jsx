@@ -21,12 +21,14 @@ class InviteUserForm extends Component {
 
     this.state = {
       errors: {
-        email: null,
         admin: null,
+        email: null,
+        name: null,
       },
       formData: {
-        email: null,
         admin: 'false',
+        email: null,
+        name: null,
       },
     };
   }
@@ -68,13 +70,14 @@ class InviteUserForm extends Component {
     const valid = this.validate();
 
     if (valid) {
-      const { formData: { admin, email } } = this.state;
+      const { formData: { admin, email, name } } = this.state;
       const { invitedBy, onSubmit } = this.props;
 
       return onSubmit({
         admin: admin === 'true',
         email,
         invited_by: invitedBy.id,
+        name,
       });
     }
 
@@ -122,6 +125,12 @@ class InviteUserForm extends Component {
       <form onSubmit={onFormSubmit}>
         <InputFieldWithIcon
           autofocus
+          error={errors.name}
+          name="name"
+          onChange={onInputChange('name')}
+          placeholder="Name"
+        />
+        <InputFieldWithIcon
           error={errors.email}
           name="email"
           onChange={onInputChange('email')}
