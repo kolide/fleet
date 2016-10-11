@@ -22,6 +22,20 @@ export const validGetConfigRequest = (bearerToken) => {
     .reply(200, { config: { name: 'Kolide' } });
 };
 
+export const validGetInvitesRequest = (bearerToken) => {
+  return nock('http://localhost:8080', {
+    reqHeaders: {
+      Authorization: `Bearer ${bearerToken}`,
+    },
+  })
+    .get('/api/v1/kolide/invites')
+    .reply(200, {
+      invites: [
+        { name: 'Joe Schmoe', email: 'joe@schmoe.org', admin: false },
+      ],
+    });
+};
+
 export const validInviteUserRequest = (bearerToken, formData) => {
   return nock('http://localhost:8080', {
     reqHeaders: {
@@ -110,6 +124,7 @@ export default {
   invalidResetPasswordRequest,
   validForgotPasswordRequest,
   validGetConfigRequest,
+  validGetInvitesRequest,
   validGetUsersRequest,
   validInviteUserRequest,
   validLoginRequest,

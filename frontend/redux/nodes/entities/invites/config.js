@@ -7,6 +7,7 @@ const { INVITES: schema } = schemas;
 export default reduxConfig({
   createFunc: Kolide.inviteUser,
   entityName: 'invites',
+  loadAllFunc: Kolide.getInvites,
   schema,
 });
 
