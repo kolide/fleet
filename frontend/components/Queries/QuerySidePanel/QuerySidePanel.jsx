@@ -73,7 +73,7 @@ class QuerySidePanel extends Component {
           <span style={columnNameStyles}>{column.name}</span>
           <div>
             <span>{displayTypeForDataType(column.type)}</span>
-            <i className="kolidecon-help" style={helpStyles} />
+            <i className="kolidecon-help" style={helpStyles} title={column.description} />
           </div>
         </div>
       );
