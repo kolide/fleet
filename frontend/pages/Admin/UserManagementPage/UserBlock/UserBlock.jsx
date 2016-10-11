@@ -1,13 +1,16 @@
 import React, { Component, PropTypes } from 'react';
 import radium from 'radium';
+
 import Avatar from '../../../../components/Avatar';
 import componentStyles from './styles';
 import Dropdown from '../../../../components/forms/fields/Dropdown';
 import EditUserForm from '../../../../components/forms/Admin/EditUserForm';
+import { userStatusLabel } from './helpers';
 
 class UserBlock extends Component {
   static propTypes = {
     currentUser: PropTypes.object,
+    invite: PropTypes.bool,
     onEditUser: PropTypes.func,
     onSelect: PropTypes.func,
     user: PropTypes.object,
@@ -77,6 +80,7 @@ class UserBlock extends Component {
   }
 
   render () {
+    const { currentUser, invite, user } = this.props;
     const {
       avatarStyles,
       nameStyles,
@@ -89,8 +93,7 @@ class UserBlock extends Component {
       userStatusStyles,
       userStatusWrapperStyles,
       userWrapperStyles,
-    } = componentStyles;
-    const { currentUser, user } = this.props;
+    } = componentStyles(invite);
     const {
       admin,
       email,
@@ -99,8 +102,8 @@ class UserBlock extends Component {
       position,
       username,
     } = user;
+    const statusLabel = userStatusLabel(user, invite);
     const userLabel = admin ? 'Admin' : 'User';
-    const activeLabel = enabled ? 'Active' : 'Disabled';
     const userActionOptions = UserBlock.userActionOptions(currentUser, user);
     const { isEdit } = this.state;
     const { onEditUserFormSubmit, onToggleEditing } = this;
@@ -111,24 +114,24 @@ class UserBlock extends Component {
 
     return (
       <div style={userWrapperStyles}>
-        <div style={userHeaderStyles}>
+        <div style={userHeaderStyles(admin)}>
           <span style={nameStyles}>{name}</span>
         </div>
         <div style={userDetailsStyles}>
           <Avatar user={user} style={avatarStyles} />
           <div style={userStatusWrapperStyles}>
-            <span style={userLabelStyles}>{userLabel}</span>
-            <span style={userStatusStyles(enabled)}>{activeLabel}</span>
+            <span style={userLabelStyles(admin)}>{userLabel}</span>
+            <span style={userStatusStyles(enabled)}>{statusLabel}</span>
             <div style={{ clear: 'both' }} />
           </div>
           <p style={usernameStyles}>{username}</p>
           <p style={userPositionStyles}>{position}</p>
           <p style={userEmailStyles}>{email}</p>
-          <Dropdown
+          {!invite && <Dropdown
             options={userActionOptions}
             initialOption={{ text: 'Actions...' }}
             onSelect={this.onUserActionSelect}
-          />
+          />}
         </div>
       </div>
     );
