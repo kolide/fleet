@@ -220,7 +220,7 @@ func makeKolideKitHandlers(ctx context.Context, e KolideEndpoints, opts []kithtt
 		DeleteLabelFromPack:           newServer(e.DeleteLabelFromPack, decodeDeleteLabelFromPackRequest),
 		GetHost:                       newServer(e.GetHost, decodeGetHostRequest),
 		DeleteHost:                    newServer(e.DeleteHost, decodeDeleteHostRequest),
-		ListHosts:                     newServer(e.ListHosts, decodeNoParamsRequest),
+		ListHosts:                     newServer(e.ListHosts, decodeListHostsRequest),
 	}
 }
 

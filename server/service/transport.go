@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/kolide/kolide-ose/server/kolide"
 	"golang.org/x/net/context"
 )
 
@@ -50,6 +51,43 @@ func idFromRequest(r *http.Request, name string) (uint, error) {
 		return 0, err
 	}
 	return uint(uid), nil
+}
+
+// default number of items to include per page
+const defaultPerPage = 20
+
+// listOptionsFromRequest parses the list options from the request parameters
+func listOptionsFromRequest(r *http.Request) (opt kolide.ListOptions, err error) {
+	pageString := r.URL.Query().Get("page")
+	var page int = 0
+	if pageString != "" {
+		page, err = strconv.Atoi(pageString)
+		if err != nil {
+			return opt, errors.New("non-int page value")
+		}
+		if page < 0 {
+			return opt, errors.New("negative page value")
+		}
+	}
+
+	perPageString := r.URL.Query().Get("per_page")
+	// We default to 0 for per_page so that not specifying any paging
+	// information gets all results
+	var perPage int = 0
+	if perPageString != "" {
+		perPage, err = strconv.Atoi(perPageString)
+		if err != nil {
+			return opt, errors.New("non-int per_page value")
+		}
+		if perPage <= 0 {
+			return opt, errors.New("invalid per_page value")
+		}
+	} else if pageString != "" {
+		// We explicitly set a non-zero default if a page is specified
+		perPage = defaultPerPage
+	}
+
+	return kolide.ListOptions{Page: uint(page), PerPage: uint(perPage)}, nil
 }
 
 func decodeNoParamsRequest(ctx context.Context, r *http.Request) (interface{}, error) {

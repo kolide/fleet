@@ -45,7 +45,7 @@ func (r listQueriesResponse) error() error { return r.Err }
 
 func makeListQueriesEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		queries, err := svc.ListQueries(ctx)
+		queries, err := svc.ListQueries(ctx, kolide.ListOptions{})
 		if err != nil {
 			return listQueriesResponse{Err: err}, nil
 		}

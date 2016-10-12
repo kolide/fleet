@@ -45,7 +45,7 @@ func (r listPacksResponse) error() error { return r.Err }
 
 func makeListPacksEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		packs, err := svc.ListPacks(ctx)
+		packs, err := svc.ListPacks(ctx, kolide.ListOptions{})
 		if err != nil {
 			return getPackResponse{Err: err}, nil
 		}

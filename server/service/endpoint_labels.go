@@ -45,7 +45,7 @@ func (r listLabelsResponse) error() error { return r.Err }
 
 func makeListLabelsEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		labels, err := svc.ListLabels(ctx)
+		labels, err := svc.ListLabels(ctx, kolide.ListOptions{})
 		if err != nil {
 			return listLabelsResponse{Err: err}, nil
 		}
