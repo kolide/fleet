@@ -15,6 +15,8 @@ export default {
       boxSizing: 'border-box',
       display: 'inline-block',
       height: '286px',
+      marginLeft: padding.base,
+      marginTop: padding.base,
       paddingBottom: padding.half,
       paddingLeft: padding.half,
       paddingRight: padding.half,
