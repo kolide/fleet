@@ -55,10 +55,6 @@ export default (user, invite) => {
       marginRight: 'auto',
       transition,
     },
-    formButtonStyles: {
-      paddingLeft: padding.medium,
-      paddingRight: padding.medium,
-    },
     nameStyles: {
       lineHeight: '51px',
       margin: 0,

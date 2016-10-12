@@ -108,7 +108,11 @@ class UserBlock extends Component {
     const { onEditUserFormSubmit, onToggleEditing } = this;
 
     if (isEdit) {
-      return <EditUserForm onCancel={onToggleEditing} onSubmit={onEditUserFormSubmit} user={user} />;
+      return (
+        <div style={userWrapperStyles}>
+          <EditUserForm onCancel={onToggleEditing} onSubmit={onEditUserFormSubmit} user={user} />
+        </div>
+      );
     }
 
     return (
