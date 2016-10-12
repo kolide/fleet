@@ -109,15 +109,15 @@ class EditUserForm extends Component {
         />
         <div style={buttonWrapperStyles}>
           <Button
+            style={formButtonStyles}
+            text="Submit"
+            type="submit"
+          />
+          <Button
             onClick={this.props.onCancel}
             style={formButtonStyles}
             text="Cancel"
             variant="inverse"
-          />
-          <Button
-            style={formButtonStyles}
-            text="Submit"
-            type="submit"
           />
         </div>
       </form>
