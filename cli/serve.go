@@ -51,7 +51,7 @@ the way that the kolide server works.
 
 			var mailService kolide.MailService
 			if devMode {
-				mailService = devMailService{}
+				mailService = createDevMailService(config)
 			} else {
 				mailService = mail.NewService(config.SMTP)
 			}
@@ -157,7 +157,19 @@ func (devMailService) SendEmail(e kolide.Email) error {
 	fmt.Printf("From: %q To: %q \n", e.From, e.To)
 	_, err = os.Stdout.Write(msg)
 	return err
+}
 
+// Creates the mail service to be used with the --dev flag.
+// If the user provides SMTP settings, then an actual MailService will be returned,
+// otherwise return the mock devMailService which prints the contents of an email to stdout.
+func createDevMailService(config config.KolideConfig) kolide.MailService {
+	smtp := config.SMTP
+	if smtp.Server != "" &&
+		smtp.Username != "" &&
+		smtp.Password != "" {
+		return mail.NewService(config.SMTP)
+	}
+	return devMailService{}
 }
 
 // Bootstrap a few users when using the in-memory database.
