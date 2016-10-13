@@ -17,8 +17,7 @@ func (orm *inmem) NewInvite(invite *kolide.Invite) (*kolide.Invite, error) {
 		}
 	}
 
-	orm.nextInviteID++
-	invite.ID = orm.nextInviteID
+	invite.ID = orm.nextID(invite)
 	orm.invites[invite.ID] = invite
 	return invite, nil
 }

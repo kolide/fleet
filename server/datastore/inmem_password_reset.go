@@ -6,8 +6,7 @@ func (orm *inmem) NewPasswordResetRequest(req *kolide.PasswordResetRequest) (*ko
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
-	orm.nextPasswordResetID++
-	req.ID = orm.nextPasswordResetID
+	req.ID = orm.nextID(req)
 	orm.passwordResets[req.ID] = req
 	return req, nil
 }
