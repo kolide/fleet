@@ -1,5 +1,6 @@
+/* eslint-disable react/no-find-dom-node */
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom'
+import ReactDOM from 'react-dom';
 import { noop } from 'lodash';
 import radium from 'radium';
 
@@ -29,7 +30,7 @@ export default (WrappedComponent, { onOutsideClick = noop }) => {
 
     render () {
       const { setInstance } = this;
-      return <WrappedComponent {...this.props } ref={setInstance}/>
+      return <WrappedComponent {...this.props} ref={setInstance} />;
     }
   }
 

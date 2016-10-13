@@ -2,7 +2,7 @@ import React from 'react';
 import expect from 'expect';
 import { mount } from 'enzyme';
 
-import ElipsisMenu from './ElipsisMenu';
+import { ElipsisMenu } from './ElipsisMenu';
 
 describe('ElipsisMenu - component', () => {
   it('Displays children on click', () => {
@@ -17,7 +17,6 @@ describe('ElipsisMenu - component', () => {
 
     component.simulate('click');
 
-    console.log(component.state());
     expect(component.state().showChildren).toEqual(true);
     expect(component.text()).toContain('ElipsisMenu Children');
   });

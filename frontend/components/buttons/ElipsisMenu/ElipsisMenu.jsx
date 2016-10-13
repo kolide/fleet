@@ -2,9 +2,10 @@ import React, { Component, PropTypes } from 'react';
 import radium from 'radium';
 
 import { calculateTooltipDirection } from './helpers';
+import ClickOutside from '../../ClickOutside';
 import componentStyles from './styles';
 
-class ElipsisMenu extends Component {
+export class ElipsisMenu extends Component {
   static propTypes = {
     children: PropTypes.node,
     positionStyles: PropTypes.object,
@@ -92,4 +93,14 @@ class ElipsisMenu extends Component {
   }
 }
 
-export default radium(ElipsisMenu);
+const StyledComponent = radium(ElipsisMenu);
+export default ClickOutside(StyledComponent, {
+  onOutsideClick: (component) => {
+    return (evt) => {
+      evt.preventDefault();
+      component.setState({ showChildren: false });
+
+      return false;
+    };
+  },
+});
