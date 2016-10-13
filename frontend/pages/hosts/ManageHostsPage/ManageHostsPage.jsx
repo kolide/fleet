@@ -20,11 +20,30 @@ class ManageHostsPage extends Component {
     return false;
   }
 
+  onHostDetailActionClick = (type) => {
+    return (host) => {
+      return (evt) => {
+        evt.preventDefault();
+
+        console.log(type, host);
+        return false;
+      };
+    };
+  }
+
   renderHosts = () => {
     const { hosts } = this.props;
+    const { onHostDetailActionClick } = this;
 
     return hosts.map(host => {
-      return <HostDetails host={host} key={host.hostname} />;
+      return (
+        <HostDetails
+          host={host}
+          key={host.hostname}
+          onDisableClick={onHostDetailActionClick('disable')}
+          onQueryClick={onHostDetailActionClick('query')}
+        />
+      );
     });
   }
 

@@ -21,17 +21,15 @@ export default {
       paddingLeft: padding.half,
       paddingRight: padding.half,
       paddingTop: padding.half,
+      position: 'relative',
       textAlign: 'center',
       width: '240px',
     };
     const statusStyles = {
-      ONLINE: {
+      online: {
         borderTop: `6px solid ${color.success}`,
       },
-      OFFLINE: {
-        borderTop: `6px solid ${color.alert}`,
-      },
-      NEEDS_UPGRADE: {
+      offline: {
         borderTop: `6px solid ${color.alert}`,
       },
     };
@@ -44,6 +42,26 @@ export default {
   contentSeparatorStyles: {
     borderTop: `1px solid ${color.accentLight}`,
     marginTop: padding.half,
+  },
+  disableIconStyles: {
+    fontSize: font.larger,
+  },
+  elipsisChidrenWrapperStyles: {
+    alignItems: 'center',
+    backgroundColor: color.white,
+    border: `1px solid ${color.textMedium}`,
+    borderRadius: '3px',
+    boxShadow: '0 2px 8px 0 rgba(0, 0, 0, 0.05)',
+    boxSizing: 'border-box',
+    color: color.textMedium,
+    display: 'flex',
+    height: '100px',
+    justifyContent: 'space-around',
+    width: '200px',
+  },
+  elipsisPositionStyles: {
+    top: '-3px',
+    right: '10px',
   },
   hostContentItemStyles: {
     color: color.textUltradark,
@@ -58,20 +76,22 @@ export default {
     marginTop: 0,
     marginBottom: 0,
   },
+  queryIconStyles: {
+    color: color.brand,
+    fontSize: font.larger,
+  },
   statusStyles: (status) => {
     const baseStyles = {
       fontSize: font.medium,
       textAlign: 'left',
+      textTransform: 'uppercase',
     };
     const statusStyles = {
-      ONLINE: {
+      online: {
         color: color.success,
       },
-      OFFLINE: {
+      offline: {
         color: color.alert,
-      },
-      NEEDS_UPGRADE: {
-        color: color.warning,
       },
     };
 
@@ -79,5 +99,10 @@ export default {
       ...baseStyles,
       ...statusStyles[status],
     };
+  },
+  verticleRuleStyles: {
+    borderRight: `1px dashed ${color.textLight}`,
+    height: '62%',
+    width: '1px',
   },
 };
