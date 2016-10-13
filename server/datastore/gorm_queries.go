@@ -52,6 +52,6 @@ func (orm gormDB) Query(id uint) (*kolide.Query, error) {
 
 func (orm gormDB) Queries(opt kolide.ListOptions) ([]*kolide.Query, error) {
 	var queries []*kolide.Query
-	err := orm.applyLimitOffset(opt).Find(&queries).Error
+	err := orm.applyListOptions(opt).Find(&queries).Error
 	return queries, err
 }

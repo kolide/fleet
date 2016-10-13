@@ -25,7 +25,7 @@ func (orm gormDB) User(username string) (*kolide.User, error) {
 
 func (orm gormDB) Users(opt kolide.ListOptions) ([]*kolide.User, error) {
 	var users []*kolide.User
-	err := orm.applyLimitOffset(opt).Find(&users).Error
+	err := orm.applyListOptions(opt).Find(&users).Error
 	if err != nil {
 		return nil, err
 	}

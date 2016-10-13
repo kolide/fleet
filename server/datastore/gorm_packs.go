@@ -52,7 +52,7 @@ func (orm gormDB) Pack(pid uint) (*kolide.Pack, error) {
 
 func (orm gormDB) Packs(opt kolide.ListOptions) ([]*kolide.Pack, error) {
 	var packs []*kolide.Pack
-	err := orm.applyLimitOffset(opt).Find(&packs).Error
+	err := orm.applyListOptions(opt).Find(&packs).Error
 	return packs, err
 }
 

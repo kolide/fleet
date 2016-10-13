@@ -23,7 +23,7 @@ func (orm gormDB) InviteByEmail(email string) (*kolide.Invite, error) {
 
 func (orm gormDB) Invites(opt kolide.ListOptions) ([]*kolide.Invite, error) {
 	var invites []*kolide.Invite
-	err := orm.applyLimitOffset(opt).Find(&invites).Error
+	err := orm.applyListOptions(opt).Find(&invites).Error
 	if err != nil {
 		return nil, err
 	}

@@ -57,33 +57,40 @@ func idFromRequest(r *http.Request, name string) (uint, error) {
 const defaultPerPage = 20
 
 // listOptionsFromRequest parses the list options from the request parameters
-func listOptionsFromRequest(r *http.Request) (opt kolide.ListOptions, err error) {
+func listOptionsFromRequest(r *http.Request) (kolide.ListOptions, error) {
+	var err error
+
 	pageString := r.URL.Query().Get("page")
+	perPageString := r.URL.Query().Get("per_page")
+
 	var page int = 0
 	if pageString != "" {
 		page, err = strconv.Atoi(pageString)
 		if err != nil {
-			return opt, errors.New("non-int page value")
+			return kolide.ListOptions{}, errors.New("non-int page value")
 		}
 		if page < 0 {
-			return opt, errors.New("negative page value")
+			return kolide.ListOptions{}, errors.New("negative page value")
 		}
 	}
 
-	perPageString := r.URL.Query().Get("per_page")
 	// We default to 0 for per_page so that not specifying any paging
 	// information gets all results
 	var perPage int = 0
 	if perPageString != "" {
 		perPage, err = strconv.Atoi(perPageString)
 		if err != nil {
-			return opt, errors.New("non-int per_page value")
+			return kolide.ListOptions{}, errors.New("non-int per_page value")
 		}
 		if perPage <= 0 {
-			return opt, errors.New("invalid per_page value")
+			return kolide.ListOptions{}, errors.New("invalid per_page value")
 		}
-	} else if pageString != "" {
+	}
+
+	if perPage == 0 && pageString != "" {
 		// We explicitly set a non-zero default if a page is specified
+		// (because the client probably intended for paging, and
+		// leaving the 0 would turn that off)
 		perPage = defaultPerPage
 	}
 
