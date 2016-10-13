@@ -48,7 +48,8 @@ func (orm *inmem) NewSession(session *kolide.Session) (*kolide.Session, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
-	session.ID = uint(len(orm.sessions))
+	orm.nextSessionID++
+	session.ID = orm.nextSessionID
 	orm.sessions[session.ID] = session
 	if err := orm.MarkSessionAccessed(session); err != nil {
 		return nil, err
