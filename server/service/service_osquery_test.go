@@ -348,7 +348,7 @@ func TestLabelQueries(t *testing.T) {
 	assert.Nil(t, err)
 
 	// Verify that labels are set appropriately
-	hostLabels, err := ds.LabelsForHost(host.ID)
+	hostLabels, err := ds.ListLabelsForHost(host.ID)
 	assert.Len(t, hostLabels, 1)
 	assert.Equal(t, "label1", hostLabels[0].Name)
 
@@ -390,7 +390,7 @@ func TestLabelQueries(t *testing.T) {
 	assert.Equal(t, expectQueries, queries)
 
 	// Verify that labels are set appropriately
-	hostLabels, err = ds.LabelsForHost(host.ID)
+	hostLabels, err = ds.ListLabelsForHost(host.ID)
 	assert.Len(t, hostLabels, 2)
 	expectLabelNames := map[string]bool{"label1": true, "label2": true}
 	for _, label := range hostLabels {

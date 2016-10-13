@@ -149,7 +149,7 @@ matches = VALUES(matches)
 	return nil
 }
 
-func (orm gormDB) LabelsForHost(hid uint) ([]kolide.Label, error) {
+func (orm gormDB) ListLabelsForHost(hid uint) ([]kolide.Label, error) {
 	results := []kolide.Label{}
 	err := orm.DB.Raw(`
 SELECT labels.* from labels, label_query_executions lqe

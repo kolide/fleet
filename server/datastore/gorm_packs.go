@@ -157,7 +157,7 @@ func (orm gormDB) ListPacksForHost(hid uint) ([]*kolide.Pack, error) {
 	}
 
 	// pull the labels that this host belongs to
-	labels, err := orm.LabelsForHost(hid)
+	labels, err := orm.ListLabelsForHost(hid)
 	if err != nil {
 		return nil, err
 	}
