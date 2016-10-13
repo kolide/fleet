@@ -32,7 +32,7 @@ const HostDetails = ({ host, onQueryClick = noop, onDisableClick = noop }) => {
     os_version: osVersion,
     platform,
     status,
-    uptime
+    uptime,
   } = host;
 
   return (
