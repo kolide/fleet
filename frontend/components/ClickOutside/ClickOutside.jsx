@@ -1,17 +1,15 @@
-/* eslint-disable react/no-find-dom-node */
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
 import { noop } from 'lodash';
 import radium from 'radium';
 
 import { handleClickOutside } from './helpers';
 
-export default (WrappedComponent, { onOutsideClick = noop }) => {
+export default (WrappedComponent, { onOutsideClick = noop, getDOMNode = noop }) => {
   class ClickOutside extends Component {
     componentDidMount () {
       const { componentInstance } = this;
       const clickHandler = onOutsideClick(componentInstance);
-      const componentNode = ReactDOM.findDOMNode(componentInstance);
+      const componentNode = getDOMNode(componentInstance);
 
       this.handleAction = handleClickOutside(clickHandler, componentNode);
 

@@ -43,13 +43,13 @@ export class ElipsisMenu extends Component {
     return false;
   }
 
-  setElement = (element) => {
-    this.element = element;
+  setDOMNode = (DOMNode) => {
+    this.DOMNode = DOMNode;
   }
 
   setTooltipDirection = () => {
-    if (this.element) {
-      const tooltipDirection = calculateTooltipDirection(this.element);
+    if (this.DOMNode) {
+      const tooltipDirection = calculateTooltipDirection(this.DOMNode);
 
       this.setState({ tooltipDirection });
     }
@@ -77,13 +77,13 @@ export class ElipsisMenu extends Component {
 
   render () {
     const { containerStyles, elipsisStyles } = componentStyles;
-    const { onToggleChildren, renderChildren, setElement } = this;
+    const { onToggleChildren, renderChildren, setDOMNode } = this;
     const { positionStyles } = this.props;
 
     return (
       <div
         onClick={onToggleChildren}
-        ref={setElement}
+        ref={setDOMNode}
         style={[containerStyles, positionStyles]}
       >
         <span style={elipsisStyles}>&bull; &bull; &bull;</span>
@@ -95,6 +95,9 @@ export class ElipsisMenu extends Component {
 
 const StyledComponent = radium(ElipsisMenu);
 export default ClickOutside(StyledComponent, {
+  getDOMNode: (component) => {
+    return component.DOMNode;
+  },
   onOutsideClick: (component) => {
     return (evt) => {
       evt.preventDefault();
