@@ -84,12 +84,14 @@ class UserBlock extends Component {
   renderCTAs = () => {
     const { currentUser, invite, onRevokeInvite, user } = this.props;
     const { onUserActionSelect } = this;
+    const { revokeInviteButtonStyles } = componentStyles(currentUser, invite);
     const userActionOptions = UserBlock.userActionOptions(currentUser, user);
 
     if (invite) {
       return (
         <Button
           onClick={onRevokeInvite}
+          style={revokeInviteButtonStyles}
           text="Revoke Invite"
           variant="inverse"
         />
