@@ -1,4 +1,5 @@
 import md5 from 'js-md5';
+import { pickBy } from 'lodash';
 
 export const addGravatarUrlToResource = (resource) => {
   const { email } = resource;
@@ -12,4 +13,10 @@ export const addGravatarUrlToResource = (resource) => {
   };
 };
 
-export default { addGravatarUrlToResource };
+export const entitiesExceptID = (entities, id) => {
+  return pickBy(entities, (entity, key) => {
+    return String(key) !== String(id);
+  });
+};
+
+export default { entitiesExceptID, addGravatarUrlToResource };

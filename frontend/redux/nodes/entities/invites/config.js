@@ -7,6 +7,7 @@ const { INVITES: schema } = schemas;
 
 export default reduxConfig({
   createFunc: Kolide.inviteUser,
+  destroyFunc: Kolide.revokeInvite,
   entityName: 'invites',
   loadAllFunc: Kolide.getInvites,
   parseFunc: addGravatarUrlToResource,

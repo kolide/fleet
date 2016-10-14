@@ -3,7 +3,8 @@ import reduxConfig from './reduxConfig';
 import { reduxMockStore } from '../../../../test/helpers';
 import schemas from './schemas';
 
-const store = { entities: { users: {} } };
+const store = { entities: { invites: {}, users: {} } };
+const invite = { id: 1, name: 'Gnar Dog', email: 'hi@thegnar.co' };
 const user = { id: 1, email: 'hi@thegnar.co' };
 
 describe('reduxConfig', () => {
@@ -59,6 +60,109 @@ describe('reduxConfig', () => {
         const newState = reducer(initialState, createSuccessAction);
 
         expect(newState.data[user.id]).toEqual(user);
+      });
+    });
+
+    describe('unsuccessful create call', () => {
+      const mockStore = reduxMockStore(store);
+      const errors = { base: 'Unable to create user' };
+      const createFunc = createSpy().andCall(() => {
+        return Promise.reject({ errors });
+      });
+      const config = reduxConfig({
+        createFunc,
+        entityName: 'users',
+        schema: schemas.USERS,
+      });
+      const { actions, reducer } = config;
+
+      it('calls the createFunc', () => {
+        mockStore.dispatch(actions.create());
+
+        expect(createFunc).toHaveBeenCalled();
+      });
+
+      it('dispatches the correct actions', () => {
+        mockStore.dispatch(actions.create());
+
+        const dispatchedActions = mockStore.getActions();
+        const dispatchedActionTypes = dispatchedActions.map(action => { return action.type; });
+
+        expect(dispatchedActionTypes).toInclude('users_CREATE_REQUEST');
+        expect(dispatchedActionTypes).toNotInclude('users_CREATE_SUCCESS');
+        expect(dispatchedActionTypes).toInclude('users_CREATE_FAILURE');
+      });
+
+      it('adds the returned errors to state', () => {
+        const createFailureAction = {
+          type: 'users_CREATE_FAILURE',
+          payload: {
+            errors,
+          },
+        };
+        const initialState = {
+          loading: false,
+          entities: {},
+          errors: {},
+        };
+        const newState = reducer(initialState, createFailureAction);
+
+        expect(newState.errors).toEqual(errors);
+      });
+    });
+  });
+
+  describe('dispatching the destroy action', () => {
+    describe('successful destroy call', () => {
+      const mockStore = reduxMockStore(store);
+      const destroyFunc = createSpy().andCall(() => {
+        return Promise.resolve();
+      });
+
+      const config = reduxConfig({
+        destroyFunc,
+        entityName: 'invites',
+        schema: schemas.INVITES,
+      });
+      const { actions, reducer } = config;
+
+      it('calls the destroyFunc', () => {
+        mockStore.dispatch(actions.destroy({ inviteID: invite.id }));
+
+        expect(destroyFunc).toHaveBeenCalled();
+      });
+
+      it('dispatches the correct actions', () => {
+        mockStore.dispatch(actions.destroy({ inviteID: invite.id }));
+
+        const dispatchedActions = mockStore.getActions();
+        const dispatchedActionTypes = dispatchedActions.map(action => { return action.type; });
+
+        expect(dispatchedActionTypes).toInclude('invites_DESTROY_REQUEST');
+        expect(dispatchedActionTypes).toInclude('invites_DESTROY_SUCCESS');
+        expect(dispatchedActionTypes).toNotInclude('invites_DESTROY_FAILURE');
+      });
+
+      it('removes the returned invite from state', () => {
+        const destroySuccessAction = {
+          type: 'invites_DESTROY_SUCCESS',
+          payload: {
+            id: 1,
+          },
+        };
+        const initialState = {
+          data: {
+            [invite.id]: invite,
+            2: { id: 2, name: 'Jason Meller' },
+          },
+          errors: {},
+          loading: false,
+        };
+        const newState = reducer(initialState, destroySuccessAction);
+
+        expect(newState.data).toEqual({
+          2: { id: 2, name: 'Jason Meller' },
+        });
       });
     });
 
