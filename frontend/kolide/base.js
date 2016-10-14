@@ -30,21 +30,6 @@ class Base {
     return this._authenticatedRequest(DELETE, endpoint, {}, overrideHeaders);
   }
 
-  _request (method, endpoint, body, overrideHeaders) {
-    const credentials = 'same-origin';
-    const { DELETE, GET } = REQUEST_METHODS;
-    const headers = {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      ...overrideHeaders,
-    };
-    const requestAttrs = (method === GET || method === DELETE)
-      ? { credentials, method, headers }
-      : { credentials, method, body, headers };
-
-    return fetch(endpoint, requestAttrs)
-  }
-
   authenticatedGet (endpoint, overrideHeaders = {}) {
     const { GET } = REQUEST_METHODS;
 
@@ -96,7 +81,7 @@ class Base {
 
     return fetch(endpoint, requestAttrs)
       .then(response => {
-        if (method === DELETE) return;
+        if (method === DELETE) return false;
 
         return response.json()
           .then(jsonResponse => {
