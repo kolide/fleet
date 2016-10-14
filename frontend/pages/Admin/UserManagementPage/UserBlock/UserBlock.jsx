@@ -93,10 +93,10 @@ class UserBlock extends Component {
 
     return (
       <Dropdown
+        containerStyles={invite ? revokeInviteStyles : {}}
         options={userActionOptions}
         initialOption={{ text: 'Actions...' }}
         onSelect={onUserActionSelect}
-        style={invite ? revokeInviteStyles : {}}
       />
     );
   }

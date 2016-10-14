@@ -5,13 +5,13 @@ import componentStyles from './styles';
 
 class Dropdown extends Component {
   static propTypes = {
-    containerStyles: PropTypes.object,
+    selectStyles: PropTypes.object,
     options: PropTypes.arrayOf(PropTypes.shape({
       text: PropTypes.string,
       value: PropTypes.string,
     })),
     onSelect: PropTypes.func,
-    style: PropTypes.object,
+    containerStyles: PropTypes.object,
   };
 
   static defaultProps = {
@@ -40,13 +40,13 @@ class Dropdown extends Component {
   }
 
   render () {
-    const { containerStyles, options, style } = this.props;
+    const { containerStyles, options, selectStyles } = this.props;
     const { onOptionClick, renderOption } = this;
     const { selectWrapperStyles } = componentStyles;
 
     return (
-      <div className="kolide-dropdown-wrapper" style={style}>
-        <select className="kolide-dropdown" style={[selectWrapperStyles, containerStyles]} onChange={onOptionClick}>
+      <div className="kolide-dropdown-wrapper" style={containerStyles}>
+        <select className="kolide-dropdown" style={[selectWrapperStyles, selectStyles]} onChange={onOptionClick}>
           {options.map(option => {
             return renderOption(option);
           })}
