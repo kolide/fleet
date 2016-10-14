@@ -122,11 +122,15 @@ class UserManagementPage extends Component {
 
       const { dispatch } = this.props;
 
-      return dispatch(inviteActions.destroy({ entityID: invite.id }))
-        .then(() => {
-          dispatch(renderFlash('success', 'Invite revoked'));
-          return false;
-        });
+      if (global.window.confirm('Are you sure you want to revoke this invitation?')) {
+        return dispatch(inviteActions.destroy({ entityID: invite.id }))
+          .then(() => {
+            dispatch(renderFlash('success', 'Invite revoked'));
+            return false;
+          });
+      }
+
+      return false;
     };
   }
 
