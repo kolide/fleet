@@ -11,6 +11,7 @@ class Dropdown extends Component {
       value: PropTypes.string,
     })),
     onSelect: PropTypes.func,
+    style: PropTypes.object,
   };
 
   static defaultProps = {
@@ -39,12 +40,12 @@ class Dropdown extends Component {
   }
 
   render () {
-    const { containerStyles, options } = this.props;
+    const { containerStyles, options, style } = this.props;
     const { onOptionClick, renderOption } = this;
     const { selectWrapperStyles } = componentStyles;
 
     return (
-      <div className="kolide-dropdown-wrapper">
+      <div className="kolide-dropdown-wrapper" style={style}>
         <select className="kolide-dropdown" style={[selectWrapperStyles, containerStyles]} onChange={onOptionClick}>
           {options.map(option => {
             return renderOption(option);

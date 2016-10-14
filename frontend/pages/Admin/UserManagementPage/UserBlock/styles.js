@@ -60,13 +60,10 @@ export default (user, invite) => {
       margin: 0,
       padding: 0,
     },
-    revokeInviteButtonStyles: {
-      fontSize: font.mini,
-      paddingBottom: '4px',
-      paddingTop: '4px',
+    revokeInviteStyles: {
       position: 'absolute',
       width: '221px',
-      bottom: '39px',
+      bottom: '43px',
     },
     userDetailsStyles: {
       paddingLeft: padding.half,

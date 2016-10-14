@@ -2,7 +2,6 @@ import React, { Component, PropTypes } from 'react';
 import radium from 'radium';
 
 import Avatar from '../../../../components/Avatar';
-import Button from '../../../../components/buttons/Button';
 import componentStyles from './styles';
 import Dropdown from '../../../../components/forms/fields/Dropdown';
 import EditUserForm from '../../../../components/forms/Admin/EditUserForm';
@@ -13,19 +12,24 @@ class UserBlock extends Component {
     currentUser: PropTypes.object,
     invite: PropTypes.bool,
     onEditUser: PropTypes.func,
-    onRevokeInvite: PropTypes.func,
     onSelect: PropTypes.func,
     user: PropTypes.object,
   };
 
-  static userActionOptions = (currentUser, user) => {
+  static userActionOptions = (currentUser, user, invite) => {
     const disableActions = currentUser.id === user.id;
+    const inviteActions = [
+      { text: 'Actions...', value: '' },
+      { text: 'Revoke Invitation', value: 'revert_invitation' },
+    ];
     const userEnableAction = user.enabled
       ? { disabled: disableActions, text: 'Disable Account', value: 'disable_account' }
       : { text: 'Enable Account', value: 'enable_account' };
     const userPromotionAction = user.admin
       ? { disabled: disableActions, text: 'Demote User', value: 'demote_user' }
       : { text: 'Promote User', value: 'promote_user' };
+
+    if (invite) return inviteActions;
 
     return [
       { text: 'Actions...', value: '' },
@@ -82,27 +86,17 @@ class UserBlock extends Component {
   }
 
   renderCTAs = () => {
-    const { currentUser, invite, onRevokeInvite, user } = this.props;
+    const { currentUser, invite, user } = this.props;
     const { onUserActionSelect } = this;
-    const { revokeInviteButtonStyles } = componentStyles(currentUser, invite);
-    const userActionOptions = UserBlock.userActionOptions(currentUser, user);
-
-    if (invite) {
-      return (
-        <Button
-          onClick={onRevokeInvite}
-          style={revokeInviteButtonStyles}
-          text="Revoke Invite"
-          variant="inverse"
-        />
-      );
-    }
+    const userActionOptions = UserBlock.userActionOptions(currentUser, user, invite);
+    const { revokeInviteStyles } = componentStyles(user, invite);
 
     return (
       <Dropdown
         options={userActionOptions}
         initialOption={{ text: 'Actions...' }}
         onSelect={onUserActionSelect}
+        style={invite ? revokeInviteStyles : {}}
       />
     );
   }

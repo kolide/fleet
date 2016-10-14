@@ -74,6 +74,11 @@ class UserManagementPage extends Component {
             .then(() => {
               return dispatch(renderFlash('success', 'User forced to reset password', update(user, { force_password_reset: false })));
             });
+        case 'revert_invitation':
+          return dispatch(inviteActions.destroy({ entityID: user.id }))
+            .then(() => {
+              return dispatch(renderFlash('success', 'Invite revoked'));
+            });
         default:
           return false;
       }
@@ -116,24 +121,6 @@ class UserManagementPage extends Component {
     return this.toggleInviteUserModal();
   }
 
-  onRevokeInvite = (invite) => {
-    return (evt) => {
-      evt.preventDefault();
-
-      const { dispatch } = this.props;
-
-      if (global.window.confirm('Are you sure you want to revoke this invitation?')) {
-        return dispatch(inviteActions.destroy({ entityID: invite.id }))
-          .then(() => {
-            dispatch(renderFlash('success', 'Invite revoked'));
-            return false;
-          });
-      }
-
-      return false;
-    };
-  }
-
   toggleInviteUserModal = () => {
     const { showInviteUserModal } = this.state;
 
@@ -147,7 +134,7 @@ class UserManagementPage extends Component {
   renderUserBlock = (user, options = { invite: false }) => {
     const { currentUser } = this.props;
     const { invite } = options;
-    const { onEditUser, onRevokeInvite, onUserActionSelect } = this;
+    const { onEditUser, onUserActionSelect } = this;
 
     return (
       <UserBlock
@@ -155,7 +142,6 @@ class UserManagementPage extends Component {
         invite={invite}
         key={user.email}
         onEditUser={onEditUser}
-        onRevokeInvite={onRevokeInvite(user)}
         onSelect={onUserActionSelect}
         user={user}
       />
