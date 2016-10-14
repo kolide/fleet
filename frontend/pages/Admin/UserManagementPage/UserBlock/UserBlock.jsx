@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import radium from 'radium';
 
 import Avatar from '../../../../components/Avatar';
+import Button from '../../../../components/buttons/Button';
 import componentStyles from './styles';
 import Dropdown from '../../../../components/forms/fields/Dropdown';
 import EditUserForm from '../../../../components/forms/Admin/EditUserForm';
@@ -12,6 +13,7 @@ class UserBlock extends Component {
     currentUser: PropTypes.object,
     invite: PropTypes.bool,
     onEditUser: PropTypes.func,
+    onRevokeInvite: PropTypes.func,
     onSelect: PropTypes.func,
     user: PropTypes.object,
   };
@@ -79,8 +81,32 @@ class UserBlock extends Component {
     return onSelect(user, action);
   }
 
+  renderCTAs = () => {
+    const { currentUser, invite, onRevokeInvite, user } = this.props;
+    const { onUserActionSelect } = this;
+    const userActionOptions = UserBlock.userActionOptions(currentUser, user);
+
+    if (invite) {
+      return (
+        <Button
+          onClick={onRevokeInvite}
+          text="Revoke Invite"
+          variant="inverse"
+        />
+      );
+    }
+
+    return (
+      <Dropdown
+        options={userActionOptions}
+        initialOption={{ text: 'Actions...' }}
+        onSelect={onUserActionSelect}
+      />
+    );
+  }
+
   render () {
-    const { currentUser, invite, user } = this.props;
+    const { invite, user } = this.props;
     const {
       avatarStyles,
       nameStyles,
@@ -101,11 +127,10 @@ class UserBlock extends Component {
       position,
       username,
     } = user;
+    const { isEdit } = this.state;
+    const { onEditUserFormSubmit, onToggleEditing, renderCTAs } = this;
     const statusLabel = userStatusLabel(user, invite);
     const userLabel = admin ? 'Admin' : 'User';
-    const userActionOptions = UserBlock.userActionOptions(currentUser, user);
-    const { isEdit } = this.state;
-    const { onEditUserFormSubmit, onToggleEditing } = this;
 
     if (isEdit) {
       return (
@@ -130,11 +155,7 @@ class UserBlock extends Component {
           <p style={usernameStyles}>{username}</p>
           <p style={userPositionStyles}>{position}</p>
           <p style={userEmailStyles}>{email}</p>
-          {!invite && <Dropdown
-            options={userActionOptions}
-            initialOption={{ text: 'Actions...' }}
-            onSelect={this.onUserActionSelect}
-          />}
+          {renderCTAs()}
         </div>
       </div>
     );

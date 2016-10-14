@@ -116,6 +116,16 @@ class UserManagementPage extends Component {
     return this.toggleInviteUserModal();
   }
 
+  onRevokeInvite = (invite) => {
+    return (evt) => {
+      evt.preventDefault();
+
+      const { dispatch } = this.props;
+
+      return dispatch(inviteActions.destroy({ entityID: invite.id }));
+    };
+  }
+
   toggleInviteUserModal = () => {
     const { showInviteUserModal } = this.state;
 
@@ -129,7 +139,7 @@ class UserManagementPage extends Component {
   renderUserBlock = (user, options = { invite: false }) => {
     const { currentUser } = this.props;
     const { invite } = options;
-    const { onEditUser, onUserActionSelect } = this;
+    const { onEditUser, onRevokeInvite, onUserActionSelect } = this;
 
     return (
       <UserBlock
@@ -137,6 +147,7 @@ class UserManagementPage extends Component {
         invite={invite}
         key={user.email}
         onEditUser={onEditUser}
+        onRevokeInvite={onRevokeInvite(user)}
         onSelect={onUserActionSelect}
         user={user}
       />
