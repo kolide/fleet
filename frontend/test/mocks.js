@@ -103,6 +103,16 @@ export const validResetPasswordRequest = (password, token) => {
   .reply(200, validUser);
 };
 
+export const validRevokeInviteRequest = (bearerToken, inviteID) => {
+  return nock('http://localhost:8080', {
+    reqheaders: {
+      Authorization: `Bearer ${bearerToken}`,
+    },
+  })
+  .delete(`/api/v1/kolide/invites/${inviteID}`)
+  .reply(200);
+};
+
 export const invalidResetPasswordRequest = (password, token, error) => {
   return nock('http://localhost:8080')
   .post('/api/v1/kolide/reset_password', JSON.stringify({
@@ -131,6 +141,7 @@ export default {
   validLogoutRequest,
   validMeRequest,
   validResetPasswordRequest,
+  validRevokeInviteRequest,
   validUpdateUserRequest,
   validUser,
 };

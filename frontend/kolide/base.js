@@ -2,6 +2,7 @@ import fetch from 'isomorphic-fetch';
 import local from '../utilities/local';
 
 const REQUEST_METHODS = {
+  DELETE: 'DELETE',
   GET: 'GET',
   PATCH: 'PATCH',
   POST: 'POST',
@@ -21,6 +22,27 @@ class Base {
 
   setBearerToken (bearerToken) {
     this.bearerToken = bearerToken;
+  }
+
+  authenticatedDelete (endpoint, overrideHeaders = {}) {
+    const { DELETE } = REQUEST_METHODS;
+
+    return this._authenticatedRequest(DELETE, endpoint, {}, overrideHeaders);
+  }
+
+  _request (method, endpoint, body, overrideHeaders) {
+    const credentials = 'same-origin';
+    const { DELETE, GET } = REQUEST_METHODS;
+    const headers = {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      ...overrideHeaders,
+    };
+    const requestAttrs = (method === GET || method === DELETE)
+      ? { credentials, method, headers }
+      : { credentials, method, body, headers };
+
+    return fetch(endpoint, requestAttrs)
   }
 
   authenticatedGet (endpoint, overrideHeaders = {}) {
@@ -47,18 +69,22 @@ class Base {
     return this._request(POST, endpoint, body, overrideHeaders);
   }
 
-  _authenticatedRequest(method, endpoint, body, overrideHeaders) {
-    const headers = {
-      ...overrideHeaders,
+  _authenticatedHeaders = (headers) => {
+    return {
+      ...headers,
       Authorization: `Bearer ${this.bearerToken}`,
     };
+  }
+
+  _authenticatedRequest(method, endpoint, body, overrideHeaders) {
+    const headers = this._authenticatedHeaders(overrideHeaders);
 
     return this._request(method, endpoint, body, headers);
   }
 
   _request (method, endpoint, body, overrideHeaders) {
     const credentials = 'same-origin';
-    const { GET } = REQUEST_METHODS;
+    const { DELETE, GET } = REQUEST_METHODS;
     const headers = {
       Accept: 'application/json',
       'Content-Type': 'application/json',
@@ -70,6 +96,8 @@ class Base {
 
     return fetch(endpoint, requestAttrs)
       .then(response => {
+        if (method === DELETE) return;
+
         return response.json()
           .then(jsonResponse => {
             if (response.ok) {

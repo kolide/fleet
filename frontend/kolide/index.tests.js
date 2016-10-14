@@ -14,6 +14,7 @@ const {
   validLogoutRequest,
   validMeRequest,
   validResetPasswordRequest,
+  validRevokeInviteRequest,
   validUpdateUserRequest,
   validUser,
 } = mocks;
@@ -206,6 +207,22 @@ describe('Kolide - API client', () => {
           expect(request.isDone()).toEqual(true);
           done();
         });
+    });
+  });
+
+  describe('#revokeInvite', () => {
+    it('calls the appropriate endpoint with the correct parameters', (done) => {
+      const bearerToken = 'valid-bearer-token';
+      const entityID = 1;
+      const request = validRevokeInviteRequest(bearerToken, entityID);
+
+      Kolide.setBearerToken(bearerToken);
+      Kolide.revokeInvite({ entityID })
+        .then(() => {
+          expect(request.isDone()).toEqual(true);
+          done();
+        })
+        .catch(done);
     });
   });
 
