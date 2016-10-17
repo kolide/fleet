@@ -125,7 +125,7 @@ class SidePanel extends Component {
         <h1 style={orgNameStyles}>{orgName}</h1>
         <div style={userStatusStyles(enabled)} />
         <h2 style={usernameStyles}>{username}</h2>
-        <i style={orgChevronStyles} className="kolidecon-chevron-bold-down" />
+        <i style={orgChevronStyles} className="kolidecon-chevrondownbold" />
       </header>
     );
   }
@@ -229,7 +229,7 @@ class SidePanel extends Component {
     const { toggleShowSubItems } = this;
     const { showSubItems } = this.state;
     const { collapseSubItemsWrapper } = componentStyles;
-    const iconName = showSubItems ? 'kolidecon-chevron-bold-left' : 'kolidecon-chevron-bold-right';
+    const iconName = showSubItems ? 'kolidecon-chevronleftbold' : 'kolidecon-chevronrightbold';
 
     return (
       <div style={collapseSubItemsWrapper} onClick={toggleShowSubItems(!showSubItems)}>
