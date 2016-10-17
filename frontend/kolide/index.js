@@ -30,6 +30,21 @@ class Kolide extends Base {
       .then((response) => { return response.hosts; });
   }
 
+  getLabels = () => {
+    return Promise.resolve({
+      labels: [
+        { id: 1, title: 'All Hosts', type: 'all', hosts_count: 22 },
+        { id: 4, title: 'OFFLINE', type: 'status', hosts_count: 2 },
+        { id: 5, title: 'ONLINE', type: 'status', hosts_count: 20 },
+        { id: 6, title: 'MAC OS', type: 'platform', hosts_count: 1 },
+        { id: 7, title: 'CENTOS', type: 'platform', hosts_count: 10 },
+        { id: 8, title: 'UBUNTU', type: 'platform', hosts_count: 10 },
+        { id: 10, title: 'WINDOWS', type: 'platform', hosts_count: 1 },
+      ],
+    })
+      .then(response => { return response.labels; });
+  }
+
   getUsers = () => {
     const { USERS } = endpoints;
 
