@@ -53,7 +53,6 @@ class ManageHostsPage extends Component {
 
     return (
       <div style={containerStyles}>
-        <h1>Manage Hosts Page</h1>
         {renderHosts()}
       </div>
     );
