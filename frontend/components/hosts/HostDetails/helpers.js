@@ -20,4 +20,12 @@ export const humanMemory = (bytes) => {
   return `${inGigaBytes(bytes)} GB`;
 };
 
-export default { humanUptime };
+export const platformIconClass = (platform) => {
+  let platformClass = platform.toLowerCase();
+
+  if (platformClass === 'darwin') platformClass = 'apple';
+
+  return `kolidecon-${platformClass}`;
+};
+
+export default { humanUptime, platformIconClass };

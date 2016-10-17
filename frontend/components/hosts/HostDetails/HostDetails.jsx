@@ -4,7 +4,7 @@ import radium from 'radium';
 
 import componentStyles from './styles';
 import ElipsisMenu from '../../../components/buttons/ElipsisMenu';
-import { humanMemory, humanUptime } from './helpers';
+import { humanMemory, humanUptime, platformIconClass } from './helpers';
 
 const {
   containerStyles,
@@ -15,6 +15,7 @@ const {
   hostContentItemStyles,
   hostnameStyles,
   iconStyles,
+  monoStyles,
   queryIconStyles,
   statusStyles,
   verticleRuleStyles,
@@ -57,7 +58,7 @@ const HostDetails = ({ host, onQueryClick = noop, onDisableClick = noop }) => {
       <p style={hostnameStyles}>{hostname}</p>
       <div style={contentSeparatorStyles}>
         <div>
-          <i className={`kolidecon-${platform}`} style={iconStyles} />
+          <i className={platformIconClass(platform)} style={iconStyles} />
           <span style={hostContentItemStyles}>{osVersion}</span>
         </div>
         <div>
@@ -73,11 +74,11 @@ const HostDetails = ({ host, onQueryClick = noop, onDisableClick = noop }) => {
         </div>
         <div>
           <i className="kolidecon-mac" style={iconStyles} />
-          <span style={hostContentItemStyles}>{mac}</span>
+          <span style={[hostContentItemStyles, monoStyles]}>{mac}</span>
         </div>
         <div>
           <i className="kolidecon-world" style={iconStyles} />
-          <span style={hostContentItemStyles}>{ip}</span>
+          <span style={[hostContentItemStyles, monoStyles]}>{ip}</span>
         </div>
       </div>
       <div style={contentSeparatorStyles}>

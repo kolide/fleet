@@ -79,6 +79,9 @@ export default {
     fontSize: font.mini,
     marginRight: '3px',
   },
+  monoStyles: {
+    fontFamily: 'SourceCodePro',
+  },
   queryIconStyles: {
     color: color.brand,
     fontSize: font.larger,
