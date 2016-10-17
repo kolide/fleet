@@ -66,8 +66,6 @@ export default {
   hostContentItemStyles: {
     color: color.textUltradark,
     fontSize: font.small,
-    marginLeft: '3px',
-    marginRight: '3px',
   },
   hostnameStyles: {
     color: color.link,
@@ -75,6 +73,11 @@ export default {
     fontWeight: 'bold',
     marginTop: 0,
     marginBottom: 0,
+  },
+  iconStyles: {
+    color: color.textDark,
+    fontSize: font.mini,
+    marginRight: '3px',
   },
   queryIconStyles: {
     color: color.brand,

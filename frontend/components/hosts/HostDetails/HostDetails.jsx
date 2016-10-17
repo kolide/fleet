@@ -14,6 +14,7 @@ const {
   elipsisPositionStyles,
   hostContentItemStyles,
   hostnameStyles,
+  iconStyles,
   queryIconStyles,
   statusStyles,
   verticleRuleStyles,
@@ -56,19 +57,26 @@ const HostDetails = ({ host, onQueryClick = noop, onDisableClick = noop }) => {
       <p style={hostnameStyles}>{hostname}</p>
       <div style={contentSeparatorStyles}>
         <div>
+          <i className={`kolidecon-${platform}`} style={iconStyles} />
           <span style={hostContentItemStyles}>{osVersion}</span>
         </div>
         <div>
           <span style={[hostContentItemStyles, { textTransform: 'capitalize' }]}>{platform}</span>
         </div>
         <div>
-          <span style={hostContentItemStyles}>{humanMemory(memory)}</span>
+          <span style={{ marginRight: '8px' }}>
+            <i className="kolidecon-memory" style={iconStyles} />
+            <span style={hostContentItemStyles}>{humanMemory(memory)}</span>
+          </span>
+          <i className="kolidecon-uptime" style={iconStyles} />
           <span style={hostContentItemStyles}>{humanUptime(uptime)}</span>
         </div>
         <div>
+          <i className="kolidecon-mac" style={iconStyles} />
           <span style={hostContentItemStyles}>{mac}</span>
         </div>
         <div>
+          <i className="kolidecon-world" style={iconStyles} />
           <span style={hostContentItemStyles}>{ip}</span>
         </div>
       </div>
