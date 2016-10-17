@@ -1,0 +1,82 @@
+
+# Group Service
+
+## /api/v1/kolide/login
+
+### Encode Response [POST]
+
+
++ Request 
+    + Body
+
+            {
+        		"username": "admin1",
+        		"password": "foobar"
+			}        
+
++ Response 200 (application/json; charset=utf-8)
+
+
+
+    + Body
+
+            {
+  "user": {
+    "id": 4,
+    "username": "admin1",
+    "name": "",
+    "email": "admin1@example.com",
+    "admin": true,
+    "enabled": true,
+    "force_password_reset": false,
+    "gravatar_url": ""
+  },
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6Ijg1Q2JJTlI2aXQ3Z1R0V0tmNkxTaFpNcmhmYTNpQi9WcEZJKzl6NTdwMTdyeGI4dzVTQW40VGNoSE5EOTl0UjE2SnVWY2R1am5UMEFnNEdKdENwQ1dnPT0ifQ.DeXFBydo_MChvGcRhwbqCvBTy_uQugQN0-SxxB6ETvE"
+}
+        
+
+
+
++ Request 
+    + Body
+
+            {
+        		"username": "nobody",
+        		"password": "foobar"
+			}        
+
++ Response 401 (application/json; charset=utf-8)
+
+
+
+    + Body
+
+            {
+  "message": "Authentication Failed",
+  "error": "username or email and password do not match"
+}
+        
+
+
+
+## /api/v1/kolide/logout
+
+### Encode Response [POST]
+
+
++ Request 
+
+    + Headers
+            
+            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6IkpTZVBmcFBpclFVWUhzSjF0YUxFdGxwWS9jcUR1SkJoQi9FYWE3dll1dXdGRGduMjJnaHdOUDMrUG93SnlOZE56Z0FBU25sa1YrMWVDais5a05sRkVBPT0ifQ.NLC17Avru176c80wy8AkFRYapc5daiLjl3ByMOCuITg
+
++ Response 200 (application/json; charset=utf-8)
+
+
+
+    + Body
+
+            {}
+        
+
+
