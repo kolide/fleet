@@ -1,6 +1,13 @@
-hash: e39bd9f3a0b0d8746e54485a742b52058d2623f3d03cb1925c0ab4cdee312385
-updated: 2016-10-17T13:39:07.1672564-04:00
+hash: 2d9c3466659e088b7168e3a6fb6b31bf29bcd6dffae3f377c237b259ea1337f5
+updated: 2016-10-18T10:18:59.488161385-04:00
 imports:
+- name: github.com/adams-sarah/test2doc
+  version: 69e12d175d95dd546acc10d886c8ad813180282c
+  repo: git@github.com:groob/test2doc.git
+  subpackages:
+  - doc
+  - doc/parse
+  - test
 - name: github.com/alecthomas/template
   version: a0175ee3bccc567396460bf5acd36800cb10c49c
   subpackages:
