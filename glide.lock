@@ -1,9 +1,9 @@
-hash: 2d9c3466659e088b7168e3a6fb6b31bf29bcd6dffae3f377c237b259ea1337f5
-updated: 2016-10-18T10:18:59.488161385-04:00
+hash: f516e418ee09ecdc7ed307d9b673894ba9915ee6180407a53aabf9767b5158cb
+updated: 2016-10-18T10:46:38.433512464-04:00
 imports:
 - name: github.com/adams-sarah/test2doc
   version: 69e12d175d95dd546acc10d886c8ad813180282c
-  repo: git@github.com:groob/test2doc.git
+  repo: https://github.com/groob/test2doc.git
   subpackages:
   - doc
   - doc/parse
@@ -181,7 +181,7 @@ imports:
 - name: gopkg.in/go-playground/validator.v8
   version: 5f57d2222ad794d0dffb07e664ea05e2ee07d60c
 - name: gopkg.in/natefinch/lumberjack.v2
-  version: 514cbda263a734ae8caac038dadf05f8f3f9f738
+  version: e21e5cbec0cd0861b9dc302736ad5666c529d93f
 - name: gopkg.in/yaml.v2
   version: e4d366fc3c7938e2958e662b4258c7a89e1f0e3e
 testImports: []
