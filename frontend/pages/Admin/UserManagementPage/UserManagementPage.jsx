@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import componentStyles from './styles';
-import entityGetter from '../../../redux/entityGetter';
+import entityGetter from '../../../redux/utilities/entityGetter';
 import Button from '../../../components/buttons/Button';
 import inviteActions from '../../../redux/nodes/entities/invites/actions';
 import InviteUserForm from '../../../components/forms/InviteUserForm';
