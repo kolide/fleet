@@ -110,8 +110,6 @@ func (orm gormDB) RecordLabelQueryExecutions(host *kolide.Host, results map[stri
 	switch orm.Driver {
 	case "mysql":
 		insert.WriteString("INSERT ")
-	case "sqlite3":
-		insert.WriteString("REPLACE ")
 	default:
 		return errors.New(
 			"Unknown DB driver",
