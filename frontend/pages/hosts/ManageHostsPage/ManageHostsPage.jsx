@@ -15,7 +15,9 @@ class ManageHostsPage extends Component {
   componentWillMount () {
     const { dispatch, hosts } = this.props;
 
-    if (!hosts.length) dispatch(hostActions.loadAll());
+    if (!hosts.length) {
+      dispatch(hostActions.loadAll());
+    }
 
     return false;
   }
