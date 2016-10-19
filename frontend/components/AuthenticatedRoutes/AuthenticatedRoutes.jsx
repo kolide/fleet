@@ -22,6 +22,7 @@ export class AuthenticatedRoutes extends Component {
     if (!loading && !user) {
       return redirectToLogin();
     }
+
     if (user && user.force_password_reset) {
       return redirectToPasswordReset();
     }
@@ -38,6 +39,7 @@ export class AuthenticatedRoutes extends Component {
     if (!loading && !user) {
       return redirectToLogin();
     }
+
     if (user && user.force_password_reset) {
       return redirectToPasswordReset();
     }
