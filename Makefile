@@ -121,7 +121,8 @@ generate-dev: .prefix
 	webpack --progress --colors --watch
 
 deps:
-	npm install
+	npm install -g yarn
+	yarn
 	go get github.com/jteeuwen/go-bindata/...
 	go get github.com/Masterminds/glide
 	glide install
