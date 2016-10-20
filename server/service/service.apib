@@ -33,7 +33,7 @@ List hosts
 
     + Headers
             
-            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6InJTR1k1bXdJY2pIcldVMHI5YVN3YXBESWVPTmUrOGJKdXVkT1JpODEwNEREZ1BzQTZ5YkI2d1A2MDRBb2dXdUZMQU05RVY5Tzlkck9Gb2doeWJEVURRPT0ifQ.xHlDBO-2jSjQ0EmB6_GACR0TP4UKJOrB1zDLxAvDZLY
+            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6Inh0dkIvMDJnMlc0VzRDbWtwNzNydmdvalc4NFQ2SDBDdHFZOXVscVRmT3BzUVZSSjZUdjNtZXpZOW9Vam1aQnhnUmlwTEpNQzk0VUJJV1ZYT3V6UXdRPT0ifQ.n04S_nQly4RBxUhRrlWLFFh7WzcI-d4sFuVv20TDu9g
 
 + Response 200 (application/json; charset=utf-8)
 
@@ -48,6 +48,51 @@ List hosts
 
 
 
+## /api/v1/kolide/hosts/1
+
+### Delete Host [DELETE]
+Delete a host by ID
+
++ Request 
+
+    + Headers
+            
+            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6IkdzVHFTMDR5WnJnbE1Wd1dDWG1rUmxmcnM4TU1kUlJjdi9zTXBCTXZnN1J3TWUyK3FSZGpRK0JyZk1IUVRIeitLWXdodUNRU0hvaHp3bUU1WXQrdWZnPT0ifQ.jLPfepgz7Y6fAdKTSpEin6KGO6HXEhmsd4QX7PvQ6BI
+
++ Response 404 (application/json; charset=utf-8)
+
+
+
+    + Body
+
+            {
+                "error": "resource not found"
+            }
+        
+
+
+### Get Host [GET]
+Get a host by ID
+
++ Request 
+
+    + Headers
+            
+            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6ImJUQnJWTUQ0UjNWRFJ2Yk05MjNwSU00OWVSNm4xVE1ibmxqc0wxWlpQbUdzQVFaS2tqam1KaWFvNVBhYlFWUGNvZjZsc0NON2hPb0VReFVsTmVpaVN3PT0ifQ.1Sg2cYG0_nQOciSGh6SgvOkWUy0oipB5IZnJQpGdsEg
+
++ Response 404 (application/json; charset=utf-8)
+
+
+
+    + Body
+
+            {
+                "error": "resource not found"
+            }
+        
+
+
+
 ## /api/v1/kolide/invites
 
 ### List Invites [GET]
@@ -57,7 +102,7 @@ List invited users
 
     + Headers
             
-            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6IjN2QUtoTkllZVp5WDlEY3dMUVpKQUJNL1MyQXNZOTlmOUZuanl2V1NhVkNqRGxsYVMzQXp6REVuRXNlZUQ2bUZpWno1N25FNDFBTTFtcUtac2tKT2l3PT0ifQ.lc5oy3oZyAH_IMU8aFldfk_ZgPlRvdn2xWF5bAivPyw
+            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6IlRKOWxDUUp4SDh2NDJCSXNOQy9zbUYreXl0UUxiZW5DdUVkL3dSZFliRXZVd3dTSk9FOEVzR0hMK21wVGE4UWtCNnowbUJMV0Y2RGI2MUpQYXN3bGdBPT0ifQ.IfkClmu3jIyt9_AGm-ubiEi7_E8pCa6FoZEhD2aPTew
 
 + Response 200 (application/json; charset=utf-8)
 
@@ -81,7 +126,7 @@ Delete invite by ID.
 
     + Headers
             
-            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6IlZuWE5aUDN6SEVBY2dzK2wzdXVBTnRUQmdvUHk1VFhnTURsbHppUzlYMzBVRHVHL1ltQTR4Lzg0SmtjVjh4NEpQSHY0VjNmZFpqSW9nSmlqN092VktRPT0ifQ.HPaRTRZOsvxcvhRidJ9p9mQGRdq_FkWppyDsaGLy6Vg
+            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6Ildpc29HZDFCdkRCVTE2b1ZXb0VGeGdyNGduTGdtM0kvYXFqU0NwZHphbGJES0t1Qlc0Z3lMSW9Sd1VjSTN2aEVkVm4xSHg0NXRKNnhucVJCUjExV0N3PT0ifQ.SAdP6F6-Xy_ceoEQKMpHtPc5No3hmhsn5qjmZg2HMKs
 
 + Response 200 (application/json; charset=utf-8)
 
@@ -126,7 +171,7 @@ Logs a user in.
                     "force_password_reset": false,
                     "gravatar_url": ""
                 },
-                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6Ik1aN0FGL2FiOEJDREZ5VkZvR1RiSVdoMURoa2VPMEtIaDU0ZkJEaDlSaEJEemc3K3JjVlNFbkN2N3F2bkt2Uy80TEVCdFlQWGtXM0xNZ1JRVVNIVk5BPT0ifQ.3IrDN7MdAU8bhrVnfikQKDMLhbkqfGTuFNLPoxfT6To"
+                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6ImFRcnRtbXFicXh1ZUdjVFlEOGRtUU1PZ3NFb1lVRFZDdGhZbWtEaHpoeGF4UFhXd1NOTHFqQkQ1cmF3M2c0T2RXZS8xemlHV1ZPYVllQmJKUzc2TlZBPT0ifQ.4b28eujgbGMzHKKFwXm0MVx4UxXCBl-J2klshP5yEAE"
             }
         
 
@@ -163,7 +208,7 @@ Logs a user out.
 
     + Headers
             
-            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6Ik1vR3daQjkzQzlHREl6RTJmM2Q4ZVEvaStOaG8vQlZTVHowS2RqSFFFbmZnaDEvVkp6RUp3eTREeElFN0FZcTBWaE1ablRiV3FUZzk0bTdzL2pidHZBPT0ifQ.T4GeA0QGu7F7ttHGQwpbDjJMsKUilxnduJPY42t0BXs
+            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6ImRQeTd1YklCT1JGek13UDUxYm1IelVHT0F4TGhxWDRweUMvSExzY25RRU9vRnlNaFV3cGZqbjg2R2tyZklZWkRPNkZFQjBpQVdSbEx2clEzSm9FcW1nPT0ifQ.Jc-YxXbh71AnuLCiTi4Uif8k-T05I7Gby-j8PX1G01Y
 
 + Response 200 (application/json; charset=utf-8)
 
@@ -185,7 +230,7 @@ Returns info about the currently logged in user
 
     + Headers
             
-            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6Ii8rNXdLaFhmVmJGWGFJcGJPOVY3anptSDBNcGVEdnFpUmpUZk1TWndiVlpqZGRvWXpWT1NqZm5IMzdjQ0FETDhraHYvT2VZYUFkc0poakpxc01jb0F3PT0ifQ.8s7JOXQia9QuEX8NoNqLtYOGQ5FXnYiScvZAZEeM1ls
+            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6Im1qS09aa1VlL00xUkFGMi9YRktiZmhBcGo0NDEwU2I1d3JSWElJTldnVkJyYWpzeUQ2dkVTK0s3Q3M4L1pyQW1KT3VGTXFmYWNqUkJ5UTVFaDhudzZBPT0ifQ.91HwSkafyyVUCso6SjoRcmV4cDjOTWL8oZbDk4iaErk
 
 + Response 200 (application/json; charset=utf-8)
 
@@ -218,7 +263,7 @@ Delete session by ID
 
     + Headers
             
-            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6ImYrNzFUTis1MWRmcjdOcnhVVVJIeEVNeUIxTFF2cmZXTGloODhPVmJKRU9INUhvVnN1eUdJYmdtVkhjR3hNcm5IRU55blhobDA5di9vUE9xaTNxVlhRPT0ifQ.9gcLfh2FwAQqwFtC1UkSBAlVROcHvMSZt4KMrlxAVj4
+            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6Ik5MNlRxMmZocTQ3d0cwR2dIQXdQZjgyTkN3bUZ6OXVMV2loRjRXZVZWVDhPa1VoRy8xUHdNeUtzYzV4bk1PS2QxZ0Ewa3ZEUHpRRGdwd2JCZFdaSXlRPT0ifQ.uIULwc70EVQyx8Ev0Jv5lfNZpAmPHNEo6gkGsQ4aX2Q
 
 + Response 404 (application/json; charset=utf-8)
 
@@ -239,7 +284,7 @@ Return session info
 
     + Headers
             
-            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6IjJIRjdZUy9HVmFIWTc3UlROdFBoR3JKZHZYZ1BIMlMyM3VxZE5rNElleEF4OUZJcElPMmxvWjNValpMN2liRWtSa0RFei9RR0lUKzUxTTd6N3BFRUp3PT0ifQ.GfKG2JLS740hkX7d2UulWdmUjwQ1-UW4NJWQVJM7ne0
+            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6IjBrTlZodkdQS29xU1QraHFLSVhBMUNnU2JaQmF6NE93NW1YWUJvUTdqeVhzM1FxbFRqWXV0d2FzWE5qV2ZRbmlHYkIwbnJuRnFWR2QvWDZ4SDJJS1FRPT0ifQ.nHm4ULA4qvIGTYPvJ4-DAnPlOm-MaD1L87cVXfmSMTk
 
 + Response 404 (application/json; charset=utf-8)
 
@@ -263,7 +308,7 @@ Return a list of users
 
     + Headers
             
-            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6ImpsRkRLaGtaS0thOXdTMXpUZjhESnJlWk1QakdjY1FQSTl3a3hGcGxKK1N5NlliVGd6YzJBQVl2R3UreDloS3E2N2hkaDBZeU96ZUkzeFFwTUVNVEpnPT0ifQ.ivSgWK5ZMluFcK163i6oKZ95wwM578x8c4oHATcRe3E
+            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6IjBHMGZhRXlZT1VSWDFmZ05sZDlDa3kxWnVESjd1TkE5a1JsY2hKK1UySHhEUkplNmlWMjJmVWFEMGdDT0dZUTBmMTU1c0VHdXllenE5bVFBRWdFcmlBPT0ifQ.SYrIxjaPei3zTwrMXICN6z9o1_bqDCh-x3KlRzE7C7I
 
 + Response 200 (application/json; charset=utf-8)
 
@@ -328,7 +373,7 @@ Return a single user by ID
 
     + Headers
             
-            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6IjBwVytMLzJxKzFkSk9BcmpML3czWXZ2WmxvTDEybGJMVC9aUkhpdUFHOFhZVWhrREdEbUdVT0VCRlJrTzBFRENuUWpBaEN4blRLUjVwNmdUR29Za3VnPT0ifQ.h1GxsrV4HVJ0EuN8ZT68HygZJBxeFkzhlZPEY2Bob68
+            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6InZZNWxuNVp0THVESFl4dWxWTW9xM1BDc1FBNXBTbWdKRWEwWExXV1l1eUMxT1RCdlFiRVUxM1U3L2VoQ1Z0Zk1xSUw4bVYvZkVheTFSRU9OeEo0b2VRPT0ifQ.YTRGax9Q1DX90X8le6DKYEfFkBzOxd10sDkvfYlf8qo
 
 + Response 200 (application/json; charset=utf-8)
 

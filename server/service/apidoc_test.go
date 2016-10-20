@@ -93,6 +93,18 @@ var hinfos = map[string]handlerInfo{
 		description: "List hosts",
 		title:       "List Hosts",
 	},
+	"GetHost": {
+		path:        "/api/v1/kolide/hosts/1",
+		method:      "GET",
+		description: "Get a host by ID",
+		title:       "Get Host",
+	},
+	"DeleteHost": {
+		path:        "/api/v1/kolide/hosts/1",
+		method:      "DELETE",
+		description: "Delete a host by ID",
+		title:       "Delete Host",
+	},
 }
 
 func TestAPIDoc(t *testing.T) {
@@ -171,6 +183,14 @@ func TestAPIDoc(t *testing.T) {
 		},
 		{
 			info:         hinfos["ListHosts"],
+			sessionToken: loggedInSessionToken(t, handler),
+		},
+		{
+			info:         hinfos["GetHost"],
+			sessionToken: loggedInSessionToken(t, handler),
+		},
+		{
+			info:         hinfos["DeleteHost"],
 			sessionToken: loggedInSessionToken(t, handler),
 		},
 	}
