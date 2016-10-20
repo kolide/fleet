@@ -77,7 +77,7 @@ export const loginUser = (formData) => {
 };
 
 export const updateUserRequest = { type: UPDATE_USER_REQUEST };
-export const updateUserSuccess = ({ user }) => {
+export const updateUserSuccess = (user) => {
   return {
     type: UPDATE_USER_SUCCESS,
     payload: {
@@ -100,7 +100,7 @@ export const updateUser = (targetUser, formData) => {
       return dispatch(userActions.update(targetUser, formData))
         .then((response) => {
           const { user } = response;
-          dispatch(updateUserSuccess({ user }));
+          dispatch(updateUserSuccess(user));
           return resolve(user);
         })
         .catch((response) => {
