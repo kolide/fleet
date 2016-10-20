@@ -7,9 +7,9 @@ import { iconClassForLabel } from './helpers';
 class PanelGroupItem extends Component {
   static propTypes = {
     item: PropTypes.shape({
-      hosts_count: PropTypes.number,
-      title: PropTypes.string,
-      type: PropTypes.string,
+      count: PropTypes.number,
+      label: PropTypes.string,
+      name: PropTypes.string,
     }).isRequired,
     onLabelClick: PropTypes.func,
     selected: PropTypes.bool,
@@ -18,8 +18,8 @@ class PanelGroupItem extends Component {
   render () {
     const { item, onLabelClick, selected } = this.props;
     const {
-      hosts_count: count,
-      title,
+      count,
+      label,
     } = item;
     const {
       PanelGroupItemStyles: {
@@ -33,7 +33,7 @@ class PanelGroupItem extends Component {
         <div style={[itemStyles, { width: '41px' }]}>
           <i className={iconClassForLabel(item)} />
         </div>
-        <div style={[itemStyles, { width: '160px' }]}>{title}</div>
+        <div style={[itemStyles, { width: '160px' }]}>{label}</div>
         <div style={[itemStyles, { width: '35px', textAlign: 'right' }]}>{count}</div>
       </div>
     );

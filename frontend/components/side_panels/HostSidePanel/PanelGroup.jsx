@@ -25,7 +25,7 @@ class PanelGroup extends Component {
     return (
       <PanelGroupItem
         item={item}
-        key={item.title}
+        key={item.label}
         onLabelClick={onLabelClick(item)}
         selected={selected}
       />

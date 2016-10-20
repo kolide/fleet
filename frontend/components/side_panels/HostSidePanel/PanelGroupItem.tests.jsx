@@ -6,9 +6,10 @@ import PanelGroupItem from './PanelGroupItem';
 
 describe('PanelGroupItem - component', () => {
   const validPanelGroupItem = {
-    hosts_count: 20,
-    type: 'all',
-    title: 'All Hosts',
+    id: 1,
+    label: 'All Hosts',
+    name: 'hosts',
+    count: 20,
   };
 
   const component = mount(
@@ -22,10 +23,10 @@ describe('PanelGroupItem - component', () => {
   });
 
   it('renders the item text', () => {
-    expect(component.text()).toContain(validPanelGroupItem.title);
+    expect(component.text()).toContain(validPanelGroupItem.label);
   });
 
   it('renders the item count', () => {
-    expect(component.text()).toContain(validPanelGroupItem.hosts_count);
+    expect(component.text()).toContain(validPanelGroupItem.count);
   });
 });

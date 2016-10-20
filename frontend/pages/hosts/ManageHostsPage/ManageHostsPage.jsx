@@ -103,8 +103,8 @@ class ManageHostsPage extends Component {
     return (
       <div style={headerStyles}>
         <i className="kolidecon-tag" />
-        <span style={headerHostsTitleStyles}>{selectedLabel.title}</span>
-        <span style={headerHostsCountStyles}>{selectedLabel.hosts_count} Hosts Total</span>
+        <span style={headerHostsTitleStyles}>{selectedLabel.label}</span>
+        <span style={headerHostsCountStyles}>{selectedLabel.count} Hosts Total</span>
       </div>
     );
   }
