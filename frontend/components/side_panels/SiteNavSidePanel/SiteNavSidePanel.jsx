@@ -10,7 +10,7 @@ import kolideLogo from '../../../../assets/images/kolide-logo.svg';
 import navItems from './navItems';
 import './styles.scss';
 
-class MainSidePanel extends Component {
+class SiteNavSidePanel extends Component {
   static propTypes = {
     config: PropTypes.shape({
       org_logo_url: PropTypes.string,
@@ -254,5 +254,5 @@ class MainSidePanel extends Component {
   }
 }
 
-const ConnectedComponent = connect()(MainSidePanel);
+const ConnectedComponent = connect()(SiteNavSidePanel);
 export default radium(ConnectedComponent);
