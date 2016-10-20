@@ -2,7 +2,7 @@ export const iconClassForLabel = (label) => {
   const lowerName = label.name && label.name.toLowerCase();
 
   switch (lowerName) {
-    case 'hosts': return 'kolidecon-hosts';
+    case 'all': return 'kolidecon-hosts';
     case 'offline': return 'kolidecon-hosts';
     case 'online': return 'kolidecon-hosts';
     case 'macs': return 'kolidecon-apple';

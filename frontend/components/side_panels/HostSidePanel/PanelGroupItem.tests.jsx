@@ -8,7 +8,7 @@ describe('PanelGroupItem - component', () => {
   const validPanelGroupItem = {
     id: 1,
     label: 'All Hosts',
-    name: 'hosts',
+    name: 'all',
     count: 20,
   };
 
