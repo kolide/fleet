@@ -51,11 +51,47 @@ var hinfos = map[string]handlerInfo{
 		description: "Returns info about the currently logged in user",
 		title:       "Current Session User",
 	},
+	"GetUser": {
+		path:        "/api/v1/kolide/users/1",
+		method:      "GET",
+		description: "Return a single user by ID",
+		title:       "Get User",
+	},
 	"ListUsers": {
 		path:        "/api/v1/kolide/users",
 		method:      "GET",
 		description: "Return a list of users",
 		title:       "List Users",
+	},
+	"GetSessionInfo": {
+		path:        "/api/v1/kolide/sessions/1",
+		method:      "GET",
+		description: "Return session info",
+		title:       "Get Session Info",
+	},
+	"DeleteSession": {
+		path:        "/api/v1/kolide/sessions/1",
+		method:      "DELETE",
+		description: "Delete session by ID",
+		title:       "Delete Session",
+	},
+	"ListInvites": {
+		path:        "/api/v1/kolide/invites",
+		method:      "GET",
+		description: "List invited users",
+		title:       "List Invites",
+	},
+	"DeleteInvite": {
+		path:        "/api/v1/kolide/invites/1",
+		method:      "DELETE",
+		description: "Delete invite by ID.",
+		title:       "Delete Invite",
+	},
+	"ListHosts": {
+		path:        "/api/v1/kolide/hosts",
+		method:      "GET",
+		description: "List hosts",
+		title:       "List Hosts",
 	},
 }
 
@@ -111,6 +147,30 @@ func TestAPIDoc(t *testing.T) {
 		},
 		{
 			info:         hinfos["ListUsers"],
+			sessionToken: loggedInSessionToken(t, handler),
+		},
+		{
+			info:         hinfos["GetUser"],
+			sessionToken: loggedInSessionToken(t, handler),
+		},
+		{
+			info:         hinfos["GetSessionInfo"],
+			sessionToken: loggedInSessionToken(t, handler),
+		},
+		{
+			info:         hinfos["DeleteSession"],
+			sessionToken: loggedInSessionToken(t, handler),
+		},
+		{
+			info:         hinfos["ListInvites"],
+			sessionToken: loggedInSessionToken(t, handler),
+		},
+		{
+			info:         hinfos["DeleteInvite"],
+			sessionToken: loggedInSessionToken(t, handler),
+		},
+		{
+			info:         hinfos["ListHosts"],
 			sessionToken: loggedInSessionToken(t, handler),
 		},
 	}

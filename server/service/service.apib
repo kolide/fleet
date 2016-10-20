@@ -18,22 +18,22 @@ Sends a password reset email.
     + Body
 
             {
-  "error": "resource not found"
-}
+                "error": "resource not found"
+            }
         
 
 
 
-## /api/v1/kolide/me
+## /api/v1/kolide/hosts
 
-### Current Session User [GET]
-Returns info about the currently logged in user
+### List Hosts [GET]
+List hosts
 
 + Request 
 
     + Headers
             
-            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6IjVHQTc4TDUvQTFUTHVHSHdYODVMMTJVVnFGREQwOFhTZTlUemxmTGNXT2RJeHJLK2RsSC9jbysrVmxNaWpmYUlBQUlnMUZ3aVoyeUZ0b0l5Ymw4bFJ3PT0ifQ.q_Rag4aTIF5TAC6qUGfm-C-hiFQRWFE8E4QmgvCBl2E
+            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6InJTR1k1bXdJY2pIcldVMHI5YVN3YXBESWVPTmUrOGJKdXVkT1JpODEwNEREZ1BzQTZ5YkI2d1A2MDRBb2dXdUZMQU05RVY5Tzlkck9Gb2doeWJEVURRPT0ifQ.xHlDBO-2jSjQ0EmB6_GACR0TP4UKJOrB1zDLxAvDZLY
 
 + Response 200 (application/json; charset=utf-8)
 
@@ -42,31 +42,22 @@ Returns info about the currently logged in user
     + Body
 
             {
-  "user": {
-    "id": 4,
-    "username": "admin1",
-    "name": "",
-    "email": "admin1@example.com",
-    "admin": true,
-    "enabled": true,
-    "force_password_reset": false,
-    "gravatar_url": ""
-  }
-}
+                "hosts": []
+            }
         
 
 
 
-## /api/v1/kolide/users
+## /api/v1/kolide/invites
 
-### List Users [GET]
-Return a list of users
+### List Invites [GET]
+List invited users
 
 + Request 
 
     + Headers
             
-            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6ImRIcVhzeEtVZEtLU0VMaG1Yc24vUjFjSWtzYnJPQlRENnc2MUtOOWwvbkNsRmVWU2Z5UXBKQXIvdlZ1RDNLZUdFNnRQVmQ2RXZUVTZtQUlrTHRiQytBPT0ifQ._V3fbnIFW9d66DFu2KDLoHO6_ZagYRESqlwQl8SS4wk
+            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6IjN2QUtoTkllZVp5WDlEY3dMUVpKQUJNL1MyQXNZOTlmOUZuanl2V1NhVkNqRGxsYVMzQXp6REVuRXNlZUQ2bUZpWno1N25FNDFBTTFtcUtac2tKT2l3PT0ifQ.lc5oy3oZyAH_IMU8aFldfk_ZgPlRvdn2xWF5bAivPyw
 
 + Response 200 (application/json; charset=utf-8)
 
@@ -75,49 +66,32 @@ Return a list of users
     + Body
 
             {
-  "users": [
-    {
-      "id": 1,
-      "username": "user1",
-      "name": "",
-      "email": "user1@example.com",
-      "admin": false,
-      "enabled": true,
-      "force_password_reset": false,
-      "gravatar_url": ""
-    },
-    {
-      "id": 2,
-      "username": "user2",
-      "name": "",
-      "email": "user2@example.com",
-      "admin": false,
-      "enabled": true,
-      "force_password_reset": false,
-      "gravatar_url": ""
-    },
-    {
-      "id": 3,
-      "username": "disabled1",
-      "name": "",
-      "email": "disabled1@example.com",
-      "admin": false,
-      "enabled": false,
-      "force_password_reset": false,
-      "gravatar_url": ""
-    },
-    {
-      "id": 4,
-      "username": "admin1",
-      "name": "",
-      "email": "admin1@example.com",
-      "admin": true,
-      "enabled": true,
-      "force_password_reset": false,
-      "gravatar_url": ""
-    }
-  ]
-}
+                "invites": []
+            }
+        
+
+
+
+## /api/v1/kolide/invites/1
+
+### Delete Invite [DELETE]
+Delete invite by ID.
+
++ Request 
+
+    + Headers
+            
+            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6IlZuWE5aUDN6SEVBY2dzK2wzdXVBTnRUQmdvUHk1VFhnTURsbHppUzlYMzBVRHVHL1ltQTR4Lzg0SmtjVjh4NEpQSHY0VjNmZFpqSW9nSmlqN092VktRPT0ifQ.HPaRTRZOsvxcvhRidJ9p9mQGRdq_FkWppyDsaGLy6Vg
+
++ Response 200 (application/json; charset=utf-8)
+
+
+
+    + Body
+
+            {
+                "error": {}
+            }
         
 
 
@@ -131,9 +105,9 @@ Logs a user in.
     + Body
 
             {
-        		"username": "admin1",
-        		"password": "foobar"
-			}        
+                        "username": "admin1",
+                        "password": "foobar"
+                        }        
 
 + Response 200 (application/json; charset=utf-8)
 
@@ -142,18 +116,18 @@ Logs a user in.
     + Body
 
             {
-  "user": {
-    "id": 4,
-    "username": "admin1",
-    "name": "",
-    "email": "admin1@example.com",
-    "admin": true,
-    "enabled": true,
-    "force_password_reset": false,
-    "gravatar_url": ""
-  },
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6InM5bG04SjE0TWRwMWlwekVIL0R3M3JBbklZNmtzMG1RUHNOOUR1bDBhUHQyd25OclVISFFKMVNjY0FGQ1NzK3lSemxlNXNKbUltSnRDSmFaVlFqZEFBPT0ifQ.Qhz45c9iqHOZ3oz9_UXenMyWyjlJZFWlC_W_nR1S1vI"
-}
+                "user": {
+                    "id": 1,
+                    "username": "admin1",
+                    "name": "",
+                    "email": "admin1@example.com",
+                    "admin": true,
+                    "enabled": true,
+                    "force_password_reset": false,
+                    "gravatar_url": ""
+                },
+                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6Ik1aN0FGL2FiOEJDREZ5VkZvR1RiSVdoMURoa2VPMEtIaDU0ZkJEaDlSaEJEemc3K3JjVlNFbkN2N3F2bkt2Uy80TEVCdFlQWGtXM0xNZ1JRVVNIVk5BPT0ifQ.3IrDN7MdAU8bhrVnfikQKDMLhbkqfGTuFNLPoxfT6To"
+            }
         
 
 
@@ -162,9 +136,9 @@ Logs a user in.
     + Body
 
             {
-        		"username": "nobody",
-        		"password": "foobar"
-			}        
+                        "username": "nobody",
+                        "password": "foobar"
+                        }        
 
 + Response 401 (application/json; charset=utf-8)
 
@@ -173,9 +147,9 @@ Logs a user in.
     + Body
 
             {
-  "message": "Authentication Failed",
-  "error": "username or email and password do not match"
-}
+                "message": "Authentication Failed",
+                "error": "username or email and password do not match"
+            }
         
 
 
@@ -189,7 +163,7 @@ Logs a user out.
 
     + Headers
             
-            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6Im1rYWoxNVYraW81M1JxY3lHRnhCdVU2eUF5RkhZb2JxTWZsTk5oZ0hEaVFGK0pCcDRDY0ZvL1lnTEVKZmJWbVEwS1haMGpGSXQrbUs2ZGkyVFN1S2JRPT0ifQ.LNG7fU9hGB9Pi4Pzr257gqAeRY8RYBfaEok08_IZW5M
+            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6Ik1vR3daQjkzQzlHREl6RTJmM2Q4ZVEvaStOaG8vQlZTVHowS2RqSFFFbmZnaDEvVkp6RUp3eTREeElFN0FZcTBWaE1ablRiV3FUZzk0bTdzL2pidHZBPT0ifQ.T4GeA0QGu7F7ttHGQwpbDjJMsKUilxnduJPY42t0BXs
 
 + Response 200 (application/json; charset=utf-8)
 
@@ -198,6 +172,182 @@ Logs a user out.
     + Body
 
             {}
+        
+
+
+
+## /api/v1/kolide/me
+
+### Current Session User [GET]
+Returns info about the currently logged in user
+
++ Request 
+
+    + Headers
+            
+            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6Ii8rNXdLaFhmVmJGWGFJcGJPOVY3anptSDBNcGVEdnFpUmpUZk1TWndiVlpqZGRvWXpWT1NqZm5IMzdjQ0FETDhraHYvT2VZYUFkc0poakpxc01jb0F3PT0ifQ.8s7JOXQia9QuEX8NoNqLtYOGQ5FXnYiScvZAZEeM1ls
+
++ Response 200 (application/json; charset=utf-8)
+
+
+
+    + Body
+
+            {
+                "user": {
+                    "id": 1,
+                    "username": "admin1",
+                    "name": "",
+                    "email": "admin1@example.com",
+                    "admin": true,
+                    "enabled": true,
+                    "force_password_reset": false,
+                    "gravatar_url": ""
+                }
+            }
+        
+
+
+
+## /api/v1/kolide/sessions/1
+
+### Delete Session [DELETE]
+Delete session by ID
+
++ Request 
+
+    + Headers
+            
+            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6ImYrNzFUTis1MWRmcjdOcnhVVVJIeEVNeUIxTFF2cmZXTGloODhPVmJKRU9INUhvVnN1eUdJYmdtVkhjR3hNcm5IRU55blhobDA5di9vUE9xaTNxVlhRPT0ifQ.9gcLfh2FwAQqwFtC1UkSBAlVROcHvMSZt4KMrlxAVj4
+
++ Response 404 (application/json; charset=utf-8)
+
+
+
+    + Body
+
+            {
+                "error": "resource not found"
+            }
+        
+
+
+### Get Session Info [GET]
+Return session info
+
++ Request 
+
+    + Headers
+            
+            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6IjJIRjdZUy9HVmFIWTc3UlROdFBoR3JKZHZYZ1BIMlMyM3VxZE5rNElleEF4OUZJcElPMmxvWjNValpMN2liRWtSa0RFei9RR0lUKzUxTTd6N3BFRUp3PT0ifQ.GfKG2JLS740hkX7d2UulWdmUjwQ1-UW4NJWQVJM7ne0
+
++ Response 404 (application/json; charset=utf-8)
+
+
+
+    + Body
+
+            {
+                "error": "resource not found"
+            }
+        
+
+
+
+## /api/v1/kolide/users
+
+### List Users [GET]
+Return a list of users
+
++ Request 
+
+    + Headers
+            
+            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6ImpsRkRLaGtaS0thOXdTMXpUZjhESnJlWk1QakdjY1FQSTl3a3hGcGxKK1N5NlliVGd6YzJBQVl2R3UreDloS3E2N2hkaDBZeU96ZUkzeFFwTUVNVEpnPT0ifQ.ivSgWK5ZMluFcK163i6oKZ95wwM578x8c4oHATcRe3E
+
++ Response 200 (application/json; charset=utf-8)
+
+
+
+    + Body
+
+            {
+                "users": [
+                    {
+                        "id": 1,
+                        "username": "admin1",
+                        "name": "",
+                        "email": "admin1@example.com",
+                        "admin": true,
+                        "enabled": true,
+                        "force_password_reset": false,
+                        "gravatar_url": ""
+                    },
+                    {
+                        "id": 2,
+                        "username": "user1",
+                        "name": "",
+                        "email": "user1@example.com",
+                        "admin": false,
+                        "enabled": true,
+                        "force_password_reset": false,
+                        "gravatar_url": ""
+                    },
+                    {
+                        "id": 3,
+                        "username": "user2",
+                        "name": "",
+                        "email": "user2@example.com",
+                        "admin": false,
+                        "enabled": true,
+                        "force_password_reset": false,
+                        "gravatar_url": ""
+                    },
+                    {
+                        "id": 4,
+                        "username": "disabled1",
+                        "name": "",
+                        "email": "disabled1@example.com",
+                        "admin": false,
+                        "enabled": false,
+                        "force_password_reset": false,
+                        "gravatar_url": ""
+                    }
+                ]
+            }
+        
+
+
+
+## /api/v1/kolide/users/1
+
+### Get User [GET]
+Return a single user by ID
+
++ Request 
+
+    + Headers
+            
+            Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6IjBwVytMLzJxKzFkSk9BcmpML3czWXZ2WmxvTDEybGJMVC9aUkhpdUFHOFhZVWhrREdEbUdVT0VCRlJrTzBFRENuUWpBaEN4blRLUjVwNmdUR29Za3VnPT0ifQ.h1GxsrV4HVJ0EuN8ZT68HygZJBxeFkzhlZPEY2Bob68
+
++ Response 200 (application/json; charset=utf-8)
+
+
+
+    + Body
+
+            {
+                "user": {
+                    "id": 1,
+                    "username": "admin1",
+                    "name": "",
+                    "email": "admin1@example.com",
+                    "admin": true,
+                    "enabled": true,
+                    "force_password_reset": false,
+                    "gravatar_url": ""
+                }
+            }
         
 
 
