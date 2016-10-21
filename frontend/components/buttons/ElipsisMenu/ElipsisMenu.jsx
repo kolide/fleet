@@ -106,8 +106,7 @@ export default ClickOutside(StyledComponent, {
     return component.DOMNode;
   },
   onOutsideClick: (component) => {
-    return (evt) => {
-      evt.preventDefault();
+    return () => {
       component.setState({ showChildren: false });
 
       return false;

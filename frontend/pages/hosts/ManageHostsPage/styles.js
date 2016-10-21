@@ -1,6 +1,6 @@
 import Styles from '../../../styles';
 
-const { color, padding } = Styles;
+const { color, font, padding } = Styles;
 
 export default {
   containerStyles: {
@@ -9,5 +9,17 @@ export default {
     paddingLeft: padding.base,
     paddingRight: padding.base,
     paddingTop: padding.base,
+  },
+  headerStyles: {
+    color: color.textMedium,
+  },
+  headerHostsTitleStyles: {
+    fontSize: font.large,
+    marginLeft: padding.half,
+    marginRight: padding.base,
+    textTransform: 'uppercase',
+  },
+  headerHostsCountStyles: {
+    fontSize: font.small,
   },
 };
