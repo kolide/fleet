@@ -127,7 +127,9 @@ class SaveQueryForm extends Component {
     return true;
   }
 
-  toggleShowMoreOptions = () => {
+  toggleShowMoreOptions = (evt) => {
+    evt.preventDefault();
+
     const { showMoreOptions } = this.state;
 
     this.setState({
