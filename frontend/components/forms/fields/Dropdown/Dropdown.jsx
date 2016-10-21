@@ -3,14 +3,12 @@ import radium from 'radium';
 import { noop } from 'lodash';
 
 import componentStyles from './styles';
+import dropdownOptionInterface from '../../../../interfaces/dropdownOption';
 
 class Dropdown extends Component {
   static propTypes = {
     selectStyles: PropTypes.object, // eslint-disable-line react/forbid-prop-types
-    options: PropTypes.arrayOf(PropTypes.shape({
-      text: PropTypes.string,
-      value: PropTypes.string,
-    })),
+    options: PropTypes.arrayOf(dropdownOptionInterface),
     onSelect: PropTypes.func,
     containerStyles: PropTypes.object, // eslint-disable-line react/forbid-prop-types
   };

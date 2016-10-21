@@ -6,6 +6,7 @@ import radium, { StyleRoot } from 'radium';
 
 import { activeTabFromPathname, activeSubTabFromPathname } from './helpers';
 import componentStyles from './styles';
+import configInterface from '../../../interfaces/config';
 import kolideLogo from '../../../../assets/images/kolide-logo.svg';
 import navItems from './navItems';
 import userInterface from '../../../interfaces/user';
@@ -13,10 +14,7 @@ import './styles.scss';
 
 class SiteNavSidePanel extends Component {
   static propTypes = {
-    config: PropTypes.shape({
-      org_logo_url: PropTypes.string,
-      org_name: PropTypes.name,
-    }),
+    config: configInterface,
     dispatch: PropTypes.func,
     pathname: PropTypes.string,
     user: userInterface,

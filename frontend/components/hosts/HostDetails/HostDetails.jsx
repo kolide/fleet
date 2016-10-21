@@ -4,6 +4,7 @@ import radium from 'radium';
 
 import componentStyles from './styles';
 import ElipsisMenu from '../../../components/buttons/ElipsisMenu';
+import hostInterface from '../../../interfaces/host';
 import { humanMemory, humanUptime, platformIconClass } from './helpers';
 
 const {
@@ -92,14 +93,7 @@ const HostDetails = ({ host, onQueryClick = noop, onDisableClick = noop }) => {
 };
 
 HostDetails.propTypes = {
-  host: PropTypes.shape({
-    hostname: PropTypes.string,
-    ip: PropTypes.string,
-    mac: PropTypes.string,
-    memory: PropTypes.number,
-    platform: PropTypes.string,
-    uptime: PropTypes.number,
-  }).isRequired,
+  host: hostInterface.isRequired,
   onDisableClick: PropTypes.func,
   onQueryClick: PropTypes.func,
 };
