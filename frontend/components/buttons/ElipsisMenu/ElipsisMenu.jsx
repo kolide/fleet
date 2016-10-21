@@ -8,7 +8,7 @@ import componentStyles from './styles';
 export class ElipsisMenu extends Component {
   static propTypes = {
     children: PropTypes.node,
-    positionStyles: PropTypes.object,
+    positionStyles: PropTypes.object, // eslint-disable-line react/forbid-prop-types
   };
 
   constructor (props) {

@@ -6,13 +6,13 @@ import componentStyles from './styles';
 
 class Dropdown extends Component {
   static propTypes = {
-    selectStyles: PropTypes.object,
+    selectStyles: PropTypes.object, // eslint-disable-line react/forbid-prop-types
     options: PropTypes.arrayOf(PropTypes.shape({
       text: PropTypes.string,
       value: PropTypes.string,
     })),
     onSelect: PropTypes.func,
-    containerStyles: PropTypes.object,
+    containerStyles: PropTypes.object, // eslint-disable-line react/forbid-prop-types
   };
 
   static defaultProps = {

@@ -7,7 +7,6 @@ class Modal extends Component {
   static propTypes = {
     children: PropTypes.node,
     onExit: PropTypes.func,
-    overrideStyles: PropTypes.object,
     title: PropTypes.string,
   };
 

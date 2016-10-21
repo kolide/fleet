@@ -9,6 +9,7 @@ import {
   numAdditionalColumns,
   shouldShowAllColumns,
 } from './helpers';
+import osqueryTableInterface from '../../../interfaces/osquery_table';
 import { osqueryTables } from '../../../utilities/osquery_tables';
 import SecondarySidePanelContainer from '../SecondarySidePanelContainer';
 
@@ -18,7 +19,7 @@ class QuerySidePanel extends Component {
   static propTypes = {
     onOsqueryTableSelect: PropTypes.func,
     onTextEditorInputChange: PropTypes.func,
-    selectedOsqueryTable: PropTypes.object,
+    selectedOsqueryTable: osqueryTableInterface,
   };
 
   componentWillMount () {

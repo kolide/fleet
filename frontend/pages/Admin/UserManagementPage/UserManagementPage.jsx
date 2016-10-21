@@ -5,18 +5,20 @@ import componentStyles from './styles';
 import entityGetter from '../../../redux/utilities/entityGetter';
 import Button from '../../../components/buttons/Button';
 import inviteActions from '../../../redux/nodes/entities/invites/actions';
+import inviteInterface from '../../../interfaces/invite';
 import InviteUserForm from '../../../components/forms/InviteUserForm';
 import Modal from '../../../components/Modal';
 import userActions from '../../../redux/nodes/entities/users/actions';
 import UserBlock from './UserBlock';
+import userInterface from '../../../interfaces/user';
 import { renderFlash } from '../../../redux/nodes/notifications/actions';
 
 class UserManagementPage extends Component {
   static propTypes = {
-    currentUser: PropTypes.object,
+    currentUser: userInterface,
     dispatch: PropTypes.func,
-    invites: PropTypes.arrayOf(PropTypes.object),
-    users: PropTypes.arrayOf(PropTypes.object),
+    invites: PropTypes.arrayOf(inviteInterface),
+    users: PropTypes.arrayOf(userInterface),
   };
 
   constructor (props) {

@@ -5,11 +5,12 @@ import componentStyles from './styles';
 import entityGetter from '../../../redux/utilities/entityGetter';
 import hostActions from '../../../redux/nodes/entities/hosts/actions';
 import HostDetails from '../../../components/hosts/HostDetails';
+import hostInterface from '../../../interfaces/host';
 
 class ManageHostsPage extends Component {
   static propTypes = {
     dispatch: PropTypes.func,
-    hosts: PropTypes.array,
+    hosts: PropTypes.arrayOf(hostInterface),
   };
 
   componentWillMount () {

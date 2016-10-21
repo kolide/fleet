@@ -8,6 +8,7 @@ import { activeTabFromPathname, activeSubTabFromPathname } from './helpers';
 import componentStyles from './styles';
 import kolideLogo from '../../../../assets/images/kolide-logo.svg';
 import navItems from './navItems';
+import userInterface from '../../../interfaces/user';
 import './styles.scss';
 
 class SiteNavSidePanel extends Component {
@@ -18,7 +19,7 @@ class SiteNavSidePanel extends Component {
     }),
     dispatch: PropTypes.func,
     pathname: PropTypes.string,
-    user: PropTypes.object,
+    user: userInterface,
   };
 
   constructor (props) {
