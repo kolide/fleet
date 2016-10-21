@@ -147,19 +147,23 @@ class SiteNavSidePanel extends Component {
 
     return (
       <div style={navItemWrapperStyles(lastChild)} key={`nav-item-${name}`}>
-        {active && <div style={navItemBeforeStyles} />}
-        <li
-          key={name}
+        <button
+          className="btn--unstyled"
           onClick={setActiveTab(navItem)}
-          style={navItemStyles(active)}
         >
-          <div style={{ position: 'relative' }}>
-            <i className={icon} style={iconStyles} />
-            <span style={navItemNameStyles}>
-              {name}
-            </span>
-          </div>
-        </li>
+          {active && <div style={navItemBeforeStyles} />}
+          <li
+            key={name}
+            style={navItemStyles(active)}
+          >
+            <div style={{ position: 'relative' }}>
+              <i className={icon} style={iconStyles} />
+              <span style={navItemNameStyles}>
+                {name}
+              </span>
+            </div>
+          </li>
+        </button>
         {active && renderSubItems(subItems)}
       </div>
     );
@@ -192,19 +196,20 @@ class SiteNavSidePanel extends Component {
     } = componentStyles;
 
     return (
-      <div
+      <button
+        className="btn--unstyled"
         key={`sub-item-${name}`}
+        onClick={setActiveSubItem(subItem)}
         style={{ position: 'relative' }}
       >
         {active && <div style={subItemBeforeStyles} />}
         <li
           key={name}
-          onClick={setActiveSubItem(subItem)}
           style={subItemStyles(active)}
         >
           <span to={path.location} style={subItemLinkStyles(active)}>{name}</span>
         </li>
-      </div>
+      </button>
     );
   }
 
@@ -234,9 +239,9 @@ class SiteNavSidePanel extends Component {
     const iconName = showSubItems ? 'kolidecon-chevronleftbold' : 'kolidecon-chevronrightbold';
 
     return (
-      <div style={collapseSubItemsWrapper} onClick={toggleShowSubItems(!showSubItems)}>
+      <button className="btn--unstyles" style={collapseSubItemsWrapper} onClick={toggleShowSubItems(!showSubItems)}>
         <i className={iconName} />
-      </div>
+      </button>
     );
   }
 

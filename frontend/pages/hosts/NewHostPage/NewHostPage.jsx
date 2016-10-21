@@ -110,7 +110,7 @@ export class NewHostPage extends Component {
     return map(HOST_TABS, (tab) => {
       const selected = selectedTab === tab;
 
-      return <span onClick={onSetActiveTab(tab)} key={tab} style={hostTabHeaderStyles(selected)}>{tab}</span>;
+      return <button className="btn--unstyled" onClick={onSetActiveTab(tab)} key={tab} style={hostTabHeaderStyles(selected)}>{tab}</button>;
     });
   }
 

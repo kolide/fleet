@@ -145,20 +145,20 @@ class SaveQueryForm extends Component {
     if (showMoreOptions) {
       return (
         <div style={moreOptionsCtaSectionStyles}>
-          <span onClick={toggleShowMoreOptions} style={moreOptionsTextStyles}>
+          <button className="btn--unstyled" onClick={toggleShowMoreOptions} style={moreOptionsTextStyles}>
             Fewer Options
             <i className="kolidecon-upcarat" style={moreOptionsIconStyles} />
-          </span>
+          </button>
         </div>
       );
     }
 
     return (
       <div style={moreOptionsCtaSectionStyles}>
-        <span onClick={toggleShowMoreOptions} style={moreOptionsTextStyles}>
+        <button className="btn--unstyled" onClick={toggleShowMoreOptions} style={moreOptionsTextStyles}>
           More Options
           <i className="kolidecon-downcarat" style={moreOptionsIconStyles} />
-        </span>
+        </button>
       </div>
     );
   }

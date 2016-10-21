@@ -84,11 +84,16 @@ export class ElipsisMenu extends Component {
 
     return (
       <div
-        onClick={onToggleChildren}
         ref={setDOMNode}
         style={[containerStyles, positionStyles]}
       >
-        <span style={elipsisStyles}>&bull; &bull; &bull;</span>
+        <button
+          className="btn--unstyled"
+          onClick={onToggleChildren}
+          style={elipsisStyles}
+        >
+          &bull; &bull; &bull;
+        </button>
         {renderChildren()}
       </div>
     );

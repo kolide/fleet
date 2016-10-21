@@ -36,8 +36,20 @@ const FlashMessage = ({ notification, dispatch }) => {
         {message}
       </div>
       <div style={flashActionStyles}>
-        <div onClick={submitUndoAction} style={undoStyles}>{undoAction && 'undo'}</div>
-        <div onClick={removeFlashMessage} style={removeFlashMessageStyles(alertType)}>x</div>
+        <button
+          className="btn--unstyled"
+          onClick={submitUndoAction}
+          style={undoStyles}
+        >
+          {undoAction && 'undo'}
+        </button>
+        <button
+          className="btn--unstyled"
+          onClick={removeFlashMessage}
+          style={removeFlashMessageStyles(alertType)}
+        >
+          x
+        </button>
       </div>
     </div>
   );

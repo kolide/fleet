@@ -94,7 +94,7 @@ class QuerySidePanel extends Component {
     return (
       <div className={`${classBlock}__column-wrapper`}>
         <span className={`${classBlock}__more-columns`}>{numAdditionalColumns(selectedOsqueryTable)} MORE COLUMNS</span>
-        <span onClick={onShowAllColumns} className={`${classBlock}__show-columns`}>SHOW</span>
+        <button className={`btn--unstyled ${classBlock}__show-columns`} onClick={onShowAllColumns}>SHOW</button>
       </div>
     );
   }

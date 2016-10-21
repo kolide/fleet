@@ -10,6 +10,7 @@ const {
   containerStyles,
   contentSeparatorStyles,
   disableIconStyles,
+  elipsisChildItemStyles,
   elipsisChidrenWrapperStyles,
   elipsisPositionStyles,
   hostContentItemStyles,
@@ -41,15 +42,15 @@ const HostDetails = ({ host, onQueryClick = noop, onDisableClick = noop }) => {
     <div style={containerStyles(status)}>
       <ElipsisMenu positionStyles={elipsisPositionStyles}>
         <div style={elipsisChidrenWrapperStyles}>
-          <div onClick={onQueryClick(host)} style={{ cursor: 'pointer', width: '60px' }}>
+          <button className="btn--unstyled" onClick={onQueryClick(host)} style={elipsisChildItemStyles}>
             <i className="kolidecon-query" style={queryIconStyles} />
             <div>Query</div>
-          </div>
+          </button>
           <div style={verticleRuleStyles} />
-          <div onClick={onDisableClick(host)} style={{ cursor: 'pointer', width: '60px' }}>
+          <button className="btn--unstyled" onClick={onDisableClick(host)} style={elipsisChildItemStyles}>
             <i className="kolidecon-ex" style={disableIconStyles} />
             <div>Disable</div>
-          </div>
+          </button>
         </div>
       </ElipsisMenu>
       <div style={statusStyles(status)}>
