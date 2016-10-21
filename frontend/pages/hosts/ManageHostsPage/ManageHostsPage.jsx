@@ -37,7 +37,7 @@ class ManageHostsPage extends Component {
     const { hosts } = this.props;
     const { onHostDetailActionClick } = this;
 
-    return hosts.map(host => {
+    return hosts.map((host) => {
       return (
         <HostDetails
           host={host}

@@ -13,35 +13,35 @@ class Kolide extends Base {
     const { CONFIG } = endpoints;
 
     return this.authenticatedGet(this.endpoint(CONFIG))
-      .then(response => { return response.org_info; });
+      .then((response) => { return response.org_info; });
   }
 
   getInvites = () => {
     const { INVITES } = endpoints;
 
     return this.authenticatedGet(this.endpoint(INVITES))
-      .then(response => { return response.invites; });
+      .then((response) => { return response.invites; });
   }
 
   getHosts = () => {
     const { HOSTS } = endpoints;
 
     return this.authenticatedGet(this.endpoint(HOSTS))
-      .then(response => { return response.hosts; });
+      .then((response) => { return response.hosts; });
   }
 
   getUsers = () => {
     const { USERS } = endpoints;
 
     return this.authenticatedGet(this.endpoint(USERS))
-      .then(response => { return response.users; });
+      .then((response) => { return response.users; });
   }
 
   inviteUser = (formData) => {
     const { INVITES } = endpoints;
 
     return this.authenticatedPost(this.endpoint(INVITES), JSON.stringify(formData))
-      .then(response => { return response.invite; });
+      .then((response) => { return response.invite; });
   }
 
   loginUser ({ username, password }) {
@@ -84,7 +84,7 @@ class Kolide extends Base {
     const updateUserEndpoint = `${this.baseURL}${USERS}/${user.id}`;
 
     return this.authenticatedPatch(updateUserEndpoint, JSON.stringify(formData))
-      .then(response => { return response.user; });
+      .then((response) => { return response.user; });
   }
 }
 

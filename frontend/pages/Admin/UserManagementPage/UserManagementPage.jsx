@@ -113,7 +113,7 @@ class UserManagementPage extends Component {
         dispatch(renderFlash('success', 'User invited'));
         return this.toggleInviteUserModal();
       })
-      .catch(error => {
+      .catch((error) => {
         const inviteError = error === 'resource already created'
           ? 'User has already been invited'
           : error;
@@ -201,10 +201,10 @@ class UserManagementPage extends Component {
           />
         </div>
         <div style={usersWrapperStyles}>
-          {users.map(user => {
+          {users.map((user) => {
             return this.renderUserBlock(user);
           })}
-          {invites.map(user => {
+          {invites.map((user) => {
             return this.renderUserBlock(user, { invite: true });
           })}
         </div>

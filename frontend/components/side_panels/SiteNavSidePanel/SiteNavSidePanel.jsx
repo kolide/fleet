@@ -217,7 +217,7 @@ class SiteNavSidePanel extends Component {
     return (
       <div className={setSubNavClass(showSubItems)} style={subItemsStyles}>
         <ul style={subItemListStyles(showSubItems)}>
-          {subItems.map(subItem => {
+          {subItems.map((subItem) => {
             return renderSubItem(subItem);
           })}
         </ul>

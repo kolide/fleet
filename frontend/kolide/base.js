@@ -81,11 +81,11 @@ class Base {
       : { credentials, method, body, headers };
 
     return fetch(endpoint, requestAttrs)
-      .then(response => {
+      .then((response) => {
         if (method === DELETE) return false;
 
         return response.json()
-          .then(jsonResponse => {
+          .then((jsonResponse) => {
             if (response.ok) {
               return jsonResponse;
             }

@@ -107,7 +107,7 @@ export class NewHostPage extends Component {
     const { selectedTab } = this.state;
     const { onSetActiveTab } = this;
 
-    return map(HOST_TABS, tab => {
+    return map(HOST_TABS, (tab) => {
       const selected = selectedTab === tab;
 
       return <span onClick={onSetActiveTab(tab)} key={tab} style={hostTabHeaderStyles(selected)}>{tab}</span>;

@@ -68,7 +68,7 @@ class QuerySidePanel extends Component {
     const { showAllColumns } = this.state;
     const columns = columnsToRender(selectedOsqueryTable, showAllColumns);
 
-    return columns.map(column => {
+    return columns.map((column) => {
       return (
         <div key={column.name} className={`${classBlock}__column-wrapper`}>
           <span className={`${classBlock}__column-name`}>{column.name}</span>
@@ -102,7 +102,7 @@ class QuerySidePanel extends Component {
     const { onSuggestedQueryClick } = this;
     const { selectedOsqueryTable } = this.props;
 
-    return selectedOsqueryTable.examples.map(example => {
+    return selectedOsqueryTable.examples.map((example) => {
       return (
         <div key={example} className={`${classBlock}__column-wrapper`}>
           <span className={`${classBlock}__suggestion`}>{example}</span>
@@ -123,7 +123,7 @@ class QuerySidePanel extends Component {
     return (
       <div className="kolide-dropdown-wrapper">
         <select className="kolide-dropdown" onChange={onSelectTable} value={selectedOsqueryTable.name}>
-          {osqueryTables.map(table => {
+          {osqueryTables.map((table) => {
             return <option key={table.name} value={table.name}>{table.name}</option>;
           })}
         </select>
