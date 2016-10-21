@@ -271,7 +271,7 @@ class SaveQueryForm extends Component {
             type="tel"
           />
           <small style={helpTextStyles}>
-            You can use queries you write in "scans". The interval can be used to control how frequently the query runs when it is running continuously.
+            You can use queries you write in &quot;scans&quot;. The interval can be used to control how frequently the query runs when it is running continuously.
           </small>
         </div>
       </div>
