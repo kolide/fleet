@@ -3,16 +3,17 @@ import radium from 'radium';
 
 import componentStyles from './styles';
 import InputField from '../../forms/fields/InputField';
+import labelInterface from '../../../interfaces/label';
 import PanelGroup from './PanelGroup';
 import SecondarySidePanelContainer from '../SecondarySidePanelContainer';
 
 class HostSidePanel extends Component {
   static propTypes = {
-    allHostGroupItems: PropTypes.array,
-    hostPlatformGroupItems: PropTypes.array,
-    hostStatusGroupItems: PropTypes.array,
+    allHostGroupItems: PropTypes.arrayOf(labelInterface),
+    hostPlatformGroupItems: PropTypes.arrayOf(labelInterface),
+    hostStatusGroupItems: PropTypes.arrayOf(labelInterface),
     onLabelClick: PropTypes.func,
-    selectedLabel: PropTypes.object,
+    selectedLabel: labelInterface,
   };
 
   render () {

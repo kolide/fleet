@@ -2,13 +2,14 @@ import React, { Component, PropTypes } from 'react';
 import { isEqual, noop } from 'lodash';
 import radium from 'radium';
 
+import labelInterface from '../../../interfaces/label';
 import PanelGroupItem from './PanelGroupItem';
 
 class PanelGroup extends Component {
   static propTypes = {
-    groupItems: PropTypes.array,
+    groupItems: PropTypes.arrayOf(labelInterface),
     onLabelClick: PropTypes.func,
-    selectedLabel: PropTypes.object,
+    selectedLabel: labelInterface,
   };
 
   static defaultProps = {
@@ -38,7 +39,7 @@ class PanelGroup extends Component {
 
     return (
       <div>
-        {groupItems.map(item => {
+        {groupItems.map((item) => {
           return renderGroupItem(item);
         })}
       </div>

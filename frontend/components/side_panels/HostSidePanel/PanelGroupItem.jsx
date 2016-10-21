@@ -3,14 +3,11 @@ import radium from 'radium';
 
 import HostSidePanelStyles from './styles';
 import { iconClassForLabel } from './helpers';
+import labelInterface from '../../../interfaces/label';
 
 class PanelGroupItem extends Component {
   static propTypes = {
-    item: PropTypes.shape({
-      count: PropTypes.number,
-      label: PropTypes.string,
-      name: PropTypes.string,
-    }).isRequired,
+    item: labelInterface.isRequired,
     onLabelClick: PropTypes.func,
     selected: PropTypes.bool,
   };
@@ -29,13 +26,13 @@ class PanelGroupItem extends Component {
     } = HostSidePanelStyles;
 
     return (
-      <div onClick={onLabelClick} style={containerStyles(selected)}>
+      <button className="btn--unstyled" onClick={onLabelClick} style={containerStyles(selected)}>
         <div style={[itemStyles, { width: '41px' }]}>
           <i className={iconClassForLabel(item)} />
         </div>
         <div style={[itemStyles, { width: '160px' }]}>{label}</div>
         <div style={[itemStyles, { width: '35px', textAlign: 'right' }]}>{count}</div>
-      </div>
+      </button>
     );
   }
 }

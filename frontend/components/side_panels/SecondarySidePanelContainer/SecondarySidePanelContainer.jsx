@@ -6,7 +6,7 @@ import componentStyles from './styles';
 class SecondarySidePanelContainer extends Component {
   static propTypes = {
     children: PropTypes.node,
-    style: PropTypes.object,
+    style: PropTypes.object, // eslint-disable-line react/forbid-prop-types
   };
 
   render () {

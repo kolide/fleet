@@ -42,7 +42,7 @@ class Kolide extends Base {
         { id: 10, label: 'WINDOWS', name: 'windows', type: 'platform', count: 1 },
       ],
     })
-      .then(response => { return response.labels; });
+      .then((response) => { return response.labels; });
   }
 
   getUsers = () => {
