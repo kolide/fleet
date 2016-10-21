@@ -1,5 +1,5 @@
 import React from 'react';
-import expect, { restoreSpies } from 'expect';
+import expect, { createSpy, restoreSpies } from 'expect';
 import { mount } from 'enzyme';
 import { noop } from 'lodash';
 
@@ -48,6 +48,45 @@ describe('NewQuery - component', () => {
     component.find('Slider').simulate('click');
 
     expect(component.find('SaveQueryForm').length).toEqual(1);
+  });
+
+  describe('Query string validations', () => {
+    const invalidQuery = 'CREATE TABLE users (LastName varchar(255))';
+    const validQuery = 'SELECT * FROM users';
+
+    it('calls onInvalidQuerySubmit when invalid', () => {
+      const invalidQuerySubmitSpy = createSpy();
+      const component = mount(
+        <NewQuery
+          onInvalidQuerySubmit={invalidQuerySubmitSpy}
+          onOsqueryTableSelect={noop}
+          onTextEditorInputChange={noop}
+          textEditorText={invalidQuery}
+        />
+      );
+      const form = component.find('SaveQueryForm');
+
+      form.simulate('submit');
+
+      expect(invalidQuerySubmitSpy).toHaveBeenCalledWith('Cannot INSERT or CREATE in osquery queries');
+    });
+
+    it('calls onNewQueryFormSubmit when valid', () => {
+      const onNewQueryFormSubmitSpy = createSpy();
+      const component = mount(
+        <NewQuery
+          onNewQueryFormSubmit={onNewQueryFormSubmitSpy}
+          onOsqueryTableSelect={noop}
+          onTextEditorInputChange={noop}
+          textEditorText={validQuery}
+        />
+      );
+      const form = component.find('SaveQueryForm');
+
+      form.simulate('submit');
+
+      expect(onNewQueryFormSubmitSpy).toHaveBeenCalled();
+    });
   });
 });
 
