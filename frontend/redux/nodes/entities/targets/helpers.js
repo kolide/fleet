@@ -24,11 +24,4 @@ export const appendTargetTypeToTargets = (apiResponse) => {
   };
 };
 
-export const parseTarget = (target) => {
-  return {
-    ...target,
-    id: `${target.target_type}-${target.id}`,
-  };
-};
-
-export default { appendTargetTypeToTargets, parseTarget };
+export default { appendTargetTypeToTargets };

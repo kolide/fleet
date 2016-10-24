@@ -62,25 +62,4 @@ describe('targets - helpers', () => {
       });
     });
   });
-
-  describe('#parseTarget', () => {
-    const { parseTarget } = helpers;
-    const target = {
-      id: 4,
-      label: 'Jason Meller\'s Macbook Pro',
-      name: 'jmeller.local',
-      platform: 'darwin',
-      target_type: 'hosts',
-    };
-
-    it('prepends the target type to the target id', () => {
-      expect(parseTarget(target)).toEqual({
-        id: 'hosts-4',
-        label: 'Jason Meller\'s Macbook Pro',
-        name: 'jmeller.local',
-        platform: 'darwin',
-        target_type: 'hosts',
-      });
-    });
-  });
 });
