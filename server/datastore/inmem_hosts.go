@@ -13,7 +13,7 @@ func (orm *inmem) NewHost(host *kolide.Host) (*kolide.Host, error) {
 	defer orm.mtx.Unlock()
 
 	for _, h := range orm.hosts {
-		if host.NodeKey == h.NodeKey || host.UUID == h.UUID {
+		if host.NodeKey != "" && host.NodeKey == h.NodeKey || host.UUID != "" && host.UUID == h.UUID {
 			return nil, ErrExists
 		}
 	}

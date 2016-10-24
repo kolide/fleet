@@ -6,7 +6,7 @@ import (
     "github.com/kolide/kolide-ose/server/kolide"
 )
 
-func (svc service) Search(ctx context.Context, query string, omit []kolide.Target) (kolide.TargetSearchResults, uint, error) {
+func (svc service) SearchTargets(ctx context.Context, query string, omit []kolide.Target) (kolide.TargetSearchResults, uint, error) {
     return kolide.TargetSearchResults{}, 0, nil
 }
 
