@@ -12,6 +12,7 @@ import debounce from '../../../utilities/debounce';
 import SaveQueryForm from '../../forms/queries/SaveQueryForm';
 import SaveQuerySection from './SaveQuerySection';
 import targetInterface from '../../../interfaces/target';
+import TargetOption from './TargetOption';
 import ThemeDropdown from './ThemeDropdown';
 import { validateQuery } from './helpers';
 
@@ -148,6 +149,7 @@ class NewQuery extends Component {
             multi
             name="targets"
             options={targets}
+            optionRenderer={TargetOption}
             onChange={onTargetSelect}
             placeholder="Type to search"
             resetValue={[]}

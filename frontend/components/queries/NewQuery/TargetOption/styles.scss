@@ -1,0 +1,28 @@
+.target-option {
+  &__count {
+    color: $textMedium;
+    font-size: $small;
+    font-weight: bold;
+    margin: 0 10px;
+  }
+  &__icon {
+    color: $textMedium;
+    font-size: $base;
+    margin: 0 0 0 10px;
+  }
+  &__ip {
+    color: $link;
+    font-size: $small;
+    margin: 0 10px;
+  }
+  &__label-host {
+    color: $link;
+    font-size: $base;
+    margin: 0 10px;
+  }
+  &__label-label {
+    color: $textMedium;
+    font-size: $base;
+    margin: 0 10px;
+  }
+}
