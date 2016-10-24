@@ -7,6 +7,7 @@ import { osqueryTables } from '../../../utilities/osquery_tables';
 import QuerySidePanel from '../../../components/side_panels/QuerySidePanel';
 import { showRightSidePanel, removeRightSidePanel } from '../../../redux/nodes/app/actions';
 import { renderFlash } from '../../../redux/nodes/notifications/actions';
+import targetActions from '../../../redux/nodes/entities/targets/actions';
 
 class NewQueryPage extends Component {
   static propTypes = {
@@ -23,6 +24,7 @@ class NewQueryPage extends Component {
     };
 
     dispatch(showRightSidePanel);
+    dispatch(targetActions.loadAll());
 
     return false;
   }
