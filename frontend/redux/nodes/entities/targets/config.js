@@ -8,6 +8,7 @@ const { TARGETS: schema } = schemas;
 export default reduxConfig({
   entityName: 'targets',
   loadAllFunc: Kolide.getTargets,
-  parseFunc: parseTarget,
+  parseApiResponseFunc: (response) => { return response.targets; },
+  parseEntityFunc: parseTarget,
   schema,
 });

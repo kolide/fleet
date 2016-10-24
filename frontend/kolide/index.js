@@ -63,7 +63,7 @@ class Kolide extends Base {
     };
 
     return Promise.resolve(stubbedResponse)
-      .then((response) => { return appendTargetTypeToTargets(response).targets; });
+      .then((response) => { return appendTargetTypeToTargets(response); });
   }
 
   getUsers = () => {
