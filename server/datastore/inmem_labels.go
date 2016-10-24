@@ -193,3 +193,7 @@ func (orm *inmem) SaveLabel(label *kolide.Label) error {
 
 	return nil
 }
+
+func (orm *inmem) SearchLabels(query string, omit []uint) ([]kolide.Label, error) {
+	return nil, errors.New("not implemented")
+}

@@ -131,3 +131,7 @@ func (orm gormDB) MarkHostSeen(host *kolide.Host, t time.Time) error {
 	host.UpdatedAt = t
 	return nil
 }
+
+func (orm gormDB) SearchHosts(query string, omit []uint) ([]kolide.Host, error) {
+	return nil, errors.New("not implemented", "")
+}

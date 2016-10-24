@@ -178,3 +178,7 @@ func (orm *inmem) MarkHostSeen(host *kolide.Host, t time.Time) error {
 	}
 	return nil
 }
+
+func (orm *inmem) SearchHosts(query string, omit []uint) ([]kolide.Host, error) {
+	return nil, errors.New("not implemented")
+}

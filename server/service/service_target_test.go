@@ -6,36 +6,52 @@ import (
     "github.com/kolide/kolide-ose/server/datastore"
     "github.com/kolide/kolide-ose/server/kolide"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"golang.org/x/net/context"
 )
 
 func TestSearchTargets(t *testing.T) {
     ds, err := datastore.New("inmem", "")
-	assert.Nil(t, err)
+	require.Nil(t, err)
+
+	svc, err := newTestService(ds)
+	require.Nil(t, err)
+
+    ctx := context.Background()
 
     h1, err := ds.NewHost(&kolide.Host{
         HostName: "foo.local",
         PrimaryIP: "192.168.1.10",
     })
-    assert.Nil(t, err)
-    _ = h1
+    require.Nil(t, err)
 
-    h2, err := ds.NewHost(&kolide.Host{
+    _, err = ds.NewHost(&kolide.Host{
         HostName: "bar.local",
         PrimaryIP: "192.168.1.11",
     })
-    assert.Nil(t, err)
-    _ = h2
+    require.Nil(t, err)
 
     q1, err := ds.NewQuery(&kolide.Query{
-        Name: "query 1",
+        Name: "query foo",
         Query: "select * from osquery_info;",
     })
-    assert.Nil(t, err)
-    assert.NotZero(t, q1.ID)
+    require.Nil(t, err)
+    require.NotZero(t, q1.ID)
 
     l1, err := ds.NewLabel(&kolide.Label{
         Name: "label 1",
         QueryID: q1.ID,
     })
-    _ = l1
+
+    results, count, err := svc.SearchTargets(ctx, "foo", nil)
+    require.Nil(t, err)
+
+    assert.Equal(t, uint(1), count)
+
+    require.Len(t, results.Hosts, 1)
+    assert.Equal(t, h1.HostName, results.Hosts[0].HostName)
+
+    require.Len(t, results.Labels, 1)
+    assert.Equal(t, l1.Name, results.Labels[0].Name)
 }
+

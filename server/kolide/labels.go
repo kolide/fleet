@@ -29,6 +29,8 @@ type LabelStore interface {
 
 	// LabelsForHost returns the labels that the given host is in.
 	ListLabelsForHost(hid uint) ([]Label, error)
+
+	SearchLabels(query string, omit []uint) ([]Label, error)
 }
 
 type LabelService interface {
