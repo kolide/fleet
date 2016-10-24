@@ -22,6 +22,7 @@ class NewQuery extends Component {
     onInvalidQuerySubmit: PropTypes.func,
     onNewQueryFormSubmit: PropTypes.func,
     onOsqueryTableSelect: PropTypes.func,
+    onTargetSelectInputChange: PropTypes.func,
     onTextEditorInputChange: PropTypes.func,
     targets: PropTypes.arrayOf(targetInterface),
     textEditorText: PropTypes.string,
@@ -106,7 +107,13 @@ class NewQuery extends Component {
       selectTargetsHeaderStyles,
       titleStyles,
     } = componentStyles;
-    const { isLoadingTargets, onTextEditorInputChange, targets, textEditorText } = this.props;
+    const {
+      isLoadingTargets,
+      onTargetSelectInputChange,
+      onTextEditorInputChange,
+      targets,
+      textEditorText,
+    } = this.props;
     const { saveQuery, selectedTargets, theme } = this.state;
     const {
       onLoad,
@@ -151,6 +158,7 @@ class NewQuery extends Component {
             options={targets}
             optionRenderer={TargetOption}
             onChange={onTargetSelect}
+            onInputChange={onTargetSelectInputChange}
             placeholder="Type to search"
             resetValue={[]}
             value={selectedTargets}

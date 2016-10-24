@@ -60,6 +60,15 @@ class NewQueryPage extends Component {
     return false;
   }
 
+  onTargetSelectInputChange = (search) => {
+    const { dispatch } = this.props;
+    const { loadAll } = targetActions;
+
+    dispatch(loadAll({ search }));
+
+    return search;
+  }
+
   onTextEditorInputChange = (textEditorText) => {
     this.setState({ textEditorText });
 
@@ -71,6 +80,7 @@ class NewQueryPage extends Component {
       onNewQueryFormSubmit,
       onInvalidQuerySubmit,
       onOsqueryTableSelect,
+      onTargetSelectInputChange,
       onTextEditorInputChange,
     } = this;
     const { selectedOsqueryTable, textEditorText } = this.state;
@@ -83,6 +93,7 @@ class NewQueryPage extends Component {
           onNewQueryFormSubmit={onNewQueryFormSubmit}
           onInvalidQuerySubmit={onInvalidQuerySubmit}
           onOsqueryTableSelect={onOsqueryTableSelect}
+          onTargetSelectInputChange={onTargetSelectInputChange}
           onTextEditorInputChange={onTextEditorInputChange}
           selectedOsqueryTable={selectedOsqueryTable}
           targets={targets}
