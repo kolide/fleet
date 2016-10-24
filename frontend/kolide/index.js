@@ -1,5 +1,6 @@
 import Base from './base';
 import endpoints from './endpoints';
+import { appendTargetTypeToTargets } from '../redux/nodes/entities/targets/helpers';
 
 class Kolide extends Base {
   forgotPassword ({ email }) {
@@ -28,6 +29,41 @@ class Kolide extends Base {
 
     return this.authenticatedGet(this.endpoint(HOSTS))
       .then((response) => { return response.hosts; });
+  }
+
+  getTargets = () => {
+    const stubbedResponse = {
+      targets: {
+        hosts: [
+          {
+            id: 3,
+            ip: '192.168.1.10',
+            label: 'OS X El Capitan 10.11',
+            name: 'osx-10.11',
+            platform: 'darwin',
+          },
+          {
+            id: 4,
+            ip: '192.168.1.11',
+            label: 'Jason Meller\'s Windows Note',
+            name: 'jmeller.local',
+            platform: 'windows',
+          },
+        ],
+        labels: [
+          {
+            id: 4,
+            label: 'All Macs',
+            name: 'macs',
+            count: 1234,
+          },
+        ],
+      },
+      selected_targets_count: 1234,
+    };
+
+    return Promise.resolve(stubbedResponse)
+      .then((response) => { return appendTargetTypeToTargets(response).targets; });
   }
 
   getUsers = () => {
