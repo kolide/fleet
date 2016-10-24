@@ -5,6 +5,7 @@ import componentStyles from './styles';
 
 class Button extends Component {
   static propTypes = {
+    disabled: PropTypes.bool,
     onClick: PropTypes.func,
     style: PropTypes.object, // eslint-disable-line react/forbid-prop-types
     text: PropTypes.string,
@@ -17,12 +18,23 @@ class Button extends Component {
     variant: 'default',
   };
 
+  handleClick = (evt) => {
+    const { disabled, onClick } = this.props;
+
+    if (disabled) return false;
+
+    onClick(evt);
+
+    return false;
+  }
+
   render () {
-    const { onClick, style, text, type, variant } = this.props;
+    const { handleClick } = this;
+    const { style, text, type, variant } = this.props;
 
     return (
       <button
-        onClick={onClick}
+        onClick={handleClick}
         style={[componentStyles[variant], style]}
         type={type}
       >
