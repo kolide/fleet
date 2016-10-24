@@ -4,6 +4,7 @@ import (
 	"errors"
 	"sort"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/kolide/kolide-ose/server/kolide"
@@ -195,5 +196,16 @@ func (orm *inmem) SaveLabel(label *kolide.Label) error {
 }
 
 func (orm *inmem) SearchLabels(query string, omit []uint) ([]kolide.Label, error) {
-	return nil, errors.New("not implemented")
+	var results []kolide.Label
+
+	orm.mtx.Lock()
+	defer orm.mtx.Unlock()
+
+	for _, l := range orm.labels {
+		if strings.Contains(l.Name, query) {
+			results = append(results, *l)
+		}
+	}
+
+	return results, nil
 }

@@ -3,6 +3,7 @@ package datastore
 import (
 	"errors"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/kolide/kolide-ose/server/kolide"
@@ -180,5 +181,16 @@ func (orm *inmem) MarkHostSeen(host *kolide.Host, t time.Time) error {
 }
 
 func (orm *inmem) SearchHosts(query string, omit []uint) ([]kolide.Host, error) {
-	return nil, errors.New("not implemented")
+	var results []kolide.Host
+
+	orm.mtx.Lock()
+	defer orm.mtx.Unlock()
+
+	for _, h := range orm.hosts {
+		if strings.Contains(h.HostName, query) || strings.Contains(h.PrimaryIP, query) {
+			results = append(results, *h)
+		}
+	}
+
+	return results, nil
 }

@@ -39,14 +39,12 @@ func TestSearchTargets(t *testing.T) {
     require.NotZero(t, q1.ID)
 
     l1, err := ds.NewLabel(&kolide.Label{
-        Name: "label 1",
+        Name: "label foo",
         QueryID: q1.ID,
     })
 
-    results, count, err := svc.SearchTargets(ctx, "foo", nil)
+    results, _, err := svc.SearchTargets(ctx, "foo", nil)
     require.Nil(t, err)
-
-    assert.Equal(t, uint(1), count)
 
     require.Len(t, results.Hosts, 1)
     assert.Equal(t, h1.HostName, results.Hosts[0].HostName)
@@ -55,3 +53,6 @@ func TestSearchTargets(t *testing.T) {
     assert.Equal(t, l1.Name, results.Labels[0].Name)
 }
 
+func TestCountHostsInTargets(t *testing.T) {
+
+}
