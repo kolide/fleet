@@ -11,15 +11,18 @@ import componentStyles from './styles';
 import debounce from '../../../utilities/debounce';
 import SaveQueryForm from '../../forms/queries/SaveQueryForm';
 import SaveQuerySection from './SaveQuerySection';
+import targetInterface from '../../../interfaces/target';
 import ThemeDropdown from './ThemeDropdown';
 import { validateQuery } from './helpers';
 
 class NewQuery extends Component {
   static propTypes = {
+    isLoadingTargets: PropTypes.bool,
     onInvalidQuerySubmit: PropTypes.func,
     onNewQueryFormSubmit: PropTypes.func,
     onOsqueryTableSelect: PropTypes.func,
     onTextEditorInputChange: PropTypes.func,
+    targets: PropTypes.arrayOf(targetInterface),
     textEditorText: PropTypes.string,
   };
 
@@ -28,26 +31,6 @@ class NewQuery extends Component {
 
     this.state = {
       saveQuery: false,
-      targetOptions: [
-        {
-          id: 3,
-          label: 'OS X El Capitan 10.11',
-          name: 'osx-10.11',
-          type: 'host',
-        },
-        {
-          id: 4,
-          label: "Jason Meller's Macbook Pro",
-          name: 'jmeller.local',
-          type: 'host',
-        },
-        {
-          id: 4,
-          label: 'All Macs',
-          name: 'macs',
-          type: 'label',
-        },
-      ],
       selectedTargets: [],
       theme: 'kolide',
     };
@@ -122,8 +105,8 @@ class NewQuery extends Component {
       selectTargetsHeaderStyles,
       titleStyles,
     } = componentStyles;
-    const { onTextEditorInputChange, textEditorText } = this.props;
-    const { saveQuery, selectedTargets, targetOptions, theme } = this.state;
+    const { isLoadingTargets, onTextEditorInputChange, targets, textEditorText } = this.props;
+    const { saveQuery, selectedTargets, theme } = this.state;
     const {
       onLoad,
       onSaveQueryFormSubmit,
@@ -161,9 +144,10 @@ class NewQuery extends Component {
           <p style={selectTargetsHeaderStyles}>Select Targets</p>
           <Select
             className="target-select"
+            isLoading={isLoadingTargets}
             multi
             name="targets"
-            options={targetOptions}
+            options={targets}
             onChange={onTargetSelect}
             placeholder="Type to search"
             resetValue={[]}

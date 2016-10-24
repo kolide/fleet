@@ -2,16 +2,20 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { find } from 'lodash';
 
+import entityGetter from '../../../redux/utilities/entityGetter';
 import NewQuery from '../../../components/queries/NewQuery';
 import { osqueryTables } from '../../../utilities/osquery_tables';
 import QuerySidePanel from '../../../components/side_panels/QuerySidePanel';
 import { showRightSidePanel, removeRightSidePanel } from '../../../redux/nodes/app/actions';
 import { renderFlash } from '../../../redux/nodes/notifications/actions';
 import targetActions from '../../../redux/nodes/entities/targets/actions';
+import targetInterface from '../../../interfaces/target';
 
 class NewQueryPage extends Component {
   static propTypes = {
     dispatch: PropTypes.func,
+    isLoadingTargets: PropTypes.bool,
+    targets: PropTypes.arrayOf(targetInterface),
   };
 
   componentWillMount () {
@@ -63,22 +67,25 @@ class NewQueryPage extends Component {
   }
 
   render () {
-    const { selectedOsqueryTable, textEditorText } = this.state;
     const {
       onNewQueryFormSubmit,
       onInvalidQuerySubmit,
       onOsqueryTableSelect,
       onTextEditorInputChange,
     } = this;
+    const { selectedOsqueryTable, textEditorText } = this.state;
+    const { isLoadingTargets, targets } = this.props;
 
     return (
       <div>
         <NewQuery
+          isLoadingTargets={isLoadingTargets}
           onNewQueryFormSubmit={onNewQueryFormSubmit}
           onInvalidQuerySubmit={onInvalidQuerySubmit}
           onOsqueryTableSelect={onOsqueryTableSelect}
           onTextEditorInputChange={onTextEditorInputChange}
           selectedOsqueryTable={selectedOsqueryTable}
+          targets={targets}
           textEditorText={textEditorText}
         />
         <QuerySidePanel
@@ -91,4 +98,11 @@ class NewQueryPage extends Component {
   }
 }
 
-export default connect()(NewQueryPage);
+const mapStateToProps = (state) => {
+  const { entities: targets } = entityGetter(state).get('targets');
+  const isLoadingTargets = state.entities.targets.loading;
+
+  return { isLoadingTargets, targets };
+};
+
+export default connect(mapStateToProps)(NewQueryPage);
