@@ -20,6 +20,7 @@ class NewQueryPage extends Component {
 
     this.state = {
       isLoadingTargets: false,
+      selectedTargetsCount: 0,
       selectedOsqueryTable,
       targets: [],
       textEditorText: 'SELECT * FROM users u JOIN groups g WHERE u.gid = g.gid',
@@ -97,7 +98,12 @@ class NewQueryPage extends Component {
       onOsqueryTableSelect,
       onTextEditorInputChange,
     } = this;
-    const { isLoadingTargets, selectedOsqueryTable, targets, textEditorText } = this.state;
+    const {
+      isLoadingTargets,
+      selectedOsqueryTable,
+      selectedTargetsCount,
+      targets,
+      textEditorText } = this.state;
 
     return (
       <div>
@@ -108,6 +114,7 @@ class NewQueryPage extends Component {
           onOsqueryTableSelect={onOsqueryTableSelect}
           onTargetSelectInputChange={fetchTargets}
           onTextEditorInputChange={onTextEditorInputChange}
+          selectedTargetsCount={selectedTargetsCount}
           selectedOsqueryTable={selectedOsqueryTable}
           targets={targets}
           textEditorText={textEditorText}

@@ -7,7 +7,6 @@ import 'react-select/dist/react-select.css';
 
 import './mode';
 import './theme';
-import componentStyles from './styles';
 import debounce from '../../../utilities/debounce';
 import SaveQueryForm from '../../forms/queries/SaveQueryForm';
 import SaveQuerySection from './SaveQuerySection';
@@ -15,6 +14,8 @@ import targetInterface from '../../../interfaces/target';
 import TargetOption from './TargetOption';
 import ThemeDropdown from './ThemeDropdown';
 import { validateQuery } from './helpers';
+
+const baseClass = 'new-query';
 
 class NewQuery extends Component {
   static propTypes = {
@@ -24,6 +25,7 @@ class NewQuery extends Component {
     onOsqueryTableSelect: PropTypes.func,
     onTargetSelectInputChange: PropTypes.func,
     onTextEditorInputChange: PropTypes.func,
+    selectedTargetsCount: PropTypes.number,
     targets: PropTypes.arrayOf(targetInterface),
     textEditorText: PropTypes.string,
   };
@@ -103,14 +105,10 @@ class NewQuery extends Component {
 
   render () {
     const {
-      containerStyles,
-      selectTargetsHeaderStyles,
-      titleStyles,
-    } = componentStyles;
-    const {
       isLoadingTargets,
       onTargetSelectInputChange,
       onTextEditorInputChange,
+      selectedTargetsCount,
       targets,
       textEditorText,
     } = this.props;
@@ -124,12 +122,12 @@ class NewQuery extends Component {
     } = this;
 
     return (
-      <div style={containerStyles}>
-        <p style={titleStyles}>
+      <div className={`${baseClass}__wrapper`}>
+        <p className={`${baseClass}__title`}>
           New Query Page
         </p>
         <ThemeDropdown onSelectChange={onThemeSelect} theme={theme} />
-        <div style={{ marginTop: '20px' }}>
+        <div className={`${baseClass}__text-editor-wrapper`}>
           <AceEditor
             enableBasicAutocompletion
             enableLiveAutocompletion
@@ -149,7 +147,10 @@ class NewQuery extends Component {
           />
         </div>
         <div>
-          <p style={selectTargetsHeaderStyles}>Select Targets</p>
+          <p>
+            <span className={`${baseClass}__select-targets`}>Select Targets</span>
+            <span className={`${baseClass}__targets-count`}> {selectedTargetsCount} unique hosts</span>
+          </p>
           <Select
             className="target-select"
             isLoading={isLoadingTargets}
