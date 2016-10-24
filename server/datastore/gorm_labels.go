@@ -154,3 +154,7 @@ AND lqe.matches
 func (orm gormDB) SearchLabels(query string, omit []uint) ([]kolide.Label, error) {
 	return nil, errors.New("not implemented", "")
 }
+
+func (orm gormDB) ListHostsInLabel(lid uint) ([]kolide.Host, error) {
+	return nil, errors.New("not implemented", "")
+}

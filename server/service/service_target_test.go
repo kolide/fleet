@@ -43,7 +43,7 @@ func TestSearchTargets(t *testing.T) {
         QueryID: q1.ID,
     })
 
-    results, _, err := svc.SearchTargets(ctx, "foo", nil)
+    results, count, err := svc.SearchTargets(ctx, "foo", nil)
     require.Nil(t, err)
 
     require.Len(t, results.Hosts, 1)
@@ -51,8 +51,14 @@ func TestSearchTargets(t *testing.T) {
 
     require.Len(t, results.Labels, 1)
     assert.Equal(t, l1.Name, results.Labels[0].Name)
+
+    assert.Equal(t, uint(1), count)
 }
 
 func TestCountHostsInTargets(t *testing.T) {
+
+}
+
+func TestSearchWithOmit(t *testing.T) {
 
 }

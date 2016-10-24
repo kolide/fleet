@@ -209,3 +209,18 @@ func (orm *inmem) SearchLabels(query string, omit []uint) ([]kolide.Label, error
 
 	return results, nil
 }
+
+func (orm *inmem) ListHostsInLabel(lid uint) ([]kolide.Host, error) {
+	var hosts []kolide.Host
+
+	orm.mtx.Lock()
+	defer orm.mtx.Unlock()
+
+	for _, lqe := range orm.labelQueryExecutions {
+		if lqe.LabelID == lid && lqe.Matches {
+			hosts = append(hosts, *orm.hosts[lqe.HostID])
+		}
+	}
+
+	return hosts, nil
+}
