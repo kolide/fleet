@@ -71,6 +71,18 @@ func TestCountHostsInTargets(t *testing.T) {
 	})
 	require.Nil(t, err)
 
+	h4, err := ds.NewHost(&kolide.Host{
+		HostName:  "xxx.local",
+		PrimaryIP: "192.168.1.13",
+	})
+	require.Nil(t, err)
+
+	h5, err := ds.NewHost(&kolide.Host{
+		HostName:  "yyy.local",
+		PrimaryIP: "192.168.1.14",
+	})
+	require.Nil(t, err)
+
 	l1, err := ds.NewLabel(&kolide.Label{
 		Name:    "label foo",
 		QueryID: 1,
@@ -79,14 +91,43 @@ func TestCountHostsInTargets(t *testing.T) {
 	require.NotZero(t, l1.ID)
 	l1ID := fmt.Sprintf("%d", l1.ID)
 
+	l2, err := ds.NewLabel(&kolide.Label{
+		Name:    "label bar",
+		QueryID: 1,
+	})
+	require.Nil(t, err)
+	require.NotZero(t, l2.ID)
+	l2ID := fmt.Sprintf("%d", l2.ID)
+
 	for _, h := range []*kolide.Host{h1, h2, h3} {
 		err = ds.RecordLabelQueryExecutions(h, map[string]bool{l1ID: true}, time.Now())
 		assert.Nil(t, err)
 	}
 
-	count, err := svc.CountHostsInTargets(ctx, nil, []kolide.Label{*l1})
+	for _, h := range []*kolide.Host{h3, h4, h5} {
+		err = ds.RecordLabelQueryExecutions(h, map[string]bool{l2ID: true}, time.Now())
+		assert.Nil(t, err)
+	}
+
+	count, err := svc.CountHostsInTargets(ctx, nil, []kolide.Label{*l1, *l2})
 	assert.Nil(t, err)
-	assert.Equal(t, uint(3), count)
+	assert.Equal(t, uint(5), count)
+
+	count, err = svc.CountHostsInTargets(ctx, []kolide.Host{*h1, *h2}, []kolide.Label{*l1, *l2})
+	assert.Nil(t, err)
+	assert.Equal(t, uint(5), count)
+
+	count, err = svc.CountHostsInTargets(ctx, []kolide.Host{*h1, *h2}, nil)
+	assert.Nil(t, err)
+	assert.Equal(t, uint(2), count)
+
+	count, err = svc.CountHostsInTargets(ctx, []kolide.Host{*h1}, []kolide.Label{*l2})
+	assert.Nil(t, err)
+	assert.Equal(t, uint(4), count)
+
+	count, err = svc.CountHostsInTargets(ctx, nil, nil)
+	assert.Nil(t, err)
+	assert.Equal(t, uint(0), count)
 }
 
 func TestSearchWithOmit(t *testing.T) {
