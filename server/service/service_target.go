@@ -47,7 +47,7 @@ func (svc service) CountHostsInTargets(ctx context.Context, hosts []kolide.Host,
 		hostLookup[host.ID] = true
 	}
 
-	count := uint(len(hosts))
+	count := uint(len(hostLookup))
 
 	for _, label := range labels {
 		hostsInLabel, err := svc.ds.ListHostsInLabel(label.ID)
