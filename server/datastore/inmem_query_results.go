@@ -36,7 +36,7 @@ func (im *inmemQueryResults) WriteResult(result kolide.DistributedQueryResult) e
 	return nil
 }
 
-func (im *inmemQueryResults) ReadChannel(query kolide.DistributedQueryCampaign) (chan kolide.DistributedQueryResult, error) {
+func (im *inmemQueryResults) ReadChannel(query kolide.DistributedQueryCampaign) (<-chan kolide.DistributedQueryResult, error) {
 	return im.getChannel(query.ID), nil
 }
 

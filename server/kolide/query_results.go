@@ -6,7 +6,7 @@ type QueryResultStore interface {
 
 	// ReadChannel returns a channel to be read for incoming distributed
 	// query results
-	ReadChannel(query DistributedQueryCampaign) (chan DistributedQueryResult, error)
+	ReadChannel(query DistributedQueryCampaign) (<-chan DistributedQueryResult, error)
 
 	// CloseQuery indicates that no more results will be read for the given
 	// query campaign

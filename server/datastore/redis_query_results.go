@@ -79,7 +79,7 @@ func (im *redisQueryResults) WriteResult(result kolide.DistributedQueryResult) e
 	return nil
 }
 
-func (im *redisQueryResults) ReadChannel(query kolide.DistributedQueryCampaign) (chan kolide.DistributedQueryResult, error) {
+func (im *redisQueryResults) ReadChannel(query kolide.DistributedQueryCampaign) (<-chan kolide.DistributedQueryResult, error) {
 	if _, exists := im.connections[query.ID]; exists {
 		return nil, fmt.Errorf("channel already open for ID %d", query.ID)
 	}
