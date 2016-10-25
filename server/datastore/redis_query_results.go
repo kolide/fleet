@@ -101,6 +101,7 @@ func (im *redisQueryResults) ReadChannel(query kolide.DistributedQueryCampaign) 
 			close(outChannel)
 			conn.Unsubscribe()
 			conn.Close()
+			delete(im.connections, query.ID)
 			im.mutex.Unlock()
 		}()
 
@@ -130,11 +131,12 @@ func (im *redisQueryResults) ReadChannel(query kolide.DistributedQueryCampaign) 
 }
 
 func (im *redisQueryResults) CloseQuery(query kolide.DistributedQueryCampaign) {
+	im.mutex.Lock()
 	conn, ok := im.connections[query.ID]
 	if !ok {
 		return
 	}
-	im.mutex.Lock()
 	conn.Unsubscribe()
+	delete(im.connections, query.ID)
 	im.mutex.Unlock()
 }
