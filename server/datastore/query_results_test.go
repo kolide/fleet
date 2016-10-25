@@ -49,15 +49,16 @@ func TestQueryResultsStore(t *testing.T) {
 }
 
 func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
+	// Test handling results for two campaigns in parallel
 
-	campaign := kolide.DistributedQueryCampaign{ID: 1}
+	campaign1 := kolide.DistributedQueryCampaign{ID: 1}
 
-	channel, err := store.ReadChannel(campaign)
+	channel1, err := store.ReadChannel(campaign1)
 	assert.Nil(t, err)
 
-	results := []kolide.DistributedQueryResult{}
+	results1 := []kolide.DistributedQueryResult{}
 
-	expected := []kolide.DistributedQueryResult{
+	expected1 := []kolide.DistributedQueryResult{
 		kolide.DistributedQueryResult{
 			DistributedQueryCampaignID: 1,
 			ResultJSON:                 json.RawMessage(`{"foo":"bar"}`),
@@ -90,13 +91,52 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 		},
 	}
 
+	campaign2 := kolide.DistributedQueryCampaign{ID: 2}
+
+	channel2, err := store.ReadChannel(campaign2)
+	assert.Nil(t, err)
+
+	results2 := []kolide.DistributedQueryResult{}
+
+	expected2 := []kolide.DistributedQueryResult{
+		kolide.DistributedQueryResult{
+			DistributedQueryCampaignID: 2,
+			ResultJSON:                 json.RawMessage(`{"tim":"tom"}`),
+			Host: kolide.Host{
+				ID: 1,
+				// Note these times need to be set to avoid
+				// issues with roundtrip serializing the zero
+				// time value. See https://goo.gl/CCEs8x
+				UpdatedAt:        time.Now(),
+				DetailUpdateTime: time.Now(),
+			},
+		},
+		kolide.DistributedQueryResult{
+			DistributedQueryCampaignID: 2,
+			ResultJSON:                 json.RawMessage(`{"slim":"slam"}`),
+			Host: kolide.Host{
+				ID:               3,
+				UpdatedAt:        time.Now(),
+				DetailUpdateTime: time.Now(),
+			},
+		},
+	}
+
 	var wg sync.WaitGroup
 
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		for res := range channel {
-			results = append(results, res)
+		for res := range channel1 {
+			results1 = append(results1, res)
+		}
+
+	}()
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for res := range channel2 {
+			results2 = append(results2, res)
 		}
 
 	}()
@@ -104,10 +144,18 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		for _, res := range expected {
+		for _, res := range expected1 {
 			assert.Nil(t, store.WriteResult(res))
 		}
-		store.CloseQuery(campaign)
+		store.CloseQuery(campaign1)
+	}()
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for _, res := range expected2 {
+			assert.Nil(t, store.WriteResult(res))
+		}
+		store.CloseQuery(campaign2)
 	}()
 
 	// wait with a timeout to ensure that the test can't hang
@@ -115,6 +163,7 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 		t.Error("Timed out waiting for goroutines to join")
 	}
 
-	assert.EqualValues(t, expected, results)
+	assert.EqualValues(t, expected1, results1)
+	assert.EqualValues(t, expected2, results2)
 
 }
