@@ -1,10 +1,10 @@
 package datastore
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"sync"
 	"time"
 
 	"github.com/garyburd/redigo/redis"
@@ -12,20 +12,14 @@ import (
 )
 
 type redisQueryResults struct {
-	// mapping of query ID to corresponding connection
-	connections map[uint]redis.PubSubConn
 	// connection pool
 	pool redis.Pool
-	// mutex used to protect the redis connection struct from race
-	// conditions during unsubscribe
-	mutex sync.Mutex
 }
 
 var _ kolide.QueryResultStore = &redisQueryResults{}
 
 func newRedisQueryResults(server, password string) redisQueryResults {
 	return redisQueryResults{
-		connections: map[uint]redis.PubSubConn{},
 		pool: redis.Pool{
 			MaxIdle:     3,
 			IdleTimeout: 240 * time.Second,
@@ -53,7 +47,7 @@ func newRedisQueryResults(server, password string) redisQueryResults {
 	}
 }
 
-func channelForID(id uint) string {
+func pubSubForID(id uint) string {
 	return fmt.Sprintf("results_%d", id)
 }
 
@@ -61,7 +55,7 @@ func (im *redisQueryResults) WriteResult(result kolide.DistributedQueryResult) e
 	conn := im.pool.Get()
 	defer conn.Close()
 
-	channelName := channelForID(result.DistributedQueryCampaignID)
+	channelName := pubSubForID(result.DistributedQueryCampaignID)
 
 	jsonVal, err := json.Marshal(&result)
 	if err != nil {
@@ -79,64 +73,74 @@ func (im *redisQueryResults) WriteResult(result kolide.DistributedQueryResult) e
 	return nil
 }
 
-func (im *redisQueryResults) ReadChannel(query kolide.DistributedQueryCampaign) (<-chan kolide.DistributedQueryResult, error) {
-	if _, exists := im.connections[query.ID]; exists {
-		return nil, fmt.Errorf("channel already open for ID %d", query.ID)
+// receiveMessages runs in a goroutine, forwarding messages from the Pub/Sub
+// connection over the provided channel. This effectively allows a select
+// statement to run on conn.Receive() (by running on the channel that is being
+// fed by this function)
+func receiveMessages(conn *redis.PubSubConn, outChan chan<- interface{}) {
+	for {
+		msg := conn.Receive()
+		outChan <- msg
+		switch msg := msg.(type) {
+		case error:
+			// If an error occurred (i.e. connection was closed),
+			// then we should exit
+			return
+		case redis.Subscription:
+			// If the subscription count is 0, the ReadChannel call
+			// that invoked this goroutine has unsubscribed, and we
+			// can exit
+			if msg.Count == 0 {
+				return
+			}
+		}
 	}
+}
 
+func (im *redisQueryResults) ReadChannel(ctx context.Context, query kolide.DistributedQueryCampaign) (<-chan kolide.DistributedQueryResult, error) {
 	outChannel := make(chan kolide.DistributedQueryResult)
 
 	conn := redis.PubSubConn{Conn: im.pool.Get()}
 
-	channelName := channelForID(query.ID)
-	conn.Subscribe(channelName)
-
-	// Save connection so it can be unsubscribed from CloseQuery
-	// and therefore alert us through the Receive() method below
-	im.connections[query.ID] = conn
+	pubSubName := pubSubForID(query.ID)
+	conn.Subscribe(pubSubName)
 
 	go func() {
 		defer func() {
-			im.mutex.Lock()
 			close(outChannel)
 			conn.Unsubscribe()
 			conn.Close()
-			delete(im.connections, query.ID)
-			im.mutex.Unlock()
 		}()
 
+		msgChannel := make(chan interface{})
+		// Run a separate goroutine feeding redis messages into
+		// msgChannel
+		go receiveMessages(&conn, msgChannel)
+
 		for {
-			switch v := conn.Receive().(type) {
+			// Loop reading messages from conn.Receive() (via
+			// msgChannel) until the context is cancelled.
+			select {
+			case msg := <-msgChannel:
+				switch msg := msg.(type) {
+				case redis.Message:
+					var res kolide.DistributedQueryResult
+					err := json.Unmarshal(msg.Data, &res)
+					if err != nil {
+						fmt.Println(err)
+					}
+					outChannel <- res
 
-			case redis.Message:
-				var res kolide.DistributedQueryResult
-				err := json.Unmarshal(v.Data, &res)
-				if err != nil {
-					fmt.Println(err)
-				}
-				outChannel <- res
-
-			case redis.Subscription:
-				if v.Channel == channelName && v.Count == 0 {
+				case error:
 					return
 				}
 
-			case error:
+			case <-ctx.Done():
 				return
+
 			}
 		}
 
 	}()
 	return outChannel, nil
-}
-
-func (im *redisQueryResults) CloseQuery(query kolide.DistributedQueryCampaign) {
-	im.mutex.Lock()
-	conn, ok := im.connections[query.ID]
-	if !ok {
-		return
-	}
-	conn.Unsubscribe()
-	delete(im.connections, query.ID)
-	im.mutex.Unlock()
 }

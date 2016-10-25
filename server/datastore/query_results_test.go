@@ -1,6 +1,7 @@
 package datastore
 
 import (
+	"context"
 	"encoding/json"
 	"os"
 	"sync"
@@ -53,7 +54,8 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 
 	campaign1 := kolide.DistributedQueryCampaign{ID: 1}
 
-	channel1, err := store.ReadChannel(campaign1)
+	ctx1, cancel1 := context.WithCancel(context.Background())
+	channel1, err := store.ReadChannel(ctx1, campaign1)
 	assert.Nil(t, err)
 
 	results1 := []kolide.DistributedQueryResult{}
@@ -93,7 +95,8 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 
 	campaign2 := kolide.DistributedQueryCampaign{ID: 2}
 
-	channel2, err := store.ReadChannel(campaign2)
+	ctx2, cancel2 := context.WithCancel(context.Background())
+	channel2, err := store.ReadChannel(ctx2, campaign2)
 	assert.Nil(t, err)
 
 	results2 := []kolide.DistributedQueryResult{}
@@ -119,45 +122,53 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 		},
 	}
 
-	var wg sync.WaitGroup
+	var readerWg, writerWg sync.WaitGroup
 
-	wg.Add(1)
+	readerWg.Add(1)
 	go func() {
-		defer wg.Done()
+		defer readerWg.Done()
 		for res := range channel1 {
 			results1 = append(results1, res)
 		}
 
 	}()
-	wg.Add(1)
+	readerWg.Add(1)
 	go func() {
-		defer wg.Done()
+		defer readerWg.Done()
 		for res := range channel2 {
 			results2 = append(results2, res)
 		}
 
 	}()
 
-	wg.Add(1)
+	// Wait to ensure subscriptions are activated before writing
+	time.Sleep(100 * time.Millisecond)
+
+	writerWg.Add(1)
 	go func() {
-		defer wg.Done()
+		defer writerWg.Done()
 		for _, res := range expected1 {
 			assert.Nil(t, store.WriteResult(res))
 		}
-		store.CloseQuery(campaign1)
+		time.Sleep(300 * time.Millisecond)
+		cancel1()
 	}()
-	wg.Add(1)
+	writerWg.Add(1)
 	go func() {
-		defer wg.Done()
+		defer writerWg.Done()
 		for _, res := range expected2 {
 			assert.Nil(t, store.WriteResult(res))
 		}
-		store.CloseQuery(campaign2)
+		time.Sleep(300 * time.Millisecond)
+		cancel2()
 	}()
 
 	// wait with a timeout to ensure that the test can't hang
-	if waitTimeout(&wg, 2*time.Second) {
-		t.Error("Timed out waiting for goroutines to join")
+	if waitTimeout(&writerWg, 5*time.Second) {
+		t.Error("Timed out waiting for writers to join")
+	}
+	if waitTimeout(&readerWg, 5*time.Second) {
+		t.Error("Timed out waiting for readers to join")
 	}
 
 	assert.EqualValues(t, expected1, results1)

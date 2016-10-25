@@ -1,6 +1,7 @@
 package datastore
 
 import (
+	"context"
 	"sync"
 
 	"github.com/kolide/kolide-ose/server/kolide"
@@ -36,14 +37,14 @@ func (im *inmemQueryResults) WriteResult(result kolide.DistributedQueryResult) e
 	return nil
 }
 
-func (im *inmemQueryResults) ReadChannel(query kolide.DistributedQueryCampaign) (<-chan kolide.DistributedQueryResult, error) {
-	return im.getChannel(query.ID), nil
-}
-
-func (im *inmemQueryResults) CloseQuery(query kolide.DistributedQueryCampaign) {
-	channel, ok := im.resultChannels[query.ID]
-	if !ok {
-		return
-	}
-	close(channel)
+func (im *inmemQueryResults) ReadChannel(ctx context.Context, query kolide.DistributedQueryCampaign) (<-chan kolide.DistributedQueryResult, error) {
+	channel := im.getChannel(query.ID)
+	go func() {
+		<-ctx.Done()
+		close(channel)
+		im.channelMutex.Lock()
+		delete(im.resultChannels, query.ID)
+		im.channelMutex.Unlock()
+	}()
+	return channel, nil
 }
