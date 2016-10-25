@@ -130,6 +130,18 @@ func TestCountHostsInTargets(t *testing.T) {
 	assert.Equal(t, uint(0), count)
 }
 
+func TestSearchHostsInLabels(t *testing.T) {
+
+}
+
+func TestSearchResultsLimit(t *testing.T) {
+
+}
+
+func TestSearchRanking(t *testing.T) {
+
+}
+
 func TestSearchWithOmit(t *testing.T) {
 
 }
