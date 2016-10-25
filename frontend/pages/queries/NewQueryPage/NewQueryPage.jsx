@@ -20,6 +20,7 @@ class NewQueryPage extends Component {
 
     this.state = {
       isLoadingTargets: false,
+      moreInfoTarget: null,
       selectedTargetsCount: 0,
       selectedOsqueryTable,
       targets: [],
@@ -59,6 +60,24 @@ class NewQueryPage extends Component {
     return false;
   }
 
+  onRemoveMoreInfoTarget = (evt) => {
+    evt.preventDefault();
+
+    this.setState({ moreInfoTarget: null });
+
+    return false;
+  }
+
+  onTargetSelectMoreInfo = (moreInfoTarget) => {
+    return (evt) => {
+      evt.preventDefault();
+
+      this.setState({ moreInfoTarget });
+
+      return false;
+    };
+  }
+
   onTextEditorInputChange = (textEditorText) => {
     this.setState({ textEditorText });
 
@@ -96,10 +115,13 @@ class NewQueryPage extends Component {
       onNewQueryFormSubmit,
       onInvalidQuerySubmit,
       onOsqueryTableSelect,
+      onRemoveMoreInfoTarget,
+      onTargetSelectMoreInfo,
       onTextEditorInputChange,
     } = this;
     const {
       isLoadingTargets,
+      moreInfoTarget,
       selectedOsqueryTable,
       selectedTargetsCount,
       targets,
@@ -109,10 +131,13 @@ class NewQueryPage extends Component {
       <div>
         <NewQuery
           isLoadingTargets={isLoadingTargets}
+          moreInfoTarget={moreInfoTarget}
           onNewQueryFormSubmit={onNewQueryFormSubmit}
           onInvalidQuerySubmit={onInvalidQuerySubmit}
           onOsqueryTableSelect={onOsqueryTableSelect}
+          onRemoveMoreInfoTarget={onRemoveMoreInfoTarget}
           onTargetSelectInputChange={fetchTargets}
+          onTargetSelectMoreInfo={onTargetSelectMoreInfo}
           onTextEditorInputChange={onTextEditorInputChange}
           selectedTargetsCount={selectedTargetsCount}
           selectedOsqueryTable={selectedOsqueryTable}

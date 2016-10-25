@@ -1,28 +1,54 @@
 .target-option {
   &__count {
-    color: $textMedium;
+    background-color: $textMedium;
+    border-radius: $border-radius;
+    color: $white;
     font-size: $small;
     font-weight: bold;
-    margin: 0 10px;
+    padding: 5px;
+  }
+  &__delimeter {
+    color: $textDark;
+    font-weight: $bold;
+    margin: 0 $xSmall;
   }
   &__icon {
     color: $textMedium;
     font-size: $base;
-    margin: 0 0 0 10px;
+    margin: 0 0 0 $base;
   }
   &__ip {
     color: $link;
     font-size: $small;
-    margin: 0 10px;
   }
   &__label-host {
     color: $link;
     font-size: $base;
-    margin: 0 10px;
+    margin-left: $xSmall;
   }
   &__label-label {
     color: $textMedium;
     font-size: $base;
-    margin: 0 10px;
+    margin-left: $xSmall;
+    .all-hosts {
+      font-weight: $bold;
+    }
+  }
+  &__more-info {
+    color: $brand;
+    cursor: pointer;
+    float: right;
+    margin-right: $base;
+  }
+  &__target-icon {
+    font-size: $base;
+    color: $textMedium;
+    margin-right: $xSmall;
+  }
+  &__target-modal {
+    width: 1000px;
+  }
+  &__wrapper {
+    cursor: default;
   }
 }

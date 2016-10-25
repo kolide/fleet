@@ -10,8 +10,8 @@ import './theme';
 import debounce from '../../../utilities/debounce';
 import SaveQueryForm from '../../forms/queries/SaveQueryForm';
 import SaveQuerySection from './SaveQuerySection';
+import SelectTargetsMenu from './SelectTargetsMenu';
 import targetInterface from '../../../interfaces/target';
-import TargetOption from './TargetOption';
 import ThemeDropdown from './ThemeDropdown';
 import { validateQuery } from './helpers';
 
@@ -20,10 +20,13 @@ const baseClass = 'new-query';
 class NewQuery extends Component {
   static propTypes = {
     isLoadingTargets: PropTypes.bool,
+    moreInfoTarget: targetInterface,
     onInvalidQuerySubmit: PropTypes.func,
     onNewQueryFormSubmit: PropTypes.func,
     onOsqueryTableSelect: PropTypes.func,
+    onRemoveMoreInfoTarget: PropTypes.func,
     onTargetSelectInputChange: PropTypes.func,
+    onTargetSelectMoreInfo: PropTypes.func,
     onTextEditorInputChange: PropTypes.func,
     selectedTargetsCount: PropTypes.number,
     targets: PropTypes.arrayOf(targetInterface),
@@ -106,7 +109,10 @@ class NewQuery extends Component {
   render () {
     const {
       isLoadingTargets,
+      moreInfoTarget,
+      onRemoveMoreInfoTarget,
       onTargetSelectInputChange,
+      onTargetSelectMoreInfo,
       onTextEditorInputChange,
       selectedTargetsCount,
       targets,
@@ -120,6 +126,7 @@ class NewQuery extends Component {
       onThemeSelect,
       onToggleSaveQuery,
     } = this;
+    const menuRenderer = SelectTargetsMenu(onTargetSelectMoreInfo, onRemoveMoreInfoTarget, moreInfoTarget);
 
     return (
       <div className={`${baseClass}__wrapper`}>
@@ -154,13 +161,13 @@ class NewQuery extends Component {
           <Select
             className="target-select"
             isLoading={isLoadingTargets}
+            menuRenderer={menuRenderer}
             multi
             name="targets"
             options={targets}
-            optionRenderer={TargetOption}
             onChange={onTargetSelect}
             onInputChange={onTargetSelectInputChange}
-            placeholder="Type to search"
+            placeholder="Label Name, Host Name, IP Address, etc."
             resetValue={[]}
             value={selectedTargets}
             valueKey="name"
