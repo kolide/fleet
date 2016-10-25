@@ -2,14 +2,13 @@ import React, { Component, PropTypes } from 'react';
 import AceEditor from 'react-ace';
 import 'brace/ext/linking';
 import radium from 'radium';
-import Select from 'react-select';
-import 'react-select/dist/react-select.css';
 
 import './mode';
 import './theme';
 import debounce from '../../../utilities/debounce';
 import SaveQueryForm from '../../forms/queries/SaveQueryForm';
 import SaveQuerySection from './SaveQuerySection';
+import SelectTargetsInput from '../SelectTargetsInput';
 import SelectTargetsMenu from '../SelectTargetsMenu';
 import targetInterface from '../../../interfaces/target';
 import ThemeDropdown from './ThemeDropdown';
@@ -158,19 +157,13 @@ class NewQuery extends Component {
             <span className={`${baseClass}__select-targets`}>Select Targets</span>
             <span className={`${baseClass}__targets-count`}> {selectedTargetsCount} unique hosts</span>
           </p>
-          <Select
-            className="target-select"
+          <SelectTargetsInput
             isLoading={isLoadingTargets}
             menuRenderer={menuRenderer}
-            multi
-            name="targets"
-            options={targets}
-            onChange={onTargetSelect}
-            onInputChange={onTargetSelectInputChange}
-            placeholder="Label Name, Host Name, IP Address, etc."
-            resetValue={[]}
-            value={selectedTargets}
-            valueKey="name"
+            onTargetSelect={onTargetSelect}
+            onTargetSelectInputChange={onTargetSelectInputChange}
+            selectedTargets={selectedTargets}
+            targets={targets}
           />
         </div>
         <SaveQuerySection onToggleSaveQuery={onToggleSaveQuery} saveQuery={saveQuery} />
