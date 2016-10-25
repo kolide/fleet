@@ -5,13 +5,13 @@ import (
 )
 
 type TargetSearchResults struct {
-    Hosts []Host
-    Labels []Label
+	Hosts  []Host
+	Labels []Label
 }
 
 type TargetService interface {
-    SearchTargets(ctx context.Context, query string, omit []Target) (*TargetSearchResults, uint, error)
-    CountHostsInTargets(ctx context.Context, hosts []Host, labels []Label) (uint, error)
+	SearchTargets(ctx context.Context, query string, omit []Target) (*TargetSearchResults, uint, error)
+	CountHostsInTargets(ctx context.Context, hosts []Host, labels []Label) (uint, error)
 }
 
 type TargetType int
@@ -22,6 +22,6 @@ const (
 )
 
 type Target struct {
-    Type TargetType
-    TargetID uint
+	Type     TargetType
+	TargetID uint
 }

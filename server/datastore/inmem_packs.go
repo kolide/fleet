@@ -143,7 +143,7 @@ func (orm *inmem) RemoveQueryFromPack(query *kolide.Query, pack *kolide.Pack) er
 
 func (orm *inmem) AddLabelToPack(lid uint, pid uint) error {
 	pt := &kolide.PackTarget{
-		PackID:   pid,
+		PackID: pid,
 		Target: kolide.Target{
 			Type:     kolide.TargetLabel,
 			TargetID: lid,
