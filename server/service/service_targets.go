@@ -55,7 +55,7 @@ func (svc service) CountHostsInTargets(ctx context.Context, hosts []kolide.Host,
 			return 0, err
 		}
 		for _, host := range hostsInLabel {
-			if _, found := hostLookup[host.ID]; !found {
+			if !hostLookup[host.ID] {
 				hostLookup[host.ID] = true
 				count++
 			}
