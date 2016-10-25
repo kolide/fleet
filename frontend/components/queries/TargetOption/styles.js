@@ -1,4 +1,4 @@
-import Styles from '../../../../styles';
+import Styles from '../../../styles';
 
 const { color, padding } = Styles;
 

@@ -1,9 +1,9 @@
 import React, { Component, PropTypes } from 'react';
 
-import Button from '../../../buttons/Button';
+import Button from '../../buttons/Button';
 import componentStyles from './styles';
-import Modal from '../../../../components/Modal';
-import targetInterface from '../../../../interfaces/target';
+import Modal from '../../Modal';
+import targetInterface from '../../../interfaces/target';
 
 const classBlock = 'target-option';
 

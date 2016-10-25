@@ -10,7 +10,7 @@ import './theme';
 import debounce from '../../../utilities/debounce';
 import SaveQueryForm from '../../forms/queries/SaveQueryForm';
 import SaveQuerySection from './SaveQuerySection';
-import SelectTargetsMenu from './SelectTargetsMenu';
+import SelectTargetsMenu from '../SelectTargetsMenu';
 import targetInterface from '../../../interfaces/target';
 import ThemeDropdown from './ThemeDropdown';
 import { validateQuery } from './helpers';

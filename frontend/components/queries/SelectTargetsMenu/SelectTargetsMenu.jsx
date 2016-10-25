@@ -2,7 +2,7 @@ import React from 'react';
 import classNames from 'classnames';
 import { includes, isEqual, noop } from 'lodash';
 
-import TargetOption from './TargetOption';
+import TargetOption from '../TargetOption';
 
 const SelectTargetsMenuWrapper = (onMoreInfoClick, onRemoveMoreInfoTarget, moreInfoTarget) => {
   const SelectTargetsMenu = ({
