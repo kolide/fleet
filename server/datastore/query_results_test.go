@@ -103,10 +103,7 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 			DistributedQueryCampaignID: 2,
 			ResultJSON:                 json.RawMessage(`{"tim":"tom"}`),
 			Host: kolide.Host{
-				ID: 1,
-				// Note these times need to be set to avoid
-				// issues with roundtrip serializing the zero
-				// time value. See https://goo.gl/CCEs8x
+				ID:               1,
 				UpdatedAt:        time.Now(),
 				DetailUpdateTime: time.Now(),
 			},
