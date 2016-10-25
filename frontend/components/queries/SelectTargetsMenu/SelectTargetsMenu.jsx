@@ -2,6 +2,7 @@ import React from 'react';
 import classNames from 'classnames';
 import { includes, isEqual, noop } from 'lodash';
 
+import { shouldShowModal } from './helpers';
 import TargetOption from '../TargetOption';
 
 const SelectTargetsMenuWrapper = (onMoreInfoClick, onRemoveMoreInfoTarget, moreInfoTarget) => {
@@ -30,7 +31,7 @@ const SelectTargetsMenuWrapper = (onMoreInfoClick, onRemoveMoreInfoTarget, moreI
         'is-disabled': true,
       });
       const setRef = (ref) => { onOptionRef(ref, isFocused); };
-      const shouldShowModal = isEqual(moreInfoTarget, option);
+      const isShowModal = shouldShowModal(moreInfoTarget, option);
 
       return (
         <Option
@@ -47,11 +48,11 @@ const SelectTargetsMenuWrapper = (onMoreInfoClick, onRemoveMoreInfoTarget, moreI
           ref={setRef}
         >
           <TargetOption
-            target={option}
+            target={moreInfoTarget && isShowModal ? moreInfoTarget : option}
             onSelect={onSelect}
             onRemoveMoreInfoTarget={onRemoveMoreInfoTarget}
             onMoreInfoClick={onMoreInfoClick}
-            shouldShowModal={shouldShowModal}
+            shouldShowModal={isShowModal}
           />
         </Option>
       );

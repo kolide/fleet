@@ -72,6 +72,24 @@ class NewQueryPage extends Component {
     return (evt) => {
       evt.preventDefault();
 
+      const { target_type: targetType } = moreInfoTarget;
+
+      if (targetType.toLowerCase() === 'labels') {
+        return Kolide.getLabelHosts(moreInfoTarget.id)
+          .then((hosts) => {
+            console.log('hosts', hosts);
+            this.setState({
+              moreInfoTarget: {
+                ...moreInfoTarget,
+                hosts,
+              },
+            });
+
+            return false;
+          });
+      }
+
+
       this.setState({ moreInfoTarget });
 
       return false;
