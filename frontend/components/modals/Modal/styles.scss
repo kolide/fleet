@@ -9,7 +9,8 @@
     z-index: 3;
   }
   &__content {
-    padding: $xSmall;
+    padding: $base;
+    padding-top: 0;
   }
   &__ex {
     color: $textMedium;
@@ -17,7 +18,7 @@
     font-size: $larger;
     position: absolute;
     top: 0px;
-    right: $xSmall;
+    right: $base;
     text-decoration: none;
   }
   &__header {
@@ -25,7 +26,8 @@
     font-size: $large;
     font-weight: $bold;
     position: relative;
-    padding: $xSmall;
+    padding: $base;
+    padding-bottom: 0;
     text-transform: uppercase;
   }
   &__modal_container {

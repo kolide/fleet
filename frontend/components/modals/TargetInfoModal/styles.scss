@@ -1,0 +1,65 @@
+.target-info-modal {
+  &__btn-wrapper {
+    text-align: right;
+
+    button {
+      &:first-child {
+        margin-right: $xSmall;
+      }
+    }
+  }
+  &__header {
+    font-size: $base;
+
+    i {
+      margin-right: $xSmall;
+    }
+    span {
+      color: $textDark;
+    }
+  }
+  &__host {
+    &__status {
+      margin-top: 0;
+
+      &.is-online {
+        color: $success;
+      }
+      &.is-offline {
+        color: $alert;
+      }
+    }
+    &__labels-wrapper {
+      color: $textMedium;
+
+      &--header {
+        font-size: $base;
+        i {
+          margin-right: $xSmall;
+        }
+      }
+    }
+    &__platform-text {
+      margin-left: 5px;
+      text-transform: capitalize;
+    }
+    &__table {
+      border-collapse: collapse;
+      color: $textMedium;
+      font-size: $medium;
+      text-align: left;
+      width: 100%;
+
+      tr {
+        border-bottom: 1px solid $accentMedium;
+
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+      th {
+        width: 200px;
+      }
+    }
+  }
+}

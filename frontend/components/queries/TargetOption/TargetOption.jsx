@@ -2,8 +2,8 @@ import React, { Component, PropTypes } from 'react';
 
 import Button from '../../buttons/Button';
 import componentStyles from './styles';
-import Modal from '../../Modal';
 import targetInterface from '../../../interfaces/target';
+import TargetInfoModal from '../../modals/TargetInfoModal';
 
 const classBlock = 'target-option';
 
@@ -19,6 +19,14 @@ class TargetOption extends Component {
   handleSelect = (evt) => {
     const { onSelect, target } = this.props;
     return onSelect(target, evt);
+  }
+
+  handleSelectFromModal = (evt) => {
+    const { handleSelect } = this;
+    const { onRemoveMoreInfoTarget } = this.props;
+
+    handleSelect(evt);
+    onRemoveMoreInfoTarget();
   }
 
   hostPlatformIconClass = () => {
@@ -81,18 +89,17 @@ class TargetOption extends Component {
   renderTargetInfoModal = () => {
     const { onRemoveMoreInfoTarget, shouldShowModal, target } = this.props;
 
-    const { label } = target;
-
     if (!shouldShowModal) return false;
 
+    const { handleSelectFromModal } = this;
+
     return (
-      <Modal
-        className={`${classBlock}__target-modal`}
+      <TargetInfoModal
+        className={`${classBlock}__modal-wrapper`}
+        onAdd={handleSelectFromModal}
         onExit={onRemoveMoreInfoTarget}
-        title={label}
-      >
-        <p>FIXME</p>
-      </Modal>
+        target={target}
+      />
     );
   }
 
