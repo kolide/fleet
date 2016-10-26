@@ -1,33 +1,29 @@
 import React, { Component, PropTypes } from 'react';
+import classnames from 'classnames';
 import radium from 'radium';
 
-import componentStyles from './styles';
+const baseClass = 'modal';
 
 class Modal extends Component {
   static propTypes = {
     children: PropTypes.node,
+    className: PropTypes.string,
     onExit: PropTypes.func,
-    title: PropTypes.string,
+    title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
   };
 
   render () {
-    const { children, onExit, title } = this.props;
-    const {
-      containerStyles,
-      contentStyles,
-      exStyles,
-      headerStyles,
-      modalStyles,
-    } = componentStyles;
+    const { children, className, onExit, title } = this.props;
+    const modalContainerClassName = classnames(`${baseClass}__modal_container`, className);
 
     return (
-      <div style={containerStyles}>
-        <div style={modalStyles}>
-          <div style={headerStyles}>
+      <div className={`${baseClass}__background`}>
+        <div className={modalContainerClassName}>
+          <div className={`${baseClass}__header`}>
             <span>{title}</span>
-            <button className="btn--unstyled" style={exStyles} onClick={onExit}>╳</button>
+            <button className={`btn--unstyled ${baseClass}__ex`} onClick={onExit}>x</button>
           </div>
-          <div style={contentStyles}>
+          <div className={`${baseClass}__content`}>
             {children}
           </div>
         </div>
