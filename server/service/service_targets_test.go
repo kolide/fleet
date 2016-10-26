@@ -130,6 +130,59 @@ func TestCountHostsInTargets(t *testing.T) {
 	assert.Equal(t, uint(0), count)
 }
 
+func TestSearchWithOmit(t *testing.T) {
+	ds, err := datastore.New("inmem", "")
+	require.Nil(t, err)
+
+	svc, err := newTestService(ds)
+	require.Nil(t, err)
+
+	ctx := context.Background()
+
+	h1, err := ds.NewHost(&kolide.Host{
+		HostName:  "foo.local",
+		PrimaryIP: "192.168.1.10",
+	})
+	require.Nil(t, err)
+
+	h2, err := ds.NewHost(&kolide.Host{
+		HostName:  "foobar.local",
+		PrimaryIP: "192.168.1.11",
+	})
+	require.Nil(t, err)
+	h2Target := kolide.Target{
+		Type:     kolide.TargetHost,
+		TargetID: h2.ID,
+	}
+
+	l1, err := ds.NewLabel(&kolide.Label{
+		Name:    "label foo",
+		QueryID: 1,
+	})
+
+	{
+		results, _, err := svc.SearchTargets(ctx, "foo", nil)
+		require.Nil(t, err)
+
+		require.Len(t, results.Hosts, 2)
+		assert.Equal(t, h1.HostName, results.Hosts[0].HostName)
+
+		require.Len(t, results.Labels, 1)
+		assert.Equal(t, l1.Name, results.Labels[0].Name)
+	}
+
+	{
+		results, _, err := svc.SearchTargets(ctx, "foo", []kolide.Target{h2Target})
+		require.Nil(t, err)
+
+		require.Len(t, results.Hosts, 1)
+		assert.Equal(t, h1.HostName, results.Hosts[0].HostName)
+
+		require.Len(t, results.Labels, 1)
+		assert.Equal(t, l1.Name, results.Labels[0].Name)
+	}
+}
+
 func TestSearchHostsInLabels(t *testing.T) {
 
 }
@@ -139,9 +192,5 @@ func TestSearchResultsLimit(t *testing.T) {
 }
 
 func TestSearchRanking(t *testing.T) {
-
-}
-
-func TestSearchWithOmit(t *testing.T) {
 
 }

@@ -15,7 +15,7 @@ type HostStore interface {
 	EnrollHost(uuid, hostname, ip, platform string, nodeKeySize int) (*Host, error)
 	AuthenticateHost(nodeKey string) (*Host, error)
 	MarkHostSeen(host *Host, t time.Time) error
-	SearchHosts(query string, omit []uint) ([]Host, error)
+	SearchHosts(query string, omitLookup map[uint]bool) ([]Host, error)
 }
 
 type HostService interface {

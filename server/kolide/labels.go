@@ -32,7 +32,7 @@ type LabelStore interface {
 
 	ListHostsInLabel(lid uint) ([]Host, error)
 
-	SearchLabels(query string, omit []uint) ([]Label, error)
+	SearchLabels(query string, omitLookup map[uint]bool) ([]Label, error)
 }
 
 type LabelService interface {

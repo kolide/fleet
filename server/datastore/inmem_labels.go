@@ -195,14 +195,14 @@ func (orm *inmem) SaveLabel(label *kolide.Label) error {
 	return nil
 }
 
-func (orm *inmem) SearchLabels(query string, omit []uint) ([]kolide.Label, error) {
+func (orm *inmem) SearchLabels(query string, omitLookup map[uint]bool) ([]kolide.Label, error) {
 	var results []kolide.Label
 
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
 	for _, l := range orm.labels {
-		if strings.Contains(l.Name, query) {
+		if strings.Contains(l.Name, query) && !omitLookup[l.ID] {
 			results = append(results, *l)
 		}
 	}

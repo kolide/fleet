@@ -8,15 +8,16 @@ import (
 func (svc service) SearchTargets(ctx context.Context, query string, omit []kolide.Target) (*kolide.TargetSearchResults, uint, error) {
 	results := &kolide.TargetSearchResults{}
 
-	// assemble the omit slices for the calls to the individual datastore methods
-	var omitHosts []uint
-	var omitLabels []uint
+	// assemble the omit sets for the calls to the individual datastore methods
+	omitHosts := map[uint]bool{}
+	omitLabels := map[uint]bool{}
+
 	for _, omitTarget := range omit {
 		switch omitTarget.Type {
 		case kolide.TargetHost:
-			omitHosts = append(omitHosts, omitTarget.TargetID)
+			omitHosts[omitTarget.TargetID] = true
 		case kolide.TargetLabel:
-			omitLabels = append(omitLabels, omitTarget.TargetID)
+			omitLabels[omitTarget.TargetID] = true
 		}
 	}
 

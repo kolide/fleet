@@ -180,14 +180,14 @@ func (orm *inmem) MarkHostSeen(host *kolide.Host, t time.Time) error {
 	return nil
 }
 
-func (orm *inmem) SearchHosts(query string, omit []uint) ([]kolide.Host, error) {
+func (orm *inmem) SearchHosts(query string, omitLookup map[uint]bool) ([]kolide.Host, error) {
 	var results []kolide.Host
 
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
 	for _, h := range orm.hosts {
-		if strings.Contains(h.HostName, query) || strings.Contains(h.PrimaryIP, query) {
+		if (strings.Contains(h.HostName, query) || strings.Contains(h.PrimaryIP, query)) && !omitLookup[h.ID] {
 			results = append(results, *h)
 		}
 	}

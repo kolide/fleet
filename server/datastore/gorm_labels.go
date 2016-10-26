@@ -151,7 +151,7 @@ AND lqe.matches
 	return results, nil
 }
 
-func (orm gormDB) SearchLabels(query string, omit []uint) ([]kolide.Label, error) {
+func (orm gormDB) SearchLabels(query string, omitLookup map[uint]bool) ([]kolide.Label, error) {
 	return nil, errors.New("not implemented", "")
 }
 
