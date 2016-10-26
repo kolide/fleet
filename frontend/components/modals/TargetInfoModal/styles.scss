@@ -18,14 +18,41 @@
       color: $textDark;
     }
   }
+  &__table {
+    border-collapse: collapse;
+    color: $textMedium;
+    font-size: $medium;
+    text-align: left;
+    width: 100%;
+
+    thead {
+      color: $textUltradark;
+      font-size: $small;
+    }
+
+    tr {
+      border-bottom: 1px solid $accentMedium;
+
+      &:last-child {
+        border-bottom: none;
+      }
+      &.__label-row {
+        color: $textDark;
+        font-size: $xSmall;
+      }
+    }
+    th {
+      width: 200px;
+    }
+  }
   &__host {
     &__status {
       margin-top: 0;
 
-      &.is-online {
+      &.--is-online {
         color: $success;
       }
-      &.is-offline {
+      &.--is-offline {
         color: $alert;
       }
     }
@@ -43,23 +70,33 @@
       margin-left: 5px;
       text-transform: capitalize;
     }
-    &__table {
-      border-collapse: collapse;
+  }
+  &__label {
+    &__description {
       color: $textMedium;
-      font-size: $medium;
-      text-align: left;
-      width: 100%;
-
-      tr {
-        border-bottom: 1px solid $accentMedium;
-
-        &:last-child {
-          border-bottom: none;
-        }
+      font-size: $small;
+      margin-top: 0;
+    }
+    &__num-hosts-section {
+      display: inline-block;
+      position: relative;
+      width: 150px;
+      .num-hosts {
+        bottom: 0;
+        color: $textMedium;
+        font-size: $medium;
+        font-weight: $bold;
+        position: absolute;
+        right: 0;
       }
-      th {
-        width: 200px;
-      }
+    }
+    &__search-section {
+      @include display(flex);
+      @include justify-content(space-between);
+      margin-bottom: $base;
+    }
+    &__text-editor-wrapper {
+      margin-bottom: $base;
     }
   }
 }
