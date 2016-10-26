@@ -1,4 +1,11 @@
 .target-option {
+  &__btn {
+    background-color: $brand;
+    border: none;
+    box-shadow: 0 3px 0 $brandDark;
+    float: right;
+    padding: 0 $medium;
+  }
   &__count {
     background-color: $textMedium;
     border-radius: $border-radius;

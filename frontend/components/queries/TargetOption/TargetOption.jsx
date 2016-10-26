@@ -1,7 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 
 import Button from '../../buttons/Button';
-import componentStyles from './styles';
 import targetInterface from '../../../interfaces/target';
 import TargetInfoModal from '../../modals/TargetInfoModal';
 
@@ -50,7 +49,6 @@ class TargetOption extends Component {
   }
 
   renderHost = () => {
-    const { btnStyle } = componentStyles;
     const { handleSelect, hostPlatformIconClass, targetIconClass } = this;
     const { onMoreInfoClick, target } = this.props;
     const { ip, label } = target;
@@ -62,14 +60,13 @@ class TargetOption extends Component {
         <span className={`${classBlock}__label-host`}>{label}</span>
         <span className={`${classBlock}__delimeter`}>&bull;</span>
         <span className={`${classBlock}__ip`}>{ip}</span>
-        <Button style={btnStyle} text="ADD" onClick={handleSelect} />
-        <button className={`btn--unstyled ${classBlock}__more-info`} onClick={onMoreInfoClick(target)}>more info</button>
+        <Button className={`${classBlock}__btn`} text="ADD" onClick={handleSelect} />
+        <Button className={`${classBlock}__more-info`} onClick={onMoreInfoClick(target)} text="more info" variant="unstyled" />
       </div>
     );
   }
 
   renderLabel = () => {
-    const { btnStyle } = componentStyles;
     const { handleSelect, targetIconClass } = this;
     const { onMoreInfoClick, target } = this.props;
     const { count, label } = target;
@@ -80,8 +77,8 @@ class TargetOption extends Component {
         <span className={`${classBlock}__label-label`}>{label}</span>
         <span className={`${classBlock}__delimeter`}>&bull;</span>
         <span className={`${classBlock}__count`}>{count} hosts</span>
-        <Button style={btnStyle} text="ADD" onClick={handleSelect} />
-        <button className={`btn--unstyled ${classBlock}__more-info`} onClick={onMoreInfoClick(target)}>more info</button>
+        <Button className={`${classBlock}__btn`} text="ADD" onClick={handleSelect} />
+        <Button className={`${classBlock}__more-info`} onClick={onMoreInfoClick(target)} text="more info" variant="unstyled" />
       </div>
     );
   }

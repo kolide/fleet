@@ -1,21 +1,20 @@
 import React, { Component, PropTypes } from 'react';
+import classnames from 'classnames';
 import radium from 'radium';
 
-import componentStyles from './styles';
+const baseClass = 'button';
 
 class Button extends Component {
   static propTypes = {
     className: PropTypes.string,
     disabled: PropTypes.bool,
     onClick: PropTypes.func,
-    style: PropTypes.object, // eslint-disable-line react/forbid-prop-types
     text: PropTypes.string,
     type: PropTypes.string,
     variant: PropTypes.string,
   };
 
   static defaultProps = {
-    style: {},
     variant: 'default',
   };
 
@@ -31,13 +30,13 @@ class Button extends Component {
 
   render () {
     const { handleClick } = this;
-    const { className, style, text, type, variant } = this.props;
+    const { className, text, type, variant } = this.props;
+    const fullClassName = classnames(`${baseClass}__${variant}`, className);
 
     return (
       <button
-        className={className}
+        className={fullClassName}
         onClick={handleClick}
-        style={[componentStyles[variant], style]}
         type={type}
       >
         {text}
