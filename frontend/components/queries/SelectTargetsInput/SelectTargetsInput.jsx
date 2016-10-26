@@ -37,7 +37,7 @@ class SelectTargetsInput extends Component {
         placeholder="Label Name, Host Name, IP Address, etc."
         resetValue={[]}
         value={selectedTargets}
-        valueKey="name"
+        valueKey="label"
       />
     );
   }
