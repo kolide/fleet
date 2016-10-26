@@ -35,6 +35,7 @@ func TestQueryResultsStore(t *testing.T) {
 	if redisAddr != "" {
 		store := newRedisQueryResults(redisAddr, redisPass)
 		t.Run("redis", func(t *testing.T) {
+			t.Parallel()
 			_, err := store.pool.Get().Do("PING")
 			require.Nil(t, err)
 			testQueryResultsStore(t, &store)
@@ -45,8 +46,13 @@ func TestQueryResultsStore(t *testing.T) {
 
 	store := newInmemQueryResults()
 	t.Run("inmem", func(t *testing.T) {
+		t.Parallel()
 		testQueryResultsStore(t, &store)
 	})
+}
+
+func testQueryResultsStoreErrors(t *testing.T, store kolide.QueryResultStore) {
+
 }
 
 func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {

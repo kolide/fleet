@@ -84,15 +84,7 @@ func receiveMessages(conn *redis.PubSubConn, outChan chan<- interface{}) {
 
 	for {
 		msg := conn.Receive()
-		select {
-		case outChan <- msg:
-			break
-		default:
-			// If no one is listening on the channel, this
-			// goroutine should exit (this should occur when the
-			// context expires in ReadChannel)
-			return
-		}
+		outChan <- msg
 		switch msg := msg.(type) {
 		case error:
 			// If an error occurred (i.e. connection was closed),
