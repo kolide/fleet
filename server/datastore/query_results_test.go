@@ -173,5 +173,4 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 
 	assert.EqualValues(t, expected1, results1)
 	assert.EqualValues(t, expected2, results2)
-
 }

@@ -78,9 +78,21 @@ func (im *redisQueryResults) WriteResult(result kolide.DistributedQueryResult) e
 // statement to run on conn.Receive() (by running on the channel that is being
 // fed by this function)
 func receiveMessages(conn *redis.PubSubConn, outChan chan<- interface{}) {
+	defer func() {
+		close(outChan)
+	}()
+
 	for {
 		msg := conn.Receive()
-		outChan <- msg
+		select {
+		case outChan <- msg:
+			break
+		default:
+			// If no one is listening on the channel, this
+			// goroutine should exit (this should occur when the
+			// context expires in ReadChannel)
+			return
+		}
 		switch msg := msg.(type) {
 		case error:
 			// If an error occurred (i.e. connection was closed),
@@ -105,23 +117,23 @@ func (im *redisQueryResults) ReadChannel(ctx context.Context, query kolide.Distr
 	pubSubName := pubSubForID(query.ID)
 	conn.Subscribe(pubSubName)
 
-	go func() {
-		defer func() {
-			close(outChannel)
-			conn.Unsubscribe()
-			conn.Close()
-		}()
+	msgChannel := make(chan interface{})
+	// Run a separate goroutine feeding redis messages into
+	// msgChannel
+	go receiveMessages(&conn, msgChannel)
 
-		msgChannel := make(chan interface{})
-		// Run a separate goroutine feeding redis messages into
-		// msgChannel
-		go receiveMessages(&conn, msgChannel)
+	go func() {
+		defer close(outChannel)
+		defer conn.Close()
 
 		for {
 			// Loop reading messages from conn.Receive() (via
 			// msgChannel) until the context is cancelled.
 			select {
-			case msg := <-msgChannel:
+			case msg, ok := <-msgChannel:
+				if !ok {
+					return
+				}
 				switch msg := msg.(type) {
 				case redis.Message:
 					var res kolide.DistributedQueryResult
@@ -132,11 +144,11 @@ func (im *redisQueryResults) ReadChannel(ctx context.Context, query kolide.Distr
 					outChannel <- res
 
 				case error:
-					return
+
 				}
 
 			case <-ctx.Done():
-				return
+				conn.Unsubscribe()
 
 			}
 		}
