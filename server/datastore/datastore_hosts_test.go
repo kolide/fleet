@@ -6,6 +6,7 @@ import (
 
 	"github.com/kolide/kolide-ose/server/kolide"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var enrollTests = []struct {
@@ -80,4 +81,46 @@ func testAuthenticateHost(t *testing.T, db kolide.Datastore) {
 
 	_, err = db.AuthenticateHost("")
 	assert.NotNil(t, err)
+}
+
+func testSearchHosts(t *testing.T, db kolide.Datastore) {
+	_, err := db.NewHost(&kolide.Host{
+		HostName:  "foo.local",
+		PrimaryIP: "192.168.1.10",
+	})
+	require.Nil(t, err)
+
+	_, err = db.NewHost(&kolide.Host{
+		HostName:  "bar.local",
+		PrimaryIP: "192.168.1.11",
+	})
+	require.Nil(t, err)
+
+	h3, err := db.NewHost(&kolide.Host{
+		HostName:  "foobar.local",
+		PrimaryIP: "192.168.1.12",
+	})
+	require.Nil(t, err)
+
+	hosts, err := db.SearchHosts("foo", nil)
+	assert.Nil(t, err)
+	assert.Len(t, hosts, 2)
+
+	host, err := db.SearchHosts("foo", map[uint]bool{h3.ID: true})
+	assert.Nil(t, err)
+	assert.Len(t, host, 1)
+}
+
+func testSearchHostsLimit(t *testing.T, db kolide.Datastore) {
+	for i := 0; i < 15; i++ {
+		_, err := db.NewHost(&kolide.Host{
+			HostName:  fmt.Sprintf("foo.%d.local", i),
+			PrimaryIP: fmt.Sprintf("192.168.1.%d", i+1),
+		})
+		require.Nil(t, err)
+	}
+
+	hosts, err := db.SearchHosts("foo", nil)
+	require.Nil(t, err)
+	assert.Len(t, hosts, 10)
 }

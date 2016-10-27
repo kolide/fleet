@@ -1,12 +1,14 @@
 package datastore
 
 import (
+	"fmt"
 	"sort"
 	"testing"
 	"time"
 
 	"github.com/kolide/kolide-ose/server/kolide"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func testLabels(t *testing.T, db kolide.Datastore) {
@@ -218,4 +220,88 @@ func testManagingLabelsOnPacks(t *testing.T, ds kolide.Datastore) {
 	labels, err = ds.ListLabelsForPack(monitoringPack)
 	assert.Nil(t, err)
 	assert.Len(t, labels, 2)
+}
+
+func testSearchLabels(t *testing.T, db kolide.Datastore) {
+	_, err := db.NewLabel(&kolide.Label{
+		Name: "foo",
+	})
+	require.Nil(t, err)
+
+	_, err = db.NewLabel(&kolide.Label{
+		Name: "bar",
+	})
+	require.Nil(t, err)
+
+	l3, err := db.NewLabel(&kolide.Label{
+		Name: "foobar",
+	})
+	require.Nil(t, err)
+
+	labels, err := db.SearchLabels("foo", nil)
+	assert.Nil(t, err)
+	assert.Len(t, labels, 2)
+
+	label, err := db.SearchLabels("foo", map[uint]bool{l3.ID: true})
+	assert.Nil(t, err)
+	assert.Len(t, label, 1)
+}
+
+func testSearchLabelsLimit(t *testing.T, db kolide.Datastore) {
+	for i := 0; i < 15; i++ {
+		_, err := db.NewLabel(&kolide.Label{
+			Name: fmt.Sprintf("foo-%d", i),
+		})
+		require.Nil(t, err)
+	}
+
+	labels, err := db.SearchLabels("foo", nil)
+	require.Nil(t, err)
+	assert.Len(t, labels, 10)
+}
+
+func testListHostsInLabel(t *testing.T, db kolide.Datastore) {
+	h1, err := db.NewHost(&kolide.Host{
+		HostName:  "foo.local",
+		PrimaryIP: "192.168.1.10",
+	})
+	require.Nil(t, err)
+
+	h2, err := db.NewHost(&kolide.Host{
+		HostName:  "bar.local",
+		PrimaryIP: "192.168.1.11",
+	})
+	require.Nil(t, err)
+
+	h3, err := db.NewHost(&kolide.Host{
+		HostName:  "baz.local",
+		PrimaryIP: "192.168.1.12",
+	})
+	require.Nil(t, err)
+
+	l1, err := db.NewLabel(&kolide.Label{
+		Name:    "label foo",
+		QueryID: 1,
+	})
+	require.Nil(t, err)
+	require.NotZero(t, l1.ID)
+	l1ID := fmt.Sprintf("%d", l1.ID)
+
+	{
+
+		hosts, err := db.ListHostsInLabel(l1.ID)
+		require.Nil(t, err)
+		assert.Len(t, hosts, 0)
+	}
+
+	for _, h := range []*kolide.Host{h1, h2, h3} {
+		err = db.RecordLabelQueryExecutions(h, map[string]bool{l1ID: true}, time.Now())
+		assert.Nil(t, err)
+	}
+
+	{
+		hosts, err := db.ListHostsInLabel(l1.ID)
+		require.Nil(t, err)
+		assert.Len(t, hosts, 3)
+	}
 }
