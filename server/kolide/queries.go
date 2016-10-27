@@ -14,6 +14,7 @@ type QueryStore interface {
 	DeleteQuery(query *Query) error
 	Query(id uint) (*Query, error)
 	ListQueries(opt ListOptions) ([]*Query, error)
+	DistributedQueriesForHost(host *Host) ([]Query, error)
 }
 
 type QueryService interface {
@@ -75,7 +76,7 @@ type DistributedQueryCampaign struct {
 type DistributedQueryCampaignTarget struct {
 	ID                         uint `gorm:"primary_key"`
 	Type                       TargetType
-	DistributedQueryCampaignID uint
+	DistributedQueryCampaignID uint `gorm:"index:idx_dqct_dqc_id"`
 	TargetID                   uint
 }
 
@@ -96,8 +97,8 @@ type DistributedQueryResult struct {
 
 type DistributedQueryExecution struct {
 	ID                 uint `gorm:"primary_key"`
-	HostID             uint
-	DistributedQueryID uint
+	HostID             uint // unique index added in migrate
+	DistributedQueryID uint // unique index added in migrate
 	Status             DistributedQueryExecutionStatus
 	Error              string `gorm:"size:1024"`
 	ExecutionDuration  time.Duration

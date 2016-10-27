@@ -101,3 +101,7 @@ func (orm *inmem) ListQueries(opt kolide.ListOptions) ([]*kolide.Query, error) {
 
 	return queries, nil
 }
+
+func (orm *inmem) DistributedQueriesForHost(host *kolide.Host) ([]kolide.Query, error) {
+	return nil, nil
+}
