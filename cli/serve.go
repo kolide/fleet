@@ -92,8 +92,9 @@ the way that the kolide server works.
 			if devMode {
 				createDevUsers(ds, config)
 				createDevHosts(ds, config)
+				createDevQueries(ds, config)
+				createDevLabels(ds, config)
 				createDevOrgInfo(svc, config)
-
 			}
 
 			fieldKeys := []string{"method", "error"}
@@ -204,7 +205,6 @@ func createDevUsers(ds kolide.Datastore, config config.KolideConfig) {
 		},
 	}
 	for _, user := range users {
-		user := user
 		err := user.SetPassword(user.Username, config.Auth.SaltKeySize, config.Auth.BcryptCost)
 		if err != nil {
 			initFatal(err, "creating bootstrap user")
@@ -248,7 +248,6 @@ func createDevHosts(ds kolide.Datastore, config config.KolideConfig) {
 	}
 
 	for _, host := range hosts {
-		host := host
 		_, err := ds.NewHost(&host)
 		if err != nil {
 			initFatal(err, "creating bootstrap host")
@@ -267,5 +266,71 @@ func createDevOrgInfo(svc kolide.Service, config config.KolideConfig) {
 	})
 	if err != nil {
 		initFatal(err, "creating fake org info")
+	}
+}
+
+func createDevQueries(ds kolide.Datastore, config config.KolideConfig) {
+	queries := []kolide.Query{
+		{
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			Name:      "dev_query_1",
+			Query:     "select * from processes",
+		},
+		{
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			Name:      "dev_query_2",
+			Query:     "select * from time",
+		},
+		{
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			Name:      "dev_query_3",
+			Query:     "select * from cpuid",
+		},
+		{
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			Name:      "dev_query_4",
+			Query:     "select 1 from processes where name like '%Apache%'",
+		},
+		{
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			Name:      "dev_query_5",
+			Query:     "select 1 from osquery_info where build_platform='darwin'",
+		},
+	}
+
+	for _, query := range queries {
+		_, err := ds.NewQuery(&query)
+		if err != nil {
+			initFatal(err, "creating bootstrap query")
+		}
+	}
+}
+
+func createDevLabels(ds kolide.Datastore, config config.KolideConfig) {
+	labels := []kolide.Label{
+		{
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			Name:      "dev_label_apache",
+			QueryID:   4,
+		},
+		{
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			Name:      "dev_label_darwin",
+			QueryID:   5,
+		},
+	}
+
+	for _, label := range labels {
+		_, err := ds.NewLabel(&label)
+		if err != nil {
+			initFatal(err, "creating bootstrap label")
+		}
 	}
 }
