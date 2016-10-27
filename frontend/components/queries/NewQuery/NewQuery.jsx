@@ -7,7 +7,6 @@ import './mode';
 import './theme';
 import debounce from '../../../utilities/debounce';
 import SaveQueryForm from '../../forms/queries/SaveQueryForm';
-import SaveQuerySection from './SaveQuerySection';
 import SelectTargetsInput from '../SelectTargetsInput';
 import SelectTargetsMenu from '../SelectTargetsMenu';
 import targetInterface from '../../../interfaces/target';
@@ -95,16 +94,6 @@ class NewQuery extends Component {
     return false;
   }
 
-  onToggleSaveQuery = () => {
-    const { saveQuery } = this.state;
-
-    this.setState({
-      saveQuery: !saveQuery,
-    });
-
-    return false;
-  }
-
   render () {
     const {
       isLoadingTargets,
@@ -123,7 +112,6 @@ class NewQuery extends Component {
       onSaveQueryFormSubmit,
       onTargetSelect,
       onThemeSelect,
-      onToggleSaveQuery,
     } = this;
     const menuRenderer = SelectTargetsMenu(onTargetSelectMoreInfo, onRemoveMoreInfoTarget, moreInfoTarget);
 
@@ -166,7 +154,6 @@ class NewQuery extends Component {
             targets={targets}
           />
         </div>
-        <SaveQuerySection onToggleSaveQuery={onToggleSaveQuery} saveQuery={saveQuery} />
         <SaveQueryForm onSubmit={onSaveQueryFormSubmit} saveQuery={saveQuery} />
       </div>
     );

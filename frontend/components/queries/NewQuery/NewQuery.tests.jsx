@@ -12,18 +12,6 @@ describe('NewQuery - component', () => {
   });
   afterEach(restoreSpies);
 
-  it('renders the SaveQuerySection', () => {
-    const component = mount(
-      <NewQuery
-        onOsqueryTableSelect={noop}
-        onTextEditorInputChange={noop}
-        textEditorText="Hello world"
-      />
-    );
-
-    expect(component.find('SaveQuerySection').length).toEqual(1);
-  });
-
   it('renders the ThemeDropdown', () => {
     const component = mount(
       <NewQuery
@@ -44,8 +32,6 @@ describe('NewQuery - component', () => {
         textEditorText="Hello world"
       />
     );
-
-    component.find('Slider').simulate('click');
 
     expect(component.find('SaveQueryForm').length).toEqual(1);
   });
