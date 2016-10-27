@@ -252,7 +252,3 @@ func TestSearchResultsLimit(t *testing.T) {
 	require.Nil(t, err)
 	assert.Equal(t, int(count), 10)
 }
-
-func TestSearchRanking(t *testing.T) {
-
-}
