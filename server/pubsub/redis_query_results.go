@@ -1,4 +1,4 @@
-package datastore
+package pubsub
 
 import (
 	"encoding/json"
@@ -19,7 +19,7 @@ type redisQueryResults struct {
 
 var _ kolide.QueryResultStore = &redisQueryResults{}
 
-func newRedisPool(server, password string) *redis.Pool {
+func NewRedisPool(server, password string) *redis.Pool {
 	return &redis.Pool{
 		MaxIdle:     3,
 		IdleTimeout: 240 * time.Second,

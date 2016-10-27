@@ -1,4 +1,4 @@
-package datastore
+package pubsub
 
 import (
 	"context"
@@ -33,7 +33,7 @@ func TestQueryResultsStore(t *testing.T) {
 	redisAddr := os.Getenv("REDIS_ADDRESS")
 	redisPass := os.Getenv("REDIS_PASSWORD")
 	if redisAddr != "" {
-		store := newRedisQueryResults(newRedisPool(redisAddr, redisPass))
+		store := newRedisQueryResults(NewRedisPool(redisAddr, redisPass))
 		t.Run("redis", func(t *testing.T) {
 			t.Parallel()
 			_, err := store.pool.Get().Do("PING")
