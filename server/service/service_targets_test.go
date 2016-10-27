@@ -165,7 +165,6 @@ func TestSearchWithOmit(t *testing.T) {
 		require.Nil(t, err)
 
 		require.Len(t, results.Hosts, 2)
-		assert.Equal(t, h1.HostName, results.Hosts[0].HostName)
 
 		require.Len(t, results.Labels, 1)
 		assert.Equal(t, l1.Name, results.Labels[0].Name)
@@ -234,7 +233,24 @@ func TestSearchHostsInLabels(t *testing.T) {
 }
 
 func TestSearchResultsLimit(t *testing.T) {
+	ds, err := datastore.New("inmem", "")
+	require.Nil(t, err)
 
+	svc, err := newTestService(ds)
+	require.Nil(t, err)
+
+	ctx := context.Background()
+
+	for i := 0; i < 15; i++ {
+		_, err := ds.NewHost(&kolide.Host{
+			HostName:  fmt.Sprintf("foo.%d.local", i),
+			PrimaryIP: fmt.Sprintf("192.168.1.%d", i+1),
+		})
+		require.Nil(t, err)
+	}
+	_, count, err := svc.SearchTargets(ctx, "foo", nil)
+	require.Nil(t, err)
+	assert.Equal(t, int(count), 10)
 }
 
 func TestSearchRanking(t *testing.T) {

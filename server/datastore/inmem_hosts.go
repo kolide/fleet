@@ -187,6 +187,10 @@ func (orm *inmem) SearchHosts(query string, omitLookup map[uint]bool) ([]kolide.
 	defer orm.mtx.Unlock()
 
 	for _, h := range orm.hosts {
+		if len(results) == 10 {
+			break
+		}
+
 		if (strings.Contains(h.HostName, query) || strings.Contains(h.PrimaryIP, query)) && !omitLookup[h.ID] {
 			results = append(results, *h)
 		}

@@ -202,6 +202,10 @@ func (orm *inmem) SearchLabels(query string, omitLookup map[uint]bool) ([]kolide
 	defer orm.mtx.Unlock()
 
 	for _, l := range orm.labels {
+		if len(results) == 10 {
+			break
+		}
+
 		// labels where the name of the label directly matches the search query
 		if strings.Contains(l.Name, query) && !omitLookup[l.ID] {
 			results = append(results, *l)
