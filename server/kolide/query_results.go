@@ -1,6 +1,6 @@
 package kolide
 
-import "context"
+import "golang.org/x/net/context"
 
 type QueryResultStore interface {
 	// WriteResult writes a distributed query result submitted by an osqueryd client

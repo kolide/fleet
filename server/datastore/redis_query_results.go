@@ -1,11 +1,12 @@
 package datastore
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
+
+	"golang.org/x/net/context"
 
 	"github.com/garyburd/redigo/redis"
 	"github.com/kolide/kolide-ose/server/kolide"
@@ -18,33 +19,35 @@ type redisQueryResults struct {
 
 var _ kolide.QueryResultStore = &redisQueryResults{}
 
-func newRedisQueryResults(server, password string) redisQueryResults {
-	return redisQueryResults{
-		pool: redis.Pool{
-			MaxIdle:     3,
-			IdleTimeout: 240 * time.Second,
-			Dial: func() (redis.Conn, error) {
-				c, err := redis.Dial("tcp", server)
-				if err != nil {
+func newRedisPool(server, password string) redis.Pool {
+	return redis.Pool{
+		MaxIdle:     3,
+		IdleTimeout: 240 * time.Second,
+		Dial: func() (redis.Conn, error) {
+			c, err := redis.Dial("tcp", server)
+			if err != nil {
+				return nil, err
+			}
+			if password != "" {
+				if _, err := c.Do("AUTH", password); err != nil {
+					c.Close()
 					return nil, err
 				}
-				if password != "" {
-					if _, err := c.Do("AUTH", password); err != nil {
-						c.Close()
-						return nil, err
-					}
-				}
-				return c, err
-			},
-			TestOnBorrow: func(c redis.Conn, t time.Time) error {
-				if time.Since(t) < time.Minute {
-					return nil
-				}
-				_, err := c.Do("PING")
-				return err
-			},
+			}
+			return c, err
+		},
+		TestOnBorrow: func(c redis.Conn, t time.Time) error {
+			if time.Since(t) < time.Minute {
+				return nil
+			}
+			_, err := c.Do("PING")
+			return err
 		},
 	}
+}
+
+func newRedisQueryResults(pool redis.Pool) redisQueryResults {
+	return redisQueryResults{pool: pool}
 }
 
 func pubSubForID(id uint) string {

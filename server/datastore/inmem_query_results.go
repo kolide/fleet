@@ -1,8 +1,9 @@
 package datastore
 
 import (
-	"context"
 	"sync"
+
+	"golang.org/x/net/context"
 
 	"github.com/kolide/kolide-ose/server/kolide"
 )

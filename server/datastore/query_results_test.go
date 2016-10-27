@@ -33,7 +33,7 @@ func TestQueryResultsStore(t *testing.T) {
 	redisAddr := os.Getenv("REDIS_ADDRESS")
 	redisPass := os.Getenv("REDIS_PASSWORD")
 	if redisAddr != "" {
-		store := newRedisQueryResults(redisAddr, redisPass)
+		store := newRedisQueryResults(newRedisPool(redisAddr, redisPass))
 		t.Run("redis", func(t *testing.T) {
 			t.Parallel()
 			_, err := store.pool.Get().Do("PING")
@@ -63,8 +63,6 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 	ctx1, cancel1 := context.WithCancel(context.Background())
 	channel1, err := store.ReadChannel(ctx1, campaign1)
 	assert.Nil(t, err)
-
-	results1 := []kolide.DistributedQueryResult{}
 
 	expected1 := []kolide.DistributedQueryResult{
 		kolide.DistributedQueryResult{
@@ -105,8 +103,6 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 	channel2, err := store.ReadChannel(ctx2, campaign2)
 	assert.Nil(t, err)
 
-	results2 := []kolide.DistributedQueryResult{}
-
 	expected2 := []kolide.DistributedQueryResult{
 		kolide.DistributedQueryResult{
 			DistributedQueryCampaignID: 2,
@@ -127,6 +123,8 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 			},
 		},
 	}
+
+	var results1, results2 []kolide.DistributedQueryResult
 
 	var readerWg, writerWg sync.WaitGroup
 
