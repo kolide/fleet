@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import classnames from 'classnames';
 
 import Button from '../../buttons/Button';
 import targetInterface from '../../../interfaces/target';
@@ -48,39 +49,15 @@ class TargetOption extends Component {
     return 'kolidecon-label';
   }
 
-  renderHost = () => {
-    const { handleSelect, hostPlatformIconClass, targetIconClass } = this;
-    const { onMoreInfoClick, target } = this.props;
-    const { ip, label } = target;
+  renderTargetDetail = () => {
+    const { target } = this.props;
+    const { count, ip, target_type: targetType } = target;
 
-    return (
-      <div className={`${classBlock}__wrapper`}>
-        <i className={`${targetIconClass()} ${classBlock}__target-icon`} />
-        <i className={`${classBlock}__icon ${hostPlatformIconClass()}`} />
-        <span className={`${classBlock}__label-host`}>{label}</span>
-        <span className={`${classBlock}__delimeter`}>&bull;</span>
-        <span className={`${classBlock}__ip`}>{ip}</span>
-        <Button className={`${classBlock}__btn`} text="ADD" onClick={handleSelect} />
-        <Button className={`${classBlock}__more-info`} onClick={onMoreInfoClick(target)} text="more info" variant="unstyled" />
-      </div>
-    );
-  }
+    if (targetType === 'hosts') {
+      return <span className={`${classBlock}__ip`}>{ip}</span>;
+    }
 
-  renderLabel = () => {
-    const { handleSelect, targetIconClass } = this;
-    const { onMoreInfoClick, target } = this.props;
-    const { count, label } = target;
-
-    return (
-      <div className={`${classBlock}__wrapper`}>
-        <i className={`${targetIconClass()} ${classBlock}__target-icon`} />
-        <span className={`${classBlock}__label-label`}>{label}</span>
-        <span className={`${classBlock}__delimeter`}>&bull;</span>
-        <span className={`${classBlock}__count`}>{count} hosts</span>
-        <Button className={`${classBlock}__btn`} text="ADD" onClick={handleSelect} />
-        <Button className={`${classBlock}__more-info`} onClick={onMoreInfoClick(target)} text="more info" variant="unstyled" />
-      </div>
-    );
+    return <span className={`${classBlock}__count`}>{count} hosts</span>;
   }
 
   renderTargetInfoModal = () => {
@@ -101,21 +78,29 @@ class TargetOption extends Component {
   }
 
   render () {
-    const { target_type: targetType } = this.props.target;
-    const { renderHost, renderLabel, renderTargetInfoModal } = this;
-
-    if (targetType === 'hosts') {
-      return (
-        <div>
-          {renderHost()}
-          {renderTargetInfoModal()}
-        </div>
-      );
-    }
+    const { onMoreInfoClick, target } = this.props;
+    const { label, target_type: targetType } = target;
+    const {
+      handleSelect,
+      hostPlatformIconClass,
+      targetIconClass,
+      renderTargetDetail,
+      renderTargetInfoModal,
+    } = this;
+    const wrapperClassName = classnames(`${classBlock}__wrapper`, {
+      '--is-label': targetType === 'labels',
+      '--is-host': targetType === 'hosts',
+    });
 
     return (
-      <div>
-        {renderLabel()}
+      <div className={wrapperClassName}>
+        <i className={`${targetIconClass()} ${classBlock}__target-icon`} />
+        {targetType === 'hosts' && <i className={`${classBlock}__icon ${hostPlatformIconClass()}`} />}
+        <span className={`${classBlock}__label-label`}>{label}</span>
+        <span className={`${classBlock}__delimeter`}>&bull;</span>
+        {renderTargetDetail()}
+        <Button className={`${classBlock}__btn`} text="ADD" onClick={handleSelect} />
+        <Button className={`${classBlock}__more-info`} onClick={onMoreInfoClick(target)} text="more info" variant="unstyled" />
         {renderTargetInfoModal()}
       </div>
     );
