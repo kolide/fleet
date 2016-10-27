@@ -48,7 +48,16 @@ func (orm gormDB) Migrate() error {
 	}
 
 	// Have to manually add indexes. Yuck!
-	orm.DB.Model(&kolide.LabelQueryExecution{}).AddUniqueIndex("idx_lqe_label_host", "label_id", "host_id")
+	err := orm.DB.Model(&kolide.LabelQueryExecution{}).AddUniqueIndex("idx_lqe_label_host", "label_id", "host_id").Error
+	if err != nil {
+		return err
+	}
+
+	// there is no IF NOT EXISTS for indexes, so need to figure out a way to not
+	// create this index if it already exists. for this reason, errors are
+	// ignored here
+	orm.DB.Exec("CREATE FULLTEXT INDEX hosts_search ON hosts(host_name, primary_ip);")
+	orm.DB.Exec("CREATE FULLTEXT INDEX labels_search ON labels(name);")
 
 	return nil
 }

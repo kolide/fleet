@@ -133,5 +133,16 @@ func (orm gormDB) MarkHostSeen(host *kolide.Host, t time.Time) error {
 }
 
 func (orm gormDB) SearchHosts(query string, omitLookup map[uint]bool) ([]kolide.Host, error) {
-	return nil, errors.New("not implemented", "")
+	// XXX this is broken
+	ids := []uint{}
+	for id, _ := range omitLookup {
+		ids = append(ids, id)
+	}
+
+	var results []kolide.Host
+	err := orm.DB.Raw("SELECT * FROM hosts WHERE MATCH(host_name, primary_ip) AGAINST('?*' IN BOOLEAN MODE) AND id NOT IN (?);", query, ids).Scan(&results).Error
+	if err != nil {
+		return nil, errors.DatabaseError(err)
+	}
+	return results, nil
 }

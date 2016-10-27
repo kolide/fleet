@@ -52,7 +52,7 @@ type Label struct {
 	ID        uint      `json:"id" gorm:"primary_key"`
 	CreatedAt time.Time `json:"-"`
 	UpdatedAt time.Time `json:"-"`
-	Name      string    `json:"name" gorm:"not null;unique_index:idx_label_unique_name"`
+	Name      string    `json:"name" gorm:"not null;unique_index:idx_label_unique_name"` // there is an fulltext index on this field
 	QueryID   uint      `json:"query_id"`
 }
 

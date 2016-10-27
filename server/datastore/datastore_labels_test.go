@@ -234,7 +234,7 @@ func testSearchLabels(t *testing.T, db kolide.Datastore) {
 	require.Nil(t, err)
 
 	l3, err := db.NewLabel(&kolide.Label{
-		Name: "foobar",
+		Name: "foo-bar",
 	})
 	require.Nil(t, err)
 
