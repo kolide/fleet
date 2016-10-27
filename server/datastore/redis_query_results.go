@@ -14,13 +14,13 @@ import (
 
 type redisQueryResults struct {
 	// connection pool
-	pool redis.Pool
+	pool *redis.Pool
 }
 
 var _ kolide.QueryResultStore = &redisQueryResults{}
 
-func newRedisPool(server, password string) redis.Pool {
-	return redis.Pool{
+func newRedisPool(server, password string) *redis.Pool {
+	return &redis.Pool{
 		MaxIdle:     3,
 		IdleTimeout: 240 * time.Second,
 		Dial: func() (redis.Conn, error) {
@@ -46,7 +46,7 @@ func newRedisPool(server, password string) redis.Pool {
 	}
 }
 
-func newRedisQueryResults(pool redis.Pool) redisQueryResults {
+func newRedisQueryResults(pool *redis.Pool) redisQueryResults {
 	return redisQueryResults{pool: pool}
 }
 
