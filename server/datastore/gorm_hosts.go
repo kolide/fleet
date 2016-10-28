@@ -140,19 +140,18 @@ WHERE MATCH(host_name, primary_ip)
 AGAINST(? IN BOOLEAN MODE)
 `
 	results := []kolide.Host{}
+	var err error
+
 	if len(omit) > 0 {
 		sql += "AND id NOT IN (?) LIMIT 10;"
-		err := orm.DB.Raw(sql, query+"*", omit).Scan(&results).Error
-		if err != nil && err != gorm.ErrRecordNotFound {
-			return nil, errors.DatabaseError(err)
-		}
+		err = orm.DB.Raw(sql, query+"*", omit).Scan(&results).Error
 	} else {
 		sql += "LIMIT 10;"
-		err := orm.DB.Raw(sql, query+"*").Scan(&results).Error
-		if err != nil && err != gorm.ErrRecordNotFound {
-			return nil, errors.DatabaseError(err)
-		}
+		err = orm.DB.Raw(sql, query+"*").Scan(&results).Error
 	}
 
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return nil, errors.DatabaseError(err)
+	}
 	return results, nil
 }
