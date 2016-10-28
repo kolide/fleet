@@ -82,14 +82,11 @@ class NewQuery extends Component {
   }
 
   onSaveQueryFormSubmit = debounce((formData) => {
-    const {
-      onInvalidQuerySubmit,
-      onNewQueryFormSubmit,
-      textEditorText,
-    } = this.props;
+    const { onInvalidQuerySubmit, onNewQueryFormSubmit, textEditorText } = this.props;
     const { selectedTargets } = this.state;
-
     const { error } = validateQuery(textEditorText);
+
+    this.setState({ isSaveQueryForm: false });
 
     if (error) {
       return onInvalidQuerySubmit(error);

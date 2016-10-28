@@ -50,6 +50,21 @@ describe('NewQuery - component', () => {
     expect(component.find('SaveQueryForm').length).toEqual(1);
   });
 
+  it('hides the SaveQueryFormModal after the form is submitted', () => {
+    const component = mount(
+      <NewQuery onNewQueryFormSubmit={noop} textEditorText="SELECT * FROM users" />
+    );
+
+    component.find('.new-query__save-query-btn').simulate('click');
+
+    const form = component.find('SaveQueryForm');
+
+    fillInFormInput(form.find({ name: 'name' }), 'My query name');
+    form.simulate('submit');
+
+    expect(component.find('SaveQueryForm').length).toEqual(0);
+  });
+
   it('calls onNewQueryFormSubmit with appropriate data from SaveQueryFormModal', () => {
     const onNewQueryFormSubmitSpy = createSpy();
     const query = 'SELECT * FROM users';
