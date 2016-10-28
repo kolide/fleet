@@ -4,6 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"os"
+	"reflect"
+	"runtime"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -29,35 +32,82 @@ func waitTimeout(wg *sync.WaitGroup, timeout time.Duration) bool {
 	}
 }
 
-func TestQueryResultsStore(t *testing.T) {
-	redisAddr := os.Getenv("REDIS_ADDRESS")
-	redisPass := os.Getenv("REDIS_PASSWORD")
-	if redisAddr != "" {
-		store := newRedisQueryResults(NewRedisPool(redisAddr, redisPass))
-		t.Run("redis", func(t *testing.T) {
-			t.Parallel()
-			_, err := store.pool.Get().Do("PING")
-			require.Nil(t, err)
-			testQueryResultsStore(t, &store)
-		})
-	} else {
-		t.Log("Skipping redis")
+func functionName(f func(*testing.T, kolide.QueryResultStore)) string {
+	fullName := runtime.FuncForPC(reflect.ValueOf(f).Pointer()).Name()
+	elements := strings.Split(fullName, ".")
+	return elements[len(elements)-1]
+}
+
+var testFunctions = [...]func(*testing.T, kolide.QueryResultStore){
+	testQueryResultsStore,
+	testQueryResultsStoreErrors,
+}
+
+func TestRedis(t *testing.T) {
+	if _, ok := os.LookupEnv("REDIS_TEST"); !ok {
+		t.SkipNow()
 	}
 
-	store := newInmemQueryResults()
-	t.Run("inmem", func(t *testing.T) {
-		t.Parallel()
-		testQueryResultsStore(t, &store)
-	})
+	store, teardown := setupRedis(t)
+	defer teardown()
+
+	for _, f := range testFunctions {
+		t.Run(functionName(f), func(t *testing.T) {
+			f(t, store)
+		})
+	}
+}
+
+func TestInmem(t *testing.T) {
+	for _, f := range testFunctions {
+		t.Run(functionName(f), func(t *testing.T) {
+			t.Parallel()
+			store := newInmemQueryResults()
+			f(t, store)
+		})
+	}
+}
+
+func setupRedis(t *testing.T) (store *redisQueryResults, teardown func()) {
+	var (
+		addr     = "127.0.0.1:6379"
+		password = ""
+	)
+
+	if a, ok := os.LookupEnv("REDIS_PORT_6379_TCP_ADDR"); ok {
+		addr = a
+	}
+
+	store = newRedisQueryResults(NewRedisPool(addr, password))
+
+	_, err := store.pool.Get().Do("PING")
+	require.Nil(t, err)
+
+	teardown = func() {
+		store.pool.Close()
+	}
+
+	return store, teardown
 }
 
 func testQueryResultsStoreErrors(t *testing.T, store kolide.QueryResultStore) {
-
+	// Test handling results for two campaigns in parallel
+	err := store.WriteResult(
+		kolide.DistributedQueryResult{
+			DistributedQueryCampaignID: 1,
+			ResultJSON:                 json.RawMessage(`{"bing":"fds"}`),
+			Host: kolide.Host{
+				ID:               4,
+				UpdatedAt:        time.Now(),
+				DetailUpdateTime: time.Now(),
+			},
+		},
+	)
+	assert.NotNil(t, err)
 }
 
 func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 	// Test handling results for two campaigns in parallel
-
 	campaign1 := kolide.DistributedQueryCampaign{ID: 1}
 
 	ctx1, cancel1 := context.WithCancel(context.Background())

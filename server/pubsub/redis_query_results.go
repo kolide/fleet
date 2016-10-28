@@ -46,16 +46,16 @@ func NewRedisPool(server, password string) *redis.Pool {
 	}
 }
 
-func newRedisQueryResults(pool *redis.Pool) redisQueryResults {
-	return redisQueryResults{pool: pool}
+func newRedisQueryResults(pool *redis.Pool) *redisQueryResults {
+	return &redisQueryResults{pool: pool}
 }
 
 func pubSubForID(id uint) string {
 	return fmt.Sprintf("results_%d", id)
 }
 
-func (im *redisQueryResults) WriteResult(result kolide.DistributedQueryResult) error {
-	conn := im.pool.Get()
+func (r *redisQueryResults) WriteResult(result kolide.DistributedQueryResult) error {
+	conn := r.pool.Get()
 	defer conn.Close()
 
 	channelName := pubSubForID(result.DistributedQueryCampaignID)
@@ -104,10 +104,10 @@ func receiveMessages(conn *redis.PubSubConn, outChan chan<- interface{}) {
 	}
 }
 
-func (im *redisQueryResults) ReadChannel(ctx context.Context, query kolide.DistributedQueryCampaign) (<-chan kolide.DistributedQueryResult, error) {
+func (r *redisQueryResults) ReadChannel(ctx context.Context, query kolide.DistributedQueryCampaign) (<-chan kolide.DistributedQueryResult, error) {
 	outChannel := make(chan kolide.DistributedQueryResult)
 
-	conn := redis.PubSubConn{Conn: im.pool.Get()}
+	conn := redis.PubSubConn{Conn: r.pool.Get()}
 
 	pubSubName := pubSubForID(query.ID)
 	conn.Subscribe(pubSubName)

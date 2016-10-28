@@ -1,6 +1,7 @@
 package pubsub
 
 import (
+	"errors"
 	"sync"
 
 	"golang.org/x/net/context"
@@ -15,8 +16,8 @@ type inmemQueryResults struct {
 
 var _ kolide.QueryResultStore = &inmemQueryResults{}
 
-func newInmemQueryResults() inmemQueryResults {
-	return inmemQueryResults{resultChannels: map[uint]chan kolide.DistributedQueryResult{}}
+func newInmemQueryResults() *inmemQueryResults {
+	return &inmemQueryResults{resultChannels: map[uint]chan kolide.DistributedQueryResult{}}
 }
 
 func (im *inmemQueryResults) getChannel(id uint) chan kolide.DistributedQueryResult {
@@ -32,8 +33,12 @@ func (im *inmemQueryResults) getChannel(id uint) chan kolide.DistributedQueryRes
 }
 
 func (im *inmemQueryResults) WriteResult(result kolide.DistributedQueryResult) error {
-	// Write the result
-	im.getChannel(result.DistributedQueryCampaignID) <- result
+	channel, ok := im.resultChannels[result.DistributedQueryCampaignID]
+	if !ok {
+		return errors.New("no subscribers for channel")
+	}
+
+	channel <- result
 
 	return nil
 }
