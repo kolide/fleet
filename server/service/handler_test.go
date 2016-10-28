@@ -5,10 +5,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"context"
 	"github.com/gorilla/mux"
 	"github.com/kolide/kolide-ose/server/datastore"
 	"github.com/stretchr/testify/assert"
-	"golang.org/x/net/context"
 )
 
 func TestAPIRoutes(t *testing.T) {

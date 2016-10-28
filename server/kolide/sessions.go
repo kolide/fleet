@@ -3,9 +3,9 @@ package kolide
 import (
 	"time"
 
+	"context"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/kolide/kolide-ose/server/errors"
-	"golang.org/x/net/context"
 )
 
 const publicErrorMessage string = "Session error"

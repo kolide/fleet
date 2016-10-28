@@ -6,10 +6,10 @@ import (
 	"strings"
 	"time"
 
+	"context"
 	"github.com/kolide/kolide-ose/server/contexts/viewer"
 	"github.com/kolide/kolide-ose/server/datastore"
 	"github.com/kolide/kolide-ose/server/kolide"
-	"golang.org/x/net/context"
 )
 
 func (svc service) Login(ctx context.Context, username, password string) (*kolide.User, string, error) {

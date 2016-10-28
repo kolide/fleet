@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	"context"
 	"github.com/kolide/kolide-ose/server/kolide"
-	"golang.org/x/net/context"
 )
 
 func (mw metricsMiddleware) Login(ctx context.Context, username string, password string) (*kolide.User, string, error) {

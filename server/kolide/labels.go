@@ -3,7 +3,7 @@ package kolide
 import (
 	"time"
 
-	"golang.org/x/net/context"
+	"context"
 )
 
 type LabelStore interface {

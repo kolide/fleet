@@ -8,10 +8,10 @@ import (
 	"strings"
 	"time"
 
+	"context"
 	hostctx "github.com/kolide/kolide-ose/server/contexts/host"
 	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
-	"golang.org/x/net/context"
 )
 
 type osqueryError struct {

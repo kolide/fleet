@@ -3,8 +3,8 @@ package service
 import (
 	"time"
 
+	"context"
 	"github.com/kolide/kolide-ose/server/kolide"
-	"golang.org/x/net/context"
 )
 
 func (mw loggingMiddleware) Login(ctx context.Context, username, password string) (user *kolide.User, token string, err error) {

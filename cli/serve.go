@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	"context"
 	"github.com/WatchBeam/clock"
 	kitlog "github.com/go-kit/kit/log"
 	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
@@ -21,7 +22,6 @@ import (
 	"github.com/kolide/kolide-ose/server/version"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/spf13/cobra"
-	"golang.org/x/net/context"
 )
 
 func createServeCmd(configManager config.Manager) *cobra.Command {

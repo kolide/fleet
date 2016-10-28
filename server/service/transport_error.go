@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"context"
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/kolide/kolide-ose/server/datastore"
-	"golang.org/x/net/context"
 )
 
 // erroer interface is implemented by response structs to encode business logic errors

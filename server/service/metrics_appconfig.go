@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	"context"
 	"github.com/kolide/kolide-ose/server/kolide"
-	"golang.org/x/net/context"
 )
 
 func (mw metricsMiddleware) NewOrgInfo(ctx context.Context, p kolide.OrgInfoPayload) (*kolide.OrgInfo, error) {

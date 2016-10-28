@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"context"
 	"github.com/WatchBeam/clock"
 	"github.com/kolide/kolide-ose/server/config"
 	"github.com/kolide/kolide-ose/server/contexts/viewer"
@@ -13,7 +14,6 @@ import (
 	"github.com/kolide/kolide-ose/server/kolide"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/net/context"
 )
 
 func TestAuthenticatedUser(t *testing.T) {

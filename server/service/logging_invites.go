@@ -3,9 +3,9 @@ package service
 import (
 	"time"
 
+	"context"
 	"github.com/kolide/kolide-ose/server/contexts/viewer"
 	"github.com/kolide/kolide-ose/server/kolide"
-	"golang.org/x/net/context"
 )
 
 func (mw loggingMiddleware) InviteNewUser(ctx context.Context, payload kolide.InvitePayload) (*kolide.Invite, error) {

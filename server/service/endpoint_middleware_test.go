@@ -3,13 +3,13 @@ package service
 import (
 	"testing"
 
+	"context"
 	"github.com/go-kit/kit/endpoint"
 	"github.com/kolide/kolide-ose/server/contexts/viewer"
 	"github.com/kolide/kolide-ose/server/datastore"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/net/context"
 )
 
 // TestEndpointPermissions tests that

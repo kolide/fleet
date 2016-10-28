@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"testing"
 
+	"context"
 	kitlog "github.com/go-kit/kit/log"
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
@@ -19,7 +20,6 @@ import (
 	"github.com/kolide/kolide-ose/server/kolide"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/net/context"
 )
 
 func TestLogin(t *testing.T) {

@@ -6,7 +6,7 @@ import (
 
 	"github.com/kolide/kolide-ose/server/kolide"
 
-	"golang.org/x/net/context"
+	"context"
 )
 
 func decodeEnrollAgentRequest(ctx context.Context, r *http.Request) (interface{}, error) {

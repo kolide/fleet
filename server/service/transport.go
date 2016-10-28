@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"strconv"
 
+	"context"
 	"github.com/gorilla/mux"
 	"github.com/kolide/kolide-ose/server/kolide"
-	"golang.org/x/net/context"
 )
 
 var (

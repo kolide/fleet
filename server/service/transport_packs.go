@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"golang.org/x/net/context"
+	"context"
 )
 
 func decodeCreatePackRequest(ctx context.Context, r *http.Request) (interface{}, error) {
