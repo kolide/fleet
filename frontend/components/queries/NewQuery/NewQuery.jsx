@@ -5,6 +5,7 @@ import radium from 'radium';
 
 import './mode';
 import './theme';
+import Button from '../../buttons/Button';
 import debounce from '../../../utilities/debounce';
 import SaveQueryFormModal from '../../modals/SaveQueryFormModal';
 import SelectTargetsInput from '../SelectTargetsInput';
@@ -56,6 +57,12 @@ class NewQuery extends Component {
 
       return false;
     });
+  }
+
+  onLoadSaveQueryModal = () => {
+    this.setState({ isSaveQueryForm: true });
+
+    return false;
   }
 
   onSaveQueryFormCancel = (evt) => {
@@ -136,6 +143,7 @@ class NewQuery extends Component {
     const { selectedTargets, theme } = this.state;
     const {
       onLoad,
+      onLoadSaveQueryModal,
       onTargetSelect,
       onThemeSelect,
       renderSaveQueryFormModal,
@@ -181,6 +189,12 @@ class NewQuery extends Component {
             targets={targets}
           />
         </div>
+        <Button
+          className={`${baseClass}__save-query-btn`}
+          onClick={onLoadSaveQueryModal}
+          text="Save Query"
+          variant="inverse"
+        />
         {renderSaveQueryFormModal()}
       </div>
     );

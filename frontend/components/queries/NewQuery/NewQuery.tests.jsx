@@ -45,6 +45,8 @@ describe('NewQuery - component', () => {
       />
     );
 
+    component.find('.new-query__save-query-btn').simulate('click');
+
     expect(component.find('SaveQueryForm').length).toEqual(1);
   });
 
@@ -65,6 +67,8 @@ describe('NewQuery - component', () => {
     const validQuery = 'SELECT * FROM users';
 
     it('calls onInvalidQuerySubmit when invalid', () => {
+      createAceSpy();
+
       const invalidQuerySubmitSpy = createSpy();
       const component = mount(
         <NewQuery
@@ -74,17 +78,21 @@ describe('NewQuery - component', () => {
           textEditorText={invalidQuery}
         />
       );
+
+      component.find('.new-query__save-query-btn').simulate('click');
+
       const form = component.find('SaveQueryForm');
       const inputField = form.find('.save-query-form__input--name');
 
       fillInFormInput(inputField, 'my query');
-
       form.simulate('submit');
 
       expect(invalidQuerySubmitSpy).toHaveBeenCalledWith('Cannot INSERT or CREATE in osquery queries');
     });
 
     it('calls onNewQueryFormSubmit when valid', () => {
+      createAceSpy();
+
       const onNewQueryFormSubmitSpy = createSpy();
       const component = mount(
         <NewQuery
@@ -94,11 +102,13 @@ describe('NewQuery - component', () => {
           textEditorText={validQuery}
         />
       );
+
+      component.find('.new-query__save-query-btn').simulate('click');
+
       const form = component.find('SaveQueryForm');
       const inputField = form.find('.save-query-form__input--name');
 
       fillInFormInput(inputField, 'my query');
-
       form.simulate('submit');
 
       expect(onNewQueryFormSubmitSpy).toHaveBeenCalled();
