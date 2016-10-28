@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import radium from 'radium';
+import classnames from 'classnames';
 
 import Button from '../../../buttons/Button';
 import InputField from '../../fields/InputField';
@@ -79,12 +79,14 @@ class SaveQueryForm extends Component {
     const { errors } = this.state;
     const { onCancel } = this.props;
     const { onFieldChange, onFormSubmit } = this;
+    const nameInputClassName = classnames(`${baseClass}__input`, `${baseClass}__input--name`);
+    const descriptionInputClassName = classnames(`${baseClass}__input`, `${baseClass}__input--description`);
 
     return (
       <form onSubmit={onFormSubmit}>
         <InputField
           error={errors.name}
-          inputClassName={`${baseClass}__input--name`}
+          inputClassName={nameInputClassName}
           label="Query Name"
           labelClassName={`${baseClass}__label`}
           name="name"
@@ -93,7 +95,7 @@ class SaveQueryForm extends Component {
         />
         <InputField
           error={errors.description}
-          inputClassName={`${baseClass}__input--description`}
+          inputClassName={descriptionInputClassName}
           label="Query Description"
           labelClassName={`${baseClass}__label`}
           name="description"
@@ -119,4 +121,4 @@ class SaveQueryForm extends Component {
   }
 }
 
-export default radium(SaveQueryForm);
+export default SaveQueryForm;

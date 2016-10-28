@@ -33,7 +33,8 @@ class Button extends Component {
     const { handleClick } = this;
     const { className, disabled, text, type, variant } = this.props;
     const fullClassName = classnames(`${baseClass}__${variant}`, className, {
-      'is-disabled': disabled,
+      [baseClass]: variant !== 'unstyled',
+      [`${baseClass}__${variant}--disabled`]: disabled,
     });
 
     return (
