@@ -31,12 +31,15 @@ class Button extends Component {
 
   render () {
     const { handleClick } = this;
-    const { className, text, type, variant } = this.props;
-    const fullClassName = classnames(baseClass, `${baseClass}__${variant}`, className);
+    const { className, disabled, text, type, variant } = this.props;
+    const fullClassName = classnames(`${baseClass}__${variant}`, className, {
+      'is-disabled': disabled,
+    });
 
     return (
       <button
         className={fullClassName}
+        disabled={disabled}
         onClick={handleClick}
         type={type}
       >

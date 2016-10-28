@@ -50,6 +50,22 @@ describe('NewQuery - component', () => {
     expect(component.find('SaveQueryForm').length).toEqual(1);
   });
 
+  it('renders the Run Query button as disabled without selected targets', () => {
+    const component = mount(
+      <NewQuery
+        onOsqueryTableSelect={noop}
+        onTextEditorInputChange={noop}
+        textEditorText="Hello world"
+      />
+    );
+
+    const runQueryBtn = component.find('.new-query__run-query-btn');
+
+    expect(runQueryBtn.props()).toInclude({
+      disabled: true,
+    });
+  });
+
   it('hides the SaveQueryFormModal after the form is submitted', () => {
     const component = mount(
       <NewQuery onNewQueryFormSubmit={noop} textEditorText="SELECT * FROM users" />

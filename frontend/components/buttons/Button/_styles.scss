@@ -24,6 +24,11 @@ $gradient-end: #c86dd7;
     border: 1px solid $brand;
     box-shadow: 0 3px 0 $brand-light;
     color: $white;
+    &.is-disabled {
+      background-color: $brandLight;
+      border-color: $brandLight;
+      cursor: not-allowed;
+    }
   }
 
   &__inverse {

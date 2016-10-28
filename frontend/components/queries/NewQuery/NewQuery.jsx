@@ -204,6 +204,7 @@ class NewQuery extends Component {
           />
           <Button
             className={`${baseClass}__run-query-btn`}
+            disabled={!selectedTargets.length}
             onClick={onRunQuery}
             text="Run Query"
           />
