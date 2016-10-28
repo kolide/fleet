@@ -188,23 +188,28 @@ func createDevMailService(config config.KolideConfig) kolide.MailService {
 func createDevUsers(ds kolide.Datastore, config config.KolideConfig) {
 	users := []kolide.User{
 		{
-			Name:     "Admin User",
-			Username: "admin",
-			Email:    "admin@kolide.co",
-			Position: "Director of Security",
-			Admin:    true,
-			Enabled:  true,
+			CreatedAt: time.Date(2016, time.October, 27, 10, 0, 0, 0, time.UTC),
+			UpdatedAt: time.Date(2016, time.October, 27, 10, 0, 0, 0, time.UTC),
+			Name:      "Admin User",
+			Username:  "admin",
+			Email:     "admin@kolide.co",
+			Position:  "Director of Security",
+			Admin:     true,
+			Enabled:   true,
 		},
 		{
-			Name:     "Normal User",
-			Username: "user",
-			Email:    "user@kolide.co",
-			Position: "Security Engineer",
-			Admin:    false,
-			Enabled:  true,
+			CreatedAt: time.Now().Add(-3 * time.Hour),
+			UpdatedAt: time.Now().Add(-1 * time.Hour),
+			Name:      "Normal User",
+			Username:  "user",
+			Email:     "user@kolide.co",
+			Position:  "Security Engineer",
+			Admin:     false,
+			Enabled:   true,
 		},
 	}
 	for _, user := range users {
+		user := user
 		err := user.SetPassword(user.Username, config.Auth.SaltKeySize, config.Auth.BcryptCost)
 		if err != nil {
 			initFatal(err, "creating bootstrap user")
@@ -220,6 +225,8 @@ func createDevUsers(ds kolide.Datastore, config config.KolideConfig) {
 func createDevHosts(ds kolide.Datastore, config config.KolideConfig) {
 	hosts := []kolide.Host{
 		{
+			CreatedAt:        time.Date(2016, time.October, 27, 10, 0, 0, 0, time.UTC),
+			UpdatedAt:        time.Now().Add(-20 * time.Minute),
 			NodeKey:          "totally-legit",
 			HostName:         "jmeller-mbp.local",
 			UUID:             "1234-5678-9101",
@@ -228,11 +235,13 @@ func createDevHosts(ds kolide.Datastore, config config.KolideConfig) {
 			OSVersion:        "Mac OS X 10.11.6",
 			Uptime:           60 * time.Minute,
 			PhysicalMemory:   4145483776,
-			PrimaryMAC:       "10:11:12:13:14:15",
+			PrimaryMAC:       "C0:11:1B:13:3E:15",
 			PrimaryIP:        "192.168.1.10",
-			DetailUpdateTime: time.Now(),
+			DetailUpdateTime: time.Now().Add(-20 * time.Minute),
 		},
 		{
+			CreatedAt:        time.Now().Add(-1 * time.Hour),
+			UpdatedAt:        time.Now().Add(-20 * time.Minute),
 			NodeKey:          "definitely-legit",
 			HostName:         "marpaia.local",
 			UUID:             "1234-5678-9102",
@@ -241,13 +250,14 @@ func createDevHosts(ds kolide.Datastore, config config.KolideConfig) {
 			OSVersion:        "Windows 10.0.0",
 			Uptime:           60 * time.Minute,
 			PhysicalMemory:   17179869184,
-			PrimaryMAC:       "10:11:12:13:14:16",
+			PrimaryMAC:       "7e:5c:be:ef:b4:df",
 			PrimaryIP:        "192.168.1.11",
-			DetailUpdateTime: time.Now(),
+			DetailUpdateTime: time.Now().Add(-10 * time.Second),
 		},
 	}
 
 	for _, host := range hosts {
+		host := host
 		_, err := ds.NewHost(&host)
 		if err != nil {
 			initFatal(err, "creating bootstrap host")
@@ -272,26 +282,26 @@ func createDevOrgInfo(svc kolide.Service, config config.KolideConfig) {
 func createDevQueries(ds kolide.Datastore, config config.KolideConfig) {
 	queries := []kolide.Query{
 		{
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
+			CreatedAt: time.Date(2016, time.October, 17, 7, 6, 0, 0, time.UTC),
+			UpdatedAt: time.Date(2016, time.October, 17, 7, 6, 0, 0, time.UTC),
 			Name:      "dev_query_1",
 			Query:     "select * from processes",
 		},
 		{
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
+			CreatedAt: time.Date(2016, time.October, 27, 4, 3, 10, 0, time.UTC),
+			UpdatedAt: time.Date(2016, time.October, 27, 4, 3, 10, 0, time.UTC),
 			Name:      "dev_query_2",
 			Query:     "select * from time",
 		},
 		{
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
+			CreatedAt: time.Now().Add(-24 * time.Hour),
+			UpdatedAt: time.Now().Add(-17 * time.Hour),
 			Name:      "dev_query_3",
 			Query:     "select * from cpuid",
 		},
 		{
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
+			CreatedAt: time.Now().Add(-1 * time.Hour),
+			UpdatedAt: time.Now().Add(-30 * time.Minute),
 			Name:      "dev_query_4",
 			Query:     "select 1 from processes where name like '%Apache%'",
 		},
@@ -304,6 +314,7 @@ func createDevQueries(ds kolide.Datastore, config config.KolideConfig) {
 	}
 
 	for _, query := range queries {
+		query := query
 		_, err := ds.NewQuery(&query)
 		if err != nil {
 			initFatal(err, "creating bootstrap query")
@@ -314,13 +325,13 @@ func createDevQueries(ds kolide.Datastore, config config.KolideConfig) {
 func createDevLabels(ds kolide.Datastore, config config.KolideConfig) {
 	labels := []kolide.Label{
 		{
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
+			CreatedAt: time.Date(2016, time.October, 27, 8, 31, 16, 0, time.UTC),
+			UpdatedAt: time.Date(2016, time.October, 27, 8, 31, 16, 0, time.UTC),
 			Name:      "dev_label_apache",
 			QueryID:   4,
 		},
 		{
-			CreatedAt: time.Now(),
+			CreatedAt: time.Now().Add(-1 * time.Hour),
 			UpdatedAt: time.Now(),
 			Name:      "dev_label_darwin",
 			QueryID:   5,
@@ -328,6 +339,7 @@ func createDevLabels(ds kolide.Datastore, config config.KolideConfig) {
 	}
 
 	for _, label := range labels {
+		label := label
 		_, err := ds.NewLabel(&label)
 		if err != nil {
 			initFatal(err, "creating bootstrap label")
