@@ -7,6 +7,34 @@
 
     &--inverse {
       margin-right: $xsmall;
+
+    &--wrapper {
+      text-align: right;
+    }
+    &--cancel {
+      @extend .save-query-form__btn;
+      margin-right: $xSmall;
+    }
+    &--submit {
+      @extend .save-query-form__btn;
+    }
+  }
+  &__label {
+    display: block;
+    margin-top: $base;
+    margin-bottom: $xSmall;
+  }
+  &__input {
+    box-shadow: inset 0 0 5px 0 rgba(0,0,0,0.12);
+    width: 100%;
+    &--name {
+      @extend .save-query-form__input;
+      height: 30px;
+      line-height: 30px;
+      padding-left: 3px;
+    }
+    &--description {
+      @extend .save-query-form__input;
     }
   }
 }

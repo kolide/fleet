@@ -24,7 +24,19 @@ describe('NewQuery - component', () => {
     expect(component.find('ThemeDropdown').length).toEqual(1);
   });
 
-  it('renders the SaveQueryForm', () => {
+  it('does not render the SaveQueryForm by default', () => {
+    const component = mount(
+      <NewQuery
+        onOsqueryTableSelect={noop}
+        onTextEditorInputChange={noop}
+        textEditorText="Hello world"
+      />
+    );
+
+    expect(component.find('SaveQueryForm').length).toEqual(0);
+  });
+
+  it('renders the SaveQueryFormModal when "Save Query" is clicked', () => {
     const component = mount(
       <NewQuery
         onOsqueryTableSelect={noop}
@@ -63,6 +75,9 @@ describe('NewQuery - component', () => {
         />
       );
       const form = component.find('SaveQueryForm');
+      const inputField = form.find('.save-query-form__input--name');
+
+      fillInFormInput(inputField, 'my query');
 
       form.simulate('submit');
 
@@ -80,6 +95,9 @@ describe('NewQuery - component', () => {
         />
       );
       const form = component.find('SaveQueryForm');
+      const inputField = form.find('.save-query-form__input--name');
+
+      fillInFormInput(inputField, 'my query');
 
       form.simulate('submit');
 

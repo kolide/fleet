@@ -6,7 +6,7 @@ import radium from 'radium';
 import './mode';
 import './theme';
 import debounce from '../../../utilities/debounce';
-import SaveQueryForm from '../../forms/queries/SaveQueryForm';
+import SaveQueryFormModal from '../../modals/SaveQueryFormModal';
 import SelectTargetsInput from '../SelectTargetsInput';
 import SelectTargetsMenu from '../SelectTargetsMenu';
 import targetInterface from '../../../interfaces/target';
@@ -35,7 +35,7 @@ class NewQuery extends Component {
     super(props);
 
     this.state = {
-      saveQuery: false,
+      isSaveQueryForm: false,
       selectedTargets: [],
       theme: 'kolide',
     };
@@ -56,6 +56,14 @@ class NewQuery extends Component {
 
       return false;
     });
+  }
+
+  onSaveQueryFormCancel = (evt) => {
+    evt.preventDefault();
+
+    this.setState({ isSaveQueryForm: false });
+
+    return false;
   }
 
   onSaveQueryFormSubmit = debounce((formData) => {
@@ -94,6 +102,25 @@ class NewQuery extends Component {
     return false;
   }
 
+  renderSaveQueryFormModal = () => {
+    const { isSaveQueryForm } = this.state;
+    const {
+      onSaveQueryFormSubmit,
+      onSaveQueryFormCancel,
+    } = this;
+
+    if (!isSaveQueryForm) {
+      return false;
+    }
+
+    return (
+      <SaveQueryFormModal
+        onCancel={onSaveQueryFormCancel}
+        onSubmit={onSaveQueryFormSubmit}
+      />
+    );
+  }
+
   render () {
     const {
       isLoadingTargets,
@@ -106,12 +133,12 @@ class NewQuery extends Component {
       targets,
       textEditorText,
     } = this.props;
-    const { saveQuery, selectedTargets, theme } = this.state;
+    const { selectedTargets, theme } = this.state;
     const {
       onLoad,
-      onSaveQueryFormSubmit,
       onTargetSelect,
       onThemeSelect,
+      renderSaveQueryFormModal,
     } = this;
     const menuRenderer = SelectTargetsMenu(onTargetSelectMoreInfo, onRemoveMoreInfoTarget, moreInfoTarget);
 
@@ -154,7 +181,7 @@ class NewQuery extends Component {
             targets={targets}
           />
         </div>
-        <SaveQueryForm onSubmit={onSaveQueryFormSubmit} saveQuery={saveQuery} />
+        {renderSaveQueryFormModal()}
       </div>
     );
   }
