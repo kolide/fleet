@@ -151,10 +151,44 @@ AND lqe.matches
 	return results, nil
 }
 
-func (orm gormDB) SearchLabels(query string, omitLookup map[uint]bool) ([]kolide.Label, error) {
-	return nil, errors.New("not implemented", "")
+func (orm gormDB) SearchLabels(query string, omit []uint) ([]kolide.Label, error) {
+	sql := `
+SELECT *
+FROM labels
+WHERE MATCH(name)
+AGAINST(? IN BOOLEAN MODE)
+`
+	results := []kolide.Label{}
+	if len(omit) > 0 {
+		sql += "AND id NOT IN (?) LIMIT 10;"
+		err := orm.DB.Raw(sql, query+"*", omit).Scan(&results).Error
+		if err != nil && err != gorm.ErrRecordNotFound {
+			return nil, errors.DatabaseError(err)
+		}
+	} else {
+		sql += "LIMIT 10;"
+		err := orm.DB.Raw(sql, query+"*").Scan(&results).Error
+		if err != nil && err != gorm.ErrRecordNotFound {
+			return nil, errors.DatabaseError(err)
+		}
+	}
+
+	return results, nil
 }
 
 func (orm gormDB) ListHostsInLabel(lid uint) ([]kolide.Host, error) {
-	return nil, errors.New("not implemented", "")
+	results := []kolide.Host{}
+	err := orm.DB.Raw(`
+SELECT h.*
+FROM label_query_executions lqe
+JOIN hosts h
+ON lqe.host_id = h.id
+WHERE lqe.label_id = ?;
+`, lid).Scan(&results).Error
+
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return nil, errors.DatabaseError(err)
+	}
+
+	return results, nil
 }

@@ -132,17 +132,27 @@ func (orm gormDB) MarkHostSeen(host *kolide.Host, t time.Time) error {
 	return nil
 }
 
-func (orm gormDB) SearchHosts(query string, omitLookup map[uint]bool) ([]kolide.Host, error) {
-	// XXX this is broken
-	ids := []uint{}
-	for id, _ := range omitLookup {
-		ids = append(ids, id)
+func (orm gormDB) SearchHosts(query string, omit []uint) ([]kolide.Host, error) {
+	sql := `
+SELECT *
+FROM hosts
+WHERE MATCH(host_name, primary_ip)
+AGAINST(? IN BOOLEAN MODE)
+`
+	results := []kolide.Host{}
+	if len(omit) > 0 {
+		sql += "AND id NOT IN (?) LIMIT 10;"
+		err := orm.DB.Raw(sql, query+"*", omit).Scan(&results).Error
+		if err != nil && err != gorm.ErrRecordNotFound {
+			return nil, errors.DatabaseError(err)
+		}
+	} else {
+		sql += "LIMIT 10;"
+		err := orm.DB.Raw(sql, query+"*").Scan(&results).Error
+		if err != nil && err != gorm.ErrRecordNotFound {
+			return nil, errors.DatabaseError(err)
+		}
 	}
 
-	var results []kolide.Host
-	err := orm.DB.Raw("SELECT * FROM hosts WHERE MATCH(host_name, primary_ip) AGAINST('?*' IN BOOLEAN MODE) AND id NOT IN (?);", query, ids).Scan(&results).Error
-	if err != nil {
-		return nil, errors.DatabaseError(err)
-	}
 	return results, nil
 }

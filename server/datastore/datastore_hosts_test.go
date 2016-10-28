@@ -116,7 +116,7 @@ func testSearchHosts(t *testing.T, db kolide.Datastore) {
 	assert.Nil(t, err)
 	assert.Len(t, hosts, 2)
 
-	host, err := db.SearchHosts("foo", map[uint]bool{h3.ID: true})
+	host, err := db.SearchHosts("foo", []uint{h3.ID})
 	assert.Nil(t, err)
 	assert.Len(t, host, 1)
 }

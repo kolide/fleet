@@ -180,7 +180,12 @@ func (orm *inmem) MarkHostSeen(host *kolide.Host, t time.Time) error {
 	return nil
 }
 
-func (orm *inmem) SearchHosts(query string, omitLookup map[uint]bool) ([]kolide.Host, error) {
+func (orm *inmem) SearchHosts(query string, omit []uint) ([]kolide.Host, error) {
+	omitLookup := map[uint]bool{}
+	for _, o := range omit {
+		omitLookup[o] = true
+	}
+
 	var results []kolide.Host
 
 	orm.mtx.Lock()
