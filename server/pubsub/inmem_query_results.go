@@ -10,23 +10,23 @@ import (
 )
 
 type inmemQueryResults struct {
-	resultChannels map[uint]chan kolide.DistributedQueryResult
+	resultChannels map[uint]chan interface{}
 	channelMutex   sync.Mutex
 }
 
 var _ kolide.QueryResultStore = &inmemQueryResults{}
 
 func newInmemQueryResults() *inmemQueryResults {
-	return &inmemQueryResults{resultChannels: map[uint]chan kolide.DistributedQueryResult{}}
+	return &inmemQueryResults{resultChannels: map[uint]chan interface{}{}}
 }
 
-func (im *inmemQueryResults) getChannel(id uint) chan kolide.DistributedQueryResult {
+func (im *inmemQueryResults) getChannel(id uint) chan interface{} {
 	im.channelMutex.Lock()
 	defer im.channelMutex.Unlock()
 
 	channel, ok := im.resultChannels[id]
 	if !ok {
-		channel = make(chan kolide.DistributedQueryResult)
+		channel = make(chan interface{})
 		im.resultChannels[id] = channel
 	}
 	return channel
@@ -43,7 +43,7 @@ func (im *inmemQueryResults) WriteResult(result kolide.DistributedQueryResult) e
 	return nil
 }
 
-func (im *inmemQueryResults) ReadChannel(ctx context.Context, query kolide.DistributedQueryCampaign) (<-chan kolide.DistributedQueryResult, error) {
+func (im *inmemQueryResults) ReadChannel(ctx context.Context, query kolide.DistributedQueryCampaign) (<-chan interface{}, error) {
 	channel := im.getChannel(query.ID)
 	go func() {
 		<-ctx.Done()

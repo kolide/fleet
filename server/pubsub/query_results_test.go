@@ -182,7 +182,10 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 	go func() {
 		defer readerWg.Done()
 		for res := range channel1 {
-			results1 = append(results1, res)
+			switch res := res.(type) {
+			case kolide.DistributedQueryResult:
+				results1 = append(results1, res)
+			}
 		}
 
 	}()
@@ -190,7 +193,10 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 	go func() {
 		defer readerWg.Done()
 		for res := range channel2 {
-			results2 = append(results2, res)
+			switch res := res.(type) {
+			case kolide.DistributedQueryResult:
+				results2 = append(results2, res)
+			}
 		}
 
 	}()

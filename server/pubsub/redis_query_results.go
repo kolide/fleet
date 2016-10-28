@@ -104,8 +104,8 @@ func receiveMessages(conn *redis.PubSubConn, outChan chan<- interface{}) {
 	}
 }
 
-func (r *redisQueryResults) ReadChannel(ctx context.Context, query kolide.DistributedQueryCampaign) (<-chan kolide.DistributedQueryResult, error) {
-	outChannel := make(chan kolide.DistributedQueryResult)
+func (r *redisQueryResults) ReadChannel(ctx context.Context, query kolide.DistributedQueryCampaign) (<-chan interface{}, error) {
+	outChannel := make(chan interface{})
 
 	conn := redis.PubSubConn{Conn: r.pool.Get()}
 
@@ -134,12 +134,11 @@ func (r *redisQueryResults) ReadChannel(ctx context.Context, query kolide.Distri
 					var res kolide.DistributedQueryResult
 					err := json.Unmarshal(msg.Data, &res)
 					if err != nil {
-						fmt.Println(err)
+						outChannel <- err
 					}
 					outChannel <- res
-
 				case error:
-
+					outChannel <- msg
 				}
 
 			case <-ctx.Done():

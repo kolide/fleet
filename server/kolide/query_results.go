@@ -7,6 +7,7 @@ type QueryResultStore interface {
 	WriteResult(result DistributedQueryResult) error
 
 	// ReadChannel returns a channel to be read for incoming distributed
-	// query results
-	ReadChannel(ctx context.Context, query DistributedQueryCampaign) (<-chan DistributedQueryResult, error)
+	// query results. Channel values should be either
+	// DistributedQueryResult or error
+	ReadChannel(ctx context.Context, query DistributedQueryCampaign) (<-chan interface{}, error)
 }
