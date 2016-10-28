@@ -50,6 +50,50 @@ describe('NewQuery - component', () => {
     expect(component.find('SaveQueryForm').length).toEqual(1);
   });
 
+  it('calls onNewQueryFormSubmit with appropriate data from SaveQueryFormModal', () => {
+    const onNewQueryFormSubmitSpy = createSpy();
+    const query = 'SELECT * FROM users';
+    const selectedTargets = [{ name: 'my target' }];
+    const component = mount(
+      <NewQuery
+        onNewQueryFormSubmit={onNewQueryFormSubmitSpy}
+        textEditorText={query}
+      />
+    );
+
+    component.setState({ selectedTargets });
+    component.find('.new-query__save-query-btn').simulate('click');
+
+    const form = component.find('SaveQueryForm');
+
+    fillInFormInput(form.find({ name: 'name' }), 'My query name');
+    fillInFormInput(form.find({ name: 'description' }), 'My query description');
+    form.simulate('submit');
+
+    expect(onNewQueryFormSubmitSpy).toHaveBeenCalledWith({
+      description: 'My query description',
+      name: 'My query name',
+      query,
+      selectedTargets,
+    });
+  });
+
+  it('calls onNewQueryFormSubmit when "Run Query" is clicked', () => {
+    const onNewQueryFormSubmitSpy = createSpy();
+    const query = 'SELECT * FROM users';
+    const selectedTargets = [{ name: 'my target' }];
+    const component = mount(
+      <NewQuery
+        onNewQueryFormSubmit={onNewQueryFormSubmitSpy}
+        textEditorText={query}
+      />
+    );
+    component.setState({ selectedTargets });
+    component.find('.new-query__run-query-btn').simulate('click');
+
+    expect(onNewQueryFormSubmitSpy).toHaveBeenCalledWith({ query, selectedTargets });
+  });
+
   it('calls onTargetSelectInputChange when changing the select target input text', () => {
     const onTargetSelectInputChangeSpy = createSpy();
     const component = mount(

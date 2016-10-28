@@ -22,7 +22,9 @@ class Button extends Component {
 
     if (disabled) return false;
 
-    onClick(evt);
+    if (onClick) {
+      onClick(evt);
+    }
 
     return false;
   }

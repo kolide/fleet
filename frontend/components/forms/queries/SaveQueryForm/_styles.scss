@@ -9,14 +9,11 @@
       margin-right: $xsmall;
 
     &--wrapper {
+      margin-top: $base;
       text-align: right;
     }
     &--cancel {
-      @extend .save-query-form__btn;
       margin-right: $xSmall;
-    }
-    &--submit {
-      @extend .save-query-form__btn;
     }
   }
   &__label {

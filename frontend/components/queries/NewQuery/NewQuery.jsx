@@ -65,6 +65,14 @@ class NewQuery extends Component {
     return false;
   }
 
+  onRunQuery = (evt) => {
+    evt.preventDefault();
+
+    const { onSaveQueryFormSubmit } = this;
+
+    return onSaveQueryFormSubmit({});
+  }
+
   onSaveQueryFormCancel = (evt) => {
     evt.preventDefault();
 
@@ -144,6 +152,7 @@ class NewQuery extends Component {
     const {
       onLoad,
       onLoadSaveQueryModal,
+      onRunQuery,
       onTargetSelect,
       onThemeSelect,
       renderSaveQueryFormModal,
@@ -189,12 +198,19 @@ class NewQuery extends Component {
             targets={targets}
           />
         </div>
-        <Button
-          className={`${baseClass}__save-query-btn`}
-          onClick={onLoadSaveQueryModal}
-          text="Save Query"
-          variant="inverse"
-        />
+        <div className={`${baseClass}__btn-wrapper`}>
+          <Button
+            className={`${baseClass}__save-query-btn`}
+            onClick={onLoadSaveQueryModal}
+            text="Save Query"
+            variant="inverse"
+          />
+          <Button
+            className={`${baseClass}__run-query-btn`}
+            onClick={onRunQuery}
+            text="Run Query"
+          />
+        </div>
         {renderSaveQueryFormModal()}
       </div>
     );
