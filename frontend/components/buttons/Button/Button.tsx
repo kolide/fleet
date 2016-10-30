@@ -1,23 +1,33 @@
-import React, { Component, PropTypes } from 'react';
-import classnames from 'classnames';
+/// <reference path="../../../../typings/react/react.d.ts" />
+import * as React from 'react';
+import * as classnames from 'classnames';
 
 const baseClass = 'button';
 
-class Button extends Component {
+class ButtonProps {
+  className: string;
+  disabled: boolean;
+  onClick: (evt: any) => boolean;
+  text: string;
+  type: string;
+  variant: string
+}
+
+class Button extends React.Component<ButtonProps, any> {
   static propTypes = {
-    className: PropTypes.string,
-    disabled: PropTypes.bool,
-    onClick: PropTypes.func,
-    text: PropTypes.string,
-    type: PropTypes.string,
-    variant: PropTypes.string,
+    className: React.PropTypes.string,
+    disabled: React.PropTypes.bool,
+    onClick: React.PropTypes.func,
+    text: React.PropTypes.string,
+    type: React.PropTypes.string,
+    variant: React.PropTypes.string,
   };
 
   static defaultProps = {
     variant: 'default',
   };
 
-  handleClick = (evt) => {
+  handleClick = (evt: any) => {
     const { disabled, onClick } = this.props;
 
     if (disabled) return false;
