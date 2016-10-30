@@ -102,7 +102,7 @@ test-go:
 	go test -cover $(shell glide nv)
 
 test-js:
-	_mocha --compilers js:babel-core/register \
+	_mocha --compilers js:babel-core/register,tsx:ts-node/register \
 		--recursive 'frontend/**/*.tests.js*' \
 		--require ignore-styles \
 		--require 'frontend/.test.setup.js' \

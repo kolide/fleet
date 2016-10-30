@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "out": "./assets/bundle.js",
+    "sourceMap": true,
+    "noImplicitAny": true,
+    "module": "amd",
+    "target": "es5",
+    "jsx": "react"
+  },
+  "include": [
+    "./frontend/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "typings",
+    "./frontend/**/*.tests.ts",
+    "./frontend/**/*.tests.tsx"
+  ]
+}
