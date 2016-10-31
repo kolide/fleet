@@ -1,7 +1,4 @@
 require('es6-promise').polyfill();
-require('typescript-require')({
-  nodeLib: true
-});
 
 var path = require('path');
 var webpack = require('webpack');
