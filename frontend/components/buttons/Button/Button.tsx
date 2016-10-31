@@ -1,5 +1,5 @@
 import * as React from 'react';
-import classnames from 'classnames';
+const classnames = require('classnames');
 
 const baseClass = 'button';
 

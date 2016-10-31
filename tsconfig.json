@@ -2,7 +2,7 @@
   "compilerOptions": {
     "sourceMap": true,
     "noImplicitAny": true,
-    "module": "system",
+    "module": "commonjs",
     "target": "es5",
     "jsx": "react"
   },
