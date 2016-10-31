@@ -1,7 +1,6 @@
 package pubsub
 
 import (
-	"context"
 	"encoding/json"
 	"os"
 	"reflect"
@@ -14,6 +13,7 @@ import (
 	"github.com/kolide/kolide-ose/server/kolide"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/net/context"
 )
 
 // waitTimeout waits for the waitgroup for the specified max timeout.
