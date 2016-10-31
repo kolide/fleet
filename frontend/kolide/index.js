@@ -75,6 +75,7 @@ class Kolide extends Base {
   }
 
   getTargets = (options = {}) => {
+    const { TARGETS } = endpoints;
     console.log(options);
 
     const stubbedResponse = {
@@ -133,6 +134,7 @@ class Kolide extends Base {
       selected_targets_count: 1234,
     };
 
+    //return this.authenticatedGet(this.endpoint(TARGETS))
     return Promise.resolve(stubbedResponse)
       .then((response) => { return appendTargetTypeToTargets(response); });
   }
