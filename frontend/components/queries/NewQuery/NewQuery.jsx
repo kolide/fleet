@@ -67,9 +67,16 @@ class NewQuery extends Component {
   onRunQuery = (evt) => {
     evt.preventDefault();
 
+    const { onInvalidQuerySubmit, textEditorText } = this.props;
+    const { error } = validateQuery(textEditorText);
     const { onSaveQueryFormSubmit } = this;
+    const { selectedTargets } = this.state;
 
-    return onSaveQueryFormSubmit({});
+    if (error) {
+      return onInvalidQuerySubmit(error);
+    }
+
+    return onSaveQueryFormSubmit({ selectedTargets });
   }
 
   onSaveQueryFormCancel = (evt) => {
@@ -82,7 +89,6 @@ class NewQuery extends Component {
 
   onSaveQueryFormSubmit = debounce((formData) => {
     const { onInvalidQuerySubmit, onNewQueryFormSubmit, textEditorText } = this.props;
-    const { selectedTargets } = this.state;
     const { error } = validateQuery(textEditorText);
 
     this.setState({ isSaveQueryForm: false });
@@ -94,7 +100,6 @@ class NewQuery extends Component {
     return onNewQueryFormSubmit({
       ...formData,
       query: textEditorText,
-      selectedTargets,
     });
   })
 

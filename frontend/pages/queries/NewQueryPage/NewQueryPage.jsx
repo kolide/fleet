@@ -5,6 +5,7 @@ import { find } from 'lodash';
 import Kolide from '../../../kolide';
 import NewQuery from '../../../components/queries/NewQuery';
 import { osqueryTables } from '../../../utilities/osquery_tables';
+import queryActions from '../../../redux/nodes/entities/queries/actions';
 import QuerySidePanel from '../../../components/side_panels/QuerySidePanel';
 import { showRightSidePanel, removeRightSidePanel } from '../../../redux/nodes/app/actions';
 import { renderFlash } from '../../../redux/nodes/notifications/actions';
@@ -43,6 +44,9 @@ class NewQueryPage extends Component {
 
   onNewQueryFormSubmit = (formData) => {
     console.log('New Query Form submitted', formData);
+    const { dispatch } = this.props;
+
+    dispatch(queryActions.create(formData));
   }
 
   onInvalidQuerySubmit = (errorMessage) => {

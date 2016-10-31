@@ -105,7 +105,6 @@ describe('NewQuery - component', () => {
       description: 'My query description',
       name: 'My query name',
       query,
-      selectedTargets,
     });
   });
 
