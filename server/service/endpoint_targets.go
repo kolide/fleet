@@ -9,10 +9,10 @@ import (
 )
 
 ////////////////////////////////////////////////////////////////////////////////
-// List Targrets
+// Search Targrets
 ////////////////////////////////////////////////////////////////////////////////
 
-type listTargetsRequest struct {
+type searchTargetsRequest struct {
 	Query string `json:"query"`
 }
 
@@ -21,14 +21,14 @@ type targetsData struct {
 	Labels []kolide.Label `json:"labels"`
 }
 
-type listTargetsResponse struct {
+type searchTargetsResponse struct {
 	Targets *targetsData `json:"targets,omitempty"`
 	Err     error        `json:"error,omitempty"`
 }
 
-func (r listTargetsResponse) error() error { return r.Err }
+func (r searchTargetsResponse) error() error { return r.Err }
 
-func makeListTargetsEndpoint(svc kolide.Service) endpoint.Endpoint {
+func makeSearchTargetsEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		return nil, errors.New("Unimplemented")
 	}
