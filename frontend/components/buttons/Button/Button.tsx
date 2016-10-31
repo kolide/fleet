@@ -12,7 +12,11 @@ interface IButtonProps {
   variant: string;
 }
 
-class Button extends React.Component<IButtonProps, any> {
+interface IButtonState {
+
+}
+
+class Button extends React.Component<IButtonProps, IButtonState> {
   static defaultProps = {
     variant: 'default',
   };
