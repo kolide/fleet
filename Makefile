@@ -89,14 +89,15 @@ build: .prefix
 
 lint-js:
 	eslint frontend --ext .js,.jsx
-
+lint-ts:
+	tslint frontend/**/*.tsx frontend/**/*.ts
 lint-scss:
 	sass-lint --verbose
 
 lint-go:
 	go vet $(shell glide nv)
 
-lint: lint-go lint-js lint-scss
+lint: lint-go lint-js lint-scss lint-ts
 
 test-go:
 	go test -cover $(shell glide nv)

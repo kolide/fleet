@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "out": "./assets/bundle.js",
     "sourceMap": true,
     "noImplicitAny": true,
     "module": "system",

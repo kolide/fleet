@@ -3,25 +3,16 @@ import classnames from 'classnames';
 
 const baseClass = 'button';
 
-class ButtonProps {
+interface IButtonProps {
   className: string;
   disabled: boolean;
   onClick: (evt: any) => boolean;
   text: string;
   type: string;
-  variant: string
+  variant: string;
 }
 
-class Button extends React.Component<ButtonProps, any> {
-  static propTypes = {
-    className: React.PropTypes.string,
-    disabled: React.PropTypes.bool,
-    onClick: React.PropTypes.func,
-    text: React.PropTypes.string,
-    type: React.PropTypes.string,
-    variant: React.PropTypes.string,
-  };
-
+class Button extends React.Component<IButtonProps, any> {
   static defaultProps = {
     variant: 'default',
   };
@@ -29,7 +20,9 @@ class Button extends React.Component<ButtonProps, any> {
   handleClick = (evt: any) => {
     const { disabled, onClick } = this.props;
 
-    if (disabled) return false;
+    if (disabled) {
+      return false;
+    }
 
     if (onClick) {
       onClick(evt);

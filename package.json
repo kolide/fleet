@@ -6,7 +6,7 @@
   "private": "true",
   "sasslintConfig": ".sass-lint.yml",
   "scripts": {
-    "lint": "make lint-js && make lint-scss",
+    "lint": "make lint-js && make lint-scss && make lint-ts",
     "test": "make test-js"
   },
   "dependencies": {
@@ -73,6 +73,7 @@
     "sqlite-parser": "^0.14.5",
     "style-loader": "^0.13.0",
     "stylus-loader": "1.5.1",
+    "tslint": "^3.15.1",
     "typescript": "^2.1.0-dev.20161031",
     "url-loader": "^0.5.7",
     "webpack": "1.13.1",
@@ -110,6 +111,9 @@
     "source-map-loader": "^0.1.5",
     "ts-loader": "^0.9.5",
     "ts-node": "^1.6.1",
+    "tslint-eslint-rules": "^2.1.0",
+    "tslint-react": "^1.1.0",
+    "typescript": "^2.1.0-dev.20161031",
     "typescript-require": "^0.2.9-1"
   }
 }
