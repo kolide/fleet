@@ -12,7 +12,6 @@
   "dependencies": {
     "@types/classnames": "0.0.31",
     "@types/expect": "^1.13.30",
-    "@types/mocha": "^2.2.32",
     "autoprefixer": "6.3.7",
     "autoprefixer-loader": "^3.2.0",
     "babel-core": "6.11.4",
@@ -95,6 +94,7 @@
     }
   },
   "devDependencies": {
+    "@types/node": "^6.0.46",
     "babel-eslint": "^6.1.2",
     "eslint": "3.6.0",
     "eslint-config-airbnb": "12.0.0",
@@ -107,6 +107,7 @@
     "sass-lint": "^1.9.1",
     "source-map-loader": "^0.1.5",
     "ts-loader": "^0.9.5",
-    "ts-node": "^1.6.1"
+    "ts-node": "^1.6.1",
+    "typescript-require": "^0.2.9-1"
   }
 }

@@ -1,6 +1,6 @@
 /// <reference path="../../../../typings/react/react.d.ts" />
 import * as React from 'react';
-import * as classnames from 'classnames';
+const classnames = require('classnames');
 
 const baseClass = 'button';
 

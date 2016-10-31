@@ -1,4 +1,7 @@
 import jsdom from 'jsdom';
+require('typescript-require')({
+    nodeLib: true
+});
 
 const doc = jsdom.jsdom(
   `<!doctype html>
