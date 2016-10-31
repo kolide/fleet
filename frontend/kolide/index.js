@@ -3,6 +3,13 @@ import endpoints from './endpoints';
 import { appendTargetTypeToTargets } from '../redux/nodes/entities/targets/helpers';
 
 class Kolide extends Base {
+  createQuery = ({ description, name, query }) => {
+    const { QUERIES } = endpoints;
+
+    return this.authenticatedPost(this.endpoint(QUERIES), JSON.stringify({ description, name, query }))
+      .then((response) => { return response.query; });
+  }
+
   forgotPassword ({ email }) {
     const { FORGOT_PASSWORD } = endpoints;
     const forgotPasswordEndpoint = this.baseURL + FORGOT_PASSWORD;

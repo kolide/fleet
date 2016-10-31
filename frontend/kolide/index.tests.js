@@ -6,6 +6,7 @@ import mocks from '../test/mocks';
 const {
   invalidForgotPasswordRequest,
   invalidResetPasswordRequest,
+  validCreateQueryRequest,
   validForgotPasswordRequest,
   validGetConfigRequest,
   validGetHostsRequest,
@@ -25,6 +26,26 @@ describe('Kolide - API client', () => {
   describe('defaults', () => {
     it('sets the base URL', () => {
       expect(Kolide.baseURL).toEqual('http://localhost:8080/api');
+    });
+  });
+
+  describe('#createQuery', () => {
+    it('calls the appropriate endpoint with the correct parameters', (done) => {
+      const bearerToken = 'valid-bearer-token';
+      const description = 'query description';
+      const name = 'query name';
+      const query = 'SELECT * FROM users';
+      const queryParams = { description, name, query };
+      const request = validCreateQueryRequest(bearerToken, queryParams);
+
+      Kolide.setBearerToken(bearerToken);
+      Kolide.createQuery(queryParams)
+        .then((queryResponse) => {
+          expect(request.isDone()).toEqual(true);
+          expect(queryResponse).toEqual(queryParams);
+          done();
+        })
+        .catch(done);
     });
   });
 
