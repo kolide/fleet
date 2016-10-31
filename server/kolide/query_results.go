@@ -2,8 +2,12 @@ package kolide
 
 import "golang.org/x/net/context"
 
+// QueryResultStore defines functions for sending and receiving distributed
+// query results over a pub/sub system. It is implemented by structs in package
+// pubsub.
 type QueryResultStore interface {
-	// WriteResult writes a distributed query result submitted by an osqueryd client
+	// WriteResult writes a distributed query result submitted by an
+	// osqueryd client
 	WriteResult(result DistributedQueryResult) error
 
 	// ReadChannel returns a channel to be read for incoming distributed

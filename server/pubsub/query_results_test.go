@@ -62,7 +62,7 @@ func TestInmem(t *testing.T) {
 	for _, f := range testFunctions {
 		t.Run(functionName(f), func(t *testing.T) {
 			t.Parallel()
-			store := newInmemQueryResults()
+			store := NewInmemQueryResults()
 			f(t, store)
 		})
 	}
@@ -78,7 +78,7 @@ func setupRedis(t *testing.T) (store *redisQueryResults, teardown func()) {
 		addr = a
 	}
 
-	store = newRedisQueryResults(NewRedisPool(addr, password))
+	store = NewRedisQueryResults(NewRedisPool(addr, password))
 
 	_, err := store.pool.Get().Do("PING")
 	require.Nil(t, err)

@@ -16,7 +16,9 @@ type inmemQueryResults struct {
 
 var _ kolide.QueryResultStore = &inmemQueryResults{}
 
-func newInmemQueryResults() *inmemQueryResults {
+// NewInmemQueryResults initializes a new in-memory implementation of the
+// QueryResultStore interface.
+func NewInmemQueryResults() *inmemQueryResults {
 	return &inmemQueryResults{resultChannels: map[uint]chan interface{}{}}
 }
 

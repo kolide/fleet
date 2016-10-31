@@ -19,6 +19,8 @@ type redisQueryResults struct {
 
 var _ kolide.QueryResultStore = &redisQueryResults{}
 
+// NewRedisPool creates a Redis connection pool using the provided server
+// address and password.
 func NewRedisPool(server, password string) *redis.Pool {
 	return &redis.Pool{
 		MaxIdle:     3,
@@ -46,7 +48,9 @@ func NewRedisPool(server, password string) *redis.Pool {
 	}
 }
 
-func newRedisQueryResults(pool *redis.Pool) *redisQueryResults {
+// NewRedisQueryResults creats a new Redis implementation of the
+// QueryResultStore interface using the provided Redis connection pool.
+func NewRedisQueryResults(pool *redis.Pool) *redisQueryResults {
 	return &redisQueryResults{pool: pool}
 }
 
