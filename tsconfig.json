@@ -10,8 +10,6 @@
     "./frontend/**/*"
   ],
   "exclude": [
-    "node_modules",
-    "./frontend/**/*.tests.ts",
-    "./frontend/**/*.tests.tsx"
+    "node_modules"
   ]
 }
