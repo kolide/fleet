@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	"context"
 	"github.com/kolide/kolide-ose/server/kolide"
-	"golang.org/x/net/context"
 )
 
 func (mw metricsMiddleware) NewUser(ctx context.Context, p kolide.UserPayload) (*kolide.User, error) {

@@ -3,10 +3,10 @@ package service
 import (
 	"testing"
 
+	"context"
 	"github.com/kolide/kolide-ose/server/datastore"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"github.com/stretchr/testify/assert"
-	"golang.org/x/net/context"
 )
 
 func TestListHosts(t *testing.T) {

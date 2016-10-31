@@ -3,10 +3,10 @@ package service
 import (
 	"errors"
 
+	"context"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/kolide/kolide-ose/server/datastore"
 	"github.com/kolide/kolide-ose/server/kolide"
-	"golang.org/x/net/context"
 )
 
 func (svc service) InviteNewUser(ctx context.Context, payload kolide.InvitePayload) (*kolide.Invite, error) {

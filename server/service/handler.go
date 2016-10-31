@@ -3,12 +3,12 @@ package service
 import (
 	"net/http"
 
+	"context"
 	"github.com/go-kit/kit/endpoint"
 	kitlog "github.com/go-kit/kit/log"
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
 	"github.com/kolide/kolide-ose/server/kolide"
-	"golang.org/x/net/context"
 )
 
 // KolideEndpoints is a collection of RPC endpoints implemented by the Kolide API.

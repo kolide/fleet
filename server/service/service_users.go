@@ -5,10 +5,10 @@ import (
 	"encoding/base64"
 	"time"
 
+	"context"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/kolide/kolide-ose/server/contexts/viewer"
 	"github.com/kolide/kolide-ose/server/kolide"
-	"golang.org/x/net/context"
 )
 
 func (svc service) NewUser(ctx context.Context, p kolide.UserPayload) (*kolide.User, error) {

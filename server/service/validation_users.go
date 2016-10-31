@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"context"
 	"github.com/kolide/kolide-ose/server/kolide"
-	"golang.org/x/net/context"
 )
 
 type validationMiddleware struct {

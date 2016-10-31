@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	"golang.org/x/net/context"
+	"context"
 )
 
 func decodeGetInfoAboutSessionRequest(ctx context.Context, r *http.Request) (interface{}, error) {

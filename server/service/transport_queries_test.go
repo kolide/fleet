@@ -9,7 +9,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
 
-	"golang.org/x/net/context"
+	"context"
 )
 
 func TestDecodeCreateQueryRequest(t *testing.T) {

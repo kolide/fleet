@@ -5,11 +5,11 @@ import (
 	"net/http"
 	"strings"
 
+	"context"
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/kolide/kolide-ose/server/contexts/token"
 	"github.com/kolide/kolide-ose/server/contexts/viewer"
 	"github.com/kolide/kolide-ose/server/kolide"
-	"golang.org/x/net/context"
 )
 
 // authentication error

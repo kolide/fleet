@@ -3,9 +3,9 @@ package service
 import (
 	"time"
 
+	"context"
 	"github.com/kolide/kolide-ose/server/contexts/viewer"
 	"github.com/kolide/kolide-ose/server/kolide"
-	"golang.org/x/net/context"
 )
 
 func (mw loggingMiddleware) NewUser(ctx context.Context, p kolide.UserPayload) (*kolide.User, error) {

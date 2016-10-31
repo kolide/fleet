@@ -6,9 +6,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"context"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
-	"golang.org/x/net/context"
 )
 
 func TestDecodeCreatePackRequest(t *testing.T) {

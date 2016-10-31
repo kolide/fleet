@@ -5,7 +5,7 @@ import (
 	"html/template"
 	"time"
 
-	"golang.org/x/net/context"
+	"context"
 )
 
 // InviteStore contains the methods for

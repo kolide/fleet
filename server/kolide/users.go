@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"time"
 
+	"context"
 	"golang.org/x/crypto/bcrypt"
-	"golang.org/x/net/context"
 )
 
 // UserStore contains methods for managing users in a datastore

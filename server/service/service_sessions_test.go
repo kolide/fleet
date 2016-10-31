@@ -4,11 +4,11 @@ import (
 	"testing"
 	"time"
 
+	"context"
 	"github.com/kolide/kolide-ose/server/datastore"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/net/context"
 )
 
 const bcryptCost = 6
