@@ -5,29 +5,16 @@ import (
 	"golang.org/x/net/context"
 )
 
-func (svc service) SearchTargets(ctx context.Context, query string, omit []kolide.Target) (*kolide.TargetSearchResults, uint, error) {
+func (svc service) SearchTargets(ctx context.Context, query string, selectedHostIDs []uint, selectedLabelIDs []uint) (*kolide.TargetSearchResults, uint, error) {
 	results := &kolide.TargetSearchResults{}
 
-	// assemble the omit sets for the calls to the individual datastore methods
-	omitHosts := []uint{}
-	omitLabels := []uint{}
-
-	for _, omitTarget := range omit {
-		switch omitTarget.Type {
-		case kolide.TargetHost:
-			omitHosts = append(omitHosts, omitTarget.TargetID)
-		case kolide.TargetLabel:
-			omitLabels = append(omitLabels, omitTarget.TargetID)
-		}
-	}
-
-	hosts, err := svc.ds.SearchHosts(query, omitHosts)
+	hosts, err := svc.ds.SearchHosts(query, selectedHostIDs)
 	if err != nil {
 		return nil, 0, err
 	}
 	results.Hosts = hosts
 
-	labels, err := svc.ds.SearchLabels(query, omitLabels)
+	labels, err := svc.ds.SearchLabels(query, selectedLabelIDs)
 	if err != nil {
 		return nil, 0, err
 	}

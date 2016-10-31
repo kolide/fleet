@@ -10,7 +10,7 @@ type TargetSearchResults struct {
 }
 
 type TargetService interface {
-	SearchTargets(ctx context.Context, query string, omit []Target) (*TargetSearchResults, uint, error)
+	SearchTargets(ctx context.Context, query string, selectedHostIDs []uint, selectedLabelIDs []uint) (*TargetSearchResults, uint, error)
 	CountHostsInTargets(ctx context.Context, hosts []Host, labels []Label) (uint, error)
 }
 

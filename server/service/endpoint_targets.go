@@ -11,7 +11,11 @@ import (
 ////////////////////////////////////////////////////////////////////////////////
 
 type searchTargetsRequest struct {
-	Query string `json:"query"`
+	Query    string `json:"query"`
+	Selected struct {
+		Labels []uint `json:"labels"`
+		Hosts  []uint `json:"hosts"`
+	} `json:"selected"`
 }
 
 type targetsData struct {
@@ -20,9 +24,9 @@ type targetsData struct {
 }
 
 type searchTargetsResponse struct {
-	Targets *targetsData `json:"targets,omitempty"`
-	Count   uint         `json:"count,omitempty"`
-	Err     error        `json:"error,omitempty"`
+	Targets              *targetsData `json:"targets,omitempty"`
+	SelectedTargetsCount uint         `json:"selected_targets_count,omitempty"`
+	Err                  error        `json:"error,omitempty"`
 }
 
 func (r searchTargetsResponse) error() error { return r.Err }
@@ -30,8 +34,8 @@ func (r searchTargetsResponse) error() error { return r.Err }
 func makeSearchTargetsEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(searchTargetsRequest)
-		// TODO: add the omit value
-		results, count, err := svc.SearchTargets(ctx, req.Query, nil)
+
+		results, count, err := svc.SearchTargets(ctx, req.Query, req.Selected.Hosts, req.Selected.Labels)
 		if err != nil {
 			return searchTargetsResponse{Err: err}, nil
 		}
@@ -50,8 +54,8 @@ func makeSearchTargetsEndpoint(svc kolide.Service) endpoint.Endpoint {
 		}
 
 		return searchTargetsResponse{
-			Targets: targets,
-			Count:   count,
+			Targets:              targets,
+			SelectedTargetsCount: count,
 		}, nil
 	}
 }

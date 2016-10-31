@@ -32,7 +32,7 @@ func TestSearchTargets(t *testing.T) {
 		QueryID: 1,
 	})
 
-	results, count, err := svc.SearchTargets(ctx, "foo", nil)
+	results, count, err := svc.SearchTargets(ctx, "foo", nil, nil)
 	require.Nil(t, err)
 
 	require.Len(t, results.Hosts, 1)
@@ -150,10 +150,6 @@ func TestSearchWithOmit(t *testing.T) {
 		PrimaryIP: "192.168.1.11",
 	})
 	require.Nil(t, err)
-	h2Target := kolide.Target{
-		Type:     kolide.TargetHost,
-		TargetID: h2.ID,
-	}
 
 	l1, err := ds.NewLabel(&kolide.Label{
 		Name:    "label foo",
@@ -161,7 +157,7 @@ func TestSearchWithOmit(t *testing.T) {
 	})
 
 	{
-		results, _, err := svc.SearchTargets(ctx, "foo", nil)
+		results, _, err := svc.SearchTargets(ctx, "foo", nil, nil)
 		require.Nil(t, err)
 
 		require.Len(t, results.Hosts, 2)
@@ -171,7 +167,7 @@ func TestSearchWithOmit(t *testing.T) {
 	}
 
 	{
-		results, _, err := svc.SearchTargets(ctx, "foo", []kolide.Target{h2Target})
+		results, _, err := svc.SearchTargets(ctx, "foo", []uint{h2.ID}, nil)
 		require.Nil(t, err)
 
 		require.Len(t, results.Hosts, 1)
@@ -222,7 +218,7 @@ func TestSearchHostsInLabels(t *testing.T) {
 		assert.Nil(t, err)
 	}
 
-	results, _, err := svc.SearchTargets(ctx, "baz", nil)
+	results, _, err := svc.SearchTargets(ctx, "baz", nil, nil)
 	require.Nil(t, err)
 
 	require.Len(t, results.Hosts, 1)
@@ -248,7 +244,7 @@ func TestSearchResultsLimit(t *testing.T) {
 		})
 		require.Nil(t, err)
 	}
-	_, count, err := svc.SearchTargets(ctx, "foo", nil)
+	_, count, err := svc.SearchTargets(ctx, "foo", nil, nil)
 	require.Nil(t, err)
 	assert.Equal(t, int(count), 10)
 }

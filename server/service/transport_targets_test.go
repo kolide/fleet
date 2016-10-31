@@ -19,11 +19,24 @@ func TestDecodeSearchTargetsRequest(t *testing.T) {
 
 		params := r.(searchTargetsRequest)
 		assert.Equal(t, "bar", params.Query)
+		assert.Len(t, params.Selected.Hosts, 3)
+		assert.Len(t, params.Selected.Labels, 2)
 	}).Methods("POST")
 	var body bytes.Buffer
 
 	body.Write([]byte(`{
-        "query": "bar"
+        "query": "bar",
+		"selected": {
+			"hosts": [
+				1,
+				2,
+				3
+			],
+			"labels": [
+				1,
+				2
+			]
+		}
     }`))
 
 	router.ServeHTTP(
