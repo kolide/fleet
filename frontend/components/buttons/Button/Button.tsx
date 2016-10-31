@@ -4,12 +4,12 @@ const classnames = require('classnames');
 const baseClass = 'button';
 
 interface IButtonProps {
-  className: string,
-  disabled: boolean,
-  onClick: (evt: React.MouseEvent<HTMLButtonElement>) => boolean,
-  text: string,
-  type: string,
-  variant: string,
+  className: string;
+  disabled: boolean;
+  onClick: (evt: React.MouseEvent<HTMLButtonElement>) => boolean;
+  text: string;
+  type: string;
+  variant: string;
 }
 
 interface IButtonState {}
