@@ -193,3 +193,26 @@ AND lqe.matches = 1;
 
 	return results, nil
 }
+
+func (orm gormDB) ListUniqueHostsInLabels(labels []uint) ([]kolide.Host, error) {
+	if labels == nil || len(labels) == 0 {
+		return nil, nil
+	}
+
+	results := []kolide.Host{}
+	err := orm.DB.Raw(`
+SELECT h.*
+FROM label_query_executions lqe
+JOIN hosts h
+ON lqe.host_id = h.id
+WHERE lqe.label_id in (?)
+AND lqe.matches = 1
+GROUP BY h.id;
+`, labels).Scan(&results).Error
+
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return nil, errors.DatabaseError(err)
+	}
+
+	return results, nil
+}

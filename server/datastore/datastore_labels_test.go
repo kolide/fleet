@@ -319,3 +319,80 @@ func testListHostsInLabel(t *testing.T, db kolide.Datastore) {
 		assert.Len(t, hosts, 3)
 	}
 }
+
+func testListUniqueHostsInLabels(t *testing.T, db kolide.Datastore) {
+	h1, err := db.NewHost(&kolide.Host{
+		DetailUpdateTime: time.Now(),
+		NodeKey:          "1",
+		UUID:             "1",
+		HostName:         "foo.local",
+		PrimaryIP:        "192.168.1.10",
+	})
+	require.Nil(t, err)
+
+	h2, err := db.NewHost(&kolide.Host{
+		DetailUpdateTime: time.Now(),
+		NodeKey:          "2",
+		UUID:             "2",
+		HostName:         "bar.local",
+		PrimaryIP:        "192.168.1.11",
+	})
+	require.Nil(t, err)
+
+	h3, err := db.NewHost(&kolide.Host{
+		DetailUpdateTime: time.Now(),
+		NodeKey:          "3",
+		UUID:             "3",
+		HostName:         "baz.local",
+		PrimaryIP:        "192.168.1.12",
+	})
+	require.Nil(t, err)
+
+	h4, err := db.NewHost(&kolide.Host{
+		DetailUpdateTime: time.Now(),
+		NodeKey:          "4",
+		UUID:             "4",
+		HostName:         "xxx.local",
+		PrimaryIP:        "192.168.1.13",
+	})
+	require.Nil(t, err)
+
+	h5, err := db.NewHost(&kolide.Host{
+		DetailUpdateTime: time.Now(),
+		NodeKey:          "5",
+		UUID:             "5",
+		HostName:         "yyy.local",
+		PrimaryIP:        "192.168.1.14",
+	})
+	require.Nil(t, err)
+
+	l1, err := db.NewLabel(&kolide.Label{
+		Name:    "label foo",
+		QueryID: 1,
+	})
+	require.Nil(t, err)
+	require.NotZero(t, l1.ID)
+	l1ID := fmt.Sprintf("%d", l1.ID)
+
+	l2, err := db.NewLabel(&kolide.Label{
+		Name:    "label bar",
+		QueryID: 2,
+	})
+	require.Nil(t, err)
+	require.NotZero(t, l2.ID)
+	l2ID := fmt.Sprintf("%d", l2.ID)
+
+	for _, h := range []*kolide.Host{h1, h2, h3} {
+		err = db.RecordLabelQueryExecutions(h, map[string]bool{l1ID: true}, time.Now())
+		assert.Nil(t, err)
+	}
+
+	for _, h := range []*kolide.Host{h3, h4, h5} {
+		err = db.RecordLabelQueryExecutions(h, map[string]bool{l2ID: true}, time.Now())
+		assert.Nil(t, err)
+	}
+
+	hosts, err := db.ListUniqueHostsInLabels([]uint{l1.ID, l2.ID})
+	assert.Nil(t, err)
+	assert.Len(t, hosts, 5)
+}

@@ -31,6 +31,7 @@ type LabelStore interface {
 	ListLabelsForHost(hid uint) ([]Label, error)
 
 	ListHostsInLabel(lid uint) ([]Host, error)
+	ListUniqueHostsInLabels(labels []uint) ([]Host, error)
 
 	SearchLabels(query string, omit []uint) ([]Label, error)
 }

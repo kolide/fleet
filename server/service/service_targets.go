@@ -24,26 +24,22 @@ func (svc service) SearchTargets(ctx context.Context, query string, selectedHost
 }
 
 func (svc service) CountHostsInTargets(ctx context.Context, hosts []uint, labels []uint) (uint, error) {
-	// make a lookup map for constant time deduplication
+	hostsInLabels, err := svc.ds.ListUniqueHostsInLabels(labels)
+	if err != nil {
+		return 0, err
+	}
+
 	hostLookup := map[uint]bool{}
+
 	for _, host := range hosts {
 		hostLookup[host] = true
 	}
 
-	count := uint(len(hostLookup))
-
-	for _, label := range labels {
-		hostsInLabel, err := svc.ds.ListHostsInLabel(label)
-		if err != nil {
-			return 0, err
-		}
-		for _, host := range hostsInLabel {
-			if !hostLookup[host.ID] {
-				hostLookup[host.ID] = true
-				count++
-			}
+	for _, host := range hostsInLabels {
+		if !hostLookup[host.ID] {
+			hostLookup[host.ID] = true
 		}
 	}
 
-	return count, nil
+	return uint(len(hostLookup)), nil
 }

@@ -234,3 +234,28 @@ func (orm *inmem) ListHostsInLabel(lid uint) ([]kolide.Host, error) {
 
 	return hosts, nil
 }
+
+func (orm *inmem) ListUniqueHostsInLabels(labels []uint) ([]kolide.Host, error) {
+	var hosts []kolide.Host
+
+	labelSet := map[uint]bool{}
+	hostSet := map[uint]bool{}
+
+	for _, label := range labels {
+		labelSet[label] = true
+	}
+
+	orm.mtx.Lock()
+	defer orm.mtx.Unlock()
+
+	for _, lqe := range orm.labelQueryExecutions {
+		if labelSet[lqe.LabelID] && lqe.Matches {
+			if !hostSet[lqe.HostID] {
+				hosts = append(hosts, *orm.hosts[lqe.HostID])
+				hostSet[lqe.HostID] = true
+			}
+		}
+	}
+
+	return hosts, nil
+}
