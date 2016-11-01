@@ -31,6 +31,7 @@ func TestSearchTargets(t *testing.T) {
 		Name:    "label foo",
 		QueryID: 1,
 	})
+	require.Nil(t, err)
 
 	results, count, err := svc.SearchTargets(ctx, "foo", nil, nil)
 	require.Nil(t, err)
