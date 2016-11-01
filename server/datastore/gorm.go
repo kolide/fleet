@@ -53,11 +53,29 @@ func (orm gormDB) Migrate() error {
 		return err
 	}
 
-	// there is no IF NOT EXISTS for indexes, so need to figure out a way to not
-	// create this index if it already exists. for this reason, errors are
-	// ignored here
-	orm.DB.Exec("CREATE FULLTEXT INDEX hosts_search ON hosts(host_name, primary_ip);")
-	orm.DB.Exec("CREATE FULLTEXT INDEX labels_search ON labels(name);")
+	indexes := []interface{}{}
+	err = orm.DB.Raw("SELECT * FROM INFORMATION_SCHEMA.STATISTICS WHERE TABLE_SCHEMA = 'kolide' AND INDEX_NAME = 'hosts_search';").Scan(&indexes).Error
+	if err != nil {
+		return err
+	}
+	if len(indexes) == 0 {
+		err = orm.DB.Exec("CREATE FULLTEXT INDEX hosts_search ON hosts(host_name, primary_ip);").Error
+		if err != nil {
+			return err
+		}
+	}
+
+	indexes = []interface{}{}
+	err = orm.DB.Raw("SELECT * FROM INFORMATION_SCHEMA.STATISTICS WHERE TABLE_SCHEMA = 'kolide' AND INDEX_NAME = 'labels_search';").Scan(&indexes).Error
+	if err != nil {
+		return err
+	}
+	if len(indexes) == 0 {
+		err = orm.DB.Exec("CREATE FULLTEXT INDEX labels_search ON labels(name);").Error
+		if err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
