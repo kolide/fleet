@@ -119,6 +119,11 @@ func testSearchHosts(t *testing.T, db kolide.Datastore) {
 	host, err := db.SearchHosts("foo", []uint{h3.ID})
 	assert.Nil(t, err)
 	assert.Len(t, host, 1)
+	assert.Equal(t, "foo.local", host[0].HostName)
+
+	none, err := db.SearchHosts("xxx", nil)
+	assert.Nil(t, err)
+	assert.Len(t, none, 0)
 }
 
 func testSearchHostsLimit(t *testing.T, db kolide.Datastore) {

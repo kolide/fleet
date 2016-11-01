@@ -245,6 +245,11 @@ func testSearchLabels(t *testing.T, db kolide.Datastore) {
 	label, err := db.SearchLabels("foo", []uint{l3.ID})
 	assert.Nil(t, err)
 	assert.Len(t, label, 1)
+	assert.Equal(t, "foo", label[0].Name)
+
+	none, err := db.SearchLabels("xxx", nil)
+	assert.Nil(t, err)
+	assert.Len(t, none, 0)
 }
 
 func testSearchLabelsLimit(t *testing.T, db kolide.Datastore) {
