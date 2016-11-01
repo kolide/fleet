@@ -211,21 +211,9 @@ func (orm *inmem) SearchLabels(query string, omit []uint) ([]kolide.Label, error
 			break
 		}
 
-		// labels where the name of the label directly matches the search query
 		if strings.Contains(l.Name, query) && !omitLookup[l.ID] {
 			results = append(results, *l)
 			continue
-		}
-
-		// labels where hosts in the label match the search query
-		for _, lqe := range orm.labelQueryExecutions {
-			if lqe.LabelID == l.ID && lqe.Matches {
-				h := orm.hosts[lqe.HostID]
-				if strings.Contains(h.HostName, query) || strings.Contains(h.PrimaryIP, query) {
-					results = append(results, *l)
-					continue
-				}
-			}
 		}
 	}
 

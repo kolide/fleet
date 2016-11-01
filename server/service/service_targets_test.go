@@ -242,9 +242,6 @@ func TestSearchHostsInLabels(t *testing.T) {
 
 	require.Len(t, results.Hosts, 1)
 	assert.Equal(t, h3.HostName, results.Hosts[0].HostName)
-
-	require.Len(t, results.Labels, 1)
-	assert.Equal(t, l1.Name, results.Labels[0].Name)
 }
 
 func TestSearchResultsLimit(t *testing.T) {
