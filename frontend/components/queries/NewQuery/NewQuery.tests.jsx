@@ -60,7 +60,7 @@ describe('NewQuery - component', () => {
   it('hides the SaveQueryFormModal after the form is submitted', () => {
     const component = mount(
       <NewQuery
-        onNewQueryFormSubmit={noop}
+        onSaveQueryFormSubmit={noop}
         selectedTargets={[]}
         textEditorText="SELECT * FROM users"
       />
@@ -76,13 +76,13 @@ describe('NewQuery - component', () => {
     expect(component.find('SaveQueryForm').length).toEqual(0);
   });
 
-  it('calls onNewQueryFormSubmit with appropriate data from SaveQueryFormModal', () => {
-    const onNewQueryFormSubmitSpy = createSpy();
+  it('calls onSaveQueryFormSubmit with appropriate data from SaveQueryFormModal', () => {
+    const onSaveQueryFormSubmitSpy = createSpy();
     const query = 'SELECT * FROM users';
     const selectedTargets = [{ name: 'my target' }];
     const component = mount(
       <NewQuery
-        onNewQueryFormSubmit={onNewQueryFormSubmitSpy}
+        onSaveQueryFormSubmit={onSaveQueryFormSubmitSpy}
         selectedTargets={selectedTargets}
         textEditorText={query}
       />
@@ -96,27 +96,26 @@ describe('NewQuery - component', () => {
     fillInFormInput(form.find({ name: 'description' }), 'My query description');
     form.simulate('submit');
 
-    expect(onNewQueryFormSubmitSpy).toHaveBeenCalledWith({
+    expect(onSaveQueryFormSubmitSpy).toHaveBeenCalledWith({
       description: 'My query description',
       name: 'My query name',
-      query,
     });
   });
 
-  it('calls onNewQueryFormSubmit when "Run Query" is clicked', () => {
-    const onNewQueryFormSubmitSpy = createSpy();
+  it('calls onRunQuery when "Run Query" is clicked', () => {
+    const onRunQuerySpy = createSpy();
     const query = 'SELECT * FROM users';
     const selectedTargets = [{ name: 'my target' }];
     const component = mount(
       <NewQuery
-        onNewQueryFormSubmit={onNewQueryFormSubmitSpy}
+        onRunQuery={onRunQuerySpy}
         selectedTargets={selectedTargets}
         textEditorText={query}
       />
     );
     component.find('.new-query__run-query-btn').simulate('click');
 
-    expect(onNewQueryFormSubmitSpy).toHaveBeenCalledWith({ query, selectedTargets });
+    expect(onRunQuerySpy).toHaveBeenCalled();
   });
 
   it('calls onTargetSelectInputChange when changing the select target input text', () => {
@@ -132,60 +131,5 @@ describe('NewQuery - component', () => {
     fillInFormInput(selectTargetsInput, 'my target');
 
     expect(onTargetSelectInputChangeSpy).toHaveBeenCalledWith('my target');
-  });
-
-  describe('Query string validations', () => {
-    const invalidQuery = 'CREATE TABLE users (LastName varchar(255))';
-    const validQuery = 'SELECT * FROM users';
-
-    it('calls onInvalidQuerySubmit when invalid', () => {
-      createAceSpy();
-
-      const invalidQuerySubmitSpy = createSpy();
-      const component = mount(
-        <NewQuery
-          onInvalidQuerySubmit={invalidQuerySubmitSpy}
-          onOsqueryTableSelect={noop}
-          onTextEditorInputChange={noop}
-          selectedTargets={[]}
-          textEditorText={invalidQuery}
-        />
-      );
-
-      component.find('.new-query__save-query-btn').simulate('click');
-
-      const form = component.find('SaveQueryForm');
-      const inputField = form.find('.save-query-form__input--name');
-
-      fillInFormInput(inputField, 'my query');
-      form.simulate('submit');
-
-      expect(invalidQuerySubmitSpy).toHaveBeenCalledWith('Cannot INSERT or CREATE in osquery queries');
-    });
-
-    it('calls onNewQueryFormSubmit when valid', () => {
-      createAceSpy();
-
-      const onNewQueryFormSubmitSpy = createSpy();
-      const component = mount(
-        <NewQuery
-          onNewQueryFormSubmit={onNewQueryFormSubmitSpy}
-          onOsqueryTableSelect={noop}
-          onTextEditorInputChange={noop}
-          selectedTargets={[]}
-          textEditorText={validQuery}
-        />
-      );
-
-      component.find('.new-query__save-query-btn').simulate('click');
-
-      const form = component.find('SaveQueryForm');
-      const inputField = form.find('.save-query-form__input--name');
-
-      fillInFormInput(inputField, 'my query');
-      form.simulate('submit');
-
-      expect(onNewQueryFormSubmitSpy).toHaveBeenCalled();
-    });
   });
 });

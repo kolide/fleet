@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
 
+import debounce from '../../../utilities/debounce';
 import Kolide from '../../../kolide';
 import NewQuery from '../../../components/queries/NewQuery';
 import osqueryTableInterface from '../../../interfaces/osquery_table';
@@ -11,6 +12,7 @@ import { removeRightSidePanel, showRightSidePanel } from '../../../redux/nodes/a
 import { renderFlash } from '../../../redux/nodes/notifications/actions';
 import { selectOsqueryTable, setQueryText, setSelectedTargets } from '../../../redux/nodes/components/QueryPages/actions';
 import targetInterface from '../../../interfaces/target';
+import { validateQuery } from './helpers';
 
 class NewQueryPage extends Component {
   static propTypes = {
@@ -44,24 +46,6 @@ class NewQueryPage extends Component {
     return false;
   }
 
-  onNewQueryFormSubmit = (formData) => {
-    console.log('New Query Form submitted', formData);
-    const { dispatch } = this.props;
-
-    return dispatch(queryActions.create(formData))
-      .then((query) => {
-        return dispatch(push(`/queries/${query.id}`));
-      });
-  }
-
-  onInvalidQuerySubmit = (errorMessage) => {
-    const { dispatch } = this.props;
-
-    dispatch(renderFlash('error', errorMessage));
-
-    return false;
-  }
-
   onOsqueryTableSelect = (tableName) => {
     const { dispatch } = this.props;
 
@@ -77,6 +61,41 @@ class NewQueryPage extends Component {
 
     return false;
   }
+
+  onRunQuery = debounce((evt) => {
+    evt.preventDefault();
+
+    const { dispatch, queryText, selectedTargets } = this.props;
+    const { error } = validateQuery(queryText);
+
+    if (error) {
+      dispatch(renderFlash('error', error));
+
+      return false;
+    }
+
+    console.log('TODO: dispatch thunk to run query with', { queryText, selectedTargets });
+
+    return false;
+  })
+
+  onSaveQueryFormSubmit = debounce((formData) => {
+    const { dispatch, queryText } = this.props;
+    const { error } = validateQuery(queryText);
+
+    if (error) {
+      dispatch(renderFlash('error', error));
+
+      return false;
+    }
+
+    const queryParams = { ...formData, query: queryText };
+
+    return dispatch(queryActions.create(queryParams))
+      .then((query) => {
+        return dispatch(push(`/queries/${query.id}`));
+      });
+  })
 
   onTargetSelect = (selectedTargets) => {
     const { dispatch } = this.props;
@@ -150,10 +169,10 @@ class NewQueryPage extends Component {
   render () {
     const {
       fetchTargets,
-      onNewQueryFormSubmit,
-      onInvalidQuerySubmit,
       onOsqueryTableSelect,
       onRemoveMoreInfoTarget,
+      onRunQuery,
+      onSaveQueryFormSubmit,
       onTargetSelect,
       onTargetSelectMoreInfo,
       onTextEditorInputChange,
@@ -171,10 +190,10 @@ class NewQueryPage extends Component {
         <NewQuery
           isLoadingTargets={isLoadingTargets}
           moreInfoTarget={moreInfoTarget}
-          onNewQueryFormSubmit={onNewQueryFormSubmit}
-          onInvalidQuerySubmit={onInvalidQuerySubmit}
           onOsqueryTableSelect={onOsqueryTableSelect}
           onRemoveMoreInfoTarget={onRemoveMoreInfoTarget}
+          onRunQuery={onRunQuery}
+          onSaveQueryFormSubmit={onSaveQueryFormSubmit}
           onTargetSelect={onTargetSelect}
           onTargetSelectInputChange={fetchTargets}
           onTargetSelectMoreInfo={onTargetSelectMoreInfo}

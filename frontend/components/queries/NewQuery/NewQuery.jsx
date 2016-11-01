@@ -4,7 +4,6 @@ import 'brace/mode/sql';
 import 'brace/ext/linking';
 
 import Button from 'components/buttons/Button';
-import debounce from 'utilities/debounce';
 import SaveQueryFormModal from 'components/modals/SaveQueryFormModal';
 import SelectTargetsInput from 'components/queries/SelectTargetsInput';
 import SelectTargetsMenu from 'components/queries/SelectTargetsMenu';
@@ -19,10 +18,10 @@ class NewQuery extends Component {
   static propTypes = {
     isLoadingTargets: PropTypes.bool,
     moreInfoTarget: targetInterface,
-    onInvalidQuerySubmit: PropTypes.func,
-    onNewQueryFormSubmit: PropTypes.func,
     onOsqueryTableSelect: PropTypes.func,
     onRemoveMoreInfoTarget: PropTypes.func,
+    onRunQuery: PropTypes.func,
+    onSaveQueryFormSubmit: PropTypes.func,
     onTargetSelect: PropTypes.func,
     onTargetSelectInputChange: PropTypes.func,
     onTargetSelectMoreInfo: PropTypes.func,
@@ -64,15 +63,6 @@ class NewQuery extends Component {
     return false;
   }
 
-  onRunQuery = (evt) => {
-    evt.preventDefault();
-
-    const { onSaveQueryFormSubmit } = this;
-    const { selectedTargets } = this.props;
-
-    return onSaveQueryFormSubmit({ selectedTargets });
-  }
-
   onSaveQueryFormCancel = (evt) => {
     evt.preventDefault();
 
@@ -81,21 +71,11 @@ class NewQuery extends Component {
     return false;
   }
 
-  onSaveQueryFormSubmit = debounce((formData) => {
-    const { onInvalidQuerySubmit, onNewQueryFormSubmit, textEditorText } = this.props;
-    const { error } = validateQuery(textEditorText);
-
+  onSaveQueryFormSubmit = (formData) => {
     this.setState({ isSaveQueryForm: false });
 
-    if (error) {
-      return onInvalidQuerySubmit(error);
-    }
-
-    return onNewQueryFormSubmit({
-      ...formData,
-      query: textEditorText,
-    });
-  })
+    return this.props.onSaveQueryFormSubmit(formData);
+  }
 
   renderSaveQueryFormModal = () => {
     const { isSaveQueryForm } = this.state;
@@ -121,6 +101,7 @@ class NewQuery extends Component {
       isLoadingTargets,
       moreInfoTarget,
       onRemoveMoreInfoTarget,
+      onRunQuery,
       onTargetSelect,
       onTargetSelectInputChange,
       onTargetSelectMoreInfo,
@@ -133,7 +114,6 @@ class NewQuery extends Component {
     const {
       onLoad,
       onLoadSaveQueryModal,
-      onRunQuery,
       renderSaveQueryFormModal,
     } = this;
     const menuRenderer = SelectTargetsMenu(onTargetSelectMoreInfo, onRemoveMoreInfoTarget, moreInfoTarget);
