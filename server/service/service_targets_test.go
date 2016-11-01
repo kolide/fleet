@@ -33,7 +33,7 @@ func TestSearchTargets(t *testing.T) {
 	})
 	require.Nil(t, err)
 
-	results, count, err := svc.SearchTargets(ctx, "foo", nil, nil)
+	results, err := svc.SearchTargets(ctx, "foo", nil, nil)
 	require.Nil(t, err)
 
 	require.Len(t, results.Hosts, 1)
@@ -41,8 +41,6 @@ func TestSearchTargets(t *testing.T) {
 
 	require.Len(t, results.Labels, 1)
 	assert.Equal(t, l1.Name, results.Labels[0].Name)
-
-	assert.Equal(t, uint(1), count)
 }
 
 func TestCountHostsInTargets(t *testing.T) {
@@ -120,19 +118,19 @@ func TestCountHostsInTargets(t *testing.T) {
 		assert.Nil(t, err)
 	}
 
-	count, err := svc.CountHostsInTargets(ctx, nil, []kolide.Label{*l1, *l2})
+	count, err := svc.CountHostsInTargets(ctx, nil, []uint{l1.ID, l2.ID})
 	assert.Nil(t, err)
 	assert.Equal(t, uint(5), count)
 
-	count, err = svc.CountHostsInTargets(ctx, []kolide.Host{*h1, *h2}, []kolide.Label{*l1, *l2})
+	count, err = svc.CountHostsInTargets(ctx, []uint{h1.ID, h2.ID}, []uint{l1.ID, l2.ID})
 	assert.Nil(t, err)
 	assert.Equal(t, uint(5), count)
 
-	count, err = svc.CountHostsInTargets(ctx, []kolide.Host{*h1, *h2}, nil)
+	count, err = svc.CountHostsInTargets(ctx, []uint{h1.ID, h2.ID}, nil)
 	assert.Nil(t, err)
 	assert.Equal(t, uint(2), count)
 
-	count, err = svc.CountHostsInTargets(ctx, []kolide.Host{*h1}, []kolide.Label{*l2})
+	count, err = svc.CountHostsInTargets(ctx, []uint{h1.ID}, []uint{l2.ID})
 	assert.Nil(t, err)
 	assert.Equal(t, uint(4), count)
 
@@ -172,7 +170,7 @@ func TestSearchWithOmit(t *testing.T) {
 	})
 
 	{
-		results, _, err := svc.SearchTargets(ctx, "foo", nil, nil)
+		results, err := svc.SearchTargets(ctx, "foo", nil, nil)
 		require.Nil(t, err)
 
 		require.Len(t, results.Hosts, 2)
@@ -182,7 +180,7 @@ func TestSearchWithOmit(t *testing.T) {
 	}
 
 	{
-		results, _, err := svc.SearchTargets(ctx, "foo", []uint{h2.ID}, nil)
+		results, err := svc.SearchTargets(ctx, "foo", []uint{h2.ID}, nil)
 		require.Nil(t, err)
 
 		require.Len(t, results.Hosts, 1)
@@ -239,7 +237,7 @@ func TestSearchHostsInLabels(t *testing.T) {
 		assert.Nil(t, err)
 	}
 
-	results, _, err := svc.SearchTargets(ctx, "baz", nil, nil)
+	results, err := svc.SearchTargets(ctx, "baz", nil, nil)
 	require.Nil(t, err)
 
 	require.Len(t, results.Hosts, 1)
@@ -267,7 +265,7 @@ func TestSearchResultsLimit(t *testing.T) {
 		})
 		require.Nil(t, err)
 	}
-	_, count, err := svc.SearchTargets(ctx, "foo", nil, nil)
+	targets, err := svc.SearchTargets(ctx, "foo", nil, nil)
 	require.Nil(t, err)
-	assert.Equal(t, int(count), 10)
+	assert.Len(t, targets.Hosts, 10)
 }

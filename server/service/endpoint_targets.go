@@ -35,7 +35,12 @@ func makeSearchTargetsEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(searchTargetsRequest)
 
-		results, count, err := svc.SearchTargets(ctx, req.Query, req.Selected.Hosts, req.Selected.Labels)
+		results, err := svc.SearchTargets(ctx, req.Query, req.Selected.Hosts, req.Selected.Labels)
+		if err != nil {
+			return searchTargetsResponse{Err: err}, nil
+		}
+
+		count, err := svc.CountHostsInTargets(ctx, req.Selected.Hosts, req.Selected.Labels)
 		if err != nil {
 			return searchTargetsResponse{Err: err}, nil
 		}
