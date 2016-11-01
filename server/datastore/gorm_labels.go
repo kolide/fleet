@@ -183,7 +183,8 @@ SELECT h.*
 FROM label_query_executions lqe
 JOIN hosts h
 ON lqe.host_id = h.id
-WHERE lqe.label_id = ?;
+WHERE lqe.label_id = ?
+AND lqe.matches = 1;
 `, lid).Scan(&results).Error
 
 	if err != nil && err != gorm.ErrRecordNotFound {
