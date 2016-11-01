@@ -1,6 +1,7 @@
 import expect, { restoreSpies } from 'expect';
 import { mount } from 'enzyme';
 
+import { defaultSelectedOsqueryTable } from '../../../redux/nodes/app/actions';
 import helpers from '../../../test/helpers';
 import NewQueryPage from './NewQueryPage';
 
@@ -11,6 +12,9 @@ describe('NewQueryPage - component', () => {
   afterEach(restoreSpies);
 
   const mockStore = reduxMockStore({
+    app: {
+      selectedOsqueryTable: defaultSelectedOsqueryTable,
+    },
     entities: {
       targets: {},
     },

@@ -1,9 +1,11 @@
 import {
+  defaultSelectedOsqueryTable,
   CONFIG_FAILURE,
   CONFIG_START,
   CONFIG_SUCCESS,
   HIDE_BACKGROUND_IMAGE,
   REMOVE_RIGHT_SIDE_PANEL,
+  SELECT_OSQUERY_TABLE,
   SHOW_BACKGROUND_IMAGE,
   SHOW_RIGHT_SIDE_PANEL,
 } from './actions';
@@ -12,6 +14,7 @@ export const initialState = {
   config: {},
   error: null,
   loading: false,
+  selectedOsqueryTable: defaultSelectedOsqueryTable,
   showBackgroundImage: false,
   showRightSidePanel: false,
 };
@@ -45,6 +48,11 @@ const reducer = (state = initialState, { type, payload }) => {
       return {
         ...state,
         showRightSidePanel: false,
+      };
+    case SELECT_OSQUERY_TABLE:
+      return {
+        ...state,
+        selectedOsqueryTable: payload.selectedOsqueryTable,
       };
     case SHOW_BACKGROUND_IMAGE:
       return {

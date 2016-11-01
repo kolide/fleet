@@ -1,29 +1,27 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { find } from 'lodash';
 
 import Kolide from '../../../kolide';
 import NewQuery from '../../../components/queries/NewQuery';
-import { osqueryTables } from '../../../utilities/osquery_tables';
+import osqueryTableInterface from '../../../interfaces/osquery_table';
 import queryActions from '../../../redux/nodes/entities/queries/actions';
 import QuerySidePanel from '../../../components/side_panels/QuerySidePanel';
-import { showRightSidePanel, removeRightSidePanel } from '../../../redux/nodes/app/actions';
+import { removeRightSidePanel, selectOsqueryTable, showRightSidePanel } from '../../../redux/nodes/app/actions';
 import { renderFlash } from '../../../redux/nodes/notifications/actions';
 
 class NewQueryPage extends Component {
   static propTypes = {
     dispatch: PropTypes.func,
+    selectedOsqueryTable: osqueryTableInterface,
   };
 
   componentWillMount () {
     const { dispatch } = this.props;
-    const selectedOsqueryTable = find(osqueryTables, { name: 'users' });
 
     this.state = {
       isLoadingTargets: false,
       moreInfoTarget: null,
       selectedTargetsCount: 0,
-      selectedOsqueryTable,
       targets: [],
       textEditorText: 'SELECT * FROM users u JOIN groups g WHERE u.gid = g.gid',
     };
@@ -58,8 +56,9 @@ class NewQueryPage extends Component {
   }
 
   onOsqueryTableSelect = (tableName) => {
-    const selectedOsqueryTable = find(osqueryTables, { name: tableName.toLowerCase() });
-    this.setState({ selectedOsqueryTable });
+    const { dispatch } = this.props;
+
+    dispatch(selectOsqueryTable(tableName));
 
     return false;
   }
@@ -144,10 +143,11 @@ class NewQueryPage extends Component {
     const {
       isLoadingTargets,
       moreInfoTarget,
-      selectedOsqueryTable,
       selectedTargetsCount,
       targets,
-      textEditorText } = this.state;
+      textEditorText,
+    } = this.state;
+    const { selectedOsqueryTable } = this.props;
 
     return (
       <div>
@@ -176,4 +176,10 @@ class NewQueryPage extends Component {
   }
 }
 
-export default connect()(NewQueryPage);
+const mapStateToProps = (state) => {
+  const { selectedOsqueryTable } = state.app;
+
+  return { selectedOsqueryTable };
+};
+
+export default connect(mapStateToProps)(NewQueryPage);
