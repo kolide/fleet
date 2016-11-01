@@ -56,30 +56,40 @@ func TestCountHostsInTargets(t *testing.T) {
 	h1, err := ds.NewHost(&kolide.Host{
 		HostName:  "foo.local",
 		PrimaryIP: "192.168.1.10",
+		NodeKey:   "1",
+		UUID:      "1",
 	})
 	require.Nil(t, err)
 
 	h2, err := ds.NewHost(&kolide.Host{
 		HostName:  "bar.local",
 		PrimaryIP: "192.168.1.11",
+		NodeKey:   "2",
+		UUID:      "2",
 	})
 	require.Nil(t, err)
 
 	h3, err := ds.NewHost(&kolide.Host{
 		HostName:  "baz.local",
 		PrimaryIP: "192.168.1.12",
+		NodeKey:   "3",
+		UUID:      "3",
 	})
 	require.Nil(t, err)
 
 	h4, err := ds.NewHost(&kolide.Host{
 		HostName:  "xxx.local",
 		PrimaryIP: "192.168.1.13",
+		NodeKey:   "4",
+		UUID:      "4",
 	})
 	require.Nil(t, err)
 
 	h5, err := ds.NewHost(&kolide.Host{
 		HostName:  "yyy.local",
 		PrimaryIP: "192.168.1.14",
+		NodeKey:   "5",
+		UUID:      "5",
 	})
 	require.Nil(t, err)
 
@@ -142,12 +152,16 @@ func TestSearchWithOmit(t *testing.T) {
 	h1, err := ds.NewHost(&kolide.Host{
 		HostName:  "foo.local",
 		PrimaryIP: "192.168.1.10",
+		NodeKey:   "1",
+		UUID:      "1",
 	})
 	require.Nil(t, err)
 
 	h2, err := ds.NewHost(&kolide.Host{
 		HostName:  "foobar.local",
 		PrimaryIP: "192.168.1.11",
+		NodeKey:   "2",
+		UUID:      "2",
 	})
 	require.Nil(t, err)
 
@@ -190,18 +204,24 @@ func TestSearchHostsInLabels(t *testing.T) {
 	h1, err := ds.NewHost(&kolide.Host{
 		HostName:  "foo.local",
 		PrimaryIP: "192.168.1.10",
+		NodeKey:   "1",
+		UUID:      "1",
 	})
 	require.Nil(t, err)
 
 	h2, err := ds.NewHost(&kolide.Host{
 		HostName:  "bar.local",
 		PrimaryIP: "192.168.1.11",
+		NodeKey:   "2",
+		UUID:      "2",
 	})
 	require.Nil(t, err)
 
 	h3, err := ds.NewHost(&kolide.Host{
 		HostName:  "baz.local",
 		PrimaryIP: "192.168.1.12",
+		NodeKey:   "3",
+		UUID:      "3",
 	})
 	require.Nil(t, err)
 
@@ -241,6 +261,8 @@ func TestSearchResultsLimit(t *testing.T) {
 		_, err := ds.NewHost(&kolide.Host{
 			HostName:  fmt.Sprintf("foo.%d.local", i),
 			PrimaryIP: fmt.Sprintf("192.168.1.%d", i+1),
+			NodeKey:   fmt.Sprintf("%d", i+1),
+			UUID:      fmt.Sprintf("%d", i+1),
 		})
 		require.Nil(t, err)
 	}
