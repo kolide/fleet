@@ -12,18 +12,6 @@ describe('NewQuery - component', () => {
   });
   afterEach(restoreSpies);
 
-  it('renders the ThemeDropdown', () => {
-    const component = mount(
-      <NewQuery
-        onOsqueryTableSelect={noop}
-        onTextEditorInputChange={noop}
-        textEditorText="Hello world"
-      />
-    );
-
-    expect(component.find('ThemeDropdown').length).toEqual(1);
-  });
-
   it('does not render the SaveQueryForm by default', () => {
     const component = mount(
       <NewQuery

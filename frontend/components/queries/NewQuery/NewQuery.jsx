@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import AceEditor from 'react-ace';
+import 'brace/mode/sql';
 import 'brace/ext/linking';
 
 import Button from 'components/buttons/Button';
@@ -8,7 +9,6 @@ import SaveQueryFormModal from 'components/modals/SaveQueryFormModal';
 import SelectTargetsInput from 'components/queries/SelectTargetsInput';
 import SelectTargetsMenu from 'components/queries/SelectTargetsMenu';
 import targetInterface from 'interfaces/target';
-import ThemeDropdown from 'components/queries/NewQuery/ThemeDropdown';
 import { validateQuery } from 'components/queries/NewQuery/helpers';
 import './mode';
 import './theme';
@@ -37,7 +37,6 @@ class NewQuery extends Component {
     this.state = {
       isSaveQueryForm: false,
       selectedTargets: [],
-      theme: 'kolide',
     };
   }
 
@@ -108,16 +107,6 @@ class NewQuery extends Component {
     return false;
   }
 
-  onThemeSelect = (evt) => {
-    evt.preventDefault();
-
-    this.setState({
-      theme: evt.target.value,
-    });
-
-    return false;
-  }
-
   renderSaveQueryFormModal = () => {
     const { isSaveQueryForm } = this.state;
     const {
@@ -149,23 +138,18 @@ class NewQuery extends Component {
       targets,
       textEditorText,
     } = this.props;
-    const { selectedTargets, theme } = this.state;
+    const { selectedTargets } = this.state;
     const {
       onLoad,
       onLoadSaveQueryModal,
       onRunQuery,
       onTargetSelect,
-      onThemeSelect,
       renderSaveQueryFormModal,
     } = this;
     const menuRenderer = SelectTargetsMenu(onTargetSelectMoreInfo, onRemoveMoreInfoTarget, moreInfoTarget);
 
     return (
       <div className={`${baseClass}__wrapper`}>
-        <p className={`${baseClass}__title`}>
-          New Query Page
-        </p>
-        <ThemeDropdown onSelectChange={onThemeSelect} theme={theme} />
         <div className={`${baseClass}__text-editor-wrapper`}>
           <AceEditor
             enableBasicAutocompletion
@@ -180,7 +164,7 @@ class NewQuery extends Component {
             setOptions={{ enableLinking: true }}
             showGutter
             showPrintMargin={false}
-            theme={theme}
+            theme="kolide"
             value={textEditorText}
             width="100%"
           />
