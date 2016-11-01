@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
+import { push } from 'react-router-redux';
 
 import Kolide from '../../../kolide';
 import NewQuery from '../../../components/queries/NewQuery';
@@ -44,7 +45,10 @@ class NewQueryPage extends Component {
     console.log('New Query Form submitted', formData);
     const { dispatch } = this.props;
 
-    dispatch(queryActions.create(formData));
+    return dispatch(queryActions.create(formData))
+      .then((query) => {
+        return dispatch(push(`/queries/${query.id}`));
+      });
   }
 
   onInvalidQuerySubmit = (errorMessage) => {

@@ -17,6 +17,7 @@ import NewHostPage from '../pages/hosts/NewHostPage';
 import NewQueryPage from '../pages/queries/NewQueryPage';
 import QueryPageWrapper from '../components/queries/QueryPageWrapper';
 import ResetPasswordPage from '../pages/ResetPasswordPage';
+import ShowQueryPage from '../pages/queries/ShowQueryPage';
 import store from '../redux/store';
 
 const history = syncHistoryWithStore(browserHistory, store);
@@ -38,6 +39,7 @@ const routes = (
             </Route>
             <Route path="queries" component={QueryPageWrapper}>
               <Route path="new" component={NewQueryPage} />
+              <Route path=":id" component={ShowQueryPage} />
             </Route>
             <Route path="hosts">
               <Route path="new" component={NewHostPage} />
