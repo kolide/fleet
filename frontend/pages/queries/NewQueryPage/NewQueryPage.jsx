@@ -7,13 +7,17 @@ import NewQuery from '../../../components/queries/NewQuery';
 import osqueryTableInterface from '../../../interfaces/osquery_table';
 import queryActions from '../../../redux/nodes/entities/queries/actions';
 import QuerySidePanel from '../../../components/side_panels/QuerySidePanel';
-import { removeRightSidePanel, selectOsqueryTable, showRightSidePanel } from '../../../redux/nodes/app/actions';
+import { removeRightSidePanel, showRightSidePanel } from '../../../redux/nodes/app/actions';
 import { renderFlash } from '../../../redux/nodes/notifications/actions';
+import { selectOsqueryTable, setQueryText, setSelectedTargets } from '../../../redux/nodes/components/QueryPages/actions';
+import targetInterface from '../../../interfaces/target';
 
 class NewQueryPage extends Component {
   static propTypes = {
     dispatch: PropTypes.func,
+    queryText: PropTypes.string,
     selectedOsqueryTable: osqueryTableInterface,
+    selectedTargets: PropTypes.arrayOf(targetInterface),
   };
 
   componentWillMount () {
@@ -24,7 +28,6 @@ class NewQueryPage extends Component {
       moreInfoTarget: null,
       selectedTargetsCount: 0,
       targets: [],
-      textEditorText: 'SELECT * FROM users u JOIN groups g WHERE u.gid = g.gid',
     };
 
     dispatch(showRightSidePanel);
@@ -75,6 +78,14 @@ class NewQueryPage extends Component {
     return false;
   }
 
+  onTargetSelect = (selectedTargets) => {
+    const { dispatch } = this.props;
+
+    dispatch(setSelectedTargets(selectedTargets));
+
+    return false;
+  }
+
   onTargetSelectMoreInfo = (moreInfoTarget) => {
     return (evt) => {
       evt.preventDefault();
@@ -103,8 +114,10 @@ class NewQueryPage extends Component {
     };
   }
 
-  onTextEditorInputChange = (textEditorText) => {
-    this.setState({ textEditorText });
+  onTextEditorInputChange = (queryText) => {
+    const { dispatch } = this.props;
+
+    dispatch(setQueryText(queryText));
 
     return false;
   }
@@ -141,6 +154,7 @@ class NewQueryPage extends Component {
       onInvalidQuerySubmit,
       onOsqueryTableSelect,
       onRemoveMoreInfoTarget,
+      onTargetSelect,
       onTargetSelectMoreInfo,
       onTextEditorInputChange,
     } = this;
@@ -149,9 +163,8 @@ class NewQueryPage extends Component {
       moreInfoTarget,
       selectedTargetsCount,
       targets,
-      textEditorText,
     } = this.state;
-    const { selectedOsqueryTable } = this.props;
+    const { queryText, selectedOsqueryTable, selectedTargets } = this.props;
 
     return (
       <div>
@@ -162,13 +175,15 @@ class NewQueryPage extends Component {
           onInvalidQuerySubmit={onInvalidQuerySubmit}
           onOsqueryTableSelect={onOsqueryTableSelect}
           onRemoveMoreInfoTarget={onRemoveMoreInfoTarget}
+          onTargetSelect={onTargetSelect}
           onTargetSelectInputChange={fetchTargets}
           onTargetSelectMoreInfo={onTargetSelectMoreInfo}
           onTextEditorInputChange={onTextEditorInputChange}
+          selectedTargets={selectedTargets}
           selectedTargetsCount={selectedTargetsCount}
           selectedOsqueryTable={selectedOsqueryTable}
           targets={targets}
-          textEditorText={textEditorText}
+          textEditorText={queryText}
         />
         <QuerySidePanel
           onOsqueryTableSelect={onOsqueryTableSelect}
@@ -181,9 +196,9 @@ class NewQueryPage extends Component {
 }
 
 const mapStateToProps = (state) => {
-  const { selectedOsqueryTable } = state.app;
+  const { queryText, selectedOsqueryTable, selectedTargets } = state.components.QueryPages;
 
-  return { selectedOsqueryTable };
+  return { queryText, selectedOsqueryTable, selectedTargets };
 };
 
 export default connect(mapStateToProps)(NewQueryPage);

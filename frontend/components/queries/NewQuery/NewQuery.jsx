@@ -23,9 +23,11 @@ class NewQuery extends Component {
     onNewQueryFormSubmit: PropTypes.func,
     onOsqueryTableSelect: PropTypes.func,
     onRemoveMoreInfoTarget: PropTypes.func,
+    onTargetSelect: PropTypes.func,
     onTargetSelectInputChange: PropTypes.func,
     onTargetSelectMoreInfo: PropTypes.func,
     onTextEditorInputChange: PropTypes.func,
+    selectedTargets: PropTypes.arrayOf(targetInterface),
     selectedTargetsCount: PropTypes.number,
     targets: PropTypes.arrayOf(targetInterface),
     textEditorText: PropTypes.string,
@@ -36,7 +38,6 @@ class NewQuery extends Component {
 
     this.state = {
       isSaveQueryForm: false,
-      selectedTargets: [],
     };
   }
 
@@ -66,14 +67,8 @@ class NewQuery extends Component {
   onRunQuery = (evt) => {
     evt.preventDefault();
 
-    const { onInvalidQuerySubmit, textEditorText } = this.props;
-    const { error } = validateQuery(textEditorText);
     const { onSaveQueryFormSubmit } = this;
-    const { selectedTargets } = this.state;
-
-    if (error) {
-      return onInvalidQuerySubmit(error);
-    }
+    const { selectedTargets } = this.props;
 
     return onSaveQueryFormSubmit({ selectedTargets });
   }
@@ -102,11 +97,6 @@ class NewQuery extends Component {
     });
   })
 
-  onTargetSelect = (selectedTargets) => {
-    this.setState({ selectedTargets });
-    return false;
-  }
-
   renderSaveQueryFormModal = () => {
     const { isSaveQueryForm } = this.state;
     const {
@@ -131,19 +121,19 @@ class NewQuery extends Component {
       isLoadingTargets,
       moreInfoTarget,
       onRemoveMoreInfoTarget,
+      onTargetSelect,
       onTargetSelectInputChange,
       onTargetSelectMoreInfo,
       onTextEditorInputChange,
+      selectedTargets,
       selectedTargetsCount,
       targets,
       textEditorText,
     } = this.props;
-    const { selectedTargets } = this.state;
     const {
       onLoad,
       onLoadSaveQueryModal,
       onRunQuery,
-      onTargetSelect,
       renderSaveQueryFormModal,
     } = this;
     const menuRenderer = SelectTargetsMenu(onTargetSelectMoreInfo, onRemoveMoreInfoTarget, moreInfoTarget);

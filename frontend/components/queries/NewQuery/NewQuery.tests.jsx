@@ -17,6 +17,7 @@ describe('NewQuery - component', () => {
       <NewQuery
         onOsqueryTableSelect={noop}
         onTextEditorInputChange={noop}
+        selectedTargets={[]}
         textEditorText="Hello world"
       />
     );
@@ -29,6 +30,7 @@ describe('NewQuery - component', () => {
       <NewQuery
         onOsqueryTableSelect={noop}
         onTextEditorInputChange={noop}
+        selectedTargets={[]}
         textEditorText="Hello world"
       />
     );
@@ -43,6 +45,7 @@ describe('NewQuery - component', () => {
       <NewQuery
         onOsqueryTableSelect={noop}
         onTextEditorInputChange={noop}
+        selectedTargets={[]}
         textEditorText="Hello world"
       />
     );
@@ -56,7 +59,11 @@ describe('NewQuery - component', () => {
 
   it('hides the SaveQueryFormModal after the form is submitted', () => {
     const component = mount(
-      <NewQuery onNewQueryFormSubmit={noop} textEditorText="SELECT * FROM users" />
+      <NewQuery
+        onNewQueryFormSubmit={noop}
+        selectedTargets={[]}
+        textEditorText="SELECT * FROM users"
+      />
     );
 
     component.find('.new-query__save-query-btn').simulate('click');
@@ -76,11 +83,11 @@ describe('NewQuery - component', () => {
     const component = mount(
       <NewQuery
         onNewQueryFormSubmit={onNewQueryFormSubmitSpy}
+        selectedTargets={selectedTargets}
         textEditorText={query}
       />
     );
 
-    component.setState({ selectedTargets });
     component.find('.new-query__save-query-btn').simulate('click');
 
     const form = component.find('SaveQueryForm');
@@ -103,10 +110,10 @@ describe('NewQuery - component', () => {
     const component = mount(
       <NewQuery
         onNewQueryFormSubmit={onNewQueryFormSubmitSpy}
+        selectedTargets={selectedTargets}
         textEditorText={query}
       />
     );
-    component.setState({ selectedTargets });
     component.find('.new-query__run-query-btn').simulate('click');
 
     expect(onNewQueryFormSubmitSpy).toHaveBeenCalledWith({ query, selectedTargets });
@@ -115,7 +122,10 @@ describe('NewQuery - component', () => {
   it('calls onTargetSelectInputChange when changing the select target input text', () => {
     const onTargetSelectInputChangeSpy = createSpy();
     const component = mount(
-      <NewQuery onTargetSelectInputChange={onTargetSelectInputChangeSpy} />
+      <NewQuery
+        onTargetSelectInputChange={onTargetSelectInputChangeSpy}
+        selectedTargets={[]}
+      />
     );
     const selectTargetsInput = component.find('.Select-input input');
 
@@ -137,6 +147,7 @@ describe('NewQuery - component', () => {
           onInvalidQuerySubmit={invalidQuerySubmitSpy}
           onOsqueryTableSelect={noop}
           onTextEditorInputChange={noop}
+          selectedTargets={[]}
           textEditorText={invalidQuery}
         />
       );
@@ -161,6 +172,7 @@ describe('NewQuery - component', () => {
           onNewQueryFormSubmit={onNewQueryFormSubmitSpy}
           onOsqueryTableSelect={noop}
           onTextEditorInputChange={noop}
+          selectedTargets={[]}
           textEditorText={validQuery}
         />
       );
@@ -177,4 +189,3 @@ describe('NewQuery - component', () => {
     });
   });
 });
-

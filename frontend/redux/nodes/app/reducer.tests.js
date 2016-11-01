@@ -4,10 +4,8 @@ import reducer, { initialState } from './reducer';
 import {
   configFailure,
   configSuccess,
-  defaultSelectedOsqueryTable,
   hideBackgroundImage,
   loadConfig,
-  selectOsqueryTable,
   showBackgroundImage,
 } from './actions';
 
@@ -16,27 +14,12 @@ describe('App - reducer', () => {
     expect(reducer(undefined, { type: 'SOME_ACTION' })).toEqual(initialState);
   });
 
-  context('selectOsqueryTable action', () => {
-    it('sets the selectedOsqueryTable attribute', () => {
-      const selectOsqueryTableAction = selectOsqueryTable('groups');
-      expect(reducer(initialState, selectOsqueryTableAction)).toEqual({
-        config: {},
-        error: null,
-        loading: false,
-        selectedOsqueryTable: selectOsqueryTableAction.payload.selectedOsqueryTable,
-        showBackgroundImage: false,
-        showRightSidePanel: false,
-      });
-    });
-  });
-
   context('showBackgroundImage action', () => {
     it('shows the background image', () => {
       expect(reducer(initialState, showBackgroundImage)).toEqual({
         config: {},
         error: null,
         loading: false,
-        selectedOsqueryTable: defaultSelectedOsqueryTable,
         showBackgroundImage: true,
         showRightSidePanel: false,
       });
@@ -54,7 +37,6 @@ describe('App - reducer', () => {
         config: {},
         error: null,
         loading: false,
-        selectedOsqueryTable: defaultSelectedOsqueryTable,
         showBackgroundImage: false,
         showRightSidePanel: false,
       });
@@ -67,7 +49,6 @@ describe('App - reducer', () => {
         config: {},
         error: null,
         loading: true,
-        selectedOsqueryTable: defaultSelectedOsqueryTable,
         showBackgroundImage: false,
         showRightSidePanel: false,
       });
@@ -85,7 +66,6 @@ describe('App - reducer', () => {
         config,
         error: null,
         loading: false,
-        selectedOsqueryTable: defaultSelectedOsqueryTable,
         showBackgroundImage: false,
         showRightSidePanel: false,
       });
@@ -103,7 +83,6 @@ describe('App - reducer', () => {
         config: {},
         error,
         loading: false,
-        selectedOsqueryTable: defaultSelectedOsqueryTable,
         showBackgroundImage: false,
         showRightSidePanel: false,
       });
