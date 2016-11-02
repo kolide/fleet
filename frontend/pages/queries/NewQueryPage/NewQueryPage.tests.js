@@ -23,10 +23,10 @@ describe('NewQueryPage - component', () => {
     },
   });
 
-  it('renders the NewQuery component', () => {
+  it('renders the QueryComposer component', () => {
     const page = mount(connectedComponent(NewQueryPage, { mockStore }));
 
-    expect(page.find('NewQuery').length).toEqual(1);
+    expect(page.find('QueryComposer').length).toEqual(1);
   });
 
   it('renders the QuerySidePanel component', () => {

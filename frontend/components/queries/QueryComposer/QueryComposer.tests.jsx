@@ -4,9 +4,9 @@ import { mount } from 'enzyme';
 import { noop } from 'lodash';
 
 import { createAceSpy, fillInFormInput } from 'test/helpers';
-import NewQuery from './index';
+import QueryComposer from './index';
 
-describe('NewQuery - component', () => {
+describe('QueryComposer - component', () => {
   beforeEach(() => {
     createAceSpy();
   });
@@ -14,7 +14,7 @@ describe('NewQuery - component', () => {
 
   it('does not render the SaveQueryForm by default', () => {
     const component = mount(
-      <NewQuery
+      <QueryComposer
         onOsqueryTableSelect={noop}
         onTextEditorInputChange={noop}
         selectedTargets={[]}
@@ -27,7 +27,7 @@ describe('NewQuery - component', () => {
 
   it('renders the SaveQueryFormModal when "Save Query" is clicked', () => {
     const component = mount(
-      <NewQuery
+      <QueryComposer
         onOsqueryTableSelect={noop}
         onTextEditorInputChange={noop}
         selectedTargets={[]}
@@ -35,14 +35,14 @@ describe('NewQuery - component', () => {
       />
     );
 
-    component.find('.new-query__save-query-btn').simulate('click');
+    component.find('.query-composer__save-query-btn').simulate('click');
 
     expect(component.find('SaveQueryForm').length).toEqual(1);
   });
 
   it('renders the Run Query button as disabled without selected targets', () => {
     const component = mount(
-      <NewQuery
+      <QueryComposer
         onOsqueryTableSelect={noop}
         onTextEditorInputChange={noop}
         selectedTargets={[]}
@@ -50,7 +50,7 @@ describe('NewQuery - component', () => {
       />
     );
 
-    const runQueryBtn = component.find('.new-query__run-query-btn');
+    const runQueryBtn = component.find('.query-composer__run-query-btn');
 
     expect(runQueryBtn.props()).toInclude({
       disabled: true,
@@ -59,14 +59,14 @@ describe('NewQuery - component', () => {
 
   it('hides the SaveQueryFormModal after the form is submitted', () => {
     const component = mount(
-      <NewQuery
+      <QueryComposer
         onSaveQueryFormSubmit={noop}
         selectedTargets={[]}
         textEditorText="SELECT * FROM users"
       />
     );
 
-    component.find('.new-query__save-query-btn').simulate('click');
+    component.find('.query-composer__save-query-btn').simulate('click');
 
     const form = component.find('SaveQueryForm');
 
@@ -81,14 +81,14 @@ describe('NewQuery - component', () => {
     const query = 'SELECT * FROM users';
     const selectedTargets = [{ name: 'my target' }];
     const component = mount(
-      <NewQuery
+      <QueryComposer
         onSaveQueryFormSubmit={onSaveQueryFormSubmitSpy}
         selectedTargets={selectedTargets}
         textEditorText={query}
       />
     );
 
-    component.find('.new-query__save-query-btn').simulate('click');
+    component.find('.query-composer__save-query-btn').simulate('click');
 
     const form = component.find('SaveQueryForm');
 
@@ -107,13 +107,13 @@ describe('NewQuery - component', () => {
     const query = 'SELECT * FROM users';
     const selectedTargets = [{ name: 'my target' }];
     const component = mount(
-      <NewQuery
+      <QueryComposer
         onRunQuery={onRunQuerySpy}
         selectedTargets={selectedTargets}
         textEditorText={query}
       />
     );
-    component.find('.new-query__run-query-btn').simulate('click');
+    component.find('.query-composer__run-query-btn').simulate('click');
 
     expect(onRunQuerySpy).toHaveBeenCalled();
   });
@@ -121,7 +121,7 @@ describe('NewQuery - component', () => {
   it('calls onTargetSelectInputChange when changing the select target input text', () => {
     const onTargetSelectInputChangeSpy = createSpy();
     const component = mount(
-      <NewQuery
+      <QueryComposer
         onTargetSelectInputChange={onTargetSelectInputChangeSpy}
         selectedTargets={[]}
       />

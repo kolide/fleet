@@ -4,7 +4,7 @@ import { push } from 'react-router-redux';
 
 import debounce from '../../../utilities/debounce';
 import Kolide from '../../../kolide';
-import NewQuery from '../../../components/queries/NewQuery';
+import QueryComposer from '../../../components/queries/QueryComposer';
 import osqueryTableInterface from '../../../interfaces/osquery_table';
 import queryActions from '../../../redux/nodes/entities/queries/actions';
 import QuerySidePanel from '../../../components/side_panels/QuerySidePanel';
@@ -187,7 +187,7 @@ class NewQueryPage extends Component {
 
     return (
       <div>
-        <NewQuery
+        <QueryComposer
           isLoadingTargets={isLoadingTargets}
           moreInfoTarget={moreInfoTarget}
           onOsqueryTableSelect={onOsqueryTableSelect}

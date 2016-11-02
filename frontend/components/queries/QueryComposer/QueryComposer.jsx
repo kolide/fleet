@@ -8,13 +8,12 @@ import SaveQueryFormModal from 'components/modals/SaveQueryFormModal';
 import SelectTargetsInput from 'components/queries/SelectTargetsInput';
 import SelectTargetsMenu from 'components/queries/SelectTargetsMenu';
 import targetInterface from 'interfaces/target';
-import { validateQuery } from 'components/queries/NewQuery/helpers';
 import './mode';
 import './theme';
 
-const baseClass = 'new-query';
+const baseClass = 'query-composer';
 
-class NewQuery extends Component {
+class QueryComposer extends Component {
   static propTypes = {
     isLoadingTargets: PropTypes.bool,
     moreInfoTarget: targetInterface,
@@ -173,4 +172,4 @@ class NewQuery extends Component {
   }
 }
 
-export default NewQuery;
+export default QueryComposer;
