@@ -37,28 +37,6 @@ func TestDecodeCreateLabelRequest(t *testing.T) {
 	)
 }
 
-func TestDecodeModifyLabelRequest(t *testing.T) {
-	router := mux.NewRouter()
-	router.HandleFunc("/api/v1/kolide/labels/{id}", func(writer http.ResponseWriter, request *http.Request) {
-		r, err := decodeModifyLabelRequest(context.Background(), request)
-		assert.Nil(t, err)
-
-		params := r.(modifyLabelRequest)
-		assert.Equal(t, "foo", *params.payload.Name)
-		assert.Equal(t, uint(1), params.ID)
-	}).Methods("PATCH")
-
-	var body bytes.Buffer
-	body.Write([]byte(`{
-        "name": "foo"
-    }`))
-
-	router.ServeHTTP(
-		httptest.NewRecorder(),
-		httptest.NewRequest("PATCH", "/api/v1/kolide/labels/1", &body),
-	)
-}
-
 func TestDecodeDeleteLabelRequest(t *testing.T) {
 	router := mux.NewRouter()
 	router.HandleFunc("/api/v1/kolide/labels/{id}", func(writer http.ResponseWriter, request *http.Request) {

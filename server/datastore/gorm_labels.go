@@ -24,16 +24,6 @@ func (orm gormDB) NewLabel(label *kolide.Label) (*kolide.Label, error) {
 	return label, nil
 }
 
-func (orm gormDB) SaveLabel(label *kolide.Label) error {
-	if label == nil {
-		return errors.New(
-			"error saving label",
-			"nil pointer passed to SaveLabel",
-		)
-	}
-	return orm.DB.Save(label).Error
-}
-
 func (orm gormDB) DeleteLabel(lid uint) error {
 	err := orm.DB.Where("id = ?", lid).Delete(&kolide.Label{}).Error
 	if err != nil {

@@ -128,45 +128,6 @@ func makeCreateLabelEndpoint(svc kolide.Service) endpoint.Endpoint {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Modify Label
-////////////////////////////////////////////////////////////////////////////////
-
-type modifyLabelRequest struct {
-	ID      uint
-	payload kolide.LabelPayload
-}
-
-type modifyLabelResponse struct {
-	Label labelResponse `json:"label"`
-	Err   error         `json:"error,omitempty"`
-}
-
-func (r modifyLabelResponse) error() error { return r.Err }
-
-func makeModifyLabelEndpoint(svc kolide.Service) endpoint.Endpoint {
-	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(modifyLabelRequest)
-		label, err := svc.ModifyLabel(ctx, req.ID, req.payload)
-		if err != nil {
-			return modifyLabelResponse{Err: err}, nil
-		}
-		count, err := svc.CountHostsInTargets(ctx, nil, []uint{label.ID})
-		if err != nil {
-			return modifyLabelResponse{Err: err}, nil
-		}
-
-		return modifyLabelResponse{
-			labelResponse{
-				*label,
-				label.Name,
-				count,
-			},
-			nil,
-		}, nil
-	}
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // Delete Label
 ////////////////////////////////////////////////////////////////////////////////
 

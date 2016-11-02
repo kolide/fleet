@@ -175,18 +175,6 @@ func (orm *inmem) ListLabels(opt kolide.ListOptions) ([]*kolide.Label, error) {
 	return labels, nil
 }
 
-func (orm *inmem) SaveLabel(label *kolide.Label) error {
-	orm.mtx.Lock()
-	if _, ok := orm.labels[label.ID]; !ok {
-		return ErrNotFound
-	}
-
-	orm.labels[label.ID] = label
-	orm.mtx.Unlock()
-
-	return nil
-}
-
 func (orm *inmem) SearchLabels(query string, omit []uint) ([]kolide.Label, error) {
 	omitLookup := map[uint]bool{}
 	for _, o := range omit {
