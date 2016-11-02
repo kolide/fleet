@@ -14,8 +14,13 @@ type getLabelRequest struct {
 	ID uint
 }
 
+type labelResponse struct {
+	kolide.Label
+	Count uint `json:"count"`
+}
+
 type getLabelResponse struct {
-	Label *kolide.Label `json:"label"`
+	Label labelResponse `json:"label"`
 	Err   error         `json:"error,omitempty"`
 }
 
@@ -28,7 +33,17 @@ func makeGetLabelEndpoint(svc kolide.Service) endpoint.Endpoint {
 		if err != nil {
 			return getLabelResponse{Err: err}, nil
 		}
-		return getLabelResponse{label, nil}, nil
+		count, err := svc.CountHostsInTargets(ctx, nil, []uint{label.ID})
+		if err != nil {
+			return getLabelResponse{Err: err}, nil
+		}
+		return getLabelResponse{
+			labelResponse{
+				*label,
+				count,
+			},
+			nil,
+		}, nil
 	}
 }
 
@@ -41,8 +56,8 @@ type listLabelsRequest struct {
 }
 
 type listLabelsResponse struct {
-	Labels []kolide.Label `json:"labels"`
-	Err    error          `json:"error,omitempty"`
+	Labels []labelResponse `json:"labels"`
+	Err    error           `json:"error,omitempty"`
 }
 
 func (r listLabelsResponse) error() error { return r.Err }
@@ -55,9 +70,18 @@ func makeListLabelsEndpoint(svc kolide.Service) endpoint.Endpoint {
 			return listLabelsResponse{Err: err}, nil
 		}
 
-		resp := listLabelsResponse{Labels: []kolide.Label{}}
+		resp := listLabelsResponse{Labels: []labelResponse{}}
 		for _, label := range labels {
-			resp.Labels = append(resp.Labels, *label)
+			count, err := svc.CountHostsInTargets(ctx, nil, []uint{label.ID})
+			if err != nil {
+				return listLabelsResponse{Err: err}, nil
+			}
+			resp.Labels = append(resp.Labels,
+				labelResponse{
+					*label,
+					count,
+				},
+			)
 		}
 		return resp, nil
 	}
@@ -72,7 +96,7 @@ type createLabelRequest struct {
 }
 
 type createLabelResponse struct {
-	Label *kolide.Label `json:"label"`
+	Label labelResponse `json:"label"`
 	Err   error         `json:"error,omitempty"`
 }
 
@@ -85,7 +109,17 @@ func makeCreateLabelEndpoint(svc kolide.Service) endpoint.Endpoint {
 		if err != nil {
 			return createLabelResponse{Err: err}, nil
 		}
-		return createLabelResponse{label, nil}, nil
+		count, err := svc.CountHostsInTargets(ctx, nil, []uint{label.ID})
+		if err != nil {
+			return createLabelResponse{Err: err}, nil
+		}
+		return createLabelResponse{
+			labelResponse{
+				*label,
+				count,
+			},
+			nil,
+		}, nil
 	}
 }
 
@@ -99,7 +133,7 @@ type modifyLabelRequest struct {
 }
 
 type modifyLabelResponse struct {
-	Label *kolide.Label `json:"label"`
+	Label labelResponse `json:"label"`
 	Err   error         `json:"error,omitempty"`
 }
 
@@ -112,7 +146,18 @@ func makeModifyLabelEndpoint(svc kolide.Service) endpoint.Endpoint {
 		if err != nil {
 			return modifyLabelResponse{Err: err}, nil
 		}
-		return modifyLabelResponse{label, nil}, nil
+		count, err := svc.CountHostsInTargets(ctx, nil, []uint{label.ID})
+		if err != nil {
+			return modifyLabelResponse{Err: err}, nil
+		}
+
+		return modifyLabelResponse{
+			labelResponse{
+				*label,
+				count,
+			},
+			nil,
+		}, nil
 	}
 }
 
