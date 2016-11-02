@@ -18,9 +18,19 @@ type searchTargetsRequest struct {
 	} `json:"selected"`
 }
 
+type hostSearchResult struct {
+	hostResponse
+	DisplayText string `json:"display_text"`
+}
+
+type labelSearchResult struct {
+	kolide.Label
+	DisplayText string `json:"display_text"`
+}
+
 type targetsData struct {
-	Hosts  []hostResponse `json:"hosts"`
-	Labels []kolide.Label `json:"labels"`
+	Hosts  []hostSearchResult  `json:"hosts"`
+	Labels []labelSearchResult `json:"labels"`
 }
 
 type searchTargetsResponse struct {
@@ -46,16 +56,26 @@ func makeSearchTargetsEndpoint(svc kolide.Service) endpoint.Endpoint {
 		}
 
 		targets := &targetsData{
-			Hosts:  []hostResponse{},
-			Labels: []kolide.Label{},
+			Hosts:  []hostSearchResult{},
+			Labels: []labelSearchResult{},
 		}
 
 		for _, host := range results.Hosts {
-			targets.Hosts = append(targets.Hosts, hostResponse{host, svc.HostStatus(ctx, host)})
+			targets.Hosts = append(targets.Hosts,
+				hostSearchResult{
+					hostResponse{host, svc.HostStatus(ctx, host)},
+					host.HostName,
+				},
+			)
 		}
 
 		for _, label := range results.Labels {
-			targets.Labels = append(targets.Labels, label)
+			targets.Labels = append(targets.Labels,
+				labelSearchResult{
+					label,
+					label.Name,
+				},
+			)
 		}
 
 		return searchTargetsResponse{
