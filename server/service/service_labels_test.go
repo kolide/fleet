@@ -23,8 +23,8 @@ func TestListLabels(t *testing.T) {
 	assert.Len(t, labels, 0)
 
 	_, err = ds.NewLabel(&kolide.Label{
-		Name:    "foo",
-		QueryID: 1,
+		Name:  "foo",
+		Query: "select * from foo;",
 	})
 	assert.Nil(t, err)
 
@@ -44,8 +44,8 @@ func TestGetLabel(t *testing.T) {
 	ctx := context.Background()
 
 	label := &kolide.Label{
-		Name:    "foo",
-		QueryID: 1,
+		Name:  "foo",
+		Query: "select * from foo;",
 	}
 	label, err = ds.NewLabel(label)
 	assert.Nil(t, err)
@@ -66,10 +66,10 @@ func TestNewLabel(t *testing.T) {
 	ctx := context.Background()
 
 	name := "foo"
-	queryID := uint(1)
+	query := "select * from foo;"
 	label, err := svc.NewLabel(ctx, kolide.LabelPayload{
-		Name:    &name,
-		QueryID: &queryID,
+		Name:  &name,
+		Query: &query,
 	})
 	assert.NotZero(t, label.ID)
 
@@ -91,8 +91,8 @@ func TestModifyLabel(t *testing.T) {
 	ctx := context.Background()
 
 	label := &kolide.Label{
-		Name:    "foo",
-		QueryID: 1,
+		Name:  "foo",
+		Query: "select * from foo;",
 	}
 	label, err = ds.NewLabel(label)
 	assert.Nil(t, err)
@@ -117,8 +117,8 @@ func TestDeleteLabel(t *testing.T) {
 	ctx := context.Background()
 
 	label := &kolide.Label{
-		Name:    "foo",
-		QueryID: 1,
+		Name:  "foo",
+		Query: "select * from foo;",
 	}
 	label, err = ds.NewLabel(label)
 	assert.Nil(t, err)

@@ -20,13 +20,15 @@ func TestDecodeCreateLabelRequest(t *testing.T) {
 
 		params := r.(createLabelRequest)
 		assert.Equal(t, "foo", *params.payload.Name)
-		assert.Equal(t, uint(4), *params.payload.QueryID)
+		assert.Equal(t, "select * from foo;", *params.payload.Query)
+		assert.Equal(t, "darwin", *params.payload.Platform)
 	}).Methods("POST")
 
 	var body bytes.Buffer
 	body.Write([]byte(`{
         "name": "foo",
-        "query_id": 4
+        "query": "select * from foo;",
+		"platform": "darwin"
     }`))
 
 	router.ServeHTTP(

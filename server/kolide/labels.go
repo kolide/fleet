@@ -45,8 +45,9 @@ type LabelService interface {
 }
 
 type LabelPayload struct {
-	Name    *string
-	QueryID *uint `json:"query_id"`
+	Name     *string
+	Query    *string `json:"query"`
+	Platform *string `json:"platform"`
 }
 
 type Label struct {
@@ -54,7 +55,8 @@ type Label struct {
 	CreatedAt time.Time `json:"-"`
 	UpdatedAt time.Time `json:"-"`
 	Name      string    `json:"name" gorm:"not null;unique_index:idx_label_unique_name"` // there is a fulltext index on this field
-	QueryID   uint      `json:"query_id"`
+	Query     string    `json:"query" gorm:"not null"`
+	Platform  string    `json:"platform"`
 }
 
 type LabelQueryExecution struct {

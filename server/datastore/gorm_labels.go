@@ -68,13 +68,12 @@ func (orm gormDB) LabelQueriesForHost(host *kolide.Host, cutoff time.Time) (map[
 		)
 	}
 	rows, err := orm.DB.Raw(`
-SELECT l.id, q.query
-FROM labels l JOIN queries q
-ON l.query_id = q.id
-WHERE q.platform = ?
-AND q.id NOT IN /* subtract the set of executions that are recent enough */
+SELECT l.id, l.query
+from labels l
+WHERE l.platform = ?
+AND l.id NOT IN /* subtract the set of executions that are recent enough */
 (
-  SELECT l.query_id
+  SELECT l.id
   FROM labels l
   JOIN label_query_executions lqe
   ON lqe.label_id = l.id
