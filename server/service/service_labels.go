@@ -30,6 +30,10 @@ func (svc service) NewLabel(ctx context.Context, p kolide.LabelPayload) (*kolide
 		label.Platform = *p.Platform
 	}
 
+	if p.Description != nil {
+		label.Description = *p.Description
+	}
+
 	label, err := svc.ds.NewLabel(label)
 	if err != nil {
 		return nil, err
@@ -53,6 +57,10 @@ func (svc service) ModifyLabel(ctx context.Context, id uint, p kolide.LabelPaylo
 
 	if p.Platform != nil {
 		label.Platform = *p.Platform
+	}
+
+	if p.Description != nil {
+		label.Description = *p.Description
 	}
 
 	err = svc.ds.SaveLabel(label)

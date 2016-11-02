@@ -45,18 +45,20 @@ type LabelService interface {
 }
 
 type LabelPayload struct {
-	Name     *string
-	Query    *string `json:"query"`
-	Platform *string `json:"platform"`
+	Name        *string
+	Query       *string `json:"query"`
+	Platform    *string `json:"platform"`
+	Description *string `json:"description"`
 }
 
 type Label struct {
-	ID        uint      `json:"id" gorm:"primary_key"`
-	CreatedAt time.Time `json:"-"`
-	UpdatedAt time.Time `json:"-"`
-	Name      string    `json:"name" gorm:"not null;unique_index:idx_label_unique_name"` // there is a fulltext index on this field
-	Query     string    `json:"query" gorm:"not null"`
-	Platform  string    `json:"platform"`
+	ID          uint      `json:"id" gorm:"primary_key"`
+	CreatedAt   time.Time `json:"-"`
+	UpdatedAt   time.Time `json:"-"`
+	Name        string    `json:"name" gorm:"not null;unique_index:idx_label_unique_name"` // there is a fulltext index on this field
+	Description string    `json:"description"`
+	Query       string    `json:"query" gorm:"not null"`
+	Platform    string    `json:"platform"`
 }
 
 type LabelQueryExecution struct {
