@@ -16,7 +16,8 @@ type getLabelRequest struct {
 
 type labelResponse struct {
 	kolide.Label
-	Count uint `json:"count"`
+	DisplayText string `json:"display_text"`
+	Count       uint   `json:"count"`
 }
 
 type getLabelResponse struct {
@@ -40,6 +41,7 @@ func makeGetLabelEndpoint(svc kolide.Service) endpoint.Endpoint {
 		return getLabelResponse{
 			labelResponse{
 				*label,
+				label.Name,
 				count,
 			},
 			nil,
@@ -79,6 +81,7 @@ func makeListLabelsEndpoint(svc kolide.Service) endpoint.Endpoint {
 			resp.Labels = append(resp.Labels,
 				labelResponse{
 					*label,
+					label.Name,
 					count,
 				},
 			)
@@ -116,6 +119,7 @@ func makeCreateLabelEndpoint(svc kolide.Service) endpoint.Endpoint {
 		return createLabelResponse{
 			labelResponse{
 				*label,
+				label.Name,
 				count,
 			},
 			nil,
@@ -154,6 +158,7 @@ func makeModifyLabelEndpoint(svc kolide.Service) endpoint.Endpoint {
 		return modifyLabelResponse{
 			labelResponse{
 				*label,
+				label.Name,
 				count,
 			},
 			nil,
