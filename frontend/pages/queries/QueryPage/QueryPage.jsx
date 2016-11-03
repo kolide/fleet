@@ -14,7 +14,7 @@ import { removeRightSidePanel, showRightSidePanel } from 'redux/nodes/app/action
 import { renderFlash } from 'redux/nodes/notifications/actions';
 import { selectOsqueryTable, setQueryText, setSelectedTargets } from 'redux/nodes/components/QueryPages/actions';
 import targetInterface from 'interfaces/target';
-import { validateQuery } from 'pages/queries/NewQueryPage/helpers';
+import { validateQuery } from 'pages/queries/QueryPage/helpers';
 
 class QueryPage extends Component {
   static propTypes = {
@@ -28,7 +28,6 @@ class QueryPage extends Component {
 
   componentWillMount () {
     const { dispatch } = this.props;
-    console.log('queryID', this.props.queryID);
 
     this.state = {
       isLoadingTargets: false,
