@@ -45,6 +45,10 @@ const routes = (
               <Route path="new" component={QueryPage} />
               <Route path=":id" component={QueryPage} />
             </Route>
+            <Route path="packs" component={PackPageWrapper}>
+              <Route path="all" component={AllPacksPage} />
+              <Route path="new" component={NewPackPage} />
+            </Route>
             <Route path="hosts">
               <Route path="new" component={NewHostPage} />
               <Route path="manage" component={ManageHostsPage} />
