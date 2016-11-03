@@ -1,5 +1,4 @@
 import React, { Component, PropTypes } from 'react';
-import radium from 'radium';
 
 import SecondarySidePanelContainer from '../SecondarySidePanelContainer';
 
@@ -43,4 +42,4 @@ class PackInfoSidePanel extends Component {
   }
 }
 
-export default radium(PackInfoSidePanel);
+export default PackInfoSidePanel;
