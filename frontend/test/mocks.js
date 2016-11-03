@@ -22,6 +22,16 @@ export const validCreateQueryRequest = (bearerToken, queryParams) => {
     .reply(201, { query: queryParams });
 };
 
+export const validGetQueryRequest = (bearerToken, queryID) => {
+  return nock('http://localhost:8080', {
+    reqHeaders: {
+      Authorization: `Bearer ${bearerToken}`,
+    },
+  })
+    .get(`/api/v1/kolide/queries/${queryID}`)
+    .reply(200, { query: { id: queryID } });
+};
+
 export const validGetConfigRequest = (bearerToken) => {
   return nock('http://localhost:8080', {
     reqHeaders: {
@@ -157,6 +167,7 @@ export default {
   validGetConfigRequest,
   validGetHostsRequest,
   validGetInvitesRequest,
+  validGetQueryRequest,
   validGetUsersRequest,
   validInviteUserRequest,
   validLoginRequest,

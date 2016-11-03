@@ -11,6 +11,7 @@ const {
   validGetConfigRequest,
   validGetHostsRequest,
   validGetInvitesRequest,
+  validGetQueryRequest,
   validGetUsersRequest,
   validInviteUserRequest,
   validLoginRequest,
@@ -85,6 +86,22 @@ describe('Kolide - API client', () => {
 
       Kolide.setBearerToken(bearerToken);
       Kolide.getInvites()
+        .then(() => {
+          expect(request.isDone()).toEqual(true);
+          done();
+        })
+        .catch(done);
+    });
+  });
+
+  describe('#getQuery', () => {
+    it('calls the appropriate endpoint with the correct parameters', (done) => {
+      const bearerToken = 'valid-bearer-token';
+      const queryID = 10;
+      const request = validGetQueryRequest(bearerToken, queryID);
+
+      Kolide.setBearerToken(bearerToken);
+      Kolide.getQuery(queryID)
         .then(() => {
           expect(request.isDone()).toEqual(true);
           done();

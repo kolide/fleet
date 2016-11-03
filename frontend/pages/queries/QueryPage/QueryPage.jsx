@@ -20,7 +20,6 @@ class QueryPage extends Component {
   static propTypes = {
     dispatch: PropTypes.func,
     query: queryInterface,
-    queryID: PropTypes.string,
     queryText: PropTypes.string,
     selectedOsqueryTable: osqueryTableInterface,
     selectedTargets: PropTypes.arrayOf(targetInterface),
@@ -243,7 +242,7 @@ const mapStateToProps = (state, { params }) => {
   const query = entityGetter(state).get('queries').findBy({ id: queryID });
   const { queryText, selectedOsqueryTable, selectedTargets } = state.components.QueryPages;
 
-  return { query, queryID, queryText, selectedOsqueryTable, selectedTargets };
+  return { query, queryText, selectedOsqueryTable, selectedTargets };
 };
 
 export default connect(mapStateToProps)(QueryPage);
