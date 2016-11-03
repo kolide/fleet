@@ -428,7 +428,11 @@ func TestGetClientConfig(t *testing.T) {
 	err = ds.AddLabelToPack(mysqlLabel.ID, monitoringPack.ID)
 	assert.Nil(t, err)
 
-	err = ds.RecordLabelQueryExecutions(host, map[string]bool{fmt.Sprintf("%d", mysqlLabel.ID): true}, mockClock.Now())
+	err = ds.RecordLabelQueryExecutions(
+		host,
+		map[string]bool{fmt.Sprintf("%d", mysqlLabel.ID): true},
+		mockClock.Now(),
+	)
 	assert.Nil(t, err)
 
 	// with a minimal setup of packs, labels, and queries, will our host get the

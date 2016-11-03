@@ -39,12 +39,11 @@ func makeGetLabelEndpoint(svc kolide.Service) endpoint.Endpoint {
 			return getLabelResponse{Err: err}, nil
 		}
 		return getLabelResponse{
-			labelResponse{
+			Label: labelResponse{
 				*label,
 				label.Name,
 				count,
 			},
-			nil,
 		}, nil
 	}
 }
@@ -72,7 +71,7 @@ func makeListLabelsEndpoint(svc kolide.Service) endpoint.Endpoint {
 			return listLabelsResponse{Err: err}, nil
 		}
 
-		resp := listLabelsResponse{Labels: []labelResponse{}}
+		resp := listLabelsResponse{}
 		for _, label := range labels {
 			count, err := svc.CountHostsInTargets(ctx, nil, []uint{label.ID})
 			if err != nil {
@@ -117,12 +116,11 @@ func makeCreateLabelEndpoint(svc kolide.Service) endpoint.Endpoint {
 			return createLabelResponse{Err: err}, nil
 		}
 		return createLabelResponse{
-			labelResponse{
+			Label: labelResponse{
 				*label,
 				label.Name,
 				count,
 			},
-			nil,
 		}, nil
 	}
 }
