@@ -40,6 +40,29 @@ describe('QueryComposer - component', () => {
     expect(component.find('SaveQueryForm').length).toEqual(1);
   });
 
+  it('renders the UpdateQueryForm when the query prop is present', () => {
+    const query = {
+      id: 1,
+      query: 'SELECT * FROM users',
+      name: 'Get all users',
+      description: 'This gets all of the users',
+    };
+    const component = mount(
+      <QueryComposer
+        onOsqueryTableSelect={noop}
+        onTextEditorInputChange={noop}
+        query={query}
+        selectedTargets={[]}
+        textEditorText="Hello world"
+      />
+    );
+
+    const form = component.find('UpdateQueryForm');
+
+    expect(form.length).toEqual(1);
+    expect(form.find('InputField').length).toEqual(2);
+  });
+
   it('renders the Run Query button as disabled without selected targets', () => {
     const component = mount(
       <QueryComposer

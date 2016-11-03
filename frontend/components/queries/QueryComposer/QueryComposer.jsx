@@ -4,10 +4,12 @@ import 'brace/mode/sql';
 import 'brace/ext/linking';
 
 import Button from 'components/buttons/Button';
+import queryInterface from 'interfaces/query';
 import SaveQueryFormModal from 'components/modals/SaveQueryFormModal';
 import SelectTargetsInput from 'components/queries/SelectTargetsInput';
 import SelectTargetsMenu from 'components/queries/SelectTargetsMenu';
 import targetInterface from 'interfaces/target';
+import UpdateQueryForm from 'components/forms/queries/UpdateQueryForm';
 import './mode';
 import './theme';
 
@@ -25,6 +27,8 @@ class QueryComposer extends Component {
     onTargetSelectInputChange: PropTypes.func,
     onTargetSelectMoreInfo: PropTypes.func,
     onTextEditorInputChange: PropTypes.func,
+    onUpdateQuery: PropTypes.func,
+    query: queryInterface,
     selectedTargets: PropTypes.arrayOf(targetInterface),
     selectedTargetsCount: PropTypes.number,
     targets: PropTypes.arrayOf(targetInterface),
@@ -76,6 +80,40 @@ class QueryComposer extends Component {
     return this.props.onSaveQueryFormSubmit(formData);
   }
 
+  renderQueryComposerActions = () => {
+    const { onRunQuery, onUpdateQuery, query, selectedTargets, textEditorText } = this.props;
+    const { onLoadSaveQueryModal, onSaveQueryFormSubmit } = this;
+
+    if (query) {
+      return (
+        <UpdateQueryForm
+          onRunQuery={onRunQuery}
+          onSaveAsNew={onSaveQueryFormSubmit}
+          onSaveChanges={onUpdateQuery}
+          query={query}
+          queryText={textEditorText}
+        />
+      );
+    }
+
+    return (
+      <div className={`${baseClass}__btn-wrapper`}>
+        <Button
+          className={`${baseClass}__save-query-btn`}
+          onClick={onLoadSaveQueryModal}
+          text="Save Query"
+          variant="inverse"
+        />
+        <Button
+          className={`${baseClass}__run-query-btn`}
+          disabled={!selectedTargets.length}
+          onClick={onRunQuery}
+          text="Run Query"
+        />
+      </div>
+    );
+  }
+
   renderSaveQueryFormModal = () => {
     const { isSaveQueryForm } = this.state;
     const {
@@ -100,7 +138,6 @@ class QueryComposer extends Component {
       isLoadingTargets,
       moreInfoTarget,
       onRemoveMoreInfoTarget,
-      onRunQuery,
       onTargetSelect,
       onTargetSelectInputChange,
       onTargetSelectMoreInfo,
@@ -112,7 +149,7 @@ class QueryComposer extends Component {
     } = this.props;
     const {
       onLoad,
-      onLoadSaveQueryModal,
+      renderQueryComposerActions,
       renderSaveQueryFormModal,
     } = this;
     const menuRenderer = SelectTargetsMenu(onTargetSelectMoreInfo, onRemoveMoreInfoTarget, moreInfoTarget);
@@ -152,20 +189,7 @@ class QueryComposer extends Component {
             targets={targets}
           />
         </div>
-        <div className={`${baseClass}__btn-wrapper`}>
-          <Button
-            className={`${baseClass}__save-query-btn`}
-            onClick={onLoadSaveQueryModal}
-            text="Save Query"
-            variant="inverse"
-          />
-          <Button
-            className={`${baseClass}__run-query-btn`}
-            disabled={!selectedTargets.length}
-            onClick={onRunQuery}
-            text="Run Query"
-          />
-        </div>
+        {renderQueryComposerActions()}
         {renderSaveQueryFormModal()}
       </div>
     );
