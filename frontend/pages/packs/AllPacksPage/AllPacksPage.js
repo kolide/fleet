@@ -1,5 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 
+import PackInfoSidePanel from '../../../components/side_panels/PackInfoSidePanel';
+
 class AllPacksPage extends Component {
   static propTypes = {
     children: PropTypes.node,
@@ -12,6 +14,7 @@ class AllPacksPage extends Component {
       <div>
         <h1>All Packs</h1>
         {children}
+        <PackInfoSidePanel />
       </div>
     );
   }
