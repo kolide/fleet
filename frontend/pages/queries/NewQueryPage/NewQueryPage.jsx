@@ -2,21 +2,24 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
 
-import debounce from '../../../utilities/debounce';
-import Kolide from '../../../kolide';
-import QueryComposer from '../../../components/queries/QueryComposer';
-import osqueryTableInterface from '../../../interfaces/osquery_table';
-import queryActions from '../../../redux/nodes/entities/queries/actions';
-import QuerySidePanel from '../../../components/side_panels/QuerySidePanel';
-import { removeRightSidePanel, showRightSidePanel } from '../../../redux/nodes/app/actions';
-import { renderFlash } from '../../../redux/nodes/notifications/actions';
-import { selectOsqueryTable, setQueryText, setSelectedTargets } from '../../../redux/nodes/components/QueryPages/actions';
-import targetInterface from '../../../interfaces/target';
-import { validateQuery } from './helpers';
+import debounce from 'utilities/debounce';
+import entityGetter from 'redux/utilities/entityGetter';
+import Kolide from 'kolide';
+import QueryComposer from 'components/queries/QueryComposer';
+import osqueryTableInterface from 'interfaces/osquery_table';
+import queryActions from 'redux/nodes/entities/queries/actions';
+import queryInterface from 'interfaces/query';
+import QuerySidePanel from 'components/side_panels/QuerySidePanel';
+import { removeRightSidePanel, showRightSidePanel } from 'redux/nodes/app/actions';
+import { renderFlash } from 'redux/nodes/notifications/actions';
+import { selectOsqueryTable, setQueryText, setSelectedTargets } from 'redux/nodes/components/QueryPages/actions';
+import targetInterface from 'interfaces/target';
+import { validateQuery } from 'pages/queries/NewQueryPage/helpers';
 
 class NewQueryPage extends Component {
   static propTypes = {
     dispatch: PropTypes.func,
+    query: queryInterface,
     queryText: PropTypes.string,
     selectedOsqueryTable: osqueryTableInterface,
     selectedTargets: PropTypes.arrayOf(targetInterface),
@@ -94,6 +97,10 @@ class NewQueryPage extends Component {
     return dispatch(queryActions.create(queryParams))
       .then((query) => {
         return dispatch(push(`/queries/${query.id}`));
+      })
+      .catch((errorResponse) => {
+        dispatch(renderFlash('error', errorResponse));
+        return false;
       });
   })
 
@@ -141,6 +148,14 @@ class NewQueryPage extends Component {
     return false;
   }
 
+  onUpdateQuery = (formData) => {
+    // TODO: call API to update the query
+
+    console.log('TODO: update query', formData);
+
+    return false;
+  };
+
   fetchTargets = (search) => {
     this.setState({ isLoadingTargets: true });
 
@@ -176,6 +191,7 @@ class NewQueryPage extends Component {
       onTargetSelect,
       onTargetSelectMoreInfo,
       onTextEditorInputChange,
+      onUpdateQuery,
     } = this;
     const {
       isLoadingTargets,
@@ -183,7 +199,12 @@ class NewQueryPage extends Component {
       selectedTargetsCount,
       targets,
     } = this.state;
-    const { queryText, selectedOsqueryTable, selectedTargets } = this.props;
+    const {
+      query,
+      queryText,
+      selectedOsqueryTable,
+      selectedTargets,
+    } = this.props;
 
     return (
       <div>
@@ -198,6 +219,8 @@ class NewQueryPage extends Component {
           onTargetSelectInputChange={fetchTargets}
           onTargetSelectMoreInfo={onTargetSelectMoreInfo}
           onTextEditorInputChange={onTextEditorInputChange}
+          onUpdateQuery={onUpdateQuery}
+          query={query}
           selectedTargets={selectedTargets}
           selectedTargetsCount={selectedTargetsCount}
           selectedOsqueryTable={selectedOsqueryTable}
@@ -214,10 +237,12 @@ class NewQueryPage extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, { params }) => {
+  const { id: queryID } = params;
+  const query = entityGetter(state).get('queries').findBy({ id: queryID });
   const { queryText, selectedOsqueryTable, selectedTargets } = state.components.QueryPages;
 
-  return { queryText, selectedOsqueryTable, selectedTargets };
+  return { query, queryText, selectedOsqueryTable, selectedTargets };
 };
 
 export default connect(mapStateToProps)(NewQueryPage);
