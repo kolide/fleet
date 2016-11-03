@@ -75,23 +75,23 @@ export default (admin) => {
       name: 'Packs',
       path: {
         regex: /^\/packs/,
-        location: '/packs/all'
+        location: '/packs/all',
       },
       subItems: [
         {
           name: 'All Packs',
           path: {
             regex: /\/all/,
-            location: '/packs/all'
-          }
+            location: '/packs/all',
+          },
         },
         {
           name: 'Pack Composer',
           path: {
             regex: /\/new/,
-            location: '/packs/new'
-          }
-        }
+            location: '/packs/new',
+          },
+        },
       ],
     },
     {
