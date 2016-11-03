@@ -81,6 +81,14 @@ class Kolide extends Base {
       .then((response) => { return response.hosts; });
   }
 
+  getQuery = (queryID) => {
+    const { QUERIES } = endpoints;
+    const getQueryEndpoint = `${this.baseURL}${QUERIES}/${queryID}`;
+
+    return this.authenticatedGet(getQueryEndpoint)
+      .then((response) => { console.log(response); return response.query; });
+  }
+
   getTargets = () => {
     const stubbedResponse = {
       targets: {

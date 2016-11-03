@@ -16,10 +16,11 @@ import { selectOsqueryTable, setQueryText, setSelectedTargets } from 'redux/node
 import targetInterface from 'interfaces/target';
 import { validateQuery } from 'pages/queries/NewQueryPage/helpers';
 
-class NewQueryPage extends Component {
+class QueryPage extends Component {
   static propTypes = {
     dispatch: PropTypes.func,
     query: queryInterface,
+    queryID: PropTypes.string,
     queryText: PropTypes.string,
     selectedOsqueryTable: osqueryTableInterface,
     selectedTargets: PropTypes.arrayOf(targetInterface),
@@ -27,6 +28,7 @@ class NewQueryPage extends Component {
 
   componentWillMount () {
     const { dispatch } = this.props;
+    console.log('queryID', this.props.queryID);
 
     this.state = {
       isLoadingTargets: false,
@@ -242,7 +244,7 @@ const mapStateToProps = (state, { params }) => {
   const query = entityGetter(state).get('queries').findBy({ id: queryID });
   const { queryText, selectedOsqueryTable, selectedTargets } = state.components.QueryPages;
 
-  return { query, queryText, selectedOsqueryTable, selectedTargets };
+  return { query, queryID, queryText, selectedOsqueryTable, selectedTargets };
 };
 
-export default connect(mapStateToProps)(NewQueryPage);
+export default connect(mapStateToProps)(QueryPage);
