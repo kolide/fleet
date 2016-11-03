@@ -165,7 +165,7 @@ const reduxConfig = ({
         .then((response) => {
           if (!response) return [];
 
-          const { entities } = normalize(parse(response), arrayOf(schema));
+          const { entities } = normalize(parse([response]), arrayOf(schema));
 
           return dispatch(loadSuccess(entities));
         })
