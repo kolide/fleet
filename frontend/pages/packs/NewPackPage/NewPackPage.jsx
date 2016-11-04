@@ -1,17 +1,18 @@
 import React, { Component, PropTypes } from 'react';
 
+import NewPack from '../../../components/packs/NewPack';
+import PackInfoSidePanel from '../../../components/side_panels/PackInfoSidePanel';
+
 class NewPackPage extends Component {
   static propTypes = {
-    children: PropTypes.node,
-  };
+    children: PropTypes.element,
+  }
 
   render () {
-    const { children } = this.props;
-
     return (
       <div>
-        <h1>New Pack</h1>
-        {children}
+        <NewPack />
+        <PackInfoSidePanel />
       </div>
     );
   }

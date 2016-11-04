@@ -1,0 +1,12 @@
+.all-packs {
+  &__title {
+    color: $text-medium;
+    display: inline-block;
+    font-size: $large;
+  }
+
+  &__wrapper {
+    background-color: $white;
+    padding: $base;
+  }
+}

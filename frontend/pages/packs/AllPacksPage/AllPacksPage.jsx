@@ -1,19 +1,17 @@
 import React, { Component, PropTypes } from 'react';
 
+import AllPacks from '../../../components/packs/AllPacks';
 import PackInfoSidePanel from '../../../components/side_panels/PackInfoSidePanel';
 
 class AllPacksPage extends Component {
   static propTypes = {
-    children: PropTypes.node,
-  };
+    children: PropTypes.element,
+  }
 
   render () {
-    const { children } = this.props;
-
     return (
       <div>
-        <h1>All Packs</h1>
-        {children}
+        <AllPacks />
         <PackInfoSidePanel />
       </div>
     );
