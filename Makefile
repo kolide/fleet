@@ -129,6 +129,7 @@ generate-dev: .prefix
 		frontend/templates/ assets/...
 	go-bindata -o=server/datastore/mysql/bindata.go -pkg=mysql db/
 	webpack --progress --colors --watch --notify
+	webpack --progress --colors --watch
 
 deps:
 	npm install
