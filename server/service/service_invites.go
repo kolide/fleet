@@ -9,7 +9,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-func (svc service) InviteNewUser(ctx context.Context, payload kolide.InvitePayload) (*kolide.Invite, error) {
+func (svc *service) InviteNewUser(ctx context.Context, payload kolide.InvitePayload) (*kolide.Invite, error) {
 	// verify that the user with the given email does not already exist
 	_, err := svc.ds.UserByEmail(*payload.Email)
 	if err == nil {
@@ -61,11 +61,11 @@ func (svc service) InviteNewUser(ctx context.Context, payload kolide.InvitePaylo
 	return invite, nil
 }
 
-func (svc service) ListInvites(ctx context.Context, opt kolide.ListOptions) ([]*kolide.Invite, error) {
+func (svc *service) ListInvites(ctx context.Context, opt kolide.ListOptions) ([]*kolide.Invite, error) {
 	return svc.ds.ListInvites(opt)
 }
 
-func (svc service) VerifyInvite(ctx context.Context, email, token string) error {
+func (svc *service) VerifyInvite(ctx context.Context, email, token string) error {
 	invite, err := svc.ds.InviteByEmail(email)
 	if err != nil {
 		return err
@@ -84,7 +84,7 @@ func (svc service) VerifyInvite(ctx context.Context, email, token string) error 
 
 }
 
-func (svc service) DeleteInvite(ctx context.Context, id uint) error {
+func (svc *service) DeleteInvite(ctx context.Context, id uint) error {
 	invite, err := svc.ds.Invite(id)
 	if err != nil {
 		return err

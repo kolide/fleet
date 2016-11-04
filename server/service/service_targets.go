@@ -5,7 +5,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-func (svc service) SearchTargets(ctx context.Context, query string, selectedHostIDs []uint, selectedLabelIDs []uint) (*kolide.TargetSearchResults, error) {
+func (svc *service) SearchTargets(ctx context.Context, query string, selectedHostIDs []uint, selectedLabelIDs []uint) (*kolide.TargetSearchResults, error) {
 	results := &kolide.TargetSearchResults{}
 
 	hosts, err := svc.ds.SearchHosts(query, selectedHostIDs)
@@ -23,7 +23,7 @@ func (svc service) SearchTargets(ctx context.Context, query string, selectedHost
 	return results, nil
 }
 
-func (svc service) CountHostsInTargets(ctx context.Context, hosts []uint, labels []uint) (uint, error) {
+func (svc *service) CountHostsInTargets(ctx context.Context, hosts []uint, labels []uint) (uint, error) {
 	hostsInLabels, err := svc.ds.ListUniqueHostsInLabels(labels)
 	if err != nil {
 		return 0, err

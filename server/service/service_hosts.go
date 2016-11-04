@@ -7,15 +7,15 @@ import (
 	"golang.org/x/net/context"
 )
 
-func (svc service) ListHosts(ctx context.Context, opt kolide.ListOptions) ([]*kolide.Host, error) {
+func (svc *service) ListHosts(ctx context.Context, opt kolide.ListOptions) ([]*kolide.Host, error) {
 	return svc.ds.ListHosts(opt)
 }
 
-func (svc service) GetHost(ctx context.Context, id uint) (*kolide.Host, error) {
+func (svc *service) GetHost(ctx context.Context, id uint) (*kolide.Host, error) {
 	return svc.ds.Host(id)
 }
 
-func (svc service) HostStatus(ctx context.Context, host kolide.Host) string {
+func (svc *service) HostStatus(ctx context.Context, host kolide.Host) string {
 	if host.UpdatedAt.Add(30 * time.Minute).Before(svc.clock.Now()) {
 		return "offline"
 	} else {
@@ -23,7 +23,7 @@ func (svc service) HostStatus(ctx context.Context, host kolide.Host) string {
 	}
 }
 
-func (svc service) DeleteHost(ctx context.Context, id uint) error {
+func (svc *service) DeleteHost(ctx context.Context, id uint) error {
 	host, err := svc.ds.Host(id)
 	if err != nil {
 		return err

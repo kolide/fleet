@@ -5,15 +5,15 @@ import (
 	"golang.org/x/net/context"
 )
 
-func (svc service) ListLabels(ctx context.Context, opt kolide.ListOptions) ([]*kolide.Label, error) {
+func (svc *service) ListLabels(ctx context.Context, opt kolide.ListOptions) ([]*kolide.Label, error) {
 	return svc.ds.ListLabels(opt)
 }
 
-func (svc service) GetLabel(ctx context.Context, id uint) (*kolide.Label, error) {
+func (svc *service) GetLabel(ctx context.Context, id uint) (*kolide.Label, error) {
 	return svc.ds.Label(id)
 }
 
-func (svc service) NewLabel(ctx context.Context, p kolide.LabelPayload) (*kolide.Label, error) {
+func (svc *service) NewLabel(ctx context.Context, p kolide.LabelPayload) (*kolide.Label, error) {
 	label := &kolide.Label{}
 
 	if p.Name == nil {
@@ -41,6 +41,6 @@ func (svc service) NewLabel(ctx context.Context, p kolide.LabelPayload) (*kolide
 	return label, nil
 }
 
-func (svc service) DeleteLabel(ctx context.Context, id uint) error {
+func (svc *service) DeleteLabel(ctx context.Context, id uint) error {
 	return svc.ds.DeleteLabel(id)
 }

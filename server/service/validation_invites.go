@@ -5,7 +5,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-func (mw validationMiddleware) InviteNewUser(ctx context.Context, payload kolide.InvitePayload) (*kolide.Invite, error) {
+func (mw *validationMiddleware) InviteNewUser(ctx context.Context, payload kolide.InvitePayload) (*kolide.Invite, error) {
 	invalid := &invalidArgumentError{}
 	if payload.Email == nil {
 		invalid.Append("email", "missing required argument")

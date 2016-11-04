@@ -5,15 +5,15 @@ import (
 	"golang.org/x/net/context"
 )
 
-func (svc service) ListQueries(ctx context.Context, opt kolide.ListOptions) ([]*kolide.Query, error) {
+func (svc *service) ListQueries(ctx context.Context, opt kolide.ListOptions) ([]*kolide.Query, error) {
 	return svc.ds.ListQueries(opt)
 }
 
-func (svc service) GetQuery(ctx context.Context, id uint) (*kolide.Query, error) {
+func (svc *service) GetQuery(ctx context.Context, id uint) (*kolide.Query, error) {
 	return svc.ds.Query(id)
 }
 
-func (svc service) NewQuery(ctx context.Context, p kolide.QueryPayload) (*kolide.Query, error) {
+func (svc *service) NewQuery(ctx context.Context, p kolide.QueryPayload) (*kolide.Query, error) {
 	query := &kolide.Query{}
 
 	if p.Name != nil {
@@ -55,7 +55,7 @@ func (svc service) NewQuery(ctx context.Context, p kolide.QueryPayload) (*kolide
 	return query, nil
 }
 
-func (svc service) ModifyQuery(ctx context.Context, id uint, p kolide.QueryPayload) (*kolide.Query, error) {
+func (svc *service) ModifyQuery(ctx context.Context, id uint, p kolide.QueryPayload) (*kolide.Query, error) {
 	query, err := svc.ds.Query(id)
 	if err != nil {
 		return nil, err
@@ -101,7 +101,7 @@ func (svc service) ModifyQuery(ctx context.Context, id uint, p kolide.QueryPaylo
 	return query, nil
 }
 
-func (svc service) DeleteQuery(ctx context.Context, id uint) error {
+func (svc *service) DeleteQuery(ctx context.Context, id uint) error {
 	query, err := svc.ds.Query(id)
 	if err != nil {
 		return err

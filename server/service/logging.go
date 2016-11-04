@@ -13,5 +13,5 @@ type loggingMiddleware struct {
 
 // NewLoggingService takes an existing service and adds a logging wrapper
 func NewLoggingService(svc kolide.Service, logger kitlog.Logger) kolide.Service {
-	return loggingMiddleware{Service: svc, logger: logger}
+	return &loggingMiddleware{Service: svc, logger: logger}
 }

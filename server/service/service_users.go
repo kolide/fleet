@@ -11,7 +11,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-func (svc service) NewUser(ctx context.Context, p kolide.UserPayload) (*kolide.User, error) {
+func (svc *service) NewUser(ctx context.Context, p kolide.UserPayload) (*kolide.User, error) {
 	err := svc.VerifyInvite(ctx, *p.Email, *p.InviteToken)
 	if err != nil {
 		return nil, err
@@ -35,7 +35,7 @@ func (svc service) NewUser(ctx context.Context, p kolide.UserPayload) (*kolide.U
 	return user, nil
 }
 
-func (svc service) ModifyUser(ctx context.Context, userID uint, p kolide.UserPayload) (*kolide.User, error) {
+func (svc *service) ModifyUser(ctx context.Context, userID uint, p kolide.UserPayload) (*kolide.User, error) {
 	user, err := svc.User(ctx, userID)
 	if err != nil {
 		return nil, err
@@ -100,11 +100,11 @@ func (svc service) ModifyUser(ctx context.Context, userID uint, p kolide.UserPay
 	return svc.User(ctx, userID)
 }
 
-func (svc service) User(ctx context.Context, id uint) (*kolide.User, error) {
+func (svc *service) User(ctx context.Context, id uint) (*kolide.User, error) {
 	return svc.ds.UserByID(id)
 }
 
-func (svc service) AuthenticatedUser(ctx context.Context) (*kolide.User, error) {
+func (svc *service) AuthenticatedUser(ctx context.Context) (*kolide.User, error) {
 	vc, ok := viewer.FromContext(ctx)
 	if !ok {
 		return nil, errNoContext
@@ -115,11 +115,11 @@ func (svc service) AuthenticatedUser(ctx context.Context) (*kolide.User, error) 
 	return vc.User, nil
 }
 
-func (svc service) ListUsers(ctx context.Context, opt kolide.ListOptions) ([]*kolide.User, error) {
+func (svc *service) ListUsers(ctx context.Context, opt kolide.ListOptions) ([]*kolide.User, error) {
 	return svc.ds.ListUsers(opt)
 }
 
-func (svc service) ResetPassword(ctx context.Context, token, password string) error {
+func (svc *service) ResetPassword(ctx context.Context, token, password string) error {
 	reset, err := svc.ds.FindPassswordResetByToken(token)
 	if err != nil {
 		return err
@@ -145,7 +145,7 @@ func (svc service) ResetPassword(ctx context.Context, token, password string) er
 	return nil
 }
 
-func (svc service) RequestPasswordReset(ctx context.Context, email string) error {
+func (svc *service) RequestPasswordReset(ctx context.Context, email string) error {
 	// the password reset is different depending on whether performed by an
 	// admin or a user
 	// if an admin requests a password reset, then no token is
@@ -205,7 +205,7 @@ func (svc service) RequestPasswordReset(ctx context.Context, email string) error
 // saves user in datastore.
 // doesn't need to be exposed to the transport
 // the service should expose actions for modifying a user instead
-func (svc service) saveUser(user *kolide.User) error {
+func (svc *service) saveUser(user *kolide.User) error {
 	return svc.ds.SaveUser(user)
 }
 
