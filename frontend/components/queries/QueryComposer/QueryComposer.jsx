@@ -3,10 +3,8 @@ import AceEditor from 'react-ace';
 import 'brace/mode/sql';
 import 'brace/ext/linking';
 
-import Button from 'components/buttons/Button';
 import QueryForm from 'components/forms/queries/QueryForm';
 import queryInterface from 'interfaces/query';
-import SaveQueryFormModal from 'components/modals/SaveQueryFormModal';
 import SelectTargetsInput from 'components/queries/SelectTargetsInput';
 import SelectTargetsMenu from 'components/queries/SelectTargetsMenu';
 import targetInterface from 'interfaces/target';
@@ -74,61 +72,22 @@ class QueryComposer extends Component {
     return false;
   }
 
-  onSaveQueryFormSubmit = (formData) => {
-    this.setState({ isSaveQueryForm: false });
-
-    return this.props.onSaveQueryFormSubmit(formData);
-  }
-
   renderQueryComposerActions = () => {
-    const { onRunQuery, onUpdateQuery, query, selectedTargets, textEditorText } = this.props;
-    const { onLoadSaveQueryModal, onSaveQueryFormSubmit } = this;
-
-    if (query) {
-      return (
-        <QueryForm
-          onRunQuery={onRunQuery}
-          onSaveAsNew={onSaveQueryFormSubmit}
-          onSaveChanges={onUpdateQuery}
-          query={query}
-          queryText={textEditorText}
-        />
-      );
-    }
-
-    return (
-      <div className={`${baseClass}__btn-wrapper`}>
-        <Button
-          className={`${baseClass}__save-query-btn`}
-          onClick={onLoadSaveQueryModal}
-          text="Save Query"
-          variant="inverse"
-        />
-        <Button
-          className={`${baseClass}__run-query-btn`}
-          disabled={!selectedTargets.length}
-          onClick={onRunQuery}
-          text="Run Query"
-        />
-      </div>
-    );
-  }
-
-  renderSaveQueryFormModal = () => {
-    const { isSaveQueryForm } = this.state;
     const {
+      onRunQuery,
       onSaveQueryFormSubmit,
-      onSaveQueryFormCancel,
-    } = this;
-
-    if (!isSaveQueryForm) {
-      return false;
-    }
+      onUpdateQuery,
+      query,
+      textEditorText,
+    } = this.props;
 
     return (
-      <SaveQueryFormModal
-        onCancel={onSaveQueryFormCancel}
-        onSubmit={onSaveQueryFormSubmit}
+      <QueryForm
+        onRunQuery={onRunQuery}
+        onSaveAsNew={onSaveQueryFormSubmit}
+        onSaveChanges={onUpdateQuery}
+        query={query}
+        queryText={textEditorText}
       />
     );
   }
@@ -150,7 +109,6 @@ class QueryComposer extends Component {
     const {
       onLoad,
       renderQueryComposerActions,
-      renderSaveQueryFormModal,
     } = this;
     const menuRenderer = SelectTargetsMenu(onTargetSelectMoreInfo, onRemoveMoreInfoTarget, moreInfoTarget);
 
@@ -190,7 +148,6 @@ class QueryComposer extends Component {
           />
         </div>
         {renderQueryComposerActions()}
-        {renderSaveQueryFormModal()}
       </div>
     );
   }

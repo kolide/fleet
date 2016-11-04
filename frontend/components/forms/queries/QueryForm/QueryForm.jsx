@@ -1,7 +1,8 @@
 import React, { Component, PropTypes } from 'react';
+import { isEqual } from 'lodash';
 
 import Button from 'components/buttons/Button';
-import { formNotChanged } from 'components/forms/queries/QueryForm/helpers';
+import helpers from 'components/forms/queries/QueryForm/helpers';
 import InputField from 'components/forms/fields/InputField';
 import queryInterface from 'interfaces/query';
 import validatePresence from 'components/forms/validators/validate_presence';
@@ -13,12 +14,18 @@ class QueryForm extends Component {
     onRunQuery: PropTypes.func,
     onSaveAsNew: PropTypes.func,
     onSaveChanges: PropTypes.func,
-    query: queryInterface.isRequired,
+    query: queryInterface,
     queryText: PropTypes.string.isRequired,
+  };
+
+  static defaultProps = {
+    query: {},
   };
 
   constructor (props) {
     super(props);
+
+    const { query: { description, name }, queryText } = this.props;
 
     this.state = {
       errors: {
@@ -26,15 +33,16 @@ class QueryForm extends Component {
         name: null,
       },
       formData: {
-        description: null,
-        name: null,
-        queryText: null,
+        description,
+        name,
+        queryText,
       },
     };
   }
 
-  componentWillMount = () => {
-    const { query: { description, name }, queryText } = this.props;
+  componentDidMount = () => {
+    const { query, queryText } = this.props;
+    const { description, name } = query;
 
     this.setState({
       formData: {
@@ -46,13 +54,14 @@ class QueryForm extends Component {
   }
 
   componentWillReceiveProps = (nextProps) => {
-    const { formData } = this.state;
-    const { queryText } = nextProps;
+    const { query, queryText } = nextProps;
+    const { query: staleQuery, queryText: staleQueryText } = this.props;
 
-    if (queryText !== this.props.queryText) {
+    if (!isEqual(query, staleQuery) || !isEqual(queryText, staleQueryText)) {
       this.setState({
         formData: {
-          ...formData,
+          description: query.description,
+          name: query.name,
           queryText,
         },
       });
@@ -136,33 +145,34 @@ class QueryForm extends Component {
     } = this.state;
     const { onFieldChange, onSaveAsNew, onSaveChanges } = this;
     const { onRunQuery, query } = this.props;
+    const { canSaveAsNew, canSaveChanges } = helpers;
 
     return (
       <form>
         <InputField
-          value={name}
           error={errors.name}
           label="Query Title:"
           name="name"
           onChange={onFieldChange('name')}
+          value={name}
         />
         <InputField
-          value={description}
           error={errors.description}
           label="Query Description:"
           name="description"
           onChange={onFieldChange('description')}
+          value={description}
         />
         <Button
           className={`${baseClass}__save-changes-btn`}
-          disabled={formNotChanged(formData, query)}
+          disabled={!canSaveChanges(formData, query)}
           onClick={onSaveChanges}
           text="Save Changes"
           variant="inverse"
         />
         <Button
           className={`${baseClass}__save-as-new-btn`}
-          disabled={formNotChanged(formData, query)}
+          disabled={!canSaveAsNew(formData, query)}
           onClick={onSaveAsNew}
           text="Save As New..."
         />

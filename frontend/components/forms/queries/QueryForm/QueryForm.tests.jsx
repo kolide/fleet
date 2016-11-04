@@ -120,16 +120,16 @@ describe('QueryForm - component', () => {
     const onSaveAsNewSpy = createSpy();
     const form = mount(<QueryForm query={query} queryText={queryText} onSaveAsNew={onSaveAsNewSpy} />);
     const inputFields = form.find('InputField');
-    const descriptionInput = inputFields.find({ name: 'description' });
+    const nameInput = inputFields.find({ name: 'name' });
     const saveAsNewBtn = form.find('.query-form__save-as-new-btn');
 
-    fillInFormInput(descriptionInput, 'New query description');
+    fillInFormInput(nameInput, 'New query name');
 
     saveAsNewBtn.simulate('click');
 
     expect(onSaveAsNewSpy).toHaveBeenCalledWith({
-      description: 'New query description',
-      name: query.name,
+      description: query.description,
+      name: 'New query name',
       queryText,
     });
   });

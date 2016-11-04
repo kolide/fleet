@@ -15,6 +15,7 @@ describe('QueryPage - component', () => {
   const mockStore = reduxMockStore({
     components: {
       QueryPages: {
+        queryText: 'SELECT * FROM users',
         selectedOsqueryTable: defaultSelectedOsqueryTable,
         selectedTargets: [],
       },
