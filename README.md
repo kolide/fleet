@@ -58,6 +58,15 @@ to re-run `make deps` if a new Go or JavaScript dependency was added.
 
 ### Building
 
+#### Generate packaged SQL statements
+SQL statements used to generate the Kolide database are bundled into the kolide binary.  
+These statements are included under the db directory. If the SQL statements are changed,
+say a table is added for example, bindata.go can be manually generated as follows.
+
+```
+make generate-db
+```
+
 #### Generating the packaged JavaScript
 
 To generate all necessary code (bundling JavaScript into Go, etc), run the
@@ -173,7 +182,7 @@ Tests fail with following message.
 ```
 This problem occurs when the tests are run when the database schema already exists. For exmaple if you run kolide prepare db,
 creating the database and then run database tests you will get this error. To fix manually drop the
-tables of the kolide database and then run tests. 
+tables of the kolide database and then run tests.
 
 
 #### JavaScript unit tests
