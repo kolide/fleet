@@ -18,8 +18,7 @@ class InputFieldWithIcon extends InputField {
   };
 
   renderHeading = () => {
-    const { error, placeholder } = this.props;
-    const { value } = this.state;
+    const { error, placeholder, value } = this.props;
 
     const labelClasses = classnames(
       `${baseClass}__label`,
@@ -34,8 +33,7 @@ class InputFieldWithIcon extends InputField {
   }
 
   render () {
-    const { error, iconName, name, placeholder, type } = this.props;
-    const { value } = this.state;
+    const { error, iconName, name, placeholder, type, value } = this.props;
     const { onInputChange } = this;
 
     const inputClasses = classnames(
@@ -62,7 +60,7 @@ class InputFieldWithIcon extends InputField {
           placeholder={placeholder}
           ref={(r) => { this.input = r; }}
           type={type}
-          value={value}
+          value={value || ''}
         />
         {iconName && <i className={iconClasses} />}
       </div>

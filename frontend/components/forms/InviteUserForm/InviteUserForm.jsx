@@ -48,9 +48,8 @@ class InviteUserForm extends Component {
   }
 
   onInputChange = (formField) => {
-    return ({ target }) => {
+    return (value) => {
       const { errors, formData } = this.state;
-      const { value } = target;
 
       this.setState({
         errors: {
@@ -116,7 +115,7 @@ class InviteUserForm extends Component {
   }
 
   render () {
-    const { errors, formData: { admin } } = this.state;
+    const { errors, formData: { admin, email, name } } = this.state;
     const { onCancel } = this.props;
     const { onFormSubmit, onInputChange } = this;
 
@@ -128,12 +127,14 @@ class InviteUserForm extends Component {
           name="name"
           onChange={onInputChange('name')}
           placeholder="Name"
+          value={name}
         />
         <InputFieldWithIcon
           error={errors.email}
           name="email"
           onChange={onInputChange('email')}
           placeholder="Email"
+          value={email}
         />
         <div className={`${baseClass}__radio`}>
           <p className={`${baseClass}__role`}>role</p>
