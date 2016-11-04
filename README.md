@@ -64,7 +64,7 @@ These statements are included under the db directory. If the SQL statements are 
 say a table is added for example, bindata.go can be manually generated as follows.
 
 ```
-make generate-db
+make generate
 ```
 
 #### Generating the packaged JavaScript
