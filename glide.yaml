@@ -83,3 +83,4 @@ import:
   version: ^1.0.0
   subpackages:
   - redis
+- package: github.com/jmoiron/sqlx
