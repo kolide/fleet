@@ -162,8 +162,7 @@ SELECT
 	l.id,
 	l.created_at,
 	l.updated_at,
-	l.name,
-	l.query_id
+	l.name
 FROM
 	labels l
 JOIN
