@@ -23,13 +23,13 @@ class EditUserForm extends Component {
   }
 
   onInputChange = (fieldName) => {
-    return (evt) => {
+    return (value) => {
       const { formData } = this.state;
 
       this.setState({
         formData: {
           ...formData,
-          [fieldName]: evt.target.value,
+          [fieldName]: value,
         },
       });
 
@@ -54,6 +54,7 @@ class EditUserForm extends Component {
       username,
     } = user;
     const { onFormSubmit, onInputChange } = this;
+    const { formData } = this.state;
 
     return (
       <form className={baseClass} onSubmit={onFormSubmit}>
@@ -65,6 +66,7 @@ class EditUserForm extends Component {
           onChange={onInputChange('name')}
           inputWrapperClass={`${baseClass}__input-wrap ${baseClass}__input-wrap--first`}
           inputClassName={`${baseClass}__input`}
+          value={formData.name}
         />
         <div className={`${baseClass}__avatar-wrap`}>
           <Avatar user={user} className="user-block__avatar" />
@@ -77,6 +79,7 @@ class EditUserForm extends Component {
           onChange={onInputChange('username')}
           inputWrapperClass={`${baseClass}__input-wrap`}
           inputClassName={`${baseClass}__input ${baseClass}__input--username`}
+          value={formData.username}
         />
         <InputField
           defaultValue={position}
@@ -86,6 +89,7 @@ class EditUserForm extends Component {
           onChange={onInputChange('position')}
           inputWrapperClass={`${baseClass}__input-wrap`}
           inputClassName={`${baseClass}__input`}
+          value={formData.position}
         />
         <InputField
           defaultValue={email}
@@ -95,6 +99,7 @@ class EditUserForm extends Component {
           name="email"
           onChange={onInputChange('email')}
           inputClassName={`${baseClass}__input ${baseClass}__input--email`}
+          value={formData.email}
         />
         <div className={`${baseClass}__btn-wrap`}>
           <Button

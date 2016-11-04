@@ -62,9 +62,8 @@ class QueryForm extends Component {
   }
 
   onFieldChange = (name) => {
-    return (evt) => {
+    return (value) => {
       const { formData } = this.state;
-      const { value } = evt.target;
 
       this.setState({
         formData: {
@@ -141,14 +140,14 @@ class QueryForm extends Component {
     return (
       <form>
         <InputField
-          defaultValue={name}
+          value={name}
           error={errors.name}
           label="Query Title:"
           name="name"
           onChange={onFieldChange('name')}
         />
         <InputField
-          defaultValue={description}
+          value={description}
           error={errors.description}
           label="Query Description:"
           name="description"
