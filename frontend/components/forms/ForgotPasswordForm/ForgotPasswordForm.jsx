@@ -22,7 +22,7 @@ class ForgotPasswordForm extends Component {
         email: null,
       },
       formData: {
-        email: null,
+        email: '',
       },
     };
   }

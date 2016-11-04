@@ -19,8 +19,8 @@ class ResetPasswordForm extends Component {
         new_password_confirmation: null,
       },
       formData: {
-        new_password: null,
-        new_password_confirmation: null,
+        new_password: '',
+        new_password_confirmation: '',
       },
     };
   }

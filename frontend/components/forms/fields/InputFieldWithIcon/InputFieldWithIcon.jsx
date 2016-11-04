@@ -8,7 +8,6 @@ const baseClass = 'input-icon-field';
 class InputFieldWithIcon extends InputField {
   static propTypes = {
     autofocus: PropTypes.bool,
-    defaultValue: PropTypes.string,
     error: PropTypes.string,
     iconName: PropTypes.string,
     name: PropTypes.string,
@@ -40,7 +39,7 @@ class InputFieldWithIcon extends InputField {
       `${baseClass}__input`,
       'input-with-icon',
       { [`${baseClass}__input--error`]: error },
-      { [`${baseClass}__input--password`]: type === 'password' && value }
+      { [`${baseClass}__input--password`]: type === 'password' }
     );
 
     const iconClasses = classnames(
@@ -60,7 +59,7 @@ class InputFieldWithIcon extends InputField {
           placeholder={placeholder}
           ref={(r) => { this.input = r; }}
           type={type}
-          value={value || ''}
+          value={value}
         />
         {iconName && <i className={iconClasses} />}
       </div>

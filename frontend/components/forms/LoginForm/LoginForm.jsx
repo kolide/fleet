@@ -36,8 +36,8 @@ class LoginForm extends Component {
         password: null,
       },
       formData: {
-        username: null,
-        password: null,
+        username: '',
+        password: '',
       },
     };
   }
