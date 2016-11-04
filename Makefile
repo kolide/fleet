@@ -78,7 +78,7 @@ else
 	mkdir -p build
 endif
 
-build: generate-db .prefix
+build: .prefix
 	${GC_OFF} go build -i -o ${OUTPUT} -ldflags "\
 	-X github.com/kolide/kolide-ose/server/version.version=${VERSION} \
 	-X github.com/kolide/kolide-ose/server/version.branch=${BRANCH} \
@@ -99,7 +99,7 @@ lint-go:
 
 lint: lint-go lint-js lint-scss lint-ts
 
-test-go: generate-db
+test-go:
 	go test -cover $(shell glide nv)
 
 test-js:
@@ -112,13 +112,12 @@ test-js:
 test: lint test-go test-js
 
 generate: .prefix
+	go-bindata -o=server/datastore/mysql/bindata.go -pkg=mysql db/
 	webpack --progress --colors
 	go-bindata -pkg=service \
 		-o=server/service/bindata.go \
 		frontend/templates/ assets/...
 
-generate-db:
-	go-bindata -o=server/datastore/mysql/bindata.go -pkg=mysql db/
 
 # we first generate the webpack bundle so that bindata knows to watch the
 # output bundle file. then, generate debug bindata source file. finally, we
