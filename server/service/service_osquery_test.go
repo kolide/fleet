@@ -82,7 +82,7 @@ func TestSubmitStatusLogs(t *testing.T) {
 	host := hosts[0]
 
 	// Hack to get at the service internals and modify the writer
-	serv := ((svc.(validationMiddleware)).Service).(service)
+	serv := ((svc.(*validationMiddleware)).Service).(*service)
 
 	// Error due to missing host
 	err = serv.SubmitResultLogs(ctx, []kolide.OsqueryResultLog{})
@@ -154,7 +154,7 @@ func TestSubmitResultLogs(t *testing.T) {
 	host := hosts[0]
 
 	// Hack to get at the service internals and modify the writer
-	serv := ((svc.(validationMiddleware)).Service).(service)
+	serv := ((svc.(*validationMiddleware)).Service).(*service)
 
 	// Error due to missing host
 	err = serv.SubmitResultLogs(ctx, []kolide.OsqueryResultLog{})

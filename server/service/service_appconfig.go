@@ -5,7 +5,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-func (svc service) NewOrgInfo(ctx context.Context, p kolide.OrgInfoPayload) (*kolide.OrgInfo, error) {
+func (svc *service) NewOrgInfo(ctx context.Context, p kolide.OrgInfoPayload) (*kolide.OrgInfo, error) {
 	info := &kolide.OrgInfo{}
 	if p.OrgName != nil {
 		info.OrgName = *p.OrgName
@@ -20,11 +20,11 @@ func (svc service) NewOrgInfo(ctx context.Context, p kolide.OrgInfoPayload) (*ko
 	return info, nil
 }
 
-func (svc service) OrgInfo(ctx context.Context) (*kolide.OrgInfo, error) {
+func (svc *service) OrgInfo(ctx context.Context) (*kolide.OrgInfo, error) {
 	return svc.ds.OrgInfo()
 }
 
-func (svc service) ModifyOrgInfo(ctx context.Context, p kolide.OrgInfoPayload) (*kolide.OrgInfo, error) {
+func (svc *service) ModifyOrgInfo(ctx context.Context, p kolide.OrgInfoPayload) (*kolide.OrgInfo, error) {
 	info, err := svc.ds.OrgInfo()
 	if err != nil {
 		return nil, err

@@ -5,15 +5,15 @@ import (
 	"golang.org/x/net/context"
 )
 
-func (svc service) ListPacks(ctx context.Context, opt kolide.ListOptions) ([]*kolide.Pack, error) {
+func (svc *service) ListPacks(ctx context.Context, opt kolide.ListOptions) ([]*kolide.Pack, error) {
 	return svc.ds.ListPacks(opt)
 }
 
-func (svc service) GetPack(ctx context.Context, id uint) (*kolide.Pack, error) {
+func (svc *service) GetPack(ctx context.Context, id uint) (*kolide.Pack, error) {
 	return svc.ds.Pack(id)
 }
 
-func (svc service) NewPack(ctx context.Context, p kolide.PackPayload) (*kolide.Pack, error) {
+func (svc *service) NewPack(ctx context.Context, p kolide.PackPayload) (*kolide.Pack, error) {
 	var pack kolide.Pack
 
 	if p.Name != nil {
@@ -31,7 +31,7 @@ func (svc service) NewPack(ctx context.Context, p kolide.PackPayload) (*kolide.P
 	return &pack, nil
 }
 
-func (svc service) ModifyPack(ctx context.Context, id uint, p kolide.PackPayload) (*kolide.Pack, error) {
+func (svc *service) ModifyPack(ctx context.Context, id uint, p kolide.PackPayload) (*kolide.Pack, error) {
 	pack, err := svc.ds.Pack(id)
 	if err != nil {
 		return nil, err
@@ -53,15 +53,15 @@ func (svc service) ModifyPack(ctx context.Context, id uint, p kolide.PackPayload
 	return pack, err
 }
 
-func (svc service) DeletePack(ctx context.Context, id uint) error {
+func (svc *service) DeletePack(ctx context.Context, id uint) error {
 	return svc.ds.DeletePack(id)
 }
 
-func (svc service) AddQueryToPack(ctx context.Context, qid, pid uint) error {
+func (svc *service) AddQueryToPack(ctx context.Context, qid, pid uint) error {
 	return svc.ds.AddQueryToPack(qid, pid)
 }
 
-func (svc service) ListQueriesInPack(ctx context.Context, id uint) ([]*kolide.Query, error) {
+func (svc *service) ListQueriesInPack(ctx context.Context, id uint) ([]*kolide.Query, error) {
 	pack, err := svc.ds.Pack(id)
 	if err != nil {
 		return nil, err
@@ -75,7 +75,7 @@ func (svc service) ListQueriesInPack(ctx context.Context, id uint) ([]*kolide.Qu
 	return queries, nil
 }
 
-func (svc service) RemoveQueryFromPack(ctx context.Context, qid, pid uint) error {
+func (svc *service) RemoveQueryFromPack(ctx context.Context, qid, pid uint) error {
 	pack, err := svc.ds.Pack(pid)
 	if err != nil {
 		return err
@@ -93,11 +93,11 @@ func (svc service) RemoveQueryFromPack(ctx context.Context, qid, pid uint) error
 
 	return nil
 }
-func (svc service) AddLabelToPack(ctx context.Context, lid, pid uint) error {
+func (svc *service) AddLabelToPack(ctx context.Context, lid, pid uint) error {
 	return svc.ds.AddLabelToPack(lid, pid)
 }
 
-func (svc service) ListLabelsForPack(ctx context.Context, pid uint) ([]*kolide.Label, error) {
+func (svc *service) ListLabelsForPack(ctx context.Context, pid uint) ([]*kolide.Label, error) {
 	pack, err := svc.ds.Pack(pid)
 	if err != nil {
 		return nil, err
@@ -111,7 +111,7 @@ func (svc service) ListLabelsForPack(ctx context.Context, pid uint) ([]*kolide.L
 	return labels, nil
 }
 
-func (svc service) RemoveLabelFromPack(ctx context.Context, lid, pid uint) error {
+func (svc *service) RemoveLabelFromPack(ctx context.Context, lid, pid uint) error {
 	pack, err := svc.ds.Pack(pid)
 	if err != nil {
 		return err
@@ -130,7 +130,7 @@ func (svc service) RemoveLabelFromPack(ctx context.Context, lid, pid uint) error
 	return nil
 }
 
-func (svc service) ListPacksForHost(ctx context.Context, hid uint) ([]*kolide.Pack, error) {
+func (svc *service) ListPacksForHost(ctx context.Context, hid uint) ([]*kolide.Pack, error) {
 	packs := []*kolide.Pack{}
 
 	// we will need to give some subset of packs to this host based on the

@@ -25,7 +25,7 @@ func NewService(ds kolide.Datastore, logger kitlog.Logger, kolideConfig config.K
 		}
 	}
 
-	svc = service{
+	svc = &service{
 		ds:     ds,
 		logger: logger,
 		config: kolideConfig,
@@ -35,7 +35,7 @@ func NewService(ds kolide.Datastore, logger kitlog.Logger, kolideConfig config.K
 		osqueryResultLogWriter: logFile(kolideConfig.Osquery.ResultLogFile),
 		mailService:            mailService,
 	}
-	svc = validationMiddleware{svc}
+	svc = &validationMiddleware{svc}
 	return svc, nil
 }
 

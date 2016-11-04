@@ -8,7 +8,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-func (mw loggingMiddleware) NewUser(ctx context.Context, p kolide.UserPayload) (*kolide.User, error) {
+func (mw *loggingMiddleware) NewUser(ctx context.Context, p kolide.UserPayload) (*kolide.User, error) {
 	var (
 		user         *kolide.User
 		err          error
@@ -39,7 +39,7 @@ func (mw loggingMiddleware) NewUser(ctx context.Context, p kolide.UserPayload) (
 	return user, err
 }
 
-func (mw loggingMiddleware) ModifyUser(ctx context.Context, userID uint, p kolide.UserPayload) (*kolide.User, error) {
+func (mw *loggingMiddleware) ModifyUser(ctx context.Context, userID uint, p kolide.UserPayload) (*kolide.User, error) {
 	var (
 		user     *kolide.User
 		err      error
@@ -70,7 +70,7 @@ func (mw loggingMiddleware) ModifyUser(ctx context.Context, userID uint, p kolid
 	return user, err
 }
 
-func (mw loggingMiddleware) User(ctx context.Context, id uint) (*kolide.User, error) {
+func (mw *loggingMiddleware) User(ctx context.Context, id uint) (*kolide.User, error) {
 	var (
 		user     *kolide.User
 		err      error
@@ -94,7 +94,7 @@ func (mw loggingMiddleware) User(ctx context.Context, id uint) (*kolide.User, er
 	return user, err
 }
 
-func (mw loggingMiddleware) AuthenticatedUser(ctx context.Context) (*kolide.User, error) {
+func (mw *loggingMiddleware) AuthenticatedUser(ctx context.Context) (*kolide.User, error) {
 	var (
 		user     *kolide.User
 		err      error
@@ -118,7 +118,7 @@ func (mw loggingMiddleware) AuthenticatedUser(ctx context.Context) (*kolide.User
 	return user, err
 }
 
-func (mw loggingMiddleware) ResetPassword(ctx context.Context, token, password string) error {
+func (mw *loggingMiddleware) ResetPassword(ctx context.Context, token, password string) error {
 	var err error
 
 	defer func(begin time.Time) {
@@ -133,7 +133,7 @@ func (mw loggingMiddleware) ResetPassword(ctx context.Context, token, password s
 	return err
 }
 
-func (mw loggingMiddleware) RequestPasswordReset(ctx context.Context, email string) error {
+func (mw *loggingMiddleware) RequestPasswordReset(ctx context.Context, email string) error {
 	var (
 		requestedBy = "unauthenticated"
 		err         error

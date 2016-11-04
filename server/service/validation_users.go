@@ -12,7 +12,7 @@ type validationMiddleware struct {
 	kolide.Service
 }
 
-func (mw validationMiddleware) NewUser(ctx context.Context, p kolide.UserPayload) (*kolide.User, error) {
+func (mw *validationMiddleware) NewUser(ctx context.Context, p kolide.UserPayload) (*kolide.User, error) {
 	invalid := &invalidArgumentError{}
 	if p.Username == nil {
 		invalid.Append("username", "missing required argument")
@@ -37,7 +37,7 @@ func (mw validationMiddleware) NewUser(ctx context.Context, p kolide.UserPayload
 	return mw.Service.NewUser(ctx, p)
 }
 
-func (mw validationMiddleware) ResetPassword(ctx context.Context, token, password string) error {
+func (mw *validationMiddleware) ResetPassword(ctx context.Context, token, password string) error {
 	invalid := &invalidArgumentError{}
 	if token == "" {
 		invalid.Append("token", "cannot be empty field")

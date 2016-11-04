@@ -1,8 +1,9 @@
 package service
 
 import (
-	"golang.org/x/net/context"
 	"testing"
+
+	"golang.org/x/net/context"
 
 	"github.com/WatchBeam/clock"
 	"github.com/kolide/kolide-ose/server/config"
@@ -18,7 +19,7 @@ func TestInviteNewUser(t *testing.T) {
 	nosuchAdminID := uint(999)
 	adminID := uint(1)
 	mailer := &mockMailService{SendEmailFn: func(e kolide.Email) error { return nil }}
-	svc := validationMiddleware{service{
+	svc := &validationMiddleware{&service{
 		ds:          ds,
 		config:      config.TestConfig(),
 		mailService: mailer,

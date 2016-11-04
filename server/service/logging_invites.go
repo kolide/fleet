@@ -8,7 +8,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-func (mw loggingMiddleware) InviteNewUser(ctx context.Context, payload kolide.InvitePayload) (*kolide.Invite, error) {
+func (mw *loggingMiddleware) InviteNewUser(ctx context.Context, payload kolide.InvitePayload) (*kolide.Invite, error) {
 	var (
 		invite *kolide.Invite
 		err    error
@@ -31,7 +31,7 @@ func (mw loggingMiddleware) InviteNewUser(ctx context.Context, payload kolide.In
 	return invite, err
 }
 
-func (mw loggingMiddleware) DeleteInvite(ctx context.Context, id uint) error {
+func (mw *loggingMiddleware) DeleteInvite(ctx context.Context, id uint) error {
 	var (
 		err error
 	)
@@ -51,7 +51,7 @@ func (mw loggingMiddleware) DeleteInvite(ctx context.Context, id uint) error {
 	return err
 }
 
-func (mw loggingMiddleware) ListInvites(ctx context.Context, opt kolide.ListOptions) ([]*kolide.Invite, error) {
+func (mw *loggingMiddleware) ListInvites(ctx context.Context, opt kolide.ListOptions) ([]*kolide.Invite, error) {
 	var (
 		invites []*kolide.Invite
 		err     error
@@ -72,7 +72,7 @@ func (mw loggingMiddleware) ListInvites(ctx context.Context, opt kolide.ListOpti
 	return invites, err
 }
 
-func (mw loggingMiddleware) VerifyInvite(ctx context.Context, email string, token string) error {
+func (mw *loggingMiddleware) VerifyInvite(ctx context.Context, email string, token string) error {
 	var (
 		err error
 	)

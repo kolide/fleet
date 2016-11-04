@@ -12,7 +12,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-func (svc service) Login(ctx context.Context, username, password string) (*kolide.User, string, error) {
+func (svc *service) Login(ctx context.Context, username, password string) (*kolide.User, string, error) {
 	user, err := svc.userByEmailOrUsername(username)
 	switch err {
 	case nil:
@@ -35,7 +35,7 @@ func (svc service) Login(ctx context.Context, username, password string) (*kolid
 	return user, token, nil
 }
 
-func (svc service) userByEmailOrUsername(username string) (*kolide.User, error) {
+func (svc *service) userByEmailOrUsername(username string) (*kolide.User, error) {
 	if strings.Contains(username, "@") {
 		return svc.ds.UserByEmail(username)
 	}
@@ -43,7 +43,7 @@ func (svc service) userByEmailOrUsername(username string) (*kolide.User, error) 
 }
 
 // makeSession is a helper that creates a new session after authentication
-func (svc service) makeSession(id uint) (string, error) {
+func (svc *service) makeSession(id uint) (string, error) {
 	sessionKeySize := svc.config.Session.KeySize
 	key := make([]byte, sessionKeySize)
 	_, err := rand.Read(key)
@@ -70,12 +70,12 @@ func (svc service) makeSession(id uint) (string, error) {
 	return tokenString, nil
 }
 
-func (svc service) Logout(ctx context.Context) error {
+func (svc *service) Logout(ctx context.Context) error {
 	// this should not return an error if the user wasn't logged in
 	return svc.DestroySession(ctx)
 }
 
-func (svc service) DestroySession(ctx context.Context) error {
+func (svc *service) DestroySession(ctx context.Context) error {
 	vc, ok := viewer.FromContext(ctx)
 	if !ok {
 		return errNoContext
@@ -89,7 +89,7 @@ func (svc service) DestroySession(ctx context.Context) error {
 	return svc.ds.DestroySession(session)
 }
 
-func (svc service) GetInfoAboutSessionsForUser(ctx context.Context, id uint) ([]*kolide.Session, error) {
+func (svc *service) GetInfoAboutSessionsForUser(ctx context.Context, id uint) ([]*kolide.Session, error) {
 	var validatedSessions []*kolide.Session
 
 	sessions, err := svc.ds.ListSessionsForUser(id)
@@ -106,11 +106,11 @@ func (svc service) GetInfoAboutSessionsForUser(ctx context.Context, id uint) ([]
 	return validatedSessions, nil
 }
 
-func (svc service) DeleteSessionsForUser(ctx context.Context, id uint) error {
+func (svc *service) DeleteSessionsForUser(ctx context.Context, id uint) error {
 	return svc.ds.DestroyAllSessionsForUser(id)
 }
 
-func (svc service) GetInfoAboutSession(ctx context.Context, id uint) (*kolide.Session, error) {
+func (svc *service) GetInfoAboutSession(ctx context.Context, id uint) (*kolide.Session, error) {
 	session, err := svc.ds.SessionByID(id)
 	if err != nil {
 		return nil, err
@@ -124,7 +124,7 @@ func (svc service) GetInfoAboutSession(ctx context.Context, id uint) (*kolide.Se
 	return session, nil
 }
 
-func (svc service) GetSessionByKey(ctx context.Context, key string) (*kolide.Session, error) {
+func (svc *service) GetSessionByKey(ctx context.Context, key string) (*kolide.Session, error) {
 	session, err := svc.ds.SessionByKey(key)
 	if err != nil {
 		return nil, err
@@ -138,7 +138,7 @@ func (svc service) GetSessionByKey(ctx context.Context, key string) (*kolide.Ses
 	return session, nil
 }
 
-func (svc service) DeleteSession(ctx context.Context, id uint) error {
+func (svc *service) DeleteSession(ctx context.Context, id uint) error {
 	session, err := svc.ds.SessionByID(id)
 	if err != nil {
 		return err
@@ -146,7 +146,7 @@ func (svc service) DeleteSession(ctx context.Context, id uint) error {
 	return svc.ds.DestroySession(session)
 }
 
-func (svc service) validateSession(session *kolide.Session) error {
+func (svc *service) validateSession(session *kolide.Session) error {
 	if session == nil {
 		return kolide.ErrNoActiveSession
 	}

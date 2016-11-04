@@ -7,7 +7,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-func (mw loggingMiddleware) Login(ctx context.Context, username, password string) (user *kolide.User, token string, err error) {
+func (mw *loggingMiddleware) Login(ctx context.Context, username, password string) (user *kolide.User, token string, err error) {
 
 	defer func(begin time.Time) {
 		_ = mw.logger.Log(
@@ -22,7 +22,7 @@ func (mw loggingMiddleware) Login(ctx context.Context, username, password string
 	return
 }
 
-func (mw loggingMiddleware) Logout(ctx context.Context) (err error) {
+func (mw *loggingMiddleware) Logout(ctx context.Context) (err error) {
 	defer func(begin time.Time) {
 		_ = mw.logger.Log(
 			"method", "Logout",
