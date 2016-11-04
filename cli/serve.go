@@ -117,7 +117,16 @@ the way that the kolide server works.
 
 			httpLogger := kitlog.NewContext(logger).With("component", "http")
 
-			apiHandler := service.MakeHandler(ctx, svc, config.Auth.JwtKey, httpLogger)
+			var apiHandler http.Handler
+			{
+				apiHandler = service.MakeHandler(ctx, svc, config.Auth.JwtKey, httpLogger)
+				// WithSetup will check if first time setup is required
+				// By performing the same check inside main, we can make server startups
+				// more efficient after the first startup.
+				if requireSetup(svc) {
+					apiHandler = service.WithSetup(svc, logger, apiHandler)
+				}
+			}
 			http.Handle("/api/", apiHandler)
 			http.Handle("/version", version.Handler())
 			http.Handle("/metrics", prometheus.Handler())
@@ -152,6 +161,14 @@ the way that the kolide server works.
 	serveCmd.PersistentFlags().BoolVar(&devMode, "dev", false, "Use dev settings (in-mem DB, etc.)")
 
 	return serveCmd
+}
+
+func requireSetup(svc kolide.Service) bool {
+	users, err := svc.ListUsers(context.Background(), kolide.ListOptions{Page: 1, PerPage: 2})
+	if err != nil {
+		initFatal(err, "checking requireSetup")
+	}
+	return len(users) == 0
 }
 
 // used in devMode to print an email

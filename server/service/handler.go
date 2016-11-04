@@ -1,6 +1,7 @@
 package service
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/go-kit/kit/endpoint"
@@ -302,4 +303,39 @@ func attachKolideAPIRoutes(r *mux.Router, h kolideHandlers) {
 	r.Handle("/api/v1/osquery/distributed/read", h.GetDistributedQueries).Methods("POST")
 	r.Handle("/api/v1/osquery/distributed/write", h.SubmitDistributedQueryResults).Methods("POST")
 	r.Handle("/api/v1/osquery/log", h.SubmitLogs).Methods("POST")
+}
+
+// WithSetup is an http middleware that checks if a database user exists.
+// If one does, it serves the API with a setup middleware.
+// If the server is already configured, the default API handler is exposed.
+func WithSetup(svc kolide.Service, logger kitlog.Logger, next http.Handler) http.Handler {
+	configRouter := http.NewServeMux()
+	configRouter.Handle("/api/v1/kolide/config", http.HandlerFunc(forceSetup))
+	configRouter.Handle("/api/v1/setup", kithttp.NewServer(
+		context.Background(),
+		makeSetupEndpoint(svc),
+		decodeSetupRequest,
+		encodeResponse,
+	))
+	var requireSetup bool
+	{
+		users, err := svc.ListUsers(context.Background(), kolide.ListOptions{Page: 1, PerPage: 2})
+		if err != nil {
+			logger.Log("err", err)
+		}
+		requireSetup = len(users) == 0
+	}
+	if requireSetup {
+		return configRouter
+	}
+	return next
+}
+
+func forceSetup(w http.ResponseWriter, r *http.Request) {
+	response := map[string]bool{
+		"require_setup": true,
+	}
+	if err := json.NewEncoder(w).Encode(&response); err != nil {
+		encodeError(context.Background(), err, w)
+	}
 }
