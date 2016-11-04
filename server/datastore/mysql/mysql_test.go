@@ -5,6 +5,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/go-kit/kit/log"
 	"github.com/stretchr/testify/require"
 )
 
@@ -23,21 +24,20 @@ func setupMySQL(t *testing.T) (ds *Datastore, teardown func()) {
 	connString := fmt.Sprintf("%s:%s@(%s:3306)/%s?charset=utf8&parseTime=True&loc=Local", user, password, host, dbName)
 	fmt.Println(connString)
 
-	ds, err := NewDatastore(connString)
+	ds, err := New(connString, Logger(log.NewLogfmtLogger(log.NewSyncWriter(os.Stdout))))
 	require.Nil(t, err)
 	teardown = func() {
 		ds.db.Close()
 	}
 
-	return
+	return ds, teardown
 }
 
 func TestDBMigrateAndDrop(t *testing.T) {
-	// if _, ok := os.LookupEnv("MYSQL_TEST"); !ok {
-	// 	t.SkipNow()
-	// }
+	if _, ok := os.LookupEnv("MYSQL_TEST"); !ok {
+		t.SkipNow()
+	}
 
-	t.SkipNow()
 	ds, teardown := setupMySQL(t)
 	defer teardown()
 

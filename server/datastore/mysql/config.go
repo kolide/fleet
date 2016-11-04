@@ -1,6 +1,6 @@
 package mysql
 
-import "log"
+import "github.com/go-kit/kit/log"
 
 const defaultMaxAttempts int = 15
 
@@ -10,11 +10,11 @@ type DBOption func(o *dbOptions) error
 type dbOptions struct {
 	// maxAttempts configures the number of retries to connect to the DB
 	maxAttempts int
-	logger      *log.Logger
+	logger      log.Logger
 }
 
 // Logger adds a logger to the datastore
-func Logger(l *log.Logger) DBOption {
+func Logger(l log.Logger) DBOption {
 	return func(o *dbOptions) error {
 		o.logger = l
 		return nil
@@ -27,14 +27,6 @@ func Logger(l *log.Logger) DBOption {
 func LimitAttempts(attempts int) DBOption {
 	return func(o *dbOptions) error {
 		o.maxAttempts = attempts
-		return nil
-	}
-}
-
-// SetLogger defines logger that service will use
-func SetLogger(logger *log.Logger) DBOption {
-	return func(opt *dbOptions) error {
-		opt.logger = logger
 		return nil
 	}
 }
