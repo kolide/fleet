@@ -1,14 +1,14 @@
 import React, { Component, PropTypes } from 'react';
 
 import Button from 'components/buttons/Button';
-import { formNotChanged } from 'components/forms/queries/UpdateQueryForm/helpers';
+import { formNotChanged } from 'components/forms/queries/QueryForm/helpers';
 import InputField from 'components/forms/fields/InputField';
 import queryInterface from 'interfaces/query';
 import validatePresence from 'components/forms/validators/validate_presence';
 
-const baseClass = 'update-query-form';
+const baseClass = 'query-form';
 
-class UpdateQueryForm extends Component {
+class QueryForm extends Component {
   static propTypes = {
     onRunQuery: PropTypes.func,
     onSaveAsNew: PropTypes.func,
@@ -177,4 +177,4 @@ class UpdateQueryForm extends Component {
   }
 }
 
-export default UpdateQueryForm;
+export default QueryForm;

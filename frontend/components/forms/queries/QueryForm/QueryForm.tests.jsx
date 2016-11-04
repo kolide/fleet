@@ -3,7 +3,7 @@ import expect, { createSpy, restoreSpies } from 'expect';
 import { mount } from 'enzyme';
 
 import { fillInFormInput } from 'test/helpers';
-import UpdateQueryForm from './index';
+import QueryForm from './index';
 
 const query = {
   id: 1,
@@ -13,11 +13,11 @@ const query = {
 };
 const queryText = 'SELECT * FROM users';
 
-describe('UpdateQueryForm - component', () => {
+describe('QueryForm - component', () => {
   afterEach(restoreSpies);
 
   it('renders InputFields for the query name and description', () => {
-    const form = mount(<UpdateQueryForm query={query} queryText={queryText} />);
+    const form = mount(<QueryForm query={query} queryText={queryText} />);
     const inputFields = form.find('InputField');
 
     expect(inputFields.length).toEqual(2);
@@ -26,7 +26,7 @@ describe('UpdateQueryForm - component', () => {
   });
 
   it('updates state on input field change', () => {
-    const form = mount(<UpdateQueryForm query={query} queryText={queryText} />);
+    const form = mount(<QueryForm query={query} queryText={queryText} />);
     const inputFields = form.find('InputField');
     const nameInput = inputFields.find({ name: 'name' });
     const descriptionInput = inputFields.find({ name: 'description' });
@@ -44,13 +44,13 @@ describe('UpdateQueryForm - component', () => {
 
   it('validates the query name before saving changes', () => {
     const onSaveChangesSpy = createSpy();
-    const form = mount(<UpdateQueryForm query={query} queryText={queryText} onSaveChanges={onSaveChangesSpy} />);
+    const form = mount(<QueryForm query={query} queryText={queryText} onSaveChanges={onSaveChangesSpy} />);
     const inputFields = form.find('InputField');
     const nameInput = inputFields.find({ name: 'name' });
 
     fillInFormInput(nameInput, '');
 
-    const saveChangesBtn = form.find('.update-query-form__save-changes-btn');
+    const saveChangesBtn = form.find('.query-form__save-changes-btn');
 
     saveChangesBtn.simulate('click');
 
@@ -65,13 +65,13 @@ describe('UpdateQueryForm - component', () => {
 
   it('calls the onSaveChanges prop when the form is valid', () => {
     const onSaveChangesSpy = createSpy();
-    const form = mount(<UpdateQueryForm query={query} queryText={queryText} onSaveChanges={onSaveChangesSpy} />);
+    const form = mount(<QueryForm query={query} queryText={queryText} onSaveChanges={onSaveChangesSpy} />);
     const inputFields = form.find('InputField');
     const nameInput = inputFields.find({ name: 'name' });
 
     fillInFormInput(nameInput, 'New query name');
 
-    const saveChangesBtn = form.find('.update-query-form__save-changes-btn');
+    const saveChangesBtn = form.find('.query-form__save-changes-btn');
 
     saveChangesBtn.simulate('click');
 
@@ -83,10 +83,10 @@ describe('UpdateQueryForm - component', () => {
   });
 
   it('enables the Save Changes button when the name input changes', () => {
-    const form = mount(<UpdateQueryForm query={query} queryText={queryText} />);
+    const form = mount(<QueryForm query={query} queryText={queryText} />);
     const inputFields = form.find('InputField');
     const nameInput = inputFields.find({ name: 'name' });
-    const saveChangesBtn = form.find('.update-query-form__save-changes-btn');
+    const saveChangesBtn = form.find('.query-form__save-changes-btn');
 
     expect(saveChangesBtn.props()).toInclude({
       disabled: true,
@@ -100,10 +100,10 @@ describe('UpdateQueryForm - component', () => {
   });
 
   it('enables the Save Changes button when the description input changes', () => {
-    const form = mount(<UpdateQueryForm query={query} queryText={queryText} />);
+    const form = mount(<QueryForm query={query} queryText={queryText} />);
     const inputFields = form.find('InputField');
     const descriptionInput = inputFields.find({ name: 'description' });
-    const saveChangesBtn = form.find('.update-query-form__save-changes-btn');
+    const saveChangesBtn = form.find('.query-form__save-changes-btn');
 
     expect(saveChangesBtn.props()).toInclude({
       disabled: true,
@@ -118,10 +118,10 @@ describe('UpdateQueryForm - component', () => {
 
   it('calls the onSaveAsNew prop when "Save As New" is clicked and the form is valid', () => {
     const onSaveAsNewSpy = createSpy();
-    const form = mount(<UpdateQueryForm query={query} queryText={queryText} onSaveAsNew={onSaveAsNewSpy} />);
+    const form = mount(<QueryForm query={query} queryText={queryText} onSaveAsNew={onSaveAsNewSpy} />);
     const inputFields = form.find('InputField');
     const descriptionInput = inputFields.find({ name: 'description' });
-    const saveAsNewBtn = form.find('.update-query-form__save-as-new-btn');
+    const saveAsNewBtn = form.find('.query-form__save-as-new-btn');
 
     fillInFormInput(descriptionInput, 'New query description');
 
@@ -136,10 +136,10 @@ describe('UpdateQueryForm - component', () => {
 
   it('does not call the onSaveAsNew prop when "Save As New" is clicked and the form is not valid', () => {
     const onSaveAsNewSpy = createSpy();
-    const form = mount(<UpdateQueryForm query={query} queryText={queryText} onSaveAsNew={onSaveAsNewSpy} />);
+    const form = mount(<QueryForm query={query} queryText={queryText} onSaveAsNew={onSaveAsNewSpy} />);
     const inputFields = form.find('InputField');
     const nameInput = inputFields.find({ name: 'name' });
-    const saveAsNewBtn = form.find('.update-query-form__save-as-new-btn');
+    const saveAsNewBtn = form.find('.query-form__save-as-new-btn');
 
     fillInFormInput(nameInput, '');
 
@@ -156,8 +156,8 @@ describe('UpdateQueryForm - component', () => {
 
   it('calls the onRunQuery prop when "Run Query" is clicked and the form is valid', () => {
     const onRunQuerySpy = createSpy();
-    const form = mount(<UpdateQueryForm query={query} queryText={queryText} onRunQuery={onRunQuerySpy} />);
-    const runQueryBtn = form.find('.update-query-form__run-query-btn');
+    const form = mount(<QueryForm query={query} queryText={queryText} onRunQuery={onRunQuerySpy} />);
+    const runQueryBtn = form.find('.query-form__run-query-btn');
 
     runQueryBtn.simulate('click');
 

@@ -4,12 +4,12 @@ import 'brace/mode/sql';
 import 'brace/ext/linking';
 
 import Button from 'components/buttons/Button';
+import QueryForm from 'components/forms/queries/QueryForm';
 import queryInterface from 'interfaces/query';
 import SaveQueryFormModal from 'components/modals/SaveQueryFormModal';
 import SelectTargetsInput from 'components/queries/SelectTargetsInput';
 import SelectTargetsMenu from 'components/queries/SelectTargetsMenu';
 import targetInterface from 'interfaces/target';
-import UpdateQueryForm from 'components/forms/queries/UpdateQueryForm';
 import './mode';
 import './theme';
 
@@ -86,7 +86,7 @@ class QueryComposer extends Component {
 
     if (query) {
       return (
-        <UpdateQueryForm
+        <QueryForm
           onRunQuery={onRunQuery}
           onSaveAsNew={onSaveQueryFormSubmit}
           onSaveChanges={onUpdateQuery}

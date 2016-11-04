@@ -40,7 +40,7 @@ describe('QueryComposer - component', () => {
     expect(component.find('SaveQueryForm').length).toEqual(1);
   });
 
-  it('renders the UpdateQueryForm when the query prop is present', () => {
+  it('renders the QueryForm when the query prop is present', () => {
     const query = {
       id: 1,
       query: 'SELECT * FROM users',
@@ -57,7 +57,7 @@ describe('QueryComposer - component', () => {
       />
     );
 
-    const form = component.find('UpdateQueryForm');
+    const form = component.find('QueryForm');
 
     expect(form.length).toEqual(1);
     expect(form.find('InputField').length).toEqual(2);
