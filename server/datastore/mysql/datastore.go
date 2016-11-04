@@ -2,12 +2,16 @@ package mysql
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	_ "github.com/go-sql-driver/mysql" // db driver
 	"github.com/jmoiron/sqlx"
 )
+
+const defaultMaxDBConnectionAttempts = 15
 
 var ErrDatabaseConnection = errors.New("Database connection attempts failed")
 
@@ -20,13 +24,16 @@ type Datastore struct {
 
 // NewDatastore creates an MySQL datastore.
 func NewDatastore(dbConnectString string, opts ...DBOption) (ds *Datastore, e error) {
-
-	var options dbOptions
+	fmt.Println("Called new ds")
+	options := dbOptions{
+		maxAttempts: defaultMaxDBConnectionAttempts,
+	}
 
 	for _, setOpt := range opts {
 		setOpt(&options)
 	}
 
+	fmt.Printf("Options %#v\n", options)
 	var logger *log.Logger
 
 	if options.logger == nil {
@@ -42,7 +49,7 @@ func NewDatastore(dbConnectString string, opts ...DBOption) (ds *Datastore, e er
 			break
 		}
 
-		logger.Printf("Connect attempt %d failed. %s\n", attempt, e.Error())
+		fmt.Printf("Connect attempt %d failed. %s\n", attempt, e.Error())
 	}
 
 	if db == nil {
@@ -57,4 +64,62 @@ func NewDatastore(dbConnectString string, opts ...DBOption) (ds *Datastore, e er
 
 func (d *Datastore) Name() string {
 	return "mysql"
+}
+
+// Migrate creates database
+func (d *Datastore) Migrate() (e error) {
+	d.logger.Println("Begin database migration")
+
+	var sql []byte
+	if sql, e = Asset("db/up.sql"); e != nil {
+		return
+	}
+
+	tx := d.db.MustBegin()
+
+	for _, statement := range strings.SplitAfter(string(sql), ";") {
+		if _, e = tx.Exec(statement); e != nil {
+			if e.Error() != "Error 1065: Query was empty" {
+				tx.Rollback()
+				return
+			}
+		}
+	}
+
+	if e = tx.Commit(); e != nil {
+		return
+	}
+
+	d.logger.Println("w00t! Migration succeeded")
+	return
+
+}
+
+// Drop removes database
+func (d *Datastore) Drop() (e error) {
+	d.logger.Println("Dropping database")
+
+	var sql []byte
+	if sql, e = Asset("db/down.sql"); e != nil {
+		return
+	}
+
+	tx := d.db.MustBegin()
+
+	for _, statement := range strings.SplitAfter(string(sql), ";") {
+		if _, e = tx.Exec(statement); e != nil {
+			if e.Error() != "Error 1065: Query was empty" {
+				tx.Rollback()
+				return
+			}
+		}
+	}
+
+	if e = tx.Commit(); e != nil {
+		return
+	}
+
+	d.logger.Println("Database drop succeeds")
+	return
+
 }
