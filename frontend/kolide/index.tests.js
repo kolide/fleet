@@ -1,4 +1,5 @@
 import expect from 'expect';
+import nock from 'nock';
 
 import Kolide from './index';
 import mocks from '../test/mocks';
@@ -24,6 +25,8 @@ const {
 } = mocks;
 
 describe('Kolide - API client', () => {
+  afterEach(() => { nock.cleanAll(); });
+
   describe('defaults', () => {
     it('sets the base URL', () => {
       expect(Kolide.baseURL).toEqual('http://localhost:8080/api');

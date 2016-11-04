@@ -1,11 +1,9 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { push } from 'react-router-redux';
 
 import entityGetter from 'redux/utilities/entityGetter';
-import queryActions from 'redux/nodes/entities/queries/actions';
+import helpers from 'components/queries/QueryPageWrapper/helpers';
 import queryInterface from 'interfaces/query';
-import { renderFlash } from 'redux/nodes/notifications/actions';
 
 class QueryPageWrapper extends Component {
   static propTypes = {
@@ -17,14 +15,10 @@ class QueryPageWrapper extends Component {
 
   componentDidMount () {
     const { dispatch, query, queryID } = this.props;
+    const { fetchQuery } = helpers;
 
     if (queryID && !query) {
-      dispatch(queryActions.load(queryID))
-        .catch((errorResponse) => {
-          const { error } = errorResponse;
-          dispatch(push('/queries/new'));
-          dispatch(renderFlash('error', error));
-        });
+      fetchQuery(dispatch, queryID);
     }
 
     return false;
