@@ -45,14 +45,14 @@ describe('QuerySidePanel - component', () => {
 
   it('renders the selected table in the dropdown', () => {
     const component = mount(<QuerySidePanel {...props} />);
-    const tableSelect = component.find('.kolide-dropdown');
+    const tableSelect = component.find('Dropdown');
 
     expect(tableSelect.prop('value')).toEqual('users');
   });
 
   it('calls the onOsqueryTableSelect prop when a new table is selected in the dropdown', () => {
     const component = mount(<QuerySidePanel {...props} />);
-    const tableSelect = component.find('.kolide-dropdown');
+    const tableSelect = component.find('Dropdown');
     fillInFormInput(tableSelect, 'groups');
 
     expect(onOsqueryTableSelect).toHaveBeenCalledWith('groups');
