@@ -2,10 +2,7 @@ import React from 'react';
 import expect, { createSpy, restoreSpies } from 'expect';
 import { mount } from 'enzyme';
 
-import helpers from '../../../test/helpers';
 import QuerySidePanel from './QuerySidePanel';
-
-const { fillInFormInput } = helpers;
 
 describe('QuerySidePanel - component', () => {
   afterEach(restoreSpies);
@@ -52,8 +49,7 @@ describe('QuerySidePanel - component', () => {
 
   it('calls the onOsqueryTableSelect prop when a new table is selected in the dropdown', () => {
     const component = mount(<QuerySidePanel {...props} />);
-    const tableSelect = component.find('Dropdown');
-    fillInFormInput(tableSelect, 'groups');
+    component.node.onSelectTable({ value: 'groups' });
 
     expect(onOsqueryTableSelect).toHaveBeenCalledWith('groups');
   });
