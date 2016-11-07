@@ -21,9 +21,9 @@ type AppConfigService interface {
 // OrgInfo holds information about the current
 // organization using Kolide
 type OrgInfo struct {
-	ID         uint `gorm:"primary_key"`
-	OrgName    string
-	OrgLogoURL string
+	ID         int64  `gorm:"primary_key"`
+	OrgName    string `db:"org_name"`
+	OrgLogoURL string `db:"org_logo_url"`
 }
 
 // OrgInfoPayload is used to accept

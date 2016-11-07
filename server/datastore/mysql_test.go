@@ -1,4 +1,4 @@
-package mysql
+package datastore
 
 import (
 	"fmt"
@@ -6,10 +6,11 @@ import (
 	"testing"
 
 	"github.com/go-kit/kit/log"
+	"github.com/kolide/kolide-ose/server/datastore/mysql"
 	"github.com/stretchr/testify/require"
 )
 
-func setupMySQL(t *testing.T) (ds *Datastore, teardown func()) {
+func setupMySQL(t *testing.T) (ds *mysql.Datastore, teardown func()) {
 	var (
 		user     = "kolide"
 		password = "kolide"
@@ -24,27 +25,35 @@ func setupMySQL(t *testing.T) (ds *Datastore, teardown func()) {
 	connString := fmt.Sprintf("%s:%s@(%s:3306)/%s?charset=utf8&parseTime=True&loc=Local", user, password, host, dbName)
 	fmt.Println(connString)
 
-	ds, err := New(connString, Logger(log.NewLogfmtLogger(log.NewSyncWriter(os.Stdout))))
+	ds, err := mysql.New(connString, mysql.Logger(log.NewLogfmtLogger(log.NewSyncWriter(os.Stdout))))
 	require.Nil(t, err)
 	teardown = func() {
-		ds.db.Close()
+		ds.Close()
 	}
 
 	return ds, teardown
 }
 
-func TestDBMigrateAndDrop(t *testing.T) {
+func TestMySQL(t *testing.T) {
 	if _, ok := os.LookupEnv("MYSQL_TEST"); !ok {
 		t.SkipNow()
 	}
 
 	ds, teardown := setupMySQL(t)
 	defer teardown()
-
-	err := ds.Migrate()
+	// get rid of database if it is hanging around
+	err := ds.Drop()
 	require.Nil(t, err)
 
-	err = ds.Drop()
-	require.Nil(t, err)
+	for _, f := range testFunctions {
+
+		t.Run(functionName(f), func(t *testing.T) {
+			err = ds.Migrate()
+			require.Nil(t, err)
+			f(t, ds)
+			err = ds.Drop()
+			require.Nil(t, err)
+		})
+	}
 
 }
