@@ -1,18 +1,23 @@
 #
 # SQL Export
 # Created by Querious (1055)
-# Created: November 4, 2016 at 6:33:31 PM GMT+8
+# Created: November 7, 2016 at 11:38:55 PM GMT+8
 # Encoding: Unicode (UTF-8)
 #
 
-
-USE `kolide`;
-
-
-
+use `kolide`;
 
 SET @PREVIOUS_FOREIGN_KEY_CHECKS = @@FOREIGN_KEY_CHECKS;
 SET FOREIGN_KEY_CHECKS = 0;
+
+
+CREATE TABLE `app_configs` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `org_name` varchar(255) DEFAULT NULL,
+  `org_logo_url` varchar(255) DEFAULT NULL,
+  `kolide_server_url` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE `distributed_query_campaign_targets` (
@@ -21,7 +26,7 @@ CREATE TABLE `distributed_query_campaign_targets` (
   `distributed_query_campaign_id` int(10) unsigned DEFAULT NULL,
   `target_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE `distributed_query_campaigns` (
@@ -33,16 +38,18 @@ CREATE TABLE `distributed_query_campaigns` (
   `status` int(11) DEFAULT NULL,
   `user_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE `distributed_query_executions` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `host_id` int(10) unsigned DEFAULT NULL,
   `distributed_query_id` int(10) unsigned DEFAULT NULL,
   `status` int(11) DEFAULT NULL,
   `error` varchar(1024) DEFAULT NULL,
-  `execution_duration` bigint(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `execution_duration` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE `hosts` (
@@ -62,8 +69,9 @@ CREATE TABLE `hosts` (
   `primary_ip` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_host_unique_nodekey` (`node_key`),
-  UNIQUE KEY `idx_host_unique_uuid` (`uuid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  UNIQUE KEY `idx_host_unique_uuid` (`uuid`),
+  FULLTEXT KEY `hosts_search` (`host_name`,`primary_ip`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE `invites` (
@@ -78,7 +86,7 @@ CREATE TABLE `invites` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_invite_unique_email` (`email`),
   UNIQUE KEY `idx_invite_unique_key` (`token`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE `label_query_executions` (
@@ -89,7 +97,7 @@ CREATE TABLE `label_query_executions` (
   `host_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_lqe_label_host` (`label_id`,`host_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE `labels` (
@@ -97,10 +105,13 @@ CREATE TABLE `labels` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `name` varchar(255) NOT NULL,
-  `query_id` int(10) unsigned DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `query` varchar(255) NOT NULL,
+  `platform` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `idx_label_unique_name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  UNIQUE KEY `idx_label_unique_name` (`name`),
+  FULLTEXT KEY `labels_search` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE `options` (
@@ -112,15 +123,7 @@ CREATE TABLE `options` (
   `platform` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_option_unique_key` (`key`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-
-CREATE TABLE `org_infos` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `org_name` varchar(255) DEFAULT NULL,
-  `org_logo_url` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE `pack_queries` (
@@ -130,16 +133,16 @@ CREATE TABLE `pack_queries` (
   `pack_id` int(10) unsigned DEFAULT NULL,
   `query_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE `pack_targets` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `type` int(11) DEFAULT NULL,
   `pack_id` int(10) unsigned DEFAULT NULL,
+  `type` int(11) DEFAULT NULL,
   `target_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE `packs` (
@@ -150,7 +153,7 @@ CREATE TABLE `packs` (
   `platform` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_pack_unique_name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE `password_reset_requests` (
@@ -161,7 +164,7 @@ CREATE TABLE `password_reset_requests` (
   `user_id` int(10) unsigned DEFAULT NULL,
   `token` varchar(1024) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE `queries` (
@@ -169,6 +172,7 @@ CREATE TABLE `queries` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `name` varchar(255) NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
   `query` varchar(255) NOT NULL,
   `interval` int(10) unsigned DEFAULT NULL,
   `snapshot` tinyint(1) DEFAULT NULL,
@@ -177,7 +181,7 @@ CREATE TABLE `queries` (
   `version` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_query_unique_name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE `sessions` (
@@ -188,7 +192,7 @@ CREATE TABLE `sessions` (
   `key` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_session_unique_key` (`key`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE `users` (
@@ -208,7 +212,7 @@ CREATE TABLE `users` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_user_unique_username` (`username`),
   UNIQUE KEY `idx_user_unique_email` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 

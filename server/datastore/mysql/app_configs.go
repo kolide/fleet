@@ -2,46 +2,53 @@ package mysql
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/kolide/kolide-ose/server/kolide"
 )
 
-func (d *Datastore) NewOrgInfo(info *kolide.OrgInfo) (*kolide.OrgInfo, error) {
+func (d *Datastore) NewAppConfig(info *kolide.AppConfig) (*kolide.AppConfig, error) {
 	var (
 		err    error
 		result sql.Result
 	)
 
-	err = d.db.Get(info, "SELECT * FROM org_infos WHERE org_name = ? LIMIT 1", info.OrgName)
+	err = d.db.Get(info, "SELECT * FROM app_configs LIMIT 1")
 	switch err {
 	case sql.ErrNoRows:
 		result, err = d.db.Exec(
-			"INSERT INTO org_infos (org_name, org_logo_url) VALUES (?, ?)",
-			info.OrgName, info.OrgLogoURL,
+			"INSERT INTO app_configs (org_name, org_logo_url, kolide_server_url) VALUES (?, ?, ?)",
+			info.OrgName, info.OrgLogoURL, info.KolideServerURL,
 		)
 
 		if err != nil {
 			return nil, err
 		}
+
 		info.ID, _ = result.LastInsertId()
 		return info, nil
 	case nil:
-		return info, d.SaveOrgInfo(info)
+		return info, d.SaveAppConfig(info)
 	default:
 		return nil, err
 	}
 }
 
-func (d *Datastore) OrgInfo() (*kolide.OrgInfo, error) {
-	info := &kolide.OrgInfo{}
-	err := d.db.Get(info, "SELECT * FROM org_infos LIMIT 1")
-	return info, err
+func (d *Datastore) AppConfig() (*kolide.AppConfig, error) {
+	info := &kolide.AppConfig{}
+	err := d.db.Get(info, "SELECT * FROM app_configs LIMIT 1")
+
+	if err != nil {
+		return nil, err
+	}
+	return info, nil
 }
 
-func (d *Datastore) SaveOrgInfo(info *kolide.OrgInfo) error {
+func (d *Datastore) SaveAppConfig(info *kolide.AppConfig) error {
+	fmt.Println("save config")
 	_, err := d.db.Exec(
-		"UPDATE org_infos SET org_name = ?, org_logo_url = ? WHERE id = ?",
-		info.OrgName, info.OrgLogoURL, info.ID,
+		"UPDATE app_configs SET org_name = ?, org_logo_url = ?, kolide_server_url = ? WHERE id = ?",
+		info.OrgName, info.OrgLogoURL, info.KolideServerURL, info.ID,
 	)
 	return err
 }
