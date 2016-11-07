@@ -96,7 +96,8 @@ class QueryPage extends Component {
 
     return dispatch(queryActions.create(queryParams))
       .then((query) => {
-        return dispatch(push(`/queries/${query.id}`));
+        dispatch(push(`/queries/${query.id}`));
+        dispatch(renderFlash('success', 'Query created'));
       })
       .catch((errorResponse) => {
         dispatch(renderFlash('error', errorResponse));
@@ -149,9 +150,12 @@ class QueryPage extends Component {
   }
 
   onUpdateQuery = (formData) => {
-    // TODO: call API to update the query
+    const { dispatch, query } = this.props;
 
-    console.log('TODO: update query', formData);
+    dispatch(queryActions.update(query, formData))
+      .then(() => {
+        dispatch(renderFlash('success', 'Query updated!'));
+      });
 
     return false;
   };
