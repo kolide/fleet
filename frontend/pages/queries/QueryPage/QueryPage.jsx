@@ -26,7 +26,11 @@ class QueryPage extends Component {
   };
 
   componentWillMount () {
-    const { dispatch } = this.props;
+    const { dispatch, query } = this.props;
+
+    if (query) {
+      dispatch(setQueryText(query.query));
+    }
 
     this.state = {
       isLoadingTargets: false,
@@ -37,6 +41,19 @@ class QueryPage extends Component {
 
     dispatch(showRightSidePanel);
     this.fetchTargets();
+
+    return false;
+  }
+
+  componentWillReceiveProps (nextProps) {
+    const { dispatch, query: newQuery } = nextProps;
+    const { query: oldQuery } = this.props;
+
+    if ((!oldQuery && newQuery) || (oldQuery && oldQuery.query !== newQuery.query)) {
+      const { query: queryText } = newQuery;
+
+      dispatch(setQueryText(queryText));
+    }
 
     return false;
   }
