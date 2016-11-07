@@ -24,17 +24,15 @@ class Dropdown extends Component {
     const { options, className, placeholder, value, clearable, onSelect } = this.props;
 
     return (
-      <div>
-        <Select
-          className={className}
-          name="targets"
-          options={options}
-          onChange={onSelect}
-          placeholder={placeholder}
-          value={value}
-          clearable={clearable}
-        />
-      </div>
+      <Select
+        className={className}
+        name="targets"
+        options={options}
+        onChange={onSelect}
+        placeholder={placeholder}
+        value={value}
+        clearable={clearable}
+      />
     );
   }
 }
