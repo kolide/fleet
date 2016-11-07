@@ -120,6 +120,11 @@ func (d *Datastore) Drop() error {
 
 }
 
+// Close frees resources associated with underlying mysql connection
+func (d *Datastore) Close() error {
+	return d.db.Close()
+}
+
 func (d *Datastore) log(msg string) {
 	d.logger.Log("comp", d.Name(), "msg", msg)
 }
