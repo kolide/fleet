@@ -40,10 +40,10 @@ describe('RegistrationPage - component', () => {
     expect(page.find('Breadcrumbs').length).toEqual(1);
   });
 
-  describe('#setPage', () => {
+  describe('#onSetPage', () => {
     it('sets state to the page number', () => {
       const page = mount(<RegistrationPage />);
-      page.node.setPage(3);
+      page.node.onSetPage(3);
 
       expect(page.state()).toInclude({ page: 3 });
     });

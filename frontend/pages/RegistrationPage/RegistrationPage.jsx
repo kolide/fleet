@@ -31,13 +31,20 @@ export class RegistrationPage extends Component {
     return false;
   }
 
+  onNextPage = () => {
+    const { page } = this.state;
+    this.setState({ page: page + 1 });
+
+    return false;
+  }
+
   onRegistrationFormSubmit = (formData) => {
     console.log('registration form submitted:', formData);
 
     return false;
   }
 
-  setPage = (page) => {
+  onSetPage = (page) => {
     this.setState({ page });
 
     return false;
@@ -45,12 +52,12 @@ export class RegistrationPage extends Component {
 
   render () {
     const { page } = this.state;
-    const { onRegistrationFormSubmit, setPage } = this;
+    const { onRegistrationFormSubmit, onNextPage, onSetPage } = this;
 
     return (
       <div>
-        <Breadcrumbs onClick={setPage} page={page} />
-        <RegistrationForm page={page} onSubmit={onRegistrationFormSubmit} />
+        <Breadcrumbs onClick={onSetPage} page={page} />
+        <RegistrationForm page={page} onNextPage={onNextPage} onSubmit={onRegistrationFormSubmit} />
       </div>
     );
   }
