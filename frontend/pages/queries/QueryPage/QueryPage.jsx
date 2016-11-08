@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
+import { flatMap } from 'lodash';
 import { push } from 'react-router-redux';
 
 import debounce from 'utilities/debounce';
@@ -180,7 +181,16 @@ class QueryPage extends Component {
   fetchTargets = (query) => {
     this.setState({ isLoadingTargets: true });
 
-    return Kolide.getTargets({ query, selected: {} })
+    const { selectedTargets } = this.props;
+    const hosts = flatMap(selectedTargets, (target) => {
+      return target.target_type === 'hosts' ? target.id : null;
+    });
+    const labels = flatMap(selectedTargets, (target) => {
+      return target.target_type === 'labels' ? target.id : null;
+    });
+    const selected = { hosts, labels };
+
+    return Kolide.getTargets(query, selected)
       .then((response) => {
         const {
           selected_targets_count: selectedTargetsCount,

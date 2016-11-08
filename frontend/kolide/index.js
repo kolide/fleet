@@ -1,5 +1,3 @@
-import { pick } from 'lodash';
-
 import Base from './base';
 import endpoints from './endpoints';
 import { appendTargetTypeToTargets } from '../redux/nodes/entities/targets/helpers';
@@ -91,18 +89,10 @@ class Kolide extends Base {
       .then((response) => { return response.query; });
   }
 
-  getTargets = ({ query, selected }) => {
+  getTargets = (query, selected = { hosts: [], labels: [] }) => {
     const { TARGETS } = endpoints;
-    const hosts = pick(selected.hosts, ['id']);
-    const labels = pick(selected.labels, ['id']);
 
-    return this.authenticatedPost(this.endpoint(TARGETS), JSON.stringify({
-      query,
-      selected: {
-        hosts: [],
-        labels: [],
-      },
-    }))
+    return this.authenticatedPost(this.endpoint(TARGETS), JSON.stringify({ query, selected }))
       .then((response) => { return appendTargetTypeToTargets(response); });
   }
 

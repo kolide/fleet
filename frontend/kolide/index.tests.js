@@ -115,7 +115,7 @@ describe('Kolide - API client', () => {
     });
   });
 
-  describe.only('#getTargets', () => {
+  describe('#getTargets', () => {
     it('correctly parses the response', (done) => {
       const bearerToken = 'valid-bearer-token';
       const hosts = [];
@@ -124,7 +124,7 @@ describe('Kolide - API client', () => {
       const request = validGetTargetsRequest(bearerToken, query);
 
       Kolide.setBearerToken(bearerToken);
-      Kolide.getTargets({ query, selected: { hosts, labels } })
+      Kolide.getTargets(query, { hosts, labels })
         .then(() => {
           expect(request.isDone()).toEqual(true);
           done();
