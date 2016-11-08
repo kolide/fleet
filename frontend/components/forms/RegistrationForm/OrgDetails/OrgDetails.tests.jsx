@@ -44,39 +44,6 @@ describe('OrgDetails - form', () => {
     });
   });
 
-  describe('organization web URL input', () => {
-    it('renders an input field', () => {
-      const form = mount(
-        <OrgDetails
-          errors={noErrors}
-          formData={{}}
-          onChange={noop}
-          onSubmit={noop}
-        />
-      );
-      const orgURLField = form.find({ name: 'org web url' });
-
-      expect(orgURLField.length).toEqual(1);
-    });
-
-    it('calls the onChange prop when the field changes', () => {
-      const onChangeSpy = createSpy();
-      const form = mount(
-        <OrgDetails
-          errors={noErrors}
-          formData={{}}
-          onChange={onChangeSpy}
-          onSubmit={noop}
-        />
-      );
-      const orgURLField = form.find({ name: 'org web url' }).find('input');
-
-      fillInFormInput(orgURLField, 'http://www.thegnar.co');
-
-      expect(onChangeSpy).toHaveBeenCalledWith('org_web_url', 'http://www.thegnar.co');
-    });
-  });
-
   describe('organization logo URL input', () => {
     it('renders an input field', () => {
       const form = mount(
@@ -128,7 +95,6 @@ describe('OrgDetails - form', () => {
       expect(onSubmitSpy).toNotHaveBeenCalled();
       expect(form.state().errors).toInclude({
         org_name: 'Organization name must be present',
-        org_web_url: 'Organization web URL must be present',
         org_logo_url: 'Organization logo URL must be present',
       });
     });
@@ -156,7 +122,6 @@ describe('OrgDetails - form', () => {
     it('submits the form when valid', () => {
       const formData = {
         org_name: 'The Gnar Co.',
-        org_web_url: 'http://www.thegnar.co',
         org_logo_url: 'https://thegnar.co/assets/logo.png',
       };
       const onSubmitSpy = createSpy();

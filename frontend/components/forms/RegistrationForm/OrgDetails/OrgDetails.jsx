@@ -57,13 +57,6 @@ class OrgDetails extends BasePageForm {
           value={formData.org_name}
         />
         <InputFieldWithIcon
-          error={errors('org_web_url')}
-          name="org web url"
-          onChange={onChange('org_web_url')}
-          placeholder="Organization Website URL"
-          value={formData.org_web_url}
-        />
-        <InputFieldWithIcon
           error={errors('org_logo_url')}
           name="org logo url"
           onChange={onChange('org_logo_url')}
