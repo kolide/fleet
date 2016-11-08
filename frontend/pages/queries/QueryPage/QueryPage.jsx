@@ -177,10 +177,10 @@ class QueryPage extends Component {
     return false;
   };
 
-  fetchTargets = (search) => {
+  fetchTargets = (query) => {
     this.setState({ isLoadingTargets: true });
 
-    return Kolide.getTargets({ search })
+    return Kolide.getTargets({ query, selected: {} })
       .then((response) => {
         const {
           selected_targets_count: selectedTargetsCount,
@@ -193,7 +193,7 @@ class QueryPage extends Component {
           targets,
         });
 
-        return search;
+        return query;
       })
       .catch((error) => {
         this.setState({ isLoadingTargets: false });

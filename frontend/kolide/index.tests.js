@@ -13,6 +13,7 @@ const {
   validGetHostsRequest,
   validGetInvitesRequest,
   validGetQueryRequest,
+  validGetTargetsRequest,
   validGetUsersRequest,
   validInviteUserRequest,
   validLoginRequest,
@@ -114,37 +115,21 @@ describe('Kolide - API client', () => {
     });
   });
 
-  describe('#getTargets', () => {
-    it('correctly parses the response', () => {
-      Kolide.getTargets()
-        .then((response) => {
-          expect(response).toEqual({
-            targets: [
-              {
-                id: 3,
-                label: 'OS X El Capitan 10.11',
-                name: 'osx-10.11',
-                platform: 'darwin',
-                target_type: 'hosts',
-              },
-              {
-                id: 4,
-                label: 'Jason Meller\'s Macbook Pro',
-                name: 'jmeller.local',
-                platform: 'darwin',
-                target_type: 'hosts',
-              },
-              {
-                id: 4,
-                label: 'All Macs',
-                name: 'macs',
-                count: 1234,
-                target_type: 'labels',
-              },
-            ],
-            selected_targets_count: 1234,
-          });
-        });
+  describe.only('#getTargets', () => {
+    it('correctly parses the response', (done) => {
+      const bearerToken = 'valid-bearer-token';
+      const hosts = [];
+      const labels = [];
+      const query = 'mac';
+      const request = validGetTargetsRequest(bearerToken, query);
+
+      Kolide.setBearerToken(bearerToken);
+      Kolide.getTargets({ query, selected: { hosts, labels } })
+        .then(() => {
+          expect(request.isDone()).toEqual(true);
+          done();
+        })
+        .catch(done);
     });
   });
 
