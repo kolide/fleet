@@ -10,5 +10,11 @@ describe('RegistrationForm - component', () => {
 
     expect(form.find('AdminDetails').length).toEqual(1);
   });
+
+  it('renders OrgDetails on the second page', () => {
+    const form = mount(<RegistrationForm page={2} />);
+
+    expect(form.find('OrgDetails').length).toEqual(1);
+  });
 });
 

@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 
 import AdminDetails from 'components/forms/RegistrationForm/AdminDetails';
+import OrgDetails from 'components/forms/RegistrationForm/OrgDetails';
 
 class RegistrationForm extends Component {
   static propTypes = {
@@ -20,6 +21,9 @@ class RegistrationForm extends Component {
         password: '',
         password_confirmation: '',
         email: '',
+        org_name: '',
+        org_web_url: '',
+        org_logo_url: '',
       },
     };
   }
@@ -64,6 +68,17 @@ class RegistrationForm extends Component {
     if (page === 1) {
       return (
         <AdminDetails
+          errors={errors}
+          formData={formData}
+          onChange={onInputFieldChange}
+          onSubmit={onPageFormSubmit}
+        />
+      );
+    }
+
+    if (page === 2) {
+      return (
+        <OrgDetails
           errors={errors}
           formData={formData}
           onChange={onInputFieldChange}
