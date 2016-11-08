@@ -16,5 +16,11 @@ describe('RegistrationForm - component', () => {
 
     expect(form.find('OrgDetails').length).toEqual(1);
   });
+
+  it('renders KolideDetails on the third page', () => {
+    const form = mount(<RegistrationForm page={3} />);
+
+    expect(form.find('KolideDetails').length).toEqual(1);
+  });
 });
 

@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 
 import AdminDetails from 'components/forms/RegistrationForm/AdminDetails';
+import KolideDetails from 'components/forms/RegistrationForm/KolideDetails';
 import OrgDetails from 'components/forms/RegistrationForm/OrgDetails';
 
 class RegistrationForm extends Component {
@@ -24,6 +25,7 @@ class RegistrationForm extends Component {
         org_name: '',
         org_web_url: '',
         org_logo_url: '',
+        kolide_web_address: '',
       },
     };
   }
@@ -79,6 +81,17 @@ class RegistrationForm extends Component {
     if (page === 2) {
       return (
         <OrgDetails
+          errors={errors}
+          formData={formData}
+          onChange={onInputFieldChange}
+          onSubmit={onPageFormSubmit}
+        />
+      );
+    }
+
+    if (page === 3) {
+      return (
+        <KolideDetails
           errors={errors}
           formData={formData}
           onChange={onInputFieldChange}
