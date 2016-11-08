@@ -28,17 +28,17 @@ class RegistrationForm extends Component {
     };
   }
 
-  onInputFieldChange = (inputData) => {
+  onInputFieldChange = (field, value) => {
     const { errors, formData } = this.state;
 
     this.setState({
       errors: {
         ...errors,
-        [Object.keys(formData)]: null,
+        [field]: null,
       },
       formData: {
         ...formData,
-        ...inputData,
+        [field]: value,
       },
     });
 

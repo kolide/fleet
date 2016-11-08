@@ -40,9 +40,7 @@ describe('OrgDetails - form', () => {
 
       fillInFormInput(orgNameField, 'The Gnar Co');
 
-      expect(onChangeSpy).toHaveBeenCalledWith({
-        org_name: 'The Gnar Co',
-      });
+      expect(onChangeSpy).toHaveBeenCalledWith('org_name', 'The Gnar Co');
     });
   });
 
@@ -75,9 +73,7 @@ describe('OrgDetails - form', () => {
 
       fillInFormInput(orgURLField, 'http://www.thegnar.co');
 
-      expect(onChangeSpy).toHaveBeenCalledWith({
-        org_web_url: 'http://www.thegnar.co',
-      });
+      expect(onChangeSpy).toHaveBeenCalledWith('org_web_url', 'http://www.thegnar.co');
     });
   });
 
@@ -110,9 +106,7 @@ describe('OrgDetails - form', () => {
 
       fillInFormInput(orgLogoField, 'http://www.thegnar.co/logo.png');
 
-      expect(onChangeSpy).toHaveBeenCalledWith({
-        org_logo_url: 'http://www.thegnar.co/logo.png',
-      });
+      expect(onChangeSpy).toHaveBeenCalledWith('org_logo_url', 'http://www.thegnar.co/logo.png');
     });
   });
 

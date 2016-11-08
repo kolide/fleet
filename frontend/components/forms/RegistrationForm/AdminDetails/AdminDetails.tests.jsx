@@ -30,9 +30,7 @@ describe('AdminDetails - form', () => {
 
       fillInFormInput(fullNameField, 'The Gnar Co');
 
-      expect(onChangeSpy).toHaveBeenCalledWith({
-        full_name: 'The Gnar Co',
-      });
+      expect(onChangeSpy).toHaveBeenCalledWith('full_name', 'The Gnar Co');
     });
   });
 
@@ -55,9 +53,7 @@ describe('AdminDetails - form', () => {
 
       fillInFormInput(usernameField, 'Gnar');
 
-      expect(onChangeSpy).toHaveBeenCalledWith({
-        username: 'Gnar',
-      });
+      expect(onChangeSpy).toHaveBeenCalledWith('username', 'Gnar');
     });
   });
 
@@ -80,9 +76,7 @@ describe('AdminDetails - form', () => {
 
       fillInFormInput(passwordField, 'p@ssw0rd');
 
-      expect(onChangeSpy).toHaveBeenCalledWith({
-        password: 'p@ssw0rd',
-      });
+      expect(onChangeSpy).toHaveBeenCalledWith('password', 'p@ssw0rd');
     });
   });
 
@@ -105,9 +99,7 @@ describe('AdminDetails - form', () => {
 
       fillInFormInput(passwordField, 'p@ssw0rd');
 
-      expect(onChangeSpy).toHaveBeenCalledWith({
-        password_confirmation: 'p@ssw0rd',
-      });
+      expect(onChangeSpy).toHaveBeenCalledWith('password_confirmation', 'p@ssw0rd');
     });
   });
 
@@ -130,9 +122,7 @@ describe('AdminDetails - form', () => {
 
       fillInFormInput(emailField, 'hi@gnar.dog');
 
-      expect(onChangeSpy).toHaveBeenCalledWith({
-        email: 'hi@gnar.dog',
-      });
+      expect(onChangeSpy).toHaveBeenCalledWith('email', 'hi@gnar.dog');
     });
   });
 

@@ -33,7 +33,7 @@ class BasePageForm extends Component {
         },
       });
 
-      return handleChange({ [fieldName]: value });
+      return handleChange(fieldName, value);
     };
   }
 
