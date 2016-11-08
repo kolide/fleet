@@ -56,22 +56,21 @@ func (orm gormDB) ListQueries(opt kolide.ListOptions) ([]*kolide.Query, error) {
 	return queries, err
 }
 
-func (orm gormDB) DistributedQueriesForHost(host *kolide.Host) ([]kolide.Query, error) {
-	sql := `
-SELECT DISTINCT dqc.id, q.query
-FROM distributed_query_campaigns dqc
-JOIN distributed_query_campaign_targets dqct
-    ON (dqc.id = dqct.distributed_query_campaign_id)
-LEFT JOIN label_query_executions lqe
-    ON (dqct.type = 0 AND dqct.target_id = lqe.label_id)
-LEFT JOIN hosts h
-    ON ((dqct.type = 0 AND lqe.host_id = h.id AND lqe.matches) OR (dqct.type = 1 AND dqct.target_id = h.id))
-LEFT JOIN distributed_query_executions dqe
-    ON (h.id = dqe.host_id AND dqc.id = dqe.distributed_query_id)
-JOIN queries q
-    ON (dqc.query_id = q.id)
-WHERE dqe.status IS NULL AND h.id = 2;
-`
-	_ = sql
-	return nil, nil
+func (orm gormDB) NewDistributedQueryExecution(exec kolide.DistributedQueryExecution) (kolide.DistributedQueryExecution, error) {
+	err := orm.DB.Create(&exec).Error
+	return exec, err
+}
+
+func (orm gormDB) NewDistributedQueryCampaign(camp kolide.DistributedQueryCampaign) (kolide.DistributedQueryCampaign, error) {
+	err := orm.DB.Create(&camp).Error
+	return camp, err
+}
+
+func (orm gormDB) SaveDistributedQueryCampaign(camp kolide.DistributedQueryCampaign) error {
+	return orm.DB.Save(&camp).Error
+}
+
+func (orm gormDB) NewDistributedQueryCampaignTarget(target kolide.DistributedQueryCampaignTarget) (kolide.DistributedQueryCampaignTarget, error) {
+	err := orm.DB.Create(&target).Error
+	return target, err
 }

@@ -14,7 +14,18 @@ type QueryStore interface {
 	DeleteQuery(query *Query) error
 	Query(id uint) (*Query, error)
 	ListQueries(opt ListOptions) ([]*Query, error)
-	DistributedQueriesForHost(host *Host) ([]Query, error)
+
+	// NewDistributedQueryCampaign creates a new distributed query campaign
+	NewDistributedQueryCampaign(camp DistributedQueryCampaign) (DistributedQueryCampaign, error)
+	// SaveDistributedQueryCampaign updates an existing distributed query
+	// campaign
+	SaveDistributedQueryCampaign(camp DistributedQueryCampaign) error
+	// NewDistributedQueryCampaignTarget adds a new target to an existing
+	// distributed query campaign
+	NewDistributedQueryCampaignTarget(target DistributedQueryCampaignTarget) (DistributedQueryCampaignTarget, error)
+	// NewDistributedQueryCampaignExecution records a new execution for a
+	// distributed query campaign
+	NewDistributedQueryExecution(exec DistributedQueryExecution) (DistributedQueryExecution, error)
 }
 
 type QueryService interface {
