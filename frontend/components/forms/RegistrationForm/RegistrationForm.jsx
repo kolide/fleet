@@ -5,6 +5,13 @@ import ConfirmationPage from 'components/forms/RegistrationForm/ConfirmationPage
 import KolideDetails from 'components/forms/RegistrationForm/KolideDetails';
 import OrgDetails from 'components/forms/RegistrationForm/OrgDetails';
 
+const PAGE_HEADER_TEXT = {
+  1: 'SET USERNAME & PASSWORD',
+  2: 'SET ORGANIZATION DETAILS',
+  3: 'SET KOLIDE WEB ADDRESS',
+  4: 'SUCCESS',
+};
+
 class RegistrationForm extends Component {
   static propTypes = {
     onNextPage: PropTypes.func,
@@ -61,6 +68,52 @@ class RegistrationForm extends Component {
     return handleSubmit(formData);
   }
 
+  renderDescription = () => {
+    const { page } = this.props;
+
+    if (page === 1) {
+      return (
+        <div>
+          <p>Additional admins can be designated within the Kolide App</p>
+          <p>Passwords must include 7 characters, at least 1 number (eg. 0-9) and at least 1 symbol (eg. ^&*#)</p>
+        </div>
+      );
+    }
+
+    if (page === 2) {
+      return (
+        <div>
+          <p>Set your Organization&apos;s name (eg. Yahoo! Inc)</p>
+          <p>Specify the website URL of your organization (eg. Yahoo.com)</p>
+        </div>
+      );
+    }
+
+    if (page === 3) {
+      return (
+        <div>
+          <p>Define the base URL which osqueryd clients use to connect and register with Kolide.</p>
+          <p>
+            <small>Note: Please ensure the URL you choose is accessible to all endpoints that need to communicate with Kolide. Otherwise, they will not be able to correctly register.</small>
+          </p>
+        </div>
+      );
+    }
+
+    return false;
+  }
+
+  renderHeader = () => {
+    const { page } = this.props;
+    const headerText = PAGE_HEADER_TEXT[page];
+
+    if (headerText) {
+      return <h2>{headerText}</h2>;
+    }
+
+    return false;
+  }
+
   renderPageForm = () => {
     const { errors, formData } = this.state;
     const { onInputFieldChange, onPageFormSubmit, onSubmit } = this;
@@ -113,10 +166,12 @@ class RegistrationForm extends Component {
 
   render () {
     const { onSubmit } = this.props;
-    const { renderPageForm } = this;
+    const { renderDescription, renderHeader, renderPageForm } = this;
 
     return (
       <form onSubmit={onSubmit}>
+        {renderHeader()}
+        {renderDescription()}
         {renderPageForm()}
       </form>
     );
