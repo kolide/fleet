@@ -179,6 +179,7 @@ class QueryForm extends Component {
             disabled={!canSaveAsNew(formData, query)}
             onClick={onSaveAsNew}
             text="Save As New..."
+            variant="success"
           />
           <Button
             className={`${baseClass}__run-query-btn`}
