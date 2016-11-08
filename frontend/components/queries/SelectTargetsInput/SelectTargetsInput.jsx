@@ -28,6 +28,7 @@ class SelectTargetsInput extends Component {
       <Select
         className="target-select"
         isLoading={isLoading}
+        labelKey="display_text"
         menuRenderer={menuRenderer}
         multi
         name="targets"
@@ -37,7 +38,7 @@ class SelectTargetsInput extends Component {
         placeholder="Label Name, Host Name, IP Address, etc."
         resetValue={[]}
         value={selectedTargets}
-        valueKey="label"
+        valueKey="display_text"
       />
     );
   }
