@@ -36,9 +36,9 @@ class Breadcrumbs extends Component {
 
     return (
       <div>
-        <button className={page1ClassName} onClick={onClick(1)} />
-        <button className={page2ClassName} onClick={onClick(2)} />
-        <button className={page3ClassName} onClick={onClick(3)} />
+        <button className={page1ClassName} onClick={onClick(1)}>Page 1</button>
+        <button className={page2ClassName} onClick={onClick(2)}>Page 2</button>
+        <button className={page3ClassName} onClick={onClick(3)}>Page 3</button>
       </div>
     );
   }
