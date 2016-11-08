@@ -71,7 +71,7 @@ $base-class: 'button';
   }
 
   &--success {
-    @include button-shadow(darker($success, 10%));
+    @include button-shadow(darken($success, 10%));
     background-color: $success;
     color: $white;
   }
