@@ -22,5 +22,11 @@ describe('RegistrationForm - component', () => {
 
     expect(form.find('KolideDetails').length).toEqual(1);
   });
+
+  it('renders ConfirmationPage on the fourth page', () => {
+    const form = mount(<RegistrationForm page={4} />);
+
+    expect(form.find('ConfirmationPage').length).toEqual(1);
+  });
 });
 

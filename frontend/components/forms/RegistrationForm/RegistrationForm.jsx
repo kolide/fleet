@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 
 import AdminDetails from 'components/forms/RegistrationForm/AdminDetails';
+import ConfirmationPage from 'components/forms/RegistrationForm/ConfirmationPage';
 import KolideDetails from 'components/forms/RegistrationForm/KolideDetails';
 import OrgDetails from 'components/forms/RegistrationForm/OrgDetails';
 
@@ -53,9 +54,7 @@ class RegistrationForm extends Component {
     return onNextPage();
   }
 
-  onSubmit = (evt) => {
-    evt.preventDefault();
-
+  onSubmit = () => {
     const { formData } = this.state;
     const { onSubmit: handleSubmit } = this.props;
 
@@ -64,7 +63,7 @@ class RegistrationForm extends Component {
 
   renderPageForm = () => {
     const { errors, formData } = this.state;
-    const { onInputFieldChange, onPageFormSubmit } = this;
+    const { onInputFieldChange, onPageFormSubmit, onSubmit } = this;
     const { page } = this.props;
 
     if (page === 1) {
@@ -96,6 +95,15 @@ class RegistrationForm extends Component {
           formData={formData}
           onChange={onInputFieldChange}
           onSubmit={onPageFormSubmit}
+        />
+      );
+    }
+
+    if (page === 4) {
+      return (
+        <ConfirmationPage
+          formData={formData}
+          onSubmit={onSubmit}
         />
       );
     }

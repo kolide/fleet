@@ -1,14 +1,11 @@
 import { Component, PropTypes } from 'react';
 
-const formInterface = PropTypes.shape({
-  fullName: PropTypes.string,
-  username: PropTypes.string,
-});
+import formDataInterface from 'interfaces/registration_form_data';
 
 class BasePageForm extends Component {
   static propTypes = {
-    errors: formInterface.isRequired,
-    formData: formInterface.isRequired,
+    errors: formDataInterface.isRequired,
+    formData: formDataInterface.isRequired,
     onChange: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
   };
