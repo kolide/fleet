@@ -111,6 +111,28 @@ describe('OrgDetails - form', () => {
   });
 
   describe('submitting the form', () => {
+    it('validates presence of all fields', () => {
+      const onSubmitSpy = createSpy();
+      const form = mount(
+        <OrgDetails
+          errors={noErrors}
+          formData={{}}
+          onChange={noop}
+          onSubmit={onSubmitSpy}
+        />
+      );
+      const submitBtn = form.find('Button');
+
+      submitBtn.simulate('click');
+
+      expect(onSubmitSpy).toNotHaveBeenCalled();
+      expect(form.state().errors).toInclude({
+        org_name: 'Organization name must be present',
+        org_web_url: 'Organization web URL must be present',
+        org_logo_url: 'Organization logo URL must be present',
+      });
+    });
+
     it('submits the form when valid', () => {
       const formData = {
         org_name: 'The Gnar Co.',

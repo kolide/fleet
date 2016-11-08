@@ -6,7 +6,29 @@ import InputFieldWithIcon from 'components/forms/fields/InputFieldWithIcon';
 
 class OrgDetails extends BasePageForm {
   valid = () => {
-    return true;
+    const { errors } = this.state;
+    const {
+      formData: {
+        org_name: orgName,
+        org_web_url: orgWebUrl,
+        org_logo_url: orgLogoUrl,
+      },
+    } = this.props;
+
+    if (orgName && orgWebUrl && orgLogoUrl) {
+      return true;
+    }
+
+    this.setState({
+      errors: {
+        ...errors,
+        org_name: !orgName ? 'Organization name must be present' : null,
+        org_web_url: !orgWebUrl ? 'Organization web URL must be present' : null,
+        org_logo_url: !orgLogoUrl ? 'Organization logo URL must be present' : null,
+      },
+    });
+
+    return false;
   }
 
   render () {
