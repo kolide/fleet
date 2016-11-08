@@ -79,7 +79,8 @@ class InputField extends Component {
       baseClass,
       inputClassName,
       { [`${baseClass}--password`]: shouldShowPasswordClass },
-      { [`${baseClass}--error`]: error }
+      { [`${baseClass}--error`]: error },
+      { [`${baseClass}__textarea`]: type === 'textarea' }
     );
     const inputWrapperClasses = classnames(`${baseClass}__wrapper`, inputWrapperClass);
 
