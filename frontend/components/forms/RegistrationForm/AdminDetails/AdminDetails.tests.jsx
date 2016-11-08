@@ -132,6 +132,31 @@ describe('AdminDetails - form', () => {
       const form = mount(
         <AdminDetails
           errors={noErrors}
+          formData={{}}
+          onChange={noop}
+          onSubmit={onSubmitSpy}
+        />
+      );
+      const submitBtn = form.find('Button');
+
+
+      submitBtn.simulate('click');
+
+      expect(onSubmitSpy).toNotHaveBeenCalled();
+      expect(form.state().errors).toInclude({
+        email: 'Email must be present',
+        full_name: 'Full name must be present',
+        password: 'Password must be present',
+        password_confirmation: 'Password confirmation must be present',
+        username: 'Username must be present',
+      });
+    });
+
+    it('validates the email field', () => {
+      const onSubmitSpy = createSpy();
+      const form = mount(
+        <AdminDetails
+          errors={noErrors}
           formData={{ email: 'invalid-email' }}
           onChange={noop}
           onSubmit={onSubmitSpy}
@@ -151,7 +176,6 @@ describe('AdminDetails - form', () => {
     it('validates the password fields match', () => {
       const onSubmitSpy = createSpy();
       const formData = {
-        email: 'hi@gnar.dog',
         password: 'p@ssw0rd',
         password_confirmation: 'password123',
       };
@@ -177,8 +201,10 @@ describe('AdminDetails - form', () => {
       const onSubmitSpy = createSpy();
       const formData = {
         email: 'hi@gnar.dog',
+        full_name: 'Gnar Dog',
         password: 'p@ssw0rd',
         password_confirmation: 'p@ssw0rd',
+        username: 'gnardog',
       };
       const form = mount(
         <AdminDetails

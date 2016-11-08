@@ -45,7 +45,7 @@ describe('KolideDetails - form', () => {
   });
 
   describe('submitting the form', () => {
-    it('does not submit the form when invalid', () => {
+    it('validates the presence of the kolide web address field', () => {
       const onSubmitSpy = createSpy();
       const form = mount(
         <KolideDetails
@@ -62,6 +62,26 @@ describe('KolideDetails - form', () => {
       expect(onSubmitSpy).toNotHaveBeenCalled();
       expect(form.state().errors).toInclude({
         kolide_web_address: 'Kolide web address must be completed',
+      });
+    });
+
+    it('validates the kolide web address field starts with https://', () => {
+      const onSubmitSpy = createSpy();
+      const form = mount(
+        <KolideDetails
+          errors={noErrors}
+          formData={{ kolide_web_address: 'http://google.com' }}
+          onChange={noop}
+          onSubmit={onSubmitSpy}
+        />
+      );
+      const submitBtn = form.find('Button');
+
+      submitBtn.simulate('click');
+
+      expect(onSubmitSpy).toNotHaveBeenCalled();
+      expect(form.state().errors).toInclude({
+        kolide_web_address: 'Kolide web address must start with https://',
       });
     });
 

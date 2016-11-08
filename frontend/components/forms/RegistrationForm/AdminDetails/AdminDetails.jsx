@@ -1,4 +1,5 @@
 import React from 'react';
+import { size } from 'lodash';
 
 import BasePageForm from 'components/forms/RegistrationForm/BasePageForm';
 import Button from 'components/buttons/Button';
@@ -8,31 +9,51 @@ import validEmail from 'components/forms/validators/valid_email';
 
 class AdminDetails extends BasePageForm {
   valid = () => {
+    const clientErrors = {};
     const { errors } = this.state;
     const {
       formData: {
         email,
+        full_name: fullName,
         password,
         password_confirmation: passwordConfirmation,
+        username,
       },
     } = this.props;
 
     if (!validEmail(email)) {
-      this.setState({
-        errors: {
-          ...errors,
-          email: 'Email must be a valid email',
-        },
-      });
-
-      return false;
+      clientErrors.email = 'Email must be a valid email';
     }
 
-    if (!validateEquality(password, passwordConfirmation)) {
+    if (!email) {
+      clientErrors.email = 'Email must be present';
+    }
+
+    if (!fullName) {
+      clientErrors.full_name = 'Full name must be present';
+    }
+
+    if (!username) {
+      clientErrors.username = 'Username must be present';
+    }
+
+    if (password && passwordConfirmation && !validateEquality(password, passwordConfirmation)) {
+      clientErrors.password_confirmation = 'Password confirmation does not match password';
+    }
+
+    if (!password) {
+      clientErrors.password = 'Password must be present';
+    }
+
+    if (!passwordConfirmation) {
+      clientErrors.password_confirmation = 'Password confirmation must be present';
+    }
+
+    if (size(clientErrors)) {
       this.setState({
         errors: {
           ...errors,
-          password_confirmation: 'Password confirmation does not match password',
+          ...clientErrors,
         },
       });
 

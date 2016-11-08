@@ -133,11 +133,31 @@ describe('OrgDetails - form', () => {
       });
     });
 
+    it('validates the logo url field starts with https://', () => {
+      const onSubmitSpy = createSpy();
+      const form = mount(
+        <OrgDetails
+          errors={noErrors}
+          formData={{ org_logo_url: 'http://google.com' }}
+          onChange={noop}
+          onSubmit={onSubmitSpy}
+        />
+      );
+      const submitBtn = form.find('Button');
+
+      submitBtn.simulate('click');
+
+      expect(onSubmitSpy).toNotHaveBeenCalled();
+      expect(form.state().errors).toInclude({
+        org_logo_url: 'Organization logo URL must start with https://',
+      });
+    });
+
     it('submits the form when valid', () => {
       const formData = {
         org_name: 'The Gnar Co.',
         org_web_url: 'http://www.thegnar.co',
-        org_logo_url: 'http://www.thegnar.co/logo.png',
+        org_logo_url: 'https://thegnar.co/assets/logo.png',
       };
       const onSubmitSpy = createSpy();
       const form = mount(

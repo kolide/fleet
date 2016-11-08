@@ -1,4 +1,5 @@
 import React from 'react';
+import { size, startsWith } from 'lodash';
 
 import BasePageForm from 'components/forms/RegistrationForm/BasePageForm';
 import Button from 'components/buttons/Button';
@@ -6,6 +7,7 @@ import InputFieldWithIcon from 'components/forms/fields/InputFieldWithIcon';
 
 class KolideDetails extends BasePageForm {
   valid = () => {
+    const clientErrors = {};
     const {
       errors,
       formData: {
@@ -13,18 +15,26 @@ class KolideDetails extends BasePageForm {
       },
     } = this.props;
 
-    if (kolideWebAddress) {
-      return true;
+    if (!kolideWebAddress) {
+      clientErrors.kolide_web_address = 'Kolide web address must be completed';
     }
 
-    this.setState({
-      errors: {
-        ...errors,
-        kolide_web_address: 'Kolide web address must be completed',
-      },
-    });
+    if (kolideWebAddress && !startsWith(kolideWebAddress, 'https://')) {
+      clientErrors.kolide_web_address = 'Kolide web address must start with https://';
+    }
 
-    return false;
+    if (size(clientErrors)) {
+      this.setState({
+        errors: {
+          ...errors,
+          ...clientErrors,
+        },
+      });
+
+      return false;
+    }
+
+    return true;
   }
 
   render () {

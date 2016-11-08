@@ -1,4 +1,5 @@
 import React from 'react';
+import { size, startsWith } from 'lodash';
 
 import BasePageForm from 'components/forms/RegistrationForm/BasePageForm';
 import Button from 'components/buttons/Button';
@@ -6,29 +7,40 @@ import InputFieldWithIcon from 'components/forms/fields/InputFieldWithIcon';
 
 class OrgDetails extends BasePageForm {
   valid = () => {
+    const clientErrors = {};
     const { errors } = this.state;
     const {
       formData: {
         org_name: orgName,
-        org_web_url: orgWebUrl,
         org_logo_url: orgLogoUrl,
       },
     } = this.props;
 
-    if (orgName && orgWebUrl && orgLogoUrl) {
-      return true;
+    if (!orgName) {
+      clientErrors.org_name = 'Organization name must be present';
     }
 
-    this.setState({
-      errors: {
-        ...errors,
-        org_name: !orgName ? 'Organization name must be present' : null,
-        org_web_url: !orgWebUrl ? 'Organization web URL must be present' : null,
-        org_logo_url: !orgLogoUrl ? 'Organization logo URL must be present' : null,
-      },
-    });
+    if (!orgLogoUrl) {
+      clientErrors.org_logo_url = 'Organization logo URL must be present';
+    }
 
-    return false;
+    if (orgLogoUrl && !startsWith(orgLogoUrl, 'https://')) {
+      clientErrors.org_logo_url = 'Organization logo URL must start with https://';
+    }
+
+
+    if (size(clientErrors)) {
+      this.setState({
+        errors: {
+          ...errors,
+          ...clientErrors,
+        },
+      });
+
+      return false;
+    }
+
+    return true;
   }
 
   render () {
@@ -55,7 +67,7 @@ class OrgDetails extends BasePageForm {
           error={errors('org_logo_url')}
           name="org logo url"
           onChange={onChange('org_logo_url')}
-          placeholder="Organization Logo URL"
+          placeholder="Organization Logo URL (must start with https://)"
           value={formData.org_logo_url}
         />
         <Button
