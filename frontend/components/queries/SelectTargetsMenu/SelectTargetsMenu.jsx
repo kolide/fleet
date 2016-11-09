@@ -1,6 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
-import { includes, isEqual, noop } from 'lodash';
+import { filter, includes, isEqual, noop } from 'lodash';
 
 import { shouldShowModal } from './helpers';
 import TargetOption from '../TargetOption';
@@ -19,44 +19,56 @@ const SelectTargetsMenuWrapper = (onMoreInfoClick, onRemoveMoreInfoTarget, moreI
     onOptionRef,
   }) => {
     const Option = optionComponent;
+    const renderTargets = (targetType) => {
+      const targets = filter(options, { target_type: targetType });
 
-    return options.map((option, index) => {
-      const { disabled: isDisabled } = option;
-      const isSelected = includes(valueArray, option);
-      const isFocused = isEqual(focusedOption, option);
-      const className = classNames(optionClassName, {
-        'Select-option': true,
-        'is-selected': isSelected,
-        'is-focused': isFocused,
-        'is-disabled': true,
+      return targets.map((target, index) => {
+        const { disabled: isDisabled } = target;
+        const isSelected = includes(valueArray, target);
+        const isFocused = isEqual(focusedOption, target);
+        const className = classNames(optionClassName, {
+          'Select-option': true,
+          'is-selected': isSelected,
+          'is-focused': isFocused,
+          'is-disabled': true,
+        });
+        const setRef = (ref) => { onOptionRef(ref, isFocused); };
+        const isShowModal = shouldShowModal(moreInfoTarget, target);
+
+        return (
+          <Option
+            className={className}
+            instancePrefix={instancePrefix}
+            isDisabled={isDisabled}
+            isFocused={isFocused}
+            isSelected={isSelected}
+            key={`option-${index}-${target[valueKey]}`}
+            onFocus={onFocus}
+            onSelect={noop}
+            option={target}
+            optionIndex={index}
+            ref={setRef}
+          >
+            <TargetOption
+              target={moreInfoTarget && isShowModal ? moreInfoTarget : target}
+              onSelect={onSelect}
+              onRemoveMoreInfoTarget={onRemoveMoreInfoTarget}
+              onMoreInfoClick={onMoreInfoClick}
+              shouldShowModal={isShowModal}
+            />
+          </Option>
+        );
       });
-      const setRef = (ref) => { onOptionRef(ref, isFocused); };
-      const isShowModal = shouldShowModal(moreInfoTarget, option);
+    };
 
-      return (
-        <Option
-          className={className}
-          instancePrefix={instancePrefix}
-          isDisabled={isDisabled}
-          isFocused={isFocused}
-          isSelected={isSelected}
-          key={`option-${index}-${option[valueKey]}`}
-          onFocus={onFocus}
-          onSelect={noop}
-          option={option}
-          optionIndex={index}
-          ref={setRef}
-        >
-          <TargetOption
-            target={moreInfoTarget && isShowModal ? moreInfoTarget : option}
-            onSelect={onSelect}
-            onRemoveMoreInfoTarget={onRemoveMoreInfoTarget}
-            onMoreInfoClick={onMoreInfoClick}
-            shouldShowModal={isShowModal}
-          />
-        </Option>
-      );
-    });
+    return (
+      <div>
+        <div>hosts</div>
+        {renderTargets('hosts')}
+        <div>labels</div>
+        {renderTargets('labels')}
+      </div>
+    );
   };
 
   return SelectTargetsMenu;
