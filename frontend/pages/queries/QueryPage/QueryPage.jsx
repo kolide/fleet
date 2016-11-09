@@ -72,6 +72,12 @@ class QueryPage extends Component {
     return false;
   }
 
+  onCloseTargetSelect = () => {
+    this.onRemoveMoreInfoTarget();
+
+    return false;
+  }
+
   onOsqueryTableSelect = (tableName) => {
     const { dispatch } = this.props;
 
@@ -137,6 +143,12 @@ class QueryPage extends Component {
   onTargetSelectMoreInfo = (moreInfoTarget) => {
     return (evt) => {
       evt.preventDefault();
+
+      if (isEqual(moreInfoTarget, this.state.moreInfoTarget)) {
+        this.setState({ moreInfoTarget: null });
+
+        return false;
+      }
 
       const { target_type: targetType } = moreInfoTarget;
 
@@ -220,6 +232,7 @@ class QueryPage extends Component {
   render () {
     const {
       fetchTargets,
+      onCloseTargetSelect,
       onOsqueryTableSelect,
       onRemoveMoreInfoTarget,
       onRunQuery,
@@ -247,6 +260,7 @@ class QueryPage extends Component {
         <QueryComposer
           isLoadingTargets={isLoadingTargets}
           moreInfoTarget={moreInfoTarget}
+          onCloseTargetSelect={onCloseTargetSelect}
           onOsqueryTableSelect={onOsqueryTableSelect}
           onRemoveMoreInfoTarget={onRemoveMoreInfoTarget}
           onRunQuery={onRunQuery}

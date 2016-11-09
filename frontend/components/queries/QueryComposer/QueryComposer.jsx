@@ -18,6 +18,7 @@ class QueryComposer extends Component {
   static propTypes = {
     isLoadingTargets: PropTypes.bool,
     moreInfoTarget: targetInterface,
+    onCloseTargetSelect: PropTypes.func,
     onOsqueryTableSelect: PropTypes.func,
     onRemoveMoreInfoTarget: PropTypes.func,
     onRunQuery: PropTypes.func,
@@ -101,6 +102,7 @@ class QueryComposer extends Component {
     const {
       isLoadingTargets,
       moreInfoTarget,
+      onCloseTargetSelect,
       onRemoveMoreInfoTarget,
       onTargetSelect,
       onTargetSelectInputChange,
@@ -146,6 +148,7 @@ class QueryComposer extends Component {
           <SelectTargetsInput
             isLoading={isLoadingTargets}
             menuRenderer={menuRenderer}
+            onCloseTargetSelect={onCloseTargetSelect}
             onTargetSelect={onTargetSelect}
             onTargetSelectInputChange={onTargetSelectInputChange}
             selectedTargets={selectedTargets}
