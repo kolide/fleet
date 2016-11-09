@@ -25,7 +25,7 @@ import (
 )
 
 func createServeCmd(configManager config.Manager) *cobra.Command {
-	var devMode bool = false
+	var devMode = false
 
 	serveCmd := &cobra.Command{
 		Use:   "serve",
@@ -123,7 +123,7 @@ the way that the kolide server works.
 				// WithSetup will check if first time setup is required
 				// By performing the same check inside main, we can make server startups
 				// more efficient after the first startup.
-				if requireSetup(svc) {
+				if service.RequireSetup(svc, logger) {
 					apiHandler = service.WithSetup(svc, logger, apiHandler)
 				}
 			}
@@ -161,14 +161,6 @@ the way that the kolide server works.
 	serveCmd.PersistentFlags().BoolVar(&devMode, "dev", false, "Use dev settings (in-mem DB, etc.)")
 
 	return serveCmd
-}
-
-func requireSetup(svc kolide.Service) bool {
-	users, err := svc.ListUsers(context.Background(), kolide.ListOptions{Page: 1, PerPage: 2})
-	if err != nil {
-		initFatal(err, "checking requireSetup")
-	}
-	return len(users) == 0
 }
 
 // used in devMode to print an email

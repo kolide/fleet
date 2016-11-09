@@ -317,15 +317,7 @@ func WithSetup(svc kolide.Service, logger kitlog.Logger, next http.Handler) http
 		decodeSetupRequest,
 		encodeResponse,
 	))
-	var requireSetup bool
-	{
-		users, err := svc.ListUsers(context.Background(), kolide.ListOptions{Page: 1, PerPage: 2})
-		if err != nil {
-			logger.Log("err", err)
-		}
-		requireSetup = len(users) == 0
-	}
-	if requireSetup {
+	if RequireSetup(svc, logger) {
 		return configRouter
 	}
 	return next
@@ -338,4 +330,13 @@ func forceSetup(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(&response); err != nil {
 		encodeError(context.Background(), err, w)
 	}
+}
+
+// RequireSetup checks if the service must be configured by an administrator.
+func RequireSetup(svc kolide.Service, logger kitlog.Logger) bool {
+	users, err := svc.ListUsers(context.Background(), kolide.ListOptions{Page: 1, PerPage: 1})
+	if err != nil {
+		logger.Log("err", err)
+	}
+	return len(users) == 0
 }
