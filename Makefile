@@ -4,8 +4,10 @@ PATH := $(GOPATH)/bin:$(shell npm bin):$(PATH)
 
 ifeq ($(OS), Windows_NT)
 	GC_OFF = set GOGC=off &&
+	SET_NODE_PATH = set NODE_PATH=./frontend &&
 else
 	GC_OFF = GOGC=off
+	SET_NODE_PATH = NODE_PATH=./frontend
 endif
 
 ifneq ($(OS), Windows_NT)
@@ -103,11 +105,11 @@ test-go:
 	go test -cover $(shell glide nv)
 
 test-js:
-	NODE_PATH=./frontend _mocha --compilers js:babel-core/register,tsx:typescript-require  \
-		--recursive 'frontend/**/*.tests.js*' \
+	${SET_NODE_PATH} _mocha --compilers js:babel-core/register,tsx:typescript-require  \
+		--recursive "frontend/**/*.tests.js*" \
 		--require ignore-styles \
-		--require 'frontend/.test.setup.js' \
-		--require 'frontend/test/loaderMock.js'
+		--require "frontend/.test.setup.js" \
+		--require "frontend/test/loaderMock.js"
 
 test: lint test-go test-js
 
