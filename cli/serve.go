@@ -279,34 +279,67 @@ func createDevOrgInfo(ds kolide.Datastore, config config.KolideConfig) {
 func createDevQueries(ds kolide.Datastore, config config.KolideConfig) {
 	queries := []kolide.Query{
 		{
-			CreatedAt: time.Date(2016, time.October, 17, 7, 6, 0, 0, time.UTC),
-			UpdatedAt: time.Date(2016, time.October, 17, 7, 6, 0, 0, time.UTC),
-			Name:      "dev_query_1",
-			Query:     "select * from processes",
+			UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
+				CreateTimestamp: kolide.CreateTimestamp{
+					CreatedAt: time.Date(2016, time.October, 17, 7, 6, 0, 0, time.UTC),
+				},
+				UpdateTimestamp: kolide.UpdateTimestamp{
+					UpdatedAt: time.Date(2016, time.October, 17, 7, 6, 0, 0, time.UTC),
+				},
+			},
+
+			Name:  "dev_query_1",
+			Query: "select * from processes",
 		},
 		{
-			CreatedAt: time.Date(2016, time.October, 27, 4, 3, 10, 0, time.UTC),
-			UpdatedAt: time.Date(2016, time.October, 27, 4, 3, 10, 0, time.UTC),
-			Name:      "dev_query_2",
-			Query:     "select * from time",
+			UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
+				CreateTimestamp: kolide.CreateTimestamp{
+					CreatedAt: time.Date(2016, time.October, 27, 4, 3, 10, 0, time.UTC),
+				},
+				UpdateTimestamp: kolide.UpdateTimestamp{
+					UpdatedAt: time.Date(2016, time.October, 27, 4, 3, 10, 0, time.UTC),
+				},
+			},
+			Name:  "dev_query_2",
+			Query: "select * from time",
 		},
 		{
-			CreatedAt: time.Now().Add(-24 * time.Hour),
-			UpdatedAt: time.Now().Add(-17 * time.Hour),
-			Name:      "dev_query_3",
-			Query:     "select * from cpuid",
+			UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
+				CreateTimestamp: kolide.CreateTimestamp{
+					CreatedAt: time.Now().Add(-24 * time.Hour),
+				},
+				UpdateTimestamp: kolide.UpdateTimestamp{
+					UpdatedAt: time.Now().Add(-17 * time.Hour),
+				},
+			},
+
+			Name:  "dev_query_3",
+			Query: "select * from cpuid",
 		},
 		{
-			CreatedAt: time.Now().Add(-1 * time.Hour),
-			UpdatedAt: time.Now().Add(-30 * time.Minute),
-			Name:      "dev_query_4",
-			Query:     "select 1 from processes where name like '%Apache%'",
+			UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
+				CreateTimestamp: kolide.CreateTimestamp{
+					CreatedAt: time.Now().Add(-1 * time.Hour),
+				},
+				UpdateTimestamp: kolide.UpdateTimestamp{
+					UpdatedAt: time.Now().Add(-30 * time.Hour),
+				},
+			},
+
+			Name:  "dev_query_4",
+			Query: "select 1 from processes where name like '%Apache%'",
 		},
 		{
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
-			Name:      "dev_query_5",
-			Query:     "select 1 from osquery_info where build_platform='darwin'",
+			UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
+				CreateTimestamp: kolide.CreateTimestamp{
+					CreatedAt: time.Now(),
+				},
+				UpdateTimestamp: kolide.UpdateTimestamp{
+					UpdatedAt: time.Now(),
+				},
+			},
+			Name:  "dev_query_5",
+			Query: "select 1 from osquery_info where build_platform='darwin'",
 		},
 	}
 

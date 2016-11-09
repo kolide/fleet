@@ -6,14 +6,20 @@ import (
 	"github.com/kolide/kolide-ose/server/kolide"
 )
 
-func (orm gormDB) NewPack(pack *kolide.Pack) error {
+func (orm gormDB) NewPack(pack *kolide.Pack) (*kolide.Pack, error) {
 	if pack == nil {
-		return errors.New(
+		return nil, errors.New(
 			"error creating pack",
 			"nil pointer passed to NewPack",
 		)
 	}
-	return orm.DB.Create(pack).Error
+
+	if err := orm.DB.Create(pack).Error; err != nil {
+		return nil, err
+	}
+
+	return pack, nil
+
 }
 
 func (orm gormDB) SavePack(pack *kolide.Pack) error {

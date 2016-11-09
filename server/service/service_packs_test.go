@@ -22,7 +22,7 @@ func TestListPacks(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Len(t, queries, 0)
 
-	err = ds.NewPack(&kolide.Pack{
+	_, err = ds.NewPack(&kolide.Pack{
 		Name: "foo",
 	})
 	assert.Nil(t, err)
@@ -44,7 +44,7 @@ func TestGetPack(t *testing.T) {
 	pack := &kolide.Pack{
 		Name: "foo",
 	}
-	err = ds.NewPack(pack)
+	_, err = ds.NewPack(pack)
 	assert.Nil(t, err)
 	assert.NotZero(t, pack.ID)
 
@@ -87,7 +87,7 @@ func TestModifyPack(t *testing.T) {
 	pack := &kolide.Pack{
 		Name: "foo",
 	}
-	err = ds.NewPack(pack)
+	_, err = ds.NewPack(pack)
 	assert.Nil(t, err)
 	assert.NotZero(t, pack.ID)
 
@@ -113,7 +113,7 @@ func TestDeletePack(t *testing.T) {
 	pack := &kolide.Pack{
 		Name: "foo",
 	}
-	err = ds.NewPack(pack)
+	_, err = ds.NewPack(pack)
 	assert.Nil(t, err)
 	assert.NotZero(t, pack.ID)
 
@@ -138,7 +138,7 @@ func TestAddQueryToPack(t *testing.T) {
 	pack := &kolide.Pack{
 		Name: "foo",
 	}
-	err = ds.NewPack(pack)
+	_, err = ds.NewPack(pack)
 	assert.Nil(t, err)
 	assert.NotZero(t, pack.ID)
 
@@ -174,7 +174,7 @@ func TestGetQueriesInPack(t *testing.T) {
 	pack := &kolide.Pack{
 		Name: "foo",
 	}
-	err = ds.NewPack(pack)
+	_, err = ds.NewPack(pack)
 	assert.Nil(t, err)
 	assert.NotZero(t, pack.ID)
 
@@ -206,7 +206,7 @@ func TestRemoveQueryFromPack(t *testing.T) {
 	pack := &kolide.Pack{
 		Name: "foo",
 	}
-	err = ds.NewPack(pack)
+	_, err = ds.NewPack(pack)
 	assert.Nil(t, err)
 	assert.NotZero(t, pack.ID)
 

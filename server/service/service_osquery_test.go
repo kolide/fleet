@@ -412,7 +412,7 @@ func TestGetClientConfig(t *testing.T) {
 	monitoringPack := &kolide.Pack{
 		Name: "monitoring",
 	}
-	err = ds.NewPack(monitoringPack)
+	_, err = ds.NewPack(monitoringPack)
 	assert.Nil(t, err)
 
 	err = ds.AddQueryToPack(infoQuery.ID, monitoringPack.ID)

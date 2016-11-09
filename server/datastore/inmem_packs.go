@@ -6,12 +6,12 @@ import (
 	"github.com/kolide/kolide-ose/server/kolide"
 )
 
-func (orm *inmem) NewPack(pack *kolide.Pack) error {
+func (orm *inmem) NewPack(pack *kolide.Pack) (*kolide.Pack, error) {
 	newPack := *pack
 
 	for _, q := range orm.packs {
 		if pack.Name == q.Name {
-			return ErrExists
+			return nil, ErrExists
 		}
 	}
 
@@ -20,10 +20,9 @@ func (orm *inmem) NewPack(pack *kolide.Pack) error {
 	orm.packs[newPack.ID] = &newPack
 	orm.mtx.Unlock()
 
-	// TODO NewPack should return (*kolide.Pack, error) and this is a work around
 	pack.ID = newPack.ID
 
-	return nil
+	return pack, nil
 }
 
 func (orm *inmem) SavePack(pack *kolide.Pack) error {
