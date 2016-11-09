@@ -49,18 +49,7 @@ describe('TargetOption - component', () => {
     expect(component.text()).toContain(hostTarget.ip);
   });
 
-  it('renders the TargetInfoModal when shouldShowModal is true', () => {
-    const component = mount(
-      <TargetOption
-        onMoreInfoClick={noop}
-        target={hostTarget}
-        shouldShowModal
-      />
-    );
-    expect(component.find('TargetInfoModal').length).toEqual(1);
-  });
-
-  it('calls the onSelect prop when ADD button is clicked', () => {
+  it('calls the onSelect prop when + icon button is clicked', () => {
     const onSelectSpy = createSpy();
     const component = mount(
       <TargetOption
@@ -69,11 +58,11 @@ describe('TargetOption - component', () => {
         target={hostTarget}
       />
     );
-    component.find('.target-option__btn').simulate('click');
+    component.find('.target-option__add-btn').simulate('click');
     expect(onSelectSpy).toHaveBeenCalled();
   });
 
-  it('calls the onMoreInfoClick prop when "more info" button is clicked', () => {
+  it('calls the onMoreInfoClick prop when the item content is clicked', () => {
     const onMoreInfoClickSpy = createSpy();
     const onMoreInfoClick = () => {
       return onMoreInfoClickSpy;
@@ -84,7 +73,7 @@ describe('TargetOption - component', () => {
         target={hostTarget}
       />
     );
-    component.find('.target-option__more-info').simulate('click');
+    component.find('.target-option__target-content').simulate('click');
     expect(onMoreInfoClickSpy).toHaveBeenCalled();
   });
 });

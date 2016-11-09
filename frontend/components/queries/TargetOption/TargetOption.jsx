@@ -3,16 +3,14 @@ import classnames from 'classnames';
 
 import Button from '../../buttons/Button';
 import targetInterface from '../../../interfaces/target';
-import TargetInfoModal from '../../modals/TargetInfoModal';
 
-const classBlock = 'target-option';
+const baseClass = 'target-option';
 
 class TargetOption extends Component {
   static propTypes = {
     onMoreInfoClick: PropTypes.func,
     onRemoveMoreInfoTarget: PropTypes.func,
     onSelect: PropTypes.func,
-    shouldShowModal: PropTypes.bool,
     target: targetInterface.isRequired,
   };
 
@@ -28,15 +26,6 @@ class TargetOption extends Component {
     const { onSelect, target } = this.props;
 
     return onSelect(target, evt);
-  }
-
-  handleSelectFromModal = (evt) => {
-    const { handleSelect } = this;
-    const { onRemoveMoreInfoTarget } = this.props;
-
-    handleSelect(evt);
-
-    return onRemoveMoreInfoTarget();
   }
 
   hostPlatformIconClass = () => {
@@ -64,28 +53,10 @@ class TargetOption extends Component {
     const { count, ip, target_type: targetType } = target;
 
     if (targetType === 'hosts') {
-      return <span className={`${classBlock}__ip`}>{ip}</span>;
+      return <span className={`${baseClass}__ip`}>{ip}</span>;
     }
 
-    return <span className={`${classBlock}__count`}>{count} hosts</span>;
-  }
-
-  renderTargetInfoModal = () => {
-    const { shouldShowModal, target } = this.props;
-    const { handleRemoveMoreInfoTarget } = this;
-
-    if (!shouldShowModal) return false;
-
-    const { handleSelectFromModal } = this;
-
-    return (
-      <TargetInfoModal
-        className={`${classBlock}__modal-wrapper`}
-        onAdd={handleSelectFromModal}
-        onExit={handleRemoveMoreInfoTarget}
-        target={target}
-      />
-    );
+    return <span className={`${baseClass}__count`}>{count} hosts</span>;
   }
 
   render () {
@@ -96,23 +67,24 @@ class TargetOption extends Component {
       hostPlatformIconClass,
       targetIconClass,
       renderTargetDetail,
-      renderTargetInfoModal,
     } = this;
-    const wrapperClassName = classnames(`${classBlock}__wrapper`, {
+    const wrapperClassName = classnames(`${baseClass}__wrapper`, {
       '--is-label': targetType === 'labels',
       '--is-host': targetType === 'hosts',
     });
 
     return (
       <div className={wrapperClassName}>
-        <i className={`${targetIconClass()} ${classBlock}__target-icon`} />
-        {targetType === 'hosts' && <i className={`${classBlock}__icon ${hostPlatformIconClass()}`} />}
-        <span className={`${classBlock}__label-label`}>{displayText}</span>
-        <span className={`${classBlock}__delimeter`}>&bull;</span>
-        {renderTargetDetail()}
-        <Button className={`${classBlock}__btn`} text="ADD" onClick={handleSelect} />
-        <Button className={`${classBlock}__more-info`} onClick={onMoreInfoClick(target)} text="more info" variant="unstyled" />
-        {renderTargetInfoModal()}
+        <button className={`button button--unstyled ${baseClass}__add-btn`} onClick={handleSelect}>
+          <i className="kolidecon-single-host" />
+        </button>
+        <button className={`button button--unstyled ${baseClass}__target-content`} onClick={onMoreInfoClick(target)}>
+          {targetType === 'hosts' && <i className={`${baseClass}__icon ${hostPlatformIconClass()}`} />}
+          {targetType === 'labels' && <i className={`${baseClass}__icon kolidecon-label`} />}
+          <span className={`${baseClass}__label-label`}>{displayText}</span>
+          <span className={`${baseClass}__delimeter`}>&bull;</span>
+          {renderTargetDetail()}
+        </button>
       </div>
     );
   }
