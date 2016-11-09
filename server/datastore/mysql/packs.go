@@ -4,8 +4,23 @@ import (
 	"github.com/kolide/kolide-ose/server/kolide"
 )
 
-func (d *Datastore) NewPack(pack *kolide.Pack) error {
-	panic("not implemented")
+// NewPack creates a new Pack
+func (d *Datastore) NewPack(pack *kolide.Pack) (*kolide.Pack, error) {
+	pack.MarkAsCreated(d.clock.Now())
+
+	sql := `
+		INSERT INTO packs (created_at, updated_at, name, platform )
+			VALUES ( ?, ?, ?, ?)
+	`
+
+	result, err := d.db.Exec(sql, pack.CreatedAt, pack.UpdatedAt, pack.Name, pack.Platform)
+	if err != nil {
+		return nil, err
+	}
+
+	id, _ := result.LastInsertId()
+	pack.ID = uint(id)
+	return pack, nil
 }
 
 func (d *Datastore) SavePack(pack *kolide.Pack) error {
