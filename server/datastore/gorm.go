@@ -52,7 +52,7 @@ func (orm gormDB) Migrate() error {
 	if err != nil {
 		return err
 	}
-	err = orm.DB.Model(&kolide.DistributedQueryExecution{}).AddUniqueIndex("idx_dqe_unique_host_dq_id", "host_id", "distributed_query_id").Error
+	err = orm.DB.Model(&kolide.DistributedQueryExecution{}).AddUniqueIndex("idx_dqe_unique_host_dq_id", "host_id", "distributed_query_campaign_id").Error
 	if err != nil {
 		return err
 	}

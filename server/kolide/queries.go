@@ -107,12 +107,12 @@ type DistributedQueryResult struct {
 }
 
 type DistributedQueryExecution struct {
-	ID                 uint `gorm:"primary_key"`
-	HostID             uint // unique index added in migrate
-	DistributedQueryID uint // unique index added in migrate
-	Status             DistributedQueryExecutionStatus
-	Error              string `gorm:"size:1024"`
-	ExecutionDuration  time.Duration
+	ID                         uint `gorm:"primary_key"`
+	HostID                     uint // unique index added in migrate
+	DistributedQueryCampaignID uint // unique index added in migrate
+	Status                     DistributedQueryExecutionStatus
+	Error                      string `gorm:"size:1024"`
+	ExecutionDuration          time.Duration
 }
 
 type Option struct {

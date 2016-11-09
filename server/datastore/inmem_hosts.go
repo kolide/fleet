@@ -209,7 +209,7 @@ func (orm *inmem) DistributedQueriesForHost(host *kolide.Host) (map[uint]string,
 	hostExecutions := map[uint]kolide.DistributedQueryExecutionStatus{}
 	for _, e := range orm.distributedQueryExecutions {
 		if e.HostID == host.ID {
-			hostExecutions[e.DistributedQueryID] = e.Status
+			hostExecutions[e.DistributedQueryCampaignID] = e.Status
 		}
 	}
 

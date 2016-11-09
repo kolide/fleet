@@ -107,7 +107,7 @@ func (orm *inmem) NewDistributedQueryExecution(exec kolide.DistributedQueryExecu
 	defer orm.mtx.Unlock()
 
 	for _, e := range orm.distributedQueryExecutions {
-		if exec.HostID == e.ID && exec.DistributedQueryID == e.DistributedQueryID {
+		if exec.HostID == e.ID && exec.DistributedQueryCampaignID == e.DistributedQueryCampaignID {
 			return exec, ErrExists
 		}
 	}

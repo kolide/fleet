@@ -222,9 +222,9 @@ func testDistributedQueriesForHost(t *testing.T, db kolide.Datastore) {
 
 	// Record an execution
 	exec := kolide.DistributedQueryExecution{
-		HostID:             h1.ID,
-		DistributedQueryID: c1.ID,
-		Status:             kolide.ExecutionSucceeded,
+		HostID: h1.ID,
+		DistributedQueryCampaignID: c1.ID,
+		Status: kolide.ExecutionSucceeded,
 	}
 	exec, err = db.NewDistributedQueryExecution(exec)
 	require.Nil(t, err)
