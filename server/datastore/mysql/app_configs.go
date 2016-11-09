@@ -2,7 +2,6 @@ package mysql
 
 import (
 	"database/sql"
-	"fmt"
 
 	"github.com/kolide/kolide-ose/server/kolide"
 )
@@ -45,7 +44,7 @@ func (d *Datastore) AppConfig() (*kolide.AppConfig, error) {
 }
 
 func (d *Datastore) SaveAppConfig(info *kolide.AppConfig) error {
-	fmt.Println("save config")
+
 	_, err := d.db.Exec(
 		"UPDATE app_configs SET org_name = ?, org_logo_url = ?, kolide_server_url = ? WHERE id = ?",
 		info.OrgName, info.OrgLogoURL, info.KolideServerURL, info.ID,

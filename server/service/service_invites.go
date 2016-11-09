@@ -34,7 +34,6 @@ func (svc service) InviteNewUser(ctx context.Context, payload kolide.InvitePaylo
 		Email:     *payload.Email,
 		Admin:     *payload.Admin,
 		InvitedBy: inviter.ID,
-		CreatedAt: svc.clock.Now(),
 		Token:     token,
 	}
 	if payload.Position != nil {

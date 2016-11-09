@@ -5,6 +5,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/WatchBeam/clock"
 	"github.com/go-kit/kit/log"
 	"github.com/kolide/kolide-ose/server/datastore/mysql"
 	"github.com/stretchr/testify/require"
@@ -23,9 +24,8 @@ func setupMySQL(t *testing.T) (ds *mysql.Datastore, teardown func()) {
 	}
 
 	connString := fmt.Sprintf("%s:%s@(%s:3306)/%s?charset=utf8&parseTime=True&loc=Local", user, password, host, dbName)
-	fmt.Println(connString)
 
-	ds, err := mysql.New(connString, mysql.Logger(log.NewLogfmtLogger(log.NewSyncWriter(os.Stdout))))
+	ds, err := mysql.New(connString, clock.NewMockClock(), mysql.Logger(log.NewLogfmtLogger(log.NewSyncWriter(os.Stdout))))
 	require.Nil(t, err)
 	teardown = func() {
 		ds.Close()

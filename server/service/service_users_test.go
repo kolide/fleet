@@ -216,7 +216,9 @@ func setupInvites(t *testing.T, ds kolide.Datastore, emails []string) map[string
 			InvitedBy: users["admin1"].ID,
 			Token:     e,
 			Email:     e,
-			CreatedAt: mockClock.Now(),
+			CreateTimestamp: kolide.CreateTimestamp{
+				CreatedAt: mockClock.Now(),
+			},
 		})
 		require.Nil(t, err)
 		invites[e] = invite
@@ -226,7 +228,9 @@ func setupInvites(t *testing.T, ds kolide.Datastore, emails []string) map[string
 		InvitedBy: users["admin1"].ID,
 		Token:     "expired",
 		Email:     "expiredinvite@gmail.com",
-		CreatedAt: mockClock.Now().AddDate(-1, 0, 0),
+		CreateTimestamp: kolide.CreateTimestamp{
+			CreatedAt: mockClock.Now().AddDate(-1, 0, 0),
+		},
 	})
 	require.Nil(t, err)
 	invites["expired"] = invite

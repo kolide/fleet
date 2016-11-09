@@ -1,11 +1,18 @@
 package mysql
 
 import (
+	"fmt"
 	"strings"
 
+	"github.com/WatchBeam/clock"
 	"github.com/go-kit/kit/log"
 	_ "github.com/go-sql-driver/mysql" // db driver
 	"github.com/jmoiron/sqlx"
+	"github.com/kolide/kolide-ose/server/kolide"
+)
+
+const (
+	defaultSelectLimit = 1000
 )
 
 // Datastore is an implementation of kolide.Datastore interface backed by
@@ -13,10 +20,11 @@ import (
 type Datastore struct {
 	db     *sqlx.DB
 	logger log.Logger
+	clock  clock.Clock
 }
 
 // New creates an MySQL datastore.
-func New(dbConnectString string, opts ...DBOption) (*Datastore, error) {
+func New(dbConnectString string, c clock.Clock, opts ...DBOption) (*Datastore, error) {
 	var (
 		ds  *Datastore
 		err error
@@ -42,9 +50,7 @@ func New(dbConnectString string, opts ...DBOption) (*Datastore, error) {
 		return nil, err
 	}
 
-	ds = &Datastore{db, options.logger}
-
-	ds.log("Datastore created")
+	ds = &Datastore{db, options.logger, c}
 
 	return ds, nil
 
@@ -60,8 +66,6 @@ func (d *Datastore) Migrate() error {
 		err error
 		sql []byte
 	)
-
-	d.log("Begin database migration")
 
 	if sql, err = Asset("db/up.sql"); err != nil {
 		return err
@@ -82,7 +86,6 @@ func (d *Datastore) Migrate() error {
 		return err
 	}
 
-	d.log("w00t! Migration succeeded")
 	return nil
 
 }
@@ -93,8 +96,6 @@ func (d *Datastore) Drop() error {
 		sql []byte
 		err error
 	)
-
-	d.log("Dropping database")
 
 	if sql, err = Asset("db/down.sql"); err != nil {
 		return err
@@ -115,7 +116,6 @@ func (d *Datastore) Drop() error {
 		return err
 	}
 
-	d.log("Database drop succeeds")
 	return nil
 
 }
@@ -127,4 +127,31 @@ func (d *Datastore) Close() error {
 
 func (d *Datastore) log(msg string) {
 	d.logger.Log("comp", d.Name(), "msg", msg)
+}
+
+func appendListOptionsToSQL(sql string, opts kolide.ListOptions) string {
+	if opts.OrderKey != "" {
+		direction := "ASC"
+		if opts.OrderDirection == kolide.OrderDescending {
+			direction = "DESC"
+		}
+
+		sql = fmt.Sprintf("%s ORDER BY %s %s", sql, opts.OrderKey, direction)
+	}
+	// REVIEW: If caller doesn't supply a limit apply a default limit of 1000
+	// to insure that an unbounded query with many results doesn't consume too
+	// much memory or hang
+	if opts.PerPage == 0 {
+		opts.PerPage = defaultSelectLimit
+	}
+
+	sql = fmt.Sprintf("%s LIMIT %d", sql, opts.PerPage)
+
+	offset := opts.PerPage * opts.Page
+
+	if offset > 0 {
+		sql = fmt.Sprintf("%s OFFSET %d", sql, offset)
+	}
+
+	return sql
 }

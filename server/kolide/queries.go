@@ -41,17 +41,17 @@ type PackPayload struct {
 }
 
 type Query struct {
-	ID           uint      `json:"id" gorm:"primary_key"`
-	CreatedAt    time.Time `json:"-"`
-	UpdatedAt    time.Time `json:"-"`
-	Name         string    `json:"name" gorm:"not null;unique_index:idx_query_unique_name"`
-	Description  string    `json:"description"`
-	Query        string    `json:"query" gorm:"not null"`
-	Interval     uint      `json:"interval"`
-	Snapshot     bool      `json:"snapshot"`
-	Differential bool      `json:"differential"`
-	Platform     string    `json:"platform"`
-	Version      string    `json:"version"`
+	UpdateCreateTimestamps
+	DeleteFields
+	ID           uint   `json:"id" gorm:"primary_key"`
+	Name         string `json:"name" gorm:"not null;unique_index:idx_query_unique_name"`
+	Description  string `json:"description"`
+	Query        string `json:"query" gorm:"not null"`
+	Interval     uint   `json:"interval"`
+	Snapshot     bool   `json:"snapshot"`
+	Differential bool   `json:"differential"`
+	Platform     string `json:"platform"`
+	Version      string `json:"version"`
 }
 
 type DistributedQueryStatus int
