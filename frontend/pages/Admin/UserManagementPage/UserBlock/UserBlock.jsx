@@ -177,6 +177,7 @@ class UserBlock extends Component {
           <p className={userUsernameClass}>{username}</p>
           <p className={`${baseClass}__position`}>{position}</p>
           <p className={userEmailClass}>{email}</p>
+          <p className={`${baseClass}__last-seen`}>Last Seen 4 Days Ago</p>
           {renderCTAs()}
         </div>
       </div>

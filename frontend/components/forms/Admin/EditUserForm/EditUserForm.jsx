@@ -66,7 +66,7 @@ class EditUserForm extends Component {
       <form className={baseClass} onSubmit={onFormSubmit}>
         <InputField
           defaultValue={name}
-          label="name"
+          label="Name"
           labelClassName={`${baseClass}__label`}
           name="name"
           onChange={onInputChange('name')}
@@ -74,12 +74,9 @@ class EditUserForm extends Component {
           inputClassName={`${baseClass}__input`}
           value={name}
         />
-        <div className={`${baseClass}__avatar-wrap`}>
-          <Avatar user={user} className="user-block__avatar" />
-        </div>
         <InputField
           defaultValue={username}
-          label="username"
+          label="Username"
           labelClassName={`${baseClass}__label`}
           name="username"
           onChange={onInputChange('username')}
@@ -89,7 +86,7 @@ class EditUserForm extends Component {
         />
         <InputField
           defaultValue={position}
-          label="position"
+          label="Position"
           labelClassName={`${baseClass}__label`}
           name="position"
           onChange={onInputChange('position')}
@@ -100,7 +97,7 @@ class EditUserForm extends Component {
         <InputField
           defaultValue={email}
           inputWrapperClass={`${baseClass}__input-wrap`}
-          label="email"
+          label="Email"
           labelClassName={`${baseClass}__label`}
           name="email"
           onChange={onInputChange('email')}
@@ -109,7 +106,7 @@ class EditUserForm extends Component {
         />
         <div className={`${baseClass}__btn-wrap`}>
           <Button
-            className={`${baseClass}__form-btn`}
+            className={`${baseClass}__form-btn ${baseClass}__form-btn--submit`}
             text="Submit"
             type="submit"
             variant="brand"
