@@ -144,7 +144,7 @@ func testManagingLabelsOnPacks(t *testing.T, ds kolide.Datastore) {
 		Name: "monitoring",
 	}
 	err := ds.NewPack(monitoringPack)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	mysqlLabel := &kolide.Label{
 		Name:  "MySQL Monitoring",
@@ -154,10 +154,10 @@ func testManagingLabelsOnPacks(t *testing.T, ds kolide.Datastore) {
 	require.Nil(t, err)
 
 	err = ds.AddLabelToPack(mysqlLabel.ID, monitoringPack.ID)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	labels, err := ds.ListLabelsForPack(monitoringPack)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	if assert.Len(t, labels, 1) {
 		assert.Equal(t, "MySQL Monitoring", labels[0].Name)
 	}
@@ -167,13 +167,13 @@ func testManagingLabelsOnPacks(t *testing.T, ds kolide.Datastore) {
 		Query: "select pid from processes where name = 'osqueryd';",
 	}
 	osqueryLabel, err = ds.NewLabel(osqueryLabel)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	err = ds.AddLabelToPack(osqueryLabel.ID, monitoringPack.ID)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	labels, err = ds.ListLabelsForPack(monitoringPack)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	assert.Len(t, labels, 2)
 }
 
