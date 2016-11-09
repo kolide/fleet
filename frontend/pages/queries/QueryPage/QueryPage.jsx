@@ -144,7 +144,9 @@ class QueryPage extends Component {
     return (evt) => {
       evt.preventDefault();
 
-      if (isEqual(moreInfoTarget, this.state.moreInfoTarget)) {
+      const currentMoreInfoTarget = this.state.moreInfoTarget || {};
+
+      if (isEqual(moreInfoTarget.display_text, currentMoreInfoTarget.display_text)) {
         this.setState({ moreInfoTarget: null });
 
         return false;
@@ -155,7 +157,6 @@ class QueryPage extends Component {
       if (targetType.toLowerCase() === 'labels') {
         return Kolide.getLabelHosts(moreInfoTarget.id)
           .then((hosts) => {
-            console.log('hosts', hosts);
             this.setState({
               moreInfoTarget: {
                 ...moreInfoTarget,

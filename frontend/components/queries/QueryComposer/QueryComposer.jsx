@@ -117,7 +117,7 @@ class QueryComposer extends Component {
       onLoad,
       renderQueryComposerActions,
     } = this;
-    const menuRenderer = SelectTargetsMenu(onTargetSelectMoreInfo, onRemoveMoreInfoTarget, moreInfoTarget);
+    const menuRenderer = SelectTargetsMenu(onTargetSelectMoreInfo, onRemoveMoreInfoTarget);
 
     return (
       <div className={`${baseClass}__wrapper`}>

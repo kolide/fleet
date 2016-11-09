@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import classNames from 'classnames';
 import { filter, includes, isEqual, noop } from 'lodash';
 
-import { shouldShowModal } from './helpers';
+import targetInterface from 'interfaces/target';
 import TargetOption from '../TargetOption';
 
-const SelectTargetsMenuWrapper = (onMoreInfoClick, onRemoveMoreInfoTarget, moreInfoTarget) => {
+
+const SelectTargetsMenuWrapper = (onMoreInfoClick, onRemoveMoreInfoTarget) => {
   const SelectTargetsMenu = ({
     focusedOption,
     instancePrefix,
@@ -33,7 +34,6 @@ const SelectTargetsMenuWrapper = (onMoreInfoClick, onRemoveMoreInfoTarget, moreI
           'is-disabled': true,
         });
         const setRef = (ref) => { onOptionRef(ref, isFocused); };
-        const isShowModal = shouldShowModal(moreInfoTarget, target);
 
         return (
           <Option
@@ -50,11 +50,10 @@ const SelectTargetsMenuWrapper = (onMoreInfoClick, onRemoveMoreInfoTarget, moreI
             ref={setRef}
           >
             <TargetOption
-              target={moreInfoTarget && isShowModal ? moreInfoTarget : target}
+              target={target}
               onSelect={onSelect}
               onRemoveMoreInfoTarget={onRemoveMoreInfoTarget}
               onMoreInfoClick={onMoreInfoClick}
-              shouldShowModal={isShowModal}
             />
           </Option>
         );
@@ -69,6 +68,19 @@ const SelectTargetsMenuWrapper = (onMoreInfoClick, onRemoveMoreInfoTarget, moreI
         {renderTargets('labels')}
       </div>
     );
+  };
+
+  SelectTargetsMenu.propTypes = {
+    focusedOption: targetInterface,
+    instancePrefix: PropTypes.string,
+    onFocus: PropTypes.func,
+    onSelect: PropTypes.func,
+    optionClassName: PropTypes.string,
+    optionComponent: PropTypes.node,
+    options: PropTypes.arrayOf(targetInterface),
+    valueArray: PropTypes.arrayOf(targetInterface),
+    valueKey: PropTypes.string,
+    onOptionRef: PropTypes.func,
   };
 
   return SelectTargetsMenu;

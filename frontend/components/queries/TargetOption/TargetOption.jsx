@@ -1,7 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import classnames from 'classnames';
 
-import Button from '../../buttons/Button';
 import targetInterface from '../../../interfaces/target';
 
 const baseClass = 'target-option';
@@ -34,20 +33,6 @@ class TargetOption extends Component {
     return platform === 'darwin' ? 'kolidecon-apple' : `kolidecon-${platform}`;
   }
 
-  targetIconClass = () => {
-    const { display_text: displayText, target_type: targetType } = this.props.target;
-
-    if (displayText.toLowerCase() === 'all hosts') {
-      return 'kolidecon-all-hosts';
-    }
-
-    if (targetType === 'hosts') {
-      return 'kolidecon-single-host';
-    }
-
-    return 'kolidecon-label';
-  }
-
   renderTargetDetail = () => {
     const { target } = this.props;
     const { count, ip, target_type: targetType } = target;
@@ -65,7 +50,6 @@ class TargetOption extends Component {
     const {
       handleSelect,
       hostPlatformIconClass,
-      targetIconClass,
       renderTargetDetail,
     } = this;
     const wrapperClassName = classnames(`${baseClass}__wrapper`, {
