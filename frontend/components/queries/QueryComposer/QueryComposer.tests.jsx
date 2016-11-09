@@ -25,6 +25,52 @@ describe('QueryComposer - component', () => {
     expect(component.find('SaveQueryForm').length).toEqual(0);
   });
 
+  it('renders the TargetDetails component when the moreInfoTarget prop is present', () => {
+    const query = {
+      id: 1,
+      query: 'SELECT * FROM users',
+      name: 'Get all users',
+      description: 'This gets all of the users',
+    };
+    const host = { target_type: 'host', status: 'online', platform: 'darwin', memory: 1 };
+    const component = mount(
+      <QueryComposer
+        moreInfoTarget={host}
+        onOsqueryTableSelect={noop}
+        onTextEditorInputChange={noop}
+        query={query}
+        selectedTargets={[]}
+        textEditorText="Hello world"
+      />
+    );
+
+    const targetDetails = component.find('TargetDetails');
+
+    expect(targetDetails.length).toEqual(1);
+  });
+
+  it('does not render TargetDetails without a moreInfoTarget prop', () => {
+    const query = {
+      id: 1,
+      query: 'SELECT * FROM users',
+      name: 'Get all users',
+      description: 'This gets all of the users',
+    };
+    const component = mount(
+      <QueryComposer
+        onOsqueryTableSelect={noop}
+        onTextEditorInputChange={noop}
+        query={query}
+        selectedTargets={[]}
+        textEditorText="Hello world"
+      />
+    );
+
+    const targetDetails = component.find('TargetDetails');
+
+    expect(targetDetails.length).toEqual(0);
+  });
+
   it('renders the QueryForm when the query prop is present', () => {
     const query = {
       id: 1,

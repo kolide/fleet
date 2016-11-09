@@ -7,6 +7,7 @@ import QueryForm from 'components/forms/queries/QueryForm';
 import queryInterface from 'interfaces/query';
 import SelectTargetsInput from 'components/queries/SelectTargetsInput';
 import SelectTargetsMenu from 'components/queries/SelectTargetsMenu';
+import TargetDetails from 'components/queries/TargetDetails';
 import targetInterface from 'interfaces/target';
 import './mode';
 import './theme';
@@ -150,6 +151,7 @@ class QueryComposer extends Component {
             selectedTargets={selectedTargets}
             targets={targets}
           />
+          {moreInfoTarget && <TargetDetails target={moreInfoTarget} />}
         </div>
         {renderQueryComposerActions()}
       </div>
