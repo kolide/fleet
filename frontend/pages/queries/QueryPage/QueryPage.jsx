@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { flatMap } from 'lodash';
+import { flatMap, isEqual } from 'lodash';
 import { push } from 'react-router-redux';
 
 import debounce from 'utilities/debounce';
@@ -13,7 +13,7 @@ import queryInterface from 'interfaces/query';
 import QuerySidePanel from 'components/side_panels/QuerySidePanel';
 import { removeRightSidePanel, showRightSidePanel } from 'redux/nodes/app/actions';
 import { renderFlash } from 'redux/nodes/notifications/actions';
-import { selectOsqueryTable, setQueryText, setSelectedTargets } from 'redux/nodes/components/QueryPages/actions';
+import { selectOsqueryTable, setQueryText, setSelectedTargets, setSelectedTargetsQuery } from 'redux/nodes/components/QueryPages/actions';
 import targetInterface from 'interfaces/target';
 import { validateQuery } from 'pages/queries/QueryPage/helpers';
 
@@ -24,6 +24,7 @@ class QueryPage extends Component {
     queryText: PropTypes.string,
     selectedOsqueryTable: osqueryTableInterface,
     selectedTargets: PropTypes.arrayOf(targetInterface),
+    selectedTargetsQuery: PropTypes.string,
   };
 
   componentWillMount () {
@@ -47,13 +48,17 @@ class QueryPage extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    const { dispatch, query: newQuery } = nextProps;
+    const { dispatch, query: newQuery, selectedTargets, selectedTargetsQuery } = nextProps;
     const { query: oldQuery } = this.props;
 
     if ((!oldQuery && newQuery) || (oldQuery && oldQuery.query !== newQuery.query)) {
       const { query: queryText } = newQuery;
 
       dispatch(setQueryText(queryText));
+    }
+
+    if (!isEqual(selectedTargets, this.props.selectedTargets)) {
+      this.fetchTargets(selectedTargetsQuery, selectedTargets);
     }
 
     return false;
@@ -178,10 +183,12 @@ class QueryPage extends Component {
     return false;
   };
 
-  fetchTargets = (query) => {
-    this.setState({ isLoadingTargets: true });
+  fetchTargets = (query, selectedTargets = this.props.selectedTargets) => {
+    const { dispatch } = this.props;
 
-    const { selectedTargets } = this.props;
+    this.setState({ isLoadingTargets: true });
+    dispatch(setSelectedTargetsQuery(query));
+
     const hosts = flatMap(selectedTargets, (target) => {
       return target.target_type === 'hosts' ? target.id : null;
     });
@@ -271,9 +278,9 @@ class QueryPage extends Component {
 const mapStateToProps = (state, { params }) => {
   const { id: queryID } = params;
   const query = entityGetter(state).get('queries').findBy({ id: queryID });
-  const { queryText, selectedOsqueryTable, selectedTargets } = state.components.QueryPages;
+  const { queryText, selectedOsqueryTable, selectedTargets, selectedTargetsQuery } = state.components.QueryPages;
 
-  return { query, queryText, selectedOsqueryTable, selectedTargets };
+  return { query, queryText, selectedOsqueryTable, selectedTargets, selectedTargetsQuery };
 };
 
 export default connect(mapStateToProps)(QueryPage);
