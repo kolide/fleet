@@ -98,6 +98,7 @@ $base-class: 'button';
     padding: $medium;
     width: 100%;
     height: auto;
+    box-shadow: none;
   }
 
   &--unstyled {
