@@ -80,9 +80,7 @@ class QueryPage extends Component {
     return false;
   }
 
-  onRemoveMoreInfoTarget = (evt) => {
-    evt.preventDefault();
-
+  onRemoveMoreInfoTarget = () => {
     this.setState({ moreInfoTarget: null });
 
     return false;

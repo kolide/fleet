@@ -16,8 +16,17 @@ class TargetOption extends Component {
     target: targetInterface.isRequired,
   };
 
+  handleRemoveMoreInfoTarget = (evt) => {
+    evt.preventDefault();
+
+    const { onRemoveMoreInfoTarget } = this.props;
+
+    return onRemoveMoreInfoTarget();
+  }
+
   handleSelect = (evt) => {
     const { onSelect, target } = this.props;
+
     return onSelect(target, evt);
   }
 
@@ -26,7 +35,8 @@ class TargetOption extends Component {
     const { onRemoveMoreInfoTarget } = this.props;
 
     handleSelect(evt);
-    onRemoveMoreInfoTarget();
+
+    return onRemoveMoreInfoTarget();
   }
 
   hostPlatformIconClass = () => {
@@ -61,7 +71,8 @@ class TargetOption extends Component {
   }
 
   renderTargetInfoModal = () => {
-    const { onRemoveMoreInfoTarget, shouldShowModal, target } = this.props;
+    const { shouldShowModal, target } = this.props;
+    const { handleRemoveMoreInfoTarget } = this;
 
     if (!shouldShowModal) return false;
 
@@ -71,7 +82,7 @@ class TargetOption extends Component {
       <TargetInfoModal
         className={`${classBlock}__modal-wrapper`}
         onAdd={handleSelectFromModal}
-        onExit={onRemoveMoreInfoTarget}
+        onExit={handleRemoveMoreInfoTarget}
         target={target}
       />
     );
