@@ -165,10 +165,10 @@ func testDistributedQueriesForHost(t *testing.T, db kolide.Datastore) {
 	// All should have no queries
 	var queries map[uint]string
 	queries, err = db.DistributedQueriesForHost(h1)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	assert.Empty(t, queries)
 	queries, err = db.DistributedQueriesForHost(h2)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	assert.Empty(t, queries)
 
 	// Create a label
@@ -212,11 +212,11 @@ func testDistributedQueriesForHost(t *testing.T, db kolide.Datastore) {
 
 	// All should have the query now
 	queries, err = db.DistributedQueriesForHost(h1)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	assert.Len(t, queries, 1)
 	assert.Equal(t, "select * from bar", queries[c1.ID])
 	queries, err = db.DistributedQueriesForHost(h2)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	assert.Len(t, queries, 1)
 	assert.Equal(t, "select * from bar", queries[c1.ID])
 
@@ -255,11 +255,11 @@ func testDistributedQueriesForHost(t *testing.T, db kolide.Datastore) {
 
 	// Check for correct queries
 	queries, err = db.DistributedQueriesForHost(h1)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	assert.Len(t, queries, 1)
 	assert.Equal(t, "select * from foo", queries[c2.ID])
 	queries, err = db.DistributedQueriesForHost(h2)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	assert.Len(t, queries, 1)
 	assert.Equal(t, "select * from bar", queries[c1.ID])
 
@@ -271,10 +271,10 @@ func testDistributedQueriesForHost(t *testing.T, db kolide.Datastore) {
 
 	// Now no queries should be returned
 	queries, err = db.DistributedQueriesForHost(h1)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	assert.Empty(t, queries)
 	queries, err = db.DistributedQueriesForHost(h2)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	assert.Empty(t, queries)
 
 }
