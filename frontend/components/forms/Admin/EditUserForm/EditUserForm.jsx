@@ -1,6 +1,5 @@
 import React, { Component, PropTypes } from 'react';
 
-import Avatar from '../../../Avatar';
 import Button from '../../../buttons/Button';
 import InputField from '../../fields/InputField';
 import userInterface from '../../../../interfaces/user';
@@ -53,7 +52,6 @@ class EditUserForm extends Component {
   }
 
   render () {
-    const { user } = this.props;
     const {
       email,
       name,
