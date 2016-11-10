@@ -17,8 +17,8 @@ interface IButtonState {}
 
 class Button extends React.Component<IButtonProps, IButtonState> {
   static defaultProps = {
-    variant: 'default',
     size: '',
+    variant: 'default',
   };
 
   handleClick = (evt: React.MouseEvent<HTMLButtonElement>) => {
