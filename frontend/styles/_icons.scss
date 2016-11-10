@@ -13,6 +13,9 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.kolidecon-add-button:before {
+  content: "\e925";
+}
 .kolidecon-single-host:before {
   content: "\e923";
 }
@@ -40,28 +43,28 @@
   margin-left: -1em;
   color: rgb(255, 255, 255);
 }
-.kolidecon-label:before {
+.kolidecon-tag-icon:before {
   content: "\e916";
 }
-.kolidecon-uptime:before {
+.kolidecon-uptime-icon:before {
   content: "\e915";
 }
-.kolidecon-world:before {
+.kolidecon-world-icon:before {
   content: "\e917";
 }
-.kolidecon-mac:before {
+.kolidecon-mac-icon:before {
   content: "\e918";
 }
-.kolidecon-memory:before {
+.kolidecon-memory-icon:before {
   content: "\e919";
 }
-.kolidecon-storage:before {
+.kolidecon-storage-icon:before {
   content: "\e91a";
 }
-.kolidecon-cpu:before {
+.kolidecon-cpu-icon:before {
   content: "\e91b";
 }
-.kolidecon-apple:before {
+.kolidecon-apple-icon:before {
   content: "\e91c";
 }
 .kolidecon-chevrondownbold:before {
@@ -130,3 +133,4 @@
 .kolidecon-admin:before {
   content: "\e90a";
 }
+

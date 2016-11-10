@@ -49,16 +49,28 @@
   .Select-option {
     color: $text-dark;
     font-size: $medium;
-    position: relative;
 
     &.is-focused {
       background-color: $brand;
       color: $white;
+
+      .Select-icon {
+        color: $brand-ultralight;
+      }
     }
 
     &.is-disabled {
       color: $silver;
+
+      .Select-icon {
+        visibility: hidden;
+        opacity: 0;
+      }
     }
+  }
+
+  .Select-icon {
+    color: $accent-medium;
   }
 
   &.Select--multi {
