@@ -56,6 +56,10 @@
 
   &__details {
     padding: 0 $pad-large;
+
+    .Select {
+      margin-top: $pad-most;
+    }
   }
 
   &__avatar {
