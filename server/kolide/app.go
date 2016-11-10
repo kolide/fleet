@@ -43,6 +43,10 @@ type OrgInfo struct {
 // ServerSettings contains general settings about the kolide App.
 type ServerSettings struct {
 	KolideServerURL *string `json:"kolide_server_url,omitempty"`
+	SMTPServer      *string `json:"smtp_server,omitempty"`
+	SMTPUsername    *string `json:"smtp_username,omitempty"`
+	SMTPPassword    *string `json:"smtp_password,omitempty"`
+	SMTPAuthMethod  *string `json:"smtp_auth_method,omitempty"`
 }
 
 type OrderDirection int
