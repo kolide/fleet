@@ -143,7 +143,7 @@ func testManagingLabelsOnPacks(t *testing.T, ds kolide.Datastore) {
 	monitoringPack := &kolide.Pack{
 		Name: "monitoring",
 	}
-	err := ds.NewPack(monitoringPack)
+	_, err := ds.NewPack(monitoringPack)
 	assert.Nil(t, err)
 
 	mysqlLabel := &kolide.Label{
@@ -192,16 +192,16 @@ func testSearchLabels(t *testing.T, db kolide.Datastore) {
 	})
 	require.Nil(t, err)
 
-	labels, err := db.SearchLabels("foo", nil)
+	labels, err := db.SearchLabels("foo")
 	assert.Nil(t, err)
 	assert.Len(t, labels, 2)
 
-	label, err := db.SearchLabels("foo", []uint{l3.ID})
+	label, err := db.SearchLabels("foo", l3.ID)
 	assert.Nil(t, err)
 	assert.Len(t, label, 1)
 	assert.Equal(t, "foo", label[0].Name)
 
-	none, err := db.SearchLabels("xxx", nil)
+	none, err := db.SearchLabels("xxx")
 	assert.Nil(t, err)
 	assert.Len(t, none, 0)
 }
@@ -214,7 +214,7 @@ func testSearchLabelsLimit(t *testing.T, db kolide.Datastore) {
 		require.Nil(t, err)
 	}
 
-	labels, err := db.SearchLabels("foo", nil)
+	labels, err := db.SearchLabels("foo")
 	require.Nil(t, err)
 	assert.Len(t, labels, 10)
 }

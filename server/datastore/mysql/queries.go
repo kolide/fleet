@@ -27,6 +27,7 @@ func (d *Datastore) NewQuery(query *kolide.Query) (*kolide.Query, error) {
 // SaveQuery saves changes to a Query.
 func (d *Datastore) SaveQuery(q *kolide.Query) error {
 	q.MarkAsUpdated(d.clock.Now())
+	// TODO it might be better to use a table alias here to deal with interval
 	sql := `
 		UPDATE queries
 			SET updated_at = ?, name = ?, description = ?, query = ?, ` + "`interval`" + `= ? snapshot = ?,
@@ -48,7 +49,7 @@ func (d *Datastore) DeleteQuery(query *kolide.Query) error {
 			SET deleted_at = ?, deleted = ?
 			WHERE id = ?
 	`
-	_, err := d.db.Exec(sql, query.DeletedAt, query.Deleted, query.ID)
+	_, err := d.db.Exec(sql, query.DeletedAt, true, query.ID)
 	return err
 }
 

@@ -140,7 +140,7 @@ AND lqe.matches
 	return results, nil
 }
 
-func (orm gormDB) SearchLabels(query string, omit []uint) ([]kolide.Label, error) {
+func (orm gormDB) SearchLabels(query string, omit ...uint) ([]kolide.Label, error) {
 	sql := `
 SELECT *
 FROM labels

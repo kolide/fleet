@@ -32,7 +32,7 @@ type LabelStore interface {
 	ListHostsInLabel(lid uint) ([]Host, error)
 	ListUniqueHostsInLabels(labels []uint) ([]Host, error)
 
-	SearchLabels(query string, omit []uint) ([]Label, error)
+	SearchLabels(query string, omit ...uint) ([]Label, error)
 }
 
 type LabelService interface {
@@ -50,13 +50,13 @@ type LabelPayload struct {
 }
 
 type Label struct {
-	ID          uint      `json:"id" gorm:"primary_key"`
-	CreatedAt   time.Time `json:"-"`
-	UpdatedAt   time.Time `json:"-"`
-	Name        string    `json:"name" gorm:"not null;unique_index:idx_label_unique_name"` // there is a fulltext index on this field
-	Description string    `json:"description"`
-	Query       string    `json:"query" gorm:"not null"`
-	Platform    string    `json:"platform"`
+	UpdateCreateTimestamps
+	DeleteFields
+	ID          uint   `json:"id" gorm:"primary_key"`
+	Name        string `json:"name" gorm:"not null;unique_index:idx_label_unique_name"` // there is a fulltext index on this field
+	Description string `json:"description"`
+	Query       string `json:"query" gorm:"not null"`
+	Platform    string `json:"platform"`
 }
 
 type LabelQueryExecution struct {
