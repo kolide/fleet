@@ -44,7 +44,6 @@ describe('TargetOption - component', () => {
   it('renders a host option for host targets', () => {
     const component = mount(<TargetOption onMoreInfoClick={noop} target={hostTarget} />);
     expect(component.find('.--is-host').length).toEqual(1);
-    expect(component.find('i.kolidecon-single-host').length).toEqual(1);
     expect(component.find('i.kolidecon-windows').length).toEqual(1);
     expect(component.text()).toContain(hostTarget.ip);
   });

@@ -60,7 +60,7 @@ class TargetOption extends Component {
     return (
       <div className={wrapperClassName}>
         <button className={`button button--unstyled ${baseClass}__add-btn`} onClick={handleSelect}>
-          <i className="kolidecon-single-host" />
+          <i className="kolidecon-add-button" />
         </button>
         <button className={`button button--unstyled ${baseClass}__target-content`} onClick={onMoreInfoClick(target)}>
           {targetType === 'hosts' && <i className={`${baseClass}__icon ${hostPlatformIconClass()}`} />}
