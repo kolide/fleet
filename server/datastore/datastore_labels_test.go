@@ -63,7 +63,8 @@ func testLabels(t *testing.T, db kolide.Datastore) {
 	}
 
 	for _, label := range newLabels {
-		newLabel, err := db.NewLabel(&label)
+		var newLabel *kolide.Label
+		newLabel, err = db.NewLabel(&label)
 		assert.Nil(t, err)
 		assert.NotZero(t, newLabel.ID)
 	}

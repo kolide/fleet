@@ -14,7 +14,7 @@ func (svc service) SearchTargets(ctx context.Context, query string, selectedHost
 	}
 	results.Hosts = hosts
 
-	labels, err := svc.ds.SearchLabels(query, selectedLabelIDs)
+	labels, err := svc.ds.SearchLabels(query, selectedLabelIDs...)
 	if err != nil {
 		return nil, err
 	}

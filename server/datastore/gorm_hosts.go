@@ -33,7 +33,7 @@ func (orm gormDB) EnrollHost(uuid, hostname, ip, platform string, nodeKeySize in
 	}
 
 	// Generate a new key each enrollment
-	host.NodeKey, err = generateRandomText(nodeKeySize)
+	host.NodeKey, err = kolide.GenerateRandomText(nodeKeySize)
 	if err != nil {
 		return nil, err
 	}

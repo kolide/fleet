@@ -97,8 +97,12 @@ func testQueryResultsStoreErrors(t *testing.T, store kolide.QueryResultStore) {
 			DistributedQueryCampaignID: 1,
 			ResultJSON:                 json.RawMessage(`{"bing":"fds"}`),
 			Host: kolide.Host{
-				ID:               4,
-				UpdatedAt:        time.Now(),
+				ID: 4,
+				UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
+					UpdateTimestamp: kolide.UpdateTimestamp{
+						UpdatedAt: time.Now(),
+					},
+				},
 				DetailUpdateTime: time.Now(),
 			},
 		},
@@ -123,7 +127,11 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 				// Note these times need to be set to avoid
 				// issues with roundtrip serializing the zero
 				// time value. See https://goo.gl/CCEs8x
-				UpdatedAt:        time.Now(),
+				UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
+					UpdateTimestamp: kolide.UpdateTimestamp{
+						UpdatedAt: time.Now(),
+					},
+				},
 				DetailUpdateTime: time.Now(),
 			},
 		},
@@ -131,8 +139,12 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 			DistributedQueryCampaignID: 1,
 			ResultJSON:                 json.RawMessage(`{"whoo":"wahh"}`),
 			Host: kolide.Host{
-				ID:               3,
-				UpdatedAt:        time.Now(),
+				ID: 3,
+				UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
+					UpdateTimestamp: kolide.UpdateTimestamp{
+						UpdatedAt: time.Now(),
+					},
+				},
 				DetailUpdateTime: time.Now(),
 			},
 		},
@@ -140,8 +152,12 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 			DistributedQueryCampaignID: 1,
 			ResultJSON:                 json.RawMessage(`{"bing":"fds"}`),
 			Host: kolide.Host{
-				ID:               4,
-				UpdatedAt:        time.Now(),
+				ID: 4,
+				UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
+					UpdateTimestamp: kolide.UpdateTimestamp{
+						UpdatedAt: time.Now(),
+					},
+				},
 				DetailUpdateTime: time.Now(),
 			},
 		},
@@ -158,8 +174,12 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 			DistributedQueryCampaignID: 2,
 			ResultJSON:                 json.RawMessage(`{"tim":"tom"}`),
 			Host: kolide.Host{
-				ID:               1,
-				UpdatedAt:        time.Now(),
+				ID: 1,
+				UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
+					UpdateTimestamp: kolide.UpdateTimestamp{
+						UpdatedAt: time.Now(),
+					},
+				},
 				DetailUpdateTime: time.Now(),
 			},
 		},
@@ -167,8 +187,12 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 			DistributedQueryCampaignID: 2,
 			ResultJSON:                 json.RawMessage(`{"slim":"slam"}`),
 			Host: kolide.Host{
-				ID:               3,
-				UpdatedAt:        time.Now(),
+				ID: 3,
+				UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
+					UpdateTimestamp: kolide.UpdateTimestamp{
+						UpdatedAt: time.Now(),
+					},
+				},
 				DetailUpdateTime: time.Now(),
 			},
 		},

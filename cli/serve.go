@@ -225,8 +225,14 @@ func createDevUsers(ds kolide.Datastore, config config.KolideConfig) {
 func createDevHosts(ds kolide.Datastore, config config.KolideConfig) {
 	hosts := []kolide.Host{
 		{
-			CreatedAt:        time.Date(2016, time.October, 27, 10, 0, 0, 0, time.UTC),
-			UpdatedAt:        time.Now().Add(-20 * time.Minute),
+			UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
+				CreateTimestamp: kolide.CreateTimestamp{
+					CreatedAt: time.Date(2016, time.October, 27, 10, 0, 0, 0, time.UTC),
+				},
+				UpdateTimestamp: kolide.UpdateTimestamp{
+					UpdatedAt: time.Now().Add(-20 * time.Minute),
+				},
+			},
 			NodeKey:          "totally-legit",
 			HostName:         "jmeller-mbp.local",
 			UUID:             "1234-5678-9101",
@@ -240,8 +246,15 @@ func createDevHosts(ds kolide.Datastore, config config.KolideConfig) {
 			DetailUpdateTime: time.Now().Add(-20 * time.Minute),
 		},
 		{
-			CreatedAt:        time.Now().Add(-1 * time.Hour),
-			UpdatedAt:        time.Now().Add(-20 * time.Minute),
+			UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
+				CreateTimestamp: kolide.CreateTimestamp{
+					CreatedAt: time.Date(2016, time.October, 27, 4, 3, 10, 0, time.UTC),
+				},
+				UpdateTimestamp: kolide.UpdateTimestamp{
+					UpdatedAt: time.Date(2016, time.October, 27, 4, 3, 10, 0, time.UTC),
+				},
+			},
+
 			NodeKey:          "definitely-legit",
 			HostName:         "marpaia.local",
 			UUID:             "1234-5678-9102",
@@ -355,16 +368,29 @@ func createDevQueries(ds kolide.Datastore, config config.KolideConfig) {
 func createDevLabels(ds kolide.Datastore, config config.KolideConfig) {
 	labels := []kolide.Label{
 		{
-			CreatedAt: time.Date(2016, time.October, 27, 8, 31, 16, 0, time.UTC),
-			UpdatedAt: time.Date(2016, time.October, 27, 8, 31, 16, 0, time.UTC),
-			Name:      "dev_label_apache",
-			Query:     "select * from processes where nae like '%Apache%'",
+			UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
+				CreateTimestamp: kolide.CreateTimestamp{
+					CreatedAt: time.Date(2016, time.October, 27, 8, 31, 16, 0, time.UTC),
+				},
+				UpdateTimestamp: kolide.UpdateTimestamp{
+					UpdatedAt: time.Date(2016, time.October, 27, 8, 31, 16, 0, time.UTC),
+				},
+			},
+			Name:  "dev_label_apache",
+			Query: "select * from processes where nae like '%Apache%'",
 		},
 		{
-			CreatedAt: time.Now().Add(-1 * time.Hour),
-			UpdatedAt: time.Now(),
-			Name:      "dev_label_darwin",
-			Query:     "select * from osquery_info where build_platform='darwin'",
+			UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
+				CreateTimestamp: kolide.CreateTimestamp{
+					CreatedAt: time.Now().Add(-1 * time.Hour),
+				},
+				UpdateTimestamp: kolide.UpdateTimestamp{
+					UpdatedAt: time.Now(),
+				},
+			},
+
+			Name:  "dev_label_darwin",
+			Query: "select * from osquery_info where build_platform='darwin'",
 		},
 	}
 

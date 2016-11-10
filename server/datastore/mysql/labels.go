@@ -139,7 +139,12 @@ func (d *Datastore) RecordLabelQueryExecutions(host *kolide.Host, results map[st
 	`
 
 	_, err := d.db.Exec(sqlStatement, vals...)
-	return errors.DatabaseError(err)
+
+	if err != nil {
+		return errors.DatabaseError(err)
+	}
+
+	return nil
 
 }
 

@@ -208,9 +208,16 @@ func TestSubmitResultLogs(t *testing.T) {
 func TestHostDetailQueries(t *testing.T) {
 	mockClock := clock.NewMockClock()
 	host := kolide.Host{
-		ID:               1,
-		CreatedAt:        mockClock.Now(),
-		UpdatedAt:        mockClock.Now(),
+		ID: 1,
+		UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
+			UpdateTimestamp: kolide.UpdateTimestamp{
+				UpdatedAt: mockClock.Now(),
+			},
+			CreateTimestamp: kolide.CreateTimestamp{
+				CreatedAt: mockClock.Now(),
+			},
+		},
+
 		DetailUpdateTime: mockClock.Now(),
 		NodeKey:          "test_key",
 		HostName:         "test_hostname",

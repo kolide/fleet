@@ -129,7 +129,7 @@ func (orm *inmem) EnrollHost(uuid, hostname, ip, platform string, nodeKeySize in
 	}
 
 	var err error
-	host.NodeKey, err = generateRandomText(nodeKeySize)
+	host.NodeKey, err = kolide.GenerateRandomText(nodeKeySize)
 	if err != nil {
 		return nil, err
 	}

@@ -2,8 +2,6 @@
 package datastore
 
 import (
-	"crypto/rand"
-	"encoding/base64"
 	"errors"
 	"fmt"
 
@@ -68,16 +66,6 @@ func New(driver, conn string, opts ...DBOption) (kolide.Datastore, error) {
 	default:
 		return nil, fmt.Errorf("unsupported datastore driver %s", driver)
 	}
-}
-
-func generateRandomText(keySize int) (string, error) {
-	key := make([]byte, keySize)
-	_, err := rand.Read(key)
-	if err != nil {
-		return "", err
-	}
-
-	return base64.StdEncoding.EncodeToString(key), nil
 }
 
 // GetMysqlConnectionString returns a MySQL connection string using the

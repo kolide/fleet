@@ -1,6 +1,7 @@
 package mysql
 
 import (
+	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
 )
 
@@ -133,11 +134,16 @@ func (d *Datastore) RemoveQueryFromPack(query *kolide.Query, pack *kolide.Pack) 
 // AddLabelToPack associates a kolide.Label with a kolide.Pack
 func (d *Datastore) AddLabelToPack(lid uint, pid uint) error {
 	sql := `
-		INSERT INTO pack_targets ( pack_id = ?,	type = ?,	target_id = ? )
-			VALUES ( ?, ?, ?, ?)
+		INSERT INTO pack_targets ( pack_id,	type,	target_id )
+			VALUES ( ?, ?, ? )
 	`
 	_, err := d.db.Exec(sql, pid, kolide.TargetLabel, lid)
-	return err
+
+	if err != nil {
+		return errors.DatabaseError(err)
+	}
+
+	return nil
 }
 
 // ListLabelsForPack will return a list of kolide.Label records associated with kolide.Pack
@@ -164,7 +170,7 @@ func (d *Datastore) ListLabelsForPack(pack *kolide.Pack) ([]*kolide.Label, error
 	labels := []*kolide.Label{}
 
 	if err := d.db.Select(&labels, sql, kolide.TargetLabel, pack.ID); err != nil {
-		return nil, err
+		return nil, errors.DatabaseError(err)
 	}
 
 	return labels, nil

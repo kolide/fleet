@@ -1,6 +1,8 @@
 package kolide
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"time"
 
 	"golang.org/x/net/context"
@@ -26,18 +28,28 @@ type HostService interface {
 }
 
 type Host struct {
+	UpdateCreateTimestamps
+	DeleteFields
 	ID               uint          `json:"id" gorm:"primary_key"`
-	CreatedAt        time.Time     `json:"-"`
-	UpdatedAt        time.Time     `json:"updated_at"`
-	DetailUpdateTime time.Time     `json:"detail_updated_at"` // Time that the host details were last updated
-	NodeKey          string        `json:"-" gorm:"unique_index:idx_host_unique_nodekey"`
-	HostName         string        `json:"hostname"` // there is a fulltext index on this field
+	DetailUpdateTime time.Time     `json:"detail_updated_at" db:"detail_update_time"` // Time that the host details were last updated
+	NodeKey          string        `json:"-" gorm:"unique_index:idx_host_unique_nodekey" db:"node_key"`
+	HostName         string        `json:"hostname" db:"host_name"` // there is a fulltext index on this field
 	UUID             string        `json:"uuid" gorm:"unique_index:idx_host_unique_uuid"`
 	Platform         string        `json:"platform"`
-	OsqueryVersion   string        `json:"osquery_version"`
-	OSVersion        string        `json:"os_version"`
+	OsqueryVersion   string        `json:"osquery_version" db:"osquery_version"`
+	OSVersion        string        `json:"os_version" db:"os_version"`
 	Uptime           time.Duration `json:"uptime"`
-	PhysicalMemory   int           `json:"memory" sql:"type:bigint"`
-	PrimaryMAC       string        `json:"mac"`
-	PrimaryIP        string        `json:"ip"` // there is a fulltext index on this field
+	PhysicalMemory   int           `json:"memory" sql:"type:bigint" db:"physical_memory"`
+	PrimaryMAC       string        `json:"mac" db:"primary_mac"`
+	PrimaryIP        string        `json:"ip" db:"primary_ip"` // there is a fulltext index on this field
+}
+
+func GenerateRandomText(keySize int) (string, error) {
+	key := make([]byte, keySize)
+	_, err := rand.Read(key)
+	if err != nil {
+		return "", err
+	}
+
+	return base64.StdEncoding.EncodeToString(key), nil
 }
