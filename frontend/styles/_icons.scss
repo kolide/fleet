@@ -43,28 +43,28 @@
   margin-left: -1em;
   color: rgb(255, 255, 255);
 }
-.kolidecon-tag-icon:before {
+.kolidecon-label:before {
   content: "\e916";
 }
-.kolidecon-uptime-icon:before {
+.kolidecon-uptime:before {
   content: "\e915";
 }
-.kolidecon-world-icon:before {
+.kolidecon-world:before {
   content: "\e917";
 }
-.kolidecon-mac-icon:before {
+.kolidecon-mac:before {
   content: "\e918";
 }
-.kolidecon-memory-icon:before {
+.kolidecon-memory:before {
   content: "\e919";
 }
-.kolidecon-storage-icon:before {
+.kolidecon-storage:before {
   content: "\e91a";
 }
-.kolidecon-cpu-icon:before {
+.kolidecon-cpu:before {
   content: "\e91b";
 }
-.kolidecon-apple-icon:before {
+.kolidecon-apple:before {
   content: "\e91c";
 }
 .kolidecon-chevrondownbold:before {
@@ -133,4 +133,3 @@
 .kolidecon-admin:before {
   content: "\e90a";
 }
-
