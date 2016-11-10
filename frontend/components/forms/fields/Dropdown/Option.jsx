@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
 
 const DropdownOption = (option) => {
   return (
@@ -6,6 +6,6 @@ const DropdownOption = (option) => {
       <i className="kolidecon-add-button Select-icon" /> {option.label}
     </span>
   );
-}
+};
 
 export default DropdownOption;
