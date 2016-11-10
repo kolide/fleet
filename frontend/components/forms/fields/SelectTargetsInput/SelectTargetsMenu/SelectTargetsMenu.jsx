@@ -3,10 +3,10 @@ import classNames from 'classnames';
 import { filter, includes, isEqual, noop } from 'lodash';
 
 import targetInterface from 'interfaces/target';
-import TargetOption from '../TargetOption';
+import SelectTargets from 'components/forms/fields/SelectTargetsInput';
 
 
-const SelectTargetsMenuWrapper = (onMoreInfoClick, onRemoveMoreInfoTarget) => {
+const SelectTargetsMenuWrapper = (onMoreInfoClick, onRemoveMoreInfoTarget, moreInfoTarget) => {
   const SelectTargetsMenu = ({
     focusedOption,
     instancePrefix,
@@ -49,7 +49,7 @@ const SelectTargetsMenuWrapper = (onMoreInfoClick, onRemoveMoreInfoTarget) => {
             optionIndex={index}
             ref={setRef}
           >
-            <TargetOption
+            <SelectTargets.Option
               target={target}
               onSelect={onSelect}
               onRemoveMoreInfoTarget={onRemoveMoreInfoTarget}
@@ -62,10 +62,13 @@ const SelectTargetsMenuWrapper = (onMoreInfoClick, onRemoveMoreInfoTarget) => {
 
     return (
       <div>
-        <div>hosts</div>
-        {renderTargets('hosts')}
-        <div>labels</div>
-        {renderTargets('labels')}
+        <div>
+          <div>hosts</div>
+          {renderTargets('hosts')}
+          <div>labels</div>
+          {renderTargets('labels')}
+        </div>
+        <SelectTargets.Details target={moreInfoTarget} />
       </div>
     );
   };

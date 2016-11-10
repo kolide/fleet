@@ -5,9 +5,7 @@ import 'brace/ext/linking';
 
 import QueryForm from 'components/forms/queries/QueryForm';
 import queryInterface from 'interfaces/query';
-import SelectTargetsInput from 'components/queries/SelectTargetsInput';
-import SelectTargetsMenu from 'components/queries/SelectTargetsMenu';
-import TargetDetails from 'components/queries/TargetDetails';
+import SelectTargets from 'components/forms/fields/SelectTargetsInput';
 import targetInterface from 'interfaces/target';
 import './mode';
 import './theme';
@@ -117,7 +115,11 @@ class QueryComposer extends Component {
       onLoad,
       renderQueryComposerActions,
     } = this;
-    const menuRenderer = SelectTargetsMenu(onTargetSelectMoreInfo, onRemoveMoreInfoTarget);
+    const menuRenderer = SelectTargets.Menu(
+      onTargetSelectMoreInfo,
+      onRemoveMoreInfoTarget,
+      moreInfoTarget,
+    );
 
     return (
       <div className={`${baseClass}__wrapper`}>
@@ -145,7 +147,7 @@ class QueryComposer extends Component {
             <span className={`${baseClass}__select-targets`}>Select Targets</span>
             <span className={`${baseClass}__targets-count`}> {selectedTargetsCount} unique hosts</span>
           </p>
-          <SelectTargetsInput
+          <SelectTargets.Input
             isLoading={isLoadingTargets}
             menuRenderer={menuRenderer}
             onCloseTargetSelect={onCloseTargetSelect}
@@ -154,7 +156,6 @@ class QueryComposer extends Component {
             selectedTargets={selectedTargets}
             targets={targets}
           />
-          {moreInfoTarget && <TargetDetails target={moreInfoTarget} />}
         </div>
         {renderQueryComposerActions()}
       </div>

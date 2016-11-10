@@ -3,7 +3,7 @@ import { difference } from 'lodash';
 import Select from 'react-select';
 import 'react-select/dist/react-select.css';
 
-import targetInterface from '../../../interfaces/target';
+import targetInterface from 'interfaces/target';
 
 class SelectTargetsInput extends Component {
   static propTypes = {

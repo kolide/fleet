@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import classnames from 'classnames';
 
-import targetInterface from '../../../interfaces/target';
+import targetInterface from 'interfaces/target';
 
 const baseClass = 'target-option';
 
