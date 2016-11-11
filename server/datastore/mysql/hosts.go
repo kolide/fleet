@@ -119,3 +119,7 @@ func (d *Datastore) MarkHostSeen(*kolide.Host, time.Time) error {
 func (d *Datastore) SearchHosts(query string, omit []uint) ([]kolide.Host, error) {
 	panic("not implemented")
 }
+
+func (d *Datastore) DistributedQueriesForHost(host *kolide.Host) (map[uint]string, error) {
+	panic("not implmented")
+}

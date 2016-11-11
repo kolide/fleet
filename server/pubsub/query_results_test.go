@@ -2,6 +2,7 @@ package pubsub
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"reflect"
 	"runtime"
@@ -75,7 +76,7 @@ func setupRedis(t *testing.T) (store *redisQueryResults, teardown func()) {
 	)
 
 	if a, ok := os.LookupEnv("REDIS_PORT_6379_TCP_ADDR"); ok {
-		addr = a
+		addr = fmt.Sprintf("%s:6379", a)
 	}
 
 	store = NewRedisQueryResults(NewRedisPool(addr, password))
@@ -100,10 +101,10 @@ func testQueryResultsStoreErrors(t *testing.T, store kolide.QueryResultStore) {
 				ID: 4,
 				UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
 					UpdateTimestamp: kolide.UpdateTimestamp{
-						UpdatedAt: time.Now(),
+						UpdatedAt: time.Now().UTC(),
 					},
 				},
-				DetailUpdateTime: time.Now(),
+				DetailUpdateTime: time.Now().UTC(),
 			},
 		},
 	)
@@ -129,10 +130,10 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 				// time value. See https://goo.gl/CCEs8x
 				UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
 					UpdateTimestamp: kolide.UpdateTimestamp{
-						UpdatedAt: time.Now(),
+						UpdatedAt: time.Now().UTC(),
 					},
 				},
-				DetailUpdateTime: time.Now(),
+				DetailUpdateTime: time.Now().UTC(),
 			},
 		},
 		kolide.DistributedQueryResult{
@@ -142,10 +143,10 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 				ID: 3,
 				UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
 					UpdateTimestamp: kolide.UpdateTimestamp{
-						UpdatedAt: time.Now(),
+						UpdatedAt: time.Now().UTC(),
 					},
 				},
-				DetailUpdateTime: time.Now(),
+				DetailUpdateTime: time.Now().UTC(),
 			},
 		},
 		kolide.DistributedQueryResult{
@@ -155,10 +156,10 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 				ID: 4,
 				UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
 					UpdateTimestamp: kolide.UpdateTimestamp{
-						UpdatedAt: time.Now(),
+						UpdatedAt: time.Now().UTC(),
 					},
 				},
-				DetailUpdateTime: time.Now(),
+				DetailUpdateTime: time.Now().UTC(),
 			},
 		},
 	}
@@ -177,10 +178,10 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 				ID: 1,
 				UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
 					UpdateTimestamp: kolide.UpdateTimestamp{
-						UpdatedAt: time.Now(),
+						UpdatedAt: time.Now().UTC(),
 					},
 				},
-				DetailUpdateTime: time.Now(),
+				DetailUpdateTime: time.Now().UTC(),
 			},
 		},
 		kolide.DistributedQueryResult{
@@ -190,10 +191,10 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 				ID: 3,
 				UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
 					UpdateTimestamp: kolide.UpdateTimestamp{
-						UpdatedAt: time.Now(),
+						UpdatedAt: time.Now().UTC(),
 					},
 				},
-				DetailUpdateTime: time.Now(),
+				DetailUpdateTime: time.Now().UTC(),
 			},
 		},
 	}

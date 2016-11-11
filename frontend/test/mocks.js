@@ -12,6 +12,36 @@ export const validUser = {
   gravatarURL: 'https://www.gravatar.com/avatar/7157f4758f8423b59aaee869d919f6b9',
 };
 
+export const validCreateQueryRequest = (bearerToken, queryParams) => {
+  return nock('http://localhost:8080', {
+    reqHeaders: {
+      Authorization: `Bearer ${bearerToken}`,
+    },
+  })
+    .post('/api/v1/kolide/queries', JSON.stringify(queryParams))
+    .reply(201, { query: queryParams });
+};
+
+export const invalidGetQueryRequest = (bearerToken, queryID) => {
+  return nock('http://localhost:8080', {
+    reqHeaders: {
+      Authorization: `Bearer ${bearerToken}`,
+    },
+  })
+    .get(`/api/v1/kolide/queries/${queryID}`)
+    .reply(404, { error: 'resource not found' });
+};
+
+export const validGetQueryRequest = (bearerToken, queryID) => {
+  return nock('http://localhost:8080', {
+    reqHeaders: {
+      Authorization: `Bearer ${bearerToken}`,
+    },
+  })
+    .get(`/api/v1/kolide/queries/${queryID}`)
+    .reply(200, { query: { id: queryID } });
+};
+
 export const validGetConfigRequest = (bearerToken) => {
   return nock('http://localhost:8080', {
     reqHeaders: {
@@ -54,6 +84,47 @@ export const validGetHostsRequest = (bearerToken) => {
   })
     .get('/api/v1/kolide/hosts')
     .reply(200, { hosts: [] });
+};
+
+export const validGetTargetsRequest = (bearerToken, query) => {
+  return nock('http://localhost:8080', {
+    reqHeaders: {
+      Authorization: `Bearer ${bearerToken}`,
+    },
+  })
+    .post('/api/v1/kolide/targets', {
+      query,
+      selected: {
+        hosts: [],
+        labels: [],
+      },
+    })
+    .reply(200, {
+      selected_targets_count: 1234,
+      targets: [
+        {
+          id: 3,
+          label: 'OS X El Capitan 10.11',
+          name: 'osx-10.11',
+          platform: 'darwin',
+          target_type: 'hosts',
+        },
+        {
+          id: 4,
+          label: 'Jason Meller\'s Macbook Pro',
+          name: 'jmeller.local',
+          platform: 'darwin',
+          target_type: 'hosts',
+        },
+        {
+          id: 4,
+          label: 'All Macs',
+          name: 'macs',
+          count: 1234,
+          target_type: 'labels',
+        },
+      ],
+    });
 };
 
 export const validGetUsersRequest = (bearerToken) => {
@@ -132,6 +203,16 @@ export const invalidResetPasswordRequest = (password, token, error) => {
   .reply(422, { error });
 };
 
+export const validUpdateQueryRequest = (bearerToken, query, formData) => {
+  return nock('http://localhost:8080', {
+    reqHeaders: {
+      Authorization: `Bearer ${bearerToken}`,
+    },
+  })
+  .patch(`/api/v1/kolide/queries/${query.id}`, JSON.stringify(formData))
+  .reply(200, { query: { ...query, ...formData } });
+};
+
 export const validUpdateUserRequest = (user, formData) => {
   return nock('http://localhost:8080')
   .patch(`/api/v1/kolide/users/${user.id}`, JSON.stringify(formData))
@@ -141,11 +222,15 @@ export const validUpdateUserRequest = (user, formData) => {
 
 export default {
   invalidForgotPasswordRequest,
+  invalidGetQueryRequest,
   invalidResetPasswordRequest,
+  validCreateQueryRequest,
   validForgotPasswordRequest,
   validGetConfigRequest,
   validGetHostsRequest,
   validGetInvitesRequest,
+  validGetQueryRequest,
+  validGetTargetsRequest,
   validGetUsersRequest,
   validInviteUserRequest,
   validLoginRequest,
@@ -153,6 +238,7 @@ export default {
   validMeRequest,
   validResetPasswordRequest,
   validRevokeInviteRequest,
+  validUpdateQueryRequest,
   validUpdateUserRequest,
   validUser,
 };

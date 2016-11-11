@@ -83,3 +83,18 @@ func (d *Datastore) ListQueries(opt kolide.ListOptions) ([]*kolide.Query, error)
 	return results, nil
 
 }
+
+func (d *Datastore) SaveDistributedQueryCampaign(camp kolide.DistributedQueryCampaign) error {
+	panic("not implemented")
+}
+func (d *Datastore) NewDistributedQueryCampaign(camp kolide.DistributedQueryCampaign) (kolide.DistributedQueryCampaign, error) {
+	panic("not implemented")
+}
+
+func (d *Datastore) NewDistributedQueryCampaignTarget(target kolide.DistributedQueryCampaignTarget) (kolide.DistributedQueryCampaignTarget, error) {
+	panic("not implemented")
+}
+
+func (d *Datastore) NewDistributedQueryExecution(exec kolide.DistributedQueryExecution) (kolide.DistributedQueryExecution, error) {
+	panic("not implemented")
+}

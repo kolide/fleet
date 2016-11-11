@@ -41,4 +41,5 @@ var testFunctions = [...]func(*testing.T, kolide.Datastore){
 	testSearchLabelsLimit,
 	testListHostsInLabel,
 	testListUniqueHostsInLabels,
+	testDistributedQueriesForHost,
 }

@@ -1,4 +1,5 @@
 import expect from 'expect';
+import nock from 'nock';
 
 import Kolide from './index';
 import mocks from '../test/mocks';
@@ -6,10 +7,13 @@ import mocks from '../test/mocks';
 const {
   invalidForgotPasswordRequest,
   invalidResetPasswordRequest,
+  validCreateQueryRequest,
   validForgotPasswordRequest,
   validGetConfigRequest,
   validGetHostsRequest,
   validGetInvitesRequest,
+  validGetQueryRequest,
+  validGetTargetsRequest,
   validGetUsersRequest,
   validInviteUserRequest,
   validLoginRequest,
@@ -17,14 +21,37 @@ const {
   validMeRequest,
   validResetPasswordRequest,
   validRevokeInviteRequest,
+  validUpdateQueryRequest,
   validUpdateUserRequest,
   validUser,
 } = mocks;
 
 describe('Kolide - API client', () => {
+  afterEach(() => { nock.cleanAll(); });
+
   describe('defaults', () => {
     it('sets the base URL', () => {
       expect(Kolide.baseURL).toEqual('http://localhost:8080/api');
+    });
+  });
+
+  describe('#createQuery', () => {
+    it('calls the appropriate endpoint with the correct parameters', (done) => {
+      const bearerToken = 'valid-bearer-token';
+      const description = 'query description';
+      const name = 'query name';
+      const query = 'SELECT * FROM users';
+      const queryParams = { description, name, query };
+      const request = validCreateQueryRequest(bearerToken, queryParams);
+
+      Kolide.setBearerToken(bearerToken);
+      Kolide.createQuery(queryParams)
+        .then((queryResponse) => {
+          expect(request.isDone()).toEqual(true);
+          expect(queryResponse).toEqual(queryParams);
+          done();
+        })
+        .catch(done);
     });
   });
 
@@ -72,37 +99,37 @@ describe('Kolide - API client', () => {
     });
   });
 
+  describe('#getQuery', () => {
+    it('calls the appropriate endpoint with the correct parameters', (done) => {
+      const bearerToken = 'valid-bearer-token';
+      const queryID = 10;
+      const request = validGetQueryRequest(bearerToken, queryID);
+
+      Kolide.setBearerToken(bearerToken);
+      Kolide.getQuery(queryID)
+        .then(() => {
+          expect(request.isDone()).toEqual(true);
+          done();
+        })
+        .catch(done);
+    });
+  });
+
   describe('#getTargets', () => {
-    it('correctly parses the response', () => {
-      Kolide.getTargets()
-        .then((response) => {
-          expect(response).toEqual({
-            targets: [
-              {
-                id: 3,
-                label: 'OS X El Capitan 10.11',
-                name: 'osx-10.11',
-                platform: 'darwin',
-                target_type: 'hosts',
-              },
-              {
-                id: 4,
-                label: 'Jason Meller\'s Macbook Pro',
-                name: 'jmeller.local',
-                platform: 'darwin',
-                target_type: 'hosts',
-              },
-              {
-                id: 4,
-                label: 'All Macs',
-                name: 'macs',
-                count: 1234,
-                target_type: 'labels',
-              },
-            ],
-            selected_targets_count: 1234,
-          });
-        });
+    it('correctly parses the response', (done) => {
+      const bearerToken = 'valid-bearer-token';
+      const hosts = [];
+      const labels = [];
+      const query = 'mac';
+      const request = validGetTargetsRequest(bearerToken, query);
+
+      Kolide.setBearerToken(bearerToken);
+      Kolide.getTargets(query, { hosts, labels })
+        .then(() => {
+          expect(request.isDone()).toEqual(true);
+          done();
+        })
+        .catch(done);
     });
   });
 
@@ -271,6 +298,27 @@ describe('Kolide - API client', () => {
       Kolide.revokeInvite({ entityID })
         .then(() => {
           expect(request.isDone()).toEqual(true);
+          done();
+        })
+        .catch(done);
+    });
+  });
+
+  describe('#updateQuery', () => {
+    it('calls the appropriate endpoint with the correct parameters', (done) => {
+      const bearerToken = 'valid-bearer-token';
+      const query = { id: 1, name: 'Query Name', description: 'Query Description', query: 'SELECT * FROM users' };
+      const updateQueryParams = { name: 'New Query Name' };
+      const request = validUpdateQueryRequest(bearerToken, query, updateQueryParams);
+
+      Kolide.setBearerToken(bearerToken);
+      Kolide.updateQuery(query, updateQueryParams)
+        .then((queryResponse) => {
+          expect(request.isDone()).toEqual(true);
+          expect(queryResponse).toEqual({
+            ...query,
+            ...updateQueryParams,
+          });
           done();
         })
         .catch(done);
