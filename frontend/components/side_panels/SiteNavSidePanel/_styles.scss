@@ -1,35 +1,42 @@
 .site-nav-header {
-  border-bottom: 1px solid $accent-light;
-  height: 62px;
+  @include transition(background 150ms $ease-in-quad);
   cursor: pointer;
-  padding-left: 54px;
-  padding-top: 26px;
-  margin-right: 16px;
+  padding: $pad-large $pad-medium 0;
   position: relative;
 
+  &:hover {
+    background: $bg-medium;
+  }
+
+  &__org {
+    @include transition(border 150ms $ease-in-quad);
+    @include clearfix;
+    position: relative;
+    z-index: 2;
+    border-bottom: 1px solid $accent-light;
+    padding-bottom: $pad-medium;
+    max-height: 100px;
+  }
+
   &__logo {
-    position: absolute;
-    left: 0;
-    top: 23px;
-    height: 42px;
+    @include size(42px);
+    float: left;
     margin-right: 10px;
     border: 1px solid $accent-medium;
-    border-radius: 100%;
+    border-radius: 50%;
 
     @media (max-width: 760px) {
-      left: 5px;
+      margin-left: 5px;
     }
   }
 
   &__org-name {
+    @include ellipsis(110px);
     font-size: 16px;
     letter-spacing: 0.5px;
     margin: 0;
-    overflow: hidden;
     padding: 0;
-    position: relative;
-    text-overflow: ellipsis;
-    top: 1px;
+    display: block;
     white-space: nowrap;
 
     @media (max-width: 760px) {
@@ -55,15 +62,14 @@
   }
 
   &__username {
-    position: relative;
-    display: inline-block;
+    @include ellipsis(110px);
     margin: 0;
     padding: 0;
-    top: -3px;
-    left: 4px;
     font-size: 13px;
     letter-spacing: 0.6px;
     text-transform: uppercase;
+    position: relative;
+    line-height: 16px;
 
     @media (max-width: 760px) {
       display: none;
@@ -71,11 +77,10 @@
   }
 
   &__org-chevron {
+    @include transition(transform 150ms $ease-in-quad);
     color: $accent-medium;
     font-size: 12px;
-    position: absolute;
-    top: 50px;
-    right: 35px;
+    float: right;
 
     @media (max-width: 760px) {
       top: auto;
@@ -84,6 +89,101 @@
       bottom: 6px;
       text-align: center;
       display: block;
+    }
+  }
+
+  &--open {
+    background-color: $text-dark;
+
+    .site-nav-header__org {
+      border-color: $text-ultradark;
+    }
+
+    .site-nav-header__org-name,
+    .site-nav-header__username {
+      color: $white;
+    }
+
+    .site-nav-header__org-chevron {
+      @include transform(rotate(180deg));
+    }
+
+    &:hover {
+      background-color: $text-dark;
+    }
+  }
+}
+
+.user-menu-toggle {
+  @include transition(opacity 150ms ease-in-out);
+  height: 0;
+  background-color: $text-dark;
+  width: 222px;
+  position: absolute;
+  left: 0;
+  padding: 0;
+  z-index: 1;
+  overflow: hidden;
+  opacity: 0;
+  box-sizing: border-box;
+
+  &--open {
+    height: auto;
+    padding: $pad-medium 0 0;
+    opacity: 1;
+  }
+
+  &__avatar {
+    @include size(42px);
+    float: left;
+    border: solid 1px $accent-medium;
+    border-radius: 50%;
+    margin: 0 10px 0 $pad-medium;
+  }
+
+  &__name,
+  &__position {
+    @include ellipsis(135px);
+    color: $white;
+    font-size: $small;
+    margin: 0;
+    line-height: $large;
+    float: left;
+  }
+
+  &__nav {
+    clear: both;
+    padding-top: $pad-small;
+  }
+
+  &__nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  &__nav-item {
+    font-size: $small;
+    text-transform: uppercase;
+
+    a {
+      @include transition(background 150ms $ease-in-quad);
+      letter-spacing: 0.5px;
+      color: $white;
+      display: block;
+      line-height: 50px;
+      text-decoration: none;
+      padding: 0 $pad-medium;
+
+      i {
+        margin-right: $pad-half;
+        font-size: $large;
+        vertical-align: middle;
+      }
+
+      &:hover {
+        background: $accent-text;
+      }
     }
   }
 }
@@ -289,7 +389,6 @@
   box-shadow: 2px 0 8px 0 rgba($black, 0.1);
   box-sizing: border-box;
   left: 0;
-  padding-left: 16px;
   position: fixed;
   top: 0;
   width: 223px;

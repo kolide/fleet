@@ -32,6 +32,7 @@ class SiteNavSidePanel extends Component {
       activeTab,
       activeSubItem,
       showSubItems: false,
+      userMenuOpened: false,
     };
   }
 
@@ -94,6 +95,13 @@ class SiteNavSidePanel extends Component {
     };
   }
 
+  toggleUserMenu = () => {
+    const toggleBool = this.state.userMenuOpened ? false : true;
+    this.setState({
+      userMenuOpened: toggleBool,
+    })
+  }
+
   renderHeader = () => {
     const {
       config: {
@@ -106,23 +114,54 @@ class SiteNavSidePanel extends Component {
     } = this.props;
 
     const headerBaseClass = 'site-nav-header';
+    const toggleBaseClass = 'user-menu-toggle';
+
+    const headerToggleClass = classnames(
+      headerBaseClass,
+      { [`${headerBaseClass}--open`]: this.state.userMenuOpened }
+    );
 
     const userStatusClass = classnames(
       `${headerBaseClass}__user-status`,
       { [`${headerBaseClass}__user-status--enabled`]: enabled }
     );
 
+    const userMenuClass = classnames(
+      toggleBaseClass,
+      { [`${toggleBaseClass}--open`]: this.state.userMenuOpened }
+    );
+
     return (
-      <header className={headerBaseClass}>
-        <img
-          alt="Company logo"
-          src={kolideLogo}
-          className={`${headerBaseClass}__logo`}
-        />
-        <h1 className={`${headerBaseClass}__org-name`}>{orgName}</h1>
-        <div className={userStatusClass} />
-        <h2 className={`${headerBaseClass}__username`}>{username}</h2>
-        <i className={`${headerBaseClass}__org-chevron kolidecon-chevrondownbold`} />
+      <header className={headerToggleClass} onClick={this.toggleUserMenu}>
+        <div className={`${headerBaseClass}__org`}>
+          <img
+            alt="Company logo"
+            src={kolideLogo}
+            className={`${headerBaseClass}__logo`}
+          />
+          <h1 className={`${headerBaseClass}__org-name`}>{orgName}</h1>
+          <div className={userStatusClass} />
+          <h2 className={`${headerBaseClass}__username`}>{username}</h2>
+          <i className={`${headerBaseClass}__org-chevron kolidecon-chevrondown`} />
+        </div>
+
+        <div className={userMenuClass}>
+          <img
+            alt="User Avatar"
+            src={kolideLogo}
+            className={`${toggleBaseClass}__avatar`}
+          />
+
+          <p className={`${toggleBaseClass}__name`}>Dwight Kurt Schrute III</p>
+          <p className={`${toggleBaseClass}__position`}>Asst. to Regional Mgr</p>
+
+          <nav className={`${toggleBaseClass}__nav`}>
+            <ul className={`${toggleBaseClass}__nav-list`}>
+              <li className={`${toggleBaseClass}__nav-item`}><a href="#"><i className="kolidecon-admin" />Account Settings</a></li>
+              <li className={`${toggleBaseClass}__nav-item`}><a href="#"><i className="kolidecon-admin" />Log Out</a></li>
+            </ul>
+          </nav>
+        </div>
       </header>
     );
   }
