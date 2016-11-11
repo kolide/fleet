@@ -7,6 +7,7 @@ import (
 
 	"github.com/kolide/kolide-ose/server/datastore"
 	"github.com/kolide/kolide-ose/server/kolide"
+	"github.com/kolide/kolide-ose/server/pubsub"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
@@ -16,7 +17,8 @@ func TestSearchTargets(t *testing.T) {
 	ds, err := datastore.New("inmem", "")
 	require.Nil(t, err)
 
-	svc, err := newTestService(ds)
+	rs := pubsub.NewInmemQueryResults()
+	svc, err := newTestService(ds, rs)
 	require.Nil(t, err)
 
 	ctx := context.Background()
@@ -47,7 +49,8 @@ func TestCountHostsInTargets(t *testing.T) {
 	ds, err := datastore.New("inmem", "")
 	require.Nil(t, err)
 
-	svc, err := newTestService(ds)
+	rs := pubsub.NewInmemQueryResults()
+	svc, err := newTestService(ds, rs)
 	require.Nil(t, err)
 
 	ctx := context.Background()
@@ -143,7 +146,8 @@ func TestSearchWithOmit(t *testing.T) {
 	ds, err := datastore.New("inmem", "")
 	require.Nil(t, err)
 
-	svc, err := newTestService(ds)
+	rs := pubsub.NewInmemQueryResults()
+	svc, err := newTestService(ds, rs)
 	require.Nil(t, err)
 
 	ctx := context.Background()
@@ -195,7 +199,8 @@ func TestSearchHostsInLabels(t *testing.T) {
 	ds, err := datastore.New("inmem", "")
 	require.Nil(t, err)
 
-	svc, err := newTestService(ds)
+	rs := pubsub.NewInmemQueryResults()
+	svc, err := newTestService(ds, rs)
 	require.Nil(t, err)
 
 	ctx := context.Background()
@@ -248,7 +253,8 @@ func TestSearchResultsLimit(t *testing.T) {
 	ds, err := datastore.New("inmem", "")
 	require.Nil(t, err)
 
-	svc, err := newTestService(ds)
+	rs := pubsub.NewInmemQueryResults()
+	svc, err := newTestService(ds, rs)
 	require.Nil(t, err)
 
 	ctx := context.Background()

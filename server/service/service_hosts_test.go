@@ -5,6 +5,7 @@ import (
 
 	"github.com/kolide/kolide-ose/server/datastore"
 	"github.com/kolide/kolide-ose/server/kolide"
+	"github.com/kolide/kolide-ose/server/pubsub"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
 )
@@ -13,7 +14,8 @@ func TestListHosts(t *testing.T) {
 	ds, err := datastore.New("inmem", "")
 	assert.Nil(t, err)
 
-	svc, err := newTestService(ds)
+	rs := pubsub.NewInmemQueryResults()
+	svc, err := newTestService(ds, rs)
 	assert.Nil(t, err)
 
 	ctx := context.Background()
@@ -36,7 +38,8 @@ func TestGetHost(t *testing.T) {
 	ds, err := datastore.New("inmem", "")
 	assert.Nil(t, err)
 
-	svc, err := newTestService(ds)
+	rs := pubsub.NewInmemQueryResults()
+	svc, err := newTestService(ds, rs)
 	assert.Nil(t, err)
 
 	ctx := context.Background()
@@ -57,7 +60,8 @@ func TestDeleteHost(t *testing.T) {
 	ds, err := datastore.New("inmem", "")
 	assert.Nil(t, err)
 
-	svc, err := newTestService(ds)
+	rs := pubsub.NewInmemQueryResults()
+	svc, err := newTestService(ds, rs)
 	assert.Nil(t, err)
 
 	ctx := context.Background()

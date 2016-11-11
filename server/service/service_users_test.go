@@ -10,6 +10,7 @@ import (
 	"github.com/kolide/kolide-ose/server/contexts/viewer"
 	"github.com/kolide/kolide-ose/server/datastore"
 	"github.com/kolide/kolide-ose/server/kolide"
+	"github.com/kolide/kolide-ose/server/pubsub"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
@@ -19,7 +20,8 @@ func TestAuthenticatedUser(t *testing.T) {
 	ds, err := datastore.New("inmem", "")
 	assert.Nil(t, err)
 	createTestUsers(t, ds)
-	svc, err := newTestService(ds)
+	rs := pubsub.NewInmemQueryResults()
+	svc, err := newTestService(ds, rs)
 	assert.Nil(t, err)
 	admin1, err := ds.User("admin1")
 	assert.Nil(t, err)
@@ -113,7 +115,8 @@ func TestRequestPasswordReset(t *testing.T) {
 
 func TestCreateUser(t *testing.T) {
 	ds, _ := datastore.New("inmem", "")
-	svc, _ := newTestService(ds)
+	rs := pubsub.NewInmemQueryResults()
+	svc, _ := newTestService(ds, rs)
 	invites := setupInvites(t, ds, []string{"admin2@example.com"})
 	ctx := context.Background()
 
@@ -236,7 +239,8 @@ func setupInvites(t *testing.T, ds kolide.Datastore, emails []string) map[string
 
 func TestChangeUserPassword(t *testing.T) {
 	ds, _ := datastore.New("inmem", "")
-	svc, _ := newTestService(ds)
+	rs := pubsub.NewInmemQueryResults()
+	svc, _ := newTestService(ds, rs)
 	createTestUsers(t, ds)
 	var passwordChangeTests = []struct {
 		token       string
