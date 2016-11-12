@@ -2,9 +2,11 @@ package mysql
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 	"time"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
 )
@@ -143,10 +145,105 @@ func (d *Datastore) MarkHostSeen(*kolide.Host, time.Time) error {
 	panic("not implemented")
 }
 
-func (d *Datastore) SearchHosts(query string, omit []uint) ([]kolide.Host, error) {
-	panic("not implemented")
+func (d *Datastore) searchHostsWithOmits(query string, omits ...uint) ([]kolide.Host, error) {
+	// The reason that string cocantenation is used to include query as opposed to a
+	// bindvar is that sqlx.In has a bug such that, if you have any bindvars other
+	// than those in the IN clause, sqlx.In returns an empty sql statement.
+	// I've submitted an issue https://github.com/jmoiron/sqlx/issues/260 about this
+	sqlStatement := `
+		SELECT *
+		FROM hosts
+		WHERE MATCH(host_name, primary_ip)
+		AGAINST('` + query + "*" + `' IN BOOLEAN MODE)
+		AND NOT deleted
+		AND id NOT IN (?)
+		LIMIT 10
+	`
+
+	sql, args, err := sqlx.In(sqlStatement, omits)
+
+	if err != nil {
+		return nil, errors.DatabaseError(err)
+	}
+
+	sql = d.db.Rebind(sql)
+
+	hosts := []kolide.Host{}
+
+	if err = d.db.Select(&hosts, sql, args...); err != nil {
+		fmt.Println(err.Error())
+		return nil, errors.DatabaseError(err)
+	}
+
+	return hosts, nil
+}
+
+// SearchHosts find hosts by query containing an IP address or a host name. Optionally
+// pass a list of IDs to omit from the search
+func (d *Datastore) SearchHosts(query string, omit ...uint) ([]kolide.Host, error) {
+	if len(omit) > 0 {
+		return d.searchHostsWithOmits(query, omit...)
+	}
+
+	sqlStatement := `
+		SELECT * FROM hosts
+		WHERE MATCH(host_name, primary_ip)
+		AGAINST(? IN BOOLEAN MODE)
+		AND not deleted
+		LIMIT 10
+	`
+	hosts := []kolide.Host{}
+
+	if err := d.db.Select(&hosts, sqlStatement, query); err != nil {
+		return nil, errors.DatabaseError(err)
+	}
+
+	return hosts, nil
+
 }
 
 func (d *Datastore) DistributedQueriesForHost(host *kolide.Host) (map[uint]string, error) {
-	panic("not implmented")
+	sqlStatement := `
+		SELECT DISTINCT dqc.id, q.query
+		FROM distributed_query_campaigns dqc
+		JOIN distributed_query_campaign_targets dqct
+		    ON (dqc.id = dqct.distributed_query_campaign_id)
+		LEFT JOIN label_query_executions lqe
+		    ON (dqct.type = ? AND dqct.target_id = lqe.label_id AND lqe.matches)
+		LEFT JOIN hosts h
+		    ON ((dqct.type = ? AND lqe.host_id = h.id) OR (dqct.type = ? AND dqct.target_id = h.id))
+		LEFT JOIN distributed_query_executions dqe
+		    ON (h.id = dqe.host_id AND dqc.id = dqe.distributed_query_campaign_id)
+		JOIN queries q
+		    ON (dqc.query_id = q.id)
+		WHERE dqe.status IS NULL AND dqc.status = ? AND h.id = ?
+			AND NOT q.deleted
+			AND NOT dqc.deleted
+ `
+	rows, err := d.db.Query(sqlStatement, kolide.TargetLabel, kolide.TargetLabel,
+		kolide.TargetHost, kolide.QueryRunning, host.ID)
+
+	if err != nil {
+		return nil, errors.DatabaseError(err)
+	}
+	defer rows.Close()
+
+	results := map[uint]string{}
+
+	for rows.Next() {
+		var (
+			id    uint
+			query string
+		)
+		err = rows.Scan(&id, &query)
+
+		if err != nil {
+			return nil, errors.DatabaseError(err)
+		}
+
+		results[id] = query
+
+	}
+
+	return results, nil
 }

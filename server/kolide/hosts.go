@@ -17,7 +17,7 @@ type HostStore interface {
 	EnrollHost(uuid, hostname, ip, platform string, nodeKeySize int) (*Host, error)
 	AuthenticateHost(nodeKey string) (*Host, error)
 	MarkHostSeen(host *Host, t time.Time) error
-	SearchHosts(query string, omit []uint) ([]Host, error)
+	SearchHosts(query string, omit ...uint) ([]Host, error)
 	// DistributedQueriesForHost retrieves the distributed queries that the
 	// given host should run. The result map is a mapping from campaign ID
 	// to query text.

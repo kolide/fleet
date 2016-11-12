@@ -8,7 +8,7 @@ import (
 func (svc service) SearchTargets(ctx context.Context, query string, selectedHostIDs []uint, selectedLabelIDs []uint) (*kolide.TargetSearchResults, error) {
 	results := &kolide.TargetSearchResults{}
 
-	hosts, err := svc.ds.SearchHosts(query, selectedHostIDs)
+	hosts, err := svc.ds.SearchHosts(query, selectedHostIDs...)
 	if err != nil {
 		return nil, err
 	}

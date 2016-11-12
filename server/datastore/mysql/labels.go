@@ -223,23 +223,18 @@ func (d *Datastore) searchLabelsWithOmits(query string, omit ...uint) ([]kolide.
 		SELECT *
 		FROM labels
 		WHERE MATCH(name)
-		AGAINST(? IN BOOLEAN MODE)
+		AGAINST('` + query + "*" + `' IN BOOLEAN MODE)
 	  AND NOT deleted
 		AND id NOT IN (?)
 		LIMIT 10
 	`
-	sql, inArgs, err := sqlx.In(sqlStatement, omit)
+	sql, args, err := sqlx.In(sqlStatement, omit)
 
 	if err != nil {
 		return nil, errors.DatabaseError(err)
 	}
 
 	sql = d.db.Rebind(sql)
-
-	args := []interface{}{
-		query + "*",
-	}
-	args = append(args, inArgs...)
 
 	matches := []kolide.Label{}
 	err = d.db.Select(&matches, sql, args...)
@@ -248,7 +243,7 @@ func (d *Datastore) searchLabelsWithOmits(query string, omit ...uint) ([]kolide.
 		return nil, errors.DatabaseError(err)
 	}
 
-	return nil, nil
+	return matches, nil
 }
 
 // SearchLabels performs wildcard searches on kolide.Label name

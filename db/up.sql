@@ -33,6 +33,8 @@ CREATE TABLE `distributed_query_campaigns` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NOT NULL DEFAULT '1970-01-01 00:00:01',
+  `deleted` tinyint(1) NOT NULL DEFAULT FALSE,
   `query_id` int(10) unsigned DEFAULT NULL,
   `max_duration` bigint(20) DEFAULT NULL,
   `status` int(11) DEFAULT NULL,
@@ -44,10 +46,12 @@ CREATE TABLE `distributed_query_campaigns` (
 CREATE TABLE `distributed_query_executions` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `host_id` int(10) unsigned DEFAULT NULL,
-  `distributed_query_id` int(10) unsigned DEFAULT NULL,
+  `distributed_query_campaign_id` int(10) unsigned DEFAULT NULL,
   `status` int(11) DEFAULT NULL,
   `error` varchar(1024) DEFAULT NULL,
   `execution_duration` bigint(20) DEFAULT NULL,
+  UNIQUE KEY `idx_dqe_unique_dqec_id` (`distributed_query_campaign_id`),
+  UNIQUE KEY `idx_dqe_unique_host_id` (`host_id`),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
