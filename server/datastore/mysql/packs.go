@@ -123,7 +123,7 @@ func (d *Datastore) ListQueriesInPack(pack *kolide.Pack) ([]*kolide.Query, error
 // RemoveQueryFromPack disassociated a kolide.Query from a kolide.Pack
 func (d *Datastore) RemoveQueryFromPack(query *kolide.Query, pack *kolide.Pack) error {
 	sql := `
-		DELETE FROM query_packs
+		DELETE FROM pack_queries
 			WHERE pack_id = ? AND query_id = ?
 	`
 	_, err := d.db.Exec(sql, pack.ID, query.ID)

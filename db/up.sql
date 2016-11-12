@@ -166,11 +166,11 @@ CREATE TABLE `packs` (
 
 CREATE TABLE `password_reset_requests` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `expires_at` timestamp NULL DEFAULT NULL,
-  `user_id` int(10) unsigned DEFAULT NULL,
-  `token` varchar(1024) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT '1970-01-01 00:00:01',
+  `updated_at` timestamp NOT NULL DEFAULT '1970-01-01 00:00:01',
+  `expires_at` timestamp NOT NULL DEFAULT '1970-01-01 00:00:01',
+  `user_id` int(10) unsigned NOT NULL,
+  `token` varchar(1024) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

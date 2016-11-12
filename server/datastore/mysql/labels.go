@@ -155,7 +155,7 @@ func (d *Datastore) ListLabelsForHost(hid uint) ([]kolide.Label, error) {
 		WHERE lqe.host_id = ?
 		AND lqe.label_id = labels.id
 		AND lqe.matches
-		AND NOT label.deleted
+		AND NOT labels.deleted
 	`
 
 	labels := []kolide.Label{}

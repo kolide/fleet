@@ -10,7 +10,34 @@ import (
 )
 
 func (d *Datastore) NewHost(host *kolide.Host) (*kolide.Host, error) {
-	panic("not implemented")
+	host.MarkAsCreated(d.clock.Now())
+	sqlStatement := `
+	INSERT INTO hosts (
+		created_at,
+		updated_at,
+		detail_update_time,
+		node_key,
+		host_name,
+		uuid,
+		platform,
+		osquery_version,
+		os_version,
+		uptime,
+		physical_memory,
+		primary_mac,
+		primary_ip
+	)
+	VALUES( ?,?,?,?,?,?,?,?,?,?,?,?,?)
+	`
+	result, err := d.db.Exec(sqlStatement, host.CreatedAt, host.UpdatedAt, host.DetailUpdateTime,
+		host.NodeKey, host.HostName, host.UUID, host.Platform, host.OsqueryVersion,
+		host.OSVersion, host.Uptime, host.PhysicalMemory, host.PrimaryMAC, host.PrimaryIP)
+	if err != nil {
+		return nil, errors.DatabaseError(err)
+	}
+	id, _ := result.LastInsertId()
+	host.ID = uint(id)
+	return host, nil
 }
 
 func (d *Datastore) SaveHost(host *kolide.Host) error {

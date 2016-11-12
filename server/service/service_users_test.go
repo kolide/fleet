@@ -270,8 +270,14 @@ func TestChangeUserPassword(t *testing.T) {
 		t.Run("", func(t *testing.T) {
 			ctx := context.Background()
 			request := &kolide.PasswordResetRequest{
-				CreatedAt: time.Now(),
-				UpdatedAt: time.Now(),
+				UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
+					CreateTimestamp: kolide.CreateTimestamp{
+						CreatedAt: time.Now(),
+					},
+					UpdateTimestamp: kolide.UpdateTimestamp{
+						UpdatedAt: time.Now(),
+					},
+				},
 				ExpiresAt: time.Now().Add(time.Hour * 24),
 				UserID:    1,
 				Token:     "abcd",

@@ -30,7 +30,7 @@ func (d *Datastore) SaveQuery(q *kolide.Query) error {
 	// TODO it might be better to use a table alias here to deal with interval
 	sql := `
 		UPDATE queries
-			SET updated_at = ?, name = ?, description = ?, query = ?, ` + "`interval`" + `= ? snapshot = ?,
+			SET updated_at = ?, name = ?, description = ?, query = ?, ` + "`interval`" + `= ?, snapshot = ?,
 			 	differential = ?, platform = ?, version = ?
 			WHERE id = ? AND NOT deleted
 	`
