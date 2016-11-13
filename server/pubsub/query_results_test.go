@@ -132,6 +132,12 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 					UpdateTimestamp: kolide.UpdateTimestamp{
 						UpdatedAt: time.Now().UTC(),
 					},
+					CreateTimestamp: kolide.CreateTimestamp{
+						CreatedAt: time.Now().UTC(),
+					},
+				},
+				DeleteFields: kolide.DeleteFields{
+					DeletedAt: time.Now().UTC(),
 				},
 				DetailUpdateTime: time.Now().UTC(),
 			},
@@ -145,6 +151,12 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 					UpdateTimestamp: kolide.UpdateTimestamp{
 						UpdatedAt: time.Now().UTC(),
 					},
+					CreateTimestamp: kolide.CreateTimestamp{
+						CreatedAt: time.Now().UTC(),
+					},
+				},
+				DeleteFields: kolide.DeleteFields{
+					DeletedAt: time.Now().UTC(),
 				},
 				DetailUpdateTime: time.Now().UTC(),
 			},
@@ -158,6 +170,12 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 					UpdateTimestamp: kolide.UpdateTimestamp{
 						UpdatedAt: time.Now().UTC(),
 					},
+					CreateTimestamp: kolide.CreateTimestamp{
+						CreatedAt: time.Now().UTC(),
+					},
+				},
+				DeleteFields: kolide.DeleteFields{
+					DeletedAt: time.Now().UTC(),
 				},
 				DetailUpdateTime: time.Now().UTC(),
 			},
@@ -180,6 +198,12 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 					UpdateTimestamp: kolide.UpdateTimestamp{
 						UpdatedAt: time.Now().UTC(),
 					},
+					CreateTimestamp: kolide.CreateTimestamp{
+						CreatedAt: time.Now().UTC(),
+					},
+				},
+				DeleteFields: kolide.DeleteFields{
+					DeletedAt: time.Now().UTC(),
 				},
 				DetailUpdateTime: time.Now().UTC(),
 			},
@@ -193,6 +217,12 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 					UpdateTimestamp: kolide.UpdateTimestamp{
 						UpdatedAt: time.Now().UTC(),
 					},
+					CreateTimestamp: kolide.CreateTimestamp{
+						CreatedAt: time.Now().UTC(),
+					},
+				},
+				DeleteFields: kolide.DeleteFields{
+					DeletedAt: time.Now().UTC(),
 				},
 				DetailUpdateTime: time.Now().UTC(),
 			},

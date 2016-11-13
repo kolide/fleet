@@ -4,7 +4,7 @@ import "time"
 
 // Createable contains common timestamp fields indicating create time
 type CreateTimestamp struct {
-	CreatedAt time.Time `json:"-" db:"created_at"`
+	CreatedAt time.Time `json:"created_at" db:"created_at"`
 }
 
 // MarkAsCreated sets timestamp, intended to be called when Createable record is
@@ -19,8 +19,8 @@ func (ci *CreateTimestamp) MarkAsCreated(created time.Time) {
 // delete record in the database. We mark it deleted, records with Deleted
 // set to true will not normally be included in results
 type DeleteFields struct {
-	DeletedAt time.Time `json:"-" db:"deleted_at" gorm:"-"`
-	Deleted   bool
+	DeletedAt time.Time `json:"deleted_at" db:"deleted_at" gorm:"-"`
+	Deleted   bool      `json:"deleted"`
 }
 
 // MarkDeleted indicates a record is deleted. It won't actually be removed from
@@ -32,7 +32,7 @@ func (d *DeleteFields) MarkDeleted(deleted time.Time) {
 
 // UpdateTimestamp contains a timestamp that is set whenever an entity is changed
 type UpdateTimestamp struct {
-	UpdatedAt time.Time `json:"-" db:"updated_at"`
+	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
 }
 
 // MarkAsUpdated is called when and entity is changed
