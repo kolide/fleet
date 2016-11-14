@@ -4,7 +4,7 @@ import { mount } from 'enzyme';
 import { noop } from 'lodash';
 
 import { ManageHostsPage } from 'pages/hosts/ManageHostsPage/ManageHostsPage';
-import { stubbedOsqueryTable } from 'test/helpers';
+import { createAceSpy, stubbedOsqueryTable } from 'test/helpers';
 
 describe('ManageHostsPage - component', () => {
   const props = {
@@ -24,6 +24,7 @@ describe('ManageHostsPage - component', () => {
   });
 
   it('renders a QuerySidePanel when adding a new label', () => {
+    createAceSpy();
     const page = mount(<ManageHostsPage {...props} />);
     page.setState({ isAddLabel: true });
 
