@@ -3,6 +3,10 @@
   cursor: pointer;
   padding: $pad-large $pad-medium 0;
   position: relative;
+  display: block;
+  width: 100%;
+  color: $text-ultradark;
+  text-align: left;
 
   &:hover {
     background: $bg-medium;
@@ -124,13 +128,13 @@
   position: absolute;
   left: 0;
   padding: 0;
-  z-index: 1;
+  z-index: 2;
   overflow: hidden;
   opacity: 0;
   box-sizing: border-box;
 
   @media (max-width: 760px) {
-    width: 53px
+    width: 53px;
   }
 
   &--open {

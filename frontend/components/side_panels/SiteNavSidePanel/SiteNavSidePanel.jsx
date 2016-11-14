@@ -97,10 +97,10 @@ class SiteNavSidePanel extends Component {
   }
 
   toggleUserMenu = () => {
-    const toggleBool = this.state.userMenuOpened ? false : true;
+    const toggleBool = !this.state.userMenuOpened;
     this.setState({
       userMenuOpened: toggleBool,
-    })
+    });
   }
 
   renderHeader = () => {
@@ -118,6 +118,8 @@ class SiteNavSidePanel extends Component {
 
     const headerToggleClass = classnames(
       headerBaseClass,
+      'button',
+      'button--unstyled',
       { [`${headerBaseClass}--open`]: this.state.userMenuOpened }
     );
 
@@ -127,25 +129,27 @@ class SiteNavSidePanel extends Component {
     );
 
     return (
-      <header className={headerToggleClass} onClick={this.toggleUserMenu}>
-        <div className={`${headerBaseClass}__org`}>
-          <img
-            alt="Company logo"
-            src={kolideLogo}
-            className={`${headerBaseClass}__logo`}
-          />
-          <h1 className={`${headerBaseClass}__org-name`}>{orgName}</h1>
-          <div className={userStatusClass} />
-          <h2 className={`${headerBaseClass}__username`}>{username}</h2>
-          <i className={`${headerBaseClass}__org-chevron kolidecon-chevrondown`} />
-        </div>
+      <header>
+        <button className={headerToggleClass} onClick={this.toggleUserMenu}>
+          <div className={`${headerBaseClass}__org`}>
+            <img
+              alt="Company logo"
+              src={kolideLogo}
+              className={`${headerBaseClass}__logo`}
+            />
+            <h1 className={`${headerBaseClass}__org-name`}>{orgName}</h1>
+            <div className={userStatusClass} />
+            <h2 className={`${headerBaseClass}__username`}>{username}</h2>
+            <i className={`${headerBaseClass}__org-chevron kolidecon-chevrondown`} />
+          </div>
 
-        <UserMenu
-          avatar={kolideLogo}
-          isOpened={this.state.userMenuOpened}
-          name="Dwight Kurt Schrute III"
-          position="Asst. to Regional Mgr"
-        />
+          <UserMenu
+            avatar={kolideLogo}
+            isOpened={this.state.userMenuOpened}
+            name="Dwight Kurt Schrute III"
+            position="Asst. to Regional Mgr"
+          />
+        </button>
       </header>
     );
   }
