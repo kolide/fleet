@@ -107,17 +107,12 @@ class SiteNavSidePanel extends Component {
       config: {
         org_name: orgName,
       },
-      user: {
-        enabled,
-        username,
-        gravatarURL,
-        name,
-        position,
-      },
+      user,
     } = this.props;
 
     const { userMenuOpened } = this.state;
     const { toggleUserMenu } = this;
+    const { enabled, username } = user;
 
     const headerBaseClass = 'site-nav-header';
 
@@ -149,10 +144,8 @@ class SiteNavSidePanel extends Component {
           </div>
 
           <UserMenu
-            avatar={gravatarURL}
+            user={user}
             isOpened={userMenuOpened}
-            name={name}
-            position={position}
           />
         </button>
       </header>

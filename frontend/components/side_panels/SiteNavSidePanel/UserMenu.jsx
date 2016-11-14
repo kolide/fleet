@@ -3,10 +3,12 @@ import classnames from 'classnames';
 
 class UserMenu extends Component {
   static propTypes = {
-    avatar: PropTypes.string,
     isOpened: PropTypes.bool,
-    name: PropTypes.string,
-    position: PropTypes.string,
+    user: PropTypes.shape({
+      gravatarURL: PropTypes.string,
+      name: PropTypes.string,
+      position: PropTypes.string,
+    }).isRequired,
   };
 
   static defaultProps = {
@@ -16,9 +18,11 @@ class UserMenu extends Component {
   render () {
     const {
       isOpened,
-      avatar,
-      name,
-      position,
+      user: {
+        gravatarURL,
+        name,
+        position,
+      },
     } = this.props;
 
     const toggleBaseClass = 'user-menu-toggle';
@@ -31,7 +35,7 @@ class UserMenu extends Component {
       <div className={userMenuClass}>
         <img
           alt="User Avatar"
-          src={avatar}
+          src={gravatarURL}
           className={`${toggleBaseClass}__avatar`}
         />
 
