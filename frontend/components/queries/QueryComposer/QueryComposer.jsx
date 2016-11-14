@@ -17,6 +17,7 @@ class QueryComposer extends Component {
     isLoadingTargets: PropTypes.bool,
     moreInfoTarget: targetInterface,
     onCloseTargetSelect: PropTypes.func,
+    onCancel: PropTypes.func,
     onOsqueryTableSelect: PropTypes.func,
     onRemoveMoreInfoTarget: PropTypes.func,
     onRunQuery: PropTypes.func,
@@ -27,6 +28,7 @@ class QueryComposer extends Component {
     onTextEditorInputChange: PropTypes.func,
     onUpdateQuery: PropTypes.func,
     query: queryInterface,
+    queryType: PropTypes.string,
     selectedTargets: PropTypes.arrayOf(targetInterface),
     selectedTargetsCount: PropTypes.number,
     targets: PropTypes.arrayOf(targetInterface),
@@ -34,6 +36,7 @@ class QueryComposer extends Component {
   };
 
   static defaultProps = {
+    queryType: 'query',
     selectedTargetsCount: 0,
   };
 
@@ -76,27 +79,31 @@ class QueryComposer extends Component {
     return false;
   }
 
-  renderQueryComposerActions = () => {
+  renderForm = () => {
     const {
+      onCancel,
       onRunQuery,
       onSaveQueryFormSubmit,
       onUpdateQuery,
       query,
+      queryType,
       textEditorText,
     } = this.props;
 
     return (
       <QueryForm
+        onCancel={onCancel}
         onRunQuery={onRunQuery}
         onSaveAsNew={onSaveQueryFormSubmit}
         onSaveChanges={onUpdateQuery}
         query={query}
+        queryType={queryType}
         queryText={textEditorText}
       />
     );
   }
 
-  render () {
+  renderTargetsInput = () => {
     const {
       isLoadingTargets,
       moreInfoTarget,
@@ -105,21 +112,40 @@ class QueryComposer extends Component {
       onTargetSelect,
       onTargetSelectInputChange,
       onTargetSelectMoreInfo,
-      onTextEditorInputChange,
+      queryType,
       selectedTargets,
       selectedTargetsCount,
       targets,
-      textEditorText,
     } = this.props;
-    const {
-      onLoad,
-      renderQueryComposerActions,
-    } = this;
-    const menuRenderer = SelectTargets.Menu(
-      onTargetSelectMoreInfo,
-      onRemoveMoreInfoTarget,
-      moreInfoTarget,
+
+    if (queryType === 'label') {
+      return false;
+    }
+
+    const menuRenderer = SelectTargets.Menu(onTargetSelectMoreInfo, onRemoveMoreInfoTarget, moreInfoTarget);
+
+    return (
+      <div>
+        <p>
+          <span className={`${baseClass}__select-targets`}>Select Targets</span>
+          <span className={`${baseClass}__targets-count`}> {selectedTargetsCount} unique hosts</span>
+        </p>
+        <SelectTargets.Input
+          isLoading={isLoadingTargets}
+          menuRenderer={menuRenderer}
+          onCloseTargetSelect={onCloseTargetSelect}
+          onTargetSelect={onTargetSelect}
+          onTargetSelectInputChange={onTargetSelectInputChange}
+          selectedTargets={selectedTargets}
+          targets={targets}
+        />
+      </div>
     );
+  }
+
+  render () {
+    const { onTextEditorInputChange, textEditorText } = this.props;
+    const { onLoad, renderForm, renderTargetsInput } = this;
 
     return (
       <div className={`${baseClass}__wrapper`}>
@@ -142,22 +168,8 @@ class QueryComposer extends Component {
             width="100%"
           />
         </div>
-        <div>
-          <p>
-            <span className={`${baseClass}__select-targets`}>Select Targets</span>
-            <span className={`${baseClass}__targets-count`}> {selectedTargetsCount} unique hosts</span>
-          </p>
-          <SelectTargets.Input
-            isLoading={isLoadingTargets}
-            menuRenderer={menuRenderer}
-            onCloseTargetSelect={onCloseTargetSelect}
-            onTargetSelect={onTargetSelect}
-            onTargetSelectInputChange={onTargetSelectInputChange}
-            selectedTargets={selectedTargets}
-            targets={targets}
-          />
-        </div>
-        {renderQueryComposerActions()}
+        {renderTargetsInput()}
+        {renderForm()}
       </div>
     );
   }
