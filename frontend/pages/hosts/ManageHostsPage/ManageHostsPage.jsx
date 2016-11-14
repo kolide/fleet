@@ -126,10 +126,14 @@ export class ManageHostsPage extends Component {
   }
 
   onSaveAddLabel = (formData) => {
-    console.log('Add label form submitted', formData);
-    this.setState({ isAddLabel: false });
+    const { dispatch } = this.props;
 
-    return false;
+    return dispatch(labelActions.create(formData))
+      .then(() => {
+        this.setState({ isAddLabel: false });
+
+        return false;
+      });
   }
 
   onTextEditorInputChange = (labelQueryText) => {
@@ -170,7 +174,7 @@ export class ManageHostsPage extends Component {
         <QueryComposer
           key="query-composer"
           onCancel={onCancelAddLabel}
-          onSaveQueryFormSubmit={onSaveAddLabel}
+          onSave={onSaveAddLabel}
           onTextEditorInputChange={onTextEditorInputChange}
           queryType="label"
           queryText={labelQueryText}

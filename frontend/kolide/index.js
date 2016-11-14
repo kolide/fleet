@@ -3,6 +3,18 @@ import endpoints from './endpoints';
 import { appendTargetTypeToTargets } from '../redux/nodes/entities/targets/helpers';
 
 class Kolide extends Base {
+  createLabel = ({ description, name, query }) => {
+    const { LABELS } = endpoints;
+
+    return this.authenticatedPost(this.endpoint(LABELS), JSON.stringify({ description, name, query }))
+      .then((response) => {
+        return {
+          ...response.label,
+          type: 'custom',
+        };
+      });
+  }
+
   createQuery = ({ description, name, query }) => {
     const { QUERIES } = endpoints;
 
