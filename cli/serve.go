@@ -3,7 +3,6 @@ package cli
 import (
 	"flag"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -15,6 +14,7 @@ import (
 	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
 	"github.com/kolide/kolide-ose/server/config"
 	"github.com/kolide/kolide-ose/server/datastore"
+	"github.com/kolide/kolide-ose/server/datastore/mysql"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"github.com/kolide/kolide-ose/server/mail"
 	"github.com/kolide/kolide-ose/server/service"
@@ -70,18 +70,15 @@ the way that the kolide server works.
 					initFatal(err, "initializing datastore")
 				}
 			} else {
-				var dbOption []datastore.DBOption
-				gormLogger := log.New(os.Stderr, "", 0)
-				gormLogger.SetOutput(kitlog.NewStdlibAdapter(logger))
-				dbOption = append(dbOption, datastore.Logger(gormLogger))
-				if config.Logging.Debug {
-					dbOption = append(dbOption, datastore.Debug())
-				}
-				connString := datastore.GetMysqlConnectionString(config.Mysql)
-				ds, err = datastore.New("gorm-mysql", connString, dbOption...)
+				const defaultMaxAttempts = 15
+
+				connString := mysql.GetMysqlConnectionString(config.Mysql)
+				ds, err = datastore.New("mysql", connString, mysql.Logger(logger), mysql.LimitAttempts(defaultMaxAttempts))
+
 				if err != nil {
 					initFatal(err, "initializing datastore")
 				}
+
 			}
 
 			svc, err := service.NewService(ds, logger, config, mailService, clock.C)

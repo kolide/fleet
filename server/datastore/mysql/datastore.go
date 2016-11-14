@@ -8,6 +8,7 @@ import (
 	"github.com/go-kit/kit/log"
 	_ "github.com/go-sql-driver/mysql" // db driver
 	"github.com/jmoiron/sqlx"
+	"github.com/kolide/kolide-ose/server/config"
 	"github.com/kolide/kolide-ose/server/kolide"
 )
 
@@ -154,4 +155,16 @@ func appendListOptionsToSQL(sql string, opts kolide.ListOptions) string {
 	}
 
 	return sql
+}
+
+// GetMysqlConnectionString returns a MySQL connection string using the
+// provided configuration.
+func GetMysqlConnectionString(conf config.MysqlConfig) string {
+	return fmt.Sprintf(
+		"%s:%s@(%s)/%s?charset=utf8&parseTime=True&loc=Local",
+		conf.Username,
+		conf.Password,
+		conf.Address,
+		conf.Database,
+	)
 }

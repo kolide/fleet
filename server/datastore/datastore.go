@@ -5,7 +5,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/kolide/kolide-ose/server/config"
+	"github.com/WatchBeam/clock"
+	"github.com/kolide/kolide-ose/server/datastore/mysql"
 	"github.com/kolide/kolide-ose/server/kolide"
 )
 
@@ -19,39 +20,22 @@ var (
 
 // New creates a kolide.Datastore with a database connection
 // Use DBOption to pass optional arguments
-func New(driver, conn string, opts ...DBOption) (kolide.Datastore, error) {
-	opt := &dbOptions{
-		maxAttempts: defaultMaxAttempts,
-	}
-	for _, option := range opts {
-		if err := option(opt); err != nil {
-			return nil, err
-		}
-	}
+func New(driver, conn string, opts ...mysql.DBOption) (kolide.Datastore, error) {
 
-	// check if datastore is already present
-	if opt.db != nil {
-		return opt.db, nil
-	}
 	switch driver {
-	case "gorm-mysql":
-		db, err := openGORM("mysql", conn, opt.maxAttempts)
+	case "mysql":
+		ds, err := mysql.New(conn, clock.C, opts...)
+
 		if err != nil {
 			return nil, err
 		}
-		ds := gormDB{
-			DB:     db,
-			Driver: "mysql",
-		}
-		// configure logger
-		if opt.logger != nil {
-			db.SetLogger(opt.logger)
-			db.LogMode(opt.debug)
-		}
-		if err := ds.Migrate(); err != nil {
+
+		if err = ds.Migrate(); err != nil {
 			return nil, err
 		}
+
 		return ds, nil
+
 	case "inmem":
 		ds := &inmem{
 			Driver: "inmem",
@@ -66,16 +50,4 @@ func New(driver, conn string, opts ...DBOption) (kolide.Datastore, error) {
 	default:
 		return nil, fmt.Errorf("unsupported datastore driver %s", driver)
 	}
-}
-
-// GetMysqlConnectionString returns a MySQL connection string using the
-// provided configuration.
-func GetMysqlConnectionString(conf config.MysqlConfig) string {
-	return fmt.Sprintf(
-		"%s:%s@(%s)/%s?charset=utf8&parseTime=True&loc=Local",
-		conf.Username,
-		conf.Password,
-		conf.Address,
-		conf.Database,
-	)
 }

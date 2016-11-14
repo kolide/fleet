@@ -25,29 +25,111 @@ func (d *Datastore) NewPasswordResetRequest(req *kolide.PasswordResetRequest) (*
 }
 
 func (d *Datastore) SavePasswordResetRequest(req *kolide.PasswordResetRequest) error {
-	panic("not implemented")
+	req.MarkAsUpdated(d.clock.Now())
+	sqlStatement := `
+		UPDATE password_reset_requests SET
+			updated_at = ?,
+			expires_at = ?,
+			user_id = ?,
+			token = ?
+		WHERE id = ?
+	`
+	_, err := d.db.Exec(sqlStatement, req.UpdatedAt, req.ExpiresAt, req.UserID, req.Token, req.ID)
+
+	if err != nil {
+		return errors.DatabaseError(err)
+	}
+
+	return nil
 }
 
 func (d *Datastore) DeletePasswordResetRequest(req *kolide.PasswordResetRequest) error {
-	panic("not implemented")
+
+	sqlStatement := `
+		DELETE FROM password_reset_requests WHERE id = ?
+	`
+	_, err := d.db.Exec(sqlStatement, req.ID)
+
+	if err != nil {
+		return errors.DatabaseError(err)
+	}
+
+	return nil
 }
 
 func (d *Datastore) DeletePasswordResetRequestsForUser(userID uint) error {
-	panic("not implemented")
+	sqlStatement := `
+		DELETE FROM password_reset_requests WHERE user_id = ?
+	`
+	_, err := d.db.Exec(sqlStatement, userID)
+
+	if err != nil {
+		return errors.DatabaseError(err)
+	}
+
+	return nil
 }
 
 func (d *Datastore) FindPassswordResetByID(id uint) (*kolide.PasswordResetRequest, error) {
-	panic("not implemented")
+	sqlStatement := `
+		SELECT * FROM password_reset_requests
+		WHERE id = ? LIMIT 1
+	`
+	passwordResetRequest := &kolide.PasswordResetRequest{}
+	err := d.db.Get(&passwordResetRequest, sqlStatement, id)
+
+	if err != nil {
+		return nil, errors.DatabaseError(err)
+	}
+
+	return passwordResetRequest, nil
 }
 
 func (d *Datastore) FindPassswordResetsByUserID(id uint) ([]*kolide.PasswordResetRequest, error) {
-	panic("not implemented")
+	sqlStatement := `
+		SELECT * FROM password_reset_requests
+		WHERE user_id = ?
+	`
+
+	passwordResetRequests := []*kolide.PasswordResetRequest{}
+	err := d.db.Select(&passwordResetRequests, sqlStatement, id)
+
+	if err != nil {
+		return nil, errors.DatabaseError(err)
+	}
+
+	return passwordResetRequests, nil
+
 }
 
 func (d *Datastore) FindPassswordResetByToken(token string) (*kolide.PasswordResetRequest, error) {
-	panic("not implemented")
+	sqlStatement := `
+		SELECT * FROM password_reset_requests
+		WHERE token = ? LIMIT 1
+	`
+	passwordResetRequest := &kolide.PasswordResetRequest{}
+	err := d.db.Get(passwordResetRequest, sqlStatement, token)
+
+	if err != nil {
+		return nil, errors.DatabaseError(err)
+	}
+
+	return passwordResetRequest, nil
+
 }
 
 func (d *Datastore) FindPassswordResetByTokenAndUserID(token string, id uint) (*kolide.PasswordResetRequest, error) {
-	panic("not implemented")
+	sqlStatement := `
+		SELECT * FROM password_reset_requests
+		WHERE user_id = ? AND token = ?
+		LIMIT 1
+	`
+	passwordResetRequest := &kolide.PasswordResetRequest{}
+	err := d.db.Get(passwordResetRequest, sqlStatement, id, token)
+
+	if err != nil {
+		return nil, errors.DatabaseError(err)
+	}
+
+	return passwordResetRequest, nil
 }

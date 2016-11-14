@@ -35,15 +35,15 @@ func setupGorm(t *testing.T) (ds kolide.Datastore, teardown func()) {
 	return ds, teardown
 }
 
-func TestGorm(t *testing.T) {
-	if _, ok := os.LookupEnv("MYSQL_TEST"); !ok {
-		t.SkipNow()
-	}
-	for _, f := range testFunctions {
-		t.Run(functionName(f), func(t *testing.T) {
-			ds, teardown := setupGorm(t)
-			defer teardown()
-			f(t, ds)
-		})
-	}
-}
+// func TestGorm(t *testing.T) {
+// 	if _, ok := os.LookupEnv("MYSQL_TEST"); !ok {
+// 		t.SkipNow()
+// 	}
+// 	for _, f := range testFunctions {
+// 		t.Run(functionName(f), func(t *testing.T) {
+// 			ds, teardown := setupGorm(t)
+// 			defer teardown()
+// 			f(t, ds)
+// 		})
+// 	}
+// }
