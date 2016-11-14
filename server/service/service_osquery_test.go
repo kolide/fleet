@@ -25,8 +25,7 @@ func TestEnrollAgent(t *testing.T) {
 	ds, err := datastore.New("inmem", "")
 	assert.Nil(t, err)
 
-	rs := pubsub.NewInmemQueryResults()
-	svc, err := newTestService(ds, rs)
+	svc, err := newTestService(ds, nil)
 	assert.Nil(t, err)
 
 	ctx := context.Background()
@@ -48,8 +47,7 @@ func TestEnrollAgentIncorrectEnrollSecret(t *testing.T) {
 	ds, err := datastore.New("inmem", "")
 	assert.Nil(t, err)
 
-	rs := pubsub.NewInmemQueryResults()
-	svc, err := newTestService(ds, rs)
+	svc, err := newTestService(ds, nil)
 	assert.Nil(t, err)
 
 	ctx := context.Background()
@@ -73,8 +71,7 @@ func TestSubmitStatusLogs(t *testing.T) {
 
 	mockClock := clock.NewMockClock()
 
-	rs := pubsub.NewInmemQueryResults()
-	svc, err := newTestServiceWithClock(ds, rs, mockClock)
+	svc, err := newTestServiceWithClock(ds, nil, mockClock)
 	assert.Nil(t, err)
 
 	ctx := context.Background()
@@ -146,8 +143,7 @@ func TestSubmitResultLogs(t *testing.T) {
 
 	mockClock := clock.NewMockClock()
 
-	rs := pubsub.NewInmemQueryResults()
-	svc, err := newTestServiceWithClock(ds, rs, mockClock)
+	svc, err := newTestServiceWithClock(ds, nil, mockClock)
 	assert.Nil(t, err)
 
 	ctx := context.Background()
@@ -248,8 +244,7 @@ func TestLabelQueries(t *testing.T) {
 
 	mockClock := clock.NewMockClock()
 
-	rs := pubsub.NewInmemQueryResults()
-	svc, err := newTestServiceWithClock(ds, rs, mockClock)
+	svc, err := newTestServiceWithClock(ds, nil, mockClock)
 	assert.Nil(t, err)
 
 	ctx := context.Background()
@@ -376,8 +371,7 @@ func TestGetClientConfig(t *testing.T) {
 
 	mockClock := clock.NewMockClock()
 
-	rs := pubsub.NewInmemQueryResults()
-	svc, err := newTestServiceWithClock(ds, rs, mockClock)
+	svc, err := newTestServiceWithClock(ds, nil, mockClock)
 	assert.Nil(t, err)
 
 	ctx := context.Background()
@@ -458,8 +452,7 @@ func TestDetailQueries(t *testing.T) {
 
 	mockClock := clock.NewMockClock()
 
-	rs := pubsub.NewInmemQueryResults()
-	svc, err := newTestServiceWithClock(ds, rs, mockClock)
+	svc, err := newTestServiceWithClock(ds, nil, mockClock)
 	assert.Nil(t, err)
 
 	ctx := context.Background()
@@ -602,6 +595,7 @@ func TestDistributedQueries(t *testing.T) {
 	mockClock := clock.NewMockClock()
 
 	rs := pubsub.NewInmemQueryResults()
+
 	svc, err := newTestServiceWithClock(ds, rs, mockClock)
 	require.Nil(t, err)
 

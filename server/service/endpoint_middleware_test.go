@@ -7,7 +7,6 @@ import (
 	"github.com/kolide/kolide-ose/server/contexts/viewer"
 	"github.com/kolide/kolide-ose/server/datastore"
 	"github.com/kolide/kolide-ose/server/kolide"
-	"github.com/kolide/kolide-ose/server/pubsub"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
@@ -187,8 +186,7 @@ func TestGetNodeKey(t *testing.T) {
 func TestAuthenticatedHost(t *testing.T) {
 	ds, err := datastore.New("inmem", "")
 	require.Nil(t, err)
-	rs := pubsub.NewInmemQueryResults()
-	svc, err := newTestService(ds, rs)
+	svc, err := newTestService(ds, nil)
 	require.Nil(t, err)
 
 	endpoint := authenticatedHost(

@@ -5,7 +5,6 @@ import (
 
 	"github.com/kolide/kolide-ose/server/datastore"
 	"github.com/kolide/kolide-ose/server/kolide"
-	"github.com/kolide/kolide-ose/server/pubsub"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
 )
@@ -14,8 +13,7 @@ func TestListPacks(t *testing.T) {
 	ds, err := datastore.New("inmem", "")
 	assert.Nil(t, err)
 
-	rs := pubsub.NewInmemQueryResults()
-	svc, err := newTestService(ds, rs)
+	svc, err := newTestService(ds, nil)
 	assert.Nil(t, err)
 
 	ctx := context.Background()
@@ -38,8 +36,7 @@ func TestGetPack(t *testing.T) {
 	ds, err := datastore.New("inmem", "")
 	assert.Nil(t, err)
 
-	rs := pubsub.NewInmemQueryResults()
-	svc, err := newTestService(ds, rs)
+	svc, err := newTestService(ds, nil)
 	assert.Nil(t, err)
 
 	ctx := context.Background()
@@ -61,8 +58,7 @@ func TestNewPack(t *testing.T) {
 	ds, err := datastore.New("inmem", "")
 	assert.Nil(t, err)
 
-	rs := pubsub.NewInmemQueryResults()
-	svc, err := newTestService(ds, rs)
+	svc, err := newTestService(ds, nil)
 	assert.Nil(t, err)
 
 	ctx := context.Background()
@@ -83,8 +79,7 @@ func TestModifyPack(t *testing.T) {
 	ds, err := datastore.New("inmem", "")
 	assert.Nil(t, err)
 
-	rs := pubsub.NewInmemQueryResults()
-	svc, err := newTestService(ds, rs)
+	svc, err := newTestService(ds, nil)
 	assert.Nil(t, err)
 
 	ctx := context.Background()
@@ -110,8 +105,7 @@ func TestDeletePack(t *testing.T) {
 	ds, err := datastore.New("inmem", "")
 	assert.Nil(t, err)
 
-	rs := pubsub.NewInmemQueryResults()
-	svc, err := newTestService(ds, rs)
+	svc, err := newTestService(ds, nil)
 	assert.Nil(t, err)
 
 	ctx := context.Background()
@@ -136,8 +130,7 @@ func TestAddQueryToPack(t *testing.T) {
 	ds, err := datastore.New("inmem", "")
 	assert.Nil(t, err)
 
-	rs := pubsub.NewInmemQueryResults()
-	svc, err := newTestService(ds, rs)
+	svc, err := newTestService(ds, nil)
 	assert.Nil(t, err)
 
 	ctx := context.Background()
@@ -173,8 +166,7 @@ func TestGetQueriesInPack(t *testing.T) {
 	ds, err := datastore.New("inmem", "")
 	assert.Nil(t, err)
 
-	rs := pubsub.NewInmemQueryResults()
-	svc, err := newTestService(ds, rs)
+	svc, err := newTestService(ds, nil)
 	assert.Nil(t, err)
 
 	ctx := context.Background()
@@ -206,8 +198,7 @@ func TestRemoveQueryFromPack(t *testing.T) {
 	ds, err := datastore.New("inmem", "")
 	assert.Nil(t, err)
 
-	rs := pubsub.NewInmemQueryResults()
-	svc, err := newTestService(ds, rs)
+	svc, err := newTestService(ds, nil)
 	assert.Nil(t, err)
 
 	ctx := context.Background()
