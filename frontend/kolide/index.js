@@ -107,18 +107,25 @@ class Kolide extends Base {
   }
 
   getLabels = () => {
-    return Promise.resolve({
-      labels: [
-        { id: 1, title: 'All Hosts', type: 'all', hosts_count: 22 },
-        { id: 4, title: 'OFFLINE', type: 'status', hosts_count: 2 },
-        { id: 5, title: 'ONLINE', type: 'status', hosts_count: 20 },
-        { id: 6, title: 'MAC OS', type: 'platform', hosts_count: 1 },
-        { id: 7, title: 'CENTOS', type: 'platform', hosts_count: 10 },
-        { id: 8, title: 'UBUNTU', type: 'platform', hosts_count: 10 },
-        { id: 10, title: 'WINDOWS', type: 'platform', hosts_count: 1 },
-      ],
-    })
-      .then((response) => { return response.labels; });
+    const { LABELS } = endpoints;
+
+    return this.authenticatedGet(this.endpoint(LABELS))
+      .then((response) => {
+        const labels = response.labels.map((label) => {
+          return { ...label, type: 'custom' };
+        });
+        const stubbedLabels = [
+          { id: 100, display_text: 'All Hosts', type: 'all', count: 22 },
+          { id: 40, display_text: 'OFFLINE', type: 'status', count: 2 },
+          { id: 50, display_text: 'ONLINE', type: 'status', count: 20 },
+          { id: 60, display_text: 'MAC OS', type: 'platform', count: 1 },
+          { id: 70, display_text: 'CENTOS', type: 'platform', count: 10 },
+          { id: 80, display_text: 'UBUNTU', type: 'platform', count: 10 },
+          { id: 110, display_text: 'WINDOWS', type: 'platform', count: 1 },
+        ];
+
+        return labels.concat(stubbedLabels);
+      });
   }
 
   getUsers = () => {
