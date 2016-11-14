@@ -26,7 +26,7 @@ class PanelGroup extends Component {
       <PanelGroupItem
         isSelected={selected}
         item={item}
-        key={item.title}
+        key={item.display_text}
         onLabelClick={onLabelClick(item)}
       />
     );

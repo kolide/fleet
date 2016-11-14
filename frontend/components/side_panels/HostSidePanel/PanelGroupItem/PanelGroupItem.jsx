@@ -19,8 +19,8 @@ class PanelGroupItem extends Component {
   render () {
     const { item, onLabelClick, isSelected } = this.props;
     const {
-      hosts_count: count,
-      title,
+      count,
+      display_text: displayText,
     } = item;
     const wrapperClassName = classnames(baseClass, `${baseClass}__wrapper`, {
       [`${baseClass}__wrapper--is-selected`]: isSelected,
@@ -29,7 +29,7 @@ class PanelGroupItem extends Component {
     return (
       <button className={`${wrapperClassName} button button--unstyled`} onClick={onLabelClick}>
         <i className={iconClassForLabel(item)} />
-        <span>{title}</span>
+        <span>{displayText}</span>
         <span>{count}</span>
       </button>
     );

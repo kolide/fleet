@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import { filter } from 'lodash';
 
 import InputField from 'components/forms/fields/InputField';
 import labelInterface from 'interfaces/label';
@@ -9,40 +10,55 @@ const baseClass = 'host-side-panel';
 
 class HostSidePanel extends Component {
   static propTypes = {
-    allHostGroupItems: PropTypes.arrayOf(labelInterface),
-    hostPlatformGroupItems: PropTypes.arrayOf(labelInterface),
-    hostStatusGroupItems: PropTypes.arrayOf(labelInterface),
+    labels: PropTypes.arrayOf(labelInterface),
     onAddLabelClick: PropTypes.func,
     onLabelClick: PropTypes.func,
     selectedLabel: labelInterface,
   };
 
+  constructor (props) {
+    super(props);
+
+    this.state = { labelFilter: '' };
+  }
+
+  onFilterLabels = (labelFilter) => {
+    const lowerLabelFilter = labelFilter.toLowerCase();
+    this.setState({ labelFilter: lowerLabelFilter });
+
+    return false;
+  }
+
   render () {
-    const {
-      allHostGroupItems,
-      hostPlatformGroupItems,
-      hostStatusGroupItems,
-      onAddLabelClick,
-      onLabelClick,
-      selectedLabel,
-    } = this.props;
+    const { labels, onAddLabelClick, onLabelClick, selectedLabel } = this.props;
+    const { labelFilter } = this.state;
+    const { onFilterLabels } = this;
+    const allHostLabels = filter(labels, { type: 'all' });
+    const hostStatusLabels = filter(labels, { type: 'status' });
+    const hostPlatformLabels = filter(labels, { type: 'platform' });
+    const customLabels = filter(labels, (label) => {
+      const lowerDisplayText = label.display_text.toLowerCase();
+
+      return label.type === 'custom' &&
+        lowerDisplayText.match(labelFilter);
+    });
 
     return (
       <SecondarySidePanelContainer className={`${baseClass}__wrapper`}>
         <PanelGroup
-          groupItems={allHostGroupItems}
+          groupItems={allHostLabels}
           onLabelClick={onLabelClick}
           selectedLabel={selectedLabel}
         />
         <hr className={`${baseClass}__hr`} />
         <PanelGroup
-          groupItems={hostStatusGroupItems}
+          groupItems={hostStatusLabels}
           onLabelClick={onLabelClick}
           selectedLabel={selectedLabel}
         />
         <hr className={`${baseClass}__hr`} />
         <PanelGroup
-          groupItems={hostPlatformGroupItems}
+          groupItems={hostPlatformLabels}
           onLabelClick={onLabelClick}
           selectedLabel={selectedLabel}
         />
@@ -54,9 +70,16 @@ class HostSidePanel extends Component {
         <div className={`${baseClass}__panel-group-item`}>
           <InputField
             name="tags-filter"
+            onChange={onFilterLabels}
             placeholder="Filter by Name..."
+            value={labelFilter}
           />
         </div>
+        <PanelGroup
+          groupItems={customLabels}
+          onLabelClick={onLabelClick}
+          selectedLabel={selectedLabel}
+        />
         <hr className={`${baseClass}__hr`} />
         <button className={`${baseClass}__add-label-btn button button--unstyled`} onClick={onAddLabelClick}>
           <i className="kolidecon-add-button" />

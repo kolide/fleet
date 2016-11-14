@@ -19,11 +19,8 @@ import { showRightSidePanel, removeRightSidePanel } from 'redux/nodes/app/action
 
 export class ManageHostsPage extends Component {
   static propTypes = {
-    allHostLabels: PropTypes.arrayOf(labelInterface),
     dispatch: PropTypes.func,
     hosts: PropTypes.arrayOf(hostInterface),
-    hostPlatformLabels: PropTypes.arrayOf(labelInterface),
-    hostStatusLabels: PropTypes.arrayOf(labelInterface),
     labels: PropTypes.arrayOf(labelInterface),
     selectedLabel: labelInterface,
     selectedOsqueryTable: osqueryTableInterface,
@@ -40,12 +37,12 @@ export class ManageHostsPage extends Component {
 
   componentWillMount () {
     const {
-      allHostLabels,
       dispatch,
       hosts,
       labels,
       selectedLabel,
     } = this.props;
+    const allHostLabel = filter(labels, { type: 'all' })[0];
 
     dispatch(showRightSidePanel);
 
@@ -58,15 +55,15 @@ export class ManageHostsPage extends Component {
     }
 
     if (!selectedLabel) {
-      dispatch(setSelectedLabel(allHostLabels[0]));
+      dispatch(setSelectedLabel(allHostLabel));
     }
 
     return false;
   }
 
   componentWillReceiveProps (nextProps) {
-    const { allHostLabels, dispatch, selectedLabel } = nextProps;
-    const allHostLabel = allHostLabels[0];
+    const { dispatch, labels, selectedLabel } = nextProps;
+    const allHostLabel = filter(labels, { type: 'all' })[0];
 
     if (!selectedLabel && !!allHostLabel) {
       dispatch(setSelectedLabel(allHostLabel));
@@ -197,9 +194,7 @@ export class ManageHostsPage extends Component {
     let SidePanel;
     const { isAddLabel } = this.state;
     const {
-      allHostLabels,
-      hostPlatformLabels,
-      hostStatusLabels,
+      labels,
       selectedLabel,
       selectedOsqueryTable,
     } = this.props;
@@ -217,9 +212,7 @@ export class ManageHostsPage extends Component {
       SidePanel = (
         <HostSidePanel
           key="hosts-side-panel"
-          allHostGroupItems={allHostLabels}
-          hostPlatformGroupItems={hostPlatformLabels}
-          hostStatusGroupItems={hostStatusLabels}
+          labels={labels}
           onAddLabelClick={onAddLabelClick}
           onLabelClick={onLabelClick}
           selectedLabel={selectedLabel}
@@ -254,18 +247,12 @@ export class ManageHostsPage extends Component {
 const mapStateToProps = (state) => {
   const { entities: hosts } = entityGetter(state).get('hosts');
   const { entities: labels } = entityGetter(state).get('labels');
-  const allHostLabels = filter(labels, { type: 'all' });
-  const hostStatusLabels = filter(labels, { type: 'status' });
-  const hostPlatformLabels = filter(labels, { type: 'platform' });
   const { selectedLabel } = state.components.ManageHostsPage;
   const { selectedOsqueryTable } = state.components.QueryPages;
 
   return {
-    allHostLabels,
     hosts,
     labels,
-    hostStatusLabels,
-    hostPlatformLabels,
     selectedLabel,
     selectedOsqueryTable,
   };
