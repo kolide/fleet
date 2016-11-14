@@ -7,6 +7,7 @@
   width: 100%;
   color: $text-ultradark;
   text-align: left;
+  border-radius: 0;
 
   &:hover {
     background: $bg-medium;
@@ -196,7 +197,6 @@
       i {
         margin-right: $pad-half;
         font-size: $large;
-        vertical-align: middle;
       }
 
       &:hover {
