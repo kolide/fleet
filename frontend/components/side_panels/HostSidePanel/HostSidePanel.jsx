@@ -12,6 +12,7 @@ class HostSidePanel extends Component {
     allHostGroupItems: PropTypes.arrayOf(labelInterface),
     hostPlatformGroupItems: PropTypes.arrayOf(labelInterface),
     hostStatusGroupItems: PropTypes.arrayOf(labelInterface),
+    onAddLabelClick: PropTypes.func,
     onLabelClick: PropTypes.func,
     selectedLabel: labelInterface,
   };

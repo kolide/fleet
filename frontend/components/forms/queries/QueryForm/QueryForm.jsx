@@ -13,10 +13,11 @@ class QueryForm extends Component {
   static propTypes = {
     onCancel: PropTypes.func,
     onRunQuery: PropTypes.func,
-    onSaveAsNew: PropTypes.func,
-    onSaveChanges: PropTypes.func,
+    onSave: PropTypes.func,
+    onUpdate: PropTypes.func,
     query: queryInterface,
     queryText: PropTypes.string.isRequired,
+    queryType: PropTypes.string,
   };
 
   static defaultProps = {
@@ -71,6 +72,14 @@ class QueryForm extends Component {
     return false;
   }
 
+  onCancel = (evt) => {
+    evt.preventDefault();
+
+    const { onCancel: handleCancel } = this.props;
+
+    return handleCancel();
+  }
+
   onFieldChange = (name) => {
     return (value) => {
       const { errors, formData } = this.state;
@@ -90,29 +99,29 @@ class QueryForm extends Component {
     };
   }
 
-  onSaveAsNew = (evt) => {
+  onSave = (evt) => {
     evt.preventDefault();
 
     const { formData } = this.state;
     const { valid } = this;
-    const { onSaveAsNew: handleSaveAsNew } = this.props;
+    const { onSave: handleSave } = this.props;
 
     if (valid()) {
-      handleSaveAsNew(formData);
+      handleSave(formData);
     }
 
     return false;
   }
 
-  onSaveChanges = (evt) => {
+  onUpdate = (evt) => {
     evt.preventDefault();
 
     const { formData } = this.state;
     const { valid } = this;
-    const { onSaveChanges: handleSaveChanges } = this.props;
+    const { onUpdate: handleUpdate } = this.props;
 
     if (valid()) {
-      handleSaveChanges(formData);
+      handleUpdate(formData);
     }
 
     return false;
@@ -143,8 +152,8 @@ class QueryForm extends Component {
   renderButtons = () => {
     const { canSaveAsNew, canSaveChanges } = helpers;
     const { formData } = this.state;
-    const { onCancel, onRunQuery, query, queryType } = this.props;
-    const { onSaveAsNew, onSaveChanges } = this;
+    const { onRunQuery, query, queryType } = this.props;
+    const { onCancel, onSave, onUpdate } = this;
 
     if (queryType === 'label') {
       return (
@@ -158,7 +167,7 @@ class QueryForm extends Component {
           <Button
             className={`${baseClass}__save-as-new-btn`}
             disabled={!canSaveAsNew(formData, query)}
-            onClick={onSaveAsNew}
+            onClick={onSave}
             text="Save Label"
             variant="brand"
           />
@@ -171,14 +180,14 @@ class QueryForm extends Component {
         <Button
           className={`${baseClass}__save-changes-btn`}
           disabled={!canSaveChanges(formData, query)}
-          onClick={onSaveChanges}
+          onClick={onUpdate}
           text="Save Changes"
           variant="inverse"
         />
         <Button
           className={`${baseClass}__save-as-new-btn`}
           disabled={!canSaveAsNew(formData, query)}
-          onClick={onSaveAsNew}
+          onClick={onSave}
           text="Save As New..."
           variant="success"
         />

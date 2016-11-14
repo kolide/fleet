@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { filter } from 'lodash';
-import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 import entityGetter from 'redux/utilities/entityGetter';
 import hostActions from 'redux/nodes/entities/hosts/actions';
@@ -34,7 +34,7 @@ export class ManageHostsPage extends Component {
 
     this.state = {
       isAddLabel: false,
-      labelQuery: '',
+      labelQueryText: '',
     };
   }
 
@@ -84,7 +84,7 @@ export class ManageHostsPage extends Component {
   onCancelAddLabel = (evt) => {
     evt.preventDefault();
 
-    this.setState({ isAddLabel: false});
+    this.setState({ isAddLabel: false });
 
     return false;
   }
@@ -137,14 +137,14 @@ export class ManageHostsPage extends Component {
     return false;
   }
 
-  onTextEditorInputChange = (labelQuery) => {
-    this.setState({ labelQuery });
+  onTextEditorInputChange = (labelQueryText) => {
+    this.setState({ labelQueryText });
 
     return false;
   }
 
   renderHeader = () => {
-    const { queryType, selectedLabel } = this.props;
+    const { selectedLabel } = this.props;
     const { isAddLabel } = this.state;
 
     if (!selectedLabel || isAddLabel) {
@@ -161,14 +161,13 @@ export class ManageHostsPage extends Component {
   }
 
   renderBody = () => {
-    let Body;
     const { hosts } = this.props;
-    const { isAddLabel, labelQuery } = this.state;
+    const { isAddLabel, labelQueryText } = this.state;
     const {
       onCancelAddLabel,
       onHostDetailActionClick,
       onSaveAddLabel,
-      onTextEditorInputChange
+      onTextEditorInputChange,
     } = this;
 
     if (isAddLabel) {
@@ -179,7 +178,7 @@ export class ManageHostsPage extends Component {
           onSaveQueryFormSubmit={onSaveAddLabel}
           onTextEditorInputChange={onTextEditorInputChange}
           queryType="label"
-          textEditorText={labelQuery}
+          queryText={labelQueryText}
         />
       );
     }
@@ -197,7 +196,7 @@ export class ManageHostsPage extends Component {
   }
 
   renderSidePanel = () => {
-    let Component;
+    let SidePanel;
     const { isAddLabel } = this.state;
     const {
       allHostLabels,
@@ -209,15 +208,15 @@ export class ManageHostsPage extends Component {
     const { onAddLabelClick, onLabelClick, onOsqueryTableSelect } = this;
 
     if (isAddLabel) {
-      Component = (
+      SidePanel = (
         <QuerySidePanel
           key="query-side-panel"
           onOsqueryTableSelect={onOsqueryTableSelect}
           selectedOsqueryTable={selectedOsqueryTable}
         />
-      )
+      );
     } else {
-      Component = (
+      SidePanel = (
         <HostSidePanel
           key="hosts-side-panel"
           allHostGroupItems={allHostLabels}
@@ -227,7 +226,7 @@ export class ManageHostsPage extends Component {
           onLabelClick={onLabelClick}
           selectedLabel={selectedLabel}
         />
-      )
+      );
     }
 
     return (
@@ -236,7 +235,7 @@ export class ManageHostsPage extends Component {
         transitionEnterTimeout={500}
         transitionLeaveTimeout={0}
       >
-        {Component}
+        {SidePanel}
       </ReactCSSTransitionGroup>
     );
   }

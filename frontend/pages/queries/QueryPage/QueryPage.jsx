@@ -265,18 +265,18 @@ class QueryPage extends Component {
           onOsqueryTableSelect={onOsqueryTableSelect}
           onRemoveMoreInfoTarget={onRemoveMoreInfoTarget}
           onRunQuery={onRunQuery}
-          onSaveQueryFormSubmit={onSaveQueryFormSubmit}
+          onSave={onSaveQueryFormSubmit}
           onTargetSelect={onTargetSelect}
           onTargetSelectInputChange={fetchTargets}
           onTargetSelectMoreInfo={onTargetSelectMoreInfo}
           onTextEditorInputChange={onTextEditorInputChange}
-          onUpdateQuery={onUpdateQuery}
+          onUpdate={onUpdateQuery}
           query={query}
           selectedTargets={selectedTargets}
           selectedTargetsCount={selectedTargetsCount}
           selectedOsqueryTable={selectedOsqueryTable}
           targets={targets}
-          textEditorText={queryText}
+          queryText={queryText}
         />
         <QuerySidePanel
           onOsqueryTableSelect={onOsqueryTableSelect}

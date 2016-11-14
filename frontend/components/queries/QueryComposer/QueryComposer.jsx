@@ -21,18 +21,18 @@ class QueryComposer extends Component {
     onOsqueryTableSelect: PropTypes.func,
     onRemoveMoreInfoTarget: PropTypes.func,
     onRunQuery: PropTypes.func,
-    onSaveQueryFormSubmit: PropTypes.func,
+    onSave: PropTypes.func,
     onTargetSelect: PropTypes.func,
     onTargetSelectInputChange: PropTypes.func,
     onTargetSelectMoreInfo: PropTypes.func,
     onTextEditorInputChange: PropTypes.func,
-    onUpdateQuery: PropTypes.func,
+    onUpdate: PropTypes.func,
     query: queryInterface,
     queryType: PropTypes.string,
     selectedTargets: PropTypes.arrayOf(targetInterface),
     selectedTargetsCount: PropTypes.number,
     targets: PropTypes.arrayOf(targetInterface),
-    textEditorText: PropTypes.string,
+    queryText: PropTypes.string,
   };
 
   static defaultProps = {
@@ -83,22 +83,22 @@ class QueryComposer extends Component {
     const {
       onCancel,
       onRunQuery,
-      onSaveQueryFormSubmit,
-      onUpdateQuery,
+      onSave,
+      onUpdate,
       query,
+      queryText,
       queryType,
-      textEditorText,
     } = this.props;
 
     return (
       <QueryForm
         onCancel={onCancel}
         onRunQuery={onRunQuery}
-        onSaveAsNew={onSaveQueryFormSubmit}
-        onSaveChanges={onUpdateQuery}
+        onSave={onSave}
+        onUpdate={onUpdate}
         query={query}
         queryType={queryType}
-        queryText={textEditorText}
+        queryText={queryText}
       />
     );
   }
@@ -144,7 +144,7 @@ class QueryComposer extends Component {
   }
 
   render () {
-    const { onTextEditorInputChange, textEditorText } = this.props;
+    const { onTextEditorInputChange, queryText } = this.props;
     const { onLoad, renderForm, renderTargetsInput } = this;
 
     return (
@@ -164,7 +164,7 @@ class QueryComposer extends Component {
             showGutter
             showPrintMargin={false}
             theme="kolide"
-            value={textEditorText}
+            value={queryText}
             width="100%"
           />
         </div>
