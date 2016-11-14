@@ -457,7 +457,7 @@ func createDevPacksAndQueries(ds kolide.Datastore, config config.KolideConfig) {
 	pack1 := &kolide.Pack{
 		Name: "Osquery Internal Info",
 	}
-	err = ds.NewPack(pack1)
+	pack1, err = ds.NewPack(pack1)
 	if err != nil {
 		initFatal(err, "creating dev packs")
 	}
@@ -465,7 +465,7 @@ func createDevPacksAndQueries(ds kolide.Datastore, config config.KolideConfig) {
 	pack2 := &kolide.Pack{
 		Name: "macOS Attacks",
 	}
-	err = ds.NewPack(pack2)
+	pack2, err = ds.NewPack(pack2)
 	if err != nil {
 		initFatal(err, "creating dev packs")
 	}
