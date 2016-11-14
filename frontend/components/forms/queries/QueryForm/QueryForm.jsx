@@ -11,6 +11,7 @@ const baseClass = 'query-form';
 
 class QueryForm extends Component {
   static propTypes = {
+    onCancel: PropTypes.func,
     onRunQuery: PropTypes.func,
     onSaveAsNew: PropTypes.func,
     onSaveChanges: PropTypes.func,
@@ -72,9 +73,13 @@ class QueryForm extends Component {
 
   onFieldChange = (name) => {
     return (value) => {
-      const { formData } = this.state;
+      const { errors, formData } = this.state;
 
       this.setState({
+        errors: {
+          ...errors,
+          [name]: null,
+        },
         formData: {
           ...formData,
           [name]: value,
@@ -115,6 +120,7 @@ class QueryForm extends Component {
 
   valid = () => {
     const { errors, formData: { name } } = this.state;
+    const { queryType } = this.props;
 
     const namePresent = validatePresence(name);
 
@@ -122,7 +128,7 @@ class QueryForm extends Component {
       this.setState({
         errors: {
           ...errors,
-          name: 'Query name must be present',
+          name: `${queryType === 'label' ? 'Label title' : 'Query title'} must be present`,
         },
       });
 
@@ -134,24 +140,74 @@ class QueryForm extends Component {
     return true;
   }
 
+  renderButtons = () => {
+    const { canSaveAsNew, canSaveChanges } = helpers;
+    const { formData } = this.state;
+    const { onCancel, onRunQuery, query, queryType } = this.props;
+    const { onSaveAsNew, onSaveChanges } = this;
+
+    if (queryType === 'label') {
+      return (
+        <div className={`${baseClass}__button-wrap`}>
+          <Button
+            className={`${baseClass}__save-changes-btn`}
+            onClick={onCancel}
+            text="Cancel"
+            variant="inverse"
+          />
+          <Button
+            className={`${baseClass}__save-as-new-btn`}
+            disabled={!canSaveAsNew(formData, query)}
+            onClick={onSaveAsNew}
+            text="Save Label"
+            variant="brand"
+          />
+        </div>
+      );
+    }
+
+    return (
+      <div className={`${baseClass}__button-wrap`}>
+        <Button
+          className={`${baseClass}__save-changes-btn`}
+          disabled={!canSaveChanges(formData, query)}
+          onClick={onSaveChanges}
+          text="Save Changes"
+          variant="inverse"
+        />
+        <Button
+          className={`${baseClass}__save-as-new-btn`}
+          disabled={!canSaveAsNew(formData, query)}
+          onClick={onSaveAsNew}
+          text="Save As New..."
+          variant="success"
+        />
+        <Button
+          className={`${baseClass}__run-query-btn`}
+          onClick={onRunQuery}
+          text="Run Query"
+          variant="brand"
+        />
+      </div>
+    );
+  }
+
   render () {
     const {
       errors,
-      formData,
       formData: {
         description,
         name,
       },
     } = this.state;
-    const { onFieldChange, onSaveAsNew, onSaveChanges } = this;
-    const { onRunQuery, query } = this.props;
-    const { canSaveAsNew, canSaveChanges } = helpers;
+    const { onFieldChange, renderButtons } = this;
+    const { queryType } = this.props;
 
     return (
       <form className={baseClass}>
         <InputField
           error={errors.name}
-          label="Query Title"
+          label={queryType === 'label' ? 'Label title' : 'Query Title'}
           name="name"
           onChange={onFieldChange('name')}
           value={name}
@@ -159,35 +215,14 @@ class QueryForm extends Component {
         />
         <InputField
           error={errors.description}
-          label="Query Description"
+          label="Description"
           name="description"
           onChange={onFieldChange('description')}
           value={description}
           type="textarea"
           inputClassName={`${baseClass}__query-description`}
         />
-        <div className={`${baseClass}__button-wrap`}>
-          <Button
-            className={`${baseClass}__save-changes-btn`}
-            disabled={!canSaveChanges(formData, query)}
-            onClick={onSaveChanges}
-            text="Save Changes"
-            variant="inverse"
-          />
-          <Button
-            className={`${baseClass}__save-as-new-btn`}
-            disabled={!canSaveAsNew(formData, query)}
-            onClick={onSaveAsNew}
-            text="Save As New..."
-            variant="success"
-          />
-          <Button
-            className={`${baseClass}__run-query-btn`}
-            onClick={onRunQuery}
-            text="Run Query"
-            variant="brand"
-          />
-        </div>
+        {renderButtons()}
       </form>
     );
   }
