@@ -14,6 +14,8 @@ bindata.go
 *.cover
 *.test
 *.log
+*.sublime-project
+*.sublime-workspace
 
 # operating system artifacts
 .DS_Store
