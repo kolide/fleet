@@ -110,10 +110,14 @@ class SiteNavSidePanel extends Component {
       user: {
         enabled,
         username,
+        gravatarURL,
+        name,
+        position,
       },
     } = this.props;
 
     const { userMenuOpened } = this.state;
+    const { toggleUserMenu } = this;
 
     const headerBaseClass = 'site-nav-header';
 
@@ -121,7 +125,7 @@ class SiteNavSidePanel extends Component {
       headerBaseClass,
       'button',
       'button--unstyled',
-      { [`${headerBaseClass}--open`]: this.state.userMenuOpened }
+      { [`${headerBaseClass}--open`]: userMenuOpened }
     );
 
     const userStatusClass = classnames(
@@ -131,7 +135,7 @@ class SiteNavSidePanel extends Component {
 
     return (
       <header>
-        <button className={headerToggleClass} onClick={this.toggleUserMenu}>
+        <button className={headerToggleClass} onClick={toggleUserMenu}>
           <div className={`${headerBaseClass}__org`}>
             <img
               alt="Company logo"
@@ -145,8 +149,10 @@ class SiteNavSidePanel extends Component {
           </div>
 
           <UserMenu
-            user={this.props.user}
+            avatar={gravatarURL}
             isOpened={userMenuOpened}
+            name={name}
+            position={position}
           />
         </button>
       </header>
