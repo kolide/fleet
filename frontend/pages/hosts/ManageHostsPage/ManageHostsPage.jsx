@@ -81,9 +81,7 @@ export class ManageHostsPage extends Component {
     dispatch(removeRightSidePanel);
   }
 
-  onCancelAddLabel = (evt) => {
-    evt.preventDefault();
-
+  onCancelAddLabel = () => {
     this.setState({ isAddLabel: false });
 
     return false;
