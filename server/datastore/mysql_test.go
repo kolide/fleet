@@ -48,11 +48,10 @@ func TestMySQL(t *testing.T) {
 	for _, f := range testFunctions {
 
 		t.Run(functionName(f), func(t *testing.T) {
-			err = ds.Migrate()
-			require.Nil(t, err)
+			require.Nil(t, ds.Migrate())
+			defer func() { require.Nil(t, ds.Drop()) }()
+
 			f(t, ds)
-			err = ds.Drop()
-			require.Nil(t, err)
 		})
 	}
 
