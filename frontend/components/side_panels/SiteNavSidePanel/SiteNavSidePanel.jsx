@@ -8,6 +8,7 @@ import { activeTabFromPathname, activeSubTabFromPathname } from './helpers';
 import configInterface from '../../../interfaces/config';
 import kolideLogo from '../../../../assets/images/kolide-logo.svg';
 import navItems from './navItems';
+import UserMenu from './UserMenu';
 import userInterface from '../../../interfaces/user';
 
 class SiteNavSidePanel extends Component {
@@ -114,7 +115,6 @@ class SiteNavSidePanel extends Component {
     } = this.props;
 
     const headerBaseClass = 'site-nav-header';
-    const toggleBaseClass = 'user-menu-toggle';
 
     const headerToggleClass = classnames(
       headerBaseClass,
@@ -124,11 +124,6 @@ class SiteNavSidePanel extends Component {
     const userStatusClass = classnames(
       `${headerBaseClass}__user-status`,
       { [`${headerBaseClass}__user-status--enabled`]: enabled }
-    );
-
-    const userMenuClass = classnames(
-      toggleBaseClass,
-      { [`${toggleBaseClass}--open`]: this.state.userMenuOpened }
     );
 
     return (
@@ -145,23 +140,12 @@ class SiteNavSidePanel extends Component {
           <i className={`${headerBaseClass}__org-chevron kolidecon-chevrondown`} />
         </div>
 
-        <div className={userMenuClass}>
-          <img
-            alt="User Avatar"
-            src={kolideLogo}
-            className={`${toggleBaseClass}__avatar`}
-          />
-
-          <p className={`${toggleBaseClass}__name`}>Dwight Kurt Schrute III</p>
-          <p className={`${toggleBaseClass}__position`}>Asst. to Regional Mgr</p>
-
-          <nav className={`${toggleBaseClass}__nav`}>
-            <ul className={`${toggleBaseClass}__nav-list`}>
-              <li className={`${toggleBaseClass}__nav-item`}><a href="#"><i className="kolidecon-admin" />Account Settings</a></li>
-              <li className={`${toggleBaseClass}__nav-item`}><a href="#"><i className="kolidecon-admin" />Log Out</a></li>
-            </ul>
-          </nav>
-        </div>
+        <UserMenu
+          avatar={kolideLogo}
+          isOpened={this.state.userMenuOpened}
+          name="Dwight Kurt Schrute III"
+          position="Asst. to Regional Mgr"
+        />
       </header>
     );
   }
@@ -186,17 +170,14 @@ class SiteNavSidePanel extends Component {
           onClick={setActiveTab(navItem)}
           style={{ width: '100%' }}
         >
-          {active && <div className={`${navItemBaseClass}__active-nav`} />}
           <li
             key={name}
             className={navItemClasses}
           >
-            <div style={{ position: 'relative', textAlign: 'left' }}>
-              <i className={`${navItemBaseClass}__icon ${icon}`} />
-              <span className={`${navItemBaseClass}__name`}>
-                {name}
-              </span>
-            </div>
+            <i className={`${navItemBaseClass}__icon ${icon}`} />
+            <span className={`${navItemBaseClass}__name`}>
+              {name}
+            </span>
           </li>
         </button>
         {active && renderSubItems(subItems)}

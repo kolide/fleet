@@ -8,6 +8,10 @@
     background: $bg-medium;
   }
 
+  @media (max-width: 760px) {
+    padding: 0;
+  }
+
   &__org {
     @include transition(border 150ms $ease-in-quad);
     @include clearfix;
@@ -26,7 +30,7 @@
     border-radius: 50%;
 
     @media (max-width: 760px) {
-      margin-left: 5px;
+      margin: $pad-half 5px;
     }
   }
 
@@ -83,12 +87,10 @@
     float: right;
 
     @media (max-width: 760px) {
-      top: auto;
-      left: 0;
-      right: 0;
-      bottom: 6px;
+      float: none;
       text-align: center;
       display: block;
+      clear: both;
     }
   }
 
@@ -127,6 +129,10 @@
   opacity: 0;
   box-sizing: border-box;
 
+  @media (max-width: 760px) {
+    width: 53px
+  }
+
   &--open {
     height: auto;
     padding: $pad-medium 0 0;
@@ -139,6 +145,10 @@
     border: solid 1px $accent-medium;
     border-radius: 50%;
     margin: 0 10px 0 $pad-medium;
+
+    @media (max-width: 760px) {
+      margin: $pad-xsmall 5px;
+    }
   }
 
   &__name,
@@ -149,6 +159,10 @@
     margin: 0;
     line-height: $large;
     float: left;
+
+    @media (max-width: 760px) {
+      display: none;
+    }
   }
 
   &__nav {
@@ -185,6 +199,12 @@
         background: $accent-text;
       }
     }
+
+    @media (max-width: 760px) {
+      span {
+        display: none;
+      }
+    }
   }
 }
 
@@ -193,36 +213,21 @@
 
   &__icon {
     position: relative;
-    font-size: 22px;
-    margin-right: 16px;
-    top: 4px;
-    left: 0;
+    font-size: $large;
+    margin-right: $pad-medium;
+    vertical-align: middle;
 
     @media (max-width: 760px) {
       display: block;
       text-align: center;
       margin-right: 0;
-    }
-  }
-
-  &__active-nav {
-    content: '';
-    width: 6px;
-    height: 50px;
-    position: absolute;
-    left: -16px;
-    top: 0;
-    bottom: 0;
-    background-color: #9a61c6;
-
-    @media (max-width: 760px) {
-      left: 0;
+      line-height: 40px;
     }
   }
 
   &__name {
-    display: inline-block;
     text-decoration: none;
+    vertical-align: middle;
 
     @media (max-width: 760px) {
       display: none;
@@ -231,14 +236,15 @@
 
   &__item {
     @include transition(color 200ms ease-in-out);
-    min-height: 40px;
+    line-height: 40px;
     position: relative;
     color: $text-light;
     cursor: pointer;
-    font-size: 13px;
+    font-size: $small;
     letter-spacing: 0.5px;
     text-transform: uppercase;
-    padding-top: $pad-half;
+    padding: 0 $pad-medium;
+    text-align: left;
 
     &:hover {
       color: $text-dark;
@@ -252,8 +258,25 @@
         color: $brand-dark;
       }
 
+      &::before {
+        content: '';
+        width: 6px;
+        height: 55px;
+        position: absolute;
+        left: 0;
+        top: 0;
+        background-color: $brand;
+        z-index: 1;
+      }
+
       @media (max-width: 760px) {
         border-bottom: 6px solid #9a61c6;
+        border-left: 6px solid #9a61c6;
+        padding: 0;
+
+        &::before {
+          display: none;
+        }
       }
     }
   }
@@ -401,7 +424,7 @@
 
 @media (max-width: 760px) {
   .sub-nav {
-    width: 22px;
+    width: 0;
 
     &-expanded {
       width: 188px;
