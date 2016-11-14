@@ -1,18 +1,23 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { filter } from 'lodash';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
 
-import entityGetter from '../../../redux/utilities/entityGetter';
-import hostActions from '../../../redux/nodes/entities/hosts/actions';
-import labelActions from '../../../redux/nodes/entities/labels/actions';
-import labelInterface from '../../../interfaces/label';
-import HostDetails from '../../../components/hosts/HostDetails';
-import hostInterface from '../../../interfaces/host';
-import HostSidePanel from '../../../components/side_panels/HostSidePanel';
-import { setSelectedLabel } from '../../../redux/nodes/components/ManageHostsPage/actions';
-import { showRightSidePanel, removeRightSidePanel } from '../../../redux/nodes/app/actions';
+import entityGetter from 'redux/utilities/entityGetter';
+import hostActions from 'redux/nodes/entities/hosts/actions';
+import labelActions from 'redux/nodes/entities/labels/actions';
+import labelInterface from 'interfaces/label';
+import HostDetails from 'components/hosts/HostDetails';
+import hostInterface from 'interfaces/host';
+import HostSidePanel from 'components/side_panels/HostSidePanel';
+import osqueryTableInterface from 'interfaces/osquery_table';
+import QueryComposer from 'components/queries/QueryComposer';
+import QuerySidePanel from 'components/side_panels/QuerySidePanel';
+import { selectOsqueryTable } from 'redux/nodes/components/QueryPages/actions';
+import { setSelectedLabel } from 'redux/nodes/components/ManageHostsPage/actions';
+import { showRightSidePanel, removeRightSidePanel } from 'redux/nodes/app/actions';
 
-class ManageHostsPage extends Component {
+export class ManageHostsPage extends Component {
   static propTypes = {
     allHostLabels: PropTypes.arrayOf(labelInterface),
     dispatch: PropTypes.func,
@@ -21,7 +26,17 @@ class ManageHostsPage extends Component {
     hostStatusLabels: PropTypes.arrayOf(labelInterface),
     labels: PropTypes.arrayOf(labelInterface),
     selectedLabel: labelInterface,
+    selectedOsqueryTable: osqueryTableInterface,
   };
+
+  constructor (props) {
+    super(props);
+
+    this.state = {
+      isAddLabel: false,
+      labelQuery: '',
+    };
+  }
 
   componentWillMount () {
     const {
@@ -66,6 +81,24 @@ class ManageHostsPage extends Component {
     dispatch(removeRightSidePanel);
   }
 
+  onCancelAddLabel = (evt) => {
+    evt.preventDefault();
+
+    this.setState({ isAddLabel: false});
+
+    return false;
+  }
+
+  onAddLabelClick = (evt) => {
+    evt.preventDefault();
+
+    this.setState({
+      isAddLabel: true,
+    });
+
+    return false;
+  }
+
   onHostDetailActionClick = (type) => {
     return (host) => {
       return (evt) => {
@@ -89,10 +122,34 @@ class ManageHostsPage extends Component {
     };
   }
 
-  renderHeader = () => {
-    const { selectedLabel } = this.props;
+  onOsqueryTableSelect = (tableName) => {
+    const { dispatch } = this.props;
 
-    if (!selectedLabel) return false;
+    dispatch(selectOsqueryTable(tableName));
+
+    return false;
+  }
+
+  onSaveAddLabel = (formData) => {
+    console.log('Add label form submitted', formData);
+    this.setState({ isAddLabel: false });
+
+    return false;
+  }
+
+  onTextEditorInputChange = (labelQuery) => {
+    this.setState({ labelQuery });
+
+    return false;
+  }
+
+  renderHeader = () => {
+    const { queryType, selectedLabel } = this.props;
+    const { isAddLabel } = this.state;
+
+    if (!selectedLabel || isAddLabel) {
+      return false;
+    }
 
     return (
       <div>
@@ -103,9 +160,29 @@ class ManageHostsPage extends Component {
     );
   }
 
-  renderHosts = () => {
+  renderBody = () => {
+    let Body;
     const { hosts } = this.props;
-    const { onHostDetailActionClick } = this;
+    const { isAddLabel, labelQuery } = this.state;
+    const {
+      onCancelAddLabel,
+      onHostDetailActionClick,
+      onSaveAddLabel,
+      onTextEditorInputChange
+    } = this;
+
+    if (isAddLabel) {
+      return (
+        <QueryComposer
+          key="query-composer"
+          onCancel={onCancelAddLabel}
+          onSaveQueryFormSubmit={onSaveAddLabel}
+          onTextEditorInputChange={onTextEditorInputChange}
+          queryType="label"
+          textEditorText={labelQuery}
+        />
+      );
+    }
 
     return hosts.map((host) => {
       return (
@@ -119,26 +196,59 @@ class ManageHostsPage extends Component {
     });
   }
 
-  render () {
+  renderSidePanel = () => {
+    let Component;
+    const { isAddLabel } = this.state;
     const {
       allHostLabels,
       hostPlatformLabels,
       hostStatusLabels,
       selectedLabel,
+      selectedOsqueryTable,
     } = this.props;
-    const { onLabelClick, renderHeader, renderHosts } = this;
+    const { onAddLabelClick, onLabelClick, onOsqueryTableSelect } = this;
+
+    if (isAddLabel) {
+      Component = (
+        <QuerySidePanel
+          key="query-side-panel"
+          onOsqueryTableSelect={onOsqueryTableSelect}
+          selectedOsqueryTable={selectedOsqueryTable}
+        />
+      )
+    } else {
+      Component = (
+        <HostSidePanel
+          key="hosts-side-panel"
+          allHostGroupItems={allHostLabels}
+          hostPlatformGroupItems={hostPlatformLabels}
+          hostStatusGroupItems={hostStatusLabels}
+          onAddLabelClick={onAddLabelClick}
+          onLabelClick={onLabelClick}
+          selectedLabel={selectedLabel}
+        />
+      )
+    }
+
+    return (
+      <ReactCSSTransitionGroup
+        transitionName="hosts-page-side-panel"
+        transitionEnterTimeout={500}
+        transitionLeaveTimeout={0}
+      >
+        {Component}
+      </ReactCSSTransitionGroup>
+    );
+  }
+
+  render () {
+    const { renderBody, renderHeader, renderSidePanel } = this;
 
     return (
       <div className="manage-hosts">
         {renderHeader()}
-        {renderHosts()}
-        <HostSidePanel
-          allHostGroupItems={allHostLabels}
-          hostPlatformGroupItems={hostPlatformLabels}
-          hostStatusGroupItems={hostStatusLabels}
-          onLabelClick={onLabelClick}
-          selectedLabel={selectedLabel}
-        />
+        {renderBody()}
+        {renderSidePanel()}
       </div>
     );
   }
@@ -151,6 +261,7 @@ const mapStateToProps = (state) => {
   const hostStatusLabels = filter(labels, { type: 'status' });
   const hostPlatformLabels = filter(labels, { type: 'platform' });
   const { selectedLabel } = state.components.ManageHostsPage;
+  const { selectedOsqueryTable } = state.components.QueryPages;
 
   return {
     allHostLabels,
@@ -159,6 +270,7 @@ const mapStateToProps = (state) => {
     hostStatusLabels,
     hostPlatformLabels,
     selectedLabel,
+    selectedOsqueryTable,
   };
 };
 
