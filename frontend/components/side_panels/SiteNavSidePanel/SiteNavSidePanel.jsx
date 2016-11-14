@@ -97,10 +97,9 @@ class SiteNavSidePanel extends Component {
   }
 
   toggleUserMenu = () => {
-    const toggleBool = !this.state.userMenuOpened;
-    this.setState({
-      userMenuOpened: toggleBool,
-    });
+    const { userMenuOpened } = this.state;
+
+    this.setState({ userMenuOpened: !userMenuOpened });
   }
 
   renderHeader = () => {
@@ -113,6 +112,8 @@ class SiteNavSidePanel extends Component {
         username,
       },
     } = this.props;
+
+    const { userMenuOpened } = this.state;
 
     const headerBaseClass = 'site-nav-header';
 
@@ -144,10 +145,8 @@ class SiteNavSidePanel extends Component {
           </div>
 
           <UserMenu
-            avatar={kolideLogo}
-            isOpened={this.state.userMenuOpened}
-            name="Dwight Kurt Schrute III"
-            position="Asst. to Regional Mgr"
+            user={this.props.user}
+            isOpened={userMenuOpened}
           />
         </button>
       </header>
