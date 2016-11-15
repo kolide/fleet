@@ -182,7 +182,7 @@ CREATE TABLE `password_reset_requests` (
 CREATE TABLE `queries` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `created_at` timestamp NOT NULL,
-  `updated_at` timestamp NOT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NOT NULL DEFAULT '1970-01-01 00:00:01',
   `deleted` tinyint(1) NOT NULL DEFAULT FALSE,
   `name` varchar(255) NOT NULL,
@@ -212,7 +212,7 @@ CREATE TABLE `sessions` (
 CREATE TABLE `users` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NOT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NOT NULL DEFAULT '1970-01-01 00:00:01',
   `deleted` tinyint(1) NOT NULL DEFAULT FALSE,
   `username` varchar(255) NOT NULL,
