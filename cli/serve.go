@@ -17,6 +17,7 @@ import (
 	"github.com/kolide/kolide-ose/server/datastore/mysql"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"github.com/kolide/kolide-ose/server/mail"
+	"github.com/kolide/kolide-ose/server/pubsub"
 	"github.com/kolide/kolide-ose/server/service"
 	"github.com/kolide/kolide-ose/server/version"
 	"github.com/prometheus/client_golang/prometheus"
@@ -81,7 +82,7 @@ the way that the kolide server works.
 
 			}
 
-			svc, err := service.NewService(ds, logger, config, mailService, clock.C)
+			svc, err := service.NewService(ds, pubsub.NewInmemQueryResults(), logger, config, mailService, clock.C)
 			if err != nil {
 				initFatal(err, "initializing service")
 			}

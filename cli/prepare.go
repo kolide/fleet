@@ -7,6 +7,7 @@ import (
 	"github.com/kolide/kolide-ose/server/datastore"
 	"github.com/kolide/kolide-ose/server/datastore/mysql"
 	"github.com/kolide/kolide-ose/server/kolide"
+	"github.com/kolide/kolide-ose/server/pubsub"
 	"github.com/kolide/kolide-ose/server/service"
 	"github.com/spf13/cobra"
 	"golang.org/x/net/context"
@@ -83,7 +84,7 @@ To setup kolide infrastructure, use one of the available commands.
 				Enabled:  &enabled,
 				Admin:    &isAdmin,
 			}
-			svc, err := service.NewService(ds, kitlog.NewNopLogger(), config, nil, clock.C)
+			svc, err := service.NewService(ds, pubsub.NewInmemQueryResults(), kitlog.NewNopLogger(), config, nil, clock.C)
 			if err != nil {
 				initFatal(err, "creating service")
 			}
