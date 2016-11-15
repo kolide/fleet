@@ -2,20 +2,12 @@
 package datastore
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/WatchBeam/clock"
+	"github.com/kolide/kolide-ose/server/datastore/inmem"
 	"github.com/kolide/kolide-ose/server/datastore/mysql"
 	"github.com/kolide/kolide-ose/server/kolide"
-)
-
-var (
-	// ErrNotFound is returned when the datastore resource cannot be found
-	ErrNotFound = errors.New("resource not found")
-
-	// ErrExists is returned when creating a datastore resource that already exists
-	ErrExists = errors.New("resource already created")
 )
 
 // New creates a kolide.Datastore with a database connection
@@ -37,9 +29,7 @@ func New(driver, conn string, opts ...mysql.DBOption) (kolide.Datastore, error) 
 		return ds, nil
 
 	case "inmem":
-		ds := &inmem{
-			Driver: "inmem",
-		}
+		ds := inmem.New("inmem")
 
 		err := ds.Migrate()
 		if err != nil {

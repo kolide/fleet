@@ -1,4 +1,4 @@
-package datastore
+package inmem
 
 import (
 	"errors"
@@ -7,16 +7,17 @@ import (
 	"strings"
 	"time"
 
+	kolide_errors "github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
 )
 
-func (orm *inmem) NewLabel(label *kolide.Label) (*kolide.Label, error) {
+func (orm *Inmem) NewLabel(label *kolide.Label) (*kolide.Label, error) {
 	newLabel := *label
 
 	orm.mtx.Lock()
 	for _, l := range orm.labels {
 		if l.Name == label.Name {
-			return nil, ErrExists
+			return nil, kolide_errors.ErrExists
 		}
 	}
 
@@ -27,7 +28,7 @@ func (orm *inmem) NewLabel(label *kolide.Label) (*kolide.Label, error) {
 	return &newLabel, nil
 }
 
-func (orm *inmem) ListLabelsForHost(hid uint) ([]kolide.Label, error) {
+func (orm *Inmem) ListLabelsForHost(hid uint) ([]kolide.Label, error) {
 	// First get IDs of label executions for the host
 	resLabels := []kolide.Label{}
 
@@ -44,7 +45,7 @@ func (orm *inmem) ListLabelsForHost(hid uint) ([]kolide.Label, error) {
 	return resLabels, nil
 }
 
-func (orm *inmem) LabelQueriesForHost(host *kolide.Host, cutoff time.Time) (map[string]string, error) {
+func (orm *Inmem) LabelQueriesForHost(host *kolide.Host, cutoff time.Time) (map[string]string, error) {
 	// Get post-cutoff executions for host
 	execedIDs := map[uint]bool{}
 
@@ -66,7 +67,7 @@ func (orm *inmem) LabelQueriesForHost(host *kolide.Host, cutoff time.Time) (map[
 	return queries, nil
 }
 
-func (orm *inmem) getLabelByIDString(id string) (*kolide.Label, error) {
+func (orm *Inmem) getLabelByIDString(id string) (*kolide.Label, error) {
 	labelID, err := strconv.Atoi(id)
 	if err != nil {
 		return nil, errors.New("non-int label ID")
@@ -83,7 +84,7 @@ func (orm *inmem) getLabelByIDString(id string) (*kolide.Label, error) {
 	return label, nil
 }
 
-func (orm *inmem) RecordLabelQueryExecutions(host *kolide.Host, results map[string]bool, t time.Time) error {
+func (orm *Inmem) RecordLabelQueryExecutions(host *kolide.Host, results map[string]bool, t time.Time) error {
 	// Record executions
 	for strLabelID, matches := range results {
 		label, err := orm.getLabelByIDString(strLabelID)
@@ -120,7 +121,7 @@ func (orm *inmem) RecordLabelQueryExecutions(host *kolide.Host, results map[stri
 	return nil
 }
 
-func (orm *inmem) DeleteLabel(lid uint) error {
+func (orm *Inmem) DeleteLabel(lid uint) error {
 	orm.mtx.Lock()
 	delete(orm.labels, lid)
 	orm.mtx.Unlock()
@@ -128,7 +129,7 @@ func (orm *inmem) DeleteLabel(lid uint) error {
 	return nil
 }
 
-func (orm *inmem) Label(lid uint) (*kolide.Label, error) {
+func (orm *Inmem) Label(lid uint) (*kolide.Label, error) {
 	orm.mtx.Lock()
 	label, ok := orm.labels[lid]
 	orm.mtx.Unlock()
@@ -139,7 +140,7 @@ func (orm *inmem) Label(lid uint) (*kolide.Label, error) {
 	return label, nil
 }
 
-func (orm *inmem) ListLabels(opt kolide.ListOptions) ([]*kolide.Label, error) {
+func (orm *Inmem) ListLabels(opt kolide.ListOptions) ([]*kolide.Label, error) {
 	// We need to sort by keys to provide reliable ordering
 	keys := []int{}
 
@@ -175,7 +176,7 @@ func (orm *inmem) ListLabels(opt kolide.ListOptions) ([]*kolide.Label, error) {
 	return labels, nil
 }
 
-func (orm *inmem) SearchLabels(query string, omit ...uint) ([]kolide.Label, error) {
+func (orm *Inmem) SearchLabels(query string, omit ...uint) ([]kolide.Label, error) {
 	omitLookup := map[uint]bool{}
 	for _, o := range omit {
 		omitLookup[o] = true
@@ -200,7 +201,7 @@ func (orm *inmem) SearchLabels(query string, omit ...uint) ([]kolide.Label, erro
 	return results, nil
 }
 
-func (orm *inmem) ListHostsInLabel(lid uint) ([]kolide.Host, error) {
+func (orm *Inmem) ListHostsInLabel(lid uint) ([]kolide.Host, error) {
 	var hosts []kolide.Host
 
 	orm.mtx.Lock()
@@ -215,7 +216,7 @@ func (orm *inmem) ListHostsInLabel(lid uint) ([]kolide.Host, error) {
 	return hosts, nil
 }
 
-func (orm *inmem) ListUniqueHostsInLabels(labels []uint) ([]kolide.Host, error) {
+func (orm *Inmem) ListUniqueHostsInLabels(labels []uint) ([]kolide.Host, error) {
 	var hosts []kolide.Host
 
 	labelSet := map[uint]bool{}

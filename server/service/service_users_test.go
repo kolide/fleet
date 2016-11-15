@@ -9,7 +9,9 @@ import (
 	"github.com/kolide/kolide-ose/server/config"
 	"github.com/kolide/kolide-ose/server/contexts/viewer"
 	"github.com/kolide/kolide-ose/server/datastore"
+	kolide_errors "github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
@@ -154,7 +156,7 @@ func TestCreateUser(t *testing.T) {
 			NeedsPasswordReset: boolPtr(true),
 			Admin:              boolPtr(false),
 			InviteToken:        &invites["admin2@example.com"].Token,
-			wantErr:            datastore.ErrNotFound,
+			wantErr:            kolide_errors.ErrNotFound,
 		},
 		{
 			Username:           stringPtr("admin3"),
@@ -217,8 +219,10 @@ func setupInvites(t *testing.T, ds kolide.Datastore, emails []string) map[string
 			InvitedBy: users["admin1"].ID,
 			Token:     e,
 			Email:     e,
-			CreateTimestamp: kolide.CreateTimestamp{
-				CreatedAt: mockClock.Now(),
+			UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
+				CreateTimestamp: kolide.CreateTimestamp{
+					CreatedAt: mockClock.Now(),
+				},
 			},
 		})
 		require.Nil(t, err)
@@ -229,8 +233,10 @@ func setupInvites(t *testing.T, ds kolide.Datastore, emails []string) map[string
 		InvitedBy: users["admin1"].ID,
 		Token:     "expired",
 		Email:     "expiredinvite@gmail.com",
-		CreateTimestamp: kolide.CreateTimestamp{
-			CreatedAt: mockClock.Now().AddDate(-1, 0, 0),
+		UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
+			CreateTimestamp: kolide.CreateTimestamp{
+				CreatedAt: mockClock.Now().AddDate(-1, 0, 0),
+			},
 		},
 	})
 	require.Nil(t, err)
@@ -254,7 +260,7 @@ func TestChangeUserPassword(t *testing.T) {
 		{ // bad token
 			token:       "dcbaz",
 			newPassword: "123cat!",
-			wantErr:     datastore.ErrNotFound,
+			wantErr:     kolide_errors.ErrNotFound,
 		},
 		{ // missing token
 			newPassword: "123cat!",

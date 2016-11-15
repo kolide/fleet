@@ -1,12 +1,21 @@
 package errors
 
 import (
+	goerrs "errors"
 	"net/http"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"gopkg.in/go-playground/validator.v8"
+)
+
+var (
+	// ErrNotFound is returned when the datastore resource cannot be found
+	ErrNotFound = goerrs.New("resource not found")
+
+	// ErrExists is returned when creating a datastore resource that already exists
+	ErrExists = goerrs.New("resource already created")
 )
 
 // Kolide's internal representation for errors. It can be used to wrap another
