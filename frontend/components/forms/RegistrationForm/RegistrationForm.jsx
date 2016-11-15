@@ -22,41 +22,19 @@ class RegistrationForm extends Component {
   constructor (props) {
     super(props);
 
-    this.state = {
-      errors: {},
-      formData: {
-        full_name: '',
-        username: '',
-        password: '',
-        password_confirmation: '',
-        email: '',
-        org_name: '',
-        org_web_url: '',
-        org_logo_url: '',
-        kolide_web_address: '',
-      },
-    };
+    this.state = { errors: {}, formData: {} };
   }
 
-  onInputFieldChange = (field, value) => {
-    const { errors, formData } = this.state;
+  onPageFormSubmit = (pageFormData) => {
+    const { formData } = this.state;
+    const { onNextPage } = this.props;
 
     this.setState({
-      errors: {
-        ...errors,
-        [field]: null,
-      },
       formData: {
         ...formData,
-        [field]: value,
+        ...pageFormData,
       },
     });
-
-    return false;
-  }
-
-  onPageFormSubmit = () => {
-    const { onNextPage } = this.props;
 
     return onNextPage();
   }
@@ -115,50 +93,24 @@ class RegistrationForm extends Component {
   }
 
   renderPageForm = () => {
-    const { errors, formData } = this.state;
-    const { onInputFieldChange, onPageFormSubmit, onSubmit } = this;
+    const { formData } = this.state;
+    const { onPageFormSubmit, onSubmit } = this;
     const { page } = this.props;
 
     if (page === 1) {
-      return (
-        <AdminDetails
-          errors={errors}
-          formData={formData}
-          onChange={onInputFieldChange}
-          onSubmit={onPageFormSubmit}
-        />
-      );
+      return <AdminDetails formData={formData} handleSubmit={onPageFormSubmit} />;
     }
 
     if (page === 2) {
-      return (
-        <OrgDetails
-          errors={errors}
-          formData={formData}
-          onChange={onInputFieldChange}
-          onSubmit={onPageFormSubmit}
-        />
-      );
+      return <OrgDetails formData={formData} handleSubmit={onPageFormSubmit} />;
     }
 
     if (page === 3) {
-      return (
-        <KolideDetails
-          errors={errors}
-          formData={formData}
-          onChange={onInputFieldChange}
-          onSubmit={onPageFormSubmit}
-        />
-      );
+      return <KolideDetails formData={formData} handleSubmit={onPageFormSubmit} />;
     }
 
     if (page === 4) {
-      return (
-        <ConfirmationPage
-          formData={formData}
-          onSubmit={onSubmit}
-        />
-      );
+      return <ConfirmationPage formData={formData} handleSubmit={onSubmit} />;
     }
 
     return false;

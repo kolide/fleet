@@ -1,70 +1,38 @@
-import React from 'react';
-import { size, startsWith } from 'lodash';
+import React, { Component, PropTypes } from 'react';
 
-import BasePageForm from 'components/forms/RegistrationForm/BasePageForm';
+import Form from 'components/forms/Form';
+import formFieldInterface from 'interfaces/form_field';
 import Button from 'components/buttons/Button';
+import helpers from 'components/forms/RegistrationForm/OrgDetails/helpers';
 import InputFieldWithIcon from 'components/forms/fields/InputFieldWithIcon';
 
-class OrgDetails extends BasePageForm {
-  valid = () => {
-    const clientErrors = {};
-    const { errors } = this.state;
-    const {
-      formData: {
-        org_name: orgName,
-        org_logo_url: orgLogoUrl,
-      },
-    } = this.props;
+const formFields = ['org_name', 'org_logo_url'];
+const { validate } = helpers;
 
-    if (!orgName) {
-      clientErrors.org_name = 'Organization name must be present';
-    }
-
-    if (!orgLogoUrl) {
-      clientErrors.org_logo_url = 'Organization logo URL must be present';
-    }
-
-    if (orgLogoUrl && !startsWith(orgLogoUrl, 'https://')) {
-      clientErrors.org_logo_url = 'Organization logo URL must start with https://';
-    }
-
-
-    if (size(clientErrors)) {
-      this.setState({
-        errors: {
-          ...errors,
-          ...clientErrors,
-        },
-      });
-
-      return false;
-    }
-
-    return true;
-  }
+class OrgDetails extends Component {
+  static propTypes = {
+    fields: PropTypes.shape({
+      org_name: formFieldInterface.isRequired,
+      org_logo_url: formFieldInterface.isRequired,
+    }).isRequired,
+    handleSubmit: PropTypes.func.isRequired,
+  };
 
   render () {
-    const { formData } = this.props;
-    const { errors, onChange, onSubmit } = this;
+    const { fields, handleSubmit } = this.props;
 
     return (
       <div>
         <InputFieldWithIcon
-          error={errors('org_name')}
-          name="organization name"
-          onChange={onChange('org_name')}
+          {...fields.org_name}
           placeholder="Organization Name"
-          value={formData.org_name}
         />
         <InputFieldWithIcon
-          error={errors('org_logo_url')}
-          name="org logo url"
-          onChange={onChange('org_logo_url')}
+          {...fields.org_logo_url}
           placeholder="Organization Logo URL (must start with https://)"
-          value={formData.org_logo_url}
         />
         <Button
-          onClick={onSubmit}
+          onClick={handleSubmit}
           text="Submit"
           variant="gradient"
         />
@@ -73,4 +41,7 @@ class OrgDetails extends BasePageForm {
   }
 }
 
-export default OrgDetails;
+export default Form(OrgDetails, {
+  fields: formFields,
+  validate,
+});

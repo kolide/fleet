@@ -1,57 +1,33 @@
-import React from 'react';
-import { size, startsWith } from 'lodash';
+import React, { Component, PropTypes } from 'react';
 
-import BasePageForm from 'components/forms/RegistrationForm/BasePageForm';
+import Form from 'components/forms/Form';
+import formFieldInterface from 'interfaces/form_field';
 import Button from 'components/buttons/Button';
+import helpers from 'components/forms/RegistrationForm/KolideDetails/helpers';
 import InputFieldWithIcon from 'components/forms/fields/InputFieldWithIcon';
 
-class KolideDetails extends BasePageForm {
-  valid = () => {
-    const clientErrors = {};
-    const {
-      errors,
-      formData: {
-        kolide_web_address: kolideWebAddress,
-      },
-    } = this.props;
+const formFields = ['kolide_web_address'];
+const { validate } = helpers;
 
-    if (!kolideWebAddress) {
-      clientErrors.kolide_web_address = 'Kolide web address must be completed';
-    }
-
-    if (kolideWebAddress && !startsWith(kolideWebAddress, 'https://')) {
-      clientErrors.kolide_web_address = 'Kolide web address must start with https://';
-    }
-
-    if (size(clientErrors)) {
-      this.setState({
-        errors: {
-          ...errors,
-          ...clientErrors,
-        },
-      });
-
-      return false;
-    }
-
-    return true;
-  }
+class KolideDetails extends Component {
+  static propTypes = {
+    fields: PropTypes.shape({
+      kolide_web_address: formFieldInterface.isRequired,
+    }).isRequired,
+    handleSubmit: PropTypes.func.isRequired,
+  };
 
   render () {
-    const { formData } = this.props;
-    const { errors, onChange, onSubmit } = this;
+    const { fields, handleSubmit } = this.props;
 
     return (
       <div>
         <InputFieldWithIcon
-          error={errors('kolide_web_address')}
-          name="kolide web address"
-          onChange={onChange('kolide_web_address')}
+          {...fields.kolide_web_address}
           placeholder="Kolide Web Address"
-          value={formData.kolide_web_address}
         />
         <Button
-          onClick={onSubmit}
+          onClick={handleSubmit}
           text="Submit"
           variant="gradient"
         />
@@ -60,5 +36,7 @@ class KolideDetails extends BasePageForm {
   }
 }
 
-export default KolideDetails;
-
+export default Form(KolideDetails, {
+  fields: formFields,
+  validate,
+});

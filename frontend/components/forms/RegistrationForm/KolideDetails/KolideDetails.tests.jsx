@@ -6,103 +6,64 @@ import { noop } from 'lodash';
 import KolideDetails from 'components/forms/RegistrationForm/KolideDetails';
 import { fillInFormInput } from 'test/helpers';
 
-const noErrors = {};
-
 describe('KolideDetails - form', () => {
   afterEach(restoreSpies);
 
   describe('kolide web address input', () => {
     it('renders an input field', () => {
-      const form = mount(
-        <KolideDetails
-          errors={noErrors}
-          formData={{}}
-          onChange={noop}
-          onSubmit={noop}
-        />
-      );
-      const kolideWebAddressField = form.find({ name: 'kolide web address' });
+      const form = mount(<KolideDetails handleSubmit={noop} />);
+      const kolideWebAddressField = form.find({ name: 'kolide_web_address' });
 
       expect(kolideWebAddressField.length).toEqual(1);
     });
 
-    it('calls the onChange prop when the field changes', () => {
-      const onChangeSpy = createSpy();
-      const form = mount(
-        <KolideDetails
-          errors={noErrors}
-          formData={{}}
-          onChange={onChangeSpy}
-          onSubmit={noop}
-        />
-      );
-      const kolideWebAddressField = form.find({ name: 'kolide web address' }).find('input');
+    it('updates state when the field changes', () => {
+      const form = mount(<KolideDetails handleSubmit={noop} />);
+      const kolideWebAddressField = form.find({ name: 'kolide_web_address' }).find('input');
 
       fillInFormInput(kolideWebAddressField, 'https://gnar.kolide.co');
 
-      expect(onChangeSpy).toHaveBeenCalledWith('kolide_web_address', 'https://gnar.kolide.co');
+      expect(form.state().formData).toInclude({ kolide_web_address: 'https://gnar.kolide.co' });
     });
   });
 
   describe('submitting the form', () => {
     it('validates the presence of the kolide web address field', () => {
-      const onSubmitSpy = createSpy();
-      const form = mount(
-        <KolideDetails
-          errors={noErrors}
-          formData={{}}
-          onChange={noop}
-          onSubmit={onSubmitSpy}
-        />
-      );
+      const handleSubmitSpy = createSpy();
+      const form = mount(<KolideDetails handleSubmit={handleSubmitSpy} />);
       const submitBtn = form.find('Button');
 
       submitBtn.simulate('click');
 
-      expect(onSubmitSpy).toNotHaveBeenCalled();
-      expect(form.state().errors).toInclude({
-        kolide_web_address: 'Kolide web address must be completed',
-      });
+      expect(handleSubmitSpy).toNotHaveBeenCalled();
+      expect(form.state().errors).toInclude({ kolide_web_address: 'Kolide web address must be completed' });
     });
 
     it('validates the kolide web address field starts with https://', () => {
-      const onSubmitSpy = createSpy();
-      const form = mount(
-        <KolideDetails
-          errors={noErrors}
-          formData={{ kolide_web_address: 'http://google.com' }}
-          onChange={noop}
-          onSubmit={onSubmitSpy}
-        />
-      );
+      const handleSubmitSpy = createSpy();
+      const form = mount(<KolideDetails handleSubmit={handleSubmitSpy} />);
+      const kolideWebAddressField = form.find({ name: 'kolide_web_address' }).find('input');
       const submitBtn = form.find('Button');
 
+      fillInFormInput(kolideWebAddressField, 'http://gnar.kolide.co');
       submitBtn.simulate('click');
 
-      expect(onSubmitSpy).toNotHaveBeenCalled();
+      expect(handleSubmitSpy).toNotHaveBeenCalled();
       expect(form.state().errors).toInclude({
         kolide_web_address: 'Kolide web address must start with https://',
       });
     });
 
     it('submits the form when valid', () => {
-      const formData = {
-        kolide_web_address: 'https://gnar.kolide.co',
-      };
-      const onSubmitSpy = createSpy();
-      const form = mount(
-        <KolideDetails
-          errors={noErrors}
-          formData={formData}
-          onChange={noop}
-          onSubmit={onSubmitSpy}
-        />
-      );
+      const handleSubmitSpy = createSpy();
+      const form = mount(<KolideDetails handleSubmit={handleSubmitSpy} />);
+      const kolideWebAddressField = form.find({ name: 'kolide_web_address' }).find('input');
       const submitBtn = form.find('Button');
 
+      fillInFormInput(kolideWebAddressField, 'https://gnar.kolide.co');
       submitBtn.simulate('click');
 
-      expect(onSubmitSpy).toHaveBeenCalled();
+      expect(handleSubmitSpy).toHaveBeenCalled();
     });
   });
 });

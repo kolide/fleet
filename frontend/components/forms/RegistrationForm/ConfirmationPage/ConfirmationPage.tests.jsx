@@ -20,7 +20,7 @@ describe('ConfirmationPage - form', () => {
     const form = mount(
       <ConfirmationPage
         formData={formData}
-        onSubmit={noop}
+        handleSubmit={noop}
       />
     );
 
@@ -32,18 +32,18 @@ describe('ConfirmationPage - form', () => {
   });
 
   it('submits the form', () => {
-    const onSubmitSpy = createSpy();
+    const handleSubmitSpy = createSpy();
     const form = mount(
       <ConfirmationPage
         formData={formData}
-        onSubmit={onSubmitSpy}
+        handleSubmit={handleSubmitSpy}
       />
     );
     const submitBtn = form.find('Button');
 
     submitBtn.simulate('click');
 
-    expect(onSubmitSpy).toHaveBeenCalled();
+    expect(handleSubmitSpy).toHaveBeenCalled();
   });
 });
 

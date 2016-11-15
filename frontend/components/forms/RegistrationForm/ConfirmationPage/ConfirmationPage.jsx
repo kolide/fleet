@@ -7,13 +7,13 @@ import Icon from 'components/icons/Icon';
 class ConfirmationPage extends Component {
   static propTypes = {
     formData: formDataInterface,
-    onSubmit: PropTypes.func,
+    handleSubmit: PropTypes.func,
   };
 
   onSubmit = (evt) => {
     evt.preventDefault();
 
-    const { onSubmit: handleSubmit } = this.props;
+    const { handleSubmit } = this.props;
 
     return handleSubmit();
   }
