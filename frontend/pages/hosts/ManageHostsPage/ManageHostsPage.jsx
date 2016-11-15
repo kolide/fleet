@@ -13,9 +13,11 @@ import HostSidePanel from 'components/side_panels/HostSidePanel';
 import osqueryTableInterface from 'interfaces/osquery_table';
 import QueryComposer from 'components/queries/QueryComposer';
 import QuerySidePanel from 'components/side_panels/QuerySidePanel';
+import { renderFlash } from 'redux/nodes/notifications/actions';
 import { selectOsqueryTable } from 'redux/nodes/components/QueryPages/actions';
 import { setSelectedLabel } from 'redux/nodes/components/ManageHostsPage/actions';
 import { showRightSidePanel, removeRightSidePanel } from 'redux/nodes/app/actions';
+import validateQuery from 'components/forms/validators/validate_query';
 
 export class ManageHostsPage extends Component {
   static propTypes = {
@@ -127,6 +129,15 @@ export class ManageHostsPage extends Component {
 
   onSaveAddLabel = (formData) => {
     const { dispatch } = this.props;
+    const { labelQueryText } = this.state;
+
+    const { error } = validateQuery(labelQueryText);
+
+    if (error) {
+      dispatch(renderFlash('error', error));
+
+      return false;
+    }
 
     return dispatch(labelActions.create(formData))
       .then(() => {

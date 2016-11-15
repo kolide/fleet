@@ -26,4 +26,5 @@ export const validateQuery = (queryText) => {
   }
 };
 
-export default { validateQuery };
+export default validateQuery;
+

@@ -15,7 +15,7 @@ import { removeRightSidePanel, showRightSidePanel } from 'redux/nodes/app/action
 import { renderFlash } from 'redux/nodes/notifications/actions';
 import { selectOsqueryTable, setQueryText, setSelectedTargets, setSelectedTargetsQuery } from 'redux/nodes/components/QueryPages/actions';
 import targetInterface from 'interfaces/target';
-import { validateQuery } from 'pages/queries/QueryPage/helpers';
+import validateQuery from 'components/forms/validators/validate_query';
 
 class QueryPage extends Component {
   static propTypes = {
