@@ -9,7 +9,7 @@ import (
 	"github.com/patrickmn/sortutil"
 )
 
-type Inmem struct {
+type Datastore struct {
 	Driver  string
 	mtx     sync.RWMutex
 	nextIDs map[interface{}]uint
@@ -32,14 +32,14 @@ type Inmem struct {
 	orginfo *kolide.AppConfig
 }
 
-func New(driver string) *Inmem {
-	ds := &Inmem{
+func New(driver string) *Datastore {
+	ds := &Datastore{
 		Driver: "inmem",
 	}
 	return ds
 }
 
-func (orm *Inmem) Name() string {
+func (orm *Datastore) Name() string {
 	return "inmem"
 }
 
@@ -58,7 +58,7 @@ func sortResults(slice interface{}, opt kolide.ListOptions, fields map[string]st
 	return nil
 }
 
-func (orm *Inmem) Migrate() error {
+func (orm *Datastore) Migrate() error {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 	orm.nextIDs = make(map[interface{}]uint)
@@ -79,14 +79,14 @@ func (orm *Inmem) Migrate() error {
 	return nil
 }
 
-func (orm *Inmem) Drop() error {
+func (orm *Datastore) Drop() error {
 	return orm.Migrate()
 }
 
 // getLimitOffsetSliceBounds returns the bounds that should be used for
 // re-slicing the results to comply with the requested ListOptions. Lack of
 // generics forces us to do this rather than reslicing in this method.
-func (orm *Inmem) getLimitOffsetSliceBounds(opt kolide.ListOptions, length int) (low uint, high uint) {
+func (orm *Datastore) getLimitOffsetSliceBounds(opt kolide.ListOptions, length int) (low uint, high uint) {
 	if opt.PerPage == 0 {
 		// PerPage value of 0 indicates unlimited
 		return 0, uint(length)
@@ -105,7 +105,7 @@ func (orm *Inmem) getLimitOffsetSliceBounds(opt kolide.ListOptions, length int) 
 
 // nextID returns the next ID value that should be used for a struct of the
 // given type
-func (orm *Inmem) nextID(val interface{}) uint {
+func (orm *Datastore) nextID(val interface{}) uint {
 	valType := reflect.TypeOf(reflect.Indirect(reflect.ValueOf(val)).Interface())
 	orm.nextIDs[valType]++
 	return orm.nextIDs[valType]

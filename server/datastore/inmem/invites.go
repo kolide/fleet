@@ -8,7 +8,7 @@ import (
 )
 
 // NewInvite creates and stores a new invitation in a DB.
-func (orm *Inmem) NewInvite(invite *kolide.Invite) (*kolide.Invite, error) {
+func (orm *Datastore) NewInvite(invite *kolide.Invite) (*kolide.Invite, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
@@ -24,7 +24,7 @@ func (orm *Inmem) NewInvite(invite *kolide.Invite) (*kolide.Invite, error) {
 }
 
 // Invites lists all invites in the datastore.
-func (orm *Inmem) ListInvites(opt kolide.ListOptions) ([]*kolide.Invite, error) {
+func (orm *Datastore) ListInvites(opt kolide.ListOptions) ([]*kolide.Invite, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
@@ -64,7 +64,7 @@ func (orm *Inmem) ListInvites(opt kolide.ListOptions) ([]*kolide.Invite, error) 
 	return invites, nil
 }
 
-func (orm *Inmem) Invite(id uint) (*kolide.Invite, error) {
+func (orm *Datastore) Invite(id uint) (*kolide.Invite, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 	if invite, ok := orm.invites[id]; ok {
@@ -74,7 +74,7 @@ func (orm *Inmem) Invite(id uint) (*kolide.Invite, error) {
 }
 
 // InviteByEmail retrieves an invite for a specific email address.
-func (orm *Inmem) InviteByEmail(email string) (*kolide.Invite, error) {
+func (orm *Datastore) InviteByEmail(email string) (*kolide.Invite, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
@@ -87,7 +87,7 @@ func (orm *Inmem) InviteByEmail(email string) (*kolide.Invite, error) {
 }
 
 // SaveInvite saves an invitation in the datastore.
-func (orm *Inmem) SaveInvite(invite *kolide.Invite) error {
+func (orm *Datastore) SaveInvite(invite *kolide.Invite) error {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
@@ -100,7 +100,7 @@ func (orm *Inmem) SaveInvite(invite *kolide.Invite) error {
 }
 
 // DeleteInvite deletes an invitation.
-func (orm *Inmem) DeleteInvite(invite *kolide.Invite) error {
+func (orm *Datastore) DeleteInvite(invite *kolide.Invite) error {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 

@@ -2,7 +2,6 @@ package mysql
 
 import (
 	"database/sql"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -39,20 +38,79 @@ func (d *Datastore) NewHost(host *kolide.Host) (*kolide.Host, error) {
 	return host, nil
 }
 
+// TODO needs test
 func (d *Datastore) SaveHost(host *kolide.Host) error {
-	panic("not implemented")
+	sqlStatement := `
+		UPDATE hosts SET
+			detail_update_time = ?,
+			node_key = ?,
+			host_name = ?,
+			uuid = ?,
+			platform = ?,
+			osquery_version = ?,
+			os_version = ?,
+			uptime = ?,
+			physical_memory = ?,
+			primary_mac = ?,
+			primary_ip = ?
+		WHERE id = ?
+	`
+	_, err := d.db.Exec(sqlStatement, host.DetailUpdateTime, host.NodeKey,
+		host.HostName, host.UUID, host.Platform, host.OsqueryVersion,
+		host.OSVersion, host.Uptime, host.PhysicalMemory, host.PrimaryMAC,
+		host.PrimaryIP, host.ID)
+	if err != nil {
+		return errors.DatabaseError(err)
+	}
+
+	return nil
 }
 
+// TODO needs test
 func (d *Datastore) DeleteHost(host *kolide.Host) error {
-	panic("not implemented")
+	sqlStatement := `
+		UPDATE hosts SET
+			deleted = TRUE,
+			deleted_at = ?
+		WHERE id = ?
+	`
+	_, err := d.db.Exec(sqlStatement, d.clock.Now(), host.ID)
+	if err != nil {
+		return errors.DatabaseError(err)
+	}
+
+	return nil
 }
 
+// TODO needs test
 func (d *Datastore) Host(id uint) (*kolide.Host, error) {
-	panic("not implemented")
+	sqlStatement := `
+		SELECT * FROM hosts
+		WHERE id = ? AND NOT deleted LIMIT 1
+	`
+	host := &kolide.Host{}
+	err := d.db.Get(host, sqlStatement, id)
+	if err != nil {
+		return nil, errors.DatabaseError(err)
+	}
+
+	return host, nil
+
 }
 
+// TODO needs test
 func (d *Datastore) ListHosts(opt kolide.ListOptions) ([]*kolide.Host, error) {
-	panic("not implemented")
+	sqlStatement := `
+		SELECT * FROM hosts
+		WHERE NOT deleted
+	`
+	sqlStatement = appendListOptionsToSQL(sqlStatement, opt)
+	hosts := []*kolide.Host{}
+	if err := d.db.Select(&hosts, sqlStatement); err != nil {
+		return nil, errors.DatabaseError(err)
+	}
+
+	return hosts, nil
 }
 
 // EnrollHost enrolls a host
@@ -104,7 +162,6 @@ func (d *Datastore) EnrollHost(uuid, hostname, ip, platform string, nodeKeySize 
 	`
 	host := &kolide.Host{}
 	err = d.db.Get(host, sqlSelect, id)
-
 	if err != nil {
 		return nil, errors.DatabaseError(err)
 	}
@@ -154,7 +211,6 @@ func (d *Datastore) searchHostsWithOmits(query string, omits ...uint) ([]kolide.
 	`
 
 	sql, args, err := sqlx.In(sqlStatement, omits)
-
 	if err != nil {
 		return nil, errors.DatabaseError(err)
 	}
@@ -164,7 +220,6 @@ func (d *Datastore) searchHostsWithOmits(query string, omits ...uint) ([]kolide.
 	hosts := []kolide.Host{}
 
 	if err = d.db.Select(&hosts, sql, args...); err != nil {
-		fmt.Println(err.Error())
 		return nil, errors.DatabaseError(err)
 	}
 
@@ -215,7 +270,6 @@ func (d *Datastore) DistributedQueriesForHost(host *kolide.Host) (map[uint]strin
  `
 	rows, err := d.db.Query(sqlStatement, kolide.TargetLabel, kolide.TargetLabel,
 		kolide.TargetHost, kolide.QueryRunning, host.ID)
-
 	if err != nil {
 		return nil, errors.DatabaseError(err)
 	}
@@ -229,7 +283,6 @@ func (d *Datastore) DistributedQueriesForHost(host *kolide.Host) (map[uint]strin
 			query string
 		)
 		err = rows.Scan(&id, &query)
-
 		if err != nil {
 			return nil, errors.DatabaseError(err)
 		}

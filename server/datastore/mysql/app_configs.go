@@ -19,7 +19,6 @@ func (d *Datastore) NewAppConfig(info *kolide.AppConfig) (*kolide.AppConfig, err
 			"INSERT INTO app_configs (org_name, org_logo_url, kolide_server_url) VALUES (?, ?, ?)",
 			info.OrgName, info.OrgLogoURL, info.KolideServerURL,
 		)
-
 		if err != nil {
 			return nil, err
 		}
@@ -36,7 +35,6 @@ func (d *Datastore) NewAppConfig(info *kolide.AppConfig) (*kolide.AppConfig, err
 func (d *Datastore) AppConfig() (*kolide.AppConfig, error) {
 	info := &kolide.AppConfig{}
 	err := d.db.Get(info, "SELECT * FROM app_configs LIMIT 1")
-
 	if err != nil {
 		return nil, err
 	}

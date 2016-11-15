@@ -15,7 +15,7 @@ func (d *Datastore) NewPack(pack *kolide.Pack) (*kolide.Pack, error) {
 
 	result, err := d.db.Exec(sql, pack.Name, pack.Platform)
 	if err != nil {
-		return nil, err
+		return nil, errors.DatabaseError(err)
 	}
 
 	id, _ := result.LastInsertId()
@@ -33,7 +33,11 @@ func (d *Datastore) SavePack(pack *kolide.Pack) error {
 	`
 
 	_, err := d.db.Exec(sql, pack.Name, pack.Platform, pack.ID)
-	return err
+	if err != nil {
+		return errors.DatabaseError(err)
+	}
+
+	return nil
 }
 
 // DeletePack soft deletes a kolide.Pack so that it won't show up in results
@@ -44,7 +48,11 @@ func (d *Datastore) DeletePack(pid uint) error {
 			WHERE id = ?
 	`
 	_, err := d.db.Exec(sql, d.clock.Now(), pid)
-	return err
+	if err != nil {
+		return errors.DatabaseError(err)
+	}
+
+	return nil
 }
 
 // Pack fetch kolide.Pack with matching ID
@@ -54,9 +62,8 @@ func (d *Datastore) Pack(pid uint) (*kolide.Pack, error) {
 			WHERE id = ? AND NOT deleted
 	`
 	pack := &kolide.Pack{}
-
 	if err := d.db.Get(pack, sql, pid); err != nil {
-		return nil, err
+		return nil, errors.DatabaseError(err)
 	}
 
 	return pack, nil
@@ -71,7 +78,7 @@ func (d *Datastore) ListPacks(opt kolide.ListOptions) ([]*kolide.Pack, error) {
 	sql = appendListOptionsToSQL(sql, opt)
 	packs := []*kolide.Pack{}
 	if err := d.db.Select(&packs, sql); err != nil {
-		return nil, err
+		return nil, errors.DatabaseError(err)
 	}
 	return packs, nil
 }
@@ -82,8 +89,11 @@ func (d *Datastore) AddQueryToPack(qid uint, pid uint) error {
 		INSERT INTO pack_queries ( pack_id, query_id)
 			VALUES (?, ?)
 	`
-	_, err := d.db.Exec(sql, pid, qid)
-	return err
+	if _, err := d.db.Exec(sql, pid, qid); err != nil {
+		return errors.DatabaseError(err)
+	}
+
+	return nil
 }
 
 // ListQueriesInPack gets all kolide.Query records associated with a kolide.Pack
@@ -112,7 +122,7 @@ func (d *Datastore) ListQueriesInPack(pack *kolide.Pack) ([]*kolide.Query, error
 	`
 	queries := []*kolide.Query{}
 	if err := d.db.Select(&queries, sql, pack.ID); err != nil {
-		return nil, err
+		return nil, errors.DatabaseError(err)
 	}
 	return queries, nil
 }
@@ -123,8 +133,11 @@ func (d *Datastore) RemoveQueryFromPack(query *kolide.Query, pack *kolide.Pack) 
 		DELETE FROM pack_queries
 			WHERE pack_id = ? AND query_id = ?
 	`
-	_, err := d.db.Exec(sql, pack.ID, query.ID)
-	return err
+	if _, err := d.db.Exec(sql, pack.ID, query.ID); err != nil {
+		return errors.DatabaseError(err)
+	}
+
+	return nil
 
 }
 
@@ -135,7 +148,6 @@ func (d *Datastore) AddLabelToPack(lid uint, pid uint) error {
 			VALUES ( ?, ?, ? )
 	`
 	_, err := d.db.Exec(sql, pid, kolide.TargetLabel, lid)
-
 	if err != nil {
 		return errors.DatabaseError(err)
 	}
@@ -180,6 +192,9 @@ func (d *Datastore) RemoveLabelFromPack(label *kolide.Label, pack *kolide.Pack) 
 		DELETE FROM pack_labels
 			WHERE target_id = ? AND pack_id = ?
 	`
-	_, err := d.db.Exec(sql, label.ID, pack.ID)
-	return err
+	if _, err := d.db.Exec(sql, label.ID, pack.ID); err != nil {
+		return errors.DatabaseError(err)
+	}
+
+	return nil
 }

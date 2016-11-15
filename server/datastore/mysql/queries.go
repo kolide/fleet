@@ -16,7 +16,6 @@ func (d *Datastore) NewQuery(query *kolide.Query) (*kolide.Query, error) {
 
 	result, err := d.db.Exec(sql, query.Name, query.Description, query.Query, query.Snapshot,
 		query.Differential, query.Platform, query.Version, query.Interval)
-
 	if err != nil {
 		return nil, errors.DatabaseError(err)
 	}
@@ -36,7 +35,6 @@ func (d *Datastore) SaveQuery(q *kolide.Query) error {
 	`
 	_, err := d.db.Exec(sql, q.Name, q.Description, q.Query, q.Interval,
 		q.Snapshot, q.Differential, q.Platform, q.Version, q.ID)
-
 	if err != nil {
 		return errors.DatabaseError(err)
 	}
@@ -53,7 +51,6 @@ func (d *Datastore) DeleteQuery(query *kolide.Query) error {
 			WHERE id = ?
 	`
 	_, err := d.db.Exec(sql, query.DeletedAt, true, query.ID)
-
 	if err != nil {
 		return errors.DatabaseError(err)
 	}
@@ -105,7 +102,6 @@ func (d *Datastore) SaveDistributedQueryCampaign(camp *kolide.DistributedQueryCa
 	`
 	_, err := d.db.Exec(sqlStatement, camp.QueryID, camp.MaxDuration,
 		camp.Status, camp.UserID, camp.ID)
-
 	if err != nil {
 		return errors.DatabaseError(err)
 	}
@@ -125,7 +121,6 @@ func (d *Datastore) NewDistributedQueryCampaign(camp *kolide.DistributedQueryCam
 		VALUES(?,?,?,?)
 	`
 	result, err := d.db.Exec(sqlStatement, camp.QueryID, camp.MaxDuration, camp.Status, camp.UserID)
-
 	if err != nil {
 		return nil, errors.DatabaseError(err)
 	}
@@ -145,7 +140,6 @@ func (d *Datastore) NewDistributedQueryCampaignTarget(target *kolide.Distributed
 		VALUES (?,?,?)
 	`
 	result, err := d.db.Exec(sqlStatement, target.Type, target.DistributedQueryCampaignID, target.TargetID)
-
 	if err != nil {
 		return nil, errors.DatabaseError(err)
 	}
@@ -167,7 +161,6 @@ func (d *Datastore) NewDistributedQueryExecution(exec *kolide.DistributedQueryEx
 	`
 	result, err := d.db.Exec(sqlStatement, exec.HostID, exec.DistributedQueryCampaignID,
 		exec.Status, exec.Error, exec.ExecutionDuration)
-
 	if err != nil {
 		return nil, errors.DatabaseError(err)
 	}

@@ -10,7 +10,7 @@ import (
 	"github.com/kolide/kolide-ose/server/kolide"
 )
 
-func (orm *Inmem) NewHost(host *kolide.Host) (*kolide.Host, error) {
+func (orm *Datastore) NewHost(host *kolide.Host) (*kolide.Host, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
@@ -26,7 +26,7 @@ func (orm *Inmem) NewHost(host *kolide.Host) (*kolide.Host, error) {
 	return host, nil
 }
 
-func (orm *Inmem) SaveHost(host *kolide.Host) error {
+func (orm *Datastore) SaveHost(host *kolide.Host) error {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
@@ -38,7 +38,7 @@ func (orm *Inmem) SaveHost(host *kolide.Host) error {
 	return nil
 }
 
-func (orm *Inmem) DeleteHost(host *kolide.Host) error {
+func (orm *Datastore) DeleteHost(host *kolide.Host) error {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
@@ -50,7 +50,7 @@ func (orm *Inmem) DeleteHost(host *kolide.Host) error {
 	return nil
 }
 
-func (orm *Inmem) Host(id uint) (*kolide.Host, error) {
+func (orm *Datastore) Host(id uint) (*kolide.Host, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
@@ -62,7 +62,7 @@ func (orm *Inmem) Host(id uint) (*kolide.Host, error) {
 	return host, nil
 }
 
-func (orm *Inmem) ListHosts(opt kolide.ListOptions) ([]*kolide.Host, error) {
+func (orm *Datastore) ListHosts(opt kolide.ListOptions) ([]*kolide.Host, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
@@ -107,7 +107,7 @@ func (orm *Inmem) ListHosts(opt kolide.ListOptions) ([]*kolide.Host, error) {
 	return hosts, nil
 }
 
-func (orm *Inmem) EnrollHost(uuid, hostname, ip, platform string, nodeKeySize int) (*kolide.Host, error) {
+func (orm *Datastore) EnrollHost(uuid, hostname, ip, platform string, nodeKeySize int) (*kolide.Host, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
@@ -153,7 +153,7 @@ func (orm *Inmem) EnrollHost(uuid, hostname, ip, platform string, nodeKeySize in
 	return &host, nil
 }
 
-func (orm *Inmem) AuthenticateHost(nodeKey string) (*kolide.Host, error) {
+func (orm *Datastore) AuthenticateHost(nodeKey string) (*kolide.Host, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
@@ -166,7 +166,7 @@ func (orm *Inmem) AuthenticateHost(nodeKey string) (*kolide.Host, error) {
 	return nil, kolide_errors.ErrNotFound
 }
 
-func (orm *Inmem) MarkHostSeen(host *kolide.Host, t time.Time) error {
+func (orm *Datastore) MarkHostSeen(host *kolide.Host, t time.Time) error {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
@@ -181,7 +181,7 @@ func (orm *Inmem) MarkHostSeen(host *kolide.Host, t time.Time) error {
 	return nil
 }
 
-func (orm *Inmem) SearchHosts(query string, omit ...uint) ([]kolide.Host, error) {
+func (orm *Datastore) SearchHosts(query string, omit ...uint) ([]kolide.Host, error) {
 	omitLookup := map[uint]bool{}
 	for _, o := range omit {
 		omitLookup[o] = true
@@ -205,7 +205,7 @@ func (orm *Inmem) SearchHosts(query string, omit ...uint) ([]kolide.Host, error)
 	return results, nil
 }
 
-func (orm *Inmem) DistributedQueriesForHost(host *kolide.Host) (map[uint]string, error) {
+func (orm *Datastore) DistributedQueriesForHost(host *kolide.Host) (map[uint]string, error) {
 	// lookup of executions for this host
 	hostExecutions := map[uint]kolide.DistributedQueryExecutionStatus{}
 	for _, e := range orm.distributedQueryExecutions {

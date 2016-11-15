@@ -5,7 +5,7 @@ import (
 	"github.com/kolide/kolide-ose/server/kolide"
 )
 
-func (orm *Inmem) NewAppConfig(info *kolide.AppConfig) (*kolide.AppConfig, error) {
+func (orm *Datastore) NewAppConfig(info *kolide.AppConfig) (*kolide.AppConfig, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
@@ -14,7 +14,7 @@ func (orm *Inmem) NewAppConfig(info *kolide.AppConfig) (*kolide.AppConfig, error
 	return info, nil
 }
 
-func (orm *Inmem) AppConfig() (*kolide.AppConfig, error) {
+func (orm *Datastore) AppConfig() (*kolide.AppConfig, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
@@ -25,7 +25,7 @@ func (orm *Inmem) AppConfig() (*kolide.AppConfig, error) {
 	return nil, errors.ErrNotFound
 }
 
-func (orm *Inmem) SaveAppConfig(info *kolide.AppConfig) error {
+func (orm *Datastore) SaveAppConfig(info *kolide.AppConfig) error {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 

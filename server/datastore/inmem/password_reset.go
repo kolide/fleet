@@ -5,7 +5,7 @@ import (
 	"github.com/kolide/kolide-ose/server/kolide"
 )
 
-func (orm *Inmem) NewPasswordResetRequest(req *kolide.PasswordResetRequest) (*kolide.PasswordResetRequest, error) {
+func (orm *Datastore) NewPasswordResetRequest(req *kolide.PasswordResetRequest) (*kolide.PasswordResetRequest, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
@@ -14,7 +14,7 @@ func (orm *Inmem) NewPasswordResetRequest(req *kolide.PasswordResetRequest) (*ko
 	return req, nil
 }
 
-func (orm *Inmem) SavePasswordResetRequest(req *kolide.PasswordResetRequest) error {
+func (orm *Datastore) SavePasswordResetRequest(req *kolide.PasswordResetRequest) error {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
@@ -26,7 +26,7 @@ func (orm *Inmem) SavePasswordResetRequest(req *kolide.PasswordResetRequest) err
 	return nil
 }
 
-func (orm *Inmem) DeletePasswordResetRequest(req *kolide.PasswordResetRequest) error {
+func (orm *Datastore) DeletePasswordResetRequest(req *kolide.PasswordResetRequest) error {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
@@ -38,7 +38,7 @@ func (orm *Inmem) DeletePasswordResetRequest(req *kolide.PasswordResetRequest) e
 	return nil
 }
 
-func (orm *Inmem) DeletePasswordResetRequestsForUser(userID uint) error {
+func (orm *Datastore) DeletePasswordResetRequestsForUser(userID uint) error {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
@@ -50,7 +50,7 @@ func (orm *Inmem) DeletePasswordResetRequestsForUser(userID uint) error {
 	return nil
 }
 
-func (orm *Inmem) FindPassswordResetByID(id uint) (*kolide.PasswordResetRequest, error) {
+func (orm *Datastore) FindPassswordResetByID(id uint) (*kolide.PasswordResetRequest, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
@@ -61,7 +61,7 @@ func (orm *Inmem) FindPassswordResetByID(id uint) (*kolide.PasswordResetRequest,
 	return nil, errors.ErrNotFound
 }
 
-func (orm *Inmem) FindPassswordResetsByUserID(userID uint) ([]*kolide.PasswordResetRequest, error) {
+func (orm *Datastore) FindPassswordResetsByUserID(userID uint) ([]*kolide.PasswordResetRequest, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 	resets := make([]*kolide.PasswordResetRequest, 0)
@@ -79,7 +79,7 @@ func (orm *Inmem) FindPassswordResetsByUserID(userID uint) ([]*kolide.PasswordRe
 	return resets, nil
 }
 
-func (orm *Inmem) FindPassswordResetByToken(token string) (*kolide.PasswordResetRequest, error) {
+func (orm *Datastore) FindPassswordResetByToken(token string) (*kolide.PasswordResetRequest, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
@@ -92,7 +92,7 @@ func (orm *Inmem) FindPassswordResetByToken(token string) (*kolide.PasswordReset
 	return nil, errors.ErrNotFound
 }
 
-func (orm *Inmem) FindPassswordResetByTokenAndUserID(token string, userID uint) (*kolide.PasswordResetRequest, error) {
+func (orm *Datastore) FindPassswordResetByTokenAndUserID(token string, userID uint) (*kolide.PasswordResetRequest, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 

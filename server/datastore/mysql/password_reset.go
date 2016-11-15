@@ -31,7 +31,6 @@ func (d *Datastore) SavePasswordResetRequest(req *kolide.PasswordResetRequest) e
 		WHERE id = ?
 	`
 	_, err := d.db.Exec(sqlStatement, req.ExpiresAt, req.UserID, req.Token, req.ID)
-
 	if err != nil {
 		return errors.DatabaseError(err)
 	}
@@ -45,7 +44,6 @@ func (d *Datastore) DeletePasswordResetRequest(req *kolide.PasswordResetRequest)
 		DELETE FROM password_reset_requests WHERE id = ?
 	`
 	_, err := d.db.Exec(sqlStatement, req.ID)
-
 	if err != nil {
 		return errors.DatabaseError(err)
 	}
@@ -58,7 +56,6 @@ func (d *Datastore) DeletePasswordResetRequestsForUser(userID uint) error {
 		DELETE FROM password_reset_requests WHERE user_id = ?
 	`
 	_, err := d.db.Exec(sqlStatement, userID)
-
 	if err != nil {
 		return errors.DatabaseError(err)
 	}
@@ -73,7 +70,6 @@ func (d *Datastore) FindPassswordResetByID(id uint) (*kolide.PasswordResetReques
 	`
 	passwordResetRequest := &kolide.PasswordResetRequest{}
 	err := d.db.Get(&passwordResetRequest, sqlStatement, id)
-
 	if err != nil {
 		return nil, errors.DatabaseError(err)
 	}
@@ -89,7 +85,6 @@ func (d *Datastore) FindPassswordResetsByUserID(id uint) ([]*kolide.PasswordRese
 
 	passwordResetRequests := []*kolide.PasswordResetRequest{}
 	err := d.db.Select(&passwordResetRequests, sqlStatement, id)
-
 	if err != nil {
 		return nil, errors.DatabaseError(err)
 	}
@@ -105,7 +100,6 @@ func (d *Datastore) FindPassswordResetByToken(token string) (*kolide.PasswordRes
 	`
 	passwordResetRequest := &kolide.PasswordResetRequest{}
 	err := d.db.Get(passwordResetRequest, sqlStatement, token)
-
 	if err != nil {
 		return nil, errors.DatabaseError(err)
 	}
@@ -122,7 +116,6 @@ func (d *Datastore) FindPassswordResetByTokenAndUserID(token string, id uint) (*
 	`
 	passwordResetRequest := &kolide.PasswordResetRequest{}
 	err := d.db.Get(passwordResetRequest, sqlStatement, id, token)
-
 	if err != nil {
 		return nil, errors.DatabaseError(err)
 	}

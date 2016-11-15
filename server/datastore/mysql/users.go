@@ -26,7 +26,6 @@ func (d *Datastore) NewUser(user *kolide.User) (*kolide.User, error) {
 	result, err := d.db.Exec(sqlStatement, user.Password, user.Salt, user.Name,
 		user.Username, user.Email, user.Admin, user.Enabled,
 		user.AdminForcedPasswordReset, user.GravatarURL, user.Position)
-
 	if err != nil {
 		return nil, errors.DatabaseError(err)
 	}
@@ -100,7 +99,6 @@ func (d *Datastore) SaveUser(user *kolide.User) error {
 	_, err := d.db.Exec(sqlStatement, user.Username, user.Password,
 		user.Salt, user.Name, user.Email, user.Admin, user.Enabled,
 		user.AdminForcedPasswordReset, user.GravatarURL, user.Position, user.ID)
-
 	if err != nil {
 		return errors.DatabaseError(err)
 	}

@@ -3,10 +3,11 @@ package mysql
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/WatchBeam/clock"
 	"github.com/go-kit/kit/log"
-	_ "github.com/go-sql-driver/mysql" // db driver
+	"github.com/go-sql-driver/mysql" // db driver
 	"github.com/jmoiron/sqlx"
 	"github.com/kolide/kolide-ose/server/config"
 	"github.com/kolide/kolide-ose/server/kolide"
@@ -32,18 +33,24 @@ func New(dbConnectString string, c clock.Clock, opts ...DBOption) (*Datastore, e
 		db  *sqlx.DB
 	)
 
-	options := dbOptions{
+	options := &dbOptions{
 		maxAttempts: defaultMaxAttempts,
 		logger:      log.NewNopLogger(),
 	}
 
 	for _, setOpt := range opts {
-		setOpt(&options)
+		setOpt(options)
 	}
 
 	for attempt := 0; attempt < options.maxAttempts; attempt++ {
 		if db, err = sqlx.Connect("mysql", dbConnectString); err == nil {
 			break
+		} else {
+			if err.Error() == "invalid database source" {
+				return nil, err
+			}
+			options.logger.Log("mysql", "connection", err)
+			time.Sleep(time.Duration(attempt) * time.Second)
 		}
 	}
 
@@ -63,12 +70,9 @@ func (d *Datastore) Name() string {
 
 // Migrate creates database
 func (d *Datastore) Migrate() error {
-	var (
-		err error
-		sql []byte
-	)
 
-	if sql, err = Asset("db/up.sql"); err != nil {
+	sql, err := Asset("db/up.sql")
+	if err != nil {
 		return err
 	}
 
@@ -76,9 +80,11 @@ func (d *Datastore) Migrate() error {
 
 	for _, statement := range strings.SplitAfter(string(sql), ";") {
 		if _, err = tx.Exec(statement); err != nil {
-			if err.Error() != "Error 1065: Query was empty" {
-				tx.Rollback()
-				return err
+			if driverErr, ok := err.(*mysql.MySQLError); ok {
+				if driverErr.Number != 1065 { // ignore empty queries
+					tx.Rollback()
+					return err
+				}
 			}
 		}
 	}
@@ -106,9 +112,11 @@ func (d *Datastore) Drop() error {
 
 	for _, statement := range strings.SplitAfter(string(sql), ";") {
 		if _, err = tx.Exec(statement); err != nil {
-			if err.Error() != "Error 1065: Query was empty" {
-				tx.Rollback()
-				return err
+			if driverErr, ok := err.(*mysql.MySQLError); ok {
+				if driverErr.Number != 1065 { // ignore empty queries
+					tx.Rollback()
+					return err
+				}
 			}
 		}
 	}

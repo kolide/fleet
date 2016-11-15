@@ -74,7 +74,7 @@ the way that the kolide server works.
 				const defaultMaxAttempts = 15
 
 				connString := mysql.GetMysqlConnectionString(config.Mysql)
-				ds, err = datastore.New("mysql", connString, mysql.Logger(logger), mysql.LimitAttempts(defaultMaxAttempts))
+				ds, err = datastore.New("mysql", connString, mysql.Logger(logger))
 
 				if err != nil {
 					initFatal(err, "initializing datastore")

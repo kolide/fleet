@@ -21,7 +21,6 @@ func (d *Datastore) NewLabel(label *kolide.Label) (*kolide.Label, error) {
 		) VALUES ( ?, ?, ?, ?)
 	`
 	result, err := d.db.Exec(sql, label.Name, label.Description, label.Query, label.Platform)
-
 	if err != nil {
 		return nil, errors.DatabaseError(err)
 	}
@@ -89,7 +88,6 @@ func (d *Datastore) LabelQueriesForHost(host *kolide.Host, cutoff time.Time) (ma
 			)
 	`
 	rows, err := d.db.Query(sqlStatment, host.Platform, host.ID, cutoff)
-
 	if err != nil && err != sql.ErrNoRows {
 		return nil, errors.DatabaseError(err)
 	}
@@ -135,7 +133,6 @@ func (d *Datastore) RecordLabelQueryExecutions(host *kolide.Host, results map[st
 	`
 
 	_, err := d.db.Exec(sqlStatement, vals...)
-
 	if err != nil {
 		return errors.DatabaseError(err)
 	}
@@ -156,7 +153,6 @@ func (d *Datastore) ListLabelsForHost(hid uint) ([]kolide.Label, error) {
 
 	labels := []kolide.Label{}
 	err := d.db.Select(&labels, sqlStatement, hid)
-
 	if err != nil {
 		return nil, errors.DatabaseError(err)
 	}
@@ -178,7 +174,6 @@ func (d *Datastore) ListHostsInLabel(lid uint) ([]kolide.Host, error) {
 	`
 	hosts := []kolide.Host{}
 	err := d.db.Select(&hosts, sqlStatement, lid)
-
 	if err != nil {
 		return nil, errors.DatabaseError(err)
 	}
@@ -197,7 +192,6 @@ func (d *Datastore) ListUniqueHostsInLabels(labels []uint) ([]kolide.Host, error
 		GROUP BY h.id;
 	`
 	query, args, err := sqlx.In(sqlStatement, labels)
-
 	if err != nil {
 		return nil, errors.DatabaseError(err)
 	}
@@ -205,7 +199,6 @@ func (d *Datastore) ListUniqueHostsInLabels(labels []uint) ([]kolide.Host, error
 	query = d.db.Rebind(query)
 	hosts := []kolide.Host{}
 	err = d.db.Select(&hosts, query, args...)
-
 	if err != nil {
 		return nil, errors.DatabaseError(err)
 	}
@@ -225,7 +218,6 @@ func (d *Datastore) searchLabelsWithOmits(query string, omit ...uint) ([]kolide.
 		LIMIT 10
 	`
 	sql, args, err := sqlx.In(sqlStatement, omit)
-
 	if err != nil {
 		return nil, errors.DatabaseError(err)
 	}
@@ -234,7 +226,6 @@ func (d *Datastore) searchLabelsWithOmits(query string, omit ...uint) ([]kolide.
 
 	matches := []kolide.Label{}
 	err = d.db.Select(&matches, sql, args...)
-
 	if err != nil {
 		return nil, errors.DatabaseError(err)
 	}
@@ -259,7 +250,6 @@ func (d *Datastore) SearchLabels(query string, omit ...uint) ([]kolide.Label, er
 	`
 	matches := []kolide.Label{}
 	err := d.db.Select(&matches, sqlStatement, query+"*")
-
 	if err != nil {
 		return nil, errors.DatabaseError(err)
 	}

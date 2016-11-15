@@ -7,7 +7,7 @@ import (
 	"github.com/kolide/kolide-ose/server/kolide"
 )
 
-func (orm *Inmem) NewQuery(query *kolide.Query) (*kolide.Query, error) {
+func (orm *Datastore) NewQuery(query *kolide.Query) (*kolide.Query, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
@@ -25,7 +25,7 @@ func (orm *Inmem) NewQuery(query *kolide.Query) (*kolide.Query, error) {
 	return &newQuery, nil
 }
 
-func (orm *Inmem) SaveQuery(query *kolide.Query) error {
+func (orm *Datastore) SaveQuery(query *kolide.Query) error {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
@@ -37,7 +37,7 @@ func (orm *Inmem) SaveQuery(query *kolide.Query) error {
 	return nil
 }
 
-func (orm *Inmem) DeleteQuery(query *kolide.Query) error {
+func (orm *Datastore) DeleteQuery(query *kolide.Query) error {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
@@ -49,7 +49,7 @@ func (orm *Inmem) DeleteQuery(query *kolide.Query) error {
 	return nil
 }
 
-func (orm *Inmem) Query(id uint) (*kolide.Query, error) {
+func (orm *Datastore) Query(id uint) (*kolide.Query, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
@@ -61,7 +61,7 @@ func (orm *Inmem) Query(id uint) (*kolide.Query, error) {
 	return query, nil
 }
 
-func (orm *Inmem) ListQueries(opt kolide.ListOptions) ([]*kolide.Query, error) {
+func (orm *Datastore) ListQueries(opt kolide.ListOptions) ([]*kolide.Query, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
@@ -103,7 +103,7 @@ func (orm *Inmem) ListQueries(opt kolide.ListOptions) ([]*kolide.Query, error) {
 	return queries, nil
 }
 
-func (orm *Inmem) NewDistributedQueryExecution(exec *kolide.DistributedQueryExecution) (*kolide.DistributedQueryExecution, error) {
+func (orm *Datastore) NewDistributedQueryExecution(exec *kolide.DistributedQueryExecution) (*kolide.DistributedQueryExecution, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
@@ -119,7 +119,7 @@ func (orm *Inmem) NewDistributedQueryExecution(exec *kolide.DistributedQueryExec
 	return exec, nil
 }
 
-func (orm *Inmem) NewDistributedQueryCampaign(camp *kolide.DistributedQueryCampaign) (*kolide.DistributedQueryCampaign, error) {
+func (orm *Datastore) NewDistributedQueryCampaign(camp *kolide.DistributedQueryCampaign) (*kolide.DistributedQueryCampaign, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
@@ -129,7 +129,7 @@ func (orm *Inmem) NewDistributedQueryCampaign(camp *kolide.DistributedQueryCampa
 	return camp, nil
 }
 
-func (orm *Inmem) SaveDistributedQueryCampaign(camp *kolide.DistributedQueryCampaign) error {
+func (orm *Datastore) SaveDistributedQueryCampaign(camp *kolide.DistributedQueryCampaign) error {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
@@ -141,7 +141,7 @@ func (orm *Inmem) SaveDistributedQueryCampaign(camp *kolide.DistributedQueryCamp
 	return nil
 }
 
-func (orm *Inmem) NewDistributedQueryCampaignTarget(target *kolide.DistributedQueryCampaignTarget) (*kolide.DistributedQueryCampaignTarget, error) {
+func (orm *Datastore) NewDistributedQueryCampaignTarget(target *kolide.DistributedQueryCampaignTarget) (*kolide.DistributedQueryCampaignTarget, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 

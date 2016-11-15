@@ -7,7 +7,7 @@ import (
 	"github.com/kolide/kolide-ose/server/kolide"
 )
 
-func (orm *Inmem) NewUser(user *kolide.User) (*kolide.User, error) {
+func (orm *Datastore) NewUser(user *kolide.User) (*kolide.User, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
@@ -23,7 +23,7 @@ func (orm *Inmem) NewUser(user *kolide.User) (*kolide.User, error) {
 	return user, nil
 }
 
-func (orm *Inmem) User(username string) (*kolide.User, error) {
+func (orm *Datastore) User(username string) (*kolide.User, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
@@ -36,7 +36,7 @@ func (orm *Inmem) User(username string) (*kolide.User, error) {
 	return nil, errors.ErrNotFound
 }
 
-func (orm *Inmem) ListUsers(opt kolide.ListOptions) ([]*kolide.User, error) {
+func (orm *Datastore) ListUsers(opt kolide.ListOptions) ([]*kolide.User, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
@@ -77,7 +77,7 @@ func (orm *Inmem) ListUsers(opt kolide.ListOptions) ([]*kolide.User, error) {
 	return users, nil
 }
 
-func (orm *Inmem) UserByEmail(email string) (*kolide.User, error) {
+func (orm *Datastore) UserByEmail(email string) (*kolide.User, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
@@ -90,7 +90,7 @@ func (orm *Inmem) UserByEmail(email string) (*kolide.User, error) {
 	return nil, errors.ErrNotFound
 }
 
-func (orm *Inmem) UserByID(id uint) (*kolide.User, error) {
+func (orm *Datastore) UserByID(id uint) (*kolide.User, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
@@ -101,7 +101,7 @@ func (orm *Inmem) UserByID(id uint) (*kolide.User, error) {
 	return nil, errors.ErrNotFound
 }
 
-func (orm *Inmem) SaveUser(user *kolide.User) error {
+func (orm *Datastore) SaveUser(user *kolide.User) error {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 

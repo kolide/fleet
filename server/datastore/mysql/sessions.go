@@ -12,7 +12,6 @@ func (d *Datastore) SessionByKey(key string) (*kolide.Session, error) {
 	`
 	session := &kolide.Session{}
 	err := d.db.Get(session, sqlStatement, key)
-
 	if err != nil {
 		return nil, errors.DatabaseError(err)
 	}
@@ -28,7 +27,6 @@ func (d *Datastore) SessionByID(id uint) (*kolide.Session, error) {
 	`
 	session := &kolide.Session{}
 	err := d.db.Get(session, sqlStatement, id)
-
 	if err != nil {
 		return nil, errors.DatabaseError(err)
 	}
@@ -43,7 +41,6 @@ func (d *Datastore) ListSessionsForUser(id uint) ([]*kolide.Session, error) {
 	`
 	sessions := []*kolide.Session{}
 	err := d.db.Select(&sessions, sqlStatement, id)
-
 	if err != nil {
 		return nil, errors.DatabaseError(err)
 	}
@@ -61,7 +58,6 @@ func (d *Datastore) NewSession(session *kolide.Session) (*kolide.Session, error)
 		VALUES(?,?,?,?)
 	`
 	result, err := d.db.Exec(sqlStatement, session.UserID, session.Key)
-
 	if err != nil {
 		return nil, errors.DatabaseError(err)
 	}
@@ -76,7 +72,6 @@ func (d *Datastore) DestroySession(session *kolide.Session) error {
 		DELETE FROM sessions WHERE id = ?
 	`
 	_, err := d.db.Exec(sqlStatement, session.ID)
-
 	if err != nil {
 		return errors.DatabaseError(err)
 	}
@@ -89,7 +84,6 @@ func (d *Datastore) DestroyAllSessionsForUser(id uint) error {
 		DELETE FROM sessions WHERE user_id = ?
 	`
 	_, err := d.db.Exec(sqlStatement, id)
-
 	if err != nil {
 		return errors.DatabaseError(err)
 	}
@@ -104,7 +98,6 @@ func (d *Datastore) MarkSessionAccessed(session *kolide.Session) error {
 		WHERE id = ?
 	`
 	_, err := d.db.Exec(sqlStatement, d.clock.Now(), session.ID)
-
 	if err != nil {
 		return errors.DatabaseError(err)
 	}

@@ -40,6 +40,78 @@ var enrollTests = []struct {
 	},
 }
 
+func testSaveHosts(t *testing.T, db kolide.Datastore) {
+	host, err := db.NewHost(&kolide.Host{
+		DetailUpdateTime: time.Now(),
+		NodeKey:          "1",
+		UUID:             "1",
+		HostName:         "foo.local",
+		PrimaryIP:        "192.168.1.10",
+	})
+	assert.Nil(t, err)
+	assert.NotNil(t, host)
+
+	host.HostName = "bar.local"
+	err = db.SaveHost(host)
+	assert.Nil(t, err)
+
+	host, err = db.Host(host.ID)
+	assert.Nil(t, err)
+	assert.Equal(t, "bar.local", host.HostName)
+
+	err = db.DeleteHost(host)
+	assert.Nil(t, err)
+
+	host, err = db.Host(host.ID)
+	assert.NotNil(t, err)
+}
+
+func testDeleteHost(t *testing.T, db kolide.Datastore) {
+	host, err := db.NewHost(&kolide.Host{
+		DetailUpdateTime: time.Now(),
+		NodeKey:          "1",
+		UUID:             "1",
+		HostName:         "foo.local",
+		PrimaryIP:        "192.168.1.10",
+	})
+	assert.Nil(t, err)
+	assert.NotNil(t, host)
+
+	err = db.DeleteHost(host)
+	assert.Nil(t, err)
+
+	host, err = db.Host(host.ID)
+	assert.NotNil(t, err)
+}
+
+func testListHost(t *testing.T, db kolide.Datastore) {
+	hosts := []*kolide.Host{}
+	for i := 0; i < 10; i++ {
+		host, err := db.NewHost(&kolide.Host{
+			DetailUpdateTime: time.Now(),
+			NodeKey:          fmt.Sprintf("%d", i),
+			UUID:             fmt.Sprintf("%d", i),
+			HostName:         fmt.Sprintf("foo.local%d", i),
+			PrimaryIP:        fmt.Sprintf("192.168.1.%d", i),
+		})
+		assert.Nil(t, err)
+		if err != nil {
+			return
+		}
+		hosts = append(hosts, host)
+	}
+
+	hosts2, err := db.ListHosts(kolide.ListOptions{})
+	assert.Nil(t, err)
+	assert.Equal(t, len(hosts), len(hosts2))
+	err = db.DeleteHost(hosts[0])
+	assert.Nil(t, err)
+	hosts2, err = db.ListHosts(kolide.ListOptions{})
+	assert.Nil(t, err)
+	assert.Equal(t, len(hosts)-1, len(hosts2))
+
+}
+
 func testEnrollHost(t *testing.T, db kolide.Datastore) {
 	var hosts []*kolide.Host
 	for _, tt := range enrollTests {

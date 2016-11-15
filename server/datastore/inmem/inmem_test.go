@@ -8,7 +8,7 @@ import (
 )
 
 func TestApplyLimitOffset(t *testing.T) {
-	im := Inmem{}
+	im := Datastore{}
 	data := []int{}
 
 	// should work with empty

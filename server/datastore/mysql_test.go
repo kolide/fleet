@@ -25,7 +25,7 @@ func setupMySQL(t *testing.T) (ds *mysql.Datastore, teardown func()) {
 
 	connString := fmt.Sprintf("%s:%s@(%s:3306)/%s?charset=utf8&parseTime=True&loc=Local", user, password, host, dbName)
 
-	ds, err := mysql.New(connString, clock.NewMockClock(), mysql.Logger(log.NewLogfmtLogger(log.NewSyncWriter(os.Stdout))))
+	ds, err := mysql.New(connString, clock.NewMockClock(), mysql.Logger(log.NewNopLogger()), mysql.LimitAttempts(1))
 	require.Nil(t, err)
 	teardown = func() {
 		ds.Close()
