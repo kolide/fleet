@@ -39,10 +39,10 @@ type MailService interface {
 // Password Reset Requests
 type PasswordResetRequest struct {
 	UpdateCreateTimestamps
-	ID        uint      `gorm:"primary_key"`
+	ID        uint
 	ExpiresAt time.Time `db:"expires_at"`
 	UserID    uint      `db:"user_id"`
-	Token     string    `gorm:"size:1024"`
+	Token     string
 }
 
 const passwordResetTemplate = `

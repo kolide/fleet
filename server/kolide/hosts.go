@@ -34,11 +34,11 @@ type HostService interface {
 type Host struct {
 	UpdateCreateTimestamps
 	DeleteFields
-	ID               uint          `json:"id" gorm:"primary_key"`
+	ID               uint          `json:"id"`
 	DetailUpdateTime time.Time     `json:"detail_updated_at" db:"detail_update_time"` // Time that the host details were last updated
-	NodeKey          string        `json:"-" gorm:"unique_index:idx_host_unique_nodekey" db:"node_key"`
+	NodeKey          string        `json:"-" db:"node_key"`
 	HostName         string        `json:"hostname" db:"host_name"` // there is a fulltext index on this field
-	UUID             string        `json:"uuid" gorm:"unique_index:idx_host_unique_uuid"`
+	UUID             string        `json:"uuid"`
 	Platform         string        `json:"platform"`
 	OsqueryVersion   string        `json:"osquery_version" db:"osquery_version"`
 	OSVersion        string        `json:"os_version" db:"os_version"`

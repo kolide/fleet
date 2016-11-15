@@ -52,17 +52,17 @@ type LabelPayload struct {
 type Label struct {
 	UpdateCreateTimestamps
 	DeleteFields
-	ID          uint   `json:"id" gorm:"primary_key"`
-	Name        string `json:"name" gorm:"not null;unique_index:idx_label_unique_name"` // there is a fulltext index on this field
+	ID          uint   `json:"id"`
+	Name        string `json:"name"`
 	Description string `json:"description"`
-	Query       string `json:"query" gorm:"not null"`
+	Query       string `json:"query"`
 	Platform    string `json:"platform"`
 }
 
 type LabelQueryExecution struct {
-	ID        uint `gorm:"primary_key"`
+	ID        uint
 	UpdatedAt time.Time
 	Matches   bool
-	LabelID   uint // Note we manually specify a unique index on these
-	HostID    uint // fields in gormDB.Migrate
+	LabelID   uint
+	HostID    uint
 }

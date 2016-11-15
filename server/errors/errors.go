@@ -6,7 +6,6 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	"gopkg.in/go-playground/validator.v8"
 )
 
@@ -121,11 +120,6 @@ func baseReturnError(c *gin.Context, err error, messageKey string) {
 				"errors": errors,
 			})
 		logrus.WithError(typedErr).Debug("Validation error")
-
-	case gorm.Errors, *gorm.Errors:
-		c.JSON(http.StatusInternalServerError,
-			gin.H{messageKey: "Database error"})
-		logrus.WithError(typedErr).Debug(typedErr.Error())
 
 	default:
 		c.JSON(http.StatusInternalServerError,

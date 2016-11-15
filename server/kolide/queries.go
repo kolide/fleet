@@ -54,10 +54,10 @@ type PackPayload struct {
 type Query struct {
 	UpdateCreateTimestamps
 	DeleteFields
-	ID           uint   `json:"id" gorm:"primary_key"`
-	Name         string `json:"name" gorm:"not null;unique_index:idx_query_unique_name"`
+	ID           uint   `json:"id"`
+	Name         string `json:"name"`
 	Description  string `json:"description"`
-	Query        string `json:"query" gorm:"not null"`
+	Query        string `json:"query"`
 	Interval     uint   `json:"interval"`
 	Snapshot     bool   `json:"snapshot"`
 	Differential bool   `json:"differential"`
@@ -76,7 +76,7 @@ const (
 type DistributedQueryCampaign struct {
 	UpdateCreateTimestamps
 	DeleteFields
-	ID          uint          `gorm:"primary_key"`
+	ID          uint
 	QueryID     uint          `db:"query_id"`
 	MaxDuration time.Duration `db:"max_duration"`
 	Status      DistributedQueryStatus
@@ -84,9 +84,9 @@ type DistributedQueryCampaign struct {
 }
 
 type DistributedQueryCampaignTarget struct {
-	ID                         uint `gorm:"primary_key"`
+	ID                         uint
 	Type                       TargetType
-	DistributedQueryCampaignID uint `gorm:"index:idx_dqct_dqc_id" db:"distributed_query_campaign_id"`
+	DistributedQueryCampaignID uint `db:"distributed_query_campaign_id"`
 	TargetID                   uint `db:"target_id"`
 }
 
@@ -106,20 +106,20 @@ type DistributedQueryResult struct {
 }
 
 type DistributedQueryExecution struct {
-	ID                         uint `gorm:"primary_key"`
+	ID                         uint
 	HostID                     uint `db:"host_id"`
 	DistributedQueryCampaignID uint `db:"distributed_query_campaign_id"`
 	Status                     DistributedQueryExecutionStatus
-	Error                      string        `gorm:"size:1024"`
+	Error                      string
 	ExecutionDuration          time.Duration `db:"execution_duration"`
 }
 
 type Option struct {
-	ID        uint `gorm:"primary_key"`
+	ID        uint
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	Key       string `gorm:"not null;unique_index:idx_option_unique_key"`
-	Value     string `gorm:"not null"`
+	Key       string
+	Value     string
 	Platform  string
 }
 
@@ -132,10 +132,10 @@ const (
 )
 
 type Decorator struct {
-	ID        uint `gorm:"primary_key"`
+	ID        uint
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	Type      DecoratorType `gorm:"not null"`
+	Type      DecoratorType
 	Interval  int
 	Query     string
 }

@@ -15,7 +15,7 @@ type dbOptions struct {
 	// maxAttempts configures the number of retries to connect to the DB
 	maxAttempts int
 	db          kolide.Datastore
-	debug       bool // gorm debug
+	debug       bool
 	logger      *log.Logger
 }
 
@@ -37,7 +37,6 @@ func LimitAttempts(attempts int) DBOption {
 	}
 }
 
-// Debug sets the GORM debug level
 func Debug() DBOption {
 	return func(o *dbOptions) error {
 		o.debug = true

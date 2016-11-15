@@ -21,7 +21,7 @@ type AppConfigService interface {
 // AppConfig holds configuration about the Kolide application.
 // AppConfig data can be managed by a Kolide API user.
 type AppConfig struct {
-	ID              int64  `gorm:"primary_key"`
+	ID              int64
 	OrgName         string `db:"org_name"`
 	OrgLogoURL      string `db:"org_logo_url"`
 	KolideServerURL string `db:"kolide_server_url"`
