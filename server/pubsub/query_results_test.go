@@ -135,9 +135,7 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 						CreatedAt: time.Now().UTC(),
 					},
 				},
-				DeleteFields: kolide.DeleteFields{
-					DeletedAt: time.Now().UTC(),
-				},
+
 				DetailUpdateTime: time.Now().UTC(),
 			},
 		},
@@ -154,9 +152,7 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 						CreatedAt: time.Now().UTC(),
 					},
 				},
-				DeleteFields: kolide.DeleteFields{
-					DeletedAt: time.Now().UTC(),
-				},
+
 				DetailUpdateTime: time.Now().UTC(),
 			},
 		},
@@ -173,9 +169,7 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 						CreatedAt: time.Now().UTC(),
 					},
 				},
-				DeleteFields: kolide.DeleteFields{
-					DeletedAt: time.Now().UTC(),
-				},
+
 				DetailUpdateTime: time.Now().UTC(),
 			},
 		},
@@ -201,9 +195,7 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 						CreatedAt: time.Now().UTC(),
 					},
 				},
-				DeleteFields: kolide.DeleteFields{
-					DeletedAt: time.Now().UTC(),
-				},
+
 				DetailUpdateTime: time.Now().UTC(),
 			},
 		},
@@ -220,9 +212,7 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 						CreatedAt: time.Now().UTC(),
 					},
 				},
-				DeleteFields: kolide.DeleteFields{
-					DeletedAt: time.Now().UTC(),
-				},
+
 				DetailUpdateTime: time.Now().UTC(),
 			},
 		},

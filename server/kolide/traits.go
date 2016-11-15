@@ -11,14 +11,14 @@ type CreateTimestamp struct {
 // delete record in the database. We mark it deleted, records with Deleted
 // set to true will not normally be included in results
 type DeleteFields struct {
-	DeletedAt time.Time `json:"deleted_at" db:"deleted_at" gorm:"-"`
-	Deleted   bool      `json:"deleted"`
+	DeletedAt *time.Time `json:"deleted_at" db:"deleted_at" gorm:"-"`
+	Deleted   bool       `json:"deleted"`
 }
 
 // MarkDeleted indicates a record is deleted. It won't actually be removed from
 // the database, but won't be returned in result sets.
 func (d *DeleteFields) MarkDeleted(deleted time.Time) {
-	d.DeletedAt = deleted
+	d.DeletedAt = &deleted
 	d.Deleted = true
 }
 
