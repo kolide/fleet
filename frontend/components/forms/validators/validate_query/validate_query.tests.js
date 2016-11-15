@@ -15,6 +15,13 @@ describe('validateQuery', () => {
     expect(error).toEqual('Syntax error found near WITH Clause (Statement)');
   });
 
+  it('rejects blank queries', () => {
+    const { error, valid } = validateQuery();
+
+    expect(valid).toEqual(false);
+    expect(error).toEqual('Query text must be present');
+  });
+
   it('rejects create queries', () => {
     const { error, valid } = validateQuery(createQuery);
     expect(valid).toEqual(false);
