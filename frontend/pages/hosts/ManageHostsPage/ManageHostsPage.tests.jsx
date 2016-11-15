@@ -17,6 +17,10 @@ describe('ManageHostsPage - component', () => {
     selectedOsqueryTable: stubbedOsqueryTable,
   };
 
+  beforeEach(() => {
+    createAceSpy();
+  });
+
   it('renders a HostSidePanel when not adding a new label', () => {
     const page = mount(<ManageHostsPage {...props} />);
 
@@ -24,8 +28,8 @@ describe('ManageHostsPage - component', () => {
   });
 
   it('renders a QuerySidePanel when adding a new label', () => {
-    createAceSpy();
     const page = mount(<ManageHostsPage {...props} />);
+
     page.setState({ isAddLabel: true });
 
     expect(page.find('QuerySidePanel').length).toEqual(1);

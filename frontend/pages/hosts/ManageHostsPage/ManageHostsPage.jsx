@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import AceEditor from 'react-ace';
 import { connect } from 'react-redux';
 import { filter } from 'lodash';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
@@ -161,11 +162,29 @@ export class ManageHostsPage extends Component {
       return false;
     }
 
+    const { count, description, display_text: displayText, query } = selectedLabel;
+
     return (
       <div>
         <i className="kolidecon-label" />
-        <span>{selectedLabel.title}</span>
-        <span>{selectedLabel.hosts_count} Hosts Total</span>
+        <span>{displayText}</span>
+        <AceEditor
+          editorProps={{ $blockScrolling: Infinity }}
+          mode="kolide"
+          minLines={2}
+          maxLines={4}
+          name="label-header"
+          readOnly
+          setOptions={{ wrap: true }}
+          showGutter={false}
+          showPrintMargin={false}
+          theme="kolide"
+          value={query}
+          width="100%"
+        />
+        <p>Description</p>
+        <p>{description}</p>
+        <p>{count} Hosts Total</p>
       </div>
     );
   }
