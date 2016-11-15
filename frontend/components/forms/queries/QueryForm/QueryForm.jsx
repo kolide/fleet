@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { isEqual } from 'lodash';
 
 import Button from 'components/buttons/Button';
+import Dropdown from 'components/forms/fields/Dropdown';
 import helpers from 'components/forms/queries/QueryForm/helpers';
 import InputField from 'components/forms/fields/InputField';
 import queryInterface from 'interfaces/query';
@@ -27,27 +28,34 @@ class QueryForm extends Component {
   constructor (props) {
     super(props);
 
-    const { query: { description, name }, queryText } = this.props;
+    const {
+      query: { description, name },
+      queryText,
+      queryType,
+    } = this.props;
+    const errors = { description: null, name: null };
+    const formData = { description, name, query: queryText };
 
-    this.state = {
-      errors: {
-        description: null,
-        name: null,
-      },
-      formData: {
-        description,
-        name,
-        query: queryText,
-      },
-    };
+    if (queryType === 'label') {
+      const { allPlatforms: platform } = helpers;
+
+      this.state = {
+        errors: { ...errors, platform: null },
+        formData: { ...formData, platform },
+      };
+    } else {
+      this.state = { errors, formData };
+    }
   }
 
   componentDidMount = () => {
     const { query, queryText } = this.props;
     const { description, name } = query;
+    const { formData } = this.state;
 
     this.setState({
       formData: {
+        ...formData,
         description,
         name,
         query: queryText,
@@ -60,10 +68,13 @@ class QueryForm extends Component {
     const { query: staleQuery, queryText: staleQueryText } = this.props;
 
     if (!isEqual(query, staleQuery) || !isEqual(queryText, staleQueryText)) {
+      const { formData } = this.state;
+
       this.setState({
         formData: {
-          description: query.description,
-          name: query.name,
+          ...formData,
+          description: query.description || formData.description,
+          name: query.name || formData.name,
           query: queryText,
         },
       });
@@ -201,6 +212,26 @@ class QueryForm extends Component {
     );
   }
 
+  renderPlatformDropdown = () => {
+    const { queryType } = this.props;
+
+    if (queryType !== 'label') {
+      return false;
+    }
+
+    const { formData: { platform } } = this.state;
+    const { onFieldChange } = this;
+    const { platformOptions } = helpers;
+
+    return (
+      <Dropdown
+        options={platformOptions}
+        onSelect={onFieldChange('platform')}
+        value={platform.value}
+      />
+    );
+  }
+
   render () {
     const {
       errors,
@@ -209,7 +240,7 @@ class QueryForm extends Component {
         name,
       },
     } = this.state;
-    const { onFieldChange, renderButtons } = this;
+    const { onFieldChange, renderPlatformDropdown, renderButtons } = this;
     const { queryType } = this.props;
 
     return (
@@ -231,6 +262,7 @@ class QueryForm extends Component {
           type="textarea"
           inputClassName={`${baseClass}__query-description`}
         />
+        {renderPlatformDropdown()}
         {renderButtons()}
       </form>
     );
