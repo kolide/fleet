@@ -48,7 +48,9 @@ type Host struct {
 	PrimaryIP        string        `json:"ip" db:"primary_ip"` // there is a fulltext index on this field
 }
 
-func GenerateRandomText(keySize int) (string, error) {
+// RandomText returns a stdEncoded string of
+// just what it says
+func RandomText(keySize int) (string, error) {
 	key := make([]byte, keySize)
 	_, err := rand.Read(key)
 	if err != nil {

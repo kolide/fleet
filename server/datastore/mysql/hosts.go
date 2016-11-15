@@ -140,7 +140,7 @@ func (d *Datastore) EnrollHost(uuid, hostname, ip, platform string, nodeKeySize 
 	args := []interface{}{}
 	args = append(args, time.Unix(0, 0).Add(24*time.Hour))
 
-	nodeKey, err := kolide.GenerateRandomText(nodeKeySize)
+	nodeKey, err := kolide.RandomText(nodeKeySize)
 
 	args = append(args, nodeKey)
 	args = append(args, hostname)

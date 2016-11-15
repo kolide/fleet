@@ -130,7 +130,7 @@ func (orm *Datastore) EnrollHost(uuid, hostname, ip, platform string, nodeKeySiz
 	}
 
 	var err error
-	host.NodeKey, err = kolide.GenerateRandomText(nodeKeySize)
+	host.NodeKey, err = kolide.RandomText(nodeKeySize)
 	if err != nil {
 		return nil, err
 	}
