@@ -1,0 +1,73 @@
+.host-target,
+.label-target {
+  padding: $pad-large;
+}
+
+.host-target {
+  &__display-text {
+    font-size: $small;
+    font-weight: $bold;
+    letter-spacing: 0.5px;
+    color: $text-dark;
+    margin: 0;
+  }
+
+  &__icon {
+    color: $accent-text;
+    margin-right: $pad-small;
+
+    &--online {
+      color: $success;
+    }
+
+    &--offline {
+      color: $alert;
+    }
+  }
+
+  &__status {
+    margin: $pad-medium 0;
+    font-size: $small;
+    font-weight: $bold;
+    letter-spacing: 1.3px;
+    text-transform: uppercase;
+
+    &--is-online {
+      color: $success;
+    }
+
+    &--is-offline {
+      color: $alert;
+    }
+  }
+
+  &__labels-header {
+    font-size: $small;
+    font-weight: $bold;
+    letter-spacing: 0.9px;
+    color: $text-dark;
+    text-transform: uppercase;
+  }
+}
+
+.label-target {
+
+}
+
+.target-details {
+  &__table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    text-align: left;
+    font-size: $small;
+    width: 100%;
+    margin-bottom: $pad-medium;
+
+    th {
+      font-weight: $bold;
+      line-height: 2.3;
+      color: $text-dark;
+      padding-right: $pad-half;
+    }
+  }
+}

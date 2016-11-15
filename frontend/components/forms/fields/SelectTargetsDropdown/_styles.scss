@@ -19,8 +19,12 @@
 
     &.Select--multi {
       .Select-option {
+        padding: 0 $pad-half;
+
         &.is-disabled {
           &.is-focused {
+            background-color: $brand-light;
+
             .target-option__label-label,
             .target-option__target-icon,
             .target-option__delimeter,
@@ -29,12 +33,44 @@
             .target-option__icon {
               color: $white;
             }
+
+            .target-option__add-btn {
+              color: $brand-ultralight;
+            }
           }
         }
       }
 
       .Select-value {
         line-height: 1.9;
+      }
+    }
+  }
+
+  .Select-menu-outer {
+    max-height: 500px;
+    height: 500px;
+    overflow: hidden;
+
+    .Select-menu {
+      height: 498px;
+      max-height: 498px;
+      overflow: hidden;
+      position: relative;
+
+      &::after {
+        display: inline-block;
+        font: normal normal normal 14px/1 'kolidecons';
+        font-size: 150px;
+        text-rendering: auto;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        content: '\f03c';
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        margin-top: -75px;
+        opacity: 0.25;
       }
     }
   }

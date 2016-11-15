@@ -7,6 +7,19 @@
     font-size: 15px;
   }
 
+  &__add-btn {
+    color: $accent-medium;
+    font-size: $medium;
+  }
+
+  &__target-content,
+  &__add-btn {
+    line-height: 34px;
+    font-size: $small;
+    font-weight: $normal;
+    text-transform: none;
+  }
+
   &__count {
     background-color: $text-medium;
     border-radius: $border-radius;
@@ -24,8 +37,8 @@
 
   &__icon {
     color: $text-medium;
-    font-size: $base;
-    margin: 0 0 0 $pad-base;
+    font-size: $small;
+    margin: 0 $pad-half;
   }
 
   &__ip {

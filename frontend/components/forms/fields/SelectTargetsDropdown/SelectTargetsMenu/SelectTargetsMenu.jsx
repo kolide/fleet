@@ -5,6 +5,7 @@ import { filter, includes, isEqual, noop } from 'lodash';
 import targetInterface from 'interfaces/target';
 import SelectTargets from 'components/forms/fields/SelectTargetsDropdown';
 
+const baseClass = 'target-list';
 
 const SelectTargetsMenuWrapper = (onMoreInfoClick, onRemoveMoreInfoTarget, moreInfoTarget) => {
   const SelectTargetsMenu = ({
@@ -61,14 +62,14 @@ const SelectTargetsMenuWrapper = (onMoreInfoClick, onRemoveMoreInfoTarget, moreI
     };
 
     return (
-      <div>
-        <div>
-          <div>hosts</div>
+      <div className={baseClass}>
+        <div className={`${baseClass}__options`}>
+          <p className={`${baseClass}__type`}>hosts</p>
           {renderTargets('hosts')}
-          <div>labels</div>
+          <p className={`${baseClass}__type`}>labels</p>
           {renderTargets('labels')}
         </div>
-        <SelectTargets.Details target={moreInfoTarget} />
+        <SelectTargets.Details target={moreInfoTarget} className={`${baseClass}__spotlight`} />
       </div>
     );
   };
