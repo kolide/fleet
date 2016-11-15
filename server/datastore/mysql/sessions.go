@@ -53,17 +53,14 @@ func (d *Datastore) ListSessionsForUser(id uint) ([]*kolide.Session, error) {
 }
 
 func (d *Datastore) NewSession(session *kolide.Session) (*kolide.Session, error) {
-	session.MarkAsCreated(d.clock.Now())
 	sqlStatement := `
 		INSERT INTO sessions (
-			created_at,
-			accessed_at,
 			user_id,
 			key
 		)
 		VALUES(?,?,?,?)
 	`
-	result, err := d.db.Exec(sqlStatement, session.CreatedAt, session.CreatedAt, session.UserID, session.Key)
+	result, err := d.db.Exec(sqlStatement, session.UserID, session.Key)
 
 	if err != nil {
 		return nil, errors.DatabaseError(err)

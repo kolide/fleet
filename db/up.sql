@@ -31,8 +31,8 @@ CREATE TABLE `distributed_query_campaign_targets` (
 
 CREATE TABLE `distributed_query_campaigns` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `deleted_at` timestamp NOT NULL DEFAULT '1970-01-01 00:00:01',
   `deleted` tinyint(1) NOT NULL DEFAULT FALSE,
   `query_id` int(10) unsigned DEFAULT NULL,
@@ -58,8 +58,8 @@ CREATE TABLE `distributed_query_executions` (
 
 CREATE TABLE `hosts` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `deleted_at` timestamp NOT NULL DEFAULT '1970-01-01 00:00:01',
   `deleted` tinyint(1) NOT NULL DEFAULT FALSE,
   `detail_update_time` timestamp NULL DEFAULT NULL,
@@ -82,7 +82,8 @@ CREATE TABLE `hosts` (
 
 CREATE TABLE `invites` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `created_at` timestamp NOT NULL,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `deleted_at` timestamp NOT NULL DEFAULT '1970-01-01 00:00:01',
   `deleted` tinyint(1) NOT NULL DEFAULT FALSE,
   `invited_by` int(10) unsigned NOT NULL,
@@ -99,7 +100,8 @@ CREATE TABLE `invites` (
 
 CREATE TABLE `label_query_executions` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `updated_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `matches` tinyint(1) NOT NULL DEFAULT FALSE,
   `label_id` int(10) unsigned DEFAULT NULL,
   `host_id` int(10) unsigned DEFAULT NULL,
@@ -110,8 +112,8 @@ CREATE TABLE `label_query_executions` (
 
 CREATE TABLE `labels` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `deleted_at` timestamp NOT NULL DEFAULT '1970-01-01 00:00:01',
   `deleted` tinyint(1) NOT NULL DEFAULT FALSE,
   `name` varchar(255) NOT NULL,
@@ -126,8 +128,8 @@ CREATE TABLE `labels` (
 
 CREATE TABLE `options` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `key` varchar(255) NOT NULL,
   `value` varchar(255) NOT NULL,
   `platform` varchar(255) DEFAULT NULL,
@@ -138,8 +140,8 @@ CREATE TABLE `options` (
 
 CREATE TABLE `pack_queries` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `pack_id` int(10) unsigned DEFAULT NULL,
   `query_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -157,8 +159,8 @@ CREATE TABLE `pack_targets` (
 
 CREATE TABLE `packs` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `deleted_at` timestamp NOT NULL DEFAULT '1970-01-01 00:00:01',
   `deleted` tinyint(1) NOT NULL DEFAULT FALSE,
   `name` varchar(255) NOT NULL,
@@ -170,8 +172,8 @@ CREATE TABLE `packs` (
 
 CREATE TABLE `password_reset_requests` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `created_at` timestamp NOT NULL DEFAULT '1970-01-01 00:00:01',
-  `updated_at` timestamp NOT NULL DEFAULT '1970-01-01 00:00:01',
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `expires_at` timestamp NOT NULL DEFAULT '1970-01-01 00:00:01',
   `user_id` int(10) unsigned NOT NULL,
   `token` varchar(1024) NOT NULL,
@@ -181,8 +183,8 @@ CREATE TABLE `password_reset_requests` (
 
 CREATE TABLE `queries` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `created_at` timestamp NOT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `deleted_at` timestamp NOT NULL DEFAULT '1970-01-01 00:00:01',
   `deleted` tinyint(1) NOT NULL DEFAULT FALSE,
   `name` varchar(255) NOT NULL,
@@ -200,8 +202,8 @@ CREATE TABLE `queries` (
 
 CREATE TABLE `sessions` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `accessed_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `accessed_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `user_id` int(10) unsigned NOT NULL,
   `key` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
@@ -211,8 +213,8 @@ CREATE TABLE `sessions` (
 
 CREATE TABLE `users` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `deleted_at` timestamp NOT NULL DEFAULT '1970-01-01 00:00:01',
   `deleted` tinyint(1) NOT NULL DEFAULT FALSE,
   `username` varchar(255) NOT NULL,

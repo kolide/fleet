@@ -6,14 +6,12 @@ import (
 )
 
 func (d *Datastore) NewPasswordResetRequest(req *kolide.PasswordResetRequest) (*kolide.PasswordResetRequest, error) {
-	req.MarkAsCreated(d.clock.Now())
 	sqlStatement := `
 		INSERT INTO password_reset_requests
-		(created_at, updated_at, user_id, token)
-		VALUES (?,?,?,?)
+		( user_id, token)
+		VALUES (?,?)
 	`
-	response, err := d.db.Exec(sqlStatement, req.CreatedAt, req.UpdatedAt, req.UserID,
-		req.Token)
+	response, err := d.db.Exec(sqlStatement, req.UserID, req.Token)
 	if err != nil {
 		return nil, errors.DatabaseError(err)
 	}
@@ -25,16 +23,14 @@ func (d *Datastore) NewPasswordResetRequest(req *kolide.PasswordResetRequest) (*
 }
 
 func (d *Datastore) SavePasswordResetRequest(req *kolide.PasswordResetRequest) error {
-	req.MarkAsUpdated(d.clock.Now())
 	sqlStatement := `
 		UPDATE password_reset_requests SET
-			updated_at = ?,
 			expires_at = ?,
 			user_id = ?,
 			token = ?
 		WHERE id = ?
 	`
-	_, err := d.db.Exec(sqlStatement, req.UpdatedAt, req.ExpiresAt, req.UserID, req.Token, req.ID)
+	_, err := d.db.Exec(sqlStatement, req.ExpiresAt, req.UserID, req.Token, req.ID)
 
 	if err != nil {
 		return errors.DatabaseError(err)

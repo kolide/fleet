@@ -7,15 +7,14 @@ import (
 
 // NewQuery creates a Query
 func (d *Datastore) NewQuery(query *kolide.Query) (*kolide.Query, error) {
-	query.MarkAsCreated(d.clock.Now())
+
 	sql := `
-		INSERT INTO queries  (created_at, updated_at, name, description, query,
+		INSERT INTO queries  ( name, description, query,
 			snapshot, differential, platform, version, ` + "`interval`" + `)
-		VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
+		VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
 	`
 
-	result, err := d.db.Exec(sql, query.CreatedAt, query.UpdatedAt,
-		query.Name, query.Description, query.Query, query.Snapshot,
+	result, err := d.db.Exec(sql, query.Name, query.Description, query.Query, query.Snapshot,
 		query.Differential, query.Platform, query.Version, query.Interval)
 
 	if err != nil {
@@ -29,14 +28,13 @@ func (d *Datastore) NewQuery(query *kolide.Query) (*kolide.Query, error) {
 
 // SaveQuery saves changes to a Query.
 func (d *Datastore) SaveQuery(q *kolide.Query) error {
-	q.MarkAsUpdated(d.clock.Now())
 	sql := `
 		UPDATE queries
-			SET updated_at = ?, name = ?, description = ?, query = ?, ` + "`interval`" + ` = ?, snapshot = ?,
+			SET name = ?, description = ?, query = ?, ` + "`interval`" + ` = ?, snapshot = ?,
 			 	differential = ?, platform = ?, version = ?
 			WHERE id = ? AND NOT deleted
 	`
-	_, err := d.db.Exec(sql, q.UpdatedAt, q.Name, q.Description, q.Query, q.Interval,
+	_, err := d.db.Exec(sql, q.Name, q.Description, q.Query, q.Interval,
 		q.Snapshot, q.Differential, q.Platform, q.Version, q.ID)
 
 	if err != nil {
@@ -95,10 +93,9 @@ func (d *Datastore) ListQueries(opt kolide.ListOptions) ([]*kolide.Query, error)
 }
 
 func (d *Datastore) SaveDistributedQueryCampaign(camp *kolide.DistributedQueryCampaign) error {
-	camp.MarkAsUpdated(d.clock.Now())
+
 	sqlStatement := `
 		UPDATE distributed_query_campaigns SET
-			updated_at = ?,
 			query_id = ?,
 			max_duration = ?,
 			status = ?,
@@ -106,7 +103,7 @@ func (d *Datastore) SaveDistributedQueryCampaign(camp *kolide.DistributedQueryCa
 		WHERE id = ?
 		AND NOT deleted
 	`
-	_, err := d.db.Exec(sqlStatement, camp.UpdatedAt, camp.QueryID, camp.MaxDuration,
+	_, err := d.db.Exec(sqlStatement, camp.QueryID, camp.MaxDuration,
 		camp.Status, camp.UserID, camp.ID)
 
 	if err != nil {
@@ -117,20 +114,17 @@ func (d *Datastore) SaveDistributedQueryCampaign(camp *kolide.DistributedQueryCa
 }
 
 func (d *Datastore) NewDistributedQueryCampaign(camp *kolide.DistributedQueryCampaign) (*kolide.DistributedQueryCampaign, error) {
-	camp.MarkAsCreated(d.clock.Now())
+
 	sqlStatement := `
 		INSERT INTO distributed_query_campaigns (
-			created_at,
-			updated_at,
 			query_id,
 			max_duration,
 			status,
 			user_id
 		)
-		VALUES(?,?,?,?,?,?)
+		VALUES(?,?,?,?)
 	`
-	result, err := d.db.Exec(sqlStatement, camp.CreatedAt, camp.UpdatedAt, camp.QueryID,
-		camp.MaxDuration, camp.Status, camp.UserID)
+	result, err := d.db.Exec(sqlStatement, camp.QueryID, camp.MaxDuration, camp.Status, camp.UserID)
 
 	if err != nil {
 		return nil, errors.DatabaseError(err)

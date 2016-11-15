@@ -7,14 +7,13 @@ import (
 
 // NewPack creates a new Pack
 func (d *Datastore) NewPack(pack *kolide.Pack) (*kolide.Pack, error) {
-	pack.MarkAsCreated(d.clock.Now())
 
 	sql := `
-		INSERT INTO packs (created_at, updated_at, name, platform )
-			VALUES ( ?, ?, ?, ?)
+		INSERT INTO packs ( name, platform )
+			VALUES ( ?, ?)
 	`
 
-	result, err := d.db.Exec(sql, pack.CreatedAt, pack.UpdatedAt, pack.Name, pack.Platform)
+	result, err := d.db.Exec(sql, pack.Name, pack.Platform)
 	if err != nil {
 		return nil, err
 	}
@@ -26,15 +25,14 @@ func (d *Datastore) NewPack(pack *kolide.Pack) (*kolide.Pack, error) {
 
 // SavePack stores changes to pack
 func (d *Datastore) SavePack(pack *kolide.Pack) error {
-	pack.MarkAsUpdated(d.clock.Now())
 
 	sql := `
 		UPDATE packs
-			SET updated_at = ?, name = ?, platform = ?
+			SET name = ?, platform = ?
 			WHERE id = ? AND NOT deleted
 	`
 
-	_, err := d.db.Exec(sql, pack.UpdatedAt, pack.Name, pack.Platform, pack.ID)
+	_, err := d.db.Exec(sql, pack.Name, pack.Platform, pack.ID)
 	return err
 }
 
@@ -81,11 +79,10 @@ func (d *Datastore) ListPacks(opt kolide.ListOptions) ([]*kolide.Pack, error) {
 // AddQueryToPack associates a kolide.Query with a kolide.Pack
 func (d *Datastore) AddQueryToPack(qid uint, pid uint) error {
 	sql := `
-		INSERT INTO pack_queries (created_at, updated_at, pack_id, query_id)
-			VALUES (?, ?, ?, ?)
+		INSERT INTO pack_queries ( pack_id, query_id)
+			VALUES (?, ?)
 	`
-	created := d.clock.Now()
-	_, err := d.db.Exec(sql, created, created, pid, qid)
+	_, err := d.db.Exec(sql, pid, qid)
 	return err
 }
 

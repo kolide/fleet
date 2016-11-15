@@ -9,7 +9,12 @@ import (
 )
 
 func testCreateInvite(t *testing.T, ds kolide.Datastore) {
-	invite := &kolide.Invite{}
+	invite := &kolide.Invite{
+
+		Email: "user@foo.com",
+		Name:  "user",
+		Token: "some_user",
+	}
 
 	invite, err := ds.NewInvite(invite)
 	assert.Nil(t, err)

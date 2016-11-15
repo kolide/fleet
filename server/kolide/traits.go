@@ -7,14 +7,6 @@ type CreateTimestamp struct {
 	CreatedAt time.Time `json:"created_at" db:"created_at"`
 }
 
-// MarkAsCreated sets timestamp, intended to be called when Createable record is
-// initially inserted in database
-func (ci *CreateTimestamp) MarkAsCreated(created time.Time) {
-	if ci.CreatedAt.IsZero() {
-		ci.CreatedAt = created
-	}
-}
-
 // Deleteable is used to indicate a record is deleted.  We don't actually
 // delete record in the database. We mark it deleted, records with Deleted
 // set to true will not normally be included in results
@@ -35,17 +27,7 @@ type UpdateTimestamp struct {
 	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
 }
 
-// MarkAsUpdated is called when and entity is changed
-func (u *UpdateTimestamp) MarkAsUpdated(updated time.Time) {
-	u.UpdatedAt = updated
-}
-
 type UpdateCreateTimestamps struct {
 	CreateTimestamp
 	UpdateTimestamp
-}
-
-func (uct *UpdateCreateTimestamps) MarkAsCreated(created time.Time) {
-	uct.CreateTimestamp.MarkAsCreated(created)
-	uct.MarkAsUpdated(created)
 }

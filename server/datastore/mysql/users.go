@@ -11,8 +11,6 @@ import (
 func (d *Datastore) NewUser(user *kolide.User) (*kolide.User, error) {
 	sqlStatement := `
 		INSERT INTO users (
-			created_at,
-			updated_at,
 			password,
 			salt,
 			name,
@@ -23,11 +21,10 @@ func (d *Datastore) NewUser(user *kolide.User) (*kolide.User, error) {
 			admin_forced_password_reset,
 			gravatar_url,
 			position
-		) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
+		) VALUES (?,?,?,?,?,?,?,?,?,?)
 	`
-	user.MarkAsCreated(d.clock.Now())
-	result, err := d.db.Exec(sqlStatement, user.CreatedAt, user.UpdatedAt,
-		user.Password, user.Salt, user.Name, user.Username, user.Email, user.Admin, user.Enabled,
+	result, err := d.db.Exec(sqlStatement, user.Password, user.Salt, user.Name,
+		user.Username, user.Email, user.Admin, user.Enabled,
 		user.AdminForcedPasswordReset, user.GravatarURL, user.Position)
 
 	if err != nil {
@@ -86,10 +83,8 @@ func (d *Datastore) UserByID(id uint) (*kolide.User, error) {
 }
 
 func (d *Datastore) SaveUser(user *kolide.User) error {
-	user.MarkAsUpdated(d.clock.Now())
 	sqlStatement := `
 		UPDATE users SET
-			updated_at = ?,
 			username = ?,
 			password = ?,
 			salt = ?,
@@ -102,7 +97,7 @@ func (d *Datastore) SaveUser(user *kolide.User) error {
 			position = ?
 		WHERE id = ?
 	`
-	_, err := d.db.Exec(sqlStatement, user.UpdatedAt, user.Username, user.Password,
+	_, err := d.db.Exec(sqlStatement, user.Username, user.Password,
 		user.Salt, user.Name, user.Email, user.Admin, user.Enabled,
 		user.AdminForcedPasswordReset, user.GravatarURL, user.Position, user.ID)
 

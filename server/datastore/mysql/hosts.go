@@ -12,11 +12,8 @@ import (
 )
 
 func (d *Datastore) NewHost(host *kolide.Host) (*kolide.Host, error) {
-	host.MarkAsCreated(d.clock.Now())
 	sqlStatement := `
 	INSERT INTO hosts (
-		created_at,
-		updated_at,
 		detail_update_time,
 		node_key,
 		host_name,
@@ -29,9 +26,9 @@ func (d *Datastore) NewHost(host *kolide.Host) (*kolide.Host, error) {
 		primary_mac,
 		primary_ip
 	)
-	VALUES( ?,?,?,?,?,?,?,?,?,?,?,?,?)
+	VALUES( ?,?,?,?,?,?,?,?,?,?,?)
 	`
-	result, err := d.db.Exec(sqlStatement, host.CreatedAt, host.UpdatedAt, host.DetailUpdateTime,
+	result, err := d.db.Exec(sqlStatement, host.DetailUpdateTime,
 		host.NodeKey, host.HostName, host.UUID, host.Platform, host.OsqueryVersion,
 		host.OSVersion, host.Uptime, host.PhysicalMemory, host.PrimaryMAC, host.PrimaryIP)
 	if err != nil {
@@ -66,15 +63,13 @@ func (d *Datastore) EnrollHost(uuid, hostname, ip, platform string, nodeKeySize 
 	// REVIEW If a deleted host is enrolled, it is undeleted
 	sqlInsert := `
 		INSERT INTO hosts (
-			created_at,
-			updated_at,
 			detail_update_time,
 			node_key,
 			host_name,
 			uuid,
 			platform,
 			primary_ip
-		) VALUES (?, ?, ?, ?, ?, ?, ?, ? )
+		) VALUES (?, ?, ?, ?, ?, ? )
 		ON DUPLICATE KEY UPDATE
 			updated_at = VALUES(updated_at),
 			detail_update_time = VALUES(detail_update_time),
@@ -85,8 +80,6 @@ func (d *Datastore) EnrollHost(uuid, hostname, ip, platform string, nodeKeySize 
 			deleted = FALSE
 	`
 	args := []interface{}{}
-	args = append(args, d.clock.Now())
-	args = append(args, d.clock.Now())
 	args = append(args, time.Unix(0, 0).Add(24*time.Hour))
 
 	nodeKey, err := kolide.GenerateRandomText(nodeKeySize)

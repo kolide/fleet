@@ -11,20 +11,16 @@ import (
 
 // NewLabel creates a new kolide.Label
 func (d *Datastore) NewLabel(label *kolide.Label) (*kolide.Label, error) {
-	label.MarkAsCreated(d.clock.Now())
 
 	sql := `
 		INSERT INTO labels (
-			created_at,
-			updated_at,
 			name,
 			description,
 			query,
 			platform
-		) VALUES ( ?, ?, ?, ?, ?, ?)
+		) VALUES ( ?, ?, ?, ?)
 	`
-	result, err := d.db.Exec(sql, label.CreatedAt, label.UpdatedAt, label.Name,
-		label.Description, label.Query, label.Platform)
+	result, err := d.db.Exec(sql, label.Name, label.Description, label.Query, label.Platform)
 
 	if err != nil {
 		return nil, errors.DatabaseError(err)

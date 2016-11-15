@@ -57,7 +57,7 @@ type InvitePayload struct {
 
 // Invite represents an invitation for a user to join Kolide.
 type Invite struct {
-	CreateTimestamp
+	UpdateCreateTimestamps
 	DeleteFields
 	ID        uint   `json:"id" gorm:"primary_key"`
 	InvitedBy uint   `json:"invited_by" gorm:"not null" db:"invited_by"`

@@ -4,14 +4,13 @@ import "github.com/kolide/kolide-ose/server/kolide"
 
 // NewInvite generates a new invitation
 func (d *Datastore) NewInvite(i *kolide.Invite) (*kolide.Invite, error) {
-	i.MarkAsCreated(d.clock.Now())
 
 	sql := `
-	INSERT INTO invites (created_at, invited_by, email, admin, name, position, token)
-	  VALUES (?, ?, ?, ?, ?, ?, ?)
+	INSERT INTO invites ( invited_by, email, admin, name, position, token)
+	  VALUES ( ?, ?, ?, ?, ?, ?)
 	`
 
-	result, err := d.db.Exec(sql, i.CreatedAt, i.InvitedBy, i.Email, i.Admin,
+	result, err := d.db.Exec(sql, i.InvitedBy, i.Email, i.Admin,
 		i.Name, i.Position, i.Token)
 
 	if err != nil {
