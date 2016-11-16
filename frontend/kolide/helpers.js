@@ -1,7 +1,7 @@
 import { pick } from 'lodash';
 
 const ORG_INFO_ATTRS = ['org_name', 'org_logo_url'];
-const ADMIN_ATTRS = ['email', 'full_name', 'password', 'password_confirmation', 'username'];
+const ADMIN_ATTRS = ['email', 'name', 'password', 'password_confirmation', 'username'];
 
 const setupData = (formData) => {
   const orgInfo = pick(formData, ORG_INFO_ATTRS);

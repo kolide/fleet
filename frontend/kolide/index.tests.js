@@ -330,7 +330,7 @@ describe('Kolide - API client', () => {
     it('calls the appropriate endpoint with the correct parameters', (done) => {
       const formData = {
         email: 'hi@gnar.dog',
-        full_name: 'Gnar Dog',
+        name: 'Gnar Dog',
         kolide_server_url: 'https://gnar.kolide.co',
         org_logo_url: 'https://thegnar.co/assets/logo.png',
         org_name: 'The Gnar Co.',
