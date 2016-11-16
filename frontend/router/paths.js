@@ -5,4 +5,6 @@ export default {
   LOGIN: '/login',
   LOGOUT: '/logout',
   RESET_PASSWORD: '/login/reset',
+  ALL_PACKS: '/packs/all',
+  NEW_PACK: '/packs/new',
 };
