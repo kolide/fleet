@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import { noop } from 'lodash';
 
 const defaultValidate = () => { return { valid: true, errors: {} }; };
 
@@ -8,6 +9,7 @@ export default (WrappedComponent, { fields, validate = defaultValidate }) => {
       errors: PropTypes.object, // eslint-disable-line react/forbid-prop-types
       formData: PropTypes.object, // eslint-disable-line react/forbid-prop-types
       handleSubmit: PropTypes.func,
+      onChangeFunc: PropTypes.func,
     };
 
     static defaultProps = {
@@ -26,6 +28,9 @@ export default (WrappedComponent, { fields, validate = defaultValidate }) => {
     onFieldChange = (fieldName) => {
       return (value) => {
         const { errors, formData } = this.state;
+        const { onChangeFunc = noop } = this.props;
+
+        onChangeFunc(fieldName, value);
 
         this.setState({
           errors: { ...errors, [fieldName]: null },
