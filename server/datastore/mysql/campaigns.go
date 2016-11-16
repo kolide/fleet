@@ -3,8 +3,8 @@ package mysql
 import (
 	"fmt"
 
-	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
+	"github.com/pkg/errors"
 )
 
 func (d *Datastore) NewDistributedQueryCampaign(camp *kolide.DistributedQueryCampaign) (*kolide.DistributedQueryCampaign, error) {
@@ -19,7 +19,7 @@ func (d *Datastore) NewDistributedQueryCampaign(camp *kolide.DistributedQueryCam
 	`
 	result, err := d.db.Exec(sqlStatement, camp.QueryID, camp.Status, camp.UserID)
 	if err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, "create distributed query campaign")
 	}
 
 	id, _ := result.LastInsertId()
@@ -33,7 +33,7 @@ func (d *Datastore) DistributedQueryCampaign(id uint) (*kolide.DistributedQueryC
 	`
 	campaign := &kolide.DistributedQueryCampaign{}
 	if err := d.db.Get(campaign, sql, id); err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, "get DistributedQueryCampaign by ID")
 	}
 
 	return campaign, nil
@@ -50,7 +50,7 @@ func (d *Datastore) SaveDistributedQueryCampaign(camp *kolide.DistributedQueryCa
 	`
 	_, err := d.db.Exec(sqlStatement, camp.QueryID, camp.Status, camp.UserID, camp.ID)
 	if err != nil {
-		return errors.DatabaseError(err)
+		return errors.Wrap(err, "save distributed query campaign")
 	}
 
 	return nil
@@ -63,7 +63,7 @@ func (d *Datastore) DistributedQueryCampaignTargetIDs(id uint) (hostIDs []uint, 
 	targets := []kolide.DistributedQueryCampaignTarget{}
 
 	if err = d.db.Select(&targets, sqlStatement, id); err != nil {
-		return nil, nil, errors.DatabaseError(err)
+		return nil, nil, errors.Wrap(err, "get DistributedQueryCampaign targets by ID")
 	}
 
 	hostIDs = []uint{}
@@ -92,7 +92,7 @@ func (d *Datastore) NewDistributedQueryCampaignTarget(target *kolide.Distributed
 	`
 	result, err := d.db.Exec(sqlStatement, target.Type, target.DistributedQueryCampaignID, target.TargetID)
 	if err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, "create DistributedQueryCampaign target")
 	}
 
 	id, _ := result.LastInsertId()
@@ -113,7 +113,7 @@ func (d *Datastore) NewDistributedQueryExecution(exec *kolide.DistributedQueryEx
 	result, err := d.db.Exec(sqlStatement, exec.HostID, exec.DistributedQueryCampaignID,
 		exec.Status, exec.Error, exec.ExecutionDuration)
 	if err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, "create DistributedQueryCampaignExecution")
 	}
 
 	id, _ := result.LastInsertId()

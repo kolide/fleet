@@ -3,8 +3,8 @@ package mysql
 import (
 	"fmt"
 
-	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
+	"github.com/pkg/errors"
 )
 
 // NewUser creates a new user
@@ -27,7 +27,7 @@ func (d *Datastore) NewUser(user *kolide.User) (*kolide.User, error) {
 		user.Username, user.Email, user.Admin, user.Enabled,
 		user.AdminForcedPasswordReset, user.GravatarURL, user.Position)
 	if err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, "NewUser$db.Exec")
 	}
 
 	id, _ := result.LastInsertId()
@@ -45,7 +45,7 @@ func (d *Datastore) findUser(searchCol string, searchVal interface{}) (*kolide.U
 	user := &kolide.User{}
 
 	if err := d.db.Get(user, sqlStatement, searchVal); err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, "findUser$db.Exec")
 	}
 
 	return user, nil
@@ -66,7 +66,7 @@ func (d *Datastore) ListUsers(opt kolide.ListOptions) ([]*kolide.User, error) {
 	users := []*kolide.User{}
 
 	if err := d.db.Select(&users, sqlStatement); err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, "ListUsers$db.Select")
 	}
 
 	return users, nil
@@ -100,7 +100,7 @@ func (d *Datastore) SaveUser(user *kolide.User) error {
 		user.Salt, user.Name, user.Email, user.Admin, user.Enabled,
 		user.AdminForcedPasswordReset, user.GravatarURL, user.Position, user.ID)
 	if err != nil {
-		return errors.DatabaseError(err)
+		return errors.Wrap(err, "SaveUser$db.Exec")
 	}
 
 	return nil

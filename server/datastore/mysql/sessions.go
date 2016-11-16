@@ -1,8 +1,8 @@
 package mysql
 
 import (
-	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
+	"github.com/pkg/errors"
 )
 
 func (d *Datastore) SessionByKey(key string) (*kolide.Session, error) {
@@ -13,7 +13,7 @@ func (d *Datastore) SessionByKey(key string) (*kolide.Session, error) {
 	session := &kolide.Session{}
 	err := d.db.Get(session, sqlStatement, key)
 	if err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, "SessionByKey$db.Get")
 	}
 
 	return session, nil
@@ -28,7 +28,7 @@ func (d *Datastore) SessionByID(id uint) (*kolide.Session, error) {
 	session := &kolide.Session{}
 	err := d.db.Get(session, sqlStatement, id)
 	if err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, "SessionByID$db.Get")
 	}
 
 	return session, nil
@@ -42,7 +42,7 @@ func (d *Datastore) ListSessionsForUser(id uint) ([]*kolide.Session, error) {
 	sessions := []*kolide.Session{}
 	err := d.db.Select(&sessions, sqlStatement, id)
 	if err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, "ListSessionsForUser$db.Select")
 	}
 
 	return sessions, nil
@@ -59,7 +59,7 @@ func (d *Datastore) NewSession(session *kolide.Session) (*kolide.Session, error)
 	`
 	result, err := d.db.Exec(sqlStatement, session.UserID, session.Key)
 	if err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, "NewSession$db.Exec")
 	}
 
 	id, _ := result.LastInsertId()
@@ -73,7 +73,7 @@ func (d *Datastore) DestroySession(session *kolide.Session) error {
 	`
 	_, err := d.db.Exec(sqlStatement, session.ID)
 	if err != nil {
-		return errors.DatabaseError(err)
+		return errors.Wrap(err, "DestroySession$db.Exec")
 	}
 
 	return nil
@@ -85,7 +85,7 @@ func (d *Datastore) DestroyAllSessionsForUser(id uint) error {
 	`
 	_, err := d.db.Exec(sqlStatement, id)
 	if err != nil {
-		return errors.DatabaseError(err)
+		return errors.Wrap(err, "DestroyAllSessionsForUser$db.Exec")
 	}
 
 	return nil
@@ -99,7 +99,7 @@ func (d *Datastore) MarkSessionAccessed(session *kolide.Session) error {
 	`
 	_, err := d.db.Exec(sqlStatement, d.clock.Now(), session.ID)
 	if err != nil {
-		return errors.DatabaseError(err)
+		return errors.Wrap(err, "MarkSessionAccessed$db.Exec")
 	}
 
 	return nil

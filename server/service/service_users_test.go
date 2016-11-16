@@ -9,7 +9,6 @@ import (
 	"github.com/kolide/kolide-ose/server/config"
 	"github.com/kolide/kolide-ose/server/contexts/viewer"
 	"github.com/kolide/kolide-ose/server/datastore/inmem"
-	kolide_errors "github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
 
 	"github.com/stretchr/testify/assert"
@@ -156,7 +155,7 @@ func TestCreateUser(t *testing.T) {
 			NeedsPasswordReset: boolPtr(true),
 			Admin:              boolPtr(false),
 			InviteToken:        &invites["admin2@example.com"].Token,
-			wantErr:            kolide_errors.ErrNotFound,
+			wantErr:            kolide.ErrNotFound,
 		},
 		{
 			Username:           stringPtr("admin3"),
@@ -260,7 +259,7 @@ func TestChangeUserPassword(t *testing.T) {
 		{ // bad token
 			token:       "dcbaz",
 			newPassword: "123cat!",
-			wantErr:     kolide_errors.ErrNotFound,
+			wantErr:     kolide.ErrNotFound,
 		},
 		{ // missing token
 			newPassword: "123cat!",

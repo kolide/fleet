@@ -3,7 +3,6 @@ package inmem
 import (
 	"fmt"
 
-	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
 )
 
@@ -23,7 +22,7 @@ func (orm *Datastore) DistributedQueryCampaign(id uint) (*kolide.DistributedQuer
 
 	campaign, ok := orm.distributedQueryCampaigns[id]
 	if !ok {
-		return nil, errors.ErrNotFound
+		return nil, kolide.ErrNotFound
 	}
 
 	return &campaign, nil
@@ -34,7 +33,7 @@ func (orm *Datastore) SaveDistributedQueryCampaign(camp *kolide.DistributedQuery
 	defer orm.mtx.Unlock()
 
 	if _, ok := orm.distributedQueryCampaigns[camp.ID]; !ok {
-		return errors.ErrNotFound
+		return kolide.ErrNotFound
 	}
 
 	orm.distributedQueryCampaigns[camp.ID] = *camp
@@ -78,7 +77,7 @@ func (orm *Datastore) NewDistributedQueryExecution(exec *kolide.DistributedQuery
 
 	for _, e := range orm.distributedQueryExecutions {
 		if exec.HostID == e.ID && exec.DistributedQueryCampaignID == e.DistributedQueryCampaignID {
-			return exec, errors.ErrExists
+			return exec, kolide.ErrExists
 		}
 	}
 

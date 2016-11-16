@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	kithttp "github.com/go-kit/kit/transport/http"
-	"github.com/kolide/kolide-ose/server/errors"
+	"github.com/kolide/kolide-ose/server/kolide"
 	"golang.org/x/net/context"
 )
 
@@ -112,9 +112,9 @@ func encodeError(ctx context.Context, err error, w http.ResponseWriter) {
 
 func codeFromErr(err error) int {
 	switch err {
-	case errors.ErrNotFound:
+	case kolide.ErrNotFound:
 		return http.StatusNotFound
-	case errors.ErrExists:
+	case kolide.ErrExists:
 		return http.StatusConflict
 	default:
 		return http.StatusInternalServerError

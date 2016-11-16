@@ -1,8 +1,8 @@
 package mysql
 
 import (
-	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
+	"github.com/pkg/errors"
 )
 
 // NewQuery creates a Query
@@ -17,7 +17,7 @@ func (d *Datastore) NewQuery(query *kolide.Query) (*kolide.Query, error) {
 	result, err := d.db.Exec(sql, query.Name, query.Description, query.Query, query.Snapshot,
 		query.Differential, query.Platform, query.Version, query.Interval)
 	if err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, "create new query")
 	}
 
 	id, _ := result.LastInsertId()
@@ -36,7 +36,7 @@ func (d *Datastore) SaveQuery(q *kolide.Query) error {
 	_, err := d.db.Exec(sql, q.Name, q.Description, q.Query, q.Interval,
 		q.Snapshot, q.Differential, q.Platform, q.Version, q.ID)
 	if err != nil {
-		return errors.DatabaseError(err)
+		return errors.Wrap(err, "save query")
 	}
 
 	return nil
@@ -52,7 +52,7 @@ func (d *Datastore) DeleteQuery(query *kolide.Query) error {
 	`
 	_, err := d.db.Exec(sql, query.DeletedAt, true, query.ID)
 	if err != nil {
-		return errors.DatabaseError(err)
+		return errors.Wrap(err, "mark query deleted")
 	}
 
 	return nil
@@ -66,7 +66,7 @@ func (d *Datastore) Query(id uint) (*kolide.Query, error) {
 	`
 	query := &kolide.Query{}
 	if err := d.db.Get(query, sql, id); err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, "get query")
 	}
 
 	return query, nil
@@ -82,7 +82,7 @@ func (d *Datastore) ListQueries(opt kolide.ListOptions) ([]*kolide.Query, error)
 	results := []*kolide.Query{}
 
 	if err := d.db.Select(&results, sql); err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, "select queries")
 	}
 
 	return results, nil

@@ -3,7 +3,6 @@ package inmem
 import (
 	"sort"
 
-	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
 )
 
@@ -13,7 +12,7 @@ func (orm *Datastore) NewUser(user *kolide.User) (*kolide.User, error) {
 
 	for _, in := range orm.users {
 		if in.Username == user.Username {
-			return nil, errors.ErrExists
+			return nil, kolide.ErrExists
 		}
 	}
 
@@ -33,7 +32,7 @@ func (orm *Datastore) User(username string) (*kolide.User, error) {
 		}
 	}
 
-	return nil, errors.ErrNotFound
+	return nil, kolide.ErrNotFound
 }
 
 func (orm *Datastore) ListUsers(opt kolide.ListOptions) ([]*kolide.User, error) {
@@ -87,7 +86,7 @@ func (orm *Datastore) UserByEmail(email string) (*kolide.User, error) {
 		}
 	}
 
-	return nil, errors.ErrNotFound
+	return nil, kolide.ErrNotFound
 }
 
 func (orm *Datastore) UserByID(id uint) (*kolide.User, error) {
@@ -98,7 +97,7 @@ func (orm *Datastore) UserByID(id uint) (*kolide.User, error) {
 		return user, nil
 	}
 
-	return nil, errors.ErrNotFound
+	return nil, kolide.ErrNotFound
 }
 
 func (orm *Datastore) SaveUser(user *kolide.User) error {
@@ -106,7 +105,7 @@ func (orm *Datastore) SaveUser(user *kolide.User) error {
 	defer orm.mtx.Unlock()
 
 	if _, ok := orm.users[user.ID]; !ok {
-		return errors.ErrNotFound
+		return kolide.ErrNotFound
 	}
 
 	orm.users[user.ID] = user

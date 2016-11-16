@@ -3,14 +3,13 @@ package service
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"strconv"
 	"strings"
 	"time"
 
 	hostctx "github.com/kolide/kolide-ose/server/contexts/host"
-	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
+	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 )
 
@@ -116,7 +115,7 @@ func (svc service) SubmitStatusLogs(ctx context.Context, logs []kolide.OsquerySt
 	for _, log := range logs {
 		err := json.NewEncoder(svc.osqueryStatusLogWriter).Encode(log)
 		if err != nil {
-			return errors.NewFromError(err, http.StatusInternalServerError, "error writing status log")
+			return errors.Wrap(err, "error writing status log")
 		}
 	}
 
@@ -137,7 +136,7 @@ func (svc service) SubmitResultLogs(ctx context.Context, logs []kolide.OsqueryRe
 	for _, log := range logs {
 		err := json.NewEncoder(svc.osqueryResultLogWriter).Encode(log)
 		if err != nil {
-			return errors.NewFromError(err, http.StatusInternalServerError, "error writing result log")
+			return errors.Wrap(err, "error writing result log")
 		}
 	}
 

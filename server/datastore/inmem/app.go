@@ -1,9 +1,6 @@
 package inmem
 
-import (
-	"github.com/kolide/kolide-ose/server/errors"
-	"github.com/kolide/kolide-ose/server/kolide"
-)
+import "github.com/kolide/kolide-ose/server/kolide"
 
 func (orm *Datastore) NewAppConfig(info *kolide.AppConfig) (*kolide.AppConfig, error) {
 	orm.mtx.Lock()
@@ -22,7 +19,7 @@ func (orm *Datastore) AppConfig() (*kolide.AppConfig, error) {
 		return orm.orginfo, nil
 	}
 
-	return nil, errors.ErrNotFound
+	return nil, kolide.ErrNotFound
 }
 
 func (orm *Datastore) SaveAppConfig(info *kolide.AppConfig) error {

@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/kolide/kolide-ose/server/contexts/viewer"
-	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"golang.org/x/net/context"
 )
@@ -16,7 +15,7 @@ func (svc service) Login(ctx context.Context, username, password string) (*kolid
 	user, err := svc.userByEmailOrUsername(username)
 	switch err {
 	case nil:
-	case errors.ErrNotFound:
+	case kolide.ErrNotFound:
 		return nil, "", authError{reason: "no such user"}
 	default:
 		return nil, "", err

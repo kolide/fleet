@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	jwt "github.com/dgrijalva/jwt-go"
-	kolide_errors "github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"golang.org/x/net/context"
 )
@@ -15,7 +14,7 @@ func (svc service) InviteNewUser(ctx context.Context, payload kolide.InvitePaylo
 	if err == nil {
 		return nil, newInvalidArgumentError("email", "a user with this account already exists")
 	}
-	if err != kolide_errors.ErrNotFound {
+	if err != kolide.ErrNotFound {
 		return nil, err
 	}
 
