@@ -77,11 +77,10 @@ const (
 type DistributedQueryCampaign struct {
 	UpdateCreateTimestamps
 	DeleteFields
-	ID          uint                   `json:"id"`
-	QueryID     uint                   `json:"query_id" db:"query_id"`
-	MaxDuration time.Duration          `db:"max_duration"`
-	Status      DistributedQueryStatus `json:"status"`
-	UserID      uint                   `json:"user_id"`
+	ID      uint                   `json:"id"`
+	QueryID uint                   `json:"query_id" db:"query_id"`
+	Status  DistributedQueryStatus `json:"status"`
+	UserID  uint                   `json:"user_id"`
 }
 
 type DistributedQueryCampaignTarget struct {
