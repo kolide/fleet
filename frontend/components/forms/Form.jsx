@@ -1,6 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 
-export default (WrappedComponent, { fields, validate }) => {
+const defaultValidate = () => { return { valid: true, errors: {} }; };
+
+export default (WrappedComponent, { fields, validate = defaultValidate }) => {
   class Form extends Component {
     static propTypes = {
       errors: PropTypes.object, // eslint-disable-line react/forbid-prop-types
