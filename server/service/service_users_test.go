@@ -8,7 +8,7 @@ import (
 	"github.com/WatchBeam/clock"
 	"github.com/kolide/kolide-ose/server/config"
 	"github.com/kolide/kolide-ose/server/contexts/viewer"
-	"github.com/kolide/kolide-ose/server/datastore"
+	"github.com/kolide/kolide-ose/server/datastore/inmem"
 	kolide_errors "github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
 
@@ -18,7 +18,7 @@ import (
 )
 
 func TestAuthenticatedUser(t *testing.T) {
-	ds, err := datastore.New("inmem", "")
+	ds, err := inmem.New()
 	assert.Nil(t, err)
 	createTestUsers(t, ds)
 	svc, err := newTestService(ds, nil)
@@ -34,7 +34,7 @@ func TestAuthenticatedUser(t *testing.T) {
 }
 
 func TestRequestPasswordReset(t *testing.T) {
-	ds, err := datastore.New("inmem", "")
+	ds, err := inmem.New()
 	assert.Nil(t, err)
 	createTestUsers(t, ds)
 	admin1, err := ds.User("admin1")
@@ -114,7 +114,7 @@ func TestRequestPasswordReset(t *testing.T) {
 }
 
 func TestCreateUser(t *testing.T) {
-	ds, _ := datastore.New("inmem", "")
+	ds, _ := inmem.New()
 	svc, _ := newTestService(ds, nil)
 	invites := setupInvites(t, ds, []string{"admin2@example.com"})
 	ctx := context.Background()
@@ -245,7 +245,7 @@ func setupInvites(t *testing.T, ds kolide.Datastore, emails []string) map[string
 }
 
 func TestChangeUserPassword(t *testing.T) {
-	ds, _ := datastore.New("inmem", "")
+	ds, _ := inmem.New()
 	svc, _ := newTestService(ds, nil)
 	createTestUsers(t, ds)
 	var passwordChangeTests = []struct {

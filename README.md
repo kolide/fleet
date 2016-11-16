@@ -5,6 +5,7 @@
 - [Development Environment](#development-environment)
   - [Installing build dependencies](#installing-build-dependencies)
   - [Building](#building)
+    - [Generate packaged SQL statements](#generate-packaged-sql-statements)
     - [Generating the packaged JavaScript](#generating-the-packaged-javascript)
     - [Automatic rebuilding of the JavaScript bundle](#automatic-rebuilding-of-the-javascript-bundle)
     - [Compiling the Kolide binary](#compiling-the-kolide-binary)
@@ -61,7 +62,9 @@ to re-run `make deps` if a new Go or JavaScript dependency was added.
 #### Generate packaged SQL statements
 SQL statements used to generate the Kolide database are bundled into the kolide binary.  
 These statements are included under the db directory. If the SQL statements are changed,
-say a table is added for example, bindata.go can be manually generated as follows.
+say a table is added for example, bindata.go must be regenerated in order for the
+application to pick up the SQL changes.  Use the following
+command to regenerate bindata.go.
 
 ```
 make generate
@@ -174,16 +177,6 @@ To run database tests set environment variables as follows.
 export MYSQL_PORT_3306_TCP_ADDR=192.168.99.100
 export MYSQL_TEST=1
 ```
-
-#### Trouble Shooting
-Tests fail with following message.
-```
-(Error 1075: Incorrect table definition; there can be only one auto column and it must be defined as a key)
-```
-This problem occurs when the tests are run when the database schema already exists. For exmaple if you run kolide prepare db,
-creating the database and then run database tests you will get this error. To fix manually drop the
-tables of the kolide database and then run tests.
-
 
 #### JavaScript unit tests
 

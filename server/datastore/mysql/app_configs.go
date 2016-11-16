@@ -42,7 +42,6 @@ func (d *Datastore) AppConfig() (*kolide.AppConfig, error) {
 }
 
 func (d *Datastore) SaveAppConfig(info *kolide.AppConfig) error {
-
 	_, err := d.db.Exec(
 		"UPDATE app_configs SET org_name = ?, org_logo_url = ?, kolide_server_url = ? WHERE id = ?",
 		info.OrgName, info.OrgLogoURL, info.KolideServerURL, info.ID,
