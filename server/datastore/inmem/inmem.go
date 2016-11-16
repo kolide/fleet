@@ -32,11 +32,16 @@ type Datastore struct {
 	orginfo *kolide.AppConfig
 }
 
-func New(driver string) *Datastore {
+func New() (*Datastore, error) {
 	ds := &Datastore{
 		Driver: "inmem",
 	}
-	return ds
+
+	if err := ds.Migrate(); err != nil {
+		return nil, err
+	}
+
+	return ds, nil
 }
 
 func (orm *Datastore) Name() string {

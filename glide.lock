@@ -75,10 +75,6 @@ imports:
   - json/token
 - name: github.com/inconshreveable/mousetrap
   version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
-- name: github.com/jinzhu/gorm
-  version: a646b13548ec0aa812fe805b2780f460dd2771b6
-  subpackages:
-  - dialects/mysql
 - name: github.com/jinzhu/inflection
   version: 8f4d3a0d04ce0b7c0cf3126fb98524246d00d102
 - name: github.com/jmoiron/sqlx

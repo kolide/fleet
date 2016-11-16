@@ -13,7 +13,7 @@ import (
 	kitlog "github.com/go-kit/kit/log"
 	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
 	"github.com/kolide/kolide-ose/server/config"
-	"github.com/kolide/kolide-ose/server/datastore"
+	"github.com/kolide/kolide-ose/server/datastore/inmem"
 	"github.com/kolide/kolide-ose/server/datastore/mysql"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"github.com/kolide/kolide-ose/server/mail"
@@ -66,15 +66,15 @@ the way that the kolide server works.
 					"Dev mode enabled, using in-memory DB.\n",
 					"Warning: Changes will not be saved across process restarts. This should NOT be used in production.",
 				)
-				ds, err = datastore.New("inmem", "")
-				if err != nil {
-					initFatal(err, "initializing datastore")
+
+				if ds, err = inmem.New(); err != nil {
+					initFatal(err, "initializing inmem database")
 				}
 			} else {
 				const defaultMaxAttempts = 15
 
 				connString := mysql.GetMysqlConnectionString(config.Mysql)
-				ds, err = datastore.New("mysql", connString, mysql.Logger(logger))
+				ds, err = mysql.New(connString, clock.C, mysql.Logger(logger))
 
 				if err != nil {
 					initFatal(err, "initializing datastore")

@@ -3,14 +3,17 @@ package datastore
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/kolide/kolide-ose/server/datastore/inmem"
+	"github.com/stretchr/testify/require"
 )
 
 func TestInmem(t *testing.T) {
+
 	for _, f := range testFunctions {
 		t.Run(functionName(f), func(t *testing.T) {
-			ds, err := New("inmem", "")
-			assert.Nil(t, err)
+			ds, err := inmem.New()
+			defer func() { require.Nil(t, ds.Drop()) }()
+			require.Nil(t, err)
 			f(t, ds)
 		})
 	}

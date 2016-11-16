@@ -4,7 +4,6 @@ import (
 	"github.com/WatchBeam/clock"
 	kitlog "github.com/go-kit/kit/log"
 	"github.com/kolide/kolide-ose/server/config"
-	"github.com/kolide/kolide-ose/server/datastore"
 	"github.com/kolide/kolide-ose/server/datastore/mysql"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"github.com/kolide/kolide-ose/server/pubsub"
@@ -36,7 +35,7 @@ To setup kolide infrastructure, use one of the available commands.
 			config := configManager.LoadConfig()
 			connString := mysql.GetMysqlConnectionString(config.Mysql)
 
-			ds, err := datastore.New("mysql", connString)
+			ds, err := mysql.New(connString, clock.C)
 			if err != nil {
 				initFatal(err, "creating db connection")
 			}
@@ -61,13 +60,11 @@ To setup kolide infrastructure, use one of the available commands.
 			config := configManager.LoadConfig()
 			connString := mysql.GetMysqlConnectionString(config.Mysql)
 
-			ds, err := datastore.New("mysql", connString)
+			ds, err := mysql.New(connString, clock.C)
 			if err != nil {
 				initFatal(err, "creating db connection")
 			}
-			if err != nil {
-				initFatal(err, "creating new service")
-			}
+
 			var (
 				name     = "admin"
 				username = "admin"

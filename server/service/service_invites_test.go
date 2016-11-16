@@ -7,14 +7,14 @@ import (
 
 	"github.com/WatchBeam/clock"
 	"github.com/kolide/kolide-ose/server/config"
-	"github.com/kolide/kolide-ose/server/datastore"
+	"github.com/kolide/kolide-ose/server/datastore/inmem"
 	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestInviteNewUser(t *testing.T) {
-	ds, err := datastore.New("inmem", "")
+	ds, err := inmem.New()
 	createTestUsers(t, ds)
 	assert.Nil(t, err)
 	nosuchAdminID := uint(999)
