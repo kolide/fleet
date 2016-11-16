@@ -27,11 +27,6 @@ type Datastore struct {
 
 // New creates an MySQL datastore.
 func New(dbConnectString string, c clock.Clock, opts ...DBOption) (*Datastore, error) {
-	var (
-		ds  *Datastore
-		err error
-		db  *sqlx.DB
-	)
 
 	options := &dbOptions{
 		maxAttempts: defaultMaxAttempts,
@@ -42,23 +37,29 @@ func New(dbConnectString string, c clock.Clock, opts ...DBOption) (*Datastore, e
 		setOpt(options)
 	}
 
-	for attempt := 0; attempt < options.maxAttempts; attempt++ {
-		if db, err = sqlx.Connect("mysql", dbConnectString); err == nil {
-			break
-		} else {
-			if err.Error() == "invalid database source" {
-				return nil, err
-			}
-			options.logger.Log("mysql", "connection", err)
-			time.Sleep(time.Duration(attempt) * time.Second)
-		}
-	}
-
-	if db == nil {
+	db, err := sqlx.Open("mysql", dbConnectString)
+	if err != nil {
 		return nil, err
 	}
 
-	ds = &Datastore{db, options.logger, c}
+	var dbError error
+	for attempt := 0; attempt < options.maxAttempts; attempt++ {
+		dbError = db.Ping()
+		if dbError == nil {
+			// we're connected!
+			break
+		}
+		sleep := time.Duration(attempt)
+		options.logger.Log("mysql", fmt.Sprintf(
+			"could not connect to db: %v, sleeping %v", dbError, sleep))
+		time.Sleep(sleep * time.Second)
+	}
+
+	if dbError != nil {
+		return nil, dbError
+	}
+
+	ds := &Datastore{db, options.logger, c}
 
 	return ds, nil
 
