@@ -1,6 +1,7 @@
-import Base from './base';
-import endpoints from './endpoints';
-import { appendTargetTypeToTargets } from '../redux/nodes/entities/targets/helpers';
+import { appendTargetTypeToTargets } from 'redux/nodes/entities/targets/helpers';
+import Base from 'kolide/base';
+import endpoints from 'kolide/endpoints';
+import helpers from 'kolide/helpers';
 
 class Kolide extends Base {
   createLabel = ({ description, name, query }) => {
@@ -187,6 +188,17 @@ class Kolide extends Base {
     const endpoint = `${this.endpoint(INVITES)}/${entityID}`;
 
     return this.authenticatedDelete(endpoint);
+  }
+
+  setup = (formData) => {
+    const { SETUP } = endpoints;
+    const setupData = helpers.setupData(formData);
+
+    return Base.post(this.endpoint(SETUP), JSON.stringify(setupData))
+      .then((response) => {
+        console.log(response);
+        return response.setup;
+      });
   }
 
   updateQuery = ({ id: queryID }, updateParams) => {
