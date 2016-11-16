@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router';
 
 import Avatar from '../../components/Avatar';
+import Rocker from '../../components/buttons/Rocker';
 import paths from '../../router/paths';
 import userInterface from '../../interfaces/user';
 
@@ -21,6 +22,7 @@ export class HomePage extends Component {
         {user && <Avatar size="small" className={`${baseClass}__avatar`} user={user} />}
         <span>You are successfully logged in! </span>
         {user && <Link to={LOGOUT}>Logout</Link>}
+        <Rocker name="view-type" value="grid" />
       </div>
     );
   }
