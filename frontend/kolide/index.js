@@ -194,11 +194,7 @@ class Kolide extends Base {
     const { SETUP } = endpoints;
     const setupData = helpers.setupData(formData);
 
-    return Base.post(this.endpoint(SETUP), JSON.stringify(setupData))
-      .then((response) => {
-        console.log(response);
-        return response.setup;
-      });
+    return Base.post(this.endpoint(SETUP), JSON.stringify(setupData));
   }
 
   updateQuery = ({ id: queryID }, updateParams) => {

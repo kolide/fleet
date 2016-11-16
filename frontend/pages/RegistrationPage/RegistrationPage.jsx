@@ -1,9 +1,12 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { noop } from 'lodash';
+import { push } from 'react-router-redux';
 
 import Breadcrumbs from 'pages/RegistrationPage/Breadcrumbs';
+import paths from 'router/paths';
 import RegistrationForm from 'components/forms/RegistrationForm';
+import { setup } from 'redux/nodes/auth/actions';
 import { showBackgroundImage } from 'redux/nodes/app/actions';
 
 export class RegistrationPage extends Component {
@@ -39,9 +42,12 @@ export class RegistrationPage extends Component {
   }
 
   onRegistrationFormSubmit = (formData) => {
-    console.log('registration form submitted:', formData);
+    const { dispatch } = this.props;
+    const { LOGIN } = paths;
 
-    return false;
+    return dispatch(setup(formData))
+      .then(() => { return dispatch(push(LOGIN)); })
+      .catch(() => { return false; });
   }
 
   onSetPage = (page) => {
