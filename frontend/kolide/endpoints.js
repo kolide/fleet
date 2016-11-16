@@ -12,7 +12,7 @@ export default {
   ME: '/v1/kolide/me',
   QUERIES: '/v1/kolide/queries',
   RESET_PASSWORD: '/v1/kolide/reset_password',
-  SETUP: '/v1/kolide/setup',
+  SETUP: '/v1/setup',
   TARGETS: '/v1/kolide/targets',
   USERS: '/v1/kolide/users',
 };

@@ -219,7 +219,7 @@ export const validSetupRequest = (formData) => {
   const setupData = helpers.setupData(formData);
 
   return nock('http://localhost:8080')
-    .post('/api/v1/kolide/setup', JSON.stringify(setupData))
+    .post('/api/v1/setup', JSON.stringify(setupData))
     .reply(200, {});
 };
 
