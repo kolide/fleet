@@ -16,13 +16,19 @@ export class HomePage extends Component {
     const { user } = this.props;
     const { LOGOUT } = paths;
     const baseClass = 'home-page';
+    const rockerOpts = {
+      aText: 'List',
+      aIcon: 'list-select',
+      bText: 'Grid',
+      bIcon: 'grid-select',
+    }
 
     return (
       <div className={baseClass}>
         {user && <Avatar size="small" className={`${baseClass}__avatar`} user={user} />}
         <span>You are successfully logged in! </span>
         {user && <Link to={LOGOUT}>Logout</Link>}
-        <Rocker name="view-type" value="grid" aText="List" aIcon="list-select" bText="Grid" bIcon="grid-select" />
+        <Rocker name="view-type" value="grid" options={rockerOpts} />
       </div>
     );
   }
