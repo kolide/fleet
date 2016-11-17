@@ -3,7 +3,6 @@ package service
 import (
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/kolide/kolide-ose/server/contexts/viewer"
@@ -171,85 +170,71 @@ func (svc service) NewDistributedQueryCampaign(ctx context.Context, queryString 
 	return campaign, nil
 }
 
-func (svc service) StreamCampaignResults(jwtKey string) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var upgrader = websocket.Upgrader{
-			ReadBufferSize:  1024,
-			WriteBufferSize: 1024,
-		}
+func (svc service) StreamCampaignResults(w http.ResponseWriter, r *http.Request) {
+	var upgrader = websocket.Upgrader{
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+	}
 
-		conn, err := upgrader.Upgrade(w, r, nil)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		defer conn.Close()
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		return
+	}
+	defer conn.Close()
 
-		// Receive the auth bearer token
-		_, token, err := conn.ReadMessage()
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
+	// Receive the auth bearer token
+	_, token, err := conn.ReadMessage()
+	if err != nil {
+		return
+	}
 
-		fmt.Println("here1")
-		// Authenticate with the token
-		vc, err := authViewer(context.Background(), jwtKey, string(token), svc)
-		if err != nil {
-			_ = conn.WriteMessage(websocket.TextMessage,
-				[]byte("unauthorized"))
-			return
-		}
-		if !vc.CanPerformActions() {
-			_ = conn.WriteMessage(websocket.TextMessage,
-				[]byte("unauthorized"))
-			return
-		}
+	// Authenticate with the token
+	vc, err := authViewer(context.Background(), svc.config.Auth.JwtKey, string(token), svc)
+	if err != nil {
+		_ = conn.WriteMessage(websocket.TextMessage,
+			[]byte("unauthorized"))
+		return
+	}
+	if !vc.CanPerformActions() {
+		_ = conn.WriteMessage(websocket.TextMessage,
+			[]byte("unauthorized"))
+		return
+	}
 
-		fmt.Println("here2")
-		campaignID, err := idFromRequest(r, "id")
-		if err != nil {
-			_ = conn.WriteMessage(websocket.TextMessage,
-				[]byte("invalid campaign ID"))
-			return
-		}
+	campaignID, err := idFromRequest(r, "id")
+	if err != nil {
+		_ = conn.WriteMessage(websocket.TextMessage,
+			[]byte("invalid campaign ID"))
+		return
+	}
 
-		// Find the campaign and ensure it is active
-		campaign, err := svc.ds.DistributedQueryCampaign(campaignID)
-		if err != nil {
-			_ = conn.WriteMessage(websocket.TextMessage,
-				[]byte(fmt.Sprintf("cannot find campaign for ID %d", campaignID)))
-			return
-		}
-		if campaign.Status != kolide.QueryRunning {
-			_ = conn.WriteMessage(websocket.TextMessage,
-				[]byte(fmt.Sprintf("campaign %d not running", campaignID)))
-			return
-		}
+	// Find the campaign and ensure it is active
+	campaign, err := svc.ds.DistributedQueryCampaign(campaignID)
+	if err != nil {
+		_ = conn.WriteMessage(websocket.TextMessage,
+			[]byte(fmt.Sprintf("cannot find campaign for ID %d", campaignID)))
+		return
+	}
+	if campaign.Status != kolide.QueryRunning {
+		_ = conn.WriteMessage(websocket.TextMessage,
+			[]byte(fmt.Sprintf("campaign %d not running", campaignID)))
+		return
+	}
 
-		fmt.Println("here3")
-		readChan, err := svc.resultStore.ReadChannel(context.Background(), kolide.DistributedQueryCampaign{ID: campaignID})
-		if err != nil {
-			_ = conn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("cannot open read channel for campaign %d ", campaignID)))
-			return
-		}
+	readChan, err := svc.resultStore.ReadChannel(context.Background(), kolide.DistributedQueryCampaign{ID: campaignID})
+	if err != nil {
+		_ = conn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("cannot open read channel for campaign %d ", campaignID)))
+		return
+	}
 
-		for res := range readChan {
-			switch res := res.(type) {
-			case kolide.DistributedQueryResult:
-				err = conn.WriteJSON(res)
-				if err != nil {
-					fmt.Println("error writing to channel")
-				}
+	for res := range readChan {
+		switch res := res.(type) {
+		case kolide.DistributedQueryResult:
+			err = conn.WriteJSON(res)
+			if err != nil {
+				fmt.Println("error writing to channel")
 			}
-		}
-
-		for {
-			if err = conn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("%d", time.Now()))); err != nil {
-				fmt.Println(err)
-				return
-			}
-			time.Sleep(1 * time.Second)
 		}
 	}
+
 }

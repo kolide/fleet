@@ -1,8 +1,6 @@
 package mysql
 
 import (
-	"fmt"
-
 	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
 )
@@ -117,11 +115,9 @@ func (d *Datastore) DistributedQueryCampaign(id uint) (*kolide.DistributedQueryC
 	`
 	campaign := &kolide.DistributedQueryCampaign{}
 	if err := d.db.Get(campaign, sql, id); err != nil {
-		fmt.Println(err)
 		return nil, errors.DatabaseError(err)
 	}
 
-	fmt.Println(campaign)
 	return campaign, nil
 }
 

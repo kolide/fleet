@@ -44,7 +44,7 @@ type QueryService interface {
 	// to a websocket connection and begins streaming distributed query
 	// results. Note that it uses a type signature inconsistent with other
 	// service methods due to go-kit's lack of support of websockets/pubsub
-	StreamCampaignResults(jwtKey string) func(w http.ResponseWriter, r *http.Request)
+	StreamCampaignResults(w http.ResponseWriter, r *http.Request)
 }
 
 type QueryPayload struct {
