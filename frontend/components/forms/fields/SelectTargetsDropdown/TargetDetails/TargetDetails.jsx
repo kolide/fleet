@@ -81,6 +81,12 @@ class TargetDetails extends Component {
             <i className={`${hostBaseClass}__icon kolidecon-fw kolidecon-label`} />
             <span>Labels</span>
           </p>
+          <ul className={`${hostBaseClass}__labels-list`}>
+            <li>Engineering</li>
+            <li>DevOps</li>
+            <li>ElCapDev</li>
+            <li>Workstation</li>
+          </ul>
         </div>
       </div>
     );
@@ -89,7 +95,8 @@ class TargetDetails extends Component {
   renderLabel = () => {
     const { className, target } = this.props;
     const {
-      displayText,
+      description,
+      display_text: displayText,
       hosts,
       query,
     } = target;
@@ -97,13 +104,25 @@ class TargetDetails extends Component {
 
     return (
       <div className={`${labelBaseClass} ${className}`}>
-        <p className={`${labelBaseClass}__display-text`}><i className={`${labelBaseClass}__icon kolidecon-fw kolidecon-label`} /> {displayText}</p>
-        <div className={`${labelBaseClass}__text-editor-wrapper`}>
+        <p className={`${labelBaseClass}__display-text`}>
+          <i className={`${labelBaseClass}__icon kolidecon-fw kolidecon-label`} /> {displayText}
+        </p>
+
+        <p className={`${labelBaseClass}__hosts`}>
+          <span className={`${labelBaseClass}__hosts-count`}>{hosts.length} HOSTS</span>
+          <span className={`${labelBaseClass}__hosts-online`}> (74% ONLINE)</span>
+        </p>
+
+        { /*<p className={`${labelBaseClass}__description`}>{description}</p> */ }
+        <p className={`${labelBaseClass}__description`}>This group consists of machines utilized for developing within the Win 10 environment.</p>
+
+        <div className={`${labelBaseClass}__editor`}>
           <AceEditor
             editorProps={{ $blockScrolling: Infinity }}
             mode="kolide"
             minLines={4}
             maxLines={4}
+            fontSize="13px"
             name="label-query"
             readOnly
             setOptions={{ wrap: true }}
@@ -114,35 +133,6 @@ class TargetDetails extends Component {
             width="100%"
           />
         </div>
-        <div className={`${labelBaseClass}__search-section`}>
-          <div className={`${labelBaseClass}__num-hosts-section`}>
-            <span className="num-hosts">{hosts.length} HOSTS</span>
-          </div>
-        </div>
-        <table className={`${baseClass}__table`}>
-          <thead>
-            <tr>
-              <th>Hostname</th>
-              <th>Status</th>
-              <th>Platform</th>
-              <th>Location</th>
-              <th>MAC</th>
-            </tr>
-          </thead>
-          <tbody>
-            {hosts.map((host) => {
-              return (
-                <tr className={`${baseClass}__label-row`} key={`host-${host.id}`}>
-                  <td>{host.hostname}</td>
-                  <td>{host.status}</td>
-                  <td><i className={hostHelpers.platformIconClass(host.platform)} /></td>
-                  <td>{host.ip}</td>
-                  <td>{host.mac}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
       </div>
     );
   }

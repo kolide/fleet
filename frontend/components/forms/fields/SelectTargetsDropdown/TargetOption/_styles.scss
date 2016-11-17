@@ -27,6 +27,7 @@
     font-size: $small;
     font-weight: bold;
     padding: 5px;
+    margin-left: $pad-half;
   }
 
   &__delimeter {
@@ -42,7 +43,7 @@
   }
 
   &__ip {
-    color: $link;
+    color: $text-dark;
     font-size: $small;
   }
 

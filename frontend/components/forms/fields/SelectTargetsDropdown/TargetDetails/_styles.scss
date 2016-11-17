@@ -47,11 +47,74 @@
     letter-spacing: 0.9px;
     color: $text-dark;
     text-transform: uppercase;
+    margin: 0;
+  }
+
+  &__labels-list {
+    font-size: $small;
+    font-weight: $normal;
+    line-height: 1.85;
+    letter-spacing: 0.5px;
+    color: $text-medium;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    li {
+      display: inline-block;
+
+      &::after {
+        content: ',';
+        margin-right: 3px;
+      }
+
+      &:last-child {
+        &::after {
+          content: '';
+          margin: 0;
+        }
+      }
+    }
   }
 }
 
 .label-target {
+  &__display-text {
+    font-size: $medium;
+    font-weight: $bold;
+    letter-spacing: 0.6px;
+    color: $text-ultradark;
+    margin: 0;
+  }
 
+  &__icon {
+    color: $accent-text;
+    margin-right: $pad-small;
+  }
+
+  &__hosts {
+    margin: $pad-small 0;
+    letter-spacing: 0.4px;
+    font-size: $small;
+    font-weight: $normal;
+  }
+
+  &__hosts-count {
+    font-weight: $bold;
+    color: $text-dark;
+  }
+
+  &__hosts-online {
+    color: $success;
+  }
+
+  &__description {
+    font-size: $pad-medium;
+    font-weight: $normal;
+    line-height: 1.71;
+    color: $text-dark;
+    margin: 0 0 $pad-base;
+  }
 }
 
 .target-details {
