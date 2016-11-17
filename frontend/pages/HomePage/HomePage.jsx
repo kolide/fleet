@@ -21,7 +21,7 @@ export class HomePage extends Component {
       aIcon: 'list-select',
       bText: 'Grid',
       bIcon: 'grid-select',
-    }
+    };
 
     return (
       <div className={baseClass}>
