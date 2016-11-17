@@ -16,7 +16,7 @@ class TargetDetails extends Component {
   renderHost = () => {
     const { className, target } = this.props;
     const {
-      display_text,
+      display_text: displayText,
       ip,
       mac,
       memory,
@@ -38,14 +38,14 @@ class TargetDetails extends Component {
       <div className={`${hostBaseClass} ${className}`}>
         <p className={`${hostBaseClass}__display-text`}>
           <i className={`${hostBaseClass}__icon kolidecon-fw kolidecon-single-host`} />
-          <span>{display_text}</span>
+          <span>{displayText}</span>
         </p>
         <p className={statusClassName}>
           {isOnline && <i className={`${hostBaseClass}__icon ${hostBaseClass}__icon--online kolidecon-fw kolidecon-success-check`} />}
           {isOffline && <i className={`${hostBaseClass}__icon ${hostBaseClass}__icon--offline kolidecon-fw kolidecon-offline`} />}
           <span>{status}</span>
         </p>
-          <table className={`${baseClass}__table`}>
+        <table className={`${baseClass}__table`}>
           <tbody>
             <tr>
               <th>IP Address</th>
@@ -89,7 +89,7 @@ class TargetDetails extends Component {
   renderLabel = () => {
     const { className, target } = this.props;
     const {
-      display_text,
+      displayText,
       hosts,
       query,
     } = target;
@@ -97,7 +97,7 @@ class TargetDetails extends Component {
 
     return (
       <div className={`${labelBaseClass} ${className}`}>
-      <p className={`${labelBaseClass}__display-text`}><i className={`${labelBaseClass}__icon kolidecon-fw kolidecon-label`} /> {display_text}</p>
+        <p className={`${labelBaseClass}__display-text`}><i className={`${labelBaseClass}__icon kolidecon-fw kolidecon-label`} /> {displayText}</p>
         <div className={`${labelBaseClass}__text-editor-wrapper`}>
           <AceEditor
             editorProps={{ $blockScrolling: Infinity }}
