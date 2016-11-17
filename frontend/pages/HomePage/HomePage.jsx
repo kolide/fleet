@@ -22,7 +22,7 @@ export class HomePage extends Component {
         {user && <Avatar size="small" className={`${baseClass}__avatar`} user={user} />}
         <span>You are successfully logged in! </span>
         {user && <Link to={LOGOUT}>Logout</Link>}
-        <Rocker name="view-type" value="grid" />
+        <Rocker name="view-type" value="grid" aText="List" aIcon="list-select" bText="Grid" bIcon="grid-select" />
       </div>
     );
   }
