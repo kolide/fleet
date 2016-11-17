@@ -17,12 +17,16 @@ type QueryStore interface {
 
 	// NewDistributedQueryCampaign creates a new distributed query campaign
 	NewDistributedQueryCampaign(camp *DistributedQueryCampaign) (*DistributedQueryCampaign, error)
+	// DistributedQueryCampaign loads a distributed query campaign by ID
+	DistributedQueryCampaign(id uint) (*DistributedQueryCampaign, error)
 	// SaveDistributedQueryCampaign updates an existing distributed query
 	// campaign
 	SaveDistributedQueryCampaign(camp *DistributedQueryCampaign) error
+
 	// NewDistributedQueryCampaignTarget adds a new target to an existing
 	// distributed query campaign
 	NewDistributedQueryCampaignTarget(target *DistributedQueryCampaignTarget) (*DistributedQueryCampaignTarget, error)
+
 	// NewDistributedQueryCampaignExecution records a new execution for a
 	// distributed query campaign
 	NewDistributedQueryExecution(exec *DistributedQueryExecution) (*DistributedQueryExecution, error)
@@ -82,7 +86,7 @@ type DistributedQueryCampaign struct {
 	ID      uint                   `json:"id"`
 	QueryID uint                   `json:"query_id" db:"query_id"`
 	Status  DistributedQueryStatus `json:"status"`
-	UserID  uint                   `json:"user_id"`
+	UserID  uint                   `json:"user_id" db:"user_id"`
 }
 
 type DistributedQueryCampaignTarget struct {

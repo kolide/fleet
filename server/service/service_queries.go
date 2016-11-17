@@ -196,18 +196,34 @@ func (svc service) StreamCampaignResults(jwtKey string) func(w http.ResponseWrit
 		// Authenticate with the token
 		vc, err := authViewer(context.Background(), jwtKey, string(token), svc)
 		if err != nil {
-			_ = conn.WriteMessage(websocket.TextMessage, []byte("unauthorized"))
+			_ = conn.WriteMessage(websocket.TextMessage,
+				[]byte("unauthorized"))
 			return
 		}
 		if !vc.CanPerformActions() {
-			_ = conn.WriteMessage(websocket.TextMessage, []byte("unauthorized"))
+			_ = conn.WriteMessage(websocket.TextMessage,
+				[]byte("unauthorized"))
 			return
 		}
 
 		fmt.Println("here2")
 		campaignID, err := idFromRequest(r, "id")
 		if err != nil {
-			_ = conn.WriteMessage(websocket.TextMessage, []byte("invalid campaign ID"))
+			_ = conn.WriteMessage(websocket.TextMessage,
+				[]byte("invalid campaign ID"))
+			return
+		}
+
+		// Find the campaign and ensure it is active
+		campaign, err := svc.ds.DistributedQueryCampaign(campaignID)
+		if err != nil {
+			_ = conn.WriteMessage(websocket.TextMessage,
+				[]byte(fmt.Sprintf("cannot find campaign for ID %d", campaignID)))
+			return
+		}
+		if campaign.Status != kolide.QueryRunning {
+			_ = conn.WriteMessage(websocket.TextMessage,
+				[]byte(fmt.Sprintf("campaign %d not running", campaignID)))
 			return
 		}
 

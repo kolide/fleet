@@ -103,22 +103,6 @@ func (orm *Datastore) ListQueries(opt kolide.ListOptions) ([]*kolide.Query, erro
 	return queries, nil
 }
 
-func (orm *Datastore) NewDistributedQueryExecution(exec *kolide.DistributedQueryExecution) (*kolide.DistributedQueryExecution, error) {
-	orm.mtx.Lock()
-	defer orm.mtx.Unlock()
-
-	for _, e := range orm.distributedQueryExecutions {
-		if exec.HostID == e.ID && exec.DistributedQueryCampaignID == e.DistributedQueryCampaignID {
-			return exec, errors.ErrExists
-		}
-	}
-
-	exec.ID = orm.nextID(exec)
-	orm.distributedQueryExecutions[exec.ID] = *exec
-
-	return exec, nil
-}
-
 func (orm *Datastore) NewDistributedQueryCampaign(camp *kolide.DistributedQueryCampaign) (*kolide.DistributedQueryCampaign, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
@@ -127,6 +111,18 @@ func (orm *Datastore) NewDistributedQueryCampaign(camp *kolide.DistributedQueryC
 	orm.distributedQueryCampaigns[camp.ID] = *camp
 
 	return camp, nil
+}
+
+func (orm *Datastore) DistributedQueryCampaign(id uint) (*kolide.DistributedQueryCampaign, error) {
+	orm.mtx.Lock()
+	defer orm.mtx.Unlock()
+
+	campaign, ok := orm.distributedQueryCampaigns[id]
+	if !ok {
+		return nil, errors.ErrNotFound
+	}
+
+	return &campaign, nil
 }
 
 func (orm *Datastore) SaveDistributedQueryCampaign(camp *kolide.DistributedQueryCampaign) error {
@@ -149,4 +145,20 @@ func (orm *Datastore) NewDistributedQueryCampaignTarget(target *kolide.Distribut
 	orm.distributedQueryCampaignTargets[target.ID] = *target
 
 	return target, nil
+}
+
+func (orm *Datastore) NewDistributedQueryExecution(exec *kolide.DistributedQueryExecution) (*kolide.DistributedQueryExecution, error) {
+	orm.mtx.Lock()
+	defer orm.mtx.Unlock()
+
+	for _, e := range orm.distributedQueryExecutions {
+		if exec.HostID == e.ID && exec.DistributedQueryCampaignID == e.DistributedQueryCampaignID {
+			return exec, errors.ErrExists
+		}
+	}
+
+	exec.ID = orm.nextID(exec)
+	orm.distributedQueryExecutions[exec.ID] = *exec
+
+	return exec, nil
 }
