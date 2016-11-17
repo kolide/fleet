@@ -113,8 +113,7 @@ class TargetDetails extends Component {
           <span className={`${labelBaseClass}__hosts-online`}> (74% ONLINE)</span>
         </p>
 
-        { /*<p className={`${labelBaseClass}__description`}>{description}</p> */ }
-        <p className={`${labelBaseClass}__description`}>This group consists of machines utilized for developing within the Win 10 environment.</p>
+        <p className={`${labelBaseClass}__description`}>{description}</p>
 
         <div className={`${labelBaseClass}__editor`}>
           <AceEditor
