@@ -26,10 +26,10 @@ class Rocker extends Component {
         <label className={`${baseClass}__label`}>
           <input className={`${baseClass}__checkbox`} type="checkbox" value={value} name={name} />
           <span className={`${baseClass}__switch ${baseClass}__switch--opt-b`}>
-            <span className={`${baseClass}__text`}><i className="kolidecon kolidecon-th-large"></i> Grid</span>
+            <span className={`${baseClass}__text`}><i className="kolidecon kolidecon-grid-select"></i> Grid</span>
           </span>
           <span className={`${baseClass}__switch ${baseClass}__switch--opt-a`}>
-            <span className={`${baseClass}__text`}><i className="kolidecon kolidecon-th-list"></i> List</span>
+            <span className={`${baseClass}__text`}><i className="kolidecon kolidecon-list-select"></i> List</span>
           </span>
         </label>
       </div>

@@ -1,6 +1,4 @@
 .kolide-rocker {
-  margin: 100px 300px;
-
   &__label {
     position: relative;
     cursor: pointer;
@@ -19,7 +17,7 @@
     &:checked ~ .kolide-rocker__switch--opt-b {
       span {
         @include transform(skewX(0) rotateZ(0));
-        top: 5px;
+        top: 3px;
       }
 
       &::after {
@@ -34,7 +32,7 @@
     &:checked ~ .kolide-rocker__switch--opt-a {
       span {
         @include transform(skewX(-6deg) rotateZ(-6deg));
-        top: -4px;
+        top: -6px;
       }
 
       &::after {
@@ -70,7 +68,6 @@
       box-sizing: border-box;
     }
 
-
     &:hover {
       cursor: pointer;
     }
@@ -87,6 +84,10 @@
       display: block;
       text-align: center;
       width: 100%;
+
+      .kolidecon {
+        margin-right: 5px;
+      }
     }
 
     &--opt-b {
@@ -97,7 +98,7 @@
         @include transform(skewX(6deg) rotateZ(6deg));
         color: #b8c2e3;
         transform-origin: left top;
-        top: -4px;
+        top: -6px;
       }
 
       &::after {
@@ -116,7 +117,7 @@
 
       span {
         transform-origin: right top;
-        top: 5px;
+        top: 4px;
       }
 
       &::after {
