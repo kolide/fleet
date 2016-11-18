@@ -43,7 +43,7 @@ class SelectTargetsDropdown extends Component {
     }
   }
 
-  onRemoveMoreInfoTarget = () => {
+  onInputClose = () => {
     this.setState({ moreInfoTarget: null, query: '' });
 
     return false;
@@ -130,21 +130,17 @@ class SelectTargetsDropdown extends Component {
     } = this.state;
     const {
       fetchTargets,
-      onRemoveMoreInfoTarget,
+      onInputClose,
       onTargetSelectMoreInfo,
     } = this;
     const { onSelect, selectedTargets } = this.props;
-    const menuRenderer = Menu(
-      onTargetSelectMoreInfo,
-      onRemoveMoreInfoTarget,
-      moreInfoTarget
-    );
+    const menuRenderer = Menu(onTargetSelectMoreInfo, moreInfoTarget);
 
     return (
       <Input
         isLoading={isLoadingTargets}
         menuRenderer={menuRenderer}
-        onCloseTargetSelect={onRemoveMoreInfoTarget}
+        onClose={onInputClose}
         onTargetSelect={onSelect}
         onTargetSelectInputChange={fetchTargets}
         onInputChange={fetchTargets}

@@ -7,7 +7,7 @@ import TargetDetails from '../TargetDetails';
 import TargetOption from '../TargetOption';
 
 
-const SelectTargetsMenuWrapper = (onMoreInfoClick, onRemoveMoreInfoTarget, moreInfoTarget) => {
+const SelectTargetsMenuWrapper = (onMoreInfoClick, moreInfoTarget) => {
   const SelectTargetsMenu = ({
     focusedOption,
     instancePrefix,
@@ -53,7 +53,6 @@ const SelectTargetsMenuWrapper = (onMoreInfoClick, onRemoveMoreInfoTarget, moreI
             <TargetOption
               target={target}
               onSelect={onSelect}
-              onRemoveMoreInfoTarget={onRemoveMoreInfoTarget}
               onMoreInfoClick={onMoreInfoClick}
             />
           </Option>
