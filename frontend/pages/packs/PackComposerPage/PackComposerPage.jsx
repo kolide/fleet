@@ -2,6 +2,8 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { noop } from 'lodash';
 
+import PackForm from 'components/forms/PackForm';
+
 export class PackComposerPage extends Component {
   static propTypes = {
     dispatch: PropTypes.func,
@@ -11,8 +13,20 @@ export class PackComposerPage extends Component {
     dispatch: noop,
   };
 
+  handleSubmit = (formData) => {
+    console.log(formData);
+
+    return false;
+  }
+
   render () {
-    return <div />;
+    const { handleSubmit } = this;
+
+    return (
+      <div>
+        <PackForm handleSubmit={handleSubmit} />
+      </div>
+    );
   }
 }
 
