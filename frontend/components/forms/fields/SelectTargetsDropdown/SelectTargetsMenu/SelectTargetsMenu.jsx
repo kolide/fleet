@@ -3,7 +3,8 @@ import classNames from 'classnames';
 import { filter, includes, isEqual, noop } from 'lodash';
 
 import targetInterface from 'interfaces/target';
-import SelectTargets from 'components/forms/fields/SelectTargetsDropdown';
+import TargetDetails from '../TargetDetails';
+import TargetOption from '../TargetOption';
 
 
 const SelectTargetsMenuWrapper = (onMoreInfoClick, onRemoveMoreInfoTarget, moreInfoTarget) => {
@@ -49,7 +50,7 @@ const SelectTargetsMenuWrapper = (onMoreInfoClick, onRemoveMoreInfoTarget, moreI
             optionIndex={index}
             ref={setRef}
           >
-            <SelectTargets.Option
+            <TargetOption
               target={target}
               onSelect={onSelect}
               onRemoveMoreInfoTarget={onRemoveMoreInfoTarget}
@@ -68,7 +69,7 @@ const SelectTargetsMenuWrapper = (onMoreInfoClick, onRemoveMoreInfoTarget, moreI
           <div>labels</div>
           {renderTargets('labels')}
         </div>
-        <SelectTargets.Details target={moreInfoTarget} />
+        <TargetDetails target={moreInfoTarget} />
       </div>
     );
   };
