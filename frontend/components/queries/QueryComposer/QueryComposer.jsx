@@ -15,6 +15,7 @@ const baseClass = 'query-composer';
 class QueryComposer extends Component {
   static propTypes = {
     onFetchTargets: PropTypes.func,
+    onFormCancel: PropTypes.func,
     onOsqueryTableSelect: PropTypes.func,
     onRunQuery: PropTypes.func,
     onSave: PropTypes.func,
@@ -52,6 +53,7 @@ class QueryComposer extends Component {
 
   renderForm = () => {
     const {
+      onFormCancel,
       onRunQuery,
       onSave,
       onUpdate,
@@ -62,6 +64,7 @@ class QueryComposer extends Component {
 
     return (
       <QueryForm
+        onCancel={onFormCancel}
         onRunQuery={onRunQuery}
         onSave={onSave}
         onUpdate={onUpdate}
