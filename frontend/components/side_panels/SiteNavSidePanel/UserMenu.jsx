@@ -1,5 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import classnames from 'classnames';
+import { Link } from 'react-router';
+
+import paths from 'router/paths';
 
 class UserMenu extends Component {
   static propTypes = {
@@ -24,6 +27,7 @@ class UserMenu extends Component {
         position,
       },
     } = this.props;
+    const { LOGOUT } = paths;
 
     const toggleBaseClass = 'user-menu-toggle';
     const userMenuClass = classnames(
@@ -45,7 +49,7 @@ class UserMenu extends Component {
         <nav className={`${toggleBaseClass}__nav`}>
           <ul className={`${toggleBaseClass}__nav-list`}>
             <li className={`${toggleBaseClass}__nav-item`}><a href="#user-settings"><i className="kolidecon-user-settings" /><span>Account Settings</span></a></li>
-            <li className={`${toggleBaseClass}__nav-item`}><a href="#logout"><i className="kolidecon-logout" /><span>Log Out</span></a></li>
+            <li className={`${toggleBaseClass}__nav-item`}><Link to={LOGOUT}><i className="kolidecon-logout" /><span>Log Out</span></Link></li>
           </ul>
         </nav>
       </div>
