@@ -48,6 +48,7 @@ class SelectTargetsInput extends Component {
         onInputChange={onTargetSelectInputChange}
         placeholder="Label Name, Host Name, IP Address, etc."
         resetValue={[]}
+        tabSelectsValue={false}
         value={selectedTargets}
         valueKey="display_text"
       />

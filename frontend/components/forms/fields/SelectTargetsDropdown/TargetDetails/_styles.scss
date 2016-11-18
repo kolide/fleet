@@ -5,10 +5,10 @@
 
 .host-target {
   &__display-text {
-    font-size: $small;
+    font-size: $medium;
     font-weight: $bold;
-    letter-spacing: 0.5px;
-    color: $text-dark;
+    letter-spacing: 0.6px;
+    color: $text-ultradark;
     margin: 0;
   }
 
@@ -39,6 +39,11 @@
     &--is-offline {
       color: $alert;
     }
+  }
+
+  &__labels-wrapper {
+    position: absolute;
+    bottom: $pad-large;
   }
 
   &__labels-header {

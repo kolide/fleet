@@ -1,25 +1,36 @@
 .target-select {
   &.Select {
     .Select-control {
+      @include transition(border 150ms ease-in-out, box-shadow 150ms ease-in-out);
       height: 48px;
+    }
+
+    .Select-arrow {
+      border-width: 8px 8px 2.5px;
     }
 
     .Select-input {
       height: 46px;
+      margin: 0 0 0 $pad-base;
 
       > input {
         line-height: 30px;
         padding: 8px 0;
+        color: $text-ultradark;
+        font-size: 16px;
       }
     }
 
     .Select-placeholder {
       line-height: 46px;
+      font-size: 16px;
+      padding: 0 $pad-base;
     }
 
     &.Select--multi {
       .Select-option {
-        padding: 0 $pad-half;
+        padding: 0;
+        background-color: $bg-light;
 
         &.is-disabled {
           &.is-focused {
@@ -44,10 +55,23 @@
             }
           }
         }
+
+        &:last-child {
+          border-bottom-right-radius: 0;
+          border-bottom-left-radius: 0;
+        }
       }
 
       .Select-value {
         line-height: 1.9;
+      }
+    }
+
+    &.is-focused {
+      .Select-control {
+        border: 1px solid $accent-medium;
+        border-bottom-color: $brand;
+        box-shadow: inset 0 0 8px 0 rgba($black, 0.1);
       }
     }
   }
@@ -56,6 +80,7 @@
     max-height: 500px;
     height: 500px;
     overflow: hidden;
+    box-shadow: 0 8px 12px 0 rgba(0, 0, 0, 0.15);
 
     .Select-menu {
       height: 498px;
@@ -72,10 +97,12 @@
         -moz-osx-font-smoothing: grayscale;
         content: '\f03c';
         position: absolute;
-        right: 15px;
+        left: 57%;
         top: 50%;
         margin-top: -75px;
         opacity: 0.25;
+        width: 43%;
+        text-align: center;
       }
     }
   }

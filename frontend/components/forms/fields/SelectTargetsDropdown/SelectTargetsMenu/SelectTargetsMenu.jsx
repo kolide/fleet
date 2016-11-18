@@ -64,10 +64,10 @@ const SelectTargetsMenuWrapper = (onMoreInfoClick, onRemoveMoreInfoTarget, moreI
     return (
       <div className={baseClass}>
         <div className={`${baseClass}__options`}>
-          <p className={`${baseClass}__type`}>hosts</p>
-          {renderTargets('hosts')}
           <p className={`${baseClass}__type`}>labels</p>
           {renderTargets('labels')}
+          <p className={`${baseClass}__type`}>hosts</p>
+          {renderTargets('hosts')}
         </div>
         <SelectTargets.Details target={moreInfoTarget} className={`${baseClass}__spotlight`} />
       </div>

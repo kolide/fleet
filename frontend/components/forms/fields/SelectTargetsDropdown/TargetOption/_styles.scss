@@ -12,6 +12,13 @@
     font-size: $medium;
   }
 
+  &__wrapper {
+    @include display(flex);
+    @include align-items(stretch);
+    @include align-content(stretch);
+    cursor: default;
+  }
+
   &__target-content,
   &__add-btn {
     line-height: 34px;
@@ -20,11 +27,21 @@
     text-transform: none;
   }
 
+  &__add-btn {
+    padding: 0 $pad-half;
+  }
+
+  &__target-content {
+    @include flex-grow(1);
+    text-align: left;
+    padding-right: $pad-half;
+  }
+
   &__count {
     background-color: $text-medium;
     border-radius: $border-radius;
     color: $white;
-    font-size: $small;
+    font-size: 13px;
     font-weight: bold;
     padding: 5px;
     margin-left: $pad-half;
@@ -39,7 +56,6 @@
   &__icon {
     color: $text-medium;
     font-size: $small;
-    margin: 0 $pad-half;
   }
 
   &__ip {
@@ -50,13 +66,13 @@
   &__label-host {
     color: $link;
     font-size: $base;
-    margin-left: $pad-xsmall;
+    margin-left: $pad-half;
   }
 
   &__label-label {
     color: $text-medium;
-    font-size: $base;
-    margin-left: $pad-xsmall;
+    font-size: 14px;
+    margin-left: $pad-half;
 
     .all-hosts {
       font-weight: $bold;
@@ -78,9 +94,5 @@
 
   &__target-modal {
     width: 1000px;
-  }
-
-  &__wrapper {
-    cursor: default;
   }
 }

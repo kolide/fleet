@@ -126,9 +126,9 @@ class QueryComposer extends Component {
 
     return (
       <div>
-        <p>
+        <p className={`${baseClass}__target-label`}>
           <span className={`${baseClass}__select-targets`}>Select Targets</span>
-          <span className={`${baseClass}__targets-count`}> {selectedTargetsCount} unique hosts</span>
+          <span className={`${baseClass}__targets-count`}> {selectedTargetsCount} unique {selectedTargetsCount === 1 ? 'host' : 'hosts' }</span>
         </p>
         <SelectTargets.Input
           isLoading={isLoadingTargets}
@@ -149,6 +149,7 @@ class QueryComposer extends Component {
 
     return (
       <div className={`${baseClass}__wrapper`}>
+        <h1>New Query</h1>
         <div className={`${baseClass}__text-editor-wrapper`}>
           <AceEditor
             enableBasicAutocompletion
