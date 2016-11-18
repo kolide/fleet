@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/kolide/kolide-ose/server/contexts/viewer"
@@ -221,19 +222,23 @@ func (svc service) StreamCampaignResults(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	readChan, err := svc.resultStore.ReadChannel(context.Background(), kolide.DistributedQueryCampaign{ID: campaignID})
+	readChan, err := svc.resultStore.ReadChannel(context.Background(), *campaign)
 	if err != nil {
 		_ = conn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("cannot open read channel for campaign %d ", campaignID)))
 		return
 	}
 
-	for res := range readChan {
-		switch res := res.(type) {
-		case kolide.DistributedQueryResult:
-			err = conn.WriteJSON(res)
-			if err != nil {
-				fmt.Println("error writing to channel")
+	for {
+		select {
+		case res := <-readChan:
+			switch res := res.(type) {
+			case kolide.DistributedQueryResult:
+				err = conn.WriteJSON(res)
+				if err != nil {
+					fmt.Println("error writing to channel")
+				}
 			}
+		case <-time.After(1 * time.Second):
 		}
 	}
 
