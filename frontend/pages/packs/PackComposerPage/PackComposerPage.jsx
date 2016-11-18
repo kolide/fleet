@@ -1,17 +1,24 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { noop } from 'lodash';
 
 import PackForm from 'components/forms/PackForm';
 
 export class PackComposerPage extends Component {
-  static propTypes = {
-    dispatch: PropTypes.func,
-  };
+  constructor (props) {
+    super(props);
 
-  static defaultProps = {
-    dispatch: noop,
-  };
+    this.state = { selectedTargetsCount: 0 };
+  }
+
+  onFetchTargets = (query, targetsResponse) => {
+    const {
+      selected_targets_count: selectedTargetsCount,
+    } = targetsResponse;
+
+    this.setState({ selectedTargetsCount });
+
+    return false;
+  }
 
   handleSubmit = (formData) => {
     console.log(formData);
@@ -20,11 +27,16 @@ export class PackComposerPage extends Component {
   }
 
   render () {
-    const { handleSubmit } = this;
+    const { handleSubmit, onFetchTargets } = this;
+    const { selectedTargetsCount } = this.state;
 
     return (
       <div>
-        <PackForm handleSubmit={handleSubmit} />
+        <PackForm
+          handleSubmit={handleSubmit}
+          onFetchTargets={onFetchTargets}
+          selectedTargetsCount={selectedTargetsCount}
+        />
       </div>
     );
   }
