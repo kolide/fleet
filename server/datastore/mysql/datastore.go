@@ -6,10 +6,10 @@ import (
 
 	"github.com/WatchBeam/clock"
 	"github.com/go-kit/kit/log"
-	_ "github.com/go-sql-driver/mysql"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/kolide/kolide-ose/server/config"
-	_ "github.com/kolide/kolide-ose/server/datastore/mysql/migrations"
+
 	"github.com/kolide/kolide-ose/server/kolide"
 	"github.com/pressly/goose"
 )
@@ -72,6 +72,7 @@ func (d *Datastore) Name() string {
 
 // Migrate creates database
 func (d *Datastore) Migrate() error {
+
 	goose.SetDialect("mysql")
 
 	if err := goose.Run("up", d.db.DB, "."); err != nil {

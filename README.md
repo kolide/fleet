@@ -142,11 +142,11 @@ To update, use [`glide up`](https://github.com/Masterminds/glide#glide-update-al
 #### Database Modifications
 
   * From the project root run the following commands:
-``` bash
-> go get github.com/pressly/goose
-> cd server/datastore/mysql/migrations
-> goose create AddColumnFooToUsers
-```
+  ``` bash
+  > go get github.com/pressly/goose
+  > cd server/datastore/mysql/migrations
+  > goose create AddColumnFooToUsers
+  ```
   * Find the file you created in the migrations directory and edit it
   ``` go
   package migration
