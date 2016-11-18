@@ -10,4 +10,10 @@ describe('PackComposerPage - component', () => {
 
     expect(page.length).toEqual(1);
   });
+
+  it('renders a PackForm component', () => {
+    const page = mount(<PackComposerPage />);
+
+    expect(page.find('PackForm').length).toEqual(1);
+  });
 });
