@@ -1,6 +1,7 @@
 package inmem
 
 import (
+	"fmt"
 	"sort"
 
 	"github.com/kolide/kolide-ose/server/errors"
@@ -135,6 +136,27 @@ func (orm *Datastore) SaveDistributedQueryCampaign(camp *kolide.DistributedQuery
 
 	orm.distributedQueryCampaigns[camp.ID] = *camp
 	return nil
+}
+
+func (orm *Datastore) DistributedQueryCampaignTargetIDs(id uint) (hostIDs []uint, labelIDs []uint, err error) {
+	orm.mtx.Lock()
+	defer orm.mtx.Unlock()
+
+	hostIDs = []uint{}
+	labelIDs = []uint{}
+	for _, target := range orm.distributedQueryCampaignTargets {
+		if target.DistributedQueryCampaignID == id {
+			if target.Type == kolide.TargetHost {
+				hostIDs = append(hostIDs, target.TargetID)
+			} else if target.Type == kolide.TargetLabel {
+				labelIDs = append(labelIDs, target.TargetID)
+			} else {
+				return []uint{}, []uint{}, fmt.Errorf("invalid target type: %d", target.Type)
+			}
+		}
+	}
+
+	return hostIDs, labelIDs, nil
 }
 
 func (orm *Datastore) NewDistributedQueryCampaignTarget(target *kolide.DistributedQueryCampaignTarget) (*kolide.DistributedQueryCampaignTarget, error) {

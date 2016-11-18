@@ -1,6 +1,8 @@
 package mysql
 
 import (
+	"fmt"
+
 	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
 )
@@ -136,6 +138,31 @@ func (d *Datastore) SaveDistributedQueryCampaign(camp *kolide.DistributedQueryCa
 	}
 
 	return nil
+}
+
+func (d *Datastore) DistributedQueryCampaignTargetIDs(id uint) (hostIDs []uint, labelIDs []uint, err error) {
+	sqlStatement := `
+		SELECT * FROM distributed_query_campaign_targets WHERE distributed_query_campaign_id = ?
+	`
+	targets := []kolide.DistributedQueryCampaignTarget{}
+
+	if err = d.db.Select(&targets, sqlStatement, id); err != nil {
+		return nil, nil, errors.DatabaseError(err)
+	}
+
+	hostIDs = []uint{}
+	labelIDs = []uint{}
+	for _, target := range targets {
+		if target.Type == kolide.TargetHost {
+			hostIDs = append(hostIDs, target.TargetID)
+		} else if target.Type == kolide.TargetLabel {
+			labelIDs = append(labelIDs, target.TargetID)
+		} else {
+			return []uint{}, []uint{}, fmt.Errorf("invalid target type: %d", target.Type)
+		}
+	}
+
+	return hostIDs, labelIDs, nil
 }
 
 func (d *Datastore) NewDistributedQueryCampaignTarget(target *kolide.DistributedQueryCampaignTarget) (*kolide.DistributedQueryCampaignTarget, error) {

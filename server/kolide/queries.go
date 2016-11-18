@@ -22,6 +22,9 @@ type QueryStore interface {
 	// SaveDistributedQueryCampaign updates an existing distributed query
 	// campaign
 	SaveDistributedQueryCampaign(camp *DistributedQueryCampaign) error
+	// DistributedQueryCampaignTargetIDs gets the IDs of the targets for
+	// the query campaign of the provided ID
+	DistributedQueryCampaignTargetIDs(id uint) (hostIDs []uint, labelIDs []uint, err error)
 
 	// NewDistributedQueryCampaignTarget adds a new target to an existing
 	// distributed query campaign
