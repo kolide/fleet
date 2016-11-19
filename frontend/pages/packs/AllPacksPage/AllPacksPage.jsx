@@ -26,6 +26,15 @@ class AllPacksPage extends Component {
     return false;
   }
 
+  goToNewPackPage = () => {
+    const { dispatch } = this.props;
+    const { NEW_PACK } = paths;
+
+    dispatch(push(NEW_PACK));
+
+    return false;
+  }
+
   renderPack = (pack) => {
     return (
       <tr key={`pack-${pack.id}-table`}>
@@ -40,8 +49,8 @@ class AllPacksPage extends Component {
   }
 
   render () {
-    const { renderPack } = this;
-    const { packs, dispatch } = this.props;
+    const { goToNewPackPage, renderPack } = this;
+    const { dispatch, packs } = this.props;
 
     return (
       <div>
@@ -52,15 +61,14 @@ class AllPacksPage extends Component {
           <div className={`${baseClass}__search`}>
             <input
               onChange={(evt) => { console.log(evt); }}
-              placeholder="SEARCH"
+              placeholder='SEARCH'
             />
           </div>
           <div className={`${baseClass}__new_pack`}>
             <Button
-              text={'CREATE NEW PACK'}
-              variant={'brand'}
-              onClick={() => { dispatch(push(paths.NEW_PACK)); }}
-            />
+              text='CREATE NEW PACK'
+              variant='brand'
+              onClick={goToNewPackPage} />
           </div>
           <table className={`${baseClass}__table`}>
             <thead>
