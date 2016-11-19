@@ -171,12 +171,27 @@ func (svc service) NewDistributedQueryCampaign(ctx context.Context, queryString 
 	return campaign, nil
 }
 
-func (svc service) StreamCampaignResults(w http.ResponseWriter, r *http.Request) {
-	var upgrader = websocket.Upgrader{
-		ReadBufferSize:  1024,
-		WriteBufferSize: 1024,
-	}
+type websocketMessage struct {
+	Type string      `json:"type"`
+	Data interface{} `json:"data"`
+}
 
+type targetTotals struct {
+	Total  uint `json:"count"`
+	Online uint `json:"online"`
+}
+
+func writeWebsocketMessage(conn *websocket.Conn, typ string, data interface{}) error {
+	return conn.WriteJSON(websocketMessage{Type: typ, Data: data})
+}
+
+func writeError(conn *websocket.Conn, data interface{}) error {
+	return writeWebsocketMessage(conn, "error", data)
+}
+
+func (svc service) StreamCampaignResults(w http.ResponseWriter, r *http.Request) {
+	// Upgrade to websocket connection
+	var upgrader = websocket.Upgrader{}
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		return
@@ -191,54 +206,72 @@ func (svc service) StreamCampaignResults(w http.ResponseWriter, r *http.Request)
 
 	// Authenticate with the token
 	vc, err := authViewer(context.Background(), svc.config.Auth.JwtKey, string(token), svc)
-	if err != nil {
-		_ = conn.WriteMessage(websocket.TextMessage,
-			[]byte("unauthorized"))
-		return
-	}
-	if !vc.CanPerformActions() {
-		_ = conn.WriteMessage(websocket.TextMessage,
-			[]byte("unauthorized"))
-		return
-	}
-
-	campaignID, err := idFromRequest(r, "id")
-	if err != nil {
-		_ = conn.WriteMessage(websocket.TextMessage,
-			[]byte("invalid campaign ID"))
+	if err != nil || !vc.CanPerformActions() {
+		writeError(conn, "unauthorized")
 		return
 	}
 
 	// Find the campaign and ensure it is active
+	campaignID, err := idFromRequest(r, "id")
+	if err != nil {
+		writeError(conn, "invalid campaign ID")
+		return
+	}
+
 	campaign, err := svc.ds.DistributedQueryCampaign(campaignID)
 	if err != nil {
-		_ = conn.WriteMessage(websocket.TextMessage,
-			[]byte(fmt.Sprintf("cannot find campaign for ID %d", campaignID)))
-		return
-	}
-	if campaign.Status != kolide.QueryRunning {
-		_ = conn.WriteMessage(websocket.TextMessage,
-			[]byte(fmt.Sprintf("campaign %d not running", campaignID)))
+		writeError(conn, fmt.Sprintf("cannot find campaign for ID %d", campaignID))
 		return
 	}
 
+	if campaign.Status != kolide.QueryRunning {
+		writeError(conn, fmt.Sprintf("campaign %d not running", campaignID))
+		return
+	}
+
+	// Open the channel from which we will receive incoming query results
+	// (probably from the redis pubsub implementation)
 	readChan, err := svc.resultStore.ReadChannel(context.Background(), *campaign)
 	if err != nil {
-		_ = conn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("cannot open read channel for campaign %d ", campaignID)))
+		writeError(conn, fmt.Sprintf("cannot open read channel for campaign %d ", campaignID))
 		return
 	}
 
+	// Loop, pushing updates to results and expected totals
 	for {
 		select {
 		case res := <-readChan:
+			// Receive a result and push it over the websocket
 			switch res := res.(type) {
 			case kolide.DistributedQueryResult:
-				err = conn.WriteJSON(res)
+				err = writeWebsocketMessage(conn, "result", res)
 				if err != nil {
 					fmt.Println("error writing to channel")
 				}
 			}
+
 		case <-time.After(1 * time.Second):
+			// Update the expected hosts total
+			hostIDs, labelIDs, err := svc.ds.DistributedQueryCampaignTargetIDs(campaign.ID)
+			if err != nil {
+				if err = writeError(conn, "error retrieving campaign targets"); err != nil {
+					return
+				}
+			}
+
+			var totals targetTotals
+			totals.Total, totals.Online, err = svc.CountHostsInTargets(
+				context.Background(), hostIDs, labelIDs,
+			)
+			if err != nil {
+				if err = writeError(conn, "error retrieving target counts"); err != nil {
+					return
+				}
+			}
+
+			if err = writeWebsocketMessage(conn, "totals", totals); err != nil {
+				return
+			}
 		}
 	}
 
