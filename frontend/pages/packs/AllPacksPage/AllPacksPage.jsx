@@ -45,19 +45,16 @@ class AllPacksPage extends Component {
 
     return (
       <div>
-
         <div className={`${baseClass}__wrapper`}>
           <p className={`${baseClass}__title`}>
             Query Packs
           </p>
-
           <div className={`${baseClass}__search`}>
             <input
               onChange={(evt) => { console.log(evt); }}
               placeholder="SEARCH"
             />
           </div>
-
           <div className={`${baseClass}__new_pack`}>
             <Button
               text={'CREATE NEW PACK'}
@@ -65,7 +62,6 @@ class AllPacksPage extends Component {
               onClick={() => { dispatch(push(paths.NEW_PACK)); }}
             />
           </div>
-
           <table className={`${baseClass}__table`}>
             <thead>
               <tr>
