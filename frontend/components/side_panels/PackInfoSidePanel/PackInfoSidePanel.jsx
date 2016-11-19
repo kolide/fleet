@@ -46,7 +46,6 @@ class PackInfoSidePanel extends React.Component {
           Packs are distributed to specified <b>targets</b>. Targets may be
           <b>individual hosts</b> or groups of hosts called <b>labels.</b>
         </p>
-
         <p>
           Learn more about Query Packs in the
           <a href="https://kolide.co">
