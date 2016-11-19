@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import { syncHistoryWithStore } from 'react-router-redux';
 
 import AdminUserManagementPage from 'pages/Admin/UserManagementPage';
+import AllPacksPage from 'pages/packs/AllPacksPage';
 import App from 'components/App';
 import AuthenticatedAdminRoutes from 'components/AuthenticatedAdminRoutes';
 import AuthenticatedRoutes from 'components/AuthenticatedRoutes';
@@ -19,7 +20,6 @@ import QueryPageWrapper from 'components/queries/QueryPageWrapper';
 import RegistrationPage from 'pages/RegistrationPage';
 import ResetPasswordPage from 'pages/ResetPasswordPage';
 import PackPageWrapper from 'components/packs/PackPageWrapper';
-import AllPacksPage from 'pages/packs/AllPacksPage';
 import store from 'redux/store';
 
 const history = syncHistoryWithStore(browserHistory, store);
