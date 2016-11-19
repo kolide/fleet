@@ -1,10 +1,10 @@
 import { PropTypes } from 'react';
 
 export default PropTypes.shape({
-  detail_updated_at: PropTypes.string,
-  name: PropTypes.string,
   description: PropTypes.string,
+  detail_updated_at: PropTypes.string,
   id: PropTypes.number,
+  name: PropTypes.string,
   platform: PropTypes.string,
   updated_at: PropTypes.string,
 });
