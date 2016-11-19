@@ -58,12 +58,6 @@ class AllPacksPage extends Component {
           <p className={`${baseClass}__title`}>
             Query Packs
           </p>
-          <div className={`${baseClass}__search`}>
-            <input
-              onChange={(evt) => { console.log(evt); }}
-              placeholder='SEARCH'
-            />
-          </div>
           <div className={`${baseClass}__new_pack`}>
             <Button
               text='CREATE NEW PACK'
