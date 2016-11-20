@@ -50,7 +50,7 @@ class AllPacksPage extends Component {
 
   render () {
     const { goToNewPackPage, renderPack } = this;
-    const { dispatch, packs } = this.props;
+    const { packs } = this.props;
 
     return (
       <div>
@@ -60,9 +60,10 @@ class AllPacksPage extends Component {
           </p>
           <div className={`${baseClass}__new_pack`}>
             <Button
-              text='CREATE NEW PACK'
-              variant='brand'
-              onClick={goToNewPackPage} />
+              text="CREATE NEW PACK"
+              variant="brand"
+              onClick={goToNewPackPage}
+            />
           </div>
           <table className={`${baseClass}__table`}>
             <thead>
