@@ -14,8 +14,13 @@ type getPackRequest struct {
 	ID uint
 }
 
+type packResponse struct {
+	kolide.Pack
+	QueryCount uint `json:"query_count"`
+}
+
 type getPackResponse struct {
-	Pack *kolide.Pack `json:"pack,omitempty"`
+	Pack packResponse `json:"pack,omitempty"`
 	Err  error        `json:"error,omitempty"`
 }
 
@@ -28,7 +33,16 @@ func makeGetPackEndpoint(svc kolide.Service) endpoint.Endpoint {
 		if err != nil {
 			return getPackResponse{Err: err}, nil
 		}
-		return getPackResponse{pack, nil}, nil
+		queries, err := svc.ListQueriesInPack(ctx, pack.ID)
+		if err != nil {
+			return getPackResponse{Err: err}, nil
+		}
+		return getPackResponse{
+			Pack: packResponse{
+				Pack:       *pack,
+				QueryCount: uint(len(queries)),
+			},
+		}, nil
 	}
 }
 
@@ -41,8 +55,8 @@ type listPacksRequest struct {
 }
 
 type listPacksResponse struct {
-	Packs []kolide.Pack `json:"packs"`
-	Err   error         `json:"error,omitempty"`
+	Packs []packResponse `json:"packs"`
+	Err   error          `json:"error,omitempty"`
 }
 
 func (r listPacksResponse) error() error { return r.Err }
@@ -55,9 +69,16 @@ func makeListPacksEndpoint(svc kolide.Service) endpoint.Endpoint {
 			return getPackResponse{Err: err}, nil
 		}
 
-		resp := listPacksResponse{Packs: []kolide.Pack{}}
+		resp := listPacksResponse{Packs: []packResponse{}}
 		for _, pack := range packs {
-			resp.Packs = append(resp.Packs, *pack)
+			queries, err := svc.ListQueriesInPack(ctx, pack.ID)
+			if err != nil {
+				return getPackResponse{Err: err}, nil
+			}
+			resp.Packs = append(resp.Packs, packResponse{
+				Pack:       *pack,
+				QueryCount: uint(len(queries)),
+			})
 		}
 		return resp, nil
 	}
