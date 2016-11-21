@@ -20,7 +20,7 @@ func Up_20161118212630(tx *sql.Tx) error {
 			"`deleted` tinyint(1) NOT NULL DEFAULT FALSE," +
 			"`disabled` tinyint(1) NOT NULL DEFAULT FALSE," +
 			"`name` varchar(255) NOT NULL," +
-			"`description` varchar(255) NOT NULL," +
+			"`description` varchar(255) DEFAULT NULL," +
 			"`platform` varchar(255) DEFAULT NULL," +
 			"`created_by` int(10) unsigned DEFAULT NULL," +
 			"PRIMARY KEY (`id`)," +
