@@ -10,9 +10,9 @@ describe('ManageHostsPage - reducer', () => {
 
   describe('#setDisplay', () => {
     it('sets the display in state', () => {
-      expect(reducer(initialState, setDisplay('table'))).toEqual({
+      expect(reducer(initialState, setDisplay('List'))).toEqual({
         ...initialState,
-        display: 'table',
+        display: 'List',
       });
     });
   });

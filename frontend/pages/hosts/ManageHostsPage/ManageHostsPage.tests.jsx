@@ -57,8 +57,8 @@ describe('ManageHostsPage - component', () => {
       expect(page.find('HostDetails').length).toEqual(1);
     });
 
-    it('renders hosts as HostsTable when the display is "table"', () => {
-      const page = mount(<ManageHostsPage {...props} display="table" hosts={[host]} />);
+    it('renders hosts as HostsTable when the display is "List"', () => {
+      const page = mount(<ManageHostsPage {...props} display="List" hosts={[host]} />);
 
       expect(page.find('HostsTable').length).toEqual(1);
     });
@@ -67,7 +67,7 @@ describe('ManageHostsPage - component', () => {
       const mockStore = reduxMockStore({
         components: {
           ManageHostsPage: {
-            display: 'detail',
+            display: 'Grid',
             selectedLabel: { id: 100, display_text: 'All Hosts', type: 'all', count: 22 },
           },
           QueryPages: {},
@@ -75,15 +75,15 @@ describe('ManageHostsPage - component', () => {
       });
       const component = connectedComponent(ConnectedManageHostsPage, { mockStore });
       const page = mount(component);
-      const button = page.find('Button');
+      const button = page.find('Rocker').find('input');
       const toggleDisplayAction = {
         type: 'SET_DISPLAY',
         payload: {
-          display: 'table',
+          display: 'List',
         },
       };
 
-      button.simulate('click');
+      button.simulate('change');
 
       expect(mockStore.getActions()).toInclude(toggleDisplayAction);
     });

@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import { filter } from 'lodash';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
-import Button from 'components/buttons/Button';
 import entityGetter from 'redux/utilities/entityGetter';
 import hostActions from 'redux/nodes/entities/hosts/actions';
 import labelActions from 'redux/nodes/entities/labels/actions';
@@ -17,6 +16,7 @@ import osqueryTableInterface from 'interfaces/osquery_table';
 import QueryComposer from 'components/queries/QueryComposer';
 import QuerySidePanel from 'components/side_panels/QuerySidePanel';
 import { renderFlash } from 'redux/nodes/notifications/actions';
+import Rocker from 'components/buttons/Rocker';
 import { selectOsqueryTable } from 'redux/nodes/components/QueryPages/actions';
 import { setDisplay, setSelectedLabel } from 'redux/nodes/components/ManageHostsPage/actions';
 import { showRightSidePanel, removeRightSidePanel } from 'redux/nodes/app/actions';
@@ -25,7 +25,7 @@ import validateQuery from 'components/forms/validators/validate_query';
 export class ManageHostsPage extends Component {
   static propTypes = {
     dispatch: PropTypes.func,
-    display: PropTypes.oneOf(['detail', 'table']),
+    display: PropTypes.oneOf(['Grid', 'List']),
     hosts: PropTypes.arrayOf(hostInterface),
     labels: PropTypes.arrayOf(labelInterface),
     selectedLabel: labelInterface,
@@ -33,7 +33,7 @@ export class ManageHostsPage extends Component {
   };
 
   static defaultProps = {
-    display: 'detail',
+    display: 'Grid',
   };
 
   constructor (props) {
@@ -163,7 +163,7 @@ export class ManageHostsPage extends Component {
 
   onToggleDisplay = () => {
     const { dispatch, display } = this.props;
-    const newDisplay = display === 'detail' ? 'table' : 'detail';
+    const newDisplay = display === 'Grid' ? 'List' : 'Grid';
 
     dispatch(setDisplay(newDisplay));
 
@@ -171,7 +171,7 @@ export class ManageHostsPage extends Component {
   }
 
   renderHeader = () => {
-    const { selectedLabel } = this.props;
+    const { display, selectedLabel } = this.props;
     const { isAddLabel } = this.state;
 
     if (!selectedLabel || isAddLabel) {
@@ -180,6 +180,12 @@ export class ManageHostsPage extends Component {
 
     const { count, description, display_text: displayText, query } = selectedLabel;
     const { onToggleDisplay } = this;
+    const buttonOptions = {
+      aText: 'List',
+      aIcon: 'list-select',
+      bText: 'Grid',
+      bIcon: 'grid-select',
+    };
 
     return (
       <div>
@@ -203,7 +209,12 @@ export class ManageHostsPage extends Component {
         <p>{description}</p>
         <p>{count} Hosts Total</p>
         <div>
-          <Button onClick={onToggleDisplay} text="Toggle Display" />
+          <Rocker
+            handleChange={onToggleDisplay}
+            name="host-display-toggle"
+            options={buttonOptions}
+            value={display}
+          />
         </div>
       </div>
     );
@@ -218,7 +229,7 @@ export class ManageHostsPage extends Component {
       return false;
     }
 
-    if (display === 'detail') {
+    if (display === 'Grid') {
       return hosts.map((host) => {
         return (
           <HostDetails

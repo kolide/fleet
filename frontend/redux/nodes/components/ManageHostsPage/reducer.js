@@ -1,7 +1,7 @@
 import { SET_DISPLAY, SET_SELECTED_LABEL } from './actions';
 
 export const initialState = {
-  display: 'detail',
+  display: 'Grid',
   selectedLabel: null,
 };
 
