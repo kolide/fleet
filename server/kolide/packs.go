@@ -50,6 +50,7 @@ type Pack struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Platform    string `json:"platform"`
+	CreatedBy   uint   `json:"created_by" db:"created_by"`
 }
 
 type PackPayload struct {

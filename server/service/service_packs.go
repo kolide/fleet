@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/kolide/kolide-ose/server/contexts/viewer"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"golang.org/x/net/context"
 )
@@ -26,6 +27,13 @@ func (svc service) NewPack(ctx context.Context, p kolide.PackPayload) (*kolide.P
 
 	if p.Platform != nil {
 		pack.Platform = *p.Platform
+	}
+
+	vc, ok := viewer.FromContext(ctx)
+	if ok {
+		if createdBy := vc.UserID(); createdBy != uint(0) {
+			pack.CreatedBy = createdBy
+		}
 	}
 
 	_, err := svc.ds.NewPack(&pack)

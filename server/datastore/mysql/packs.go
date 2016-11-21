@@ -9,11 +9,11 @@ import (
 func (d *Datastore) NewPack(pack *kolide.Pack) (*kolide.Pack, error) {
 
 	sql := `
-		INSERT INTO packs ( name, platform )
-			VALUES ( ?, ?)
+		INSERT INTO packs ( name, description, platform, created_by )
+			VALUES ( ?, ?, ?, ?)
 	`
 
-	result, err := d.db.Exec(sql, pack.Name, pack.Platform)
+	result, err := d.db.Exec(sql, pack.Name, pack.Description, pack.Platform, pack.CreatedBy)
 	if err != nil {
 		return nil, errors.DatabaseError(err)
 	}
