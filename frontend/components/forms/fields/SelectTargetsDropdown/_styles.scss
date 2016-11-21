@@ -27,6 +27,10 @@
       padding: 0 $pad-base;
     }
 
+    .Select-arrow-zone {
+      padding-right: 19px;
+    }
+
     &.Select--multi {
       .Select-option {
         padding: 0;
@@ -104,6 +108,49 @@
         width: 43%;
         text-align: center;
       }
+    }
+  }
+
+  .Select-value {
+    border-radius: 2px;
+    background-color: $white;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.12), 0 2px 0 0 $accent-dark;
+    border: solid 1px $accent-dark;
+
+    .Select-value-icon {
+      border: 0;
+      float: right;
+      visibility: hidden;
+      position: relative;
+      padding: 0 $pad-medium;
+      line-height: 34px;
+
+      &::after {
+        @extend %kolidecon;
+        @include transition(color 150ms ease-in-out);
+        @include transform(translate(-50%, -50%));
+        content: '\f036';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        visibility: visible;
+        font-size: 20px;
+        color: $accent-text;
+      }
+
+      &:hover {
+        &::after {
+          color: $warning;
+        }
+      }
+    }
+
+    .Select-value-label {
+      font-size: 16px;
+      font-weight: $normal;
+      color: $text-dark;
+      padding: 0 0 0 $pad-medium;
+      line-height: 34px;
     }
   }
 }

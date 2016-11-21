@@ -1,12 +1,16 @@
-[class^='kolidecon-'],
-[class*=' kolidecon-'],
-.kolidecon {
+%kolidecon {
   display: inline-block;
   font: normal normal normal 14px/1 'kolidecons';
   font-size: inherit;
   text-rendering: auto;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+[class^='kolidecon-'],
+[class*=' kolidecon-'],
+.kolidecon {
+  @extend %kolidecon;
 }
 
 .kolidecon-lg {

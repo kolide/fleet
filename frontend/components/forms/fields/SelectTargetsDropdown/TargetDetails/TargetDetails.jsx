@@ -95,9 +95,10 @@ class TargetDetails extends Component {
   renderLabel = () => {
     const { className, target } = this.props;
     const {
+      count,
       description,
       display_text: displayText,
-      hosts,
+      online,
       query,
     } = target;
     const labelBaseClass = 'label-target';
@@ -109,8 +110,8 @@ class TargetDetails extends Component {
         </p>
 
         <p className={`${labelBaseClass}__hosts`}>
-          <span className={`${labelBaseClass}__hosts-count`}>{hosts.length} HOSTS</span>
-          <span className={`${labelBaseClass}__hosts-online`}> (74% ONLINE)</span>
+          <span className={`${labelBaseClass}__hosts-count`}>{count} HOSTS</span>
+          <span className={`${labelBaseClass}__hosts-online`}> ({online}% ONLINE)</span>
         </p>
 
         <p className={`${labelBaseClass}__description`}>{description}</p>

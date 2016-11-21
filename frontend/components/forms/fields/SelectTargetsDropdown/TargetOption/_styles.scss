@@ -10,6 +10,7 @@
   &__add-btn {
     color: $accent-medium;
     font-size: $medium;
+    padding: 0 $pad-half;
   }
 
   &__wrapper {
@@ -25,10 +26,6 @@
     font-size: $small;
     font-weight: $normal;
     text-transform: none;
-  }
-
-  &__add-btn {
-    padding: 0 $pad-half;
   }
 
   &__target-content {
