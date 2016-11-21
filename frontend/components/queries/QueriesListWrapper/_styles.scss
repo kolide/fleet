@@ -1,0 +1,22 @@
+.queries-list-wrapper {
+  &__add-query-btn-icon {
+    margin-right: 10px;
+  }
+
+  &__add-query-btn-text {
+    font-size: 15px;
+  }
+
+  &__search-queries-input {
+    width: '400px';
+  }
+
+  &__wrapper {
+    background-color: $accent-light;
+    border-radius: 3px;
+    box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+    border: 1px solid $silver;
+    margin-top: $pad-base;
+    padding: $pad-small $pad-base;
+  }
+}
