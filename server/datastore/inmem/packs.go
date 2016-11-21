@@ -158,12 +158,12 @@ func (orm *Datastore) AddLabelToPack(lid uint, pid uint) error {
 	return nil
 }
 
-func (orm *Datastore) ListLabelsForPack(pack *kolide.Pack) ([]*kolide.Label, error) {
+func (orm *Datastore) ListLabelsForPack(pid uint) ([]*kolide.Label, error) {
 	var labels []*kolide.Label
 
 	orm.mtx.Lock()
 	for _, pt := range orm.packTargets {
-		if pt.Type == kolide.TargetLabel && pt.PackID == pack.ID {
+		if pt.Type == kolide.TargetLabel && pt.PackID == pid {
 			labels = append(labels, orm.labels[pt.TargetID])
 		}
 	}

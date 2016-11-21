@@ -122,12 +122,7 @@ func (svc service) AddLabelToPack(ctx context.Context, lid, pid uint) error {
 }
 
 func (svc service) ListLabelsForPack(ctx context.Context, pid uint) ([]*kolide.Label, error) {
-	pack, err := svc.ds.Pack(pid)
-	if err != nil {
-		return nil, err
-	}
-
-	labels, err := svc.ds.ListLabelsForPack(pack)
+	labels, err := svc.ds.ListLabelsForPack(pid)
 	if err != nil {
 		return nil, err
 	}
@@ -152,6 +147,33 @@ func (svc service) RemoveLabelFromPack(ctx context.Context, lid, pid uint) error
 	}
 
 	return nil
+}
+
+func (svc service) ListHostsInPack(ctx context.Context, pid uint) ([]kolide.Host, error) {
+	hosts := []kolide.Host{}
+
+	labels, err := svc.ds.ListLabelsForPack(pid)
+	if err != nil {
+		return nil, err
+	}
+
+	hostLookup := map[uint]bool{}
+
+	// TODO: do this in MySQL
+	for _, label := range labels {
+		hostsInLabel, err := svc.ds.ListHostsInLabel(label.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, host := range hostsInLabel {
+			if !hostLookup[host.ID] {
+				hostLookup[host.ID] = true
+				hosts = append(hosts, host)
+			}
+		}
+	}
+	return hosts, nil
 }
 
 func (svc service) ListPacksForHost(ctx context.Context, hid uint) ([]*kolide.Pack, error) {
@@ -185,7 +207,7 @@ func (svc service) ListPacksForHost(ctx context.Context, hid uint) ([]*kolide.Pa
 
 		// for each pack, we must know what labels have been assigned to that
 		// pack
-		labelsForPack, err := svc.ds.ListLabelsForPack(pack)
+		labelsForPack, err := svc.ds.ListLabelsForPack(pack.ID)
 		if err != nil {
 			return nil, err
 		}

@@ -17,6 +17,7 @@ type getPackRequest struct {
 type packResponse struct {
 	kolide.Pack
 	QueryCount uint `json:"query_count"`
+	HostCount  uint `json:"host_count"`
 }
 
 type getPackResponse struct {
@@ -29,18 +30,27 @@ func (r getPackResponse) error() error { return r.Err }
 func makeGetPackEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(getPackRequest)
+
 		pack, err := svc.GetPack(ctx, req.ID)
 		if err != nil {
 			return getPackResponse{Err: err}, nil
 		}
+
 		queries, err := svc.ListQueriesInPack(ctx, pack.ID)
 		if err != nil {
 			return getPackResponse{Err: err}, nil
 		}
+
+		hosts, err := svc.ListHostsInPack(ctx, pack.ID)
+		if err != nil {
+			return getPackResponse{Err: err}, nil
+		}
+
 		return getPackResponse{
 			Pack: packResponse{
 				Pack:       *pack,
 				QueryCount: uint(len(queries)),
+				HostCount:  uint(len(hosts)),
 			},
 		}, nil
 	}
@@ -75,9 +85,14 @@ func makeListPacksEndpoint(svc kolide.Service) endpoint.Endpoint {
 			if err != nil {
 				return getPackResponse{Err: err}, nil
 			}
+			hosts, err := svc.ListHostsInPack(ctx, pack.ID)
+			if err != nil {
+				return getPackResponse{Err: err}, nil
+			}
 			resp.Packs = append(resp.Packs, packResponse{
 				Pack:       *pack,
 				QueryCount: uint(len(queries)),
+				HostCount:  uint(len(hosts)),
 			})
 		}
 		return resp, nil

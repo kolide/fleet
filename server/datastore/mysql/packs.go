@@ -156,7 +156,7 @@ func (d *Datastore) AddLabelToPack(lid uint, pid uint) error {
 }
 
 // ListLabelsForPack will return a list of kolide.Label records associated with kolide.Pack
-func (d *Datastore) ListLabelsForPack(pack *kolide.Pack) ([]*kolide.Label, error) {
+func (d *Datastore) ListLabelsForPack(pid uint) ([]*kolide.Label, error) {
 	sql := `
 	SELECT
 		l.id,
@@ -178,7 +178,7 @@ func (d *Datastore) ListLabelsForPack(pack *kolide.Pack) ([]*kolide.Label, error
 
 	labels := []*kolide.Label{}
 
-	if err := d.db.Select(&labels, sql, kolide.TargetLabel, pack.ID); err != nil {
+	if err := d.db.Select(&labels, sql, kolide.TargetLabel, pid); err != nil {
 		return nil, errors.DatabaseError(err)
 	}
 
