@@ -1,4 +1,16 @@
 .target-select {
+  &__label {
+    display: block;
+    font-size: $base;
+    font-weight: $light;
+    color: $text-dark;
+    margin-bottom: $pad-xsmall;
+
+    &--error {
+      color: $alert;
+    }
+  }
+
   &.Select {
     .Select-control {
       @include transition(border 150ms ease-in-out, box-shadow 150ms ease-in-out);
