@@ -109,6 +109,10 @@
         text-align: center;
       }
     }
+
+    .target-list {
+      height: 100%;
+    }
   }
 
   .Select-value {
@@ -151,6 +155,36 @@
       color: $text-dark;
       padding: 0 0 0 $pad-medium;
       line-height: 34px;
+    }
+  }
+
+  @media (min-width: 768px) and (max-width: 1280px) {
+    .Select-menu-outer {
+      overflow-x: scroll;
+
+      &--results {
+        direction: ltr;
+
+        .Select-menu {
+          direction: ltr;
+        }
+      }
+
+      &--preview {
+        direction: rtl;
+
+        .Select-menu {
+          direction: rtl;
+        }
+      }
+    }
+
+    .Select-menu {
+      min-width: 665px;
+
+      .target-list {
+        direction: ltr;
+      }
     }
   }
 }
