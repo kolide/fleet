@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
-import { isEqual, noop } from 'lodash';
 import classnames from 'classnames';
+import { isEqual, noop } from 'lodash';
 
 import Kolide from 'kolide';
 import targetInterface from 'interfaces/target';
@@ -8,8 +8,14 @@ import { formatSelectedTargetsForApi } from './helpers';
 import Input from './SelectTargetsInput';
 import Menu from './SelectTargetsMenu';
 
+const baseClass = 'target-select';
+
 class SelectTargetsDropdown extends Component {
   static propTypes = {
+    error: PropTypes.string,
+    label: PropTypes.string,
+    labelClassName: PropTypes.string,
+    name: PropTypes.string,
     onFetchTargets: PropTypes.func,
     onSelect: PropTypes.func.isRequired,
     selectedTargets: PropTypes.arrayOf(targetInterface),
@@ -119,9 +125,37 @@ class SelectTargetsDropdown extends Component {
       });
   }
 
+  renderLabel = () => {
+    const { error, label, labelClassName, name } = this.props;
+    const labelWrapperClasses = classnames(
+      `${baseClass}__label`,
+      labelClassName,
+      { [`${baseClass}__label--error`]: error }
+    );
+
+    if (!label) {
+      return false;
+    }
+
+    return (
+      <label
+        className={labelWrapperClasses}
+        htmlFor={name}
+      >
+        {error || label}
+      </label>
+    );
+  }
+
   render () {
     const { isEmpty, isLoadingTargets, moreInfoTarget, targets } = this.state;
-    const { fetchTargets, onBackToResults, onInputClose, onTargetSelectMoreInfo } = this;
+    const {
+      fetchTargets,
+      onBackToResults,
+      onInputClose,
+      onTargetSelectMoreInfo,
+      renderLabel,
+    } = this;
     const { onSelect, selectedTargets } = this.props;
     const menuRenderer = Menu(onTargetSelectMoreInfo, moreInfoTarget, onBackToResults);
 
@@ -131,17 +165,20 @@ class SelectTargetsDropdown extends Component {
     });
 
     return (
-      <Input
-        className={inputClasses}
-        isLoading={isLoadingTargets}
-        menuRenderer={menuRenderer}
-        onClose={onInputClose}
-        onTargetSelect={onSelect}
-        onTargetSelectInputChange={fetchTargets}
-        onInputChange={fetchTargets}
-        selectedTargets={selectedTargets}
-        targets={targets}
-      />
+      <div>
+        {renderLabel()}
+        <Input
+          className={inputClasses}
+          isLoading={isLoadingTargets}
+          menuRenderer={menuRenderer}
+          onClose={onInputClose}
+          onTargetSelect={onSelect}
+          onTargetSelectInputChange={fetchTargets}
+          onInputChange={fetchTargets}
+          selectedTargets={selectedTargets}
+          targets={targets}
+        />
+      </div>
     );
   }
 }
