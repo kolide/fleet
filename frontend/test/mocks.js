@@ -43,6 +43,16 @@ export const invalidGetQueryRequest = (bearerToken, queryID) => {
     .reply(404, { error: 'resource not found' });
 };
 
+export const validGetQueriesRequest = (bearerToken) => {
+  return nock('http://localhost:8080', {
+    reqHeaders: {
+      Authorization: `Bearer ${bearerToken}`,
+    },
+  })
+    .get('/api/v1/kolide/queries')
+    .reply(200, { queries: [] });
+};
+
 export const validGetQueryRequest = (bearerToken, queryID) => {
   return nock('http://localhost:8080', {
     reqHeaders: {
@@ -249,6 +259,7 @@ export default {
   validGetConfigRequest,
   validGetHostsRequest,
   validGetInvitesRequest,
+  validGetQueriesRequest,
   validGetQueryRequest,
   validGetTargetsRequest,
   validGetUsersRequest,
