@@ -18,6 +18,7 @@ func Up_20161118212630(tx *sql.Tx) error {
 			"`updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP," +
 			"`deleted_at` timestamp NULL DEFAULT NULL," +
 			"`deleted` tinyint(1) NOT NULL DEFAULT FALSE," +
+			"`disabled` tinyint(1) NOT NULL DEFAULT FALSE," +
 			"`name` varchar(255) NOT NULL," +
 			"`description` varchar(255) NOT NULL," +
 			"`platform` varchar(255) DEFAULT NULL," +

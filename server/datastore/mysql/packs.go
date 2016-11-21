@@ -9,11 +9,11 @@ import (
 func (d *Datastore) NewPack(pack *kolide.Pack) (*kolide.Pack, error) {
 
 	sql := `
-		INSERT INTO packs ( name, description, platform, created_by )
-			VALUES ( ?, ?, ?, ?)
+		INSERT INTO packs ( name, description, platform, created_by, disabled )
+			VALUES ( ?, ?, ?, ?, ?)
 	`
 
-	result, err := d.db.Exec(sql, pack.Name, pack.Description, pack.Platform, pack.CreatedBy)
+	result, err := d.db.Exec(sql, pack.Name, pack.Description, pack.Platform, pack.CreatedBy, pack.Disabled)
 	if err != nil {
 		return nil, errors.DatabaseError(err)
 	}
@@ -28,11 +28,11 @@ func (d *Datastore) SavePack(pack *kolide.Pack) error {
 
 	sql := `
 		UPDATE packs
-			SET name = ?, platform = ?
+			SET name = ?, platform = ?, disabled = ?,
 			WHERE id = ? AND NOT deleted
 	`
 
-	_, err := d.db.Exec(sql, pack.Name, pack.Platform, pack.ID)
+	_, err := d.db.Exec(sql, pack.Name, pack.Platform, pack.Disabled, pack.ID)
 	if err != nil {
 		return errors.DatabaseError(err)
 	}

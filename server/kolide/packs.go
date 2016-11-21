@@ -51,12 +51,14 @@ type Pack struct {
 	Description string `json:"description"`
 	Platform    string `json:"platform"`
 	CreatedBy   uint   `json:"created_by" db:"created_by"`
+	Disabled    bool   `json:"disabled"`
 }
 
 type PackPayload struct {
 	Name        *string
 	Description *string
 	Platform    *string
+	Disabled    *bool
 }
 
 type PackQuery struct {

@@ -29,6 +29,10 @@ func (svc service) NewPack(ctx context.Context, p kolide.PackPayload) (*kolide.P
 		pack.Platform = *p.Platform
 	}
 
+	if p.Disabled != nil {
+		pack.Disabled = *p.Disabled
+	}
+
 	vc, ok := viewer.FromContext(ctx)
 	if ok {
 		if createdBy := vc.UserID(); createdBy != uint(0) {
@@ -59,6 +63,10 @@ func (svc service) ModifyPack(ctx context.Context, id uint, p kolide.PackPayload
 
 	if p.Platform != nil {
 		pack.Platform = *p.Platform
+	}
+
+	if p.Disabled != nil {
+		pack.Disabled = *p.Disabled
 	}
 
 	err = svc.ds.SavePack(pack)
@@ -170,6 +178,11 @@ func (svc service) ListPacksForHost(ctx context.Context, hid uint) ([]*kolide.Pa
 	}
 
 	for _, pack := range allPacks {
+		// don't include packs which have been disabled
+		if pack.Disabled {
+			continue
+		}
+
 		// for each pack, we must know what labels have been assigned to that
 		// pack
 		labelsForPack, err := svc.ds.ListLabelsForPack(pack)
