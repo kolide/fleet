@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import { noop } from 'lodash';
 import AceEditor from 'react-ace';
 import classnames from 'classnames';
 
@@ -11,10 +12,15 @@ class TargetDetails extends Component {
   static propTypes = {
     target: targetInterface,
     className: PropTypes.string,
+    handleBackToResults: PropTypes.func,
+  };
+
+  static defaultProps = {
+    handleBackToResults: noop,
   };
 
   renderHost = () => {
-    const { className, target } = this.props;
+    const { className, handleBackToResults, target } = this.props;
     const {
       display_text: displayText,
       ip,
@@ -36,6 +42,10 @@ class TargetDetails extends Component {
 
     return (
       <div className={`${hostBaseClass} ${className}`}>
+        <button className={`button button--unstyled ${hostBaseClass}__back`} onClick={handleBackToResults}>
+          <i className="kolidecon kolidecon-chevronleft" />Back
+        </button>
+
         <p className={`${hostBaseClass}__display-text`}>
           <i className={`${hostBaseClass}__icon kolidecon-fw kolidecon-single-host`} />
           <span>{displayText}</span>
@@ -93,7 +103,7 @@ class TargetDetails extends Component {
   }
 
   renderLabel = () => {
-    const { className, target } = this.props;
+    const { handleBackToResults, className, target } = this.props;
     const {
       count,
       description,
@@ -105,6 +115,10 @@ class TargetDetails extends Component {
 
     return (
       <div className={`${labelBaseClass} ${className}`}>
+        <button className={`button button--unstyled ${labelBaseClass}__back`} onClick={handleBackToResults}>
+          <i className="kolidecon kolidecon-chevronleft" />Back
+        </button>
+
         <p className={`${labelBaseClass}__display-text`}>
           <i className={`${labelBaseClass}__icon kolidecon-fw kolidecon-label`} /> {displayText}
         </p>

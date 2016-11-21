@@ -1,6 +1,28 @@
 .host-target,
 .label-target {
   padding: $pad-large;
+
+  &__back {
+    color: $text-dark;
+    font-size: $xsmall;
+    display: none;
+
+    @media (min-width: 768px) and (max-width: 1280px) {
+      display: inline-block;
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      padding: 10px;
+
+      &:active {
+        top: 10px;
+      }
+    }
+  }
+
+  @media (min-width: 768px) and (max-width: 1280px) {
+    padding-top: $pad-most;
+  }
 }
 
 .host-target {

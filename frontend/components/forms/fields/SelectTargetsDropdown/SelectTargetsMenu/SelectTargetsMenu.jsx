@@ -3,11 +3,12 @@ import classNames from 'classnames';
 import { filter, includes, isEqual, noop } from 'lodash';
 
 import targetInterface from 'interfaces/target';
-import SelectTargets from 'components/forms/fields/SelectTargetsDropdown';
+import TargetDetails from '../TargetDetails';
+import TargetOption from '../TargetOption';
 
 const baseClass = 'target-list';
 
-const SelectTargetsMenuWrapper = (onMoreInfoClick, onRemoveMoreInfoTarget, moreInfoTarget) => {
+const SelectTargetsMenuWrapper = (onMoreInfoClick, moreInfoTarget, handleBackToResults) => {
   const SelectTargetsMenu = ({
     focusedOption,
     instancePrefix,
@@ -50,10 +51,9 @@ const SelectTargetsMenuWrapper = (onMoreInfoClick, onRemoveMoreInfoTarget, moreI
             optionIndex={index}
             ref={setRef}
           >
-            <SelectTargets.Option
+            <TargetOption
               target={target}
               onSelect={onSelect}
-              onRemoveMoreInfoTarget={onRemoveMoreInfoTarget}
               onMoreInfoClick={onMoreInfoClick}
             />
           </Option>
@@ -69,7 +69,7 @@ const SelectTargetsMenuWrapper = (onMoreInfoClick, onRemoveMoreInfoTarget, moreI
           <p className={`${baseClass}__type`}>hosts</p>
           {renderTargets('hosts')}
         </div>
-        <SelectTargets.Details target={moreInfoTarget} className={`${baseClass}__spotlight`} />
+        <TargetDetails target={moreInfoTarget} className={`${baseClass}__spotlight`} handleBackToResults={handleBackToResults} />
       </div>
     );
   };

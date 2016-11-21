@@ -7,9 +7,10 @@ import targetInterface from 'interfaces/target';
 
 class SelectTargetsInput extends Component {
   static propTypes = {
+    className: PropTypes.string,
     isLoading: PropTypes.bool,
     menuRenderer: PropTypes.func,
-    onCloseTargetSelect: PropTypes.func,
+    onClose: PropTypes.func,
     onTargetSelect: PropTypes.func,
     onTargetSelectInputChange: PropTypes.func,
     selectedTargets: PropTypes.arrayOf(targetInterface),
@@ -24,9 +25,10 @@ class SelectTargetsInput extends Component {
 
   render () {
     const {
+      className,
       isLoading,
       menuRenderer,
-      onCloseTargetSelect,
+      onClose,
       onTargetSelect,
       onTargetSelectInputChange,
       selectedTargets,
@@ -35,7 +37,7 @@ class SelectTargetsInput extends Component {
 
     return (
       <Select
-        className="target-select"
+        className={`${className} target-select`}
         isLoading={isLoading}
         filterOptions={this.filterOptions}
         labelKey="display_text"
@@ -44,7 +46,7 @@ class SelectTargetsInput extends Component {
         name="targets"
         options={targets}
         onChange={onTargetSelect}
-        onClose={onCloseTargetSelect}
+        onClose={onClose}
         onInputChange={onTargetSelectInputChange}
         placeholder="Label Name, Host Name, IP Address, etc."
         resetValue={[]}

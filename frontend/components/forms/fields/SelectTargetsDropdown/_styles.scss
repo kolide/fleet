@@ -160,30 +160,28 @@
 
   @media (min-width: 768px) and (max-width: 1280px) {
     .Select-menu-outer {
-      overflow-x: scroll;
+      .Select-menu {
+        min-width: 665px;
 
-      &--results {
-        direction: ltr;
-
-        .Select-menu {
-          direction: ltr;
+        &::after {
+          display: none;
         }
       }
+    }
 
-      &--preview {
+    &.show-preview {
+      .Select-menu-outer {
         direction: rtl;
 
         .Select-menu {
           direction: rtl;
         }
       }
-    }
 
-    .Select-menu {
-      min-width: 665px;
-
-      .target-list {
-        direction: ltr;
+      .Select-menu {
+        .target-list {
+          direction: ltr;
+        }
       }
     }
   }
