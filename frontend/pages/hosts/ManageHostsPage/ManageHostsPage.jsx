@@ -181,10 +181,10 @@ export class ManageHostsPage extends Component {
     const { count, description, display_text: displayText, query } = selectedLabel;
     const { onToggleDisplay } = this;
     const buttonOptions = {
-      aText: 'List',
-      aIcon: 'list-select',
-      bText: 'Grid',
-      bIcon: 'grid-select',
+      aIcon: 'grid-select',
+      aText: 'Grid',
+      bIcon: 'list-select',
+      bText: 'List',
     };
 
     return (
