@@ -1,8 +1,9 @@
 import React, { Component, PropTypes } from 'react';
-import { flatMap, isEqual, noop } from 'lodash';
+import { isEqual, noop } from 'lodash';
 
 import Kolide from 'kolide';
 import targetInterface from 'interfaces/target';
+import { formatSelectedTargetsForApi } from './helpers';
 import Input from './SelectTargetsInput';
 import Menu from './SelectTargetsMenu';
 
@@ -67,10 +68,7 @@ class SelectTargetsDropdown extends Component {
         return Kolide.getLabelHosts(moreInfoTarget.id)
           .then((hosts) => {
             this.setState({
-              moreInfoTarget: {
-                ...moreInfoTarget,
-                hosts,
-              },
+              moreInfoTarget: { ...moreInfoTarget, hosts },
             });
 
             return false;
@@ -87,20 +85,9 @@ class SelectTargetsDropdown extends Component {
   fetchTargets = (query, selectedTargets = this.props.selectedTargets) => {
     const { onFetchTargets } = this.props;
 
-    this.setState({
-      isLoadingTargets: true,
-      query,
-    });
+    this.setState({ isLoadingTargets: true, query });
 
-    const hosts = flatMap(selectedTargets, (target) => {
-      return target.target_type === 'hosts' ? [target.id] : [];
-    });
-    const labels = flatMap(selectedTargets, (target) => {
-      return target.target_type === 'labels' ? [target.id] : [];
-    });
-    const selected = { hosts, labels };
-
-    return Kolide.getTargets(query, selected)
+    return Kolide.getTargets(query, formatSelectedTargetsForApi(selectedTargets))
       .then((response) => {
         const {
           targets,
@@ -108,10 +95,7 @@ class SelectTargetsDropdown extends Component {
 
         onFetchTargets(query, response);
 
-        this.setState({
-          isLoadingTargets: false,
-          targets,
-        });
+        this.setState({ isLoadingTargets: false, targets });
 
         return query;
       })
@@ -123,16 +107,8 @@ class SelectTargetsDropdown extends Component {
   }
 
   render () {
-    const {
-      isLoadingTargets,
-      moreInfoTarget,
-      targets,
-    } = this.state;
-    const {
-      fetchTargets,
-      onInputClose,
-      onTargetSelectMoreInfo,
-    } = this;
+    const { isLoadingTargets, moreInfoTarget, targets } = this.state;
+    const { fetchTargets, onInputClose, onTargetSelectMoreInfo } = this;
     const { onSelect, selectedTargets } = this.props;
     const menuRenderer = Menu(onTargetSelectMoreInfo, moreInfoTarget);
 
