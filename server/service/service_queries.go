@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gorilla/websocket"
 	"github.com/kolide/kolide-ose/server/contexts/viewer"
 	"github.com/kolide/kolide-ose/server/kolide"
+	"github.com/kolide/kolide-ose/server/websocket"
 	"golang.org/x/net/context"
 )
 
@@ -171,35 +171,21 @@ func (svc service) NewDistributedQueryCampaign(ctx context.Context, queryString 
 	return campaign, nil
 }
 
-type websocketMessage struct {
-	Type string      `json:"type"`
-	Data interface{} `json:"data"`
-}
-
 type targetTotals struct {
 	Total  uint `json:"count"`
 	Online uint `json:"online"`
 }
 
-func writeWebsocketMessage(conn *websocket.Conn, typ string, data interface{}) error {
-	return conn.WriteJSON(websocketMessage{Type: typ, Data: data})
-}
-
-func writeError(conn *websocket.Conn, data interface{}) error {
-	return writeWebsocketMessage(conn, "error", data)
-}
-
 func (svc service) StreamCampaignResults(w http.ResponseWriter, r *http.Request) {
 	// Upgrade to websocket connection
-	var upgrader = websocket.Upgrader{}
-	conn, err := upgrader.Upgrade(w, r, nil)
+	conn, err := websocket.Upgrade(w, r)
 	if err != nil {
 		return
 	}
 	defer conn.Close()
 
 	// Receive the auth bearer token
-	_, token, err := conn.ReadMessage()
+	token, err := conn.ReadAuthToken()
 	if err != nil {
 		return
 	}
@@ -207,25 +193,25 @@ func (svc service) StreamCampaignResults(w http.ResponseWriter, r *http.Request)
 	// Authenticate with the token
 	vc, err := authViewer(context.Background(), svc.config.Auth.JwtKey, string(token), svc)
 	if err != nil || !vc.CanPerformActions() {
-		writeError(conn, "unauthorized")
+		conn.WriteJSONError("unauthorized")
 		return
 	}
 
 	// Find the campaign and ensure it is active
 	campaignID, err := idFromRequest(r, "id")
 	if err != nil {
-		writeError(conn, "invalid campaign ID")
+		conn.WriteJSONError("invalid campaign ID")
 		return
 	}
 
 	campaign, err := svc.ds.DistributedQueryCampaign(campaignID)
 	if err != nil {
-		writeError(conn, fmt.Sprintf("cannot find campaign for ID %d", campaignID))
+		conn.WriteJSONError(fmt.Sprintf("cannot find campaign for ID %d", campaignID))
 		return
 	}
 
 	if campaign.Status != kolide.QueryRunning {
-		writeError(conn, fmt.Sprintf("campaign %d not running", campaignID))
+		conn.WriteJSONError(fmt.Sprintf("campaign %d not running", campaignID))
 		return
 	}
 
@@ -233,7 +219,7 @@ func (svc service) StreamCampaignResults(w http.ResponseWriter, r *http.Request)
 	// (probably from the redis pubsub implementation)
 	readChan, err := svc.resultStore.ReadChannel(context.Background(), *campaign)
 	if err != nil {
-		writeError(conn, fmt.Sprintf("cannot open read channel for campaign %d ", campaignID))
+		conn.WriteJSONError(fmt.Sprintf("cannot open read channel for campaign %d ", campaignID))
 		return
 	}
 
@@ -244,7 +230,7 @@ func (svc service) StreamCampaignResults(w http.ResponseWriter, r *http.Request)
 			// Receive a result and push it over the websocket
 			switch res := res.(type) {
 			case kolide.DistributedQueryResult:
-				err = writeWebsocketMessage(conn, "result", res)
+				err = conn.WriteJSONMessage("result", res)
 				if err != nil {
 					fmt.Println("error writing to channel")
 				}
@@ -254,7 +240,7 @@ func (svc service) StreamCampaignResults(w http.ResponseWriter, r *http.Request)
 			// Update the expected hosts total
 			hostIDs, labelIDs, err := svc.ds.DistributedQueryCampaignTargetIDs(campaign.ID)
 			if err != nil {
-				if err = writeError(conn, "error retrieving campaign targets"); err != nil {
+				if err = conn.WriteJSONError("error retrieving campaign targets"); err != nil {
 					return
 				}
 			}
@@ -264,12 +250,12 @@ func (svc service) StreamCampaignResults(w http.ResponseWriter, r *http.Request)
 				context.Background(), hostIDs, labelIDs,
 			)
 			if err != nil {
-				if err = writeError(conn, "error retrieving target counts"); err != nil {
+				if err = conn.WriteJSONError("error retrieving target counts"); err != nil {
 					return
 				}
 			}
 
-			if err = writeWebsocketMessage(conn, "totals", totals); err != nil {
+			if err = conn.WriteJSONMessage("totals", totals); err != nil {
 				return
 			}
 		}
