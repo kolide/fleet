@@ -19,7 +19,7 @@ class TargetDetails extends Component {
     handleBackToResults: noop,
   };
 
-  onlineHosts = (online) => {
+  onlineHosts = (labelBaseClass, online) => {
     if (online > 0) {
       return (
         <span className={`${labelBaseClass}__hosts-online`}> ({online}% ONLINE)</span>
@@ -137,7 +137,7 @@ class TargetDetails extends Component {
 
         <p className={`${labelBaseClass}__hosts`}>
           <span className={`${labelBaseClass}__hosts-count`}><strong>{count}</strong>HOSTS</span>
-          { onlineHosts(online) }
+          { onlineHosts(labelBaseClass, online) }
         </p>
 
         <p className={`${labelBaseClass}__description`}>{description || 'No Description'}</p>
