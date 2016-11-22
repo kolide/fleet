@@ -9,15 +9,16 @@ const baseClass = 'input-dropdown';
 
 class Dropdown extends Component {
   static propTypes = {
-    options: PropTypes.arrayOf(dropdownOptionInterface).isRequired,
-    onChange: PropTypes.func,
     className: PropTypes.string,
+    clearable: PropTypes.bool,
     error: PropTypes.string,
     hint: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
     label: PropTypes.string,
+    name: PropTypes.string,
+    onChange: PropTypes.func,
+    options: PropTypes.arrayOf(dropdownOptionInterface).isRequired,
     placeholder: PropTypes.string,
     value: PropTypes.string,
-    clearable: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -34,7 +35,7 @@ class Dropdown extends Component {
 
   render () {
     const { handleChange } = this;
-    const { options, className, placeholder, value, clearable } = this.props;
+    const { className, clearable, name, options, placeholder, value } = this.props;
 
     const formFieldProps = pick(this.props, ['hint', 'label', 'error', 'name']);
 
@@ -42,7 +43,7 @@ class Dropdown extends Component {
       <FormField {...formFieldProps} type="dropdown">
         <Select
           className={`${baseClass}__select ${className}`}
-          name="targets"
+          name={`${name}-select` || "targets"}
           options={options}
           onChange={handleChange}
           placeholder={placeholder}
