@@ -11,10 +11,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-// upgrader is the websocket upgrader used to upgrade connections from regular
-// HTTP(S) to websocket.
-var upgrader = websocket.Upgrader{}
-
 // maxMessageSize is used to set a read limit on the websocket and prevent
 // clients from flooding us with data.
 const maxMessageSize int64 = 8096
@@ -49,6 +45,10 @@ type Conn struct {
 
 // Upgrade is used to upgrade a normal HTTP request to a websocket connection.
 func Upgrade(w http.ResponseWriter, r *http.Request) (*Conn, error) {
+	var upgrader = websocket.Upgrader{
+		HandshakeTimeout: defaultTimeout,
+	}
+
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "upgrading connection")
