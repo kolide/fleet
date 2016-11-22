@@ -276,6 +276,17 @@ func testListHostsInLabel(t *testing.T, db kolide.Datastore) {
 	}
 }
 
+func testBuiltInLabels(t *testing.T, db kolide.Datastore) {
+	var err error
+	err = db.Initialize()
+	assert.Nil(t, err)
+
+	hits, err := db.SearchLabels("Mac OS X")
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(hits))
+	assert.Equal(t, kolide.LabelTypeBuiltIn, hits[0].LabelType)
+}
+
 func testListUniqueHostsInLabels(t *testing.T, db kolide.Datastore) {
 	h1, err := db.NewHost(&kolide.Host{
 		DetailUpdateTime: time.Now(),

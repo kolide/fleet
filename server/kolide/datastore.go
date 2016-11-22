@@ -14,4 +14,6 @@ type Datastore interface {
 	Name() string
 	Drop() error
 	Migrate() error
+	// Initialize loads built in records when application starts.
+	Initialize() error
 }

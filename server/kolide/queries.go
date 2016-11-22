@@ -64,9 +64,9 @@ type Query struct {
 type DistributedQueryStatus int
 
 const (
-	QueryRunning  DistributedQueryStatus = iota
-	QueryComplete DistributedQueryStatus = iota
-	QueryError    DistributedQueryStatus = iota
+	QueryRunning DistributedQueryStatus = iota
+	QueryComplete
+	QueryError
 )
 
 type DistributedQueryCampaign struct {
