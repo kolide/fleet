@@ -41,7 +41,7 @@ class QueryForm extends Component {
 
       this.state = {
         errors: { ...errors, platform: null },
-        formData: { ...formData, platform },
+        formData: { ...formData, platform: platform.value },
       };
     } else {
       this.state = { errors, formData };
