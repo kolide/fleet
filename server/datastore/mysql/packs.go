@@ -214,7 +214,7 @@ func (d *Datastore) ListHostsInPack(pid uint) ([]*kolide.Host, error) {
 		  pt.target_id = h.id
 		  AND pt.type = ?
 		)
-		AND pt.pack_id = ?;
+		WHERE pt.pack_id = ?;
 	`
 	hosts := []*kolide.Host{}
 	if err := d.db.Select(&hosts, sql, kolide.TargetLabel, kolide.TargetHost, pid); err != nil {
