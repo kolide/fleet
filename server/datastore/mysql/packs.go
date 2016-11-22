@@ -28,11 +28,11 @@ func (d *Datastore) SavePack(pack *kolide.Pack) error {
 
 	sql := `
 		UPDATE packs
-			SET name = ?, platform = ?, disabled = ?,
+			SET name = ?, platform = ?, disabled = ?, description = ?,
 			WHERE id = ? AND NOT deleted
 	`
 
-	_, err := d.db.Exec(sql, pack.Name, pack.Platform, pack.Disabled, pack.ID)
+	_, err := d.db.Exec(sql, pack.Name, pack.Platform, pack.Disabled, pack.Description, pack.ID)
 	if err != nil {
 		return errors.DatabaseError(err)
 	}
