@@ -79,7 +79,10 @@ the way that the kolide server works.
 				if err != nil {
 					initFatal(err, "initializing datastore")
 				}
+			}
 
+			if err = ds.Initialize(); err != nil {
+				initFatal(err, "loading built in data")
 			}
 
 			svc, err := service.NewService(ds, pubsub.NewInmemQueryResults(), logger, config, mailService, clock.C)
