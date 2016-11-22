@@ -135,12 +135,12 @@
         left: 50%;
         visibility: visible;
         font-size: 20px;
-        color: $accent-text;
+        color: $accent-dark;
       }
 
       &:hover {
         &::after {
-          color: $warning;
+          color: $accent-text;
         }
       }
     }
@@ -152,6 +152,20 @@
       padding: 0 0 0 $pad-medium;
       line-height: 34px;
     }
+  }
+
+  .Select-clear {
+    font-size: 28px;
+    margin-right: 10px;
+    color: $text-dark;
+
+    &:hover {
+      color: $alert;
+    }
+  }
+
+  .Select-loading-zone {
+    padding-right: 10px;
   }
 
   &.is-empty {

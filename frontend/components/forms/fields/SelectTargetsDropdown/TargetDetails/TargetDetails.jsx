@@ -69,7 +69,7 @@ class TargetDetails extends Component {
               <th>Platform</th>
               <td>
                 <i className={hostHelpers.platformIconClass(platform)} />
-                <span className={`${hostBaseClass}__platform-text`}>{platform}</span>
+                <span className={`${hostBaseClass}__platform-text`}> {platform}</span>
               </td>
             </tr>
             <tr>
@@ -124,11 +124,11 @@ class TargetDetails extends Component {
         </p>
 
         <p className={`${labelBaseClass}__hosts`}>
-          <span className={`${labelBaseClass}__hosts-count`}>{count} HOSTS</span>
-          <span className={`${labelBaseClass}__hosts-online`}> ({online}% ONLINE)</span>
+          <span className={`${labelBaseClass}__hosts-count`}><strong>{count}</strong> HOSTS</span>
+          { online && <span className={`${labelBaseClass}__hosts-online`}> ({online}% ONLINE)</span> }
         </p>
 
-        <p className={`${labelBaseClass}__description`}>{description}</p>
+        <p className={`${labelBaseClass}__description`}>{description || 'No Description'}</p>
 
         <div className={`${labelBaseClass}__editor`}>
           <AceEditor

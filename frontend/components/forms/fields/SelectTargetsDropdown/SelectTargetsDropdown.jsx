@@ -99,6 +99,7 @@ class SelectTargetsDropdown extends Component {
         } = response;
 
         if (targets.length === 0) {
+          // We don't want the lib's default "No Results" so we fake it
           targets.push({});
           this.setState({ isEmpty: true });
         } else {
