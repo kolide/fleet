@@ -16,6 +16,7 @@ const validate = () => {
 
 class PackForm extends Component {
   static propTypes = {
+    className: PropTypes.string,
     fields: PropTypes.shape({
       description: formFieldInterface.isRequired,
       targets: formFieldInterface.isRequired,
@@ -28,6 +29,7 @@ class PackForm extends Component {
 
   render () {
     const {
+      className,
       fields,
       handleSubmit,
       onFetchTargets,
@@ -35,7 +37,7 @@ class PackForm extends Component {
     } = this.props;
 
     return (
-      <form onSubmit={handleSubmit}>
+      <form className={className} onSubmit={handleSubmit}>
         <InputField
           {...fields.title}
           placeholder="Query Pack Title"

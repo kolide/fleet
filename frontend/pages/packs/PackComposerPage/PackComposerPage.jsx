@@ -8,6 +8,8 @@ import queryInterface from 'interfaces/query';
 import QueriesListWrapper from 'components/queries/QueriesListWrapper';
 import stateEntityGetter from 'redux/utilities/entityGetter';
 
+const baseClass = 'pack-composer-page';
+
 export class PackComposerPage extends Component {
   static propTypes = {
     dispatch: PropTypes.func,
@@ -52,8 +54,9 @@ export class PackComposerPage extends Component {
     const { queries } = this.props;
 
     return (
-      <div>
+      <div className={baseClass}>
         <PackForm
+          className={`${baseClass}__pack-form`}
           handleSubmit={handleSubmit}
           onFetchTargets={onFetchTargets}
           selectedTargetsCount={selectedTargetsCount}
