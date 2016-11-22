@@ -106,6 +106,10 @@
   }
 
   &__platform-text {
+    text-transform: capitalize;
+  }
+
+  &__mac-address {
     text-transform: uppercase;
   }
 }
@@ -122,6 +126,7 @@
   &__icon {
     color: $accent-text;
     margin-right: $pad-small;
+    width: 21px;
   }
 
   &__hosts {
@@ -136,10 +141,11 @@
     color: $text-dark;
 
     strong {
-      width: 1.28571429em;
+      width: 21px;
       text-align: center;
       font-weight: $bold;
       display: inline-block;
+      margin-right: $pad-small;
     }
   }
 

@@ -19,6 +19,16 @@ class TargetDetails extends Component {
     handleBackToResults: noop,
   };
 
+  onlineHosts = (online) => {
+    if (online > 0) {
+      return (
+        <span className={`${labelBaseClass}__hosts-online`}> ({online}% ONLINE)</span>
+      );
+    }
+
+    return false;
+  };
+
   renderHost = () => {
     const { className, handleBackToResults, target } = this.props;
     const {
@@ -63,7 +73,7 @@ class TargetDetails extends Component {
             </tr>
             <tr>
               <th>MAC Address</th>
-              <td>{mac}</td>
+              <td><span className={`${hostBaseClass}__mac-address`}>{mac}</span></td>
             </tr>
             <tr>
               <th>Platform</th>
@@ -103,6 +113,7 @@ class TargetDetails extends Component {
   }
 
   renderLabel = () => {
+    const { onlineHosts } = this;
     const { handleBackToResults, className, target } = this.props;
     const {
       count,
@@ -120,12 +131,13 @@ class TargetDetails extends Component {
         </button>
 
         <p className={`${labelBaseClass}__display-text`}>
-          <i className={`${labelBaseClass}__icon kolidecon-fw kolidecon-label`} /> {displayText}
+          <i className={`${labelBaseClass}__icon kolidecon-fw kolidecon-label`} />
+          <span>{displayText}</span>
         </p>
 
         <p className={`${labelBaseClass}__hosts`}>
-          <span className={`${labelBaseClass}__hosts-count`}><strong>{count}</strong> HOSTS</span>
-          { online && <span className={`${labelBaseClass}__hosts-online`}> ({online}% ONLINE)</span> }
+          <span className={`${labelBaseClass}__hosts-count`}><strong>{count}</strong>HOSTS</span>
+          { onlineHosts(online) }
         </p>
 
         <p className={`${labelBaseClass}__description`}>{description || 'No Description'}</p>
