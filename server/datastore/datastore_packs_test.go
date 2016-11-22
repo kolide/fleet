@@ -1,9 +1,8 @@
 package datastore
 
 import (
-	"testing"
-
 	"fmt"
+	"testing"
 
 	"github.com/WatchBeam/clock"
 	"github.com/kolide/kolide-ose/server/kolide"
