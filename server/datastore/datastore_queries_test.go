@@ -86,50 +86,30 @@ func testDistributedQueryCampaign(t *testing.T, ds kolide.Datastore) {
 		assert.Equal(t, campaign.Status, retrieved.Status)
 	}
 
-	h1, err := ds.NewHost(&kolide.Host{
-		HostName:         "foo.local",
-		PrimaryIP:        "192.168.1.10",
-		NodeKey:          "1",
-		UUID:             "1",
-		DetailUpdateTime: mockClock.Now(),
-	})
-	require.Nil(t, err)
-	require.Nil(t, ds.MarkHostSeen(h1, mockClock.Now()))
+	newHost := func(name string, ip string, key string, uuid string, tim time.Time) *kolide.Host {
+		h, err := ds.NewHost(&kolide.Host{
+			HostName:         name,
+			PrimaryIP:        ip,
+			NodeKey:          key,
+			UUID:             uuid,
+			DetailUpdateTime: tim,
+		})
 
-	h2, err := ds.NewHost(&kolide.Host{
-		HostName:         "bar.local",
-		PrimaryIP:        "192.168.1.11",
-		NodeKey:          "2",
-		UUID:             "2",
-		DetailUpdateTime: mockClock.Now().Add(-1 * time.Hour),
-	})
-	require.Nil(t, err)
-	// make this host "offline"
-	require.Nil(t, ds.MarkHostSeen(h2, mockClock.Now().Add(-1*time.Hour)))
+		require.Nil(t, err)
+		require.NotZero(t, h.ID)
+		require.Nil(t, ds.MarkHostSeen(h, tim))
 
-	h3, err := ds.NewHost(&kolide.Host{
-		HostName:         "baz.local",
-		PrimaryIP:        "192.168.1.12",
-		NodeKey:          "3",
-		UUID:             "3",
-		DetailUpdateTime: mockClock.Now().Add(-13 * time.Minute),
-	})
-	require.Nil(t, err)
-	require.Nil(t, ds.MarkHostSeen(h3, mockClock.Now().Add(-5*time.Minute)))
+		return h
+	}
 
-	l1, err := ds.NewLabel(&kolide.Label{
-		Name:  "label foo",
-		Query: "query foo",
-	})
-	require.Nil(t, err)
-	require.NotZero(t, l1.ID)
+	newLabel := func(name string, query string) *kolide.Label {
+		l, err := ds.NewLabel(&kolide.Label{Name: name, Query: query})
 
-	l2, err := ds.NewLabel(&kolide.Label{
-		Name:  "label bar",
-		Query: "query foo",
-	})
-	require.Nil(t, err)
-	require.NotZero(t, l2.ID)
+		require.Nil(t, err)
+		require.NotZero(t, l.ID)
+
+		return l
+	}
 
 	addHost := func(h *kolide.Host) {
 		_, err := ds.NewDistributedQueryCampaignTarget(
@@ -164,6 +144,13 @@ func testDistributedQueryCampaign(t *testing.T, ds kolide.Datastore) {
 		sortutil.Asc(labelIDs)
 		assert.Equal(t, expectedLabelIDs, labelIDs)
 	}
+
+	h1 := newHost("foo.local", "192.168.1.10", "1", "1", mockClock.Now())
+	h2 := newHost("bar.local", "192.168.1.11", "2", "2", mockClock.Now().Add(-1*time.Hour))
+	h3 := newHost("baz.local", "192.168.1.12", "3", "3", mockClock.Now().Add(-13*time.Minute))
+
+	l1 := newLabel("label foo", "query foo")
+	l2 := newLabel("label bar", "query foo")
 
 	checkTargets([]uint{}, []uint{})
 
