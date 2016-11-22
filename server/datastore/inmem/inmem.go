@@ -4,6 +4,7 @@ import (
 	"errors"
 	"reflect"
 	"sync"
+	"time"
 
 	"github.com/kolide/kolide-ose/server/kolide"
 	"github.com/patrickmn/sortutil"
@@ -88,6 +89,14 @@ func (orm *Datastore) Drop() error {
 	return orm.Migrate()
 }
 
+func (orm *Datastore) Initialize() error {
+	if err := orm.createBuiltinLabels(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // getLimitOffsetSliceBounds returns the bounds that should be used for
 // re-slicing the results to comply with the requested ListOptions. Lack of
 // generics forces us to do this rather than reslicing in this method.
@@ -114,4 +123,76 @@ func (orm *Datastore) nextID(val interface{}) uint {
 	valType := reflect.TypeOf(reflect.Indirect(reflect.ValueOf(val)).Interface())
 	orm.nextIDs[valType]++
 	return orm.nextIDs[valType]
+}
+
+func (orm *Datastore) createBuiltinLabels() error {
+	labels := []kolide.Label{
+		{
+			UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
+				CreateTimestamp: kolide.CreateTimestamp{
+					CreatedAt: time.Now().UTC(),
+				},
+				UpdateTimestamp: kolide.UpdateTimestamp{
+					UpdatedAt: time.Now().UTC(),
+				},
+			},
+			Platform:  "darwin",
+			Name:      "Mac OS X",
+			Query:     "select * from osquery_info where build_platform = 'darwin';",
+			LabelType: kolide.LabelTypeBuiltIn,
+		},
+		{
+			UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
+				CreateTimestamp: kolide.CreateTimestamp{
+					CreatedAt: time.Now().UTC(),
+				},
+				UpdateTimestamp: kolide.UpdateTimestamp{
+					UpdatedAt: time.Now().UTC(),
+				},
+			},
+			Platform:  "ubuntu",
+			Name:      "Ubuntu Linux",
+			Query:     "select * from osquery_info where build_platform = 'ubuntu';",
+			LabelType: kolide.LabelTypeBuiltIn,
+		},
+		{
+			UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
+				CreateTimestamp: kolide.CreateTimestamp{
+					CreatedAt: time.Now().UTC(),
+				},
+				UpdateTimestamp: kolide.UpdateTimestamp{
+					UpdatedAt: time.Now().UTC(),
+				},
+			},
+			Platform:  "centos",
+			Name:      "CentOS Linux",
+			Query:     "select * from osquery_info where build_platform = 'centos';",
+			LabelType: kolide.LabelTypeBuiltIn,
+		},
+		{
+			UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
+				CreateTimestamp: kolide.CreateTimestamp{
+					CreatedAt: time.Now().UTC(),
+				},
+				UpdateTimestamp: kolide.UpdateTimestamp{
+					UpdatedAt: time.Now().UTC(),
+				},
+			},
+			Platform:  "windows",
+			Name:      "MS Windows",
+			Query:     "select * from osquery_info where build_platform = 'windows';",
+			LabelType: kolide.LabelTypeBuiltIn,
+		},
+	}
+
+	for _, label := range labels {
+		label := label
+		_, err := orm.NewLabel(&label)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+
 }
