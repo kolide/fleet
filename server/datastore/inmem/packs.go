@@ -190,7 +190,7 @@ func (orm *Datastore) RemoveLabelFromPack(label *kolide.Label, pack *kolide.Pack
 	return nil
 }
 
-func (orm *Datastore) ListHostsInPack(pid uint) ([]*kolide.Host, error) {
+func (orm *Datastore) ListHostsInPack(pid uint, opt kolide.ListOptions) ([]*kolide.Host, error) {
 	hosts := []*kolide.Host{}
 	hostLookup := map[uint]bool{}
 
@@ -216,6 +216,32 @@ func (orm *Datastore) ListHostsInPack(pid uint) ([]*kolide.Host, error) {
 		}
 	}
 	orm.mtx.Unlock()
+
+	// Apply ordering
+	if opt.OrderKey != "" {
+		var fields = map[string]string{
+			"id":                 "ID",
+			"created_at":         "CreatedAt",
+			"updated_at":         "UpdatedAt",
+			"detail_update_time": "DetailUpdateTime",
+			"hostname":           "HostName",
+			"uuid":               "UUID",
+			"platform":           "Platform",
+			"osquery_version":    "OsqueryVersion",
+			"os_version":         "OSVersion",
+			"uptime":             "Uptime",
+			"memory":             "PhysicalMemory",
+			"mac":                "PrimaryMAC",
+			"ip":                 "PrimaryIP",
+		}
+		if err := sortResults(hosts, opt, fields); err != nil {
+			return nil, err
+		}
+	}
+
+	// Apply limit/offset
+	low, high := orm.getLimitOffsetSliceBounds(opt, len(hosts))
+	hosts = hosts[low:high]
 
 	return hosts, nil
 }

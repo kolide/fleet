@@ -149,8 +149,8 @@ func (svc service) RemoveLabelFromPack(ctx context.Context, lid, pid uint) error
 	return nil
 }
 
-func (svc service) ListHostsInPack(ctx context.Context, pid uint) ([]*kolide.Host, error) {
-	return svc.ds.ListHostsInPack(pid)
+func (svc service) ListHostsInPack(ctx context.Context, pid uint, opt kolide.ListOptions) ([]*kolide.Host, error) {
+	return svc.ds.ListHostsInPack(pid, opt)
 }
 
 func (svc service) ListPacksForHost(ctx context.Context, hid uint) ([]*kolide.Pack, error) {

@@ -41,7 +41,7 @@ func makeGetPackEndpoint(svc kolide.Service) endpoint.Endpoint {
 			return getPackResponse{Err: err}, nil
 		}
 
-		hosts, err := svc.ListHostsInPack(ctx, pack.ID)
+		hosts, err := svc.ListHostsInPack(ctx, pack.ID, kolide.ListOptions{})
 		if err != nil {
 			return getPackResponse{Err: err}, nil
 		}
@@ -85,7 +85,7 @@ func makeListPacksEndpoint(svc kolide.Service) endpoint.Endpoint {
 			if err != nil {
 				return getPackResponse{Err: err}, nil
 			}
-			hosts, err := svc.ListHostsInPack(ctx, pack.ID)
+			hosts, err := svc.ListHostsInPack(ctx, pack.ID, kolide.ListOptions{})
 			if err != nil {
 				return getPackResponse{Err: err}, nil
 			}

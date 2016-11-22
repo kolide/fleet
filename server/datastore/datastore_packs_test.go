@@ -123,7 +123,7 @@ func testGetHostsInPack(t *testing.T, ds kolide.Datastore) {
 	)
 	require.Nil(t, err)
 
-	hostsInPack, err := ds.ListHostsInPack(p1.ID)
+	hostsInPack, err := ds.ListHostsInPack(p1.ID, kolide.ListOptions{})
 	require.Nil(t, err)
 	require.Len(t, hostsInPack, 1)
 
@@ -143,7 +143,7 @@ func testGetHostsInPack(t *testing.T, ds kolide.Datastore) {
 	)
 	require.Nil(t, err)
 
-	hostsInPack, err = ds.ListHostsInPack(p1.ID)
+	hostsInPack, err = ds.ListHostsInPack(p1.ID, kolide.ListOptions{})
 	require.Nil(t, err)
 	require.Len(t, hostsInPack, 2)
 }

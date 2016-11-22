@@ -199,7 +199,7 @@ func (d *Datastore) RemoveLabelFromPack(label *kolide.Label, pack *kolide.Pack) 
 	return nil
 }
 
-func (d *Datastore) ListHostsInPack(pid uint) ([]*kolide.Host, error) {
+func (d *Datastore) ListHostsInPack(pid uint, opt kolide.ListOptions) ([]*kolide.Host, error) {
 	sql := `
 		SELECT DISTINCT h.*
 		FROM hosts h
@@ -214,8 +214,9 @@ func (d *Datastore) ListHostsInPack(pid uint) ([]*kolide.Host, error) {
 		  pt.target_id = h.id
 		  AND pt.type = ?
 		)
-		WHERE pt.pack_id = ?;
+		WHERE pt.pack_id = ?
 	`
+	sql = appendListOptionsToSQL(sql, opt)
 	hosts := []*kolide.Host{}
 	if err := d.db.Select(&hosts, sql, kolide.TargetLabel, kolide.TargetHost, pid); err != nil {
 		return nil, errors.DatabaseError(err)
