@@ -167,7 +167,7 @@
     }
   }
 
-  @include tablet-breakpoint {
+  @include breakpoint(tablet) {
     .Select-menu-outer {
       .Select-menu {
         min-width: 665px;

@@ -24,7 +24,6 @@ const SelectTargetsMenuWrapper = (onMoreInfoClick, moreInfoTarget, handleBackToR
     const Option = optionComponent;
 
     const renderTargets = (targetType) => {
-      let targetCount = 0;
       const targets = filter(options, { target_type: targetType });
 
       if (targets.length === 0) {

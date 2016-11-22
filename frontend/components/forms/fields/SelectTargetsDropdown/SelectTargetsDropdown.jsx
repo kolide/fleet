@@ -127,7 +127,7 @@ class SelectTargetsDropdown extends Component {
     const inputClasses = classnames({
       'show-preview': moreInfoTarget,
       'is-empty': isEmpty,
-    })
+    });
 
     return (
       <Input
