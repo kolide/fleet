@@ -64,20 +64,91 @@ func testListQuery(t *testing.T, ds kolide.Datastore) {
 	assert.Equal(t, 10, len(results))
 }
 
+func newQuery(t *testing.T, ds kolide.Datastore, name, q string) *kolide.Query {
+	query, err := ds.NewQuery(&kolide.Query{
+		Name:  name,
+		Query: q,
+	})
+	require.Nil(t, err)
+
+	return query
+}
+
+func newCampaign(t *testing.T, ds kolide.Datastore, queryID uint, status kolide.DistributedQueryStatus) *kolide.DistributedQueryCampaign {
+	campaign, err := ds.NewDistributedQueryCampaign(&kolide.DistributedQueryCampaign{
+		QueryID: queryID,
+		Status:  status,
+	})
+	require.Nil(t, err)
+
+	return campaign
+}
+
+func newHost(t *testing.T, ds kolide.Datastore, name, ip, key, uuid string, tim time.Time) *kolide.Host {
+	h, err := ds.NewHost(&kolide.Host{
+		HostName:         name,
+		PrimaryIP:        ip,
+		NodeKey:          key,
+		UUID:             uuid,
+		DetailUpdateTime: tim,
+	})
+
+	require.Nil(t, err)
+	require.NotZero(t, h.ID)
+	require.Nil(t, ds.MarkHostSeen(h, tim))
+
+	return h
+}
+
+func newLabel(t *testing.T, ds kolide.Datastore, name, query string) *kolide.Label {
+	l, err := ds.NewLabel(&kolide.Label{Name: name, Query: query})
+
+	require.Nil(t, err)
+	require.NotZero(t, l.ID)
+
+	return l
+}
+
+func addHost(t *testing.T, ds kolide.Datastore, campaignID, hostID uint) {
+	_, err := ds.NewDistributedQueryCampaignTarget(
+		&kolide.DistributedQueryCampaignTarget{
+			Type:                       kolide.TargetHost,
+			TargetID:                   hostID,
+			DistributedQueryCampaignID: campaignID,
+		})
+	require.Nil(t, err)
+
+}
+
+func addLabel(t *testing.T, ds kolide.Datastore, campaignID, labelID uint) {
+	_, err := ds.NewDistributedQueryCampaignTarget(
+		&kolide.DistributedQueryCampaignTarget{
+			Type:                       kolide.TargetLabel,
+			TargetID:                   labelID,
+			DistributedQueryCampaignID: campaignID,
+		})
+	require.Nil(t, err)
+}
+
+func checkTargets(t *testing.T, ds kolide.Datastore, campaignID uint, expectedHostIDs []uint, expectedLabelIDs []uint) {
+	hostIDs, labelIDs, err := ds.DistributedQueryCampaignTargetIDs(campaignID)
+	require.Nil(t, err)
+
+	sortutil.Asc(expectedHostIDs)
+	sortutil.Asc(hostIDs)
+	assert.Equal(t, expectedHostIDs, hostIDs)
+
+	sortutil.Asc(expectedLabelIDs)
+	sortutil.Asc(labelIDs)
+	assert.Equal(t, expectedLabelIDs, labelIDs)
+}
+
 func testDistributedQueryCampaign(t *testing.T, ds kolide.Datastore) {
 	mockClock := clock.NewMockClock()
 
-	query, err := ds.NewQuery(&kolide.Query{
-		Name:  "test",
-		Query: "select * from time",
-	})
-	require.Nil(t, err)
+	query := newQuery(t, ds, "test", "select * from time")
 
-	campaign, err := ds.NewDistributedQueryCampaign(&kolide.DistributedQueryCampaign{
-		QueryID: query.ID,
-		Status:  kolide.QueryRunning,
-	})
-	require.Nil(t, err)
+	campaign := newCampaign(t, ds, query.ID, kolide.QueryRunning)
 
 	{
 		retrieved, err := ds.DistributedQueryCampaign(campaign.ID)
@@ -86,85 +157,27 @@ func testDistributedQueryCampaign(t *testing.T, ds kolide.Datastore) {
 		assert.Equal(t, campaign.Status, retrieved.Status)
 	}
 
-	newHost := func(name string, ip string, key string, uuid string, tim time.Time) *kolide.Host {
-		h, err := ds.NewHost(&kolide.Host{
-			HostName:         name,
-			PrimaryIP:        ip,
-			NodeKey:          key,
-			UUID:             uuid,
-			DetailUpdateTime: tim,
-		})
+	h1 := newHost(t, ds, "foo.local", "192.168.1.10", "1", "1", mockClock.Now())
+	h2 := newHost(t, ds, "bar.local", "192.168.1.11", "2", "2", mockClock.Now().Add(-1*time.Hour))
+	h3 := newHost(t, ds, "baz.local", "192.168.1.12", "3", "3", mockClock.Now().Add(-13*time.Minute))
 
-		require.Nil(t, err)
-		require.NotZero(t, h.ID)
-		require.Nil(t, ds.MarkHostSeen(h, tim))
+	l1 := newLabel(t, ds, "label foo", "query foo")
+	l2 := newLabel(t, ds, "label bar", "query foo")
 
-		return h
-	}
+	checkTargets(t, ds, campaign.ID, []uint{}, []uint{})
 
-	newLabel := func(name string, query string) *kolide.Label {
-		l, err := ds.NewLabel(&kolide.Label{Name: name, Query: query})
+	addHost(t, ds, campaign.ID, h1.ID)
+	checkTargets(t, ds, campaign.ID, []uint{h1.ID}, []uint{})
 
-		require.Nil(t, err)
-		require.NotZero(t, l.ID)
+	addLabel(t, ds, campaign.ID, l1.ID)
+	checkTargets(t, ds, campaign.ID, []uint{h1.ID}, []uint{l1.ID})
 
-		return l
-	}
+	addLabel(t, ds, campaign.ID, l2.ID)
+	checkTargets(t, ds, campaign.ID, []uint{h1.ID}, []uint{l1.ID, l2.ID})
 
-	addHost := func(h *kolide.Host) {
-		_, err := ds.NewDistributedQueryCampaignTarget(
-			&kolide.DistributedQueryCampaignTarget{
-				Type:                       kolide.TargetHost,
-				TargetID:                   h.ID,
-				DistributedQueryCampaignID: campaign.ID,
-			})
-		require.Nil(t, err)
+	addHost(t, ds, campaign.ID, h2.ID)
+	addHost(t, ds, campaign.ID, h3.ID)
 
-	}
-
-	addLabel := func(l *kolide.Label) {
-		_, err := ds.NewDistributedQueryCampaignTarget(
-			&kolide.DistributedQueryCampaignTarget{
-				Type:                       kolide.TargetLabel,
-				TargetID:                   l.ID,
-				DistributedQueryCampaignID: campaign.ID,
-			})
-		require.Nil(t, err)
-	}
-
-	checkTargets := func(expectedHostIDs []uint, expectedLabelIDs []uint) {
-		hostIDs, labelIDs, err := ds.DistributedQueryCampaignTargetIDs(campaign.ID)
-		require.Nil(t, err)
-
-		sortutil.Asc(expectedHostIDs)
-		sortutil.Asc(hostIDs)
-		assert.Equal(t, expectedHostIDs, hostIDs)
-
-		sortutil.Asc(expectedLabelIDs)
-		sortutil.Asc(labelIDs)
-		assert.Equal(t, expectedLabelIDs, labelIDs)
-	}
-
-	h1 := newHost("foo.local", "192.168.1.10", "1", "1", mockClock.Now())
-	h2 := newHost("bar.local", "192.168.1.11", "2", "2", mockClock.Now().Add(-1*time.Hour))
-	h3 := newHost("baz.local", "192.168.1.12", "3", "3", mockClock.Now().Add(-13*time.Minute))
-
-	l1 := newLabel("label foo", "query foo")
-	l2 := newLabel("label bar", "query foo")
-
-	checkTargets([]uint{}, []uint{})
-
-	addHost(h1)
-	checkTargets([]uint{h1.ID}, []uint{})
-
-	addLabel(l1)
-	checkTargets([]uint{h1.ID}, []uint{l1.ID})
-
-	addLabel(l2)
-	checkTargets([]uint{h1.ID}, []uint{l1.ID, l2.ID})
-
-	addHost(h2)
-	addHost(h3)
-	checkTargets([]uint{h1.ID, h2.ID, h3.ID}, []uint{l1.ID, l2.ID})
+	checkTargets(t, ds, campaign.ID, []uint{h1.ID, h2.ID, h3.ID}, []uint{l1.ID, l2.ID})
 
 }
