@@ -247,7 +247,9 @@ func MakeHandler(ctx context.Context, svc kolide.Service, jwtKey string, logger 
 
 	r := mux.NewRouter()
 	attachKolideAPIRoutes(r, kolideHandlers)
-	r.HandleFunc("/api/v1/kolide/results/{id}", svc.StreamCampaignResults).Methods("GET")
+	r.HandleFunc("/api/v1/kolide/results/{id}",
+		makeStreamDistributedQueryCampaignResultsHandler(svc, jwtKey)).
+		Methods("GET")
 
 	return r
 }

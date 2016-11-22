@@ -1,9 +1,9 @@
 package kolide
 
 import (
-	"net/http"
 	"time"
 
+	"github.com/kolide/kolide-ose/server/websocket"
 	"golang.org/x/net/context"
 )
 
@@ -43,11 +43,11 @@ type QueryService interface {
 	DeleteQuery(ctx context.Context, id uint) error
 	NewDistributedQueryCampaign(ctx context.Context, queryString string, hosts []uint, labels []uint) (*DistributedQueryCampaign, error)
 
-	// StreamCampaignResults is a handler function that upgrades a request
-	// to a websocket connection and begins streaming distributed query
-	// results. Note that it uses a type signature inconsistent with other
-	// service methods due to go-kit's lack of support of websockets/pubsub
-	StreamCampaignResults(w http.ResponseWriter, r *http.Request)
+	// StreamCampaignResults streams updates with query results and
+	// expected host totals over the provided websocket. Note that the type
+	// signature is somewhat inconsistent due to this being a streaming API
+	// and not the typical go-kit RPC style.
+	StreamCampaignResults(ctx context.Context, conn *websocket.Conn, campaignID uint)
 }
 
 type QueryPayload struct {

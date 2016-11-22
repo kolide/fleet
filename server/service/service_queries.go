@@ -2,7 +2,6 @@ package service
 
 import (
 	"fmt"
-	"net/http"
 	"time"
 
 	"github.com/kolide/kolide-ose/server/contexts/viewer"
@@ -176,34 +175,8 @@ type targetTotals struct {
 	Online uint `json:"online"`
 }
 
-func (svc service) StreamCampaignResults(w http.ResponseWriter, r *http.Request) {
-	// Upgrade to websocket connection
-	conn, err := websocket.Upgrade(w, r)
-	if err != nil {
-		return
-	}
-	defer conn.Close()
-
-	// Receive the auth bearer token
-	token, err := conn.ReadAuthToken()
-	if err != nil {
-		return
-	}
-
-	// Authenticate with the token
-	vc, err := authViewer(context.Background(), svc.config.Auth.JwtKey, string(token), svc)
-	if err != nil || !vc.CanPerformActions() {
-		conn.WriteJSONError("unauthorized")
-		return
-	}
-
+func (svc service) StreamCampaignResults(ctx context.Context, conn *websocket.Conn, campaignID uint) {
 	// Find the campaign and ensure it is active
-	campaignID, err := idFromRequest(r, "id")
-	if err != nil {
-		conn.WriteJSONError("invalid campaign ID")
-		return
-	}
-
 	campaign, err := svc.ds.DistributedQueryCampaign(campaignID)
 	if err != nil {
 		conn.WriteJSONError(fmt.Sprintf("cannot find campaign for ID %d", campaignID))
