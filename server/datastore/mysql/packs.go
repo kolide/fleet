@@ -198,3 +198,27 @@ func (d *Datastore) RemoveLabelFromPack(label *kolide.Label, pack *kolide.Pack) 
 
 	return nil
 }
+
+func (d *Datastore) ListHostsInPack(pid uint) ([]*kolide.Host, error) {
+	sql := `
+		SELECT DISTINCT h.*
+		FROM hosts h
+		JOIN pack_targets pt
+		JOIN label_query_executions lqe
+		ON (
+		  pt.target_id = lqe.label_id
+		  AND lqe.host_id = h.id
+		  AND lqe.matches
+		  AND pt.type = ?
+		) OR (
+		  pt.target_id = h.id
+		  AND pt.type = ?
+		)
+		AND pt.pack_id = ?;
+	`
+	hosts := []*kolide.Host{}
+	if err := d.db.Select(&hosts, sql, kolide.TargetLabel, kolide.TargetHost, pid); err != nil {
+		return nil, errors.DatabaseError(err)
+	}
+	return hosts, nil
+}

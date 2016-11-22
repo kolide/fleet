@@ -189,3 +189,32 @@ func (orm *Datastore) RemoveLabelFromPack(label *kolide.Label, pack *kolide.Pack
 
 	return nil
 }
+
+func (orm *Datastore) ListHostsInPack(pid uint) ([]*kolide.Host, error) {
+	hosts := []*kolide.Host{}
+	hostLookup := map[uint]bool{}
+
+	orm.mtx.Lock()
+	for _, pt := range orm.packTargets {
+		if pt.PackID != pid {
+			continue
+		}
+
+		if pt.Type == kolide.TargetHost {
+			if !hostLookup[pt.TargetID] {
+				hostLookup[pt.TargetID] = true
+				hosts = append(hosts, orm.hosts[pt.TargetID])
+			}
+		} else if pt.Type == kolide.TargetLabel {
+			for _, lqe := range orm.labelQueryExecutions {
+				if lqe.LabelID == pt.TargetID && lqe.Matches && !hostLookup[lqe.HostID] {
+					hostLookup[lqe.HostID] = true
+					hosts = append(hosts, orm.hosts[lqe.HostID])
+				}
+			}
+		}
+	}
+	orm.mtx.Unlock()
+
+	return hosts, nil
+}
