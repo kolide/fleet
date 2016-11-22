@@ -200,12 +200,13 @@ func (orm *Datastore) ListHostsInPack(pid uint) ([]*kolide.Host, error) {
 			continue
 		}
 
-		if pt.Type == kolide.TargetHost {
+		switch pt.Type {
+		case kolide.TargetHost:
 			if !hostLookup[pt.TargetID] {
 				hostLookup[pt.TargetID] = true
 				hosts = append(hosts, orm.hosts[pt.TargetID])
 			}
-		} else if pt.Type == kolide.TargetLabel {
+		case kolide.TargetLabel:
 			for _, lqe := range orm.labelQueryExecutions {
 				if lqe.LabelID == pt.TargetID && lqe.Matches && !hostLookup[lqe.HostID] {
 					hostLookup[lqe.HostID] = true
