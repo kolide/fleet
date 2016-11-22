@@ -71,14 +71,14 @@ func TestWriteJSONMessage(t *testing.T) {
 		},
 	}
 
-	for _, c := range cases {
+	for _, tt := range cases {
 		t.Run("", func(t *testing.T) {
 			handler := func(w http.ResponseWriter, req *http.Request) {
 				conn, err := Upgrade(w, req)
 				require.Nil(t, err)
 				defer conn.Close()
 
-				require.Nil(t, conn.WriteJSONMessage(c.typ, c.data))
+				require.Nil(t, conn.WriteJSONMessage(tt.typ, tt.data))
 			}
 
 			// Connect to websocket handler server
@@ -89,7 +89,7 @@ func TestWriteJSONMessage(t *testing.T) {
 			require.Nil(t, err)
 			defer conn.Close()
 
-			dataJSON, err := json.Marshal(c.data)
+			dataJSON, err := json.Marshal(tt.data)
 			require.Nil(t, err)
 
 			// Ensure we read the correct message
@@ -97,7 +97,7 @@ func TestWriteJSONMessage(t *testing.T) {
 			require.Nil(t, err)
 			assert.Equal(t, websocket.TextMessage, mType)
 			assert.JSONEq(t,
-				fmt.Sprintf(`{"type": "%s", "data": %s}`, c.typ, dataJSON),
+				fmt.Sprintf(`{"type": "%s", "data": %s}`, tt.typ, dataJSON),
 				string(data),
 			)
 
@@ -123,14 +123,14 @@ func TestWriteJSONError(t *testing.T) {
 		},
 	}
 
-	for _, c := range cases {
+	for _, tt := range cases {
 		t.Run("", func(t *testing.T) {
 			handler := func(w http.ResponseWriter, req *http.Request) {
 				conn, err := Upgrade(w, req)
 				require.Nil(t, err)
 				defer conn.Close()
 
-				require.Nil(t, conn.WriteJSONError(c.err))
+				require.Nil(t, conn.WriteJSONError(tt.err))
 			}
 
 			// Connect to websocket handler server
@@ -141,7 +141,7 @@ func TestWriteJSONError(t *testing.T) {
 			require.Nil(t, err)
 			defer conn.Close()
 
-			errJSON, err := json.Marshal(c.err)
+			errJSON, err := json.Marshal(tt.err)
 			require.Nil(t, err)
 
 			// Ensure we read the correct message
@@ -187,9 +187,9 @@ func TestReadJSONMessage(t *testing.T) {
 		},
 	}
 
-	for _, c := range cases {
+	for _, tt := range cases {
 		t.Run("", func(t *testing.T) {
-			dataJSON, err := json.Marshal(c.data)
+			dataJSON, err := json.Marshal(tt.data)
 			require.Nil(t, err)
 
 			completed := make(chan struct{})
@@ -201,14 +201,14 @@ func TestReadJSONMessage(t *testing.T) {
 				defer conn.Close()
 
 				msg, err := conn.ReadJSONMessage()
-				if c.err == nil {
+				if tt.err == nil {
 					require.Nil(t, err)
 				} else {
-					require.Equal(t, c.err.Error(), err.Error())
+					require.Equal(t, tt.err.Error(), err.Error())
 					return
 				}
 
-				assert.Equal(t, c.typ, msg.Type)
+				assert.Equal(t, tt.typ, msg.Type)
 				assert.EqualValues(t, &dataJSON, msg.Data)
 
 			}
@@ -222,7 +222,7 @@ func TestReadJSONMessage(t *testing.T) {
 			conn := &Conn{wsConn, defaultTimeout}
 			defer conn.Close()
 
-			require.Nil(t, conn.WriteJSONMessage(c.typ, c.data))
+			require.Nil(t, conn.WriteJSONMessage(tt.typ, tt.data))
 
 			select {
 			case <-completed:
@@ -258,7 +258,7 @@ func TestReadAuthToken(t *testing.T) {
 		},
 	}
 
-	for _, c := range cases {
+	for _, tt := range cases {
 		t.Run("", func(t *testing.T) {
 			completed := make(chan struct{})
 			handler := func(w http.ResponseWriter, req *http.Request) {
@@ -269,14 +269,14 @@ func TestReadAuthToken(t *testing.T) {
 				defer conn.Close()
 
 				token, err := conn.ReadAuthToken()
-				if c.err == nil {
+				if tt.err == nil {
 					require.Nil(t, err)
 				} else {
-					require.Equal(t, c.err.Error(), err.Error())
+					require.Equal(t, tt.err.Error(), err.Error())
 					return
 				}
 
-				assert.Equal(t, c.token, token)
+				assert.Equal(t, tt.token, token)
 			}
 
 			// Connect to websocket handler server
@@ -288,7 +288,7 @@ func TestReadAuthToken(t *testing.T) {
 			conn := &Conn{wsConn, defaultTimeout}
 			defer conn.Close()
 
-			require.Nil(t, conn.WriteJSONMessage(c.typ, c.data))
+			require.Nil(t, conn.WriteJSONMessage(tt.typ, tt.data))
 
 			select {
 			case <-completed:
