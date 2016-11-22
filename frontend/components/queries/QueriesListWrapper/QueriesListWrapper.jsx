@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
+import { Link } from 'react-router';
 import { remove, size } from 'lodash';
 
-import Button from 'components/buttons/Button';
 import InputField from 'components/forms/fields/InputField';
 import QueriesList from 'components/queries/QueriesList';
 import queryInterface from 'interfaces/query';
@@ -57,13 +57,6 @@ class QueriesListWrapper extends Component {
       return false;
     }
 
-    const addQueryBtnText = (
-      <span className={`${baseClass}__add-query-btn-text`}>
-        <i className={`${baseClass}__add-query-btn-icon kolidecon-add-button`} />
-        Add New Query
-      </span>
-    );
-
     return (
       <div className={`${baseClass} ${baseClass}__wrapper`}>
         <p>Add Queries to Pack</p>
@@ -74,10 +67,12 @@ class QueriesListWrapper extends Component {
           placeholder="Search Queries"
           value={querySearchText}
         />
-        <Button
-          text={addQueryBtnText}
-          variant="brand"
-        />
+        <Link className={`${baseClass}__add-query-btn`} to="/queries/new">
+          <span className={`${baseClass}__add-query-btn-text`}>
+            <i className={`${baseClass}__add-query-btn-icon kolidecon-add-button`} />
+            Add New Query
+          </span>
+        </Link>
         <QueriesList
           onSelectQuery={onSelectQuery}
           queries={queries}

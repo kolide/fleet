@@ -28,6 +28,15 @@ describe('QueriesListWrapper - component', () => {
     expect(component.find('QueriesList').length).toEqual(1);
   });
 
+  it('renders a Link to the new query page', () => {
+    const queries = [query];
+    const component = mount(<QueriesListWrapper queries={queries} />);
+
+    expect(component.find('Link').props()).toInclude({
+      to: '/queries/new',
+    });
+  });
+
   it('updates state when a query checkbox is changed', () => {
     const component = mount(<QueriesListWrapper queries={[query]} />);
     const checkbox = component.find('Checkbox').first();
