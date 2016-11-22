@@ -22,8 +22,14 @@ const SelectTargetsMenuWrapper = (onMoreInfoClick, moreInfoTarget, handleBackToR
     onOptionRef,
   }) => {
     const Option = optionComponent;
+
     const renderTargets = (targetType) => {
+      let targetCount = 0;
       const targets = filter(options, { target_type: targetType });
+
+      if (targets.length === 0) {
+        return <span className={`${baseClass}__not-found`}>Unable to find any matching {targetType}.</span>;
+      }
 
       return targets.map((target, index) => {
         const { disabled: isDisabled } = target;

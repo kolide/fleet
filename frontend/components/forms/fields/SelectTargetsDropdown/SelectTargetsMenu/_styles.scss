@@ -31,4 +31,15 @@
     position: relative;
     z-index: 1;
   }
+
+  &__not-found {
+    font-size: $small;
+    font-weight: $bold;
+    line-height: 2.64;
+    text-align: left;
+    color: $text-dark;
+    text-transform: uppercase;
+    display: block;
+    padding: 0 $large;
+  }
 }

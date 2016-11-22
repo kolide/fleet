@@ -40,180 +40,252 @@
   text-align: center;
 }
 
-.kolidecon-kolide-logo-flat:before {
+.kolidecon-kolide-logo-flat::before {
   content: '\f000';
 }
 
-.kolidecon-chevrondown:before {
+.kolidecon-chevrondown::before {
   content: '\f004';
 }
 
-.kolidecon-chevronleft:before {
+.kolidecon-chevronleft::before {
   content: '\f006';
 }
 
-.kolidecon-chevronright:before {
+.kolidecon-chevronright::before {
   content: '\f008';
 }
 
-.kolidecon-chevronup:before {
+.kolidecon-chevronup::before {
   content: '\f00a';
 }
 
-.kolidecon-cpu:before {
+.kolidecon-cpu::before {
   content: '\f00c';
 }
 
-.kolidecon-downcarat:before {
+.kolidecon-downcarat::before {
   content: '\f00d';
 }
 
-.kolidecon-filter:before {
+.kolidecon-filter::before {
   content: '\f00f';
 }
 
-.kolidecon-mac:before {
+.kolidecon-mac::before {
   content: '\f012';
 }
 
-.kolidecon-memory:before {
+.kolidecon-memory::before {
   content: '\f013';
 }
 
-.kolidecon-penciledit:before {
+.kolidecon-penciledit::before {
   content: '\f015';
 }
 
-.kolidecon-storage:before {
+.kolidecon-storage::before {
   content: '\f019';
 }
 
-.kolidecon-upcarat:before {
+.kolidecon-upcarat::before {
   content: '\f01b';
 }
 
-.kolidecon-uptime:before {
+.kolidecon-uptime::before {
   content: '\f01c';
 }
 
-.kolidecon-world:before {
+.kolidecon-world::before {
   content: '\f01d';
 }
 
-.kolidecon-osquery:before {
+.kolidecon-osquery::before {
   content: '\f021';
 }
 
-.kolidecon-join:before {
+.kolidecon-join::before {
   content: '\f022';
 }
 
-.kolidecon-add-button:before {
+.kolidecon-add-button::before {
   content: '\f029';
 }
 
-.kolidecon-username:before {
+.kolidecon-username::before {
   content: '\f02a';
 }
 
-.kolidecon-password:before {
+.kolidecon-password::before {
   content: '\f02b';
 }
 
-.kolidecon-email:before {
+.kolidecon-email::before {
   content: '\f02c';
 }
 
-.kolidecon-query:before {
+.kolidecon-query::before {
   content: '\f02d';
 }
 
-.kolidecon-hosts:before {
+.kolidecon-hosts::before {
   content: '\f02e';
 }
 
-.kolidecon-packs:before {
+.kolidecon-packs::before {
   content: '\f02f';
 }
 
-.kolidecon-help:before {
+.kolidecon-help::before {
   content: '\f030';
 }
 
-.kolidecon-admin:before {
+.kolidecon-admin::before {
   content: '\f031';
 }
 
-.kolidecon-config:before {
+.kolidecon-config::before {
   content: '\f032';
 }
 
-.kolidecon-mia:before {
+.kolidecon-mia::before {
   content: '\f034';
 }
 
-.kolidecon-success-check:before {
+.kolidecon-success-check::before {
   content: '\f035';
 }
 
-.kolidecon-offline:before {
+.kolidecon-offline::before {
   content: '\f036';
 }
 
-.kolidecon-windows:before {
+.kolidecon-windows::before {
   content: '\f037';
 }
 
-.kolidecon-centos:before {
+.kolidecon-centos::before {
   content: '\f038';
 }
 
-.kolidecon-ubuntu:before {
+.kolidecon-ubuntu::before {
   content: '\f039';
 }
 
-.kolidecon-apple:before {
+.kolidecon-apple::before {
   content: '\f03a';
 }
 
-.kolidecon-search:before {
+.kolidecon-search::before {
   content: '\f03b';
 }
 
-.kolidecon-all-hosts:before {
+.kolidecon-all-hosts::before {
   content: '\f03c';
 }
 
-.kolidecon-single-host:before {
+.kolidecon-single-host::before {
   content: '\f03d';
 }
 
-.kolidecon-alerts:before {
+.kolidecon-alerts::before {
   content: '\f03e';
 }
 
-.kolidecon-logout:before {
+.kolidecon-logout::before {
   content: '\f03f';
 }
 
-.kolidecon-user-settings:before {
+.kolidecon-user-settings::before {
   content: '\f040';
 }
 
-.kolidecon-clipboard:before {
+.kolidecon-clipboard::before {
   content: '\f043';
 }
 
-.kolidecon-list-select:before {
+.kolidecon-list-select::before {
   content: '\f044';
 }
 
-.kolidecon-grid-select:before {
+.kolidecon-grid-select::before {
   content: '\f045';
 }
 
-.kolidecon-label:before {
+.kolidecon-label::before {
   content: '\f033';
+}
+
+.kolidecon-docker::before {
+  content: '\f046';
+}
+
+.kolidecon-cloud::before {
+  content: '\f047';
+}
+
+.kolidecon-self-hosted::before {
+  content: '\f048';
+}
+
+.kolidecon-help-solid::before {
+  content: '\f049';
+}
+
+.kolidecon-help-stroke::before {
+  content: '\f04a';
+}
+
+.kolidecon-warning-filled::before {
+  content: '\f04b';
+}
+
+.kolidecon-delete-cloud::before {
+  content: '\f04c';
+}
+
+.kolidecon-pdf::before {
+  content: '\f04d';
+}
+
+.kolidecon-credit-card-small::before {
+  content: '\f04e';
+}
+
+.kolidecon-billing-card::before {
+  content: '\f04f';
+}
+
+.kolidecon-lock-big::before {
+  content: '\f050';
+}
+
+.kolidecon-link-big::before {
+  content: '\f051';
+}
+
+.kolidecon-briefcase::before {
+  content: '\f052';
+}
+
+.kolidecon-name-card::before {
+  content: '\f053';
+}
+
+.kolidecon-kolide-logo::before {
+  content: '\f054';
+}
+
+.kolidecon-business::before {
+  content: '\f055';
+}
+
+.kolidecon-clock::before {
+  content: '\f056';
+}
+
+.kolidecon-host-large::before {
+  content: '\f057';
 }
 
 

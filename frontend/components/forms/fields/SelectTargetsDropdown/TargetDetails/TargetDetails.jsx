@@ -116,7 +116,7 @@ class TargetDetails extends Component {
     return (
       <div className={`${labelBaseClass} ${className}`}>
         <button className={`button button--unstyled ${labelBaseClass}__back`} onClick={handleBackToResults}>
-          <i className="kolidecon kolidecon-chevronleft" />Back
+          <i className="kolidecon kolidecon-chevronleft" /> Back
         </button>
 
         <p className={`${labelBaseClass}__display-text`}>
