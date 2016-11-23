@@ -2,6 +2,7 @@ import React from 'react';
 import expect, { createSpy, restoreSpies } from 'expect';
 import { mount } from 'enzyme';
 
+import { fillInFormInput } from 'test/helpers';
 import QueriesListWrapper from './index';
 
 const query = {
@@ -46,6 +47,24 @@ describe('QueriesListWrapper - component', () => {
     expect(
       componentWithStagedQueries.find('PackQueryConfigForm').length
     ).toEqual(1);
+  });
+
+  it('filters queries', () => {
+    const component = mount(
+      <QueriesListWrapper
+        configuredQueries={[]}
+        queries={queries}
+        stagedQueries={[]}
+      />
+    );
+
+    const searchQueriesInput = component.find('InputField').find('input');
+
+    fillInFormInput(searchQueriesInput, 'darwin');
+
+    const queriesListQueries = component.find('QueriesList').prop('queries');
+
+    expect(queriesListQueries).toEqual([]);
   });
 
   it('calls the onSelectQuery prop when a query checkbox is selected', () => {

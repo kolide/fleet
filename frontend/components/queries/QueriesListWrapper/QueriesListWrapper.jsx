@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { size } from 'lodash';
 
+import helpers from 'components/queries/QueriesListWrapper/helpers';
 import InputField from 'components/forms/fields/InputField';
 import PackQueryConfigForm from 'components/forms/packs/PackQueryConfigForm';
 import QueriesList from 'components/queries/QueriesList';
@@ -48,6 +49,13 @@ class QueriesListWrapper extends Component {
     this.setState({ querySearchText });
   }
 
+  getQueries = () => {
+    const { queries } = this.props;
+    const { querySearchText } = this.state;
+
+    return helpers.filterQueries(queries, querySearchText);
+  }
+
   renderPackQueryConfigForm = () => {
     const {
       onClearStagedQueries,
@@ -72,6 +80,7 @@ class QueriesListWrapper extends Component {
 
   render () {
     const {
+      getQueries,
       onSelectQuery,
       onUpdateQuerySearchText,
       renderPackQueryConfigForm,
@@ -98,7 +107,7 @@ class QueriesListWrapper extends Component {
         <QueriesList
           configuredQueryIDs={configuredQueryIDs}
           onSelectQuery={onSelectQuery}
-          queries={queries}
+          queries={getQueries()}
           selectedQueries={stagedQueries}
         />
       </div>
