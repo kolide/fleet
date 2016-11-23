@@ -105,7 +105,12 @@ class RegistrationForm extends Component {
     } = this;
 
     if (page === 4) {
-      return <ConfirmationPage formData={formData} handleSubmit={onSubmitConfirmation} className={`${baseClass}__confirmation`} />;
+      return (
+        <div>
+          {renderHeader()}
+          <ConfirmationPage formData={formData} handleSubmit={onSubmitConfirmation} className={`${baseClass}__confirmation`} />
+        </div>
+      );
     }
 
     return (
