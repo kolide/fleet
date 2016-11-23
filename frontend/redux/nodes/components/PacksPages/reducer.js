@@ -4,9 +4,13 @@ import { CONFIGURE_STAGED_QUERIES, STAGE_QUERY, UNSTAGE_QUERY } from './actions'
 
 export const initialState = {
   stagedQueries: [],
-  configuredQueries: [],
+  configuredQueryIDs: [],
   configurations: [],
 };
+
+const queryIDs = (queries) => {
+  return queries.map((query) => query.id);
+}
 
 const reducer = (state = initialState, { type, payload }) => {
   switch (type) {
@@ -14,9 +18,9 @@ const reducer = (state = initialState, { type, payload }) => {
       return {
         ...state,
         stagedQueries: [],
-        configuredQueries: [
-          ...state.configuredQueries,
-          ...state.stagedQueries,
+        configuredQueryIDs: [
+          ...state.configuredQueryIDs,
+          ...queryIDs(state.stagedQueries),
         ],
         configurations: [
           ...state.configurations,

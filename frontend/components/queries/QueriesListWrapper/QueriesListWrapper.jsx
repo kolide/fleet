@@ -10,7 +10,7 @@ const baseClass = 'queries-list-wrapper';
 
 class QueriesListWrapper extends Component {
   static propTypes = {
-    configuredQueries: PropTypes.arrayOf(queryInterface),
+    configuredQueryIDs: PropTypes.arrayOf(PropTypes.number),
     onConfigureQueries: PropTypes.func,
     onDeselectQuery: PropTypes.func,
     onSelectQuery: PropTypes.func,
@@ -70,7 +70,7 @@ class QueriesListWrapper extends Component {
       onUpdateQuerySearchText,
       renderPackQueryConfigForm,
     } = this;
-    const { configuredQueries, queries, stagedQueries } = this.props;
+    const { configuredQueryIDs, queries, stagedQueries } = this.props;
     const { querySearchText } = this.state;
     const queryCount = size(queries);
 
@@ -90,7 +90,7 @@ class QueriesListWrapper extends Component {
         />
         {renderPackQueryConfigForm()}
         <QueriesList
-          configuredQueries={configuredQueries}
+          configuredQueryIDs={configuredQueryIDs}
           onSelectQuery={onSelectQuery}
           queries={queries}
           selectedQueries={stagedQueries}
