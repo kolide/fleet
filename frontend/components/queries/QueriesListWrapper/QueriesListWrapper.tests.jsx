@@ -1,5 +1,5 @@
 import React from 'react';
-import expect from 'expect';
+import expect, { createSpy, restoreSpies } from 'expect';
 import { mount } from 'enzyme';
 
 import QueriesListWrapper from './index';
@@ -19,34 +19,62 @@ const query = {
   updated_at: '2016-10-17T07:06:00Z',
   version: '',
 };
+const queries = [query];
 
 describe('QueriesListWrapper - component', () => {
-  it('renders a QueriesList component', () => {
-    const queries = [query];
-    const component = mount(<QueriesListWrapper queries={queries} />);
+  afterEach(restoreSpies);
 
-    expect(component.find('QueriesList').length).toEqual(1);
+  it('renders the PackQueryConfigForm when there are staged queries', () => {
+    const componentWithoutStagedQueries = mount(
+      <QueriesListWrapper
+        queries={queries}
+        stagedQueries={[]}
+      />
+    );
+    const componentWithStagedQueries = mount(
+      <QueriesListWrapper
+        queries={queries}
+        stagedQueries={queries}
+      />
+    );
+
+    expect(
+      componentWithoutStagedQueries.find('PackQueryConfigForm').length
+    ).toEqual(0);
+    expect(
+      componentWithStagedQueries.find('PackQueryConfigForm').length
+    ).toEqual(1);
   });
 
-  it('renders a Link to the new query page', () => {
-    const queries = [query];
-    const component = mount(<QueriesListWrapper queries={queries} />);
-
-    expect(component.find('Link').props()).toInclude({
-      to: '/queries/new',
-    });
-  });
-
-  it('updates state when a query checkbox is changed', () => {
-    const component = mount(<QueriesListWrapper queries={[query]} />);
+  it('calls the onSelectQuery prop when a query checkbox is selected', () => {
+    const onSelectQuerySpy = createSpy();
+    const component = mount(
+      <QueriesListWrapper
+        onSelectQuery={onSelectQuerySpy}
+        queries={queries}
+        stagedQueries={[]}
+      />
+    );
     const checkbox = component.find('Checkbox').first();
 
     checkbox.simulate('change');
 
-    expect(component.state().selectedQueries).toEqual([query]);
+    expect(onSelectQuerySpy).toHaveBeenCalledWith(query);
+  });
+
+  it('calls the onSelectQuery prop when a query checkbox is changed', () => {
+    const onDeselectQuerySpy = createSpy();
+    const component = mount(
+      <QueriesListWrapper
+        onDeselectQuery={onDeselectQuerySpy}
+        queries={queries}
+        stagedQueries={queries}
+      />
+    );
+    const checkbox = component.find('Checkbox').first();
 
     checkbox.simulate('change');
 
-    expect(component.state().selectedQueries).toEqual([]);
+    expect(onDeselectQuerySpy).toHaveBeenCalledWith(query);
   });
 });
