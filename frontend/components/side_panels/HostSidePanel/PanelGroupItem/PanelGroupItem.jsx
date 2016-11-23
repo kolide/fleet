@@ -22,13 +22,18 @@ class PanelGroupItem extends Component {
       count,
       display_text: displayText,
     } = item;
-    const wrapperClassName = classnames(baseClass, `${baseClass}__wrapper`, {
-      [`${baseClass}__wrapper--is-selected`]: isSelected,
-    });
+    const wrapperClassName = classnames(
+      baseClass,
+      'button',
+      'button--unstyled',
+      {
+        [`${baseClass}--selected`]: isSelected,
+      }
+    );
 
     return (
-      <button className={`${wrapperClassName} button button--unstyled`} onClick={onLabelClick}>
-        <i className={iconClassForLabel(item)} />
+      <button className={wrapperClassName} onClick={onLabelClick}>
+        <i className={`${iconClassForLabel(item)} ${baseClass}__icon`} />
         <span>{displayText}</span>
         <span>{count}</span>
       </button>

@@ -82,9 +82,9 @@ class HostSidePanel extends Component {
         />
         <hr className={`${baseClass}__hr`} />
         <button className={`${baseClass}__add-label-btn button button--unstyled`} onClick={onAddLabelClick}>
-          <i className="kolidecon-add-button" />
+          <i className={`kolidecon-add-button ${baseClass}__add-label-btn--icon ${baseClass}__add-label-btn--icon-add`} />
           ADD NEW LABEL
-          <i className="kolidecon-label" />
+          <i className={`kolidecon-label ${baseClass}__add-label-btn--icon ${baseClass}__add-label-btn--icon-label`} />
         </button>
       </SecondarySidePanelContainer>
     );

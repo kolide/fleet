@@ -1,17 +1,29 @@
 .host-side-panel {
   &__add-label-btn {
     color: $success;
+    padding: 0 $pad-large;
+
+    &--icon {
+      margin-right: $pad-large;
+
+      &-label {
+        margin: 0 0 0 $pad-small;
+      }
+    }
   }
 
   &__wrapper {
     color: $text-medium;
-    padding: 0;
+    padding: 60px 0 0;
   }
 
   &__hr {
     color: $text-medium;
     margin: $pad-base $pad-auto;
     width: 80%;
+    height: 1px;
+    background-color: #ececec;
+    border: 0;
   }
 
   &__panel-group-item {
@@ -21,6 +33,10 @@
 
     .title {
       padding-left: 20px;
+    }
+
+    .input-field {
+      width: 100%;
     }
   }
 }

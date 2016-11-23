@@ -1,12 +1,29 @@
 .panel-group-item {
-  &__wrapper {
-    color: $text-medium;
-    display: block;
-    width: 100%;
+  display: block;
+  width: 100%;
+  font-size: 16px;
+  line-height: 2.25;
+  letter-spacing: 0.5px;
+  font-weight: $normal;
+  color: $text-medium;
+  text-align: left;
+  padding: 0 $pad-large;
+  border-radius: 0;
 
-    &--is-selected {
-      background-color: $brand;
-      color: $white;
-    };
+  &:hover {
+    background-color: $bg-medium;
+  }
+
+  &--selected {
+    background-color: $brand-ultralight;
+    color: $brand-dark;
+
+    &:hover {
+      background-color: $brand-ultralight;
+    }
+  }
+
+  &__icon {
+    margin-right: 23px;
   }
 }
