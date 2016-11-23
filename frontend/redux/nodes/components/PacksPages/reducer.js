@@ -1,6 +1,6 @@
 import { pull } from 'lodash';
 
-import { CONFIGURE_STAGED_QUERIES, STAGE_QUERY, UNSTAGE_QUERY } from './actions';
+import { CLEAR_STAGED_QUERIES, CONFIGURE_STAGED_QUERIES, STAGE_QUERY, UNSTAGE_QUERY } from './actions';
 
 export const initialState = {
   stagedQueries: [],
@@ -14,6 +14,11 @@ const queryIDs = (queries) => {
 
 const reducer = (state = initialState, { type, payload }) => {
   switch (type) {
+    case CLEAR_STAGED_QUERIES:
+      return {
+        ...state,
+        stagedQueries: [],
+      };
     case CONFIGURE_STAGED_QUERIES:
       return {
         ...state,

@@ -41,6 +41,15 @@ export class PackComposerPage extends Component {
     dispatch(queryActions.loadAll());
   }
 
+  onClearStagedQueries = () => {
+    const { clearStagedQueries } = packsPageActions;
+    const { dispatch } = this.props;
+
+    dispatch(clearStagedQueries);
+
+    return false;
+  }
+
   onConfigureQueries = (formData) => {
     const { configureStagedQueries } = packsPageActions;
     const { dispatch } = this.props;
@@ -88,6 +97,7 @@ export class PackComposerPage extends Component {
   render () {
     const {
       handleSubmit,
+      onClearStagedQueries,
       onConfigureQueries,
       onFetchTargets,
       onStageQuery,
@@ -106,6 +116,7 @@ export class PackComposerPage extends Component {
         />
         <QueriesListWrapper
           configuredQueryIDs={configuredQueryIDs}
+          onClearStagedQueries={onClearStagedQueries}
           onConfigureQueries={onConfigureQueries}
           onDeselectQuery={onUnstageQuery}
           onSelectQuery={onStageQuery}

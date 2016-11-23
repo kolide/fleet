@@ -1,7 +1,9 @@
+export const CLEAR_STAGED_QUERIES = 'CLEAR_STAGED_QUERIES';
 export const CONFIGURE_STAGED_QUERIES = 'CONFIGURE_STAGED_QUERIES';
 export const STAGE_QUERY = 'STAGE_QUERY';
 export const UNSTAGE_QUERY = 'UNSTAGE_QUERY';
 
+export const clearStagedQueries = { type: CLEAR_STAGED_QUERIES };
 export const unstageQuery = (query) => {
   return {
     type: UNSTAGE_QUERY,
@@ -37,6 +39,7 @@ export const configureStagedQueries = (configurationFormData) => {
 };
 
 export default {
+  clearStagedQueries,
   configureStagedQueries,
   stageQuery,
   unstageQuery,

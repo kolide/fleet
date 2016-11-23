@@ -33,6 +33,15 @@ describe('PacksPages - reducer', () => {
     });
   });
 
+  it('clears staged queries', () => {
+    const stagedQueryState = {
+      ...initialState,
+      stagedQueries: [query],
+    };
+
+    expect(reducer(stagedQueryState, actions.clearStagedQueries)).toEqual(initialState);
+  });
+
   it('unstages queries', () => {
     const stagedQueryState = {
       ...initialState,
