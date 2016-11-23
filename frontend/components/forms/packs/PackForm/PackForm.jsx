@@ -5,14 +5,9 @@ import Form from 'components/forms/Form';
 import formFieldInterface from 'interfaces/form_field';
 import InputField from 'components/forms/fields/InputField';
 import SelectTargetsDropdown from 'components/forms/fields/SelectTargetsDropdown';
+import validate from './validate';
 
 const fieldNames = ['title', 'description', 'targets'];
-const validate = () => {
-  return {
-    valid: true,
-    errors: {},
-  };
-};
 
 class PackForm extends Component {
   static propTypes = {
