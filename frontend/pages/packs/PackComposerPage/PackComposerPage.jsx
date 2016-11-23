@@ -42,7 +42,10 @@ export class PackComposerPage extends Component {
   }
 
   onConfigureQueries = (formData) => {
-    console.log('configure queries', formData);
+    const { configureStagedQueries } = packsPageActions;
+    const { dispatch } = this.props;
+
+    dispatch(configureStagedQueries(formData));
   }
 
   onFetchTargets = (query, targetsResponse) => {
