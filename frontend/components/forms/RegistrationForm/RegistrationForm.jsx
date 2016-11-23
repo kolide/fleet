@@ -95,50 +95,49 @@ class RegistrationForm extends Component {
     return false;
   }
 
-  render () {
-    const { onSubmit, page } = this.props;
+  renderContent = () => {
+    const { page } = this.props;
     const { formData } = this.state;
     const {
-      onPageFormSubmit,
       onSubmitConfirmation,
       renderDescription,
       renderHeader,
-      renderPageForm,
     } = this;
+
+    if (page === 4) {
+      return <ConfirmationPage formData={formData} handleSubmit={onSubmitConfirmation} className={`${baseClass}__confirmation`} />
+    }
+
+    return (
+      <div>
+        {renderHeader()}
+        {renderDescription()}
+      </div>
+    );
+  }
+
+  render () {
+    const { onSubmit, page } = this.props;
+    const { formData } = this.state;
+    const { onPageFormSubmit, renderContent } = this;
+
+    const containerClass = classnames(`${baseClass}__container`, {
+      [`${baseClass}__container--complete`]: page > 3
+    });
 
     const adminDetailsClass = classnames(
       `${baseClass}__field-wrapper`,
-      `${baseClass}__field-wrapper--admin`,
-      {
-        [`${baseClass}__field-wrapper--active`]: page === 1,
-        [`${baseClass}__field-wrapper--complete`]: page > 1,
-      }
+      `${baseClass}__field-wrapper--admin`
     );
 
     const orgDetailsClass = classnames(
       `${baseClass}__field-wrapper`,
-      `${baseClass}__field-wrapper--org`,
-      {
-        [`${baseClass}__field-wrapper--active`]: page === 2,
-        [`${baseClass}__field-wrapper--complete`]: page > 2,
-      }
+      `${baseClass}__field-wrapper--org`
     );
 
     const kolideDetailsClass = classnames(
       `${baseClass}__field-wrapper`,
-      `${baseClass}__field-wrapper--kolide`,
-      {
-        [`${baseClass}__field-wrapper--active`]: page === 3,
-        [`${baseClass}__field-wrapper--complete`]: page > 3,
-      }
-    );
-
-    const confirmDetailsClass = classnames(
-      `${baseClass}__field-wrapper`,
-      `${baseClass}__field-wrapper--confirm`,
-      {
-        [`${baseClass}__field-wrapper--active`]: page === 4,
-      }
+      `${baseClass}__field-wrapper--kolide`
     );
 
     const formSectionClasses = classnames(
@@ -150,16 +149,13 @@ class RegistrationForm extends Component {
         [`${baseClass}__form--step2-complete`]: page > 2,
         [`${baseClass}__form--step3-active`]: page === 3,
         [`${baseClass}__form--step3-complete`]: page > 3,
-        [`${baseClass}__form--step4-active`]: page === 4,
       }
     );
-    // <ConfirmationPage formData={formData} handleSubmit={onSubmitConfirmation} className={confirmDetailsClass} />
 
     return (
       <div className={baseClass}>
-        <div className={`${baseClass}__container`}>
-          {renderHeader()}
-          {renderDescription()}
+        <div className={containerClass}>
+          {renderContent()}
 
           <form onSubmit={onSubmit} className={formSectionClasses}>
             <AdminDetails formData={formData} handleSubmit={onPageFormSubmit} className={adminDetailsClass} />

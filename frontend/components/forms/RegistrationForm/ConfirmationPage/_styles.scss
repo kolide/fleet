@@ -1,0 +1,18 @@
+.confirm-user-reg {
+  &__wrapper {
+    padding: 25px 35px;
+  }
+
+  &__icon {
+    color: $success;
+    font-size: 120px;
+    display: block;
+    text-align: center;
+  }
+
+  &__submit {
+    bottom: 0;
+    top: auto;
+    position: absolute;
+  }
+}

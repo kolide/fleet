@@ -11,6 +11,10 @@
     box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.3);
     box-sizing: border-box;
     padding: 25px 35px;
+
+    &--complete {
+      padding: 0;
+    }
   }
 
   &__form {
@@ -48,6 +52,20 @@
       }
     }
 
+    &--step3-complete {
+      .user-registration__field-wrapper--admin {
+        left: calc(-100% - 200px);
+      }
+
+      .user-registration__field-wrapper--org {
+        left: calc(-50% - 200px);
+      }
+
+      .user-registration__field-wrapper--kolide {
+        left: -200px;
+      }
+    }
+
     &::before,
     &::after {
       background-image: linear-gradient(to right, $accent-dark 50%, transparent 50%);
@@ -74,7 +92,8 @@
       }
     }
 
-    &--step3-active {
+    &--step3-active,
+    &--step3-complete {
       &::after {
         display: none;
       }
@@ -130,5 +149,13 @@
       padding: 0 35px 25px;
       box-sizing: border-box;
     }
+  }
+
+  &__confirmation {
+    background-color: $bg-light;
+    position: relative;
+    z-index: 2;
+    width: 500px;
+    height: 540px;
   }
 }
