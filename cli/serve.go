@@ -24,6 +24,10 @@ import (
 	"golang.org/x/net/context"
 )
 
+type initializer interface {
+	Initialize() error
+}
+
 func createServeCmd(configManager config.Manager) *cobra.Command {
 	var devMode = false
 
@@ -58,7 +62,7 @@ the way that the kolide server works.
 				mailService = mail.NewService(config.SMTP)
 			}
 
-			var ds kolide.InitializerDatastore
+			var ds kolide.Datastore
 			var err error
 			if devMode {
 				fmt.Println(
@@ -80,8 +84,10 @@ the way that the kolide server works.
 				}
 			}
 
-			if err = ds.Initialize(); err != nil {
-				initFatal(err, "loading built in data")
+			if initializingDS, ok := ds.(initializer); ok {
+				if err = initializingDS.Initialize(); err != nil {
+					initFatal(err, "loading built in data")
+				}
 			}
 
 			svc, err := service.NewService(ds, pubsub.NewInmemQueryResults(), logger, config, mailService, clock.C)

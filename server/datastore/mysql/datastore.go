@@ -172,25 +172,31 @@ func (d *Datastore) createBuiltinLabels() error {
 		{
 			Platform:  "darwin",
 			Name:      "Mac OS X",
-			Query:     "select * from osquery_info where build_platform = 'darwin';",
+			Query:     "select 1 from osquery_info where build_platform = 'darwin';",
 			LabelType: kolide.LabelTypeBuiltIn,
 		},
 		{
 			Platform:  "ubuntu",
 			Name:      "Ubuntu Linux",
-			Query:     "select * from osquery_info where build_platform = 'ubuntu';",
+			Query:     "select 1 from osquery_info where build_platform = 'ubuntu';",
 			LabelType: kolide.LabelTypeBuiltIn,
 		},
 		{
 			Platform:  "centos",
 			Name:      "CentOS Linux",
-			Query:     "select * from osquery_info where build_platform = 'centos';",
+			Query:     "select 1 from osquery_info where build_platform = 'centos';",
 			LabelType: kolide.LabelTypeBuiltIn,
 		},
 		{
 			Platform:  "windows",
 			Name:      "MS Windows",
-			Query:     "select * from osquery_info where build_platform = 'windows';",
+			Query:     "select 1 from osquery_info where build_platform = 'windows';",
+			LabelType: kolide.LabelTypeBuiltIn,
+		},
+		{
+			Platform:  "all",
+			Name:      "All Hosts",
+			Query:     "select 1;",
 			LabelType: kolide.LabelTypeBuiltIn,
 		},
 	}

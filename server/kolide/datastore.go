@@ -15,9 +15,3 @@ type Datastore interface {
 	Drop() error
 	Migrate() error
 }
-
-type InitializerDatastore interface {
-	Datastore
-	// Initialize loads built in records when application starts.
-	Initialize() error
-}
