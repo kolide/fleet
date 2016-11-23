@@ -64,7 +64,7 @@ the way that the kolide server works.
 				mailService = mail.NewService(config.SMTP)
 			}
 
-			var ds kolide.Datastore
+			var ds kolide.InitializerDatastore
 			var err error
 			if devMode {
 				fmt.Println(
