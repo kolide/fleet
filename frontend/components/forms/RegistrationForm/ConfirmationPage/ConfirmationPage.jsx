@@ -62,7 +62,7 @@ class ConfirmationPage extends Component {
               </tr>
               <tr>
                 <th>Kolide URL:</th>
-                <td>{kolideWebAddress}</td>
+                <td className={`${baseClass}__table-url`}>{kolideWebAddress}</td>
               </tr>
             </tbody>
           </table>

@@ -14,6 +14,15 @@
 
     &--complete {
       padding: 0;
+
+      .user-registration__title {
+        font-size: 24px;
+        font-weight: $bold;
+        line-height: 0.54;
+        letter-spacing: 0.9px;
+        color: $text-dark;
+        padding: 25px 35px;
+      }
     }
   }
 
@@ -117,11 +126,15 @@
     line-height: 0.72;
     letter-spacing: 0.6px;
     color: $text-dark;
+    margin: 0;
+    padding: 0;
   }
 
   &__field-wrapper {
-    @include transition(left 150ms ease);
+    @include transition(left 300ms ease);
     width: 430px;
+    min-height: 400px;
+    padding-bottom: 75px;
     border-radius: 4px;
     background-color: $bg-light;
     box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.3);
@@ -146,6 +159,12 @@
 
     input {
       background-color: transparent;
+    }
+
+    .button {
+      bottom: 0;
+      top: auto;
+      position: absolute;
     }
 
     .registration-fields {

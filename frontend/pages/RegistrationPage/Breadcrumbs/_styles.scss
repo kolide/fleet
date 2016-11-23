@@ -19,7 +19,7 @@
     &::before {
       content: '';
       position: absolute;
-      width: 212px;
+      width: 214px;
       height: 2px;
       background-image: linear-gradient(to right, $accent-dark 50%, transparent 50%);
       background-position: left top;
@@ -30,11 +30,13 @@
     }
 
     &::after {
+      @extend %kolidecon;
       @include size(24px);
       background-color: $white;
       display: block;
       border-radius: 50%;
       content: '';
+      font-size: 28px;
       margin: 23px auto 0;
       position: relative;
       z-index: 1;
@@ -58,6 +60,21 @@
           background-color: $success;
         }
       }
+
+      &.registration-breadcrumbs__page--complete {
+        &::before {
+          background-image: linear-gradient(to right, $success 0%, $link 100%);
+          background-size: auto;
+          z-index: 2;
+        }
+
+        &::after {
+          @include size(28px);
+          content: '\f035';
+          color: $success;
+          border: 0;
+        }
+      }
     }
 
     &--2 {
@@ -68,6 +85,21 @@
       &.registration-breadcrumbs__page--active {
         &::after {
           background-color: $link;
+        }
+      }
+
+      &.registration-breadcrumbs__page--complete {
+        &::before {
+          background-image: linear-gradient(to right, $link 0%, $brand-light 100%);
+          background-size: auto;
+          z-index: 2;
+        }
+
+        &::after {
+          @include size(28px);
+          content: '\f035';
+          color: $link;
+          border: 0;
         }
       }
     }
@@ -84,6 +116,15 @@
       &.registration-breadcrumbs__page--active {
         &::after {
           background-color: $brand-light;
+        }
+      }
+
+      &.registration-breadcrumbs__page--complete {
+        &::after {
+          @include size(28px);
+          content: '\f035';
+          color: $brand-light;
+          border: 0;
         }
       }
     }

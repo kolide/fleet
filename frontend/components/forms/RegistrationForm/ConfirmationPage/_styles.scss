@@ -1,6 +1,6 @@
 .confirm-user-reg {
   &__wrapper {
-    padding: 25px 35px;
+    padding: 0 35px 25px;
   }
 
   &__icon {
@@ -8,11 +8,46 @@
     font-size: 120px;
     display: block;
     text-align: center;
+    margin: 10px 0 35px;
   }
 
   &__submit {
     bottom: 0;
     top: auto;
     position: absolute;
+  }
+
+  &__table {
+    width: 100%;
+
+    caption {
+      font-size: 18px;
+      font-weight: $bold;
+      line-height: 0.72;
+      letter-spacing: 0.6px;
+      color: $text-dark;
+      text-transform: uppercase;
+      padding-bottom: 20px;
+    }
+
+    th {
+      font-size: 14px;
+      font-weight: $bold;
+      line-height: 1.71;
+      letter-spacing: 0.5px;
+      color: $text-dark;
+    }
+
+    td {
+      font-size: 14px;
+      font-weight: $light;
+      line-height: 1.71;
+      letter-spacing: 0.5px;
+      color: $text-dark;
+    }
+  }
+
+  &__table-url {
+    font-family: 'Source-codePro', $monospace;
   }
 }
