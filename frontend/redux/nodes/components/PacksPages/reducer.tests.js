@@ -43,7 +43,7 @@ describe('PacksPages - reducer', () => {
     expect(reducer(stagedQueryState, unstageQueryAction)).toEqual(initialState);
   });
 
-  it('configured staged queries', () => {
+  it('configures staged queries', () => {
     const stagedQueryState = {
       ...initialState,
       stagedQueries: [query],
@@ -52,14 +52,21 @@ describe('PacksPages - reducer', () => {
       interval: 3600,
       platform: 'windows',
       logging_type: 'differential',
-      query_ids: [query.id],
+      queries: [query],
     };
     const configureStagedQueriesAction = actions.configureStagedQueries(configObject);
 
     expect(reducer(stagedQueryState, configureStagedQueriesAction)).toEqual({
       stagedQueries: [],
-      configuredQueries: [query],
-      configurations: [configObject],
+      configuredQueryIDs: [query.id],
+      configurations: [
+        {
+          interval: 3600,
+          platform: 'windows',
+          logging_type: 'differential',
+          query_ids: [query.id],
+        },
+      ],
     });
   });
 });
