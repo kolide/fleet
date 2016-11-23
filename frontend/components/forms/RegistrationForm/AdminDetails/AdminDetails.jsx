@@ -11,6 +11,7 @@ const { validate } = helpers;
 
 class AdminDetails extends Component {
   static propTypes = {
+    className: PropTypes.string,
     fields: PropTypes.shape({
       email: formFieldInterface.isRequired,
       name: formFieldInterface.isRequired,
@@ -22,36 +23,38 @@ class AdminDetails extends Component {
   };
 
   render () {
-    const { fields, handleSubmit } = this.props;
+    const { className, fields, handleSubmit } = this.props;
 
     return (
-      <div>
-        <InputFieldWithIcon
-          {...fields.name}
-          placeholder="Full Name"
-        />
-        <InputFieldWithIcon
-          {...fields.username}
-          iconName="kolidecon-username"
-          placeholder="Username"
-        />
-        <InputFieldWithIcon
-          {...fields.password}
-          iconName="kolidecon-password"
-          placeholder="Password"
-          type="password"
-        />
-        <InputFieldWithIcon
-          {...fields.password_confirmation}
-          iconName="kolidecon-password"
-          placeholder="Confirm Password"
-          type="password"
-        />
-        <InputFieldWithIcon
-          {...fields.email}
-          iconName="kolidecon-email"
-          placeholder="Email"
-        />
+      <div className={className}>
+        <div className="registration-fields">
+          <InputFieldWithIcon
+            {...fields.name}
+            placeholder="Full Name"
+          />
+          <InputFieldWithIcon
+            {...fields.username}
+            iconName="kolidecon-username"
+            placeholder="Username"
+          />
+          <InputFieldWithIcon
+            {...fields.password}
+            iconName="kolidecon-password"
+            placeholder="Password"
+            type="password"
+          />
+          <InputFieldWithIcon
+            {...fields.password_confirmation}
+            iconName="kolidecon-password"
+            placeholder="Confirm Password"
+            type="password"
+          />
+          <InputFieldWithIcon
+            {...fields.email}
+            iconName="kolidecon-email"
+            placeholder="Email"
+          />
+        </div>
         <Button
           onClick={handleSubmit}
           text="Submit"

@@ -11,6 +11,7 @@ const { validate } = helpers;
 
 class KolideDetails extends Component {
   static propTypes = {
+    className: PropTypes.string,
     fields: PropTypes.shape({
       kolide_server_url: formFieldInterface.isRequired,
     }).isRequired,
@@ -18,14 +19,16 @@ class KolideDetails extends Component {
   };
 
   render () {
-    const { fields, handleSubmit } = this.props;
+    const { className, fields, handleSubmit } = this.props;
 
     return (
-      <div>
-        <InputFieldWithIcon
-          {...fields.kolide_server_url}
-          placeholder="Kolide Web Address"
-        />
+      <div className={className}>
+        <div className="registration-fields">
+          <InputFieldWithIcon
+            {...fields.kolide_server_url}
+            placeholder="Kolide Web Address"
+          />
+        </div>
         <Button
           onClick={handleSubmit}
           text="Submit"

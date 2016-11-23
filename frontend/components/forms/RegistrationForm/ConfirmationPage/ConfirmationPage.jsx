@@ -5,6 +5,7 @@ import formDataInterface from 'interfaces/registration_form_data';
 
 class ConfirmationPage extends Component {
   static propTypes = {
+    className: PropTypes.string,
     formData: formDataInterface,
     handleSubmit: PropTypes.func,
   };
@@ -19,6 +20,7 @@ class ConfirmationPage extends Component {
 
   render () {
     const {
+      className,
       formData: {
         email,
         full_name: fullName,
@@ -30,7 +32,7 @@ class ConfirmationPage extends Component {
     const { onSubmit } = this;
 
     return (
-      <div>
+      <div className={className}>
         <i className="kolidecon kolidecon-success-check" />
         <table>
           <caption>Administrator Configuration</caption>

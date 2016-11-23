@@ -1,0 +1,134 @@
+.user-registration {
+  @include display(flex);
+  @include align-content(center);
+  @include justify-content(center);
+
+  &__container {
+    width: 500px;
+    height: 540px;
+    border-radius: 4px;
+    background-color: $bg-light;
+    box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.3);
+    box-sizing: border-box;
+    padding: 25px 35px;
+  }
+
+  &__form {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 325px;
+    left: 0;
+
+    &--step1-complete {
+      .user-registration__field-wrapper--admin {
+        left: -200px;
+      }
+
+      .user-registration__field-wrapper--org {
+        left: 50%;
+      }
+
+      .user-registration__field-wrapper--kolide {
+        left: calc(100% + 200px);
+      }
+    }
+
+    &--step2-complete {
+      .user-registration__field-wrapper--admin {
+        left: calc(-50% - 200px);
+      }
+
+      .user-registration__field-wrapper--org {
+        left: -200px;
+      }
+
+      .user-registration__field-wrapper--kolide {
+        left: 50%;
+      }
+    }
+
+    &::before,
+    &::after {
+      background-image: linear-gradient(to right, $accent-dark 50%, transparent 50%);
+      background-position: left top;
+      background-repeat: repeat-x;
+      background-size: 17px 2px;
+      position: absolute;
+      top: 100px;
+      left: 50%;
+      width: 50%;
+      height: 2px;
+      content: '';
+      z-index: 1;
+    }
+
+    &::before {
+      left: auto;
+      right: 50%;
+    }
+
+    &--step1-active {
+      &::before {
+        display: none;
+      }
+    }
+
+    &--step3-active {
+      &::after {
+        display: none;
+      }
+    }
+  }
+
+  &__description {
+    font-size: 14px;
+    font-weight: $light;
+    line-height: 1.43;
+    letter-spacing: 0.5px;
+    color: $text-dark;
+  }
+
+  &__title {
+    font-size: 18px;
+    font-weight: $bold;
+    line-height: 0.72;
+    letter-spacing: 0.6px;
+    color: $text-dark;
+  }
+
+  &__field-wrapper {
+    @include transition(left 150ms ease);
+    width: 430px;
+    border-radius: 4px;
+    background-color: $bg-light;
+    box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.3);
+    margin: 0 auto;
+    position: absolute;
+    box-sizing: border-box;
+    margin-left: -215px;
+    z-index: 2;
+
+    &--admin {
+      left: 50%;
+    }
+
+    &--org {
+      left: calc(100% + 200px);
+    }
+
+    &--kolide {
+      top: 45px;
+      left: calc(150% + 200px);
+    }
+
+    input {
+      background-color: transparent;
+    }
+
+    .registration-fields {
+      padding: 0 35px 25px;
+      box-sizing: border-box;
+    }
+  }
+}
