@@ -18,8 +18,18 @@ describe('PackComposerPage - component', () => {
     expect(page.find('PackForm').length).toEqual(1);
   });
 
+  it('renders a QueriesListWrapper component', () => {
+    const page = mount(<PackComposerPage />);
+
+    expect(page.find('QueriesListWrapper').length).toEqual(1);
+  });
+
   it('loads all queries when it mounts', () => {
-    const mockStore = reduxMockStore();
+    const mockStore = reduxMockStore({
+      components: {
+        PacksPages: {},
+      },
+    });
     const page = mount(
       connectedComponent(ConnectedPacksComposerPage, { mockStore })
     );
