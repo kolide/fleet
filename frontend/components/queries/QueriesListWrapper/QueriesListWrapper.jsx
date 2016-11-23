@@ -1,8 +1,8 @@
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
-import { remove, size } from 'lodash';
+import { size } from 'lodash';
 
 import InputField from 'components/forms/fields/InputField';
+import PackQueryConfigForm from 'components/forms/packs/PackQueryConfigForm';
 import QueriesList from 'components/queries/QueriesList';
 import queryInterface from 'interfaces/query';
 
@@ -10,7 +10,12 @@ const baseClass = 'queries-list-wrapper';
 
 class QueriesListWrapper extends Component {
   static propTypes = {
+    configuredQueries: PropTypes.arrayOf(queryInterface),
+    onConfigureQueries: PropTypes.func,
+    onDeselectQuery: PropTypes.func,
+    onSelectQuery: PropTypes.func,
     queries: PropTypes.arrayOf(queryInterface),
+    stagedQueries: PropTypes.arrayOf(queryInterface),
   };
 
   constructor (props) {
@@ -19,25 +24,20 @@ class QueriesListWrapper extends Component {
     this.state = {
       querySearchText: '',
       selectAll: false,
-      selectedQueries: [],
     };
   }
 
   onSelectQuery = (query) => {
     return (shouldCheck) => {
-      const { selectedQueries } = this.state;
+      const { onDeselectQuery, onSelectQuery } = this.props;
 
       if (shouldCheck) {
-        this.setState({
-          selectedQueries: selectedQueries.concat(query),
-        });
+        onSelectQuery(query);
 
         return false;
       }
 
-      remove(selectedQueries, query);
-
-      this.setState({ selectedQueries });
+      onDeselectQuery(query);
 
       return false;
     };
@@ -47,10 +47,31 @@ class QueriesListWrapper extends Component {
     this.setState({ querySearchText });
   }
 
+  renderPackQueryConfigForm = () => {
+    const { onConfigureQueries, stagedQueries } = this.props;
+
+    if (!size(stagedQueries)) {
+      return false;
+    }
+
+    const formData = { queries: stagedQueries };
+
+    return (
+      <PackQueryConfigForm
+        formData={formData}
+        handleSubmit={onConfigureQueries}
+      />
+    );
+  }
+
   render () {
-    const { onSelectQuery, onUpdateQuerySearchText } = this;
-    const { queries } = this.props;
-    const { querySearchText, selectedQueries } = this.state;
+    const {
+      onSelectQuery,
+      onUpdateQuerySearchText,
+      renderPackQueryConfigForm,
+    } = this;
+    const { queries, stagedQueries } = this.props;
+    const { querySearchText } = this.state;
     const queryCount = size(queries);
 
     if (!queryCount) {
@@ -67,16 +88,11 @@ class QueriesListWrapper extends Component {
           placeholder="Search Queries"
           value={querySearchText}
         />
-        <Link className={`${baseClass}__add-query-btn`} to="/queries/new">
-          <span className={`${baseClass}__add-query-btn-text`}>
-            <i className={`${baseClass}__add-query-btn-icon kolidecon-add-button`} />
-            Add New Query
-          </span>
-        </Link>
+        {renderPackQueryConfigForm()}
         <QueriesList
           onSelectQuery={onSelectQuery}
           queries={queries}
-          selectedQueries={selectedQueries}
+          selectedQueries={stagedQueries}
         />
       </div>
     );
