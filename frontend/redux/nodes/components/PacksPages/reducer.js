@@ -9,8 +9,8 @@ export const initialState = {
 };
 
 const queryIDs = (queries) => {
-  return queries.map((query) => query.id);
-}
+  return queries.map(query => query.id);
+};
 
 const reducer = (state = initialState, { type, payload }) => {
   switch (type) {

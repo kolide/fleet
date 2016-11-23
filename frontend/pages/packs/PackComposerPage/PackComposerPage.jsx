@@ -77,6 +77,9 @@ export class PackComposerPage extends Component {
   }
 
   handleSubmit = (formData) => {
+    const { configurations } = this.props;
+
+    console.log('configurations data', configurations);
     console.log('pack form data', formData);
 
     return false;

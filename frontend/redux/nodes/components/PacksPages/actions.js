@@ -27,7 +27,7 @@ export const configureStagedQueries = (configurationFormData) => {
     interval,
     logging_type: loggingType,
     platform,
-    query_ids: queries.map((query) => query.id),
+    query_ids: queries.map(query => query.id),
   };
 
   return {
