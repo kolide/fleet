@@ -6,13 +6,19 @@ import QueriesListItem from 'components/queries/QueriesList/QueriesListItem';
 
 class QueriesList extends Component {
   static propTypes = {
+    configuredQueries: PropTypes.arrayOf(queryInterface),
     onSelectQuery: PropTypes.func.isRequired,
     queries: PropTypes.arrayOf(queryInterface).isRequired,
     selectedQueries: PropTypes.arrayOf(queryInterface),
   };
 
   render () {
-    const { onSelectQuery, queries, selectedQueries } = this.props;
+    const {
+      configuredQueries,
+      onSelectQuery,
+      queries,
+      selectedQueries,
+    } = this.props;
 
     return (
       <table>
@@ -31,6 +37,7 @@ class QueriesList extends Component {
             return (
               <QueriesListItem
                 checked={includes(selectedQueries, query)}
+                configured={includes(configuredQueries, query)}
                 key={`query-${query.id}`}
                 onSelect={onSelectQuery(query)}
                 query={query}

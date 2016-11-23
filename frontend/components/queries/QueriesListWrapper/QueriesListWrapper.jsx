@@ -70,7 +70,7 @@ class QueriesListWrapper extends Component {
       onUpdateQuerySearchText,
       renderPackQueryConfigForm,
     } = this;
-    const { queries, stagedQueries } = this.props;
+    const { configuredQueries, queries, stagedQueries } = this.props;
     const { querySearchText } = this.state;
     const queryCount = size(queries);
 
@@ -90,6 +90,7 @@ class QueriesListWrapper extends Component {
         />
         {renderPackQueryConfigForm()}
         <QueriesList
+          configuredQueries={configuredQueries}
           onSelectQuery={onSelectQuery}
           queries={queries}
           selectedQueries={stagedQueries}
