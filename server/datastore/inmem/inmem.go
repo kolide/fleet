@@ -38,9 +38,9 @@ type Datastore struct {
 
 type Option func(ds *Datastore)
 
-func WithConfig(config *config.KolideConfig) Option {
+func WithConfig(config config.KolideConfig) Option {
 	return func(ds *Datastore) {
-		ds.config = config
+		ds.config = &config
 	}
 }
 
@@ -240,7 +240,7 @@ func (orm *Datastore) createBuiltinLabels() error {
 			},
 			Platform:  "darwin",
 			Name:      "Mac OS X",
-			Query:     "select * from osquery_info where build_platform = 'darwin';",
+			Query:     "select 1 from osquery_info where build_platform = 'darwin';",
 			LabelType: kolide.LabelTypeBuiltIn,
 		},
 		{
@@ -254,7 +254,7 @@ func (orm *Datastore) createBuiltinLabels() error {
 			},
 			Platform:  "ubuntu",
 			Name:      "Ubuntu Linux",
-			Query:     "select * from osquery_info where build_platform = 'ubuntu';",
+			Query:     "select 1 from osquery_info where build_platform = 'ubuntu';",
 			LabelType: kolide.LabelTypeBuiltIn,
 		},
 		{
@@ -268,7 +268,7 @@ func (orm *Datastore) createBuiltinLabels() error {
 			},
 			Platform:  "centos",
 			Name:      "CentOS Linux",
-			Query:     "select * from osquery_info where build_platform = 'centos';",
+			Query:     "select 1 from osquery_info where build_platform = 'centos';",
 			LabelType: kolide.LabelTypeBuiltIn,
 		},
 		{
@@ -282,7 +282,21 @@ func (orm *Datastore) createBuiltinLabels() error {
 			},
 			Platform:  "windows",
 			Name:      "MS Windows",
-			Query:     "select * from osquery_info where build_platform = 'windows';",
+			Query:     "select 1 from osquery_info where build_platform = 'windows';",
+			LabelType: kolide.LabelTypeBuiltIn,
+		},
+		{
+			UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
+				CreateTimestamp: kolide.CreateTimestamp{
+					CreatedAt: time.Now().UTC(),
+				},
+				UpdateTimestamp: kolide.UpdateTimestamp{
+					UpdatedAt: time.Now().UTC(),
+				},
+			},
+			Platform:  "all",
+			Name:      "All Hosts",
+			Query:     "select 1;",
 			LabelType: kolide.LabelTypeBuiltIn,
 		},
 	}

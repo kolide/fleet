@@ -18,7 +18,7 @@ func TestInmem(t *testing.T) {
 
 	for _, f := range testFunctions {
 		t.Run(functionName(f), func(t *testing.T) {
-			ds, err := inmem.New(inmem.WithConfig(&config))
+			ds, err := inmem.New(inmem.WithConfig(config))
 			defer func() { require.Nil(t, ds.Drop()) }()
 			require.Nil(t, err)
 			f(t, ds)

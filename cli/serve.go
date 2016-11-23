@@ -70,7 +70,7 @@ the way that the kolide server works.
 					"Warning: Changes will not be saved across process restarts. This should NOT be used in production.",
 				)
 
-				if ds, err = inmem.New(inmem.WithConfig(&config)); err != nil {
+				if ds, err = inmem.New(inmem.WithConfig(config)); err != nil {
 					initFatal(err, "initializing inmem database")
 				}
 			} else {
@@ -85,7 +85,7 @@ the way that the kolide server works.
 			}
 
 			if initializingDS, ok := ds.(initializer); ok {
-				if err = initializingDS.Initialize(); err != nil {
+				if err := initializingDS.Initialize(); err != nil {
 					initFatal(err, "loading built in data")
 				}
 			}
