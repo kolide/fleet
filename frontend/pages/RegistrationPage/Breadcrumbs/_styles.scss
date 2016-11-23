@@ -2,7 +2,7 @@
   @include display(flex);
   @include justify-content(space-between);
   @include align-content(center);
-  width: 600px;
+  width: 665px;
   height: 175px;
   margin: 0 auto;
 
@@ -19,7 +19,7 @@
     &::before {
       content: '';
       position: absolute;
-      width: 214px;
+      width: 246px;
       height: 2px;
       background-image: linear-gradient(to right, $accent-dark 50%, transparent 50%);
       background-position: left top;
