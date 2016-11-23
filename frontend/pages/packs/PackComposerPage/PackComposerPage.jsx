@@ -20,7 +20,7 @@ export class PackComposerPage extends Component {
       logging_type: PropTypes.string,
       query_ids: PropTypes.arrayOf(PropTypes.number),
     })),
-    configuredQueries: PropTypes.arrayOf(queryInterface),
+    configuredQueryIDs: PropTypes.arrayOf(PropTypes.number),
     dispatch: PropTypes.func,
     stagedQueries: PropTypes.arrayOf(queryInterface),
   };
@@ -77,9 +77,7 @@ export class PackComposerPage extends Component {
   }
 
   handleSubmit = (formData) => {
-    const { configurations } = this.props;
     console.log('pack form data', formData);
-    console.log('configurations', configurations);
 
     return false;
   }
@@ -93,7 +91,7 @@ export class PackComposerPage extends Component {
       onUnstageQuery,
     } = this;
     const { selectedTargetsCount } = this.state;
-    const { allQueries, configuredQueries, stagedQueries } = this.props;
+    const { allQueries, configuredQueryIDs, stagedQueries } = this.props;
 
     return (
       <div className={baseClass}>
@@ -104,7 +102,7 @@ export class PackComposerPage extends Component {
           selectedTargetsCount={selectedTargetsCount}
         />
         <QueriesListWrapper
-          configuredQueries={configuredQueries}
+          configuredQueryIDs={configuredQueryIDs}
           onConfigureQueries={onConfigureQueries}
           onDeselectQuery={onUnstageQuery}
           onSelectQuery={onStageQuery}
@@ -118,9 +116,9 @@ export class PackComposerPage extends Component {
 
 const mapStateToProps = (state) => {
   const { entities: queries } = stateEntityGetter(state).get('queries');
-  const { configurations, configuredQueries, stagedQueries } = state.components.PacksPages;
+  const { configurations, configuredQueryIDs, stagedQueries } = state.components.PacksPages;
 
-  return { allQueries: queries, configurations, configuredQueries, stagedQueries };
+  return { allQueries: queries, configurations, configuredQueryIDs, stagedQueries };
 };
 
 export default connect(mapStateToProps)(PackComposerPage);
