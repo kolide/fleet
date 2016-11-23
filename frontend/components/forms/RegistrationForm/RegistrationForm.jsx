@@ -105,7 +105,7 @@ class RegistrationForm extends Component {
     } = this;
 
     if (page === 4) {
-      return <ConfirmationPage formData={formData} handleSubmit={onSubmitConfirmation} className={`${baseClass}__confirmation`} />
+      return <ConfirmationPage formData={formData} handleSubmit={onSubmitConfirmation} className={`${baseClass}__confirmation`} />;
     }
 
     return (
@@ -122,7 +122,7 @@ class RegistrationForm extends Component {
     const { onPageFormSubmit, renderContent } = this;
 
     const containerClass = classnames(`${baseClass}__container`, {
-      [`${baseClass}__container--complete`]: page > 3
+      [`${baseClass}__container--complete`]: page > 3,
     });
 
     const adminDetailsClass = classnames(

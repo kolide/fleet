@@ -35,7 +35,7 @@ class ConfirmationPage extends Component {
     const { onSubmit } = this;
 
     const confirmRegClasses = classnames(className, baseClass);
-    const confirmIconClasses = classnames("kolidecon", "kolidecon-success-check", `${baseClass}__icon`);
+    const confirmIconClasses = classnames('kolidecon', 'kolidecon-success-check', `${baseClass}__icon`);
 
     return (
       <div className={confirmRegClasses}>
