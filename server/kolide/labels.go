@@ -49,11 +49,12 @@ type LabelPayload struct {
 	Description *string `json:"description"`
 }
 
+// LabelType is used to catagorize the kind of label
 type LabelType uint
 
 const (
-	// LabelTypeMutable - the label can change, this is the default
-	LabelTypeMutable LabelType = iota
+	// LabelTypeDefault - the label can change, this is the default
+	LabelTypeDefault LabelType = iota
 	// LabelTypeBuiltIn - this type of label is created by Kolide on start up
 	// and can't be removed by end user.
 	LabelTypeBuiltIn

@@ -14,7 +14,7 @@ func init() {
 
 func Up_20161123011056(tx *sql.Tx) error {
 	// create a column to represent built in types, default is mutable
-	_, err := tx.Exec(fmt.Sprintf("ALTER TABLE labels ADD COLUMN label_type INT UNSIGNED NOT NULL DEFAULT %d;", kolide.LabelTypeMutable))
+	_, err := tx.Exec(fmt.Sprintf("ALTER TABLE labels ADD COLUMN label_type INT UNSIGNED NOT NULL DEFAULT %d;", kolide.LabelTypeDefault))
 
 	return err
 }
