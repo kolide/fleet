@@ -27,12 +27,14 @@ describe('QueriesListWrapper - component', () => {
   it('renders the PackQueryConfigForm when there are staged queries', () => {
     const componentWithoutStagedQueries = mount(
       <QueriesListWrapper
+        configuredQueries={[]}
         queries={queries}
         stagedQueries={[]}
       />
     );
     const componentWithStagedQueries = mount(
       <QueriesListWrapper
+        configuredQueries={[]}
         queries={queries}
         stagedQueries={queries}
       />
@@ -50,6 +52,7 @@ describe('QueriesListWrapper - component', () => {
     const onSelectQuerySpy = createSpy();
     const component = mount(
       <QueriesListWrapper
+        configuredQueries={[]}
         onSelectQuery={onSelectQuerySpy}
         queries={queries}
         stagedQueries={[]}
@@ -66,6 +69,7 @@ describe('QueriesListWrapper - component', () => {
     const onDeselectQuerySpy = createSpy();
     const component = mount(
       <QueriesListWrapper
+        configuredQueries={[]}
         onDeselectQuery={onDeselectQuerySpy}
         queries={queries}
         stagedQueries={queries}
