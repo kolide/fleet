@@ -30,17 +30,33 @@ class PackQueryConfigForm extends Component {
       queries: formFieldInterface.isRequired,
     }).isRequired,
     handleSubmit: PropTypes.func,
+    onCancel: PropTypes.func,
   };
+
+  onCancel = (evt) => {
+    evt.preventDefault();
+
+    const { onCancel: handleCancel } = this.props;
+
+    return handleCancel();
+  }
 
   render () {
     const { fields, handleSubmit } = this.props;
+    const { onCancel } = this;
 
     return (
-      <form onSubmit={handleSubmit}>
+      <form>
         <Button
+          onClick={handleSubmit}
           text="Save and Close"
           type="submit"
           variant="brand"
+        />
+        <Button
+          onClick={onCancel}
+          text="Cancel"
+          variant="inverse"
         />
         <InputField
           {...fields.interval}

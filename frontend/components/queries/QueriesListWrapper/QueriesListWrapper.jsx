@@ -11,6 +11,7 @@ const baseClass = 'queries-list-wrapper';
 class QueriesListWrapper extends Component {
   static propTypes = {
     configuredQueryIDs: PropTypes.arrayOf(PropTypes.number),
+    onClearStagedQueries: PropTypes.func,
     onConfigureQueries: PropTypes.func,
     onDeselectQuery: PropTypes.func,
     onSelectQuery: PropTypes.func,
@@ -48,7 +49,11 @@ class QueriesListWrapper extends Component {
   }
 
   renderPackQueryConfigForm = () => {
-    const { onConfigureQueries, stagedQueries } = this.props;
+    const {
+      onClearStagedQueries,
+      onConfigureQueries,
+      stagedQueries,
+    } = this.props;
 
     if (!size(stagedQueries)) {
       return false;
@@ -60,6 +65,7 @@ class QueriesListWrapper extends Component {
       <PackQueryConfigForm
         formData={formData}
         handleSubmit={onConfigureQueries}
+        onCancel={onClearStagedQueries}
       />
     );
   }
