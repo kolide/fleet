@@ -14,7 +14,10 @@ const reducer = (state = initialState, { type, payload }) => {
       return {
         ...state,
         stagedQueries: [],
-        configuredQueries: state.stagedQueries,
+        configuredQueries: [
+          ...state.configuredQueries,
+          ...state.stagedQueries,
+        ],
         configurations: [
           ...state.configurations,
           payload.configuration,

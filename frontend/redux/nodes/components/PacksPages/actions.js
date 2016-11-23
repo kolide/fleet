@@ -15,7 +15,21 @@ export const stageQuery = (query) => {
   };
 };
 
-export const configureStagedQueries = (configuration) => {
+export const configureStagedQueries = (configurationFormData) => {
+  const {
+    interval,
+    logging_type: loggingType,
+    platform,
+    queries,
+  } = configurationFormData;
+
+  const configuration = {
+    interval,
+    logging_type: loggingType,
+    platform,
+    query_ids: queries.map((query) => query.id),
+  };
+
   return {
     type: CONFIGURE_STAGED_QUERIES,
     payload: { configuration },
