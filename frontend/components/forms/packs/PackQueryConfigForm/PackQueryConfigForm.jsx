@@ -48,15 +48,15 @@ class PackQueryConfigForm extends Component {
     return (
       <form>
         <Button
+          onClick={onCancel}
+          text="Cancel"
+          variant="inverse"
+        />
+        <Button
           onClick={handleSubmit}
           text="Save and Close"
           type="submit"
           variant="brand"
-        />
-        <Button
-          onClick={onCancel}
-          text="Cancel"
-          variant="inverse"
         />
         <InputField
           {...fields.interval}

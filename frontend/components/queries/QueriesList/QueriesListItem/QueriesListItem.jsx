@@ -5,6 +5,8 @@ import Checkbox from 'components/forms/fields/Checkbox';
 import { platformIconClass } from 'utilities/icon_class';
 import queryInterface from 'interfaces/query';
 
+const baseClass = 'queries-list-item';
+
 class QueriesListItem extends Component {
   static propTypes = {
     checked: PropTypes.bool,
@@ -17,7 +19,7 @@ class QueriesListItem extends Component {
     const { checked, configured, onSelect, query } = this.props;
 
     if (configured) {
-      return <i className="kolidecon-success-check" />;
+      return <i className={`${baseClass}__check-icon kolidecon-success-check`} />;
     }
 
     return (
