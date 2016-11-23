@@ -40,10 +40,13 @@ const query2 = {
 describe('QueriesList - component', () => {
   it('renders a QueriesListItem for each query', () => {
     const queries = [query1, query2];
+    const onSelectQuery = () => {
+      return noop;
+    };
 
     const component = mount(
       <QueriesList
-        onSelectQuery={noop}
+        onSelectQuery={onSelectQuery}
         queries={queries}
         selectedQueries={[]}
       />

@@ -22,7 +22,7 @@ const query = {
 };
 
 describe('QueriesListItem - component', () => {
-  const component = mount(<QueriesListItem onSelect={noop} query={query} />);
+  const component = mount(<QueriesListItem checked={false} onSelect={noop} query={query} />);
 
   it('renders the query data', () => {
     expect(component.text()).toInclude(query.name);
