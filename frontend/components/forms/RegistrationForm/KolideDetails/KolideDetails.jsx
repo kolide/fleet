@@ -12,6 +12,7 @@ const { validate } = helpers;
 class KolideDetails extends Component {
   static propTypes = {
     className: PropTypes.string,
+    currentPage: PropTypes.bool,
     fields: PropTypes.shape({
       kolide_server_url: formFieldInterface.isRequired,
     }).isRequired,
@@ -19,7 +20,8 @@ class KolideDetails extends Component {
   };
 
   render () {
-    const { className, fields, handleSubmit } = this.props;
+    const { className, currentPage, fields, handleSubmit } = this.props;
+    const tabIndex = currentPage ? 1 : -1;
 
     return (
       <div className={className}>
@@ -27,12 +29,15 @@ class KolideDetails extends Component {
           <InputFieldWithIcon
             {...fields.kolide_server_url}
             placeholder="Kolide Web Address"
+            tabIndex={tabIndex}
+            hint={["Don’t include ", <code key="hint">/v1</code>,  " or any other path"]}
           />
         </div>
         <Button
           onClick={handleSubmit}
           text="Submit"
           variant="gradient"
+          tabIndex={tabIndex}
         />
       </div>
     );

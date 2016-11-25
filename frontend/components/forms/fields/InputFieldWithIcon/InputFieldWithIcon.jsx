@@ -9,10 +9,12 @@ class InputFieldWithIcon extends InputField {
   static propTypes = {
     autofocus: PropTypes.bool,
     error: PropTypes.string,
+    hint: PropTypes.any,
     iconName: PropTypes.string,
     name: PropTypes.string,
     onChange: PropTypes.func,
     placeholder: PropTypes.string,
+    tabIndex: PropTypes.number,
     type: PropTypes.string,
   };
 
@@ -31,9 +33,19 @@ class InputFieldWithIcon extends InputField {
     return <div className={labelClasses}>{placeholder}</div>;
   }
 
+  renderHint = () => {
+    const { hint } = this.props;
+
+    if (hint) {
+      return <span className={`${baseClass}__hint`}>{hint}</span>
+    }
+
+    return false;
+  }
+
   render () {
-    const { error, iconName, name, placeholder, type, value } = this.props;
-    const { onInputChange } = this;
+    const { error, iconName, name, placeholder, tabIndex, type, value } = this.props;
+    const { onInputChange, renderHint } = this;
 
     const inputClasses = classnames(
       `${baseClass}__input`,
@@ -58,10 +70,12 @@ class InputFieldWithIcon extends InputField {
           className={inputClasses}
           placeholder={placeholder}
           ref={(r) => { this.input = r; }}
+          tabIndex={tabIndex}
           type={type}
           value={value}
         />
         {iconName && <i className={iconClasses} />}
+        {renderHint()}
       </div>
     );
   }

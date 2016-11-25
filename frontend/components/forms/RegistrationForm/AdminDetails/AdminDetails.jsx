@@ -12,6 +12,7 @@ const { validate } = helpers;
 class AdminDetails extends Component {
   static propTypes = {
     className: PropTypes.string,
+    currentPage: PropTypes.bool,
     fields: PropTypes.shape({
       email: formFieldInterface.isRequired,
       name: formFieldInterface.isRequired,
@@ -23,7 +24,8 @@ class AdminDetails extends Component {
   };
 
   render () {
-    const { className, fields, handleSubmit } = this.props;
+    const { className, currentPage, fields, handleSubmit } = this.props;
+    const tabIndex = currentPage ? 1 : -1;
 
     return (
       <div className={className}>
@@ -31,34 +33,40 @@ class AdminDetails extends Component {
           <InputFieldWithIcon
             {...fields.name}
             placeholder="Full Name"
+            tabIndex={tabIndex}
           />
           <InputFieldWithIcon
             {...fields.username}
             iconName="kolidecon-username"
             placeholder="Username"
+            tabIndex={tabIndex}
           />
           <InputFieldWithIcon
             {...fields.password}
             iconName="kolidecon-password"
             placeholder="Password"
             type="password"
+            tabIndex={tabIndex}
           />
           <InputFieldWithIcon
             {...fields.password_confirmation}
             iconName="kolidecon-password"
             placeholder="Confirm Password"
             type="password"
+            tabIndex={tabIndex}
           />
           <InputFieldWithIcon
             {...fields.email}
             iconName="kolidecon-email"
             placeholder="Email"
+            tabIndex={tabIndex}
           />
         </div>
         <Button
           onClick={handleSubmit}
           text="Submit"
           variant="gradient"
+          tabIndex={tabIndex}
         />
       </div>
     );

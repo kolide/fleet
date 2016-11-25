@@ -11,7 +11,7 @@
     width: 125px;
     font-size: 14px;
     font-weight: $normal;
-    line-height: 0.93;
+    line-height: 1.53;
     letter-spacing: 0.5px;
     color: $text-medium;
     position: relative;
@@ -25,7 +25,7 @@
       background-position: left top;
       background-repeat: repeat-x;
       background-size: 17px 2px;
-      bottom: 62px;
+      bottom: 54px;
       left: 72px;
     }
 
@@ -40,6 +40,7 @@
       margin: 23px auto 0;
       position: relative;
       z-index: 1;
+      cursor: pointer;
     }
 
     &:focus {
@@ -48,6 +49,7 @@
 
     &--active {
       font-weight: $bold;
+      color: $text-dark;
     }
 
     &--1 {

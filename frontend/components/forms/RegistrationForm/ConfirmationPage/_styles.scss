@@ -36,6 +36,10 @@
       padding-bottom: 20px;
     }
 
+    tr {
+      vertical-align: bottom;
+    }
+
     th {
       font-size: 14px;
       font-weight: $bold;
@@ -54,6 +58,6 @@
   }
 
   &__table-url {
-    font-family: 'Source-codePro', $monospace;
+    font-family: 'SourceCodePro', $monospace;
   }
 }
