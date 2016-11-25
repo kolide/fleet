@@ -25,6 +25,8 @@ import (
 )
 
 type initializer interface {
+	// Initialize is used to populate a datastore with
+	// preloaded data
 	Initialize() error
 }
 
@@ -70,7 +72,7 @@ the way that the kolide server works.
 					"Warning: Changes will not be saved across process restarts. This should NOT be used in production.",
 				)
 
-				if ds, err = inmem.New(inmem.WithConfig(config)); err != nil {
+				if ds, err = inmem.New(config); err != nil {
 					initFatal(err, "initializing inmem database")
 				}
 			} else {

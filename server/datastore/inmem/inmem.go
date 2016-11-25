@@ -36,21 +36,10 @@ type Datastore struct {
 	config  *config.KolideConfig
 }
 
-type Option func(ds *Datastore)
-
-func WithConfig(config config.KolideConfig) Option {
-	return func(ds *Datastore) {
-		ds.config = &config
-	}
-}
-
-func New(opts ...Option) (*Datastore, error) {
+func New(config config.KolideConfig) (*Datastore, error) {
 	ds := &Datastore{
 		Driver: "inmem",
-	}
-
-	for _, opt := range opts {
-		opt(ds)
+		config: &config,
 	}
 
 	if err := ds.Migrate(); err != nil {
