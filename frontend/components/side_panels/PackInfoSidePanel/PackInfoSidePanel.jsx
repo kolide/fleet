@@ -1,6 +1,7 @@
 import React from 'react';
 
 import SecondarySidePanelContainer from '../SecondarySidePanelContainer';
+import Icon from 'components/Icon';
 
 const classBlock = 'pack-info-side-panel';
 
@@ -10,7 +11,7 @@ class PackInfoSidePanel extends React.Component {
       <SecondarySidePanelContainer className={classBlock}>
         <div>
           <h3>
-            <i className="kolidecon-packs" />
+            <Icon name="packs" />
             &nbsp;
             What&apos;s a Query Pack?
           </h3>
