@@ -64,7 +64,7 @@ class HostSidePanel extends Component {
         />
         <hr className={`${baseClass}__hr`} />
         <div className={`${baseClass}__panel-group-item`}>
-          <i className="kolidecon-tag" />
+          <i className="kolidecon-label" />
           <span className="title">LABELS</span>
         </div>
         <div className={`${baseClass}__panel-group-item`}>
