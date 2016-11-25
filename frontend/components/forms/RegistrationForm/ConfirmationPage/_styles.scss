@@ -15,6 +15,12 @@
     bottom: 0;
     top: auto;
     position: absolute;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+
+    &:active {
+      top: auto;
+    }
   }
 
   &__table {
