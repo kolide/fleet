@@ -5,8 +5,8 @@ export const iconClassForLabel = (label) => {
   if (lowerType === 'all') return 'kolidecon-hosts';
 
   switch (lowerDisplayText) {
-    case 'offline': return 'kolidecon-hosts';
-    case 'online': return 'kolidecon-hosts';
+    case 'offline': return 'kolidecon-success-check';
+    case 'online': return 'kolidecon-offline';
     case 'mac os': return 'kolidecon-apple';
     case 'centos': return 'kolidecon-centos';
     case 'ubuntu': return 'kolidecon-ubuntu';

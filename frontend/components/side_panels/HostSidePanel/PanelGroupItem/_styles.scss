@@ -1,5 +1,8 @@
-.panel-group-item {
-  display: block;
+$base-class: 'panel-group-item';
+
+.#{$base-class} {
+  @include display(flex);
+  @include align-items(center);
   width: 100%;
   font-size: 16px;
   line-height: 2.25;
@@ -25,5 +28,64 @@
 
   &__icon {
     margin-right: 23px;
+  }
+
+  &__name {
+    @include ellipsis(80%);
+    @include flex-grow(1);
+  }
+
+  &__count {
+    font-weight: $bold;
+    text-align: right;
+  }
+
+  &__status {
+    &--offline {
+      .#{$base-class}__icon,
+      .#{$base-class}__count {
+        color: $alert;
+      }
+    }
+
+    &--online {
+      .#{$base-class}__icon,
+      .#{$base-class}__count {
+        color: $success;
+      }
+    }
+
+    &--mia {
+      .#{$base-class}__icon,
+      .#{$base-class}__count {
+        color: $text-ultradark;
+      }
+    }
+  }
+
+  &__platform {
+    .#{$base-class}__icon {
+      color: $text-light;
+    }
+
+    @at-root &.#{$base-class}--selected {
+      .#{$base-class}__icon {
+        color: $brand;
+      }
+    }
+  }
+
+  &__custom {
+    font-size: 14px;
+
+    .#{$base-class}__icon {
+      color: $silver;
+    }
+
+    @at-root &.#{$base-class}--selected {
+      .#{$base-class}__icon {
+        color: $brand;
+      }
+    }
   }
 }

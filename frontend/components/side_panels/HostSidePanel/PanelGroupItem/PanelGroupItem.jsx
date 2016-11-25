@@ -26,6 +26,8 @@ class PanelGroupItem extends Component {
       baseClass,
       'button',
       'button--unstyled',
+      `${baseClass}__${item.type.toLowerCase()}`,
+      `${baseClass}__${item.type.toLowerCase()}--${displayText.toLowerCase()}`,
       {
         [`${baseClass}--selected`]: isSelected,
       }
@@ -34,8 +36,8 @@ class PanelGroupItem extends Component {
     return (
       <button className={wrapperClassName} onClick={onLabelClick}>
         <i className={`${iconClassForLabel(item)} ${baseClass}__icon`} />
-        <span>{displayText}</span>
-        <span>{count}</span>
+        <span className={`${baseClass}__name`}>{displayText}</span>
+        <span className={`${baseClass}__count`}>{count}</span>
       </button>
     );
   }
