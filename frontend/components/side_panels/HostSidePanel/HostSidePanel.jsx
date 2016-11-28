@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { filter } from 'lodash';
 
+import Icon from 'components/Icon';
 import InputField from 'components/forms/fields/InputField';
 import labelInterface from 'interfaces/label';
 import PanelGroup from 'components/side_panels/HostSidePanel/PanelGroup';
@@ -64,7 +65,7 @@ class HostSidePanel extends Component {
         />
         <hr className={`${baseClass}__hr`} />
         <div className={`${baseClass}__panel-group-item`}>
-          <i className="kolidecon-label icon" />
+          <Icon name="label" />
           <span className="title">LABELS</span>
         </div>
         <div className={`${baseClass}__panel-group-item`}>
@@ -82,9 +83,9 @@ class HostSidePanel extends Component {
         />
         <hr className={`${baseClass}__hr`} />
         <button className={`${baseClass}__add-label-btn button button--unstyled`} onClick={onAddLabelClick}>
-          <i className={`kolidecon-add-button ${baseClass}__add-label-btn--icon ${baseClass}__add-label-btn--icon-add`} />
+          <Icon name="add-button" className={`${baseClass}__add-label-btn--icon ${baseClass}__add-label-btn--icon-add`} />
           ADD NEW LABEL
-          <i className={`kolidecon-label ${baseClass}__add-label-btn--icon ${baseClass}__add-label-btn--icon-label`} />
+          <Icon name="label" className={`${baseClass}__add-label-btn--icon ${baseClass}__add-label-btn--icon-label`} />
         </button>
       </SecondarySidePanelContainer>
     );
