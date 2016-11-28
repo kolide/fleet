@@ -1,3 +1,17 @@
+.dropdown {
+  &__label {
+    display: block;
+    font-size: $base;
+    font-weight: $light;
+    color: $text-dark;
+    margin-bottom: $pad-xsmall;
+
+    &--error {
+      color: $alert;
+    }
+  }
+}
+
 .Select {
   .Select-control {
     border: 1px solid $accent-medium;

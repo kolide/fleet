@@ -79,17 +79,19 @@ class PackQueryConfigForm extends Component {
           />
           <Dropdown
             {...fields.platform}
-            className={`${baseClass}__form-field`}
+            label="Platform"
             options={platformOptions}
             onSelect={fields.platform.onChange}
             placeholder="Platform"
+            wrapperClassName={`${baseClass}__form-field`}
           />
           <Dropdown
             {...fields.logging_type}
-            className={`${baseClass}__form-field`}
+            label="Logging Type"
             options={loggingTypeOptions}
             onSelect={fields.logging_type.onChange}
             placeholder="Logging type"
+            wrapperClassName={`${baseClass}__form-field`}
           />
         </div>
       </form>
