@@ -9,7 +9,7 @@ describe('ConfirmationPage - form', () => {
   afterEach(restoreSpies);
 
   const formData = {
-    full_name: 'Jason Meller',
+    name: 'Jason Meller',
     username: 'jmeller',
     email: 'jason@kolide.co',
     org_name: 'Kolide',
@@ -24,7 +24,7 @@ describe('ConfirmationPage - form', () => {
       />
     );
 
-    expect(form.text()).toInclude(formData.full_name);
+    expect(form.text()).toInclude(formData.name);
     expect(form.text()).toInclude(formData.username);
     expect(form.text()).toInclude(formData.email);
     expect(form.text()).toInclude(formData.org_name);
