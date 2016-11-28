@@ -49,9 +49,10 @@ type CampaignService interface {
 type DistributedQueryStatus int
 
 const (
-	QueryRunning  DistributedQueryStatus = iota
-	QueryComplete DistributedQueryStatus = iota
-	QueryError    DistributedQueryStatus = iota
+	QueryWaiting DistributedQueryStatus = iota
+	QueryRunning
+	QueryComplete
+	QueryError
 )
 
 // DistributedQueryCampaign is the basic metadata associated with a distributed
