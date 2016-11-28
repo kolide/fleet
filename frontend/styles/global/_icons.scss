@@ -112,14 +112,6 @@
     content: '\f029';
 }
 
- .kolidecon-username:before {
-    content: '\f02a';
-}
-
- .kolidecon-password:before {
-    content: '\f02b';
-}
-
  .kolidecon-query:before {
     content: '\f02d';
 }
@@ -282,6 +274,14 @@
 
  .kolidecon-single-host:before {
     content: '\f03d';
+}
+
+ .kolidecon-username:before {
+    content: '\f02a';
+}
+
+ .kolidecon-password:before {
+    content: '\f02b';
 }
 
  .kolidecon-email:before {
