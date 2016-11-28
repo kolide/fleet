@@ -1,24 +1,27 @@
 import React, { Component, PropTypes } from 'react';
-import Select from 'react-select';
+import classnames from 'classnames';
 import { noop, pick } from 'lodash';
+import Select from 'react-select';
 
 import dropdownOptionInterface from 'interfaces/dropdownOption';
 import FormField from 'components/forms/FormField';
 
-const baseClass = 'input-dropdown';
+const baseClass = 'dropdown';
 
 class Dropdown extends Component {
   static propTypes = {
-    className: PropTypes.string,
     clearable: PropTypes.bool,
     error: PropTypes.string,
     hint: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
     label: PropTypes.string,
+    labelClassName: PropTypes.string,
     name: PropTypes.string,
     onChange: PropTypes.func,
     options: PropTypes.arrayOf(dropdownOptionInterface).isRequired,
     placeholder: PropTypes.string,
+    selectClassName: PropTypes.string,
     value: PropTypes.string,
+    wrapperClassName: PropTypes.string,
   };
 
   static defaultProps = {
@@ -33,6 +36,28 @@ class Dropdown extends Component {
     return onChange(value);
   };
 
+  renderLabel = () => {
+    const { error, label, labelClassName, name } = this.props;
+    const labelWrapperClasses = classnames(
+      `${baseClass}__label`,
+      labelClassName,
+      { [`${baseClass}__label--error`]: error }
+    );
+
+    if (!label) {
+      return false;
+    }
+
+    return (
+      <label
+        className={labelWrapperClasses}
+        htmlFor={name}
+      >
+        {error || label}
+      </label>
+    );
+  }
+
   render () {
     const { handleChange } = this;
     const { className, clearable, name, options, placeholder, value } = this.props;
@@ -43,12 +68,12 @@ class Dropdown extends Component {
       <FormField {...formFieldProps} type="dropdown">
         <Select
           className={`${baseClass}__select ${className}`}
+          clearable={clearable}
           name={`${name}-select` || "targets"}
-          options={options}
           onChange={handleChange}
+          options={options}
           placeholder={placeholder}
           value={value}
-          clearable={clearable}
         />
       </FormField>
     );
