@@ -7,7 +7,7 @@ import InputField from 'components/forms/fields/InputField';
 import SelectTargetsDropdown from 'components/forms/fields/SelectTargetsDropdown';
 import validate from './validate';
 
-const fieldNames = ['title', 'description', 'targets'];
+const fieldNames = ['name', 'description', 'targets'];
 
 class PackForm extends Component {
   static propTypes = {
@@ -15,7 +15,7 @@ class PackForm extends Component {
     fields: PropTypes.shape({
       description: formFieldInterface.isRequired,
       targets: formFieldInterface.isRequired,
-      title: formFieldInterface.isRequired,
+      name: formFieldInterface.isRequired,
     }).isRequired,
     handleSubmit: PropTypes.func,
     onFetchTargets: PropTypes.func,
@@ -34,7 +34,7 @@ class PackForm extends Component {
     return (
       <form className={className} onSubmit={handleSubmit}>
         <InputField
-          {...fields.title}
+          {...fields.name}
           placeholder="Query Pack Title"
         />
         <InputField

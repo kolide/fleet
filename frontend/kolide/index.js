@@ -4,6 +4,12 @@ import endpoints from 'kolide/endpoints';
 import helpers from 'kolide/helpers';
 
 class Kolide extends Base {
+  addQueryToPack = ({ packID, queryID }) => {
+    const endpoint = `/v1/kolide/packs/${packID}/queries/${queryID}`;
+
+    return this.authenticatedPost(this.endpoint(endpoint));
+  }
+
   createLabel = ({ description, name, query }) => {
     const { LABELS } = endpoints;
 
@@ -17,6 +23,13 @@ class Kolide extends Base {
           type: 'custom',
         };
       });
+  }
+
+  createPack = ({ name, description }) => {
+    const { PACKS } = endpoints;
+
+    return this.authenticatedPost(this.endpoint(PACKS), JSON.stringify({ description, name }))
+      .then((response) => { return response.pack; });
   }
 
   createQuery = ({ description, name, query }) => {
@@ -101,6 +114,14 @@ class Kolide extends Base {
 
     return Promise.resolve(stubbedResponse)
       .then((response) => { return response.hosts; });
+  }
+
+  getPack = (packID) => {
+    const { PACKS } = endpoints;
+    const getPackEndpoint = `${this.baseURL}${PACKS}/${packID}`;
+
+    return this.authenticatedGet(getPackEndpoint)
+      .then((response) => { return response.pack; });
   }
 
   getQuery = (queryID) => {
