@@ -1,5 +1,6 @@
 .queries-list {
   &__wrapper {
+    @include transition(top 150ms ease-in);
     background-color: $white;
     border: 1px solid $accent-dark;
     border-bottom-left-radius: 3px;
@@ -7,8 +8,7 @@
     box-shadow: inset 0 0 8px 0 rgba(0, 0, 0, 0.12);
     box-sizing: border-box;
     position: relative;
-    top: -122px;
-    transition: top 0.3s ease-in;
+    top: -126px;
     left: 0;
     right: 0;
     width: 100%;
