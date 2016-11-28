@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/kolide/kolide-ose/server/datastore/inmem"
+	"github.com/kolide/kolide-ose/server/datastore/mysql"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -157,7 +159,7 @@ func testManagingLabelsOnPacks(t *testing.T, ds kolide.Datastore) {
 	err = ds.AddLabelToPack(mysqlLabel.ID, monitoringPack.ID)
 	require.Nil(t, err)
 
-	labels, err := ds.ListLabelsForPack(monitoringPack)
+	labels, err := ds.ListLabelsForPack(monitoringPack.ID)
 	require.Nil(t, err)
 	if assert.Len(t, labels, 1) {
 		assert.Equal(t, "MySQL Monitoring", labels[0].Name)
@@ -173,7 +175,7 @@ func testManagingLabelsOnPacks(t *testing.T, ds kolide.Datastore) {
 	err = ds.AddLabelToPack(osqueryLabel.ID, monitoringPack.ID)
 	require.Nil(t, err)
 
-	labels, err = ds.ListLabelsForPack(monitoringPack)
+	labels, err = ds.ListLabelsForPack(monitoringPack.ID)
 	require.Nil(t, err)
 	assert.Len(t, labels, 2)
 }
@@ -274,6 +276,22 @@ func testListHostsInLabel(t *testing.T, db kolide.Datastore) {
 		require.Nil(t, err)
 		assert.Len(t, hosts, 3)
 	}
+}
+
+func testBuiltInLabels(t *testing.T, db kolide.Datastore) {
+	if i, ok := db.(*mysql.Datastore); ok {
+		err := i.Initialize()
+		require.Nil(t, err)
+	}
+	if i, ok := db.(*inmem.Datastore); ok {
+		err := i.Initialize()
+		require.Nil(t, err)
+	}
+
+	hits, err := db.SearchLabels("Mac OS X")
+	require.Nil(t, err)
+	assert.Equal(t, 1, len(hits))
+	assert.Equal(t, kolide.LabelTypeBuiltIn, hits[0].LabelType)
 }
 
 func testListUniqueHostsInLabels(t *testing.T, db kolide.Datastore) {
