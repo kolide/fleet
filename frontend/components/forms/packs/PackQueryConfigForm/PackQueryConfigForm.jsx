@@ -5,8 +5,10 @@ import Dropdown from 'components/forms/fields/Dropdown';
 import Form from 'components/forms/Form';
 import formFieldInterface from 'interfaces/form_field';
 import InputField from 'components/forms/fields/InputField';
+import queryInterface from 'interfaces/query';
 import validate from 'components/forms/packs/PackQueryConfigForm/validate';
 
+const baseClass = 'pack-query-config-form';
 const fieldNames = ['queries', 'interval', 'platform', 'min_osquery_version', 'logging_type'];
 const platformOptions = [
   { label: 'All', value: 'all' },
@@ -29,6 +31,9 @@ class PackQueryConfigForm extends Component {
       platform: formFieldInterface.isRequired,
       queries: formFieldInterface.isRequired,
     }).isRequired,
+    formData: PropTypes.shape({
+      queries: PropTypes.arrayOf(queryInterface),
+    }),
     handleSubmit: PropTypes.func,
     onCancel: PropTypes.func,
   };
@@ -42,39 +47,51 @@ class PackQueryConfigForm extends Component {
   }
 
   render () {
-    const { fields, handleSubmit } = this.props;
+    const { fields, formData, handleSubmit } = this.props;
     const { onCancel } = this;
+    const queryCount = formData.queries.length;
 
     return (
-      <form>
-        <Button
-          onClick={onCancel}
-          text="Cancel"
-          variant="inverse"
-        />
-        <Button
-          onClick={handleSubmit}
-          text="Save and Close"
-          type="submit"
-          variant="brand"
-        />
-        <InputField
-          {...fields.interval}
-          label="Interval"
-          placeholder="Interval (seconds)"
-        />
-        <Dropdown
-          {...fields.platform}
-          options={platformOptions}
-          onSelect={fields.platform.onChange}
-          placeholder="Platform"
-        />
-        <Dropdown
-          {...fields.logging_type}
-          options={loggingTypeOptions}
-          onSelect={fields.logging_type.onChange}
-          placeholder="Logging type"
-        />
+      <form className={`${baseClass}__wrapper`}>
+        <div className={`${baseClass}__header-section`}>
+          <span>Configure {queryCount} Selected {queryCount === 1 ? 'Query' : 'Queries'}</span>
+          <div className={`${baseClass}__btn-wrapper`}>
+            <Button
+              onClick={onCancel}
+              text="Cancel"
+              variant="unstyled"
+            />
+            <span> | </span>
+            <Button
+              onClick={handleSubmit}
+              text="Save and Close"
+              type="submit"
+              variant="unstyled"
+            />
+          </div>
+        </div>
+        <div className={`${baseClass}__body-section`}>
+          <InputField
+            {...fields.interval}
+            inputWrapperClass={`${baseClass}__form-field`}
+            label="Interval"
+            placeholder="Interval (seconds)"
+          />
+          <Dropdown
+            {...fields.platform}
+            className={`${baseClass}__form-field`}
+            options={platformOptions}
+            onSelect={fields.platform.onChange}
+            placeholder="Platform"
+          />
+          <Dropdown
+            {...fields.logging_type}
+            className={`${baseClass}__form-field`}
+            options={loggingTypeOptions}
+            onSelect={fields.logging_type.onChange}
+            placeholder="Logging type"
+          />
+        </div>
       </form>
     );
   }

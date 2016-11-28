@@ -63,10 +63,6 @@ class QueriesListWrapper extends Component {
       stagedQueries,
     } = this.props;
 
-    if (!size(stagedQueries)) {
-      return false;
-    }
-
     const formData = { queries: stagedQueries };
 
     return (
@@ -103,13 +99,15 @@ class QueriesListWrapper extends Component {
           placeholder="Search Queries"
           value={querySearchText}
         />
-        {renderPackQueryConfigForm()}
-        <QueriesList
-          configuredQueryIDs={configuredQueryIDs}
-          onSelectQuery={onSelectQuery}
-          queries={getQueries()}
-          selectedQueries={stagedQueries}
-        />
+        <div style={{ position: 'relative' }}>
+          {renderPackQueryConfigForm()}
+          <QueriesList
+            configuredQueryIDs={configuredQueryIDs}
+            onSelectQuery={onSelectQuery}
+            queries={getQueries()}
+            selectedQueries={stagedQueries}
+          />
+        </div>
       </div>
     );
   }

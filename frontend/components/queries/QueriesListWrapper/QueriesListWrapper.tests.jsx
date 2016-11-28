@@ -25,28 +25,16 @@ const queries = [query];
 describe('QueriesListWrapper - component', () => {
   afterEach(restoreSpies);
 
-  it('renders the PackQueryConfigForm when there are staged queries', () => {
-    const componentWithoutStagedQueries = mount(
+  it('renders the PackQueryConfigForm', () => {
+    const component = mount(
       <QueriesListWrapper
         configuredQueries={[]}
         queries={queries}
         stagedQueries={[]}
       />
     );
-    const componentWithStagedQueries = mount(
-      <QueriesListWrapper
-        configuredQueries={[]}
-        queries={queries}
-        stagedQueries={queries}
-      />
-    );
 
-    expect(
-      componentWithoutStagedQueries.find('PackQueryConfigForm').length
-    ).toEqual(0);
-    expect(
-      componentWithStagedQueries.find('PackQueryConfigForm').length
-    ).toEqual(1);
+    expect(component.find('PackQueryConfigForm').length).toEqual(1);
   });
 
   it('filters queries', () => {
@@ -58,7 +46,7 @@ describe('QueriesListWrapper - component', () => {
       />
     );
 
-    const searchQueriesInput = component.find('InputField').find('input');
+    const searchQueriesInput = component.find({ name: 'search-queries' });
 
     fillInFormInput(searchQueriesInput, 'darwin');
 
