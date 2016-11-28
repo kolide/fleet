@@ -1,5 +1,6 @@
 .pack-query-config-form {
   &__body-section {
+    @include display(flex);
     background-color: $accent-light;
     padding: 0 $pad-small;
   }
@@ -20,8 +21,8 @@
   }
 
   &__header-section {
-    display: flex;
-    justify-content: space-between;
+    @include display(flex);
+    @include justify-content(space-between);
     background-color: $brand;
     height: 34px;
     padding: 0 $pad-small;
@@ -46,7 +47,6 @@
     top: 0;
     left: 0;
     right: 0;
-    transition: top 0.3s ease-in;
     z-index: 1;
   }
 }
