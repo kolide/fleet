@@ -58,12 +58,12 @@ class TargetDetails extends Component {
         </button>
 
         <p className={`${hostBaseClass}__display-text`}>
-          <Icon name="single-host" fw={true} className={`${hostBaseClass}__icon`} />
+          <Icon name="single-host" fw className={`${hostBaseClass}__icon`} />
           <span>{displayText}</span>
         </p>
         <p className={statusClassName}>
-          {isOnline && <Icon name="success-check" fw={true} className={`${hostBaseClass}__icon ${hostBaseClass}__icon--online`} />}
-          {isOffline && <Icon name="offline" fw={true} className={`${hostBaseClass}__icon ${hostBaseClass}__icon--offline`} />}
+          {isOnline && <Icon name="success-check" fw className={`${hostBaseClass}__icon ${hostBaseClass}__icon--online`} />}
+          {isOffline && <Icon name="offline" fw className={`${hostBaseClass}__icon ${hostBaseClass}__icon--offline`} />}
           <span>{status}</span>
         </p>
         <table className={`${baseClass}__table`}>
@@ -99,7 +99,7 @@ class TargetDetails extends Component {
         </table>
         <div className={`${hostBaseClass}__labels-wrapper`}>
           <p className={`${hostBaseClass}__labels-header`}>
-            <Icon name="label" fw={true} className={`${hostBaseClass}__icon`} />
+            <Icon name="label" fw className={`${hostBaseClass}__icon`} />
             <span>Labels</span>
           </p>
           <ul className={`${hostBaseClass}__labels-list`}>
@@ -132,7 +132,7 @@ class TargetDetails extends Component {
         </button>
 
         <p className={`${labelBaseClass}__display-text`}>
-          <Icon name="label" fw={true} className={`${labelBaseClass}__icon`} />
+          <Icon name="label" fw className={`${labelBaseClass}__icon`} />
           <span>{displayText}</span>
         </p>
 

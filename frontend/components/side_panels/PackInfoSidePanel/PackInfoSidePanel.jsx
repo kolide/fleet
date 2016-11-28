@@ -1,7 +1,7 @@
 import React from 'react';
 
-import SecondarySidePanelContainer from '../SecondarySidePanelContainer';
 import Icon from 'components/Icon';
+import SecondarySidePanelContainer from '../SecondarySidePanelContainer';
 
 const classBlock = 'pack-info-side-panel';
 

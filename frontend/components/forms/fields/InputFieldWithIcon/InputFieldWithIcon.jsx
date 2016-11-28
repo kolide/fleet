@@ -1,8 +1,8 @@
 import React, { PropTypes } from 'react';
 import classnames from 'classnames';
 
-import InputField from '../InputField';
 import Icon from 'components/Icon';
+import InputField from '../InputField';
 
 const baseClass = 'input-icon-field';
 

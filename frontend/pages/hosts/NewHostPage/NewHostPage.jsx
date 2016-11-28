@@ -3,9 +3,9 @@ import { connect } from 'react-redux';
 import { map, noop } from 'lodash';
 import classnames from 'classnames';
 
-import { copyText } from './helpers';
 import { renderFlash } from 'redux/nodes/notifications/actions';
 import Icon from 'components/Icon';
+import { copyText } from './helpers';
 
 const HOST_TABS = {
   FIRST: 'What Does This Script Do?',
