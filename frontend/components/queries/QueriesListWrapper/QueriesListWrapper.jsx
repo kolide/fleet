@@ -74,20 +74,35 @@ class QueriesListWrapper extends Component {
     );
   }
 
+  renderQueriesList = () => {
+    const { getQueries, onSelectQuery, renderPackQueryConfigForm } = this;
+    const { configuredQueryIDs, stagedQueries } = this.props;
+    const queryCount = size(getQueries());
+
+    if (!queryCount) {
+      return <p>There are no available queries for your pack</p>;
+    }
+
+    return (
+      <div className={`${baseClass}__queries-list-wrapper`}>
+        {renderPackQueryConfigForm()}
+        <QueriesList
+          configuredQueryIDs={configuredQueryIDs}
+          onSelectQuery={onSelectQuery}
+          queries={getQueries()}
+          selectedQueries={stagedQueries}
+        />
+      </div>
+    );
+  }
+
   render () {
     const {
       getQueries,
-      onSelectQuery,
       onUpdateQuerySearchText,
-      renderPackQueryConfigForm,
+      renderQueriesList,
     } = this;
-    const { configuredQueryIDs, queries, stagedQueries } = this.props;
     const { querySearchText } = this.state;
-    const queryCount = size(queries);
-
-    if (!queryCount) {
-      return false;
-    }
 
     return (
       <div className={`${baseClass} ${baseClass}__wrapper`}>
@@ -99,15 +114,7 @@ class QueriesListWrapper extends Component {
           placeholder="Search Queries"
           value={querySearchText}
         />
-        <div style={{ position: 'relative' }}>
-          {renderPackQueryConfigForm()}
-          <QueriesList
-            configuredQueryIDs={configuredQueryIDs}
-            onSelectQuery={onSelectQuery}
-            queries={getQueries()}
-            selectedQueries={stagedQueries}
-          />
-        </div>
+        {renderQueriesList()}
       </div>
     );
   }
