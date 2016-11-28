@@ -37,27 +37,27 @@ class AdminDetails extends Component {
           />
           <InputFieldWithIcon
             {...fields.username}
-            iconName="kolidecon-username"
+            iconName="username"
             placeholder="Username"
             tabIndex={tabIndex}
           />
           <InputFieldWithIcon
             {...fields.password}
-            iconName="kolidecon-password"
+            iconName="password"
             placeholder="Password"
             type="password"
             tabIndex={tabIndex}
           />
           <InputFieldWithIcon
             {...fields.password_confirmation}
-            iconName="kolidecon-password"
+            iconName="password"
             placeholder="Confirm Password"
             type="password"
             tabIndex={tabIndex}
           />
           <InputFieldWithIcon
             {...fields.email}
-            iconName="kolidecon-email"
+            iconName="email"
             placeholder="Email"
             tabIndex={tabIndex}
           />

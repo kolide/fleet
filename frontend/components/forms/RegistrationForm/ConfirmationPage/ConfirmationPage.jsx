@@ -3,6 +3,7 @@ import classnames from 'classnames';
 
 import Button from 'components/buttons/Button';
 import formDataInterface from 'interfaces/registration_form_data';
+import Icon from 'components/Icon';
 
 const baseClass = 'confirm-user-reg';
 
@@ -75,6 +76,7 @@ class ConfirmationPage extends Component {
             </label>
           </div>
         </div>
+
         <Button
           onClick={onSubmit}
           text="Finish"
