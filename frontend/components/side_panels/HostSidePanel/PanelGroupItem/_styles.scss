@@ -28,6 +28,7 @@ $base-class: 'panel-group-item';
 
   &__icon {
     margin-right: 23px;
+    font-size: 18px;
   }
 
   &__name {
@@ -38,6 +39,7 @@ $base-class: 'panel-group-item';
   &__count {
     font-weight: $bold;
     text-align: right;
+    font-size: 14px;
   }
 
   &__status {
