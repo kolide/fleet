@@ -174,7 +174,6 @@ class SelectTargetsDropdown extends Component {
           onClose={onInputClose}
           onTargetSelect={onSelect}
           onTargetSelectInputChange={fetchTargets}
-          onInputChange={fetchTargets}
           selectedTargets={selectedTargets}
           targets={targets}
         />
