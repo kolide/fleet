@@ -1,12 +1,16 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { noop } from 'lodash';
+import { push } from 'react-router-redux';
 
+import Kolide from 'kolide';
 import PackForm from 'components/forms/packs/PackForm';
+import packActions from 'redux/nodes/entities/packs/actions';
 import packsPageActions from 'redux/nodes/components/PacksPages/actions';
 import queryActions from 'redux/nodes/entities/queries/actions';
 import queryInterface from 'interfaces/query';
 import QueriesListWrapper from 'components/queries/QueriesListWrapper';
+import { renderFlash } from 'redux/nodes/notifications/actions';
 import stateEntityGetter from 'redux/utilities/entityGetter';
 
 const baseClass = 'pack-composer-page';
@@ -86,10 +90,33 @@ export class PackComposerPage extends Component {
   }
 
   handleSubmit = (formData) => {
-    const { configurations } = this.props;
+    const { configurations, dispatch } = this.props;
+    const { load, create } = packActions;
+
+    dispatch(create(formData))
+      .then((pack) => {
+        const { id: packID } = pack;
+        const promises = [];
+
+        configurations.forEach((configuration) => {
+          configuration.query_ids.forEach((queryID) => {
+            promises.push(Kolide.addQueryToPack({ packID, queryID }));
+          });
+        });
+
+        promises.push(dispatch(load(packID)));
+
+        Promise.all(promises)
+          .then(() => {
+            dispatch(push('/packs/all'));
+            dispatch(renderFlash('success', 'Pack created!'));
+          })
+          .catch(() => {
+            dispatch(renderFlash('error', 'There was an error creating your pack'));
+          });
+      });
 
     console.log('configurations data', configurations);
-    console.log('pack form data', formData);
 
     return false;
   }

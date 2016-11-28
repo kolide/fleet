@@ -23,6 +23,16 @@ export const validCreateLabelRequest = (bearerToken, labelParams) => {
     .reply(201, { label: { ...labelParams, display_text: labelParams.name } });
 };
 
+export const validCreatePackRequest = (bearerToken, packParams) => {
+  return nock('http://localhost:8080', {
+    reqHeaders: {
+      Authorization: `Bearer ${bearerToken}`,
+    },
+  })
+    .post('/api/v1/kolide/packs', JSON.stringify(packParams))
+    .reply(201, { pack: packParams });
+};
+
 export const validCreateQueryRequest = (bearerToken, queryParams) => {
   return nock('http://localhost:8080', {
     reqHeaders: {
@@ -254,6 +264,7 @@ export default {
   invalidGetQueryRequest,
   invalidResetPasswordRequest,
   validCreateLabelRequest,
+  validCreatePackRequest,
   validCreateQueryRequest,
   validForgotPasswordRequest,
   validGetConfigRequest,

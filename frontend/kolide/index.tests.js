@@ -8,6 +8,7 @@ const {
   invalidForgotPasswordRequest,
   invalidResetPasswordRequest,
   validCreateLabelRequest,
+  validCreatePackRequest,
   validCreateQueryRequest,
   validForgotPasswordRequest,
   validGetConfigRequest,
@@ -57,6 +58,24 @@ describe('Kolide - API client', () => {
             slug: 'label-name',
             type: 'custom',
           });
+          done();
+        })
+        .catch(done);
+    });
+  });
+
+  describe('#createPack', () => {
+    it('calls the appropriate endpoint with the correct parameters', (done) => {
+      const bearerToken = 'valid-bearer-token';
+      const description = 'pack description';
+      const name = 'pack name';
+      const queryParams = { description, name };
+      const request = validCreatePackRequest(bearerToken, queryParams);
+
+      Kolide.setBearerToken(bearerToken);
+      Kolide.createPack(queryParams)
+        .then(() => {
+          expect(request.isDone()).toEqual(true);
           done();
         })
         .catch(done);

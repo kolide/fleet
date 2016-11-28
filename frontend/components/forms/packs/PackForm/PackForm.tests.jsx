@@ -16,7 +16,7 @@ describe('PackForm - component', () => {
     expect(form.find('Button').length).toEqual(1);
   });
 
-  it('validates the query pack title field', () => {
+  it('validates the query pack name field', () => {
     const handleSubmitSpy = createSpy();
     const form = mount(<PackForm handleSubmit={handleSubmitSpy} />);
 
@@ -26,7 +26,7 @@ describe('PackForm - component', () => {
 
     const formFieldProps = form.find('PackForm').prop('fields');
 
-    expect(formFieldProps.title).toInclude({
+    expect(formFieldProps.name).toInclude({
       error: 'Title field must be completed',
     });
   });
@@ -34,9 +34,9 @@ describe('PackForm - component', () => {
   it('calls the handleSubmit prop when a valid form is submitted', () => {
     const handleSubmitSpy = createSpy();
     const form = mount(<PackForm handleSubmit={handleSubmitSpy} />);
-    const titleField = form.find('InputField').find({ name: 'title' });
+    const nameField = form.find('InputField').find({ name: 'name' });
 
-    fillInFormInput(titleField, 'Mac OS Attacks');
+    fillInFormInput(nameField, 'Mac OS Attacks');
 
     form.simulate('submit');
 
