@@ -11,7 +11,6 @@ import (
 	hostctx "github.com/kolide/kolide-ose/server/contexts/host"
 	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
-	"github.com/y0ssar1an/q"
 	"golang.org/x/net/context"
 )
 
@@ -255,18 +254,69 @@ var detailQueries = map[string]struct {
 		},
 	},
 	"network_interface": {
+		// REVIEW: Do we want to account for multihomed/multi-interface networks?
 		Query: `select * from interface_details id join interface_addresses ia
                         on ia.interface = id.interface where broadcast != ""
-                        order by (ibytes + obytes) desc limit 1`,
-		IngestFunc: func(host *kolide.Host, rows []map[string]string) error {
-			if len(rows) != 1 {
+                        order by (ibytes + obytes) desc`,
+		IngestFunc: func(host *kolide.Host, rows []map[string]string) (err error) {
+			if len(rows) == 0 {
 				return osqueryError{
-					message: fmt.Sprintf("expected 1 row but got %d", len(rows)),
+					message: "expected network interface rows, go none",
 				}
 			}
-			q.Q(rows)
-			host.PrimaryMAC = rows[0]["mac"]
-			host.PrimaryIP = rows[0]["address"]
+
+			networkInterfaces := []kolide.NetworkInterface{}
+
+			for _, row := range rows {
+				nic := kolide.NetworkInterface{}
+
+				nic.MAC = row["mac"]
+				nic.IPAddress = row["address"]
+				nic.Broadcast = row["broadcast"]
+				if nic.IBytes, err = strconv.ParseInt(row["ibytes"], 10, 64); err != nil {
+					return err
+				}
+				if nic.IErrors, err = strconv.ParseInt(row["ierrors"], 10, 64); err != nil {
+					return err
+				}
+				nic.Interface = row["interface"]
+				if nic.IPackets, err = strconv.ParseInt(row["ipackets"], 10, 64); err != nil {
+					return err
+				}
+				// Optional last_change
+				if lastChange, ok := row["last_change"]; ok {
+					if nic.LastChange, err = strconv.ParseInt(lastChange, 10, 64); err != nil {
+						return err
+					}
+				}
+				nic.Mask = row["mask"]
+				if nic.Metric, err = strconv.Atoi(row["metric"]); err != nil {
+					return err
+				}
+				if nic.MTU, err = strconv.Atoi(row["mtu"]); err != nil {
+					return err
+				}
+				if nic.OBytes, err = strconv.ParseInt(row["obytes"], 10, 64); err != nil {
+					return err
+				}
+				if nic.OErrors, err = strconv.ParseInt(row["oerrors"], 10, 64); err != nil {
+					return err
+				}
+				if nic.OPackets, err = strconv.ParseInt(row["opackets"], 10, 64); err != nil {
+					return err
+				}
+				nic.PointToPoint = row["point_to_point"]
+				if nic.Type, err = strconv.Atoi(row["type"]); err != nil {
+					return err
+				}
+
+				networkInterfaces = append(networkInterfaces, nic)
+			}
+
+			// TODO: set default primary ip address in host if it's not already
+			// set OR if the existing primary ip address isn't in the
+			// interfaces we got back from osquery
+			host.NetworkInterfaces = networkInterfaces
 
 			return nil
 		},
@@ -338,7 +388,6 @@ func (svc service) ingestDetailQuery(host *kolide.Host, name string, rows []map[
 			message: fmt.Sprintf("ingesting query %s: %s", name, err.Error()),
 		}
 	}
-
 	if err = svc.ds.SaveHost(host); err != nil {
 		return osqueryError{
 			message: fmt.Sprintf("writing detail query results to host %s", err.Error()),

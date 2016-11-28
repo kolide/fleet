@@ -22,14 +22,13 @@ func (d *Datastore) NewHost(host *kolide.Host) (*kolide.Host, error) {
 		os_version,
 		uptime,
 		physical_memory,
-		primary_mac,
 		primary_ip
 	)
 	VALUES( ?,?,?,?,?,?,?,?,?,?,?)
 	`
 	result, err := d.db.Exec(sqlStatement, host.DetailUpdateTime,
 		host.NodeKey, host.HostName, host.UUID, host.Platform, host.OsqueryVersion,
-		host.OSVersion, host.Uptime, host.PhysicalMemory, host.PrimaryMAC, host.PrimaryIP)
+		host.OSVersion, host.Uptime, host.PhysicalMemory, host.PrimaryIP)
 	if err != nil {
 		return nil, errors.DatabaseError(err)
 	}
@@ -51,14 +50,39 @@ func (d *Datastore) SaveHost(host *kolide.Host) error {
 			os_version = ?,
 			uptime = ?,
 			physical_memory = ?,
-			primary_mac = ?,
+			cpu_type = ?,
+			cpu_subtype = ?,
+			cpu_brand = ?,
+			cpu_physical_cores = ?,
+			hardware_vendor = ?,
+			hardware_model = ?,
+			hardware_version = ?,
+			hardware_serial = ?,
+			computer_name = ?,
 			primary_ip = ?
 		WHERE id = ?
 	`
-	_, err := d.db.Exec(sqlStatement, host.DetailUpdateTime, host.NodeKey,
-		host.HostName, host.UUID, host.Platform, host.OsqueryVersion,
-		host.OSVersion, host.Uptime, host.PhysicalMemory, host.PrimaryMAC,
-		host.PrimaryIP, host.ID)
+	_, err := d.db.Exec(sqlStatement,
+		host.DetailUpdateTime,
+		host.NodeKey,
+		host.HostName,
+		host.UUID,
+		host.Platform,
+		host.OsqueryVersion,
+		host.OSVersion,
+		host.Uptime,
+		host.PhysicalMemory,
+		host.CPUType,
+		host.CPUSubtype,
+		host.CPUBrand,
+		host.CPUPhysicalCores,
+		host.HardwareVendor,
+		host.HardwareModel,
+		host.HardwareVersion,
+		host.HardwareSerial,
+		host.ComputerName,
+		host.PrimaryIP,
+		host.ID)
 	if err != nil {
 		return errors.DatabaseError(err)
 	}
