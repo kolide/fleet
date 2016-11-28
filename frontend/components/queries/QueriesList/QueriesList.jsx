@@ -1,8 +1,11 @@
 import React, { Component, PropTypes } from 'react';
-import { includes } from 'lodash';
+import classnames from 'classnames';
+import { includes, size } from 'lodash';
 
 import queryInterface from 'interfaces/query';
 import QueriesListItem from 'components/queries/QueriesList/QueriesListItem';
+
+const baseClass = 'queries-list';
 
 class QueriesList extends Component {
   static propTypes = {
@@ -20,8 +23,12 @@ class QueriesList extends Component {
       selectedQueries,
     } = this.props;
 
+    const wrapperClassName = classnames(`${baseClass}__wrapper`, {
+      [`${baseClass}__wrapper--query-selected`]: size(selectedQueries),
+    });
+
     return (
-      <table>
+      <table className={wrapperClassName}>
         <thead>
           <tr>
             <td />
