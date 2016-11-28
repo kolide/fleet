@@ -50,9 +50,8 @@ describe('QueriesListWrapper - component', () => {
 
     fillInFormInput(searchQueriesInput, 'darwin');
 
-    const queriesListQueries = component.find('QueriesList').prop('queries');
-
-    expect(queriesListQueries).toEqual([]);
+    expect(component.find('QueriesList').length).toEqual(0);
+    expect(component.text()).toContain('There are no available queries for your pack');
   });
 
   it('calls the onSelectQuery prop when a query checkbox is selected', () => {
