@@ -1,4 +1,8 @@
 .queries-list-wrapper {
+  &__queries-list-wrapper {
+    position: relative;
+  }
+
   &__search-queries-input {
     width: '400px';
   }
