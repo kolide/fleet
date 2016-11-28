@@ -36,12 +36,11 @@ class ConfirmationPage extends Component {
     const { onSubmit } = this;
 
     const confirmRegClasses = classnames(className, baseClass);
-    const confirmIconClasses = classnames('kolidecon', 'kolidecon-success-check', `${baseClass}__icon`);
 
     return (
       <div className={confirmRegClasses}>
         <div className={`${baseClass}__wrapper`}>
-          <i className={confirmIconClasses} />
+          <Icon name="success-check" className={`${baseClass}__icon`} />
           <table className={`${baseClass}__table`}>
             <caption>Administrator Configuration</caption>
             <tbody>
