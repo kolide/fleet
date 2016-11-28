@@ -12,7 +12,6 @@ import Icon from 'components/Icon';
 import { activeTabFromPathname, activeSubTabFromPathname } from './helpers';
 import kolideLogo from '../../../../assets/images/kolide-logo.svg';
 import navItems from './navItems';
-import UserMenu from './UserMenu';
 
 class SiteNavSidePanel extends Component {
   static propTypes = {
@@ -115,57 +114,6 @@ class SiteNavSidePanel extends Component {
     this.setState({ userMenuOpened: !userMenuOpened });
   }
 
-  renderHeader = () => {
-    const {
-      config: {
-        org_name: orgName,
-      },
-      user,
-    } = this.props;
-
-    const { userMenuOpened } = this.state;
-    const { onLogout, toggleUserMenu } = this;
-    const { enabled, username } = user;
-
-    const headerBaseClass = 'site-nav-header';
-
-    const headerToggleClass = classnames(
-      headerBaseClass,
-      'button',
-      'button--unstyled',
-      { [`${headerBaseClass}--open`]: userMenuOpened }
-    );
-
-    const userStatusClass = classnames(
-      `${headerBaseClass}__user-status`,
-      { [`${headerBaseClass}__user-status--enabled`]: enabled }
-    );
-
-    return (
-      <header>
-        <button className={headerToggleClass} onClick={toggleUserMenu}>
-          <div className={`${headerBaseClass}__org`}>
-            <img
-              alt="Company logo"
-              src={kolideLogo}
-              className={`${headerBaseClass}__logo`}
-            />
-            <h1 className={`${headerBaseClass}__org-name`}>{orgName}</h1>
-            <div className={userStatusClass} />
-            <h2 className={`${headerBaseClass}__username`}>{username}</h2>
-            <Icon name="chevrondown" className={`${headerBaseClass}__org-chevron`} />
-          </div>
-
-          <UserMenu
-            isOpened={userMenuOpened}
-            onLogout={onLogout}
-            user={user}
-          />
-        </button>
-      </header>
-    );
-  }
-
   renderNavItem = (navItem) => {
     const { activeTab = {} } = this.state;
     const { icon, name, subItems } = navItem;
@@ -175,29 +123,24 @@ class SiteNavSidePanel extends Component {
     const navItemBaseClass = 'site-nav-item';
 
     const navItemClasses = classnames(
-      `${navItemBaseClass}__item`,
-      { [`${navItemBaseClass}__item--active`]: active }
+      `${navItemBaseClass}`,
+      { [`${navItemBaseClass}--active`]: active }
     );
 
     return (
-      <div className={navItemBaseClass} key={`nav-item-${name}`}>
+      <li className={navItemClasses} key={`nav-item-${name}`}>
         <button
-          className="button button--unstyled"
+          className={`${navItemBaseClass}__button button button--unstyled`}
           onClick={setActiveTab(navItem)}
           style={{ width: '100%' }}
         >
-          <li
-            key={name}
-            className={navItemClasses}
-          >
-            <Icon name={icon} className={`${navItemBaseClass}__icon`} />
-            <span className={`${navItemBaseClass}__name`}>
-              {name}
-            </span>
-          </li>
+          <Icon name={icon} className={`${navItemBaseClass}__icon`} />
+          <span className={`${navItemBaseClass}__name`}>
+            {name}
+          </span>
         </button>
         {active && renderSubItems(subItems)}
-      </div>
+      </li>
     );
   }
 
@@ -222,8 +165,8 @@ class SiteNavSidePanel extends Component {
     const baseSubItemClass = 'site-sub-item';
 
     const baseSubItemItemClass = classnames(
-      `${baseSubItemClass}__item`,
-      { [`${baseSubItemClass}__item--active`]: active }
+      `${baseSubItemClass}`,
+      { [`${baseSubItemClass}--active`]: active }
     );
 
     const baseSubItemLinkClass = classnames(
@@ -232,19 +175,19 @@ class SiteNavSidePanel extends Component {
     );
 
     return (
-      <button
-        key={`sub-item-${name}`}
-        onClick={setActiveSubItem(subItem)}
-        className={`${baseSubItemClass} button button--unstyled`}
+      <li
+        key={name}
+        className={baseSubItemItemClass}
       >
-        {active && <div className={`${baseSubItemClass}__before`} />}
-        <li
-          key={name}
-          className={baseSubItemItemClass}
+        <button
+          key={`sub-item-${name}`}
+          onClick={setActiveSubItem(subItem)}
+          className={`${baseSubItemClass}__button button button--unstyled`}
+          to={path.location}
         >
-          <span to={path.location} className={baseSubItemLinkClass}>{name}</span>
-        </li>
-      </button>
+          {name}
+        </button>
+      </li>
     );
   }
 
@@ -289,13 +232,10 @@ class SiteNavSidePanel extends Component {
   }
 
   render () {
-    const { renderHeader, renderNavItems } = this;
+    const { renderNavItems } = this;
 
     return (
-      <nav className="site-nav">
-        {renderHeader()}
-        {renderNavItems()}
-      </nav>
+      renderNavItems()
     );
   }
 }
