@@ -4,18 +4,15 @@ import { isEqual } from 'lodash';
 import { push } from 'react-router-redux';
 import classnames from 'classnames';
 
-import configInterface from 'interfaces/config';
 import { logoutUser } from 'redux/nodes/auth/actions';
 import userInterface from 'interfaces/user';
 import Icon from 'components/Icon';
 
 import { activeTabFromPathname, activeSubTabFromPathname } from './helpers';
-import kolideLogo from '../../../../assets/images/kolide-logo.svg';
 import navItems from './navItems';
 
 class SiteNavSidePanel extends Component {
   static propTypes = {
-    config: configInterface,
     dispatch: PropTypes.func,
     pathname: PropTypes.string,
     user: userInterface,
@@ -167,11 +164,6 @@ class SiteNavSidePanel extends Component {
     const baseSubItemItemClass = classnames(
       `${baseSubItemClass}`,
       { [`${baseSubItemClass}--active`]: active }
-    );
-
-    const baseSubItemLinkClass = classnames(
-      `${baseSubItemClass}__link`,
-      { [`${baseSubItemClass}__link--active`]: active }
     );
 
     return (
