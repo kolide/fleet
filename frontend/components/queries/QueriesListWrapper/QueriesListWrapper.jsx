@@ -97,11 +97,7 @@ class QueriesListWrapper extends Component {
   }
 
   render () {
-    const {
-      getQueries,
-      onUpdateQuerySearchText,
-      renderQueriesList,
-    } = this;
+    const { onUpdateQuerySearchText, renderQueriesList } = this;
     const { querySearchText } = this.state;
 
     return (
