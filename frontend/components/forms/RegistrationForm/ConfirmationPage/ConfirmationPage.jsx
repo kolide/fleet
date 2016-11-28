@@ -62,10 +62,18 @@ class ConfirmationPage extends Component {
               </tr>
               <tr>
                 <th>Kolide URL:</th>
-                <td className={`${baseClass}__table-url`}>{kolideWebAddress}</td>
+                <td><span className={`${baseClass}__table-url`} title={kolideWebAddress}>{kolideWebAddress}</span></td>
               </tr>
             </tbody>
           </table>
+
+          <div className={`${baseClass}__import`}>
+            <label htmlFor="import-install">
+              <input type="checkbox" name="import-install" id="import-install" className="kolide-checkbox" />
+              <p>I am migrating an existing <strong>osquery</strong> installation.</p>
+              <p>Take me to the <strong>Import Configuration</strong> page.</p>
+            </label>
+          </div>
         </div>
         <Button
           onClick={onSubmit}

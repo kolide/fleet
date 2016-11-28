@@ -46,6 +46,7 @@
       line-height: 1.71;
       letter-spacing: 0.5px;
       color: $text-dark;
+      text-align: left;
     }
 
     td {
@@ -58,6 +59,54 @@
   }
 
   &__table-url {
+    @include ellipsis(90%);
     font-family: 'SourceCodePro', $monospace;
+    vertical-align: bottom;
+  }
+
+  &__import {
+    @include user-select(none);
+    font-size: 14px;
+    font-weight: $light;
+    line-height: 1.71;
+    letter-spacing: 0.5px;
+    color: $text-dark;
+    margin: 30px 0 0;
+
+    label {
+      display: block;
+      position: relative;
+    }
+
+    p {
+      margin: 0;
+      padding-left: 40px;
+    }
+
+    .kolide-checkbox {
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+  }
+}
+
+.kolide-checkbox {
+  visibility: hidden;
+
+  &::after {
+    @include size(21px);
+    border-radius: 5px;
+    border: solid 1px $brand-ultralight;
+    content: '';
+    box-sizing: border-box;
+    display: block;
+    visibility: visible;
+  }
+
+  &:checked {
+    &::after {
+      content: 'X';
+    }
   }
 }

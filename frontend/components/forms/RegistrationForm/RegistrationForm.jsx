@@ -49,6 +49,27 @@ class RegistrationForm extends Component {
     return handleSubmit(formData);
   }
 
+  isCurrentPage = (num) => {
+    const { page } = this.props;
+
+    if (num === page) {
+      return true;
+    }
+
+    return false;
+  }
+
+  renderHeader = () => {
+    const { page } = this.props;
+    const headerText = PAGE_HEADER_TEXT[page];
+
+    if (headerText) {
+      return <h2 className={`${baseClass}__title`}>{headerText}</h2>;
+    }
+
+    return false;
+  }
+
   renderDescription = () => {
     const { page } = this.props;
 
@@ -79,27 +100,6 @@ class RegistrationForm extends Component {
           </p>
         </div>
       );
-    }
-
-    return false;
-  }
-
-  renderHeader = () => {
-    const { page } = this.props;
-    const headerText = PAGE_HEADER_TEXT[page];
-
-    if (headerText) {
-      return <h2 className={`${baseClass}__title`}>{headerText}</h2>;
-    }
-
-    return false;
-  }
-
-  isCurrentPage = (num) => {
-    const { page } = this.props;
-
-    if (num === page) {
-      return true;
     }
 
     return false;

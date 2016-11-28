@@ -9,7 +9,7 @@ class InputFieldWithIcon extends InputField {
   static propTypes = {
     autofocus: PropTypes.bool,
     error: PropTypes.string,
-    hint: PropTypes.any,
+    hint: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
     iconName: PropTypes.string,
     name: PropTypes.string,
     onChange: PropTypes.func,
@@ -37,7 +37,7 @@ class InputFieldWithIcon extends InputField {
     const { hint } = this.props;
 
     if (hint) {
-      return <span className={`${baseClass}__hint`}>{hint}</span>
+      return <span className={`${baseClass}__hint`}>{hint}</span>;
     }
 
     return false;

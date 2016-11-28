@@ -30,7 +30,7 @@ class KolideDetails extends Component {
             {...fields.kolide_server_url}
             placeholder="Kolide Web Address"
             tabIndex={tabIndex}
-            hint={["Don’t include ", <code key="hint">/v1</code>,  " or any other path"]}
+            hint={['Don’t include ', <code key="hint">/v1</code>, ' or any other path']}
           />
         </div>
         <Button
