@@ -46,6 +46,16 @@ type Host struct {
 	PhysicalMemory   int           `json:"memory" sql:"type:bigint" db:"physical_memory"`
 	PrimaryMAC       string        `json:"mac" db:"primary_mac"`
 	PrimaryIP        string        `json:"ip" db:"primary_ip"` // there is a fulltext index on this field
+	// system_info fields
+	CPUType          string `json:"cpu_type" db:"cpu_type"`
+	CPUSubtype       string `json:"cpu_subtype" db:"cpu_subtype"`
+	CPUBrand         string `json:"cpu_brand" db:"cpu_brand"`
+	CPUPhysicalCores int    `json:"cpu_physical_cores" db:"cpu_physical_cores"`
+	HardwareVendor   string `json:"hardware_vendor" db:"hardware_vendor"`
+	HardwareModel    string `json:"hardware_model" db:"hardware_model"`
+	HardwareVersion  string `json:"hardware_version" db:"hardware_version"`
+	HardwareSerial   string `json:"hardware_serial" db:"hardware_serial"`
+	ComputerName     string `json:"computer_name" db:"computer_name"`
 }
 
 // RandomText returns a stdEncoded string of

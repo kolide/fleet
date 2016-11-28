@@ -11,6 +11,7 @@ import (
 	hostctx "github.com/kolide/kolide-ose/server/contexts/host"
 	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
+	"github.com/y0ssar1an/q"
 	"golang.org/x/net/context"
 )
 
@@ -200,7 +201,18 @@ var detailQueries = map[string]struct {
 			}
 			host.HostName = rows[0]["hostname"]
 			host.UUID = rows[0]["uuid"]
-
+			host.CPUType = rows[0]["cpu_type"]
+			host.CPUSubtype = rows[0]["cpu_subtype"]
+			host.CPUBrand = rows[0]["cpu_brand"]
+			host.CPUPhysicalCores, err = strconv.Atoi(rows[0]["cpu_physical_cores"])
+			if err != nil {
+				return err
+			}
+			host.HardwareVendor = rows[0]["hardware_vendor"]
+			host.HardwareModel = rows[0]["hardware_model"]
+			host.HardwareVersion = rows[0]["hardware_version"]
+			host.HardwareSerial = rows[0]["hardware_serial"]
+			host.ComputerName = rows[0]["computer_name"]
 			return nil
 		},
 	},
@@ -252,7 +264,7 @@ var detailQueries = map[string]struct {
 					message: fmt.Sprintf("expected 1 row but got %d", len(rows)),
 				}
 			}
-
+			q.Q(rows)
 			host.PrimaryMAC = rows[0]["mac"]
 			host.PrimaryIP = rows[0]["address"]
 
@@ -326,6 +338,13 @@ func (svc service) ingestDetailQuery(host *kolide.Host, name string, rows []map[
 			message: fmt.Sprintf("ingesting query %s: %s", name, err.Error()),
 		}
 	}
+
+	if err = svc.ds.SaveHost(host); err != nil {
+		return osqueryError{
+			message: fmt.Sprintf("writing detail query results to host %s", err.Error()),
+		}
+	}
+
 	return nil
 }
 

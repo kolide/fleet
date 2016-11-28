@@ -29,6 +29,15 @@ func Up_20161118212528(tx *sql.Tx) error {
 			"`physical_memory` bigint(20) NOT NULL DEFAULT 0," +
 			"`primary_mac` varchar(255) NOT NULL DEFAULT ''," +
 			"`primary_ip` varchar(255) NOT NULL DEFAULT ''," +
+			"`cpu_type` varchar(255) NOT NULL DEFAULT ''," +
+			"`cpu_subtype` varchar(255) NOT NULL DEFAULT ''," +
+			"`cpu_brand` varchar(255) NOT NULL DEFAULT ''," +
+			"`cpu_physical_cores` int NOT NULL DEFAULT 0," +
+			"`hardware_vendor` varchar(255) NOT NULL DEFAULT ''," +
+			"`hardware_model` varchar(255) NOT NULL DEFAULT ''," +
+			"`hardware_version` varchar(255) NOT NULL DEFAULT ''," +
+			"`hardware_serial` varchar(255) NOT NULL DEFAULT ''," +
+			"`computer_name` varchar(255) NOT NULL DEFAULT ''," +
 			"PRIMARY KEY (`id`)," +
 			"UNIQUE KEY `idx_host_unique_nodekey` (`node_key`)," +
 			"UNIQUE KEY `idx_host_unique_uuid` (`uuid`)," +
