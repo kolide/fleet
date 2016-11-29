@@ -15,7 +15,7 @@ func (orm *Datastore) NewHost(host *kolide.Host) (*kolide.Host, error) {
 
 	for _, h := range orm.hosts {
 		if host.NodeKey == h.NodeKey || host.UUID == h.UUID {
-			return nil, kolide.ErrExists
+			return nil, alreadyExists("Host", host.ID)
 		}
 	}
 
@@ -30,7 +30,7 @@ func (orm *Datastore) SaveHost(host *kolide.Host) error {
 	defer orm.mtx.Unlock()
 
 	if _, ok := orm.hosts[host.ID]; !ok {
-		return kolide.ErrNotFound
+		return notFound("Host", host.ID)
 	}
 
 	orm.hosts[host.ID] = host
@@ -42,7 +42,7 @@ func (orm *Datastore) DeleteHost(host *kolide.Host) error {
 	defer orm.mtx.Unlock()
 
 	if _, ok := orm.hosts[host.ID]; !ok {
-		return kolide.ErrNotFound
+		return notFound("Host", host.ID)
 	}
 
 	delete(orm.hosts, host.ID)
@@ -55,7 +55,7 @@ func (orm *Datastore) Host(id uint) (*kolide.Host, error) {
 
 	host, ok := orm.hosts[id]
 	if !ok {
-		return nil, kolide.ErrNotFound
+		return nil, notFound("Host", id)
 	}
 
 	return host, nil
@@ -162,7 +162,7 @@ func (orm *Datastore) AuthenticateHost(nodeKey string) (*kolide.Host, error) {
 		}
 	}
 
-	return nil, kolide.ErrNotFound
+	return nil, notFound("Host", 0)
 }
 
 func (orm *Datastore) MarkHostSeen(host *kolide.Host, t time.Time) error {

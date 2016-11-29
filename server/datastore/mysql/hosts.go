@@ -85,7 +85,7 @@ func (d *Datastore) Host(id uint) (*kolide.Host, error) {
 		WHERE id = ? AND NOT deleted LIMIT 1
 	`
 	var host kolide.Host
-	if err := d.db.Get(host, sqlStatement, id); err != nil {
+	if err := d.db.Get(&host, sqlStatement, id); err != nil {
 		return nil, errors.Wrap(err, "get host")
 	}
 

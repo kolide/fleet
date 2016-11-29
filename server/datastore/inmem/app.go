@@ -19,7 +19,7 @@ func (orm *Datastore) AppConfig() (*kolide.AppConfig, error) {
 		return orm.orginfo, nil
 	}
 
-	return nil, kolide.ErrNotFound
+	return nil, notFound("AppConfig", 0)
 }
 
 func (orm *Datastore) SaveAppConfig(info *kolide.AppConfig) error {

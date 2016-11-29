@@ -53,14 +53,14 @@ func testSaveHost(t *testing.T, db kolide.Datastore) {
 
 	host.HostName = "bar.local"
 	err = db.SaveHost(host)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	host, err = db.Host(host.ID)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	assert.Equal(t, "bar.local", host.HostName)
 
 	err = db.DeleteHost(host)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	host, err = db.Host(host.ID)
 	assert.NotNil(t, err)

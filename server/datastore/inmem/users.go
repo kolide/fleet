@@ -12,7 +12,7 @@ func (orm *Datastore) NewUser(user *kolide.User) (*kolide.User, error) {
 
 	for _, in := range orm.users {
 		if in.Username == user.Username {
-			return nil, kolide.ErrExists
+			return nil, alreadyExists("User", in.ID)
 		}
 	}
 
@@ -32,7 +32,7 @@ func (orm *Datastore) User(username string) (*kolide.User, error) {
 		}
 	}
 
-	return nil, kolide.ErrNotFound
+	return nil, notFound("User", 0)
 }
 
 func (orm *Datastore) ListUsers(opt kolide.ListOptions) ([]*kolide.User, error) {
@@ -86,7 +86,7 @@ func (orm *Datastore) UserByEmail(email string) (*kolide.User, error) {
 		}
 	}
 
-	return nil, kolide.ErrNotFound
+	return nil, notFound("User", 0)
 }
 
 func (orm *Datastore) UserByID(id uint) (*kolide.User, error) {
@@ -97,7 +97,7 @@ func (orm *Datastore) UserByID(id uint) (*kolide.User, error) {
 		return user, nil
 	}
 
-	return nil, kolide.ErrNotFound
+	return nil, notFound("User", id)
 }
 
 func (orm *Datastore) SaveUser(user *kolide.User) error {
@@ -105,7 +105,7 @@ func (orm *Datastore) SaveUser(user *kolide.User) error {
 	defer orm.mtx.Unlock()
 
 	if _, ok := orm.users[user.ID]; !ok {
-		return kolide.ErrNotFound
+		return notFound("User", user.ID)
 	}
 
 	orm.users[user.ID] = user

@@ -11,7 +11,7 @@ func (orm *Datastore) NewPack(pack *kolide.Pack) (*kolide.Pack, error) {
 
 	for _, q := range orm.packs {
 		if pack.Name == q.Name {
-			return nil, kolide.ErrExists
+			return nil, alreadyExists("Pack", pack.ID)
 		}
 	}
 
@@ -27,7 +27,7 @@ func (orm *Datastore) NewPack(pack *kolide.Pack) (*kolide.Pack, error) {
 
 func (orm *Datastore) SavePack(pack *kolide.Pack) error {
 	if _, ok := orm.packs[pack.ID]; !ok {
-		return kolide.ErrNotFound
+		return notFound("Pack", pack.ID)
 	}
 
 	orm.mtx.Lock()
@@ -39,7 +39,7 @@ func (orm *Datastore) SavePack(pack *kolide.Pack) error {
 
 func (orm *Datastore) DeletePack(pid uint) error {
 	if _, ok := orm.packs[pid]; !ok {
-		return kolide.ErrNotFound
+		return notFound("Pack", pid)
 	}
 
 	orm.mtx.Lock()
@@ -54,7 +54,7 @@ func (orm *Datastore) Pack(id uint) (*kolide.Pack, error) {
 	pack, ok := orm.packs[id]
 	orm.mtx.Unlock()
 	if !ok {
-		return nil, kolide.ErrNotFound
+		return nil, notFound("Pack", id)
 	}
 
 	return pack, nil

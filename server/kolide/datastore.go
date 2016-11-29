@@ -1,14 +1,17 @@
 package kolide
 
-import "errors"
+// NotFoundError is returned when the datastore resource cannot be found.
+type NotFoundError interface {
+	error
+	IsNotFound() bool
+}
 
-var (
-	// ErrNotFound is returned when the datastore resource cannot be found
-	ErrNotFound = errors.New("resource not found")
-
-	// ErrExists is returned when creating a datastore resource that already exists
-	ErrExists = errors.New("resource already created")
-)
+// AlreadyExists is returned when creating a datastore resource that already
+// exists.
+type AlreadyExistsError interface {
+	error
+	IsExists() bool
+}
 
 // Datastore combines all the interfaces in the Kolide DAL
 type Datastore interface {

@@ -16,7 +16,7 @@ func (orm *Datastore) NewLabel(label *kolide.Label) (*kolide.Label, error) {
 	orm.mtx.Lock()
 	for _, l := range orm.labels {
 		if l.Name == label.Name {
-			return nil, kolide.ErrExists
+			return nil, alreadyExists("Label", label.ID)
 		}
 	}
 

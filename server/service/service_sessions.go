@@ -13,17 +13,13 @@ import (
 
 func (svc service) Login(ctx context.Context, username, password string) (*kolide.User, string, error) {
 	user, err := svc.userByEmailOrUsername(username)
-	switch err {
-	case nil:
-	case kolide.ErrNotFound:
+	if _, ok := err.(kolide.NotFoundError); ok {
 		return nil, "", authError{reason: "no such user"}
-	default:
-		return nil, "", err
 	}
 	if !user.Enabled {
 		return nil, "", authError{reason: "account disabled", clientReason: "account disabled"}
 	}
-	if err = user.ValidatePassword(password); err != nil {
+	if err := user.ValidatePassword(password); err != nil {
 		return nil, "", authError{reason: "bad password"}
 	}
 	token, err := svc.makeSession(user.ID)

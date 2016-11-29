@@ -22,7 +22,7 @@ func (orm *Datastore) DistributedQueryCampaign(id uint) (*kolide.DistributedQuer
 
 	campaign, ok := orm.distributedQueryCampaigns[id]
 	if !ok {
-		return nil, kolide.ErrNotFound
+		return nil, notFound("DistributedQueryCampaign", id)
 	}
 
 	return &campaign, nil
@@ -33,7 +33,7 @@ func (orm *Datastore) SaveDistributedQueryCampaign(camp *kolide.DistributedQuery
 	defer orm.mtx.Unlock()
 
 	if _, ok := orm.distributedQueryCampaigns[camp.ID]; !ok {
-		return kolide.ErrNotFound
+		return notFound("DistributedQueryCampaign", camp.ID)
 	}
 
 	orm.distributedQueryCampaigns[camp.ID] = *camp
@@ -77,7 +77,7 @@ func (orm *Datastore) NewDistributedQueryExecution(exec *kolide.DistributedQuery
 
 	for _, e := range orm.distributedQueryExecutions {
 		if exec.HostID == e.ID && exec.DistributedQueryCampaignID == e.DistributedQueryCampaignID {
-			return exec, kolide.ErrExists
+			return exec, alreadyExists("DistributedQueryExecution", exec.ID)
 		}
 	}
 
