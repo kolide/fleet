@@ -17,6 +17,7 @@ class InputFieldWithIcon extends InputField {
     placeholder: PropTypes.string,
     tabIndex: PropTypes.number,
     type: PropTypes.string,
+    className: PropTypes.string,
   };
 
   renderHeading = () => {
@@ -45,12 +46,13 @@ class InputFieldWithIcon extends InputField {
   }
 
   render () {
-    const { error, iconName, name, placeholder, tabIndex, type, value } = this.props;
+    const { className, error, iconName, name, placeholder, tabIndex, type, value } = this.props;
     const { onInputChange, renderHint } = this;
 
     const inputClasses = classnames(
       `${baseClass}__input`,
       'input-with-icon',
+      className,
       { [`${baseClass}__input--error`]: error },
       { [`${baseClass}__input--password`]: type === 'password' && value }
     );
