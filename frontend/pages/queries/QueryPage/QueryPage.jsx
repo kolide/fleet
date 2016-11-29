@@ -58,6 +58,20 @@ class QueryPage extends Component {
     return false;
   }
 
+  componentWillUnmount () {
+    const { dispatch } = this.props;
+
+    dispatch(removeRightSidePanel);
+
+    if (this.socket) {
+      this.socket.close();
+
+      this.socket = null;
+    }
+
+    return false;
+  }
+
   onFetchTargets = (query, targetResponse) => {
     const { dispatch } = this.props;
     const {
@@ -93,7 +107,9 @@ class QueryPage extends Component {
     const selected = formatSelectedTargetsForApi(selectedTargets);
     const { create, destroy, update } = campaignActions;
 
-    // TODO: If there is a socket, close it
+    if (this.socket) {
+      this.socket.close();
+    }
 
     if (campaign) {
       dispatch(destroy(campaign));
