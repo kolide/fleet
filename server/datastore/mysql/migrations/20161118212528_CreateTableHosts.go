@@ -36,11 +36,11 @@ func Up_20161118212528(tx *sql.Tx) error {
 			"`hardware_version` varchar(255) NOT NULL DEFAULT ''," +
 			"`hardware_serial` varchar(255) NOT NULL DEFAULT ''," +
 			"`computer_name` varchar(255) NOT NULL DEFAULT ''," +
-			"`primary_ip` varchar(255) NOT NULL DEFAULT ''," +
+			"`primary_ip_id` INT(10) UNSIGNED DEFAULT NULL, " +
 			"PRIMARY KEY (`id`)," +
 			"UNIQUE KEY `idx_host_unique_nodekey` (`node_key`)," +
 			"UNIQUE KEY `idx_host_unique_uuid` (`uuid`)," +
-			"FULLTEXT KEY `hosts_search` (`host_name`,`primary_ip`)" +
+			"FULLTEXT KEY `hosts_search` (`host_name`)" +
 			") ENGINE=InnoDB DEFAULT CHARSET=utf8;",
 	)
 	return err

@@ -49,7 +49,7 @@ func (svc service) EnrollAgent(ctx context.Context, enrollSecret, hostIdentifier
 		return "", osqueryError{message: "invalid enroll secret", nodeInvalid: true}
 	}
 
-	host, err := svc.ds.EnrollHost(hostIdentifier, "", "", "", svc.config.Osquery.NodeKeySize)
+	host, err := svc.ds.EnrollHost(hostIdentifier, "", "", svc.config.Osquery.NodeKeySize)
 	if err != nil {
 		return "", osqueryError{message: "enrollment failed: " + err.Error(), nodeInvalid: true}
 	}

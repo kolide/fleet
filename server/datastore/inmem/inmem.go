@@ -453,7 +453,6 @@ func (orm *Datastore) createDevHosts() error {
 			OSVersion:        "Mac OS X 10.11.6",
 			Uptime:           60 * time.Minute,
 			PhysicalMemory:   4145483776,
-			PrimaryIP:        "192.168.1.10",
 			DetailUpdateTime: time.Now().Add(-20 * time.Minute),
 		},
 		{
@@ -474,7 +473,6 @@ func (orm *Datastore) createDevHosts() error {
 			OSVersion:        "Windows 10.0.0",
 			Uptime:           60 * time.Minute,
 			PhysicalMemory:   17179869184,
-			PrimaryIP:        "192.168.1.11",
 			DetailUpdateTime: time.Now().Add(-10 * time.Second),
 		},
 	}

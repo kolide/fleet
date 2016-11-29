@@ -14,7 +14,7 @@ type HostStore interface {
 	DeleteHost(host *Host) error
 	Host(id uint) (*Host, error)
 	ListHosts(opt ListOptions) ([]*Host, error)
-	EnrollHost(uuid, hostname, ip, platform string, nodeKeySize int) (*Host, error)
+	EnrollHost(uuid, hostname, platform string, nodeKeySize int) (*Host, error)
 	AuthenticateHost(nodeKey string) (*Host, error)
 	MarkHostSeen(host *Host, t time.Time) error
 	SearchHosts(query string, omit ...uint) ([]Host, error)
@@ -54,10 +54,10 @@ type Host struct {
 	HardwareVersion  string `json:"hardware_version" db:"hardware_version"`
 	HardwareSerial   string `json:"hardware_serial" db:"hardware_serial"`
 	ComputerName     string `json:"computer_name" db:"computer_name"`
-	// PrimaryIP if present indicates to primary network for the host, the details of which
+	// PrimaryNetworkInterfaceID if present indicates to primary network for the host, the details of which
 	// can be found in the NetworkInterfaces element with the same ip_address.
-	PrimaryIP         string             `json:"primary_ip" db:"primary_ip"`
-	NetworkInterfaces []NetworkInterface `json:"network_interfaces" db:"-"`
+	PrimaryNetworkInterfaceID *uint              `json:"primary_ip_id,omitempty" db:"primary_ip_id"`
+	NetworkInterfaces         []NetworkInterface `json:"network_interfaces" db:"-"`
 }
 
 // RandomText returns a stdEncoded string of

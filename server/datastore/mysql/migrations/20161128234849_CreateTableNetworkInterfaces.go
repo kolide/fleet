@@ -34,7 +34,8 @@ func Up_20161128234849(tx *sql.Tx) error {
 			"PRIMARY KEY (`id`), " +
 			"FOREIGN KEY `idx_network_interfaces_hosts_fk` (`host_id`) " +
 			"REFERENCES hosts(id) " +
-			"ON DELETE CASCADE " +
+			"ON DELETE CASCADE, " +
+			"FULLTEXT KEY `ip_address_search` (`ip_address`)" +
 			") ENGINE=InnoDB DEFAULT CHARSET=utf8;",
 	)
 	return err

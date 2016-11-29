@@ -107,7 +107,7 @@ func (orm *Datastore) ListHosts(opt kolide.ListOptions) ([]*kolide.Host, error) 
 	return hosts, nil
 }
 
-func (orm *Datastore) EnrollHost(uuid, hostname, ip, platform string, nodeKeySize int) (*kolide.Host, error) {
+func (orm *Datastore) EnrollHost(uuid, hostname, platform string, nodeKeySize int) (*kolide.Host, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
@@ -118,7 +118,6 @@ func (orm *Datastore) EnrollHost(uuid, hostname, ip, platform string, nodeKeySiz
 	host := kolide.Host{
 		UUID:             uuid,
 		HostName:         hostname,
-		PrimaryIP:        ip,
 		Platform:         platform,
 		DetailUpdateTime: time.Unix(0, 0).Add(24 * time.Hour),
 	}
@@ -138,9 +137,7 @@ func (orm *Datastore) EnrollHost(uuid, hostname, ip, platform string, nodeKeySiz
 	if hostname != "" {
 		host.HostName = hostname
 	}
-	if ip != "" {
-		host.PrimaryIP = ip
-	}
+
 	if platform != "" {
 		host.Platform = platform
 	}
@@ -196,8 +193,9 @@ func (orm *Datastore) SearchHosts(query string, omit ...uint) ([]kolide.Host, er
 		if len(results) == 10 {
 			break
 		}
-
-		if (strings.Contains(h.HostName, query) || strings.Contains(h.PrimaryIP, query)) && !omitLookup[h.ID] {
+		// TODO: fix this so it uses network_interfaces for search
+		//	if (strings.Contains(h.HostName, query) || strings.Contains(h.PrimaryIP, query)) && !omitLookup[h.ID] {
+		if strings.Contains(h.HostName, query) && !omitLookup[h.ID] {
 			results = append(results, *h)
 		}
 	}

@@ -21,14 +21,13 @@ func (d *Datastore) NewHost(host *kolide.Host) (*kolide.Host, error) {
 		osquery_version,
 		os_version,
 		uptime,
-		physical_memory,
-		primary_ip
+		physical_memory
 	)
-	VALUES( ?,?,?,?,?,?,?,?,?,?,?)
+	VALUES( ?,?,?,?,?,?,?,?,? )
 	`
 	result, err := d.db.Exec(sqlStatement, host.DetailUpdateTime,
 		host.NodeKey, host.HostName, host.UUID, host.Platform, host.OsqueryVersion,
-		host.OSVersion, host.Uptime, host.PhysicalMemory, host.PrimaryIP)
+		host.OSVersion, host.Uptime, host.PhysicalMemory)
 	if err != nil {
 		return nil, errors.DatabaseError(err)
 	}
@@ -58,8 +57,7 @@ func (d *Datastore) SaveHost(host *kolide.Host) error {
 			hardware_model = ?,
 			hardware_version = ?,
 			hardware_serial = ?,
-			computer_name = ?,
-			primary_ip = ?
+			computer_name = ?
 		WHERE id = ?
 	`
 	_, err := d.db.Exec(sqlStatement,
@@ -81,7 +79,6 @@ func (d *Datastore) SaveHost(host *kolide.Host) error {
 		host.HardwareVersion,
 		host.HardwareSerial,
 		host.ComputerName,
-		host.PrimaryIP,
 		host.ID)
 	if err != nil {
 		return errors.DatabaseError(err)
@@ -138,7 +135,7 @@ func (d *Datastore) ListHosts(opt kolide.ListOptions) ([]*kolide.Host, error) {
 }
 
 // EnrollHost enrolls a host
-func (d *Datastore) EnrollHost(uuid, hostname, ip, platform string, nodeKeySize int) (*kolide.Host, error) {
+func (d *Datastore) EnrollHost(uuid, hostname, platform string, nodeKeySize int) (*kolide.Host, error) {
 	if uuid == "" {
 		return nil, errors.New("missing uuid for host enrollment", "programmer error")
 	}
@@ -149,16 +146,14 @@ func (d *Datastore) EnrollHost(uuid, hostname, ip, platform string, nodeKeySize 
 			node_key,
 			host_name,
 			uuid,
-			platform,
-			primary_ip
-		) VALUES (?, ?, ?, ?, ?, ? )
+			platform
+		) VALUES (?, ?, ?, ?, ? )
 		ON DUPLICATE KEY UPDATE
 			updated_at = VALUES(updated_at),
 			detail_update_time = VALUES(detail_update_time),
 			node_key = VALUES(node_key),
 			host_name = VALUES(host_name),
 			platform = VALUES(platform),
-			primary_ip = VALUES(primary_ip),
 			deleted = FALSE
 	`
 	args := []interface{}{}
@@ -170,7 +165,6 @@ func (d *Datastore) EnrollHost(uuid, hostname, ip, platform string, nodeKeySize 
 	args = append(args, hostname)
 	args = append(args, uuid)
 	args = append(args, platform)
-	args = append(args, ip)
 
 	var result sql.Result
 
@@ -239,7 +233,7 @@ func (d *Datastore) searchHostsWithOmits(query string, omits ...uint) ([]kolide.
 	sqlStatement := `
 		SELECT *
 		FROM hosts
-		WHERE MATCH(host_name, primary_ip)
+		WHERE MATCH(host_name)
 		AGAINST('` + query + "*" + `' IN BOOLEAN MODE)
 		AND NOT deleted
 		AND id NOT IN (?)
@@ -271,7 +265,7 @@ func (d *Datastore) SearchHosts(query string, omit ...uint) ([]kolide.Host, erro
 
 	sqlStatement := `
 		SELECT * FROM hosts
-		WHERE MATCH(host_name, primary_ip)
+		WHERE MATCH(host_name)
 		AGAINST(? IN BOOLEAN MODE)
 		AND not deleted
 		LIMIT 10
