@@ -48,7 +48,7 @@ func testAddAndRemoveQueryFromPack(t *testing.T, ds kolide.Datastore) {
 	require.Nil(t, err)
 	assert.NotEqual(t, uint(0), q1.ID)
 
-	err = ds.AddQueryToPack(q1.ID, pack.ID)
+	err = ds.AddQueryToPack(q1.ID, pack.ID, kolide.QueryOptions{})
 	require.Nil(t, err)
 
 	q2 := &kolide.Query{
@@ -63,6 +63,7 @@ func testAddAndRemoveQueryFromPack(t *testing.T, ds kolide.Datastore) {
 	assert.NotEqual(t, q1.ID, q2.ID)
 
 	err = ds.AddQueryToPack(q2.ID, pack.ID)
+	err = ds.AddQueryToPack(q2.ID, pack.ID, kolide.QueryOptions{})
 	require.Nil(t, err)
 
 	queries, err := ds.ListQueriesInPack(pack)
@@ -101,10 +102,10 @@ func testGetHostsInPack(t *testing.T, ds kolide.Datastore) {
 	})
 	require.Nil(t, err)
 
-	err = ds.AddQueryToPack(q1.ID, p1.ID)
+	err = ds.AddQueryToPack(q1.ID, p1.ID, kolide.QueryOptions{})
 	require.Nil(t, err)
 
-	err = ds.AddQueryToPack(q2.ID, p1.ID)
+	err = ds.AddQueryToPack(q2.ID, p1.ID, kolide.QueryOptions{})
 	require.Nil(t, err)
 
 	l1, err := ds.NewLabel(&kolide.Label{

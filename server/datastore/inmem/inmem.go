@@ -164,9 +164,8 @@ func (orm *Datastore) createDevPacksAndQueries() error {
 	}
 
 	query2 := &kolide.Query{
-		Name:     "Launchd",
-		Query:    "select * from launchd",
-		Platform: "darwin",
+		Name:  "Launchd",
+		Query: "select * from launchd",
 	}
 	query2, err = orm.NewQuery(query2)
 	if err != nil {
@@ -198,17 +197,17 @@ func (orm *Datastore) createDevPacksAndQueries() error {
 		return err
 	}
 
-	err = orm.AddQueryToPack(query1.ID, pack1.ID)
+	err = orm.AddQueryToPack(query1.ID, pack1.ID, kolide.QueryOptions{})
 	if err != nil {
 		return err
 	}
 
-	err = orm.AddQueryToPack(query3.ID, pack1.ID)
+	err = orm.AddQueryToPack(query3.ID, pack1.ID, kolide.QueryOptions{})
 	if err != nil {
 		return err
 	}
 
-	err = orm.AddQueryToPack(query2.ID, pack2.ID)
+	err = orm.AddQueryToPack(query2.ID, pack2.ID, kolide.QueryOptions{})
 	if err != nil {
 		return err
 	}

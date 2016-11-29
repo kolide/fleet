@@ -414,10 +414,10 @@ func TestGetClientConfig(t *testing.T) {
 	// let's populate the database with some info
 
 	infoQuery := &kolide.Query{
-		Name:     "Info",
-		Query:    "select * from osquery_info;",
-		Interval: 60,
+		Name:  "Info",
+		Query: "select * from osquery_info;",
 	}
+	infoQueryInterval := uint(60)
 	infoQuery, err = ds.NewQuery(infoQuery)
 	assert.Nil(t, err)
 
@@ -427,7 +427,7 @@ func TestGetClientConfig(t *testing.T) {
 	_, err = ds.NewPack(monitoringPack)
 	assert.Nil(t, err)
 
-	err = ds.AddQueryToPack(infoQuery.ID, monitoringPack.ID)
+	err = ds.AddQueryToPack(infoQuery.ID, monitoringPack.ID, kolide.QueryOptions{Interval: &infoQueryInterval})
 	assert.Nil(t, err)
 
 	mysqlLabel := &kolide.Label{

@@ -18,6 +18,12 @@ func Up_20161118212613(tx *sql.Tx) error {
 			"`updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP," +
 			"`pack_id` int(10) unsigned DEFAULT NULL," +
 			"`query_id` int(10) unsigned DEFAULT NULL," +
+			"`interval` int(10) unsigned DEFAULT NULL," +
+			"`snapshot` tinyint(1) DEFAULT NULL," +
+			"`differential` tinyint(1) DEFAULT NULL," +
+			"`platform` varchar(255) DEFAULT NULL," +
+			"`version` varchar(255) DEFAULT NULL," +
+			"`shard` int(10) unsigned DEFAULT NULL," +
 			"PRIMARY KEY (`id`)" +
 			") ENGINE=InnoDB DEFAULT CHARSET=utf8;",
 	)

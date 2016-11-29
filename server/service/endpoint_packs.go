@@ -184,6 +184,7 @@ func makeDeletePackEndpoint(svc kolide.Service) endpoint.Endpoint {
 type addQueryToPackRequest struct {
 	QueryID uint
 	PackID  uint
+	Options kolide.QueryOptions
 }
 
 type addQueryToPackResponse struct {
@@ -195,7 +196,7 @@ func (r addQueryToPackResponse) error() error { return r.Err }
 func makeAddQueryToPackEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(addQueryToPackRequest)
-		err := svc.AddQueryToPack(ctx, req.QueryID, req.PackID)
+		err := svc.AddQueryToPack(ctx, req.QueryID, req.PackID, req.Options)
 		if err != nil {
 			return addQueryToPackResponse{Err: err}, nil
 		}
@@ -212,8 +213,8 @@ type getQueriesInPackRequest struct {
 }
 
 type getQueriesInPackResponse struct {
-	Queries []kolide.Query `json:"queries"`
-	Err     error          `json:"error,omitempty"`
+	Queries []kolide.QueryWithOptions `json:"queries"`
+	Err     error                     `json:"error,omitempty"`
 }
 
 func (r getQueriesInPackResponse) error() error { return r.Err }
@@ -228,7 +229,7 @@ func makeGetQueriesInPackEndpoint(svc kolide.Service) endpoint.Endpoint {
 
 		var resp getQueriesInPackResponse
 		for _, query := range queries {
-			resp.Queries = append(resp.Queries, *query)
+			resp.Queries = append(resp.Queries, query)
 		}
 		return resp, nil
 	}

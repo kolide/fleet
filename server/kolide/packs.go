@@ -1,8 +1,6 @@
 package kolide
 
 import (
-	"time"
-
 	"golang.org/x/net/context"
 )
 
@@ -15,8 +13,8 @@ type PackStore interface {
 	ListPacks(opt ListOptions) ([]*Pack, error)
 
 	// Modifying the queries in packs
-	AddQueryToPack(qid uint, pid uint) error
-	ListQueriesInPack(pack *Pack) ([]*Query, error)
+	AddQueryToPack(qid uint, pid uint, opts QueryOptions) error
+	ListQueriesInPack(pack *Pack) ([]QueryWithOptions, error)
 	RemoveQueryFromPack(query *Query, pack *Pack) error
 
 	// Modifying the labels for packs
@@ -34,8 +32,8 @@ type PackService interface {
 	ModifyPack(ctx context.Context, id uint, p PackPayload) (*Pack, error)
 	DeletePack(ctx context.Context, id uint) error
 
-	AddQueryToPack(ctx context.Context, qid, pid uint) error
-	ListQueriesInPack(ctx context.Context, id uint) ([]*Query, error)
+	AddQueryToPack(ctx context.Context, qid, pid uint, opt QueryOptions) error
+	ListQueriesInPack(ctx context.Context, id uint) ([]QueryWithOptions, error)
 	RemoveQueryFromPack(ctx context.Context, qid, pid uint) error
 
 	AddLabelToPack(ctx context.Context, lid, pid uint) error
@@ -65,11 +63,17 @@ type PackPayload struct {
 }
 
 type PackQuery struct {
-	ID        uint
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	PackID    uint
-	QueryID   uint
+	UpdateCreateTimestamps
+	DeleteFields
+	ID           uint
+	PackID       uint
+	QueryID      uint
+	Interval     uint   `json:"interval"`
+	Snapshot     bool   `json:"snapshot"`
+	Differential bool   `json:"differential"`
+	Platform     string `json:"platform"`
+	Version      string `json:"version"`
+	Shard        uint   `json:"shard"`
 }
 
 type PackTarget struct {

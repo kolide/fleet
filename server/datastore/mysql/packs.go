@@ -1,6 +1,8 @@
 package mysql
 
 import (
+	"database/sql"
+
 	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
 )
@@ -27,7 +29,7 @@ func (d *Datastore) NewPack(pack *kolide.Pack) (*kolide.Pack, error) {
 func (d *Datastore) SavePack(pack *kolide.Pack) error {
 
 	sql := `
-		UPDATE packs
+			UPDATE packs
 			SET name = ?, platform = ?, disabled = ?, description = ?,
 			WHERE id = ? AND NOT deleted
 	`
@@ -57,10 +59,7 @@ func (d *Datastore) DeletePack(pid uint) error {
 
 // Pack fetch kolide.Pack with matching ID
 func (d *Datastore) Pack(pid uint) (*kolide.Pack, error) {
-	sql := `
-		SELECT * FROM packs
-			WHERE id = ? AND NOT deleted
-	`
+	sql := `SELECT * FROM packs WHERE id = ? AND NOT deleted`
 	pack := &kolide.Pack{}
 	if err := d.db.Get(pack, sql, pid); err != nil {
 		return nil, errors.DatabaseError(err)
@@ -71,10 +70,7 @@ func (d *Datastore) Pack(pid uint) (*kolide.Pack, error) {
 
 // ListPacks returns all kolide.Pack records limited and sorted by kolide.ListOptions
 func (d *Datastore) ListPacks(opt kolide.ListOptions) ([]*kolide.Pack, error) {
-	sql := `
-		SELECT * FROM packs
-			WHERE NOT deleted
-	`
+	sql := `SELECT * FROM packs WHERE NOT deleted`
 	sql = appendListOptionsToSQL(sql, opt)
 	packs := []*kolide.Pack{}
 	if err := d.db.Select(&packs, sql); err != nil {
@@ -84,12 +80,27 @@ func (d *Datastore) ListPacks(opt kolide.ListOptions) ([]*kolide.Pack, error) {
 }
 
 // AddQueryToPack associates a kolide.Query with a kolide.Pack
-func (d *Datastore) AddQueryToPack(qid uint, pid uint) error {
+func (d *Datastore) AddQueryToPack(qid uint, pid uint, opts kolide.QueryOptions) error {
 	sql := `
-		INSERT INTO pack_queries (query_id, pack_id)
-			VALUES (?, ?)
-	`
-	if _, err := d.db.Exec(sql, qid, pid); err != nil {
+	    INSERT INTO pack_queries (
+		    pack_id,
+			query_id,
+			snapshot,
+			differential,
+			` + "`interval`" + `,
+			platform,
+			version,
+			shard
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+	if _, err := d.db.Exec(sql,
+		pid,
+		qid,
+		opts.Snapshot,
+		opts.Differential,
+		opts.Interval,
+		opts.Platform,
+		opts.Version,
+		opts.Shard); err != nil {
 		return errors.DatabaseError(err)
 	}
 
@@ -97,19 +108,31 @@ func (d *Datastore) AddQueryToPack(qid uint, pid uint) error {
 }
 
 // ListQueriesInPack gets all kolide.Query records associated with a kolide.Pack
-func (d *Datastore) ListQueriesInPack(pack *kolide.Pack) ([]*kolide.Query, error) {
+func (d *Datastore) ListQueriesInPack(pack *kolide.Pack) ([]kolide.QueryWithOptions, error) {
+	type annotatedQuery struct {
+		kolide.UpdateCreateTimestamps
+		kolide.DeleteFields
+		ID           uint           `json:"id"`
+		Name         string         `json:"name"`
+		Description  string         `json:"description"`
+		Query        string         `json:"query"`
+		Saved        bool           `json:"saved"`
+		Interval     sql.NullInt64  `json:"interval"`
+		Snapshot     sql.NullBool   `json:"snapshot"`
+		Differential sql.NullBool   `json:"differential"`
+		Platform     sql.NullString `json:"platform"`
+		Version      sql.NullString `json:"version"`
+		Shard        sql.NullInt64  `json:"shard"`
+	}
 	sql := `
 	SELECT
-	  q.id,
-	  q.created_at,
-	  q.updated_at,
-	  q.name,
-	  q.query,
-	  q.interval,
-	  q.snapshot,
-	  q.differential,
-	  q.platform,
-	  q.version
+	  q.*,
+	  pq.interval,
+	  pq.snapshot,
+	  pq.differential,
+	  pq.platform,
+	  pq.version,
+	  pq.shard
 	FROM
 	  queries q
 	JOIN
@@ -120,9 +143,51 @@ func (d *Datastore) ListQueriesInPack(pack *kolide.Pack) ([]*kolide.Query, error
 	  pq.pack_id = ?
 	AND NOT q.deleted
 	`
-	queries := []*kolide.Query{}
-	if err := d.db.Select(&queries, sql, pack.ID); err != nil {
+	results := []annotatedQuery{}
+	if err := d.db.Select(&results, sql, pack.ID); err != nil {
 		return nil, errors.DatabaseError(err)
+	}
+
+	queries := []kolide.QueryWithOptions{}
+	for _, row := range results {
+		query := kolide.QueryWithOptions{
+			Query: kolide.Query{
+				ID:          row.ID,
+				Name:        row.Name,
+				Description: row.Description,
+				Query:       row.Query,
+			},
+			Options: kolide.QueryOptions{},
+		}
+
+		if row.Interval.Valid {
+			interval := uint(row.Interval.Int64)
+			query.Options.Interval = &interval
+		}
+
+		if row.Snapshot.Valid {
+			query.Options.Snapshot = &row.Snapshot.Bool
+		}
+
+		if row.Differential.Valid {
+			query.Options.Differential = &row.Differential.Bool
+		}
+
+		if row.Platform.Valid {
+			query.Options.Platform = &row.Platform.String
+		}
+
+		if row.Version.Valid {
+			query.Options.Version = &row.Version.String
+		}
+
+		if row.Shard.Valid {
+			shard := uint(row.Shard.Int64)
+			query.Options.Shard = &shard
+		}
+
+		queries = append(queries, query)
+
 	}
 	return queries, nil
 }
@@ -144,7 +209,7 @@ func (d *Datastore) RemoveQueryFromPack(query *kolide.Query, pack *kolide.Pack) 
 // AddLabelToPack associates a kolide.Label with a kolide.Pack
 func (d *Datastore) AddLabelToPack(lid uint, pid uint) error {
 	sql := `
-		INSERT INTO pack_targets ( pack_id,	type,	target_id )
+		INSERT INTO pack_targets ( pack_id,	type, target_id )
 			VALUES ( ?, ?, ? )
 	`
 	_, err := d.db.Exec(sql, pid, kolide.TargetLabel, lid)

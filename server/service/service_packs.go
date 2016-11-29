@@ -81,11 +81,11 @@ func (svc service) DeletePack(ctx context.Context, id uint) error {
 	return svc.ds.DeletePack(id)
 }
 
-func (svc service) AddQueryToPack(ctx context.Context, qid, pid uint) error {
-	return svc.ds.AddQueryToPack(qid, pid)
+func (svc service) AddQueryToPack(ctx context.Context, qid, pid uint, opt kolide.QueryOptions) error {
+	return svc.ds.AddQueryToPack(qid, pid, opt)
 }
 
-func (svc service) ListQueriesInPack(ctx context.Context, id uint) ([]*kolide.Query, error) {
+func (svc service) ListQueriesInPack(ctx context.Context, id uint) ([]kolide.QueryWithOptions, error) {
 	pack, err := svc.ds.Pack(id)
 	if err != nil {
 		return nil, err
