@@ -33,7 +33,7 @@ export default (admin) => {
       name: 'Hosts',
       path: {
         regex: /^\/hosts/,
-        location: '/hosts/new',
+        location: '/hosts/manage',
       },
       subItems: [
         {
@@ -58,7 +58,7 @@ export default (admin) => {
       name: 'Query',
       path: {
         regex: /^\/queries/,
-        location: '/queries/new',
+        location: '/queries/results',
       },
       subItems: [
         {
@@ -98,6 +98,31 @@ export default (admin) => {
           path: {
             regex: /\/new/,
             location: '/packs/new',
+          },
+        },
+      ],
+    },
+    {
+      defaultPathname: '/config/options',
+      icon: 'config',
+      name: 'Config',
+      path: {
+        regex: /^\/config/,
+        location: '/config/options',
+      },
+      subItems: [
+        {
+          name: 'Osquery Options',
+          path: {
+            regex: /\/options/,
+            location: '/config/options',
+          },
+        },
+        {
+          name: 'Import Config',
+          path: {
+            regex: /\/import/,
+            location: '/config/import',
           },
         },
       ],
