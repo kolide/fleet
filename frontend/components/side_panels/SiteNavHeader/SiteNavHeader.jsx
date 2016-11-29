@@ -26,8 +26,9 @@ class SiteNavSidePanel extends Component {
   }
 
   componentDidMount = () => {
+    const { document } = global;
     const { closeUserMenu } = this;
-    window.addEventListener('mousedown', closeUserMenu, false);
+    document.addEventListener('mousedown', closeUserMenu, false);
   }
 
   onLogout = (evt) => {
