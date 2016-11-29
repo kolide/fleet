@@ -8,7 +8,7 @@ export const iconClassForLabel = (label) => {
     case 'offline': return 'offline';
     case 'online': return 'success-check';
     case 'mia': return 'mia';
-    case 'mac os': return 'apple';
+    case 'macos': return 'apple';
     case 'centos': return 'centos';
     case 'ubuntu': return 'ubuntu';
     case 'windows': return 'windows';
