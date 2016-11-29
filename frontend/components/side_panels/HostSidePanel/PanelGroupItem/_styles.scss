@@ -89,6 +89,7 @@ $base-class: 'panel-group-item';
 
   &__platform {
     @include selected-hover($link);
+    text-transform: none;
 
     .#{$base-class}__icon {
       color: $text-light;
@@ -98,6 +99,7 @@ $base-class: 'panel-group-item';
   &__custom {
     @include selected-hover($brand);
     font-size: 14px;
+    text-transform: none;
 
     .#{$base-class}__icon {
       color: $silver;

@@ -21,6 +21,18 @@
   &__wrapper {
     color: $text-medium;
     padding: 60px 7px 0;
+
+    .input-icon-field {
+      margin-top: 0;
+
+      &__label {
+        display: none;
+      }
+
+      &__icon {
+        top: 4px;
+      }
+    }
   }
 
   &__hr {
@@ -48,6 +60,22 @@
 
     .input-field {
       width: 100%;
+    }
+  }
+
+  &__filter-labels {
+    border-radius: 3px;
+    background-color: $white;
+    border: 1px solid $silver;
+    font-size: 14px;
+    font-weight: $normal;
+    letter-spacing: 0.7px;
+    text-align: left;
+    padding: 6px 25px 6px 20px;
+    color: $text-dark;
+
+    @include placeholder {
+      color: $text-light;
     }
   }
 }
