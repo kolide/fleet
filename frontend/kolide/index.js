@@ -131,6 +131,7 @@ class Kolide extends Base {
           { id: 100, display_text: 'All Hosts', type: 'all', count: 22 },
           { id: 40, display_text: 'OFFLINE', type: 'status', count: 2 },
           { id: 50, display_text: 'ONLINE', type: 'status', count: 20 },
+          { id: 55, display_text: 'MIA', type: 'status', count: 3 },
           { id: 60, display_text: 'macOS', type: 'platform', count: 1 },
           { id: 110, display_text: 'Windows', type: 'platform', count: 1 },
           { id: 80, display_text: 'Ubuntu', type: 'platform', count: 10 },
