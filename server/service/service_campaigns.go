@@ -26,7 +26,7 @@ func (svc service) NewDistributedQueryCampaign(ctx context.Context, queryString 
 
 	campaign, err := svc.ds.NewDistributedQueryCampaign(&kolide.DistributedQueryCampaign{
 		QueryID: query.ID,
-		Status:  kolide.QueryRunning,
+		Status:  kolide.QueryWaiting,
 		UserID:  vc.UserID(),
 	})
 	if err != nil {
@@ -73,8 +73,14 @@ func (svc service) StreamCampaignResults(ctx context.Context, conn *websocket.Co
 		return
 	}
 
-	if campaign.Status != kolide.QueryRunning {
+	if campaign.Status != kolide.QueryWaiting {
 		conn.WriteJSONError(fmt.Sprintf("campaign %d not running", campaignID))
+		return
+	}
+
+	campaign.Status = kolide.QueryRunning
+	if err := svc.ds.SaveDistributedQueryCampaign(campaign); err != nil {
+		conn.WriteJSONError("error saving campaign state")
 		return
 	}
 
