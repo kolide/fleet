@@ -6,6 +6,9 @@ const { CAMPAIGNS: schema } = schemas;
 
 export default reduxConfig({
   createFunc: Kolide.runQuery,
+  destroyFunc: (campaign) => {
+    return Promise.resolve(campaign);
+  },
   updateFunc: (campaign, updatedAttrs = {}) => {
     return Promise.resolve({
       ...campaign,

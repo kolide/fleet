@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
+import { first, isEqual, values } from 'lodash';
 
 import Kolide from 'kolide';
 import campaignActions from 'redux/nodes/entities/campaigns/actions';
@@ -80,7 +81,7 @@ class QueryPage extends Component {
   onRunQuery = debounce((evt) => {
     evt.preventDefault();
 
-    const { dispatch, queryText, selectedTargets } = this.props;
+    const { campaign, dispatch, queryText, selectedTargets } = this.props;
     const { error } = validateQuery(queryText);
 
     if (error) {
@@ -90,7 +91,14 @@ class QueryPage extends Component {
     }
 
     const selected = formatSelectedTargetsForApi(selectedTargets);
-    const { create, update } = campaignActions;
+    const { create, destroy, update } = campaignActions;
+
+    // TODO: If there is a socket, close it
+
+    if (campaign) {
+      dispatch(destroy(campaign));
+    }
+
     dispatch(create({ query: queryText, selected }))
       .then((campaignResponse) => {
         this.socket = Kolide.runQueryWebsocket(campaignResponse.id);
@@ -209,10 +217,12 @@ class QueryPage extends Component {
 
 const mapStateToProps = (state, { params }) => {
   const { id: queryID } = params;
+  const { entities: campaigns } = entityGetter(state).get('campaigns');
   const query = entityGetter(state).get('queries').findBy({ id: queryID });
   const { queryText, selectedOsqueryTable, selectedTargets } = state.components.QueryPages;
+  const campaign = first(values(campaigns));
 
-  return { query, queryText, selectedOsqueryTable, selectedTargets };
+  return { campaign, query, queryText, selectedOsqueryTable, selectedTargets };
 };
 
 export default connect(mapStateToProps)(QueryPage);

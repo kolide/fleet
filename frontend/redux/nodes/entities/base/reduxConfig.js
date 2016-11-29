@@ -141,7 +141,7 @@ const reduxConfig = ({
 
       return destroyFunc(...args)
         .then(() => {
-          const { entityID } = args[0];
+          const { id: entityID } = args[0];
 
           return dispatch(destroySuccess(entityID));
         })
