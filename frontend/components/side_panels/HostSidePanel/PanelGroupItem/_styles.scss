@@ -47,6 +47,12 @@ $base-class: 'panel-group-item';
     @include flex-grow(1);
   }
 
+  &__description {
+    font-size: 13px;
+    margin-left: 4px;
+    text-transform: lowercase;
+  }
+
   &__count {
     @include transition(color 75ms ease-in-out);
     font-weight: $bold;
