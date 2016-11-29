@@ -40,7 +40,7 @@ var enrollTests = []struct {
 	},
 }
 
-func testSaveHosts(t *testing.T, db kolide.Datastore) {
+func testSaveHost(t *testing.T, db kolide.Datastore) {
 	host, err := db.NewHost(&kolide.Host{
 		DetailUpdateTime: time.Now(),
 		NodeKey:          "1",
@@ -48,7 +48,7 @@ func testSaveHosts(t *testing.T, db kolide.Datastore) {
 		HostName:         "foo.local",
 		PrimaryIP:        "192.168.1.10",
 	})
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	assert.NotNil(t, host)
 
 	host.HostName = "bar.local"
@@ -64,6 +64,25 @@ func testSaveHosts(t *testing.T, db kolide.Datastore) {
 
 	host, err = db.Host(host.ID)
 	assert.NotNil(t, err)
+}
+
+func testGetHost(t *testing.T, db kolide.Datastore) {
+	want := &kolide.Host{
+		DetailUpdateTime: time.Now(),
+		NodeKey:          "1",
+		UUID:             "1",
+		HostName:         "foo.local",
+		PrimaryIP:        "192.168.1.10",
+	}
+	want, err := db.NewHost(want)
+	require.Nil(t, err)
+
+	got, err := db.Host(want.ID)
+	require.Nil(t, err)
+
+	assert.Equal(t, want.HostName, got.HostName)
+	assert.Equal(t, want.ID, got.ID)
+
 }
 
 func testDeleteHost(t *testing.T, db kolide.Datastore) {
