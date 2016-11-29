@@ -28,6 +28,7 @@ export default (admin) => {
 
   const userNavItems = [
     {
+      defaultPathname: '/hosts/manage',
       icon: 'hosts',
       name: 'Hosts',
       path: {
@@ -36,23 +37,23 @@ export default (admin) => {
       },
       subItems: [
         {
-          name: 'Add Hosts',
-          path: {
-            regex: /\/new/,
-            location: '/hosts/new',
-          },
-        },
-        {
           name: 'Manage Hosts',
           path: {
             regex: /\/manage/,
             location: '/hosts/manage',
           },
         },
+        {
+          name: 'Add Hosts',
+          path: {
+            regex: /\/new/,
+            location: '/hosts/new',
+          },
+        },
       ],
     },
     {
-      defaultPathname: '/queries/new',
+      defaultPathname: '/queries/results',
       icon: 'query',
       name: 'Query',
       path: {
@@ -61,17 +62,17 @@ export default (admin) => {
       },
       subItems: [
         {
+          name: 'Manage Queries',
+          path: {
+            regex: /\/results/,
+            location: '/queries/results',
+          },
+        },
+        {
           name: 'New Query',
           path: {
             regex: /\/new/,
             location: '/queries/new',
-          },
-        },
-        {
-          name: 'Queries & Results',
-          path: {
-            regex: /\/results/,
-            location: '/queries/results',
           },
         },
       ],
@@ -86,14 +87,14 @@ export default (admin) => {
       },
       subItems: [
         {
-          name: 'All Packs',
+          name: 'Manage Packs',
           path: {
             regex: /\/all/,
             location: '/packs/all',
           },
         },
         {
-          name: 'Pack Composer',
+          name: 'New Pack',
           path: {
             regex: /\/new/,
             location: '/packs/new',

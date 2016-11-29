@@ -25,6 +25,11 @@ class SiteNavSidePanel extends Component {
     };
   }
 
+  componentDidMount = () => {
+    const { closeUserMenu } = this;
+    window.addEventListener('mousedown', closeUserMenu, false);
+  }
+
   onLogout = (evt) => {
     evt.preventDefault();
 
@@ -35,12 +40,20 @@ class SiteNavSidePanel extends Component {
     return false;
   }
 
-  toggleUserMenu = () => {
+  closeUserMenu = (evt) => {
+    const { headerNav } = this;
+
+    if (headerNav && !headerNav.contains(evt.target)) {
+      this.setState({ userMenuOpened: false });
+    }
+  }
+
+  toggleUserMenu = (evt) => {
+    evt.preventDefault();
     const { userMenuOpened } = this.state;
 
     this.setState({ userMenuOpened: !userMenuOpened });
   }
-
 
   render () {
     const {
@@ -70,7 +83,7 @@ class SiteNavSidePanel extends Component {
 
     return (
       <header>
-        <button className={headerToggleClass} onClick={toggleUserMenu}>
+        <button className={headerToggleClass} onClick={toggleUserMenu} ref={(r) => { this.headerNav = r; }}>
           <div className={`${headerBaseClass}__org`}>
             <img
               alt="Company logo"
