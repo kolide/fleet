@@ -251,6 +251,7 @@ class Kolide extends Base {
     socket.onmessage = ({ data }) => {
       console.log('websocket event', data);
     };
+
     socket.onopen = () => {
       socket.send(JSON.stringify({ type: 'auth', data: { token: local.getItem('auth_token') } }));
     };

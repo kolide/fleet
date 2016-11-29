@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
 
 import Kolide from 'kolide';
+import campaignActions from 'redux/nodes/entities/campaigns/actions';
 import debounce from 'utilities/debounce';
 import entityGetter from 'redux/utilities/entityGetter';
 import { formatSelectedTargetsForApi } from 'kolide/helpers';
@@ -89,10 +90,24 @@ class QueryPage extends Component {
     }
 
     const selected = formatSelectedTargetsForApi(selectedTargets);
+    const { create, update } = campaignActions;
+    dispatch(create({ query: queryText, selected }))
+      .then((campaignResponse) => {
+        this.socket = Kolide.runQueryWebsocket(campaignResponse.id);
 
-    Kolide.runQuery({ query: queryText, selected })
-      .then((campaign) => {
-        this.socket = Kolide.runQueryWebsocket(campaign.id);
+        this.socket.onmessage = ({ data }) => {
+          const socketData = JSON.parse(data);
+
+          if (!this.previousSocketData) {
+            this.previousSocketData = socketData;
+          } else if (isEqual(socketData, this.previousSocketData)) {
+            this.previousSocketData = socketData;
+
+            return false;
+          }
+
+          return dispatch(update(campaignResponse, socketData.data));
+        };
       });
 
     return false;
