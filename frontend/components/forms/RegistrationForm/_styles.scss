@@ -3,9 +3,19 @@
   @include align-content(center);
   @include justify-content(center);
 
+  &__logo {
+    @include position(absolute, 15px null null 15px);
+    width: 200px;
+
+    @include breakpoint(tablet) {
+      @include transform(rotate(-90deg));
+      left: -60px;
+      top: 90px;
+    }
+  }
+
   &__container {
-    width: 500px;
-    height: 540px;
+    @include size(500px 520px);
     border-radius: 4px;
     background-color: $bg-light;
     box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.3);
@@ -30,11 +40,15 @@
     width: 100%;
     height: calc(100% - 300px);
     position: absolute;
-    top: 300px;
+    top: 260px;
     left: 0;
     overflow: hidden;
     box-sizing: border-box;
     padding: 25px 0;
+
+    @include breakpoint(tablet) {
+      top: 210px;
+    }
 
     &--step1-complete {
       .user-registration__field-wrapper--admin {

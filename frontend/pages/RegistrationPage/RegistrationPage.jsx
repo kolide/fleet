@@ -70,6 +70,11 @@ export class RegistrationPage extends Component {
   }
 
   onSetPage = (page) => {
+    const { page: currentPage } = this.state;
+    if (page >= currentPage) {
+      return false;
+    }
+
     this.setState({ page });
 
     return false;

@@ -27,7 +27,6 @@ class ConfirmationPage extends Component {
       className,
       formData: {
         email,
-        name,
         kolide_server_url: kolideWebAddress,
         org_name: orgName,
         username,
@@ -44,10 +43,6 @@ class ConfirmationPage extends Component {
           <table className={`${baseClass}__table`}>
             <caption>Administrator Configuration</caption>
             <tbody>
-              <tr>
-                <th>Full Name:</th>
-                <td>{name}</td>
-              </tr>
               <tr>
                 <th>Username:</th>
                 <td>{username}</td>

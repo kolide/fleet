@@ -6,7 +6,7 @@ import Button from 'components/buttons/Button';
 import InputFieldWithIcon from 'components/forms/fields/InputFieldWithIcon';
 import helpers from './helpers';
 
-const formFields = ['name', 'username', 'password', 'password_confirmation', 'email'];
+const formFields = ['username', 'password', 'password_confirmation', 'email'];
 const { validate } = helpers;
 
 class AdminDetails extends Component {
@@ -15,7 +15,6 @@ class AdminDetails extends Component {
     currentPage: PropTypes.bool,
     fields: PropTypes.shape({
       email: formFieldInterface.isRequired,
-      name: formFieldInterface.isRequired,
       password: formFieldInterface.isRequired,
       password_confirmation: formFieldInterface.isRequired,
       username: formFieldInterface.isRequired,
@@ -30,11 +29,6 @@ class AdminDetails extends Component {
     return (
       <div className={className}>
         <div className="registration-fields">
-          <InputFieldWithIcon
-            {...fields.name}
-            placeholder="Full Name"
-            tabIndex={tabIndex}
-          />
           <InputFieldWithIcon
             {...fields.username}
             iconName="username"

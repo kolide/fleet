@@ -3,12 +3,16 @@
   @include justify-content(space-between);
   @include align-content(center);
   width: 665px;
-  height: 175px;
+  height: 125px;
   margin: 0 auto;
+
+  @include breakpoint(tablet) {
+    height: 75px;
+  }
 
   &__page {
     text-align: center;
-    width: 125px;
+    width: 145px;
     font-size: 14px;
     font-weight: $normal;
     line-height: 1.53;
@@ -19,14 +23,18 @@
     &::before {
       content: '';
       position: absolute;
-      width: 246px;
+      width: 235px;
       height: 2px;
       background-image: linear-gradient(to right, $accent-dark 50%, transparent 50%);
       background-position: left top;
       background-repeat: repeat-x;
       background-size: 17px 2px;
-      bottom: 54px;
-      left: 72px;
+      bottom: 43px;
+      left: 84px;
+
+      @include breakpoint(tablet) {
+        bottom: 23px;
+      }
     }
 
     &::after {
@@ -37,10 +45,14 @@
       border-radius: 50%;
       content: '';
       font-size: 28px;
-      margin: 23px auto 0;
+      margin: 14px auto 0;
       position: relative;
       z-index: 1;
       cursor: pointer;
+
+      @include breakpoint(tablet) {
+        margin-top: 4px;
+      }
     }
 
     &:focus {

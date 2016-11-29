@@ -6,6 +6,8 @@ import ConfirmationPage from 'components/forms/RegistrationForm/ConfirmationPage
 import KolideDetails from 'components/forms/RegistrationForm/KolideDetails';
 import OrgDetails from 'components/forms/RegistrationForm/OrgDetails';
 
+import kolideLogo from '../../../../assets/images/kolide-logo-condensed.svg';
+
 const PAGE_HEADER_TEXT = {
   1: 'SET USERNAME & PASSWORD',
   2: 'SET ORGANIZATION DETAILS',
@@ -169,6 +171,11 @@ class RegistrationForm extends Component {
 
     return (
       <div className={baseClass}>
+        <img
+          alt="Kolide"
+          src={kolideLogo}
+          className={`${baseClass}__logo`}
+        />
         <div className={containerClass}>
           {renderContent()}
 
