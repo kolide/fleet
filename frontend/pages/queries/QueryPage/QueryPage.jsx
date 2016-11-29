@@ -2,8 +2,10 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
 
+import Kolide from 'kolide';
 import debounce from 'utilities/debounce';
 import entityGetter from 'redux/utilities/entityGetter';
+import { formatSelectedTargetsForApi } from 'kolide/helpers';
 import QueryComposer from 'components/queries/QueryComposer';
 import osqueryTableInterface from 'interfaces/osquery_table';
 import queryActions from 'redux/nodes/entities/queries/actions';
@@ -86,7 +88,12 @@ class QueryPage extends Component {
       return false;
     }
 
-    console.log('TODO: dispatch thunk to run query with', { queryText, selectedTargets });
+    const selected = formatSelectedTargetsForApi(selectedTargets);
+
+    Kolide.runQuery({ query: queryText, selected })
+      .then((campaign) => {
+        this.socket = Kolide.runQueryWebsocket(campaign.id);
+      });
 
     return false;
   })
