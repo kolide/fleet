@@ -265,7 +265,7 @@ var detailQueries = map[string]struct {
 				}
 			}
 
-			networkInterfaces := []kolide.NetworkInterface{}
+			networkInterfaces := []*kolide.NetworkInterface{}
 
 			for _, row := range rows {
 				nic := kolide.NetworkInterface{}
@@ -310,12 +310,9 @@ var detailQueries = map[string]struct {
 					return err
 				}
 
-				networkInterfaces = append(networkInterfaces, nic)
+				networkInterfaces = append(networkInterfaces, &nic)
 			}
 
-			// TODO: set default primary ip address in host if it's not already
-			// set OR if the existing primary ip address isn't in the
-			// interfaces we got back from osquery
 			host.NetworkInterfaces = networkInterfaces
 
 			return nil

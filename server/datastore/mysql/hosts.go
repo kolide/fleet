@@ -2,12 +2,14 @@ package mysql
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
+	//	. "github.com/y0ssar1an/q"
 )
 
 func (d *Datastore) NewHost(host *kolide.Host) (*kolide.Host, error) {
@@ -36,6 +38,110 @@ func (d *Datastore) NewHost(host *kolide.Host) (*kolide.Host, error) {
 	return host, nil
 }
 
+func removedUnusedNics(tx *sqlx.Tx, host *kolide.Host) error {
+	if len(host.NetworkInterfaces) == 0 {
+		_, err := tx.Exec(`DELETE FROM network_interfaces WHERE host_id = ?`, host.ID)
+		return err
+	}
+	// Remove nics not associated with host
+	sqlStatement := fmt.Sprintf(`
+			DELETE FROM network_interfaces
+			WHERE host_id = %d AND id NOT IN (?)
+		`, host.ID)
+
+	list := []uint{}
+	for _, nic := range host.NetworkInterfaces {
+		list = append(list, nic.ID)
+	}
+
+	sql, args, err := sqlx.In(sqlStatement, list)
+	if err != nil {
+		return err
+	}
+
+	sql = tx.Rebind(sql)
+	_, err = tx.Exec(sql, args...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func updateNicsForHost(tx *sqlx.Tx, host *kolide.Host) ([]*kolide.NetworkInterface, error) {
+	updatedNics := []*kolide.NetworkInterface{}
+	sqlStatement := `
+	 	INSERT INTO network_interfaces (
+			host_id,
+			mac,
+			ip_address,
+			broadcast,
+			ibytes,
+			interface,
+			ipackets,
+			last_change,
+			mask,
+			metric,
+			mtu,
+			obytes,
+			ierrors,
+			oerrors,
+			opackets,
+			point_to_point,
+			type
+		) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+		ON DUPLICATE KEY UPDATE
+			mac = VALUES(mac),
+			broadcast = VALUES(broadcast),
+			ibytes = VALUES(ibytes),
+			ipackets = VALUES(ipackets),
+			last_change = VALUES(last_change),
+			mask = VALUES(mask),
+			metric = VALUES(metric),
+			mtu = VALUES(mtu),
+			obytes = VALUES(obytes),
+			ierrors = VALUES(ierrors),
+			oerrors = VALUES(oerrors),
+			opackets = VALUES(opackets),
+			point_to_point = VALUES(point_to_point),
+			type = VALUES(type)
+	 `
+	for _, nic := range host.NetworkInterfaces {
+		nic.HostID = host.ID
+		result, err := tx.Exec(sqlStatement,
+			nic.HostID,
+			nic.MAC,
+			nic.IPAddress,
+			nic.Broadcast,
+			nic.IBytes,
+			nic.Interface,
+			nic.IPackets,
+			nic.LastChange,
+			nic.Mask,
+			nic.Metric,
+			nic.MTU,
+			nic.OBytes,
+			nic.IErrors,
+			nic.OErrors,
+			nic.OPackets,
+			nic.PointToPoint,
+			nic.Type,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+		nicID, _ := result.LastInsertId()
+		// if row was updated there is no LastInsertID
+		if nicID != 0 {
+			nic.ID = uint(nicID)
+		}
+		updatedNics = append(updatedNics, nic)
+	}
+
+	return updatedNics, nil
+}
+
 // TODO needs test
 func (d *Datastore) SaveHost(host *kolide.Host) error {
 	sqlStatement := `
@@ -57,10 +163,19 @@ func (d *Datastore) SaveHost(host *kolide.Host) error {
 			hardware_model = ?,
 			hardware_version = ?,
 			hardware_serial = ?,
-			computer_name = ?
+			computer_name = ?,
+			primary_ip_id = ?
 		WHERE id = ?
 	`
-	_, err := d.db.Exec(sqlStatement,
+
+	tx, err := d.db.Beginx()
+	if err != nil {
+		return errors.DatabaseError(err)
+	}
+
+	host.ResetPrimaryNetwork()
+
+	_, err = tx.Exec(sqlStatement,
 		host.DetailUpdateTime,
 		host.NodeKey,
 		host.HostName,
@@ -79,11 +194,27 @@ func (d *Datastore) SaveHost(host *kolide.Host) error {
 		host.HardwareVersion,
 		host.HardwareSerial,
 		host.ComputerName,
+		host.PrimaryNetworkInterfaceID,
 		host.ID)
 	if err != nil {
+		tx.Rollback()
 		return errors.DatabaseError(err)
 	}
 
+	host.NetworkInterfaces, err = updateNicsForHost(tx, host)
+	if err != nil {
+		tx.Rollback()
+		return errors.DatabaseError(err)
+	}
+	if err = removedUnusedNics(tx, host); err != nil {
+		tx.Rollback()
+		return errors.DatabaseError(err)
+	}
+
+	if err = tx.Commit(); err != nil {
+		tx.Rollback()
+		return errors.DatabaseError(err)
+	}
 	return nil
 }
 
@@ -115,11 +246,19 @@ func (d *Datastore) Host(id uint) (*kolide.Host, error) {
 		return nil, errors.DatabaseError(err)
 	}
 
+	sqlStatement = `
+		SELECT * from network_interfaces
+		WHERE host_id = ?
+	`
+	err = d.db.Select(&host.NetworkInterfaces, sqlStatement, id)
+	if err != nil {
+		return nil, errors.DatabaseError(err)
+	}
+
 	return host, nil
 
 }
 
-// TODO needs test
 func (d *Datastore) ListHosts(opt kolide.ListOptions) ([]*kolide.Host, error) {
 	sqlStatement := `
 		SELECT * FROM hosts
@@ -129,6 +268,19 @@ func (d *Datastore) ListHosts(opt kolide.ListOptions) ([]*kolide.Host, error) {
 	hosts := []*kolide.Host{}
 	if err := d.db.Select(&hosts, sqlStatement); err != nil {
 		return nil, errors.DatabaseError(err)
+	}
+
+	sqlStatement = `
+		SELECT * FROM network_interfaces
+		WHERE host_id = ?
+	`
+	// TODO: This should be changed so that hosts and network interfaces
+	// are grabbed in a single sql request,
+	for _, host := range hosts {
+		err := d.db.Select(&host.NetworkInterfaces, sqlStatement, host.ID)
+		if err != nil {
+			return nil, errors.DatabaseError(err)
+		}
 	}
 
 	return hosts, nil
@@ -230,6 +382,7 @@ func (d *Datastore) searchHostsWithOmits(query string, omits ...uint) ([]kolide.
 	// bindvar is that sqlx.In has a bug such that, if you have any bindvars other
 	// than those in the IN clause, sqlx.In returns an empty sql statement.
 	// I've submitted an issue https://github.com/jmoiron/sqlx/issues/260 about this
+	// TODO: update this to search on ip address in network interfaces
 	sqlStatement := `
 		SELECT *
 		FROM hosts
@@ -266,13 +419,18 @@ func (d *Datastore) SearchHosts(query string, omit ...uint) ([]kolide.Host, erro
 	sqlStatement := `
 		SELECT * FROM hosts
 		WHERE MATCH(host_name)
-		AGAINST(? IN BOOLEAN MODE)
+		AGAINST(? IN BOOLEAN MODE) OR
+		id IN (SELECT host_id
+			FROM network_interfaces
+			WHERE MATCH(ip_address)
+			AGAINST(? IN BOOLEAN MODE)
+		)
 		AND not deleted
 		LIMIT 10
 	`
 	hosts := []kolide.Host{}
 
-	if err := d.db.Select(&hosts, sqlStatement, query); err != nil {
+	if err := d.db.Select(&hosts, sqlStatement, query, query); err != nil {
 		return nil, errors.DatabaseError(err)
 	}
 

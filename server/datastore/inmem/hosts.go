@@ -34,6 +34,13 @@ func (orm *Datastore) SaveHost(host *kolide.Host) error {
 		return kolide_errors.ErrNotFound
 	}
 
+	for _, nic := range host.NetworkInterfaces {
+		if nic.ID == 0 {
+			nic.ID = orm.nextID(nic)
+		}
+		nic.HostID = host.ID
+	}
+	host.ResetPrimaryNetwork()
 	orm.hosts[host.ID] = host
 	return nil
 }

@@ -56,8 +56,21 @@ type Host struct {
 	ComputerName     string `json:"computer_name" db:"computer_name"`
 	// PrimaryNetworkInterfaceID if present indicates to primary network for the host, the details of which
 	// can be found in the NetworkInterfaces element with the same ip_address.
-	PrimaryNetworkInterfaceID *uint              `json:"primary_ip_id,omitempty" db:"primary_ip_id"`
-	NetworkInterfaces         []NetworkInterface `json:"network_interfaces" db:"-"`
+	PrimaryNetworkInterfaceID *uint               `json:"primary_ip_id,omitempty" db:"primary_ip_id"`
+	NetworkInterfaces         []*NetworkInterface `json:"network_interfaces" db:"-"`
+}
+
+// ResetPrimaryNetwork sets PrimaryNetworkInterfaceID to nil if
+// there is not a host NetworkInterface that matches
+func (h *Host) ResetPrimaryNetwork() {
+	if h.PrimaryNetworkInterfaceID != nil {
+		for _, nic := range h.NetworkInterfaces {
+			if *h.PrimaryNetworkInterfaceID == nic.ID {
+				return
+			}
+		}
+		h.PrimaryNetworkInterfaceID = nil
+	}
 }
 
 // RandomText returns a stdEncoded string of

@@ -43,22 +43,65 @@ func testSaveHosts(t *testing.T, db kolide.Datastore) {
 		UUID:             "1",
 		HostName:         "foo.local",
 	})
-	assert.Nil(t, err)
-	assert.NotNil(t, host)
+	require.Nil(t, err)
+	require.NotNil(t, host)
 
 	host.HostName = "bar.local"
 	err = db.SaveHost(host)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	host, err = db.Host(host.ID)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	assert.Equal(t, "bar.local", host.HostName)
+
+	host.NetworkInterfaces = []*kolide.NetworkInterface{
+		&kolide.NetworkInterface{
+			HostID:    host.ID,
+			Interface: "en0",
+			IPAddress: "98.99.100.101",
+		},
+		&kolide.NetworkInterface{
+			HostID:    host.ID,
+			Interface: "en1",
+			IPAddress: "98.99.100.102",
+		},
+	}
+
+	err = db.SaveHost(host)
+	require.Nil(t, err)
+
+	host, err = db.Host(host.ID)
+	require.Nil(t, err)
+	require.NotNil(t, host)
+	require.Equal(t, 2, len(host.NetworkInterfaces))
+	primaryNicID := host.NetworkInterfaces[0].ID
+	host.PrimaryNetworkInterfaceID = &primaryNicID
+	err = db.SaveHost(host)
+	require.Nil(t, err)
+	host, err = db.Host(host.ID)
+	require.Nil(t, err)
+	require.NotNil(t, host)
+	require.Equal(t, 2, len(host.NetworkInterfaces))
+	assert.Equal(t, primaryNicID, *host.PrimaryNetworkInterfaceID)
+
+	// remove primary nic, host primary nic should be nil
+	host.NetworkInterfaces = []*kolide.NetworkInterface{
+		host.NetworkInterfaces[1],
+	}
+	err = db.SaveHost(host)
+	require.Nil(t, err)
+	host, err = db.Host(host.ID)
+	require.Nil(t, err)
+	require.NotNil(t, host)
+	assert.Nil(t, host.PrimaryNetworkInterfaceID)
+	assert.Equal(t, 1, len(host.NetworkInterfaces))
 
 	err = db.DeleteHost(host)
 	assert.Nil(t, err)
 
 	host, err = db.Host(host.ID)
 	assert.NotNil(t, err)
+	assert.Nil(t, host)
 }
 
 func testDeleteHost(t *testing.T, db kolide.Datastore) {
@@ -95,14 +138,36 @@ func testListHost(t *testing.T, db kolide.Datastore) {
 	}
 
 	hosts2, err := db.ListHosts(kolide.ListOptions{})
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	assert.Equal(t, len(hosts), len(hosts2))
 	err = db.DeleteHost(hosts[0])
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	hosts2, err = db.ListHosts(kolide.ListOptions{})
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	assert.Equal(t, len(hosts)-1, len(hosts2))
 
+	hosts, err = db.ListHosts(kolide.ListOptions{})
+	require.Nil(t, err)
+	require.Equal(t, len(hosts2), len(hosts))
+	hosts[0].NetworkInterfaces = []*kolide.NetworkInterface{
+		&kolide.NetworkInterface{
+			IPAddress: "98.99.100.101",
+			Interface: "en0",
+		},
+		&kolide.NetworkInterface{
+			IPAddress: "98.99.100.102",
+			Interface: "en1",
+		},
+	}
+
+	err = db.SaveHost(hosts[0])
+	require.Nil(t, err)
+	hosts2, err = db.ListHosts(kolide.ListOptions{})
+	require.Nil(t, err)
+	require.Equal(t, hosts[0].ID, hosts2[0].ID)
+	assert.Equal(t, len(hosts[0].NetworkInterfaces), len(hosts2[0].NetworkInterfaces))
+	assert.Equal(t, 0, len(hosts2[1].NetworkInterfaces))
+	assert.Equal(t, hosts[0].ID, hosts2[0].NetworkInterfaces[0].HostID)
 }
 
 func testEnrollHost(t *testing.T, db kolide.Datastore) {
