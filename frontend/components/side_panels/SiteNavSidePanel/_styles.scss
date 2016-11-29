@@ -119,7 +119,7 @@
 
   &__button {
     @include transition(color 150ms ease-in-out);
-    color: rgba($white, 0.5);
+    color: rgba($white, 0.75);
     text-transform: none;
     cursor: pointer;
     padding: 6px 0 6px 55px;
@@ -129,7 +129,7 @@
     text-align: left;
 
     &:hover {
-      color: rgba($white, 0.75);
+      color: rgba($white, 0.9);
     }
   }
 
