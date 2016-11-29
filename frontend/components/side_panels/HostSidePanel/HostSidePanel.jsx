@@ -83,7 +83,6 @@ class HostSidePanel extends Component {
         />
         <hr className={`${baseClass}__hr`} />
         <button className={`${baseClass}__add-label-btn button button--unstyled`} onClick={onAddLabelClick}>
-          <Icon name="add-button" className={`${baseClass}__add-label-btn--icon ${baseClass}__add-label-btn--icon-add`} />
           ADD NEW LABEL
           <Icon name="label" className={`${baseClass}__add-label-btn--icon ${baseClass}__add-label-btn--icon-label`} />
         </button>

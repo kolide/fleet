@@ -28,14 +28,14 @@ class PanelGroupItem extends Component {
       'button',
       'button--unstyled',
       `${baseClass}__${item.type.toLowerCase()}`,
-      `${baseClass}__${item.type.toLowerCase()}--${displayText.toLowerCase()}`,
+      `${baseClass}__${item.type.toLowerCase()}--${displayText.toLowerCase().replace(' ', '-')}`,
       {
         [`${baseClass}--selected`]: isSelected,
       }
     );
 
     return (
-      <button className={`${wrapperClassName} button button--unstyled`} onClick={onLabelClick}>
+      <button className={wrapperClassName} onClick={onLabelClick}>
         <Icon name={iconClassForLabel(item)} className={`${baseClass}__icon`} />
         <span className={`${baseClass}__name`}>{displayText}</span>
         <span className={`${baseClass}__count`}>{count}</span>

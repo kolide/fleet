@@ -1,21 +1,26 @@
 .host-side-panel {
   &__add-label-btn {
     color: $success;
-    padding: 0 $pad-large;
     font-weight: $normal;
+    line-height: 2.25;
+    letter-spacing: 0.5px;
+    padding: 0 30px;
+    border-radius: 4px;
+    width: 100%;
+    text-align: left;
 
-    &--icon {
-      margin-right: $pad-large;
+    &--icon-label {
+      margin: 0 0 0 $pad-small;
+    }
 
-      &-label {
-        margin: 0 0 0 $pad-small;
-      }
+    &:hover {
+      background-color: rgba($success, 0.1);
     }
   }
 
   &__wrapper {
     color: $text-medium;
-    padding: 60px 0 0;
+    padding: 60px 7px 0;
   }
 
   &__hr {
