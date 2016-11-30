@@ -13,7 +13,7 @@ class ProgressBar extends Component {
 
   render () {
     const { className, max, value } = this.props;
-    const percentComplete = `${(round((value / max) * 100, 0))}%`;
+    const percentComplete = `${(round((value / (max || 1)) * 100, 0))}%`;
     const wrapperClassName = classnames(baseClass, className);
 
     return (
