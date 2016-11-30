@@ -25,7 +25,7 @@ export default (admin) => {
           icon: 'hosts',
           name: 'Manage Hosts',
           path: {
-            regex: /\/manage/,
+            regex: /\/hosts\/manage/,
             location: '/hosts/manage',
           },
         },
@@ -33,7 +33,7 @@ export default (admin) => {
           icon: 'add-plus',
           name: 'Add Hosts',
           path: {
-            regex: /\/new/,
+            regex: /\/hosts\/new/,
             location: '/hosts/new',
           },
         },
@@ -52,7 +52,7 @@ export default (admin) => {
           icon: 'query',
           name: 'Manage Queries',
           path: {
-            regex: /\/results/,
+            regex: /\/queries\/results/,
             location: '/queries/results',
           },
         },
@@ -60,7 +60,7 @@ export default (admin) => {
           icon: 'pencil',
           name: 'New Query',
           path: {
-            regex: /\/new/,
+            regex: /\/queries\/new/,
             location: '/queries/new',
           },
         },
@@ -79,7 +79,7 @@ export default (admin) => {
           icon: 'packs',
           name: 'Manage Packs',
           path: {
-            regex: /\/all/,
+            regex: /\/packs\/all/,
             location: '/packs/all',
           },
         },
@@ -87,7 +87,7 @@ export default (admin) => {
           icon: 'pencil',
           name: 'New Pack',
           path: {
-            regex: /\/new/,
+            regex: /\/packs\/new/,
             location: '/packs/new',
           },
         },
@@ -106,7 +106,7 @@ export default (admin) => {
           icon: 'config',
           name: 'Osquery Options',
           path: {
-            regex: /\/options/,
+            regex: /\/config\/options/,
             location: '/config/options',
           },
         },
@@ -114,7 +114,7 @@ export default (admin) => {
           icon: 'import',
           name: 'Import Config',
           path: {
-            regex: /\/import/,
+            regex: /\/config\/import/,
             location: '/config/import',
           },
         },

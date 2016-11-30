@@ -66,12 +66,15 @@ class SiteNavSidePanel extends Component {
     return (evt) => {
       evt.preventDefault();
 
-      const { dispatch } = this.props;
-      const { path: { location: tabLocation } } = activeSubItem;
+      if (activeSubItem) {
+        const { dispatch } = this.props;
+        const { path: { location: tabLocation } } = activeSubItem;
 
-      if (!tabLocation) return false;
+        if (!tabLocation) return false;
 
-      dispatch(push(tabLocation));
+        dispatch(push(tabLocation));
+      }
+
       return false;
     };
   }
@@ -82,10 +85,12 @@ class SiteNavSidePanel extends Component {
 
       const { pathname, dispatch } = this.props;
       const activeSubItem = activeSubTabFromPathname(activeTab, pathname);
-      const { path: { location: tabLocation } } = activeSubItem;
 
       this.setState({ activeTab, activeSubItem });
-      if (tabLocation) return dispatch(push(tabLocation));
+
+      const tabLocation = activeSubItem ? activeSubItem.path.location : activeTab.path.location
+
+      dispatch(push(tabLocation));
 
       return false;
     };
