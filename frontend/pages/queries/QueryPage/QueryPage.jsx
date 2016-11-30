@@ -5,6 +5,7 @@ import { first, isEqual, values } from 'lodash';
 
 import Kolide from 'kolide';
 import campaignActions from 'redux/nodes/entities/campaigns/actions';
+import campaignInterface from 'interfaces/campaign';
 import debounce from 'utilities/debounce';
 import entityGetter from 'redux/utilities/entityGetter';
 import { formatSelectedTargetsForApi } from 'kolide/helpers';
@@ -20,6 +21,7 @@ import validateQuery from 'components/forms/validators/validate_query';
 
 class QueryPage extends Component {
   static propTypes = {
+    campaign: campaignInterface,
     dispatch: PropTypes.func,
     query: queryInterface,
     queryText: PropTypes.string,

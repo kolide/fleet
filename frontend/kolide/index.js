@@ -246,7 +246,7 @@ class Kolide extends Base {
   }
 
   runQueryWebsocket = (campaignID) => {
-    const socket = new WebSocket(`${this.websocketHost}/v1/kolide/results/${campaignID}`);
+    const socket = new global.WebSocket(`${this.websocketHost}/v1/kolide/results/${campaignID}`);
 
     socket.onmessage = ({ data }) => {
       console.log('websocket event', data);
