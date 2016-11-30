@@ -1,5 +1,5 @@
-hash: 4a87ddb9e91081df70590230979f58985cc7a9a1f9f6be2e1033e4b84cf2c6e0
-updated: 2016-11-18T19:27:52.047338531+08:00
+hash: 41d2411c2f3f091e67ae03b22c814a34283bce2238192ad31efefe6d5a546350
+updated: 2016-11-29T17:24:51.829140641-08:00
 imports:
 - name: github.com/alecthomas/template
   version: a0175ee3bccc567396460bf5acd36800cb10c49c
@@ -11,6 +11,8 @@ imports:
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
   subpackages:
   - quantile
+- name: github.com/carlescere/scheduler
+  version: ddcf6a6be3e8bd4b480f96031d9e1f3abecf2767
 - name: github.com/dgrijalva/jwt-go
   version: 01aeca54ebda6e0fbfafd0a524d234159c05ec20
 - name: github.com/elazarl/go-bindata-assetfs
@@ -162,7 +164,7 @@ imports:
 - name: gopkg.in/go-playground/validator.v8
   version: 5f57d2222ad794d0dffb07e664ea05e2ee07d60c
 - name: gopkg.in/natefinch/lumberjack.v2
-  version: e21e5cbec0cd0861b9dc302736ad5666c529d93f
+  version: 514cbda263a734ae8caac038dadf05f8f3f9f738
 - name: gopkg.in/yaml.v2
   version: e4d366fc3c7938e2958e662b4258c7a89e1f0e3e
 testImports:

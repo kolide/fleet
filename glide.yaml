@@ -60,3 +60,5 @@ import:
   - redis
 - package: github.com/jmoiron/sqlx
 - package: github.com/pressly/goose
+- package: github.com/carlescere/scheduler
+  version: 5e2cc370dae40237c2a08b9181d4c84faf4150e9

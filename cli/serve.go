@@ -7,8 +7,10 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/WatchBeam/clock"
+	"github.com/carlescere/scheduler"
 	kitlog "github.com/go-kit/kit/log"
 	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
 	"github.com/kolide/kolide-ose/server/config"
@@ -96,6 +98,10 @@ the way that the kolide server works.
 			if err != nil {
 				initFatal(err, "initializing service")
 			}
+
+			scheduler.Every(1).Hours().Run(func() {
+				ds.CleanupDistributedQueryCampaigns(time.Now())
+			})
 
 			fieldKeys := []string{"method", "error"}
 			requestCount := kitprometheus.NewCounterFrom(prometheus.CounterOpts{
