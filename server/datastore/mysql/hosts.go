@@ -10,7 +10,6 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
-	"github.com/y0ssar1an/q"
 )
 
 func (d *Datastore) NewHost(host *kolide.Host) (*kolide.Host, error) {
@@ -271,20 +270,27 @@ func (d *Datastore) ListHosts(opt kolide.ListOptions) ([]*kolide.Host, error) {
 		return nil, errors.DatabaseError(err)
 	}
 
-	sqlStatement = `
-		SELECT * FROM network_interfaces
-		WHERE host_id = ?
-	`
 	// TODO: This should be changed so that hosts and network interfaces
 	// are grabbed in a single sql request,
 	for _, host := range hosts {
-		err := d.db.Select(&host.NetworkInterfaces, sqlStatement, host.ID)
-		if err != nil {
+		if err := d.getNetInterfacesForHost(host); err != nil {
 			return nil, errors.DatabaseError(err)
 		}
 	}
 
 	return hosts, nil
+}
+
+func (d *Datastore) getNetInterfacesForHost(host *kolide.Host) error {
+	sqlStatement := `
+		SELECT * FROM network_interfaces
+		WHERE host_id = ?
+	`
+	if err := d.db.Select(&host.NetworkInterfaces, sqlStatement, host.ID); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // EnrollHost enrolls a host
@@ -379,19 +385,29 @@ func (d *Datastore) MarkHostSeen(host *kolide.Host, t time.Time) error {
 }
 
 func (d *Datastore) searchHostsWithOmits(query string, omits ...uint) ([]kolide.Host, error) {
-	sqlStatement := `
-		SELECT  hst.*
-		FROM hosts AS hst
-		LEFT JOIN network_interfaces AS ni
-		ON (
-			MATCH(ni.ip_address)
-			AGAINST('%s*' IN BOOLEAN MODE)
-			AND ni.host_id NOT IN (%s)
+
+	sqlStatement :=
+		`
+		SELECT DISTINCT *
+		FROM hosts
+		WHERE
+		(
+			id IN (
+				SELECT id
+				FROM hosts
+				WHERE
+				MATCH(host_name) AGAINST('%s*' IN BOOLEAN MODE)
+			)
+		OR
+			id IN (
+				SELECT host_id
+				FROM network_interfaces
+				WHERE
+				MATCH(ip_address) AGAINST('"%s"' IN BOOLEAN MODE)
+			)
 		)
-		WHERE MATCH(hst.host_name)
-		AGAINST('%s*' IN BOOLEAN MODE)
-		AND NOT hst.deleted
-		AND hst.id NOT IN (%s)
+		AND NOT deleted
+		AND id NOT IN (%s)
 		LIMIT 10
 	`
 	excludeList := ""
@@ -402,13 +418,17 @@ func (d *Datastore) searchHostsWithOmits(query string, omits ...uint) ([]kolide.
 		excludeList += strconv.Itoa(int(omit))
 	}
 
-	sqlStatement = fmt.Sprintf(sqlStatement, query, excludeList, query, excludeList)
-	q.Q(sqlStatement)
-
+	sqlStatement = fmt.Sprintf(sqlStatement, query, query, excludeList)
 	hosts := []kolide.Host{}
 
 	if err := d.db.Select(&hosts, sqlStatement); err != nil {
 		return nil, errors.DatabaseError(err)
+	}
+
+	for i := 0; i < len(hosts); i++ {
+		if err := d.getNetInterfacesForHost(&hosts[i]); err != nil {
+			return nil, errors.DatabaseError(err)
+		}
 	}
 
 	return hosts, nil
@@ -421,25 +441,43 @@ func (d *Datastore) SearchHosts(query string, omit ...uint) ([]kolide.Host, erro
 		return d.searchHostsWithOmits(query, omit...)
 	}
 
-	query += "*"
+	hostNameQuery := fmt.Sprintf(`%s*`, query)
+	ipQuery := fmt.Sprintf(`"%s"`, query)
 
-	sqlStatement := `
-		SELECT hst.*
-		FROM hosts AS hst
-		LEFT JOIN network_interfaces AS ni
-		ON (
-			MATCH(ni.ip_address)
-			AGAINST(? IN BOOLEAN MODE)
+	sqlStatement :=
+		`
+		SELECT DISTINCT *
+		FROM hosts
+		WHERE
+		(
+			id IN (
+				SELECT id
+				FROM hosts
+				WHERE
+				MATCH(host_name) AGAINST(? IN BOOLEAN MODE)
+			)
+		OR
+			id IN (
+				SELECT host_id
+				FROM network_interfaces
+				WHERE
+				MATCH(ip_address) AGAINST(? IN BOOLEAN MODE)
+			)
 		)
-		WHERE MATCH(hst.host_name)
-		AGAINST(? IN BOOLEAN MODE)
-		AND NOT hst.deleted
+		AND NOT deleted
 		LIMIT 10
 	`
 	hosts := []kolide.Host{}
 
-	if err := d.db.Select(&hosts, sqlStatement, query, query); err != nil {
+	if err := d.db.Select(&hosts, sqlStatement, hostNameQuery, ipQuery); err != nil {
 		return nil, errors.DatabaseError(err)
+	}
+	// We're not using range to avoid having to copy the hosts slice
+	// when we populate the host NewworkInterfaces
+	for i := 0; i < len(hosts); i++ {
+		if err := d.getNetInterfacesForHost(&hosts[i]); err != nil {
+			return nil, errors.DatabaseError(err)
+		}
 	}
 
 	return hosts, nil

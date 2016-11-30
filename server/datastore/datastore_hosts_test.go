@@ -214,6 +214,9 @@ func testAuthenticateHost(t *testing.T, db kolide.Datastore) {
 }
 
 func testSearchHosts(t *testing.T, db kolide.Datastore) {
+	if db.Name() == "inmem" {
+		t.Skip("skipping for inmem")
+	}
 	_, err := db.NewHost(&kolide.Host{
 		DetailUpdateTime: time.Now(),
 		NodeKey:          "1",
@@ -255,6 +258,47 @@ func testSearchHosts(t *testing.T, db kolide.Datastore) {
 	none, err := db.SearchHosts("xxx")
 	assert.Nil(t, err)
 	assert.Len(t, none, 0)
+
+	// check to make sure search on ip address works
+	h2.NetworkInterfaces = []*kolide.NetworkInterface{
+		&kolide.NetworkInterface{
+			Interface: "en0",
+			IPAddress: "99.100.101.102",
+		},
+		&kolide.NetworkInterface{
+			Interface: "en1",
+			IPAddress: "99.100.101.103",
+		},
+	}
+	err = db.SaveHost(h2)
+	require.Nil(t, err)
+
+	hits, err := db.SearchHosts("99.100.101")
+	require.Nil(t, err)
+	require.Equal(t, 1, len(hits))
+	// q.Q(hits[0])
+	assert.Equal(t, 2, len(hits[0].NetworkInterfaces))
+
+	hits, err = db.SearchHosts("99.100.111")
+	require.Nil(t, err)
+	assert.Equal(t, 0, len(hits))
+
+	h3.NetworkInterfaces = []*kolide.NetworkInterface{
+		&kolide.NetworkInterface{
+			Interface: "en0",
+			IPAddress: "99.100.101.104",
+		},
+	}
+	err = db.SaveHost(h3)
+	require.Nil(t, err)
+	hits, err = db.SearchHosts("99.100.101")
+	require.Nil(t, err)
+	assert.Equal(t, 2, len(hits))
+
+	hits, err = db.SearchHosts("99.100.101", h3.ID)
+	require.Nil(t, err)
+	assert.Equal(t, 1, len(hits))
+
 }
 
 func testSearchHostsLimit(t *testing.T, db kolide.Datastore) {
