@@ -6,6 +6,7 @@ const baseClass = 'kolide-checkbox';
 
 class InputField extends Component {
   static propTypes = {
+    children: PropTypes.node,
     className: PropTypes.string,
     name: PropTypes.string,
     onChange: PropTypes.func,
@@ -22,7 +23,7 @@ class InputField extends Component {
     return (
       <label htmlFor={name} className={checkBoxClass}>
         <input type="checkbox" name={name} id={name} className={`${checkBoxClass}__input`} onChange={onChange} />
-        <span className={`${checkBoxClass}__tick`}></span>
+        <span className={`${checkBoxClass}__tick`} />
         {children}
       </label>
     );

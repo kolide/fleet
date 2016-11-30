@@ -32,7 +32,7 @@ class RegistrationForm extends Component {
       errors: {},
       formData: {
         kolide_server_url: window.location.origin,
-      }
+      },
     };
   }
 
