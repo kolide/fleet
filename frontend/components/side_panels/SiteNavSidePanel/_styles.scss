@@ -8,7 +8,7 @@
     margin-right: $pad-medium;
     vertical-align: sub;
 
-    @media (max-width: 760px) {
+    @include breakpoint(tablet) {
       display: block;
       text-align: center;
       margin-right: 0;
@@ -22,7 +22,7 @@
     font-weight: $normal;
     font-size: 14px;
 
-    @media (max-width: 760px) {
+    @include breakpoint(tablet) {
       display: none;
     }
   }
@@ -62,10 +62,11 @@
         z-index: 1;
       }
 
-      @media (max-width: 760px) {
+      @include breakpoint(tablet) {
         border-bottom: 6px solid #9a61c6;
         border-left: 6px solid #9a61c6;
         padding: 0;
+        border-radius: 0;
 
         &::before {
           display: none;
@@ -78,7 +79,7 @@
     border-top: 1px solid $accent-light;
     padding-top: 15px;
 
-    @media (max-width: 760px) {
+    @include breakpoint(tablet) {
       margin-right: 0;
     }
   }
@@ -117,6 +118,10 @@
       left: 45px;
       top: 50%;
       margin: -3px 0 0 -4px;
+
+      @include breakpoint(tablet) {
+        display: none;
+      }
     }
   }
 
@@ -134,6 +139,12 @@
     &:hover {
       color: rgba($white, 0.9);
     }
+
+    @include breakpoint(tablet) {
+      padding: 0;
+      text-align: center;
+      padding: 9px 0;
+    }
   }
 
   &__link {
@@ -143,6 +154,33 @@
     &--active {
       text-decoration: none;
       text-transform: none;
+    }
+  }
+
+  &__name {
+    @include breakpoint(desktop) {
+      display: inline-block;
+    }
+
+    @include breakpoint(tablet) {
+      display: none;
+    }
+  }
+
+  &__icon {
+    @include breakpoint(desktop) {
+      display: none;
+    }
+
+    @include breakpoint(tablet) {
+      display: inline-block;
+      font-size: 25px;
+    }
+  }
+
+  @include breakpoint(tablet) {
+    &:first-child {
+      display: none;
     }
   }
 }
@@ -156,31 +194,24 @@
   padding: 0;
   position: relative;
 
-  @media (max-width: 760px) {
-    min-height: 84px;
-    border-top-right-radius: 3px;
-    border-bottom-right-radius: 3px;
-    box-shadow: 2px 2px 8px rgba($black, 0.1);
-    bottom: -8px;
-    left: 54px;
-    margin-left: 0;
-    position: absolute;
+  @include breakpoint(tablet) {
+    @include linear-gradient(to bottom, #9a61c6 0%, $brand 15%);
+    min-height: 55px;
+    box-shadow: none;
   }
 
   &__list {
     padding: 12px 0;
     margin: 0;
 
-    @media (max-width: 760px) {
-      border-right: 1px solid rgba($black, 0.16);
-      display: none;
+    @include breakpoint(tablet) {
       padding: 0;
-      text-align: left;
-      width: 166px;
+      text-align: center;
+      width: 54px;
     }
 
     &--expanded {
-      @media (max-width: 760px) {
+      @include breakpoint(tablet) {
         display: inline-block;
       }
     }
@@ -196,7 +227,7 @@
   right: 4px;
   top: 0;
 
-  @media (min-width: 761px) {
+  @include breakpoint(gttablet) {
     display: none;
   }
 }
@@ -212,18 +243,8 @@
   top: 0;
   width: 240px;
 
-  @media (max-width: 760px) {
+  @include breakpoint(tablet) {
     padding-left: 0;
     width: 54px;
-  }
-}
-
-@media (max-width: 760px) {
-  .sub-nav {
-    width: 0;
-
-    &-expanded {
-      width: 188px;
-    }
   }
 }

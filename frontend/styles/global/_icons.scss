@@ -80,10 +80,6 @@
     content: '\f013';
 }
 
- .kolidecon-penciledit:before {
-    content: '\f015';
-}
-
  .kolidecon-storage:before {
     content: '\f019';
 }
@@ -110,26 +106,6 @@
 
  .kolidecon-add-button:before {
     content: '\f029';
-}
-
- .kolidecon-username:before {
-    content: '\f02a';
-}
-
- .kolidecon-password:before {
-    content: '\f02b';
-}
-
- .kolidecon-email:before {
-    content: '\f02c';
-}
-
- .kolidecon-query:before {
-    content: '\f02d';
-}
-
- .kolidecon-hosts:before {
-    content: '\f02e';
 }
 
  .kolidecon-packs:before {
@@ -286,6 +262,38 @@
 
  .kolidecon-single-host:before {
     content: '\f03d';
+}
+
+ .kolidecon-username:before {
+    content: '\f02a';
+}
+
+ .kolidecon-password:before {
+    content: '\f02b';
+}
+
+ .kolidecon-email:before {
+    content: '\f02c';
+}
+
+ .kolidecon-hosts:before {
+    content: '\f02e';
+}
+
+ .kolidecon-query:before {
+    content: '\f02d';
+}
+
+ .kolidecon-import:before {
+    content: '\f058';
+}
+
+ .kolidecon-pencil:before {
+    content: '\f059';
+}
+
+ .kolidecon-add-plus:before {
+    content: '\f05a';
 }
 
 

@@ -155,7 +155,7 @@ class SiteNavSidePanel extends Component {
 
   renderSubItem = (subItem) => {
     const { activeSubItem } = this.state;
-    const { name, path } = subItem;
+    const { icon, name, path } = subItem;
     const active = activeSubItem === subItem;
     const { setActiveSubItem } = this;
 
@@ -177,14 +177,15 @@ class SiteNavSidePanel extends Component {
           className={`${baseSubItemClass}__button button button--unstyled`}
           to={path.location}
         >
-          {name}
+          <span className={`${baseSubItemClass}__name`}>{name}</span>
+          <span className={`${baseSubItemClass}__icon`}><Icon name={icon} /></span>
         </button>
       </li>
     );
   }
 
   renderSubItems = (subItems) => {
-    const { renderCollapseSubItems, renderSubItem, setSubNavClass } = this;
+    const { renderSubItem, setSubNavClass } = this;
     const { showSubItems } = this.state;
 
     const baseSubItemsClass = 'site-sub-items';
@@ -203,23 +204,7 @@ class SiteNavSidePanel extends Component {
             return renderSubItem(subItem);
           })}
         </ul>
-        {renderCollapseSubItems()}
       </div>
-    );
-  }
-
-  renderCollapseSubItems = () => {
-    const { toggleShowSubItems } = this;
-    const { showSubItems } = this.state;
-    const iconName = showSubItems ? 'chevronleft' : 'chevronright';
-
-    return (
-      <button
-        className="button button--unstyled collapse-sub-item"
-        onClick={toggleShowSubItems(!showSubItems)}
-      >
-        <Icon name={iconName} />
-      </button>
     );
   }
 

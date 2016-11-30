@@ -7,22 +7,7 @@ export default (admin) => {
         regex: /^\/admin/,
         location: '/admin/users',
       },
-      subItems: [
-        {
-          name: 'Manage Users',
-          path: {
-            regex: /\/users/,
-            location: '/admin/users',
-          },
-        },
-        {
-          name: 'App Settings',
-          path: {
-            regex: /\/settings/,
-            location: '/admin/settings',
-          },
-        },
-      ],
+      subItems: [],
     },
   ];
 
@@ -37,6 +22,7 @@ export default (admin) => {
       },
       subItems: [
         {
+          icon: 'hosts',
           name: 'Manage Hosts',
           path: {
             regex: /\/manage/,
@@ -44,6 +30,7 @@ export default (admin) => {
           },
         },
         {
+          icon: 'add-plus',
           name: 'Add Hosts',
           path: {
             regex: /\/new/,
@@ -62,6 +49,7 @@ export default (admin) => {
       },
       subItems: [
         {
+          icon: 'query',
           name: 'Manage Queries',
           path: {
             regex: /\/results/,
@@ -69,6 +57,7 @@ export default (admin) => {
           },
         },
         {
+          icon: 'pencil',
           name: 'New Query',
           path: {
             regex: /\/new/,
@@ -87,6 +76,7 @@ export default (admin) => {
       },
       subItems: [
         {
+          icon: 'packs',
           name: 'Manage Packs',
           path: {
             regex: /\/all/,
@@ -94,6 +84,7 @@ export default (admin) => {
           },
         },
         {
+          icon: 'pencil',
           name: 'New Pack',
           path: {
             regex: /\/new/,
@@ -112,6 +103,7 @@ export default (admin) => {
       },
       subItems: [
         {
+          icon: 'config',
           name: 'Osquery Options',
           path: {
             regex: /\/options/,
@@ -119,6 +111,7 @@ export default (admin) => {
           },
         },
         {
+          icon: 'import',
           name: 'Import Config',
           path: {
             regex: /\/import/,
