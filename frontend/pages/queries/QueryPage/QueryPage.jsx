@@ -33,6 +33,7 @@ class QueryPage extends Component {
     super(props);
 
     this.state = {
+      queryIsRunning: false,
       targetsCount: 0,
     };
   }
@@ -120,6 +121,7 @@ class QueryPage extends Component {
     dispatch(create({ query: queryText, selected }))
       .then((campaignResponse) => {
         this.socket = Kolide.runQueryWebsocket(campaignResponse.id);
+        this.setState({ queryIsRunning: true });
 
         this.socket.onmessage = ({ data }) => {
           const socketData = JSON.parse(data);
@@ -162,6 +164,18 @@ class QueryPage extends Component {
       });
   })
 
+  onStopQuery = (evt) => {
+    evt.preventDefault();
+
+    this.setState({ queryIsRunning: false });
+
+    if (this.socket) {
+      this.socket.close();
+    }
+
+    return false;
+  }
+
   onTargetSelect = (selectedTargets) => {
     const { dispatch } = this.props;
 
@@ -195,11 +209,12 @@ class QueryPage extends Component {
       onOsqueryTableSelect,
       onRunQuery,
       onSaveQueryFormSubmit,
+      onStopQuery,
       onTargetSelect,
       onTextEditorInputChange,
       onUpdateQuery,
     } = this;
-    const { targetsCount } = this.state;
+    const { queryIsRunning, targetsCount } = this.state;
     const {
       query,
       queryText,
@@ -214,10 +229,12 @@ class QueryPage extends Component {
           onOsqueryTableSelect={onOsqueryTableSelect}
           onRunQuery={onRunQuery}
           onSave={onSaveQueryFormSubmit}
+          onStopQuery={onStopQuery}
           onTargetSelect={onTargetSelect}
           onTextEditorInputChange={onTextEditorInputChange}
           onUpdate={onUpdateQuery}
           query={query}
+          queryIsRunning={queryIsRunning}
           selectedTargets={selectedTargets}
           targetsCount={targetsCount}
           selectedOsqueryTable={selectedOsqueryTable}
