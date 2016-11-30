@@ -83,30 +83,10 @@
       padding-left: 40px;
     }
 
-    .kolide-checkbox {
+    .kolide-checkbox__input {
       position: absolute;
       left: 0;
       top: 0;
-    }
-  }
-}
-
-.kolide-checkbox {
-  visibility: hidden;
-
-  &::after {
-    @include size(21px);
-    border-radius: 5px;
-    border: solid 1px $brand-ultralight;
-    content: '';
-    box-sizing: border-box;
-    display: block;
-    visibility: visible;
-  }
-
-  &:checked {
-    &::after {
-      content: 'X';
     }
   }
 }

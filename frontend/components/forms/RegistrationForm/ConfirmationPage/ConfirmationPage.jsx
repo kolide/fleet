@@ -4,6 +4,7 @@ import classnames from 'classnames';
 import Button from 'components/buttons/Button';
 import formDataInterface from 'interfaces/registration_form_data';
 import Icon from 'components/Icon';
+import Checkbox from 'components/forms/fields/Checkbox';
 
 const baseClass = 'confirm-user-reg';
 
@@ -63,11 +64,10 @@ class ConfirmationPage extends Component {
           </table>
 
           <div className={`${baseClass}__import`}>
-            <label htmlFor="import-install">
-              <input type="checkbox" name="import-install" id="import-install" className="kolide-checkbox" />
+            <Checkbox name="import-install">
               <p>I am migrating an existing <strong>osquery</strong> installation.</p>
               <p>Take me to the <strong>Import Configuration</strong> page.</p>
-            </label>
+            </Checkbox>
           </div>
         </div>
 

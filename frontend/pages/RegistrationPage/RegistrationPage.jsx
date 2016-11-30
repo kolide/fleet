@@ -98,7 +98,7 @@ export class RegistrationPage extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
   const { loading: isLoadingUser, user: currentUser } = state.auth;
 
   return { currentUser, isLoadingUser };

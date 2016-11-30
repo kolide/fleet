@@ -26,8 +26,14 @@ class RegistrationForm extends Component {
 
   constructor (props) {
     super(props);
+    const { window } = global;
 
-    this.state = { errors: {}, formData: {} };
+    this.state = {
+      errors: {},
+      formData: {
+        kolide_server_url: window.location.origin,
+      }
+    };
   }
 
   onPageFormSubmit = (pageFormData) => {

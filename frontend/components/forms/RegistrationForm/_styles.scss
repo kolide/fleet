@@ -8,9 +8,7 @@
     width: 200px;
 
     @include breakpoint(tablet) {
-      @include transform(rotate(-90deg));
-      left: -60px;
-      top: 90px;
+      width: 125px;
     }
   }
 
