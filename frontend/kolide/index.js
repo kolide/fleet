@@ -246,13 +246,15 @@ class Kolide extends Base {
   }
 
   runQueryWebsocket = (campaignID) => {
-    const socket = new global.WebSocket(`${this.websocketBaseURL}/v1/kolide/results/${campaignID}`);
+    return new Promise((resolve) => {
+      const socket = new global.WebSocket(`${this.websocketBaseURL}/v1/kolide/results/${campaignID}`);
 
-    socket.onopen = () => {
-      socket.send(JSON.stringify({ type: 'auth', data: { token: local.getItem('auth_token') } }));
-    };
+      socket.onopen = () => {
+        socket.send(JSON.stringify({ type: 'auth', data: { token: local.getItem('auth_token') } }));
+      };
 
-    return socket;
+      return resolve(socket);
+    });
   }
 
   setup = (formData) => {

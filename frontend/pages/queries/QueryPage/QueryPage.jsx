@@ -63,16 +63,11 @@ class QueryPage extends Component {
 
   componentWillUnmount () {
     const { dispatch } = this.props;
+    const { removeSocket } = this;
 
     dispatch(removeRightSidePanel);
 
-    if (this.socket) {
-      this.socket.close();
-
-      this.socket = null;
-    }
-
-    return false;
+    return removeSocket();
   }
 
   onFetchTargets = (query, targetResponse) => {
@@ -107,12 +102,11 @@ class QueryPage extends Component {
       return false;
     }
 
-    const selected = formatSelectedTargetsForApi(selectedTargets);
     const { create, destroy, update } = campaignActions;
+    const { removeSocket } = this;
+    const selected = formatSelectedTargetsForApi(selectedTargets);
 
-    if (this.socket) {
-      this.socket.close();
-    }
+    removeSocket();
 
     if (campaign) {
       dispatch(destroy(campaign));
@@ -120,22 +114,25 @@ class QueryPage extends Component {
 
     dispatch(create({ query: queryText, selected }))
       .then((campaignResponse) => {
-        this.socket = Kolide.runQueryWebsocket(campaignResponse.id);
-        this.setState({ queryIsRunning: true });
+        return Kolide.runQueryWebsocket(campaignResponse.id)
+          .then((socket) => {
+            this.socket = socket;
+            this.setState({ queryIsRunning: true });
 
-        this.socket.onmessage = ({ data }) => {
-          const socketData = JSON.parse(data);
+            this.socket.onmessage = ({ data }) => {
+              const socketData = JSON.parse(data);
 
-          if (!this.previousSocketData) {
-            this.previousSocketData = socketData;
-          } else if (isEqual(socketData, this.previousSocketData)) {
-            this.previousSocketData = socketData;
+              if (!this.previousSocketData) {
+                this.previousSocketData = socketData;
+              } else if (isEqual(socketData, this.previousSocketData)) {
+                this.previousSocketData = socketData;
 
-            return false;
-          }
+                return false;
+              }
 
-          return dispatch(update(campaignResponse, socketData.data));
-        };
+              return dispatch(update(campaignResponse, socketData.data));
+            };
+          });
       });
 
     return false;
@@ -167,13 +164,11 @@ class QueryPage extends Component {
   onStopQuery = (evt) => {
     evt.preventDefault();
 
+    const { removeSocket } = this;
+
     this.setState({ queryIsRunning: false });
 
-    if (this.socket) {
-      this.socket.close();
-    }
-
-    return false;
+    return removeSocket();
   }
 
   onTargetSelect = (selectedTargets) => {
@@ -202,6 +197,15 @@ class QueryPage extends Component {
 
     return false;
   };
+
+  removeSocket = () => {
+    if (this.socket) {
+      this.socket.close();
+      this.socket = null;
+    }
+
+    return false;
+  }
 
   render () {
     const {
