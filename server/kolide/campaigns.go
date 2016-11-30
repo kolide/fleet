@@ -28,6 +28,17 @@ type CampaignStore interface {
 	// NewDistributedQueryCampaignExecution records a new execution for a
 	// distributed query campaign
 	NewDistributedQueryExecution(exec *DistributedQueryExecution) (*DistributedQueryExecution, error)
+
+	// CleanupDistributedQueryCampaigns will clean and trim metadata for
+	// old distributed query campaigns. Any campaign in the QueryWaiting
+	// state will be moved to QueryComplete after one minute. Any campaign
+	// in the QueryRunning state will be moved to QueryComplete after one
+	// day. Any campaign in the QueryComplete state will have the
+	// associated executions deleted. All times are from creation time. The
+	// now parameter makes this method easier to test. The return values
+	// indicate how many campaigns were expired, how many executions were
+	// deleted, and any error.
+	CleanupDistributedQueryCampaigns(now time.Time) (expired uint, deleted uint, err error)
 }
 
 // CampaignService defines the distributed query campaign related service
@@ -52,7 +63,6 @@ const (
 	QueryWaiting DistributedQueryStatus = iota
 	QueryRunning
 	QueryComplete
-	QueryError
 )
 
 // DistributedQueryCampaign is the basic metadata associated with a distributed
