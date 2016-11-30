@@ -63,11 +63,14 @@ class QueryPage extends Component {
 
   componentWillUnmount () {
     const { dispatch } = this.props;
-    const { removeSocket } = this;
+    const { destroyCampaign, removeSocket } = this;
 
     dispatch(removeRightSidePanel);
 
-    return removeSocket();
+    removeSocket();
+    destroyCampaign();
+
+    return false;
   }
 
   onFetchTargets = (query, targetResponse) => {
@@ -93,7 +96,7 @@ class QueryPage extends Component {
   onRunQuery = debounce((evt) => {
     evt.preventDefault();
 
-    const { campaign, dispatch, queryText, selectedTargets } = this.props;
+    const { dispatch, queryText, selectedTargets } = this.props;
     const { error } = validateQuery(queryText);
 
     if (error) {
@@ -102,20 +105,18 @@ class QueryPage extends Component {
       return false;
     }
 
-    const { create, destroy, update } = campaignActions;
-    const { removeSocket } = this;
+    const { create, update } = campaignActions;
+    const { destroyCampaign, removeSocket } = this;
     const selected = formatSelectedTargetsForApi(selectedTargets);
 
     removeSocket();
-
-    if (campaign) {
-      dispatch(destroy(campaign));
-    }
+    destroyCampaign();
 
     dispatch(create({ query: queryText, selected }))
       .then((campaignResponse) => {
         return Kolide.runQueryWebsocket(campaignResponse.id)
           .then((socket) => {
+            this.campaign = campaignResponse;
             this.socket = socket;
             this.setState({ queryIsRunning: true });
 
@@ -130,7 +131,11 @@ class QueryPage extends Component {
                 return false;
               }
 
-              return dispatch(update(campaignResponse, socketData.data));
+              return dispatch(update(this.campaign, socketData))
+                .then((updatedCampaign) => {
+                  console.log('updatedCampaign', updatedCampaign);
+                  this.campaign = updatedCampaign;
+                });
             };
           });
       });
@@ -198,10 +203,23 @@ class QueryPage extends Component {
     return false;
   };
 
+  destroyCampaign = () => {
+    const { campaign, dispatch } = this.props;
+    const { destroy } = campaignActions;
+
+    if (campaign) {
+      this.campaign = null;
+      dispatch(destroy(campaign));
+    }
+
+    return false;
+  }
+
   removeSocket = () => {
     if (this.socket) {
       this.socket.close();
       this.socket = null;
+      this.previousSocketData = null;
     }
 
     return false;
