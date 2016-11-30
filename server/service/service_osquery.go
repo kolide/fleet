@@ -207,6 +207,10 @@ var detailQueries = map[string]struct {
 			if err != nil {
 				return err
 			}
+			host.CPULogicalCores, err = strconv.Atoi(rows[0]["cpu_logical_cores"])
+			if err != nil {
+				return err
+			}
 			host.HardwareVendor = rows[0]["hardware_vendor"]
 			host.HardwareModel = rows[0]["hardware_model"]
 			host.HardwareVersion = rows[0]["hardware_version"]
@@ -232,6 +236,12 @@ var detailQueries = map[string]struct {
 				rows[0]["patch"],
 			)
 
+			if build, ok := rows[0]["build"]; ok {
+				host.Build = build
+			}
+
+			host.PlatformLike = rows[0]["platform_like"]
+			host.CodeName = rows[0]["code_name"]
 			return nil
 		},
 	},

@@ -25,12 +25,16 @@ func Up_20161118212528(tx *sql.Tx) error {
 			"`platform` varchar(255) DEFAULT NULL," +
 			"`osquery_version` varchar(255) NOT NULL DEFAULT ''," +
 			"`os_version` varchar(255) NOT NULL DEFAULT ''," +
+			"`build` varchar(255) NOT NULL DEFAULT ''," +
+			"`platform_like` varchar(255) NOT NULL DEFAULT ''," +
+			"`code_name` varchar(255) NOT NULL DEFAULT ''," +
 			"`uptime` bigint(20) NOT NULL DEFAULT 0," +
 			"`physical_memory` bigint(20) NOT NULL DEFAULT 0," +
 			"`cpu_type` varchar(255) NOT NULL DEFAULT ''," +
 			"`cpu_subtype` varchar(255) NOT NULL DEFAULT ''," +
 			"`cpu_brand` varchar(255) NOT NULL DEFAULT ''," +
 			"`cpu_physical_cores` int NOT NULL DEFAULT 0," +
+			"`cpu_logical_cores` int NOT NULL DEFAULT 0," +
 			"`hardware_vendor` varchar(255) NOT NULL DEFAULT ''," +
 			"`hardware_model` varchar(255) NOT NULL DEFAULT ''," +
 			"`hardware_version` varchar(255) NOT NULL DEFAULT ''," +

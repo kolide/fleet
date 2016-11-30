@@ -42,6 +42,9 @@ type Host struct {
 	Platform         string        `json:"platform"`
 	OsqueryVersion   string        `json:"osquery_version" db:"osquery_version"`
 	OSVersion        string        `json:"os_version" db:"os_version"`
+	Build            string        `json:"build"`
+	PlatformLike     string        `json:"platform_like" db:"platform_like"`
+	CodeName         string        `json:"code_name" db:"code_name"`
 	Uptime           time.Duration `json:"uptime"`
 	PhysicalMemory   int           `json:"memory" sql:"type:bigint" db:"physical_memory"`
 	// system_info fields
@@ -49,6 +52,7 @@ type Host struct {
 	CPUSubtype       string `json:"cpu_subtype" db:"cpu_subtype"`
 	CPUBrand         string `json:"cpu_brand" db:"cpu_brand"`
 	CPUPhysicalCores int    `json:"cpu_physical_cores" db:"cpu_physical_cores"`
+	CPULogicalCores  int    `json:"cpu_logical_cores" db:"cpu_logical_cores"`
 	HardwareVendor   string `json:"hardware_vendor" db:"hardware_vendor"`
 	HardwareModel    string `json:"hardware_model" db:"hardware_model"`
 	HardwareVersion  string `json:"hardware_version" db:"hardware_version"`

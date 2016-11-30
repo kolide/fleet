@@ -164,7 +164,11 @@ func (d *Datastore) SaveHost(host *kolide.Host) error {
 			hardware_version = ?,
 			hardware_serial = ?,
 			computer_name = ?,
-			primary_ip_id = ?
+			primary_ip_id = ?,
+			build = ?,
+			platform_like = ?,
+			code_name = ?,
+			cpu_logical_cores = ?
 		WHERE id = ?
 	`
 
@@ -193,6 +197,10 @@ func (d *Datastore) SaveHost(host *kolide.Host) error {
 		host.HardwareSerial,
 		host.ComputerName,
 		host.PrimaryNetworkInterfaceID,
+		host.Build,
+		host.PlatformLike,
+		host.CodeName,
+		host.CPULogicalCores,
 		host.ID)
 	if err != nil {
 		tx.Rollback()
