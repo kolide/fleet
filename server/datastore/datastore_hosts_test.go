@@ -84,7 +84,7 @@ func testSaveHosts(t *testing.T, db kolide.Datastore) {
 	require.Equal(t, 2, len(host.NetworkInterfaces))
 	assert.Equal(t, primaryNicID, *host.PrimaryNetworkInterfaceID)
 
-	// remove primary nic, host primary nic should be nil
+	// remove primary nic, host primary nic should change
 	host.NetworkInterfaces = []*kolide.NetworkInterface{
 		host.NetworkInterfaces[1],
 	}
@@ -93,7 +93,7 @@ func testSaveHosts(t *testing.T, db kolide.Datastore) {
 	host, err = db.Host(host.ID)
 	require.Nil(t, err)
 	require.NotNil(t, host)
-	assert.Nil(t, host.PrimaryNetworkInterfaceID)
+	assert.Equal(t, host.NetworkInterfaces[0].ID, *host.PrimaryNetworkInterfaceID)
 	assert.Equal(t, 1, len(host.NetworkInterfaces))
 
 	err = db.DeleteHost(host)
@@ -214,9 +214,6 @@ func testAuthenticateHost(t *testing.T, db kolide.Datastore) {
 }
 
 func testSearchHosts(t *testing.T, db kolide.Datastore) {
-	if db.Name() == "inmem" {
-		t.Skip("skipping for inmem")
-	}
 	_, err := db.NewHost(&kolide.Host{
 		DetailUpdateTime: time.Now(),
 		NodeKey:          "1",

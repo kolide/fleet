@@ -60,17 +60,36 @@ type Host struct {
 	NetworkInterfaces         []*NetworkInterface `json:"network_interfaces" db:"-"`
 }
 
-// ResetPrimaryNetwork sets PrimaryNetworkInterfaceID to nil if
-// there is not a host NetworkInterface that matches
-func (h *Host) ResetPrimaryNetwork() {
+// ResetPrimaryNetwork will determine if the PrimaryNetworkInterfaceID
+// needs to change.  If it has not been set, it will default to the interface
+// with the most IO.  If it doesn't match an existing nic (as in the nic got changed)
+// is will be reset.  If there are not any nics, it will be set to nil.  In any
+// case if it changes, this function will return true, indicating that the
+// change should be written back to the database
+func (h *Host) ResetPrimaryNetwork() bool {
 	if h.PrimaryNetworkInterfaceID != nil {
+		// No nic (should never happen)
+		if len(h.NetworkInterfaces) == 0 {
+			h.PrimaryNetworkInterfaceID = nil
+			return true
+		}
 		for _, nic := range h.NetworkInterfaces {
 			if *h.PrimaryNetworkInterfaceID == nic.ID {
-				return
+				return false
 			}
 		}
 		h.PrimaryNetworkInterfaceID = nil
 	}
+
+	// nics are in descending order of IO
+	// so we default to the most active nic
+	if len(h.NetworkInterfaces) > 0 {
+		h.PrimaryNetworkInterfaceID = &h.NetworkInterfaces[0].ID
+		return true
+	}
+
+	return false
+
 }
 
 // RandomText returns a stdEncoded string of

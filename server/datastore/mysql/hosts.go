@@ -173,8 +173,6 @@ func (d *Datastore) SaveHost(host *kolide.Host) error {
 		return errors.DatabaseError(err)
 	}
 
-	host.ResetPrimaryNetwork()
-
 	_, err = tx.Exec(sqlStatement,
 		host.DetailUpdateTime,
 		host.NodeKey,
@@ -209,6 +207,18 @@ func (d *Datastore) SaveHost(host *kolide.Host) error {
 	if err = removedUnusedNics(tx, host); err != nil {
 		tx.Rollback()
 		return errors.DatabaseError(err)
+	}
+
+	if needsUpdate := host.ResetPrimaryNetwork(); needsUpdate {
+		_, err = tx.Exec(
+			"UPDATE hosts SET primary_ip_id = ? WHERE id = ?",
+			*host.PrimaryNetworkInterfaceID,
+			host.ID,
+		)
+		if err != nil {
+			tx.Rollback()
+			return errors.DatabaseError(err)
+		}
 	}
 
 	if err = tx.Commit(); err != nil {

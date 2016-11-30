@@ -385,11 +385,6 @@ func (svc service) ingestDetailQuery(host *kolide.Host, name string, rows []map[
 			message: fmt.Sprintf("ingesting query %s: %s", name, err.Error()),
 		}
 	}
-	if err = svc.ds.SaveHost(host); err != nil {
-		return osqueryError{
-			message: fmt.Sprintf("writing detail query results to host %s", err.Error()),
-		}
-	}
 
 	return nil
 }
