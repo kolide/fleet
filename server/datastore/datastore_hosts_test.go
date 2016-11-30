@@ -222,7 +222,7 @@ func testSearchHosts(t *testing.T, db kolide.Datastore) {
 	})
 	require.Nil(t, err)
 
-	_, err = db.NewHost(&kolide.Host{
+	h2, err := db.NewHost(&kolide.Host{
 		DetailUpdateTime: time.Now(),
 		NodeKey:          "2",
 		UUID:             "2",
@@ -243,6 +243,11 @@ func testSearchHosts(t *testing.T, db kolide.Datastore) {
 	assert.Len(t, hosts, 2)
 
 	host, err := db.SearchHosts("foo", h3.ID)
+	require.Nil(t, err)
+	require.Len(t, host, 1)
+	assert.Equal(t, "foo.local", host[0].HostName)
+
+	host, err = db.SearchHosts("foo", h3.ID, h2.ID)
 	require.Nil(t, err)
 	require.Len(t, host, 1)
 	assert.Equal(t, "foo.local", host[0].HostName)

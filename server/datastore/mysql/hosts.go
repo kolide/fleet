@@ -4,12 +4,13 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
-	//	. "github.com/y0ssar1an/q"
+	"github.com/y0ssar1an/q"
 )
 
 func (d *Datastore) NewHost(host *kolide.Host) (*kolide.Host, error) {
@@ -378,31 +379,35 @@ func (d *Datastore) MarkHostSeen(host *kolide.Host, t time.Time) error {
 }
 
 func (d *Datastore) searchHostsWithOmits(query string, omits ...uint) ([]kolide.Host, error) {
-	// The reason that string cocantenation is used to include query as opposed to a
-	// bindvar is that sqlx.In has a bug such that, if you have any bindvars other
-	// than those in the IN clause, sqlx.In returns an empty sql statement.
-	// I've submitted an issue https://github.com/jmoiron/sqlx/issues/260 about this
-	// TODO: update this to search on ip address in network interfaces
 	sqlStatement := `
-		SELECT *
-		FROM hosts
-		WHERE MATCH(host_name)
-		AGAINST('` + query + "*" + `' IN BOOLEAN MODE)
-		AND NOT deleted
-		AND id NOT IN (?)
+		SELECT  hst.*
+		FROM hosts AS hst
+		LEFT JOIN network_interfaces AS ni
+		ON (
+			MATCH(ni.ip_address)
+			AGAINST('%s*' IN BOOLEAN MODE)
+			AND ni.host_id NOT IN (%s)
+		)
+		WHERE MATCH(hst.host_name)
+		AGAINST('%s*' IN BOOLEAN MODE)
+		AND NOT hst.deleted
+		AND hst.id NOT IN (%s)
 		LIMIT 10
 	`
-
-	sql, args, err := sqlx.In(sqlStatement, omits)
-	if err != nil {
-		return nil, errors.DatabaseError(err)
+	excludeList := ""
+	for _, omit := range omits {
+		if excludeList != "" {
+			excludeList += ", "
+		}
+		excludeList += strconv.Itoa(int(omit))
 	}
 
-	sql = d.db.Rebind(sql)
+	sqlStatement = fmt.Sprintf(sqlStatement, query, excludeList, query, excludeList)
+	q.Q(sqlStatement)
 
 	hosts := []kolide.Host{}
 
-	if err = d.db.Select(&hosts, sql, args...); err != nil {
+	if err := d.db.Select(&hosts, sqlStatement); err != nil {
 		return nil, errors.DatabaseError(err)
 	}
 
@@ -416,16 +421,19 @@ func (d *Datastore) SearchHosts(query string, omit ...uint) ([]kolide.Host, erro
 		return d.searchHostsWithOmits(query, omit...)
 	}
 
+	query += "*"
+
 	sqlStatement := `
-		SELECT * FROM hosts
-		WHERE MATCH(host_name)
-		AGAINST(? IN BOOLEAN MODE) OR
-		id IN (SELECT host_id
-			FROM network_interfaces
-			WHERE MATCH(ip_address)
+		SELECT hst.*
+		FROM hosts AS hst
+		LEFT JOIN network_interfaces AS ni
+		ON (
+			MATCH(ni.ip_address)
 			AGAINST(? IN BOOLEAN MODE)
 		)
-		AND not deleted
+		WHERE MATCH(hst.host_name)
+		AGAINST(? IN BOOLEAN MODE)
+		AND NOT hst.deleted
 		LIMIT 10
 	`
 	hosts := []kolide.Host{}
