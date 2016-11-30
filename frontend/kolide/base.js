@@ -14,7 +14,7 @@ class Base {
     const { host, origin } = global.window.location;
 
     this.baseURL = `${origin}/api`;
-    this.websocketHost = `wss://${host}/api`;
+    this.websocketBaseURL = `wss://${host}/api`;
     this.bearerToken = local.getItem('auth_token');
   }
 

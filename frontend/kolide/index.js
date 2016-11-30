@@ -246,11 +246,7 @@ class Kolide extends Base {
   }
 
   runQueryWebsocket = (campaignID) => {
-    const socket = new global.WebSocket(`${this.websocketHost}/v1/kolide/results/${campaignID}`);
-
-    socket.onmessage = ({ data }) => {
-      console.log('websocket event', data);
-    };
+    const socket = new global.WebSocket(`${this.websocketBaseURL}/v1/kolide/results/${campaignID}`);
 
     socket.onopen = () => {
       socket.send(JSON.stringify({ type: 'auth', data: { token: local.getItem('auth_token') } }));
