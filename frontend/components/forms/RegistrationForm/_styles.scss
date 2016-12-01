@@ -2,6 +2,7 @@
   @include display(flex);
   @include align-content(center);
   @include justify-content(center);
+  @include flex-grow(1);
 
   &__logo {
     @include position(absolute, 15px null null 15px);
@@ -13,12 +14,14 @@
   }
 
   &__container {
+    @include align-self(center);
     @include size(500px 520px);
     border-radius: 4px;
     background-color: $bg-light;
     box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.3);
     box-sizing: border-box;
     padding: 25px 35px;
+    margin-top: -55px;
 
     &--complete {
       padding: 0;
@@ -35,22 +38,23 @@
   }
 
   &__form {
+    @include transform(translateY(-85px));
     width: 100%;
-    height: calc(100% - 300px);
+    height: 470px;
     position: absolute;
-    top: 260px;
+    top: 50%;
     left: 0;
     overflow: hidden;
     box-sizing: border-box;
     padding: 25px 0;
 
     @include breakpoint(tablet) {
-      top: 210px;
+      @include transform(translateY(-100px));
     }
 
     &--step1-complete {
       .user-registration__field-wrapper--admin {
-        left: -200px;
+        left: -184px;
       }
 
       .user-registration__field-wrapper--org {
@@ -58,17 +62,17 @@
       }
 
       .user-registration__field-wrapper--kolide {
-        left: calc(100% + 200px);
+        left: calc(100% + 184px);
       }
     }
 
     &--step2-complete {
       .user-registration__field-wrapper--admin {
-        left: calc(-50% - 200px);
+        left: calc(-50% - 184px);
       }
 
       .user-registration__field-wrapper--org {
-        left: -200px;
+        left: -184px;
       }
 
       .user-registration__field-wrapper--kolide {
@@ -78,15 +82,15 @@
 
     &--step3-complete {
       .user-registration__field-wrapper--admin {
-        left: calc(-100% - 200px);
+        left: calc(-100% - 184px);
       }
 
       .user-registration__field-wrapper--org {
-        left: calc(-50% - 200px);
+        left: calc(-50% - 184px);
       }
 
       .user-registration__field-wrapper--kolide {
-        left: -200px;
+        left: -184px;
       }
     }
 
@@ -161,12 +165,12 @@
     }
 
     &--org {
-      left: calc(100% + 200px);
+      left: calc(100% + 184px);
     }
 
     &--kolide {
       top: 45px;
-      left: calc(150% + 200px);
+      left: calc(150% + 184px);
     }
 
     input {
@@ -196,6 +200,6 @@
     position: relative;
     z-index: 2;
     width: 500px;
-    height: 540px;
+    height: 500px;
   }
 }

@@ -90,7 +90,7 @@ export class RegistrationPage extends Component {
     }
 
     return (
-      <div>
+      <div className="registration-page">
         <Breadcrumbs onClick={onSetPage} page={page} />
         <RegistrationForm page={page} onNextPage={onNextPage} onSubmit={onRegistrationFormSubmit} />
       </div>
