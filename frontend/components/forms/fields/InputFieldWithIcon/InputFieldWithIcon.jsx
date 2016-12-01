@@ -10,11 +10,14 @@ class InputFieldWithIcon extends InputField {
   static propTypes = {
     autofocus: PropTypes.bool,
     error: PropTypes.string,
+    hint: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
     iconName: PropTypes.string,
     name: PropTypes.string,
     onChange: PropTypes.func,
     placeholder: PropTypes.string,
+    tabIndex: PropTypes.number,
     type: PropTypes.string,
+    className: PropTypes.string,
   };
 
   renderHeading = () => {
@@ -32,13 +35,24 @@ class InputFieldWithIcon extends InputField {
     return <div className={labelClasses}>{placeholder}</div>;
   }
 
+  renderHint = () => {
+    const { hint } = this.props;
+
+    if (hint) {
+      return <span className={`${baseClass}__hint`}>{hint}</span>;
+    }
+
+    return false;
+  }
+
   render () {
-    const { error, iconName, name, placeholder, type, value } = this.props;
-    const { onInputChange } = this;
+    const { className, error, iconName, name, placeholder, tabIndex, type, value } = this.props;
+    const { onInputChange, renderHint } = this;
 
     const inputClasses = classnames(
       `${baseClass}__input`,
       'input-with-icon',
+      className,
       { [`${baseClass}__input--error`]: error },
       { [`${baseClass}__input--password`]: type === 'password' && value }
     );
@@ -58,10 +72,12 @@ class InputFieldWithIcon extends InputField {
           className={inputClasses}
           placeholder={placeholder}
           ref={(r) => { this.input = r; }}
+          tabIndex={tabIndex}
           type={type}
           value={value}
         />
         {iconName && <Icon name={iconName} className={iconClasses} />}
+        {renderHint()}
       </div>
     );
   }
