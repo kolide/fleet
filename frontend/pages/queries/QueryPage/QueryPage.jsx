@@ -13,6 +13,7 @@ import QueryComposer from 'components/queries/QueryComposer';
 import osqueryTableInterface from 'interfaces/osquery_table';
 import queryActions from 'redux/nodes/entities/queries/actions';
 import queryInterface from 'interfaces/query';
+import QueryResultsTable from 'components/queries/QueryResultsTable';
 import QuerySidePanel from 'components/side_panels/QuerySidePanel';
 import { renderFlash } from 'redux/nodes/notifications/actions';
 import { selectOsqueryTable, setQueryText, setSelectedTargets, setSelectedTargetsQuery } from 'redux/nodes/components/QueryPages/actions';
@@ -133,7 +134,6 @@ class QueryPage extends Component {
 
               return dispatch(update(this.campaign, socketData))
                 .then((updatedCampaign) => {
-                  console.log('updatedCampaign', updatedCampaign);
                   this.campaign = updatedCampaign;
                 });
             };
@@ -238,6 +238,7 @@ class QueryPage extends Component {
     } = this;
     const { queryIsRunning, targetsCount } = this.state;
     const {
+      campaign,
       query,
       queryText,
       selectedOsqueryTable,
@@ -262,6 +263,7 @@ class QueryPage extends Component {
           selectedOsqueryTable={selectedOsqueryTable}
           queryText={queryText}
         />
+        {campaign && <QueryResultsTable campaign={campaign} />}
         <QuerySidePanel
           onOsqueryTableSelect={onOsqueryTableSelect}
           onTextEditorInputChange={onTextEditorInputChange}
