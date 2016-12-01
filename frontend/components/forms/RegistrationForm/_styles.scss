@@ -4,15 +4,6 @@
   @include justify-content(center);
   @include flex-grow(1);
 
-  &__logo {
-    @include position(absolute, 15px null null 15px);
-    width: 200px;
-
-    @include breakpoint(tablet) {
-      width: 125px;
-    }
-  }
-
   &__container {
     @include align-self(center);
     @include size(500px 520px);

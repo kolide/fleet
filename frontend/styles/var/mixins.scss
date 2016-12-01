@@ -5,7 +5,7 @@ $max-width: 2560px;
 
 @mixin breakpoint($size: desktop) {
   @if ($size == tablet) {
-    @media (min-width: $min-width) and (max-width: $medium-width) {
+    @media (max-width: $medium-width) {
       @content;
     }
   } @else if ($size == ltdesktop) {
