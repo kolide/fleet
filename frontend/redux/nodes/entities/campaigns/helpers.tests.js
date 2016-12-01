@@ -2,40 +2,37 @@ import expect from 'expect';
 
 import helpers from './helpers';
 
+const host = {
+  hostname: 'jmeller-mbp.local',
+  id: 1,
+};
 const campaign = {
-  created_at: '0001-01-01T00:00:00Z',
-  deleted: false,
-  deleted_at: null,
   id: 4,
   query_id: 12,
   status: 0,
-  updated_at: '0001-01-01T00:00:00Z',
   user_id: 1,
 };
 const campaignWithResults = {
-  created_at: '0001-01-01T00:00:00Z',
-  deleted: false,
-  deleted_at: null,
-  id: 4,
-  query_id: 12,
+  ...campaign,
+  hosts: [{ id: 2, hostname: 'some-machine' }],
   query_results: [
-    { distributed_query_execution_id: 4, host: {}, rows: [] },
+    { host: 'some-machine', feature: 'vendor', value: 'GenuineIntel' },
   ],
-  status: 0,
   totals: {
     count: 3,
     online: 2,
   },
-  updated_at: '0001-01-01T00:00:00Z',
-  user_id: 1,
 };
 const { destroyFunc, updateFunc } = helpers;
 const resultSocketData = {
   type: 'result',
   data: {
     distributed_query_execution_id: 5,
-    host: {},
-    rows: [],
+    host,
+    rows: [
+      { feature: 'product_name', value: 'Intel Core' },
+      { feature: 'family', value: '0600' },
+    ],
   },
 };
 const totalsSocketData = {
@@ -63,9 +60,11 @@ describe('campaign entity - helpers', () => {
       updateFunc(campaignWithResults, resultSocketData)
         .then((response) => {
           expect(response.query_results).toEqual([
-            { distributed_query_execution_id: 4, host: {}, rows: [] },
-            resultSocketData.data,
+            ...campaignWithResults.query_results,
+            { hostname: host.hostname, feature: 'product_name', value: 'Intel Core' },
+            { hostname: host.hostname, feature: 'family', value: '0600' },
           ]);
+          expect(response.hosts).toInclude(host);
           done();
         })
         .catch(done);
@@ -75,8 +74,10 @@ describe('campaign entity - helpers', () => {
       updateFunc(campaign, resultSocketData)
         .then((response) => {
           expect(response.query_results).toEqual([
-            resultSocketData.data,
+            { hostname: host.hostname, feature: 'product_name', value: 'Intel Core' },
+            { hostname: host.hostname, feature: 'family', value: '0600' },
           ]);
+          expect(response.hosts).toInclude(host);
           done();
         })
         .catch(done);

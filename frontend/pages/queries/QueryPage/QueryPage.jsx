@@ -139,14 +139,14 @@ class QueryPage extends Component {
             };
           });
       })
-      .catch((error) => {
-        if (error === 'resource already created') {
+      .catch((campaignError) => {
+        if (campaignError === 'resource already created') {
           dispatch(renderFlash('error', 'A campaign with the provided query text has already been created'));
 
           return false;
         }
 
-        dispatch(renderFlash('error', error));
+        dispatch(renderFlash('error', campaignError));
 
         return false;
       });

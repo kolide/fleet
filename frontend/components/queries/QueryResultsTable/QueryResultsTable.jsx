@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { keys, some, values } from 'lodash';
+import { get, keys, omit, values } from 'lodash';
 
 import campaignInterface from 'interfaces/campaign';
+import ProgressBar from 'components/ProgressBar';
 
 const baseClass = 'query-results-table';
 
@@ -10,16 +11,34 @@ class QueryResultsTable extends Component {
     campaign: campaignInterface.isRequired,
   };
 
+  renderProgressDetails = () => {
+    const { campaign } = this.props;
+    const totalHostsCount = get(campaign, 'totals.count', 0);
+    const totalHostsReturned = get(campaign, 'hosts.length', 0);
+    const totalRowsCount = get(campaign, 'query_results.length', 0);
+
+    return (
+      <div className={`${baseClass}__progress-details`}>
+        <span>
+          <b>{totalHostsReturned}</b>&nbsp;of&nbsp;
+          <b>{totalHostsCount} Hosts</b>&nbsp;Returning&nbsp;
+          <b>{totalRowsCount} Records</b>
+        </span>
+        <ProgressBar max={totalHostsCount} value={totalHostsReturned} />
+      </div>
+    );
+  }
+
   renderTableHeaderRow = () => {
     const { campaign } = this.props;
     const { query_results: queryResults } = campaign;
 
-    const { rows } = queryResults[0];
-    const queryResultColumns = keys(rows[0]);
+    const queryAttrs = omit(queryResults[0], ['hostname']);
+    const queryResultColumns = keys(queryAttrs);
 
     return (
       <tr>
-        <th>hostname</th>
+        <th>host</th>
         {queryResultColumns.map((column) => {
           return <th key={column}>{column}</th>;
         })}
@@ -31,56 +50,47 @@ class QueryResultsTable extends Component {
     const { campaign } = this.props;
     const { query_results: queryResults } = campaign;
 
-    if (!queryResults) {
-      return false;
-    }
+    return queryResults.map((row) => {
+      const queryAttrs = omit(row, ['hostname']);
+      const queryResult = values(queryAttrs);
 
-
-    return queryResults.map((result) => {
-      const { host, rows } = result;
-
-      return rows.map((row) => {
-        const rowResults = values(row);
-
-        return (
-          <tr>
-            <td>{host.hostname}</td>
-            {rowResults.map((rowData, i) => {
-              return <td key={`query-results-table-row-${i}`}>{rowData}</td>;
-            })}
-          </tr>
-        );
-      });
+      return (
+        <tr>
+          <td>{row.hostname}</td>
+          {queryResult.map((attribute, i) => {
+            return <td key={`query-results-table-row-${i}`}>{attribute}</td>;
+          })}
+        </tr>
+      );
     });
   }
 
   render () {
     const { campaign } = this.props;
-    const { renderTableRows, renderTableHeaderRow } = this;
+    const {
+      renderProgressDetails,
+      renderTableHeaderRow,
+      renderTableRows,
+    } = this;
     const { query_results: queryResults } = campaign;
 
-    if (!queryResults) {
-      return false;
-    }
-
-    const rowsPresent = some(queryResults, (result) => {
-      return result.rows.length;
-    });
-
-    if (!rowsPresent) {
+    if (!queryResults || !queryResults.length) {
       return false;
     }
 
     return (
-      <div className={`${baseClass} ${baseClass}__wrapper`}>
-        <table className={`${baseClass}__table`}>
-          <thead>
-            {renderTableHeaderRow()}
-          </thead>
-          <tbody>
-            {renderTableRows()}
-          </tbody>
-        </table>
+      <div className={baseClass}>
+        {renderProgressDetails()}
+        <div className={`${baseClass}__table-wrapper`}>
+          <table className={`${baseClass}__table`}>
+            <thead>
+              {renderTableHeaderRow()}
+            </thead>
+            <tbody>
+              {renderTableRows()}
+            </tbody>
+          </table>
+        </div>
       </div>
     );
   }

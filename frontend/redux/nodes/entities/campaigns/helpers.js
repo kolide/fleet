@@ -15,12 +15,21 @@ export const updateFunc = (campaign, socketData) => {
 
     if (type === 'result') {
       const queryResults = campaign.query_results || [];
+      const hosts = campaign.hosts || [];
+      const { host, rows } = data;
+      const newQueryResults = rows.map((row) => {
+        return { ...row, hostname: host.hostname };
+      });
 
       return resolve({
         ...campaign,
+        hosts: [
+          ...hosts,
+          host,
+        ],
         query_results: [
           ...queryResults,
-          data,
+          ...newQueryResults,
         ],
       });
     }

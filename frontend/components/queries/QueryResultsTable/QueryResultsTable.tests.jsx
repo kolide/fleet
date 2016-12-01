@@ -23,16 +23,7 @@ const host = {
 const queryResult = {
   distributed_query_execution_id: 4,
   host,
-  rows: [
-    {
-      cmdline: "osqueryd --flagfile=/etc/osquery/osquery.flags",
-      cwd: "/",
-      egid: "0",
-      euid: "0",
-      gid: "0",
-      name: "osqueryd",
-    },
-  ],
+  rows: [{ cwd: '/' }],
 };
 
 const campaignWithNoQueryResults = {
@@ -52,7 +43,7 @@ const campaignWithNoQueryResults = {
 const campaignWithQueryResults = {
   ...campaignWithNoQueryResults,
   query_results: [
-    queryResult,
+    { hostname: host.hostname, cwd: '/' },
   ],
 };
 
@@ -71,6 +62,12 @@ describe('QueryResultsTable - component', () => {
 
   it('does not return HTML when there are no query results', () => {
     expect(componentWithoutQueryResults.html()).toNotExist();
+  });
+
+  it('renders a ProgressBar component', () => {
+    expect(
+      componentWithQueryResults.find('ProgressBar').length
+    ).toEqual(1);
   });
 
   it('sets the column headers to the keys of the query results', () => {
