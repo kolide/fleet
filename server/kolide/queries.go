@@ -24,14 +24,14 @@ type QueryService interface {
 }
 
 type QueryPayload struct {
-	Name         *string
-	Description  *string
-	Query        *string
-	Interval     *uint
-	Snapshot     *bool
-	Differential *bool
-	Platform     *string
-	Version      *string
+	Name         *string `json:"name"`
+	Description  *string `json:"description"`
+	Query        *string `json:"query"`
+	Interval     *uint   `json:"interval"`
+	Snapshot     *bool   `json:"snapshot"`
+	Differential *bool   `json:"differential"`
+	Platform     *string `json:"platform"`
+	Version      *string `json:"version"`
 }
 
 type Query struct {
