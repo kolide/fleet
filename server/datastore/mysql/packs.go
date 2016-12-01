@@ -1,8 +1,8 @@
 package mysql
 
 import (
-	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
+	"github.com/pkg/errors"
 )
 
 // NewPack creates a new Pack
@@ -15,7 +15,7 @@ func (d *Datastore) NewPack(pack *kolide.Pack) (*kolide.Pack, error) {
 
 	result, err := d.db.Exec(sql, pack.Name, pack.Description, pack.Platform, pack.CreatedBy, pack.Disabled)
 	if err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, "create new pack")
 	}
 
 	id, _ := result.LastInsertId()
@@ -34,10 +34,11 @@ func (d *Datastore) SavePack(pack *kolide.Pack) error {
 
 	_, err := d.db.Exec(sql, pack.Name, pack.Platform, pack.Disabled, pack.Description, pack.ID)
 	if err != nil {
-		return errors.DatabaseError(err)
+		return errors.Wrap(err, "SavePack$db.Exec")
 	}
 
 	return nil
+
 }
 
 // DeletePack soft deletes a kolide.Pack so that it won't show up in results
@@ -48,11 +49,7 @@ func (d *Datastore) DeletePack(pid uint) error {
 			WHERE id = ?
 	`
 	_, err := d.db.Exec(sql, d.clock.Now(), pid)
-	if err != nil {
-		return errors.DatabaseError(err)
-	}
-
-	return nil
+	return err
 }
 
 // Pack fetch kolide.Pack with matching ID
@@ -63,7 +60,7 @@ func (d *Datastore) Pack(pid uint) (*kolide.Pack, error) {
 	`
 	pack := &kolide.Pack{}
 	if err := d.db.Get(pack, sql, pid); err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrapf(err, "failed to get pack", pid)
 	}
 
 	return pack, nil
@@ -78,7 +75,7 @@ func (d *Datastore) ListPacks(opt kolide.ListOptions) ([]*kolide.Pack, error) {
 	sql = appendListOptionsToSQL(sql, opt)
 	packs := []*kolide.Pack{}
 	if err := d.db.Select(&packs, sql); err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, "list packs")
 	}
 	return packs, nil
 }
@@ -90,7 +87,7 @@ func (d *Datastore) AddQueryToPack(qid uint, pid uint) error {
 			VALUES (?, ?)
 	`
 	if _, err := d.db.Exec(sql, pid, qid); err != nil {
-		return errors.DatabaseError(err)
+		return errors.Wrap(err, "add query to pack")
 	}
 
 	return nil
@@ -122,7 +119,7 @@ func (d *Datastore) ListQueriesInPack(pack *kolide.Pack) ([]*kolide.Query, error
 	`
 	queries := []*kolide.Query{}
 	if err := d.db.Select(&queries, sql, pack.ID); err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, "list queries in pack")
 	}
 	return queries, nil
 }
@@ -134,7 +131,7 @@ func (d *Datastore) RemoveQueryFromPack(query *kolide.Query, pack *kolide.Pack) 
 			WHERE pack_id = ? AND query_id = ?
 	`
 	if _, err := d.db.Exec(sql, pack.ID, query.ID); err != nil {
-		return errors.DatabaseError(err)
+		return errors.Wrap(err, "remove query from pack")
 	}
 
 	return nil
@@ -148,11 +145,7 @@ func (d *Datastore) AddLabelToPack(lid uint, pid uint) error {
 			VALUES ( ?, ?, ? )
 	`
 	_, err := d.db.Exec(sql, pid, kolide.TargetLabel, lid)
-	if err != nil {
-		return errors.DatabaseError(err)
-	}
-
-	return nil
+	return err
 }
 
 // ListLabelsForPack will return a list of kolide.Label records associated with kolide.Pack
@@ -179,7 +172,7 @@ func (d *Datastore) ListLabelsForPack(pid uint) ([]*kolide.Label, error) {
 	labels := []*kolide.Label{}
 
 	if err := d.db.Select(&labels, sql, kolide.TargetLabel, pid); err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, "ListLabelsForPack$db.Select")
 	}
 
 	return labels, nil
@@ -193,7 +186,7 @@ func (d *Datastore) RemoveLabelFromPack(label *kolide.Label, pack *kolide.Pack) 
 			WHERE target_id = ? AND pack_id = ?
 	`
 	if _, err := d.db.Exec(sql, label.ID, pack.ID); err != nil {
-		return errors.DatabaseError(err)
+		return errors.Wrap(err, "remove label from pack")
 	}
 
 	return nil
@@ -219,7 +212,7 @@ func (d *Datastore) ListHostsInPack(pid uint, opt kolide.ListOptions) ([]*kolide
 	sql = appendListOptionsToSQL(sql, opt)
 	hosts := []*kolide.Host{}
 	if err := d.db.Select(&hosts, sql, kolide.TargetLabel, kolide.TargetHost, pid); err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, "ListHostsInPack$db.Select")
 	}
 	return hosts, nil
 }

@@ -3,7 +3,6 @@ package inmem
 import (
 	"sort"
 
-	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
 )
 
@@ -14,7 +13,7 @@ func (orm *Datastore) NewInvite(invite *kolide.Invite) (*kolide.Invite, error) {
 
 	for _, in := range orm.invites {
 		if in.Email == invite.Email {
-			return nil, errors.ErrExists
+			return nil, notFound("Invite", invite.ID)
 		}
 	}
 
@@ -70,7 +69,7 @@ func (orm *Datastore) Invite(id uint) (*kolide.Invite, error) {
 	if invite, ok := orm.invites[id]; ok {
 		return invite, nil
 	}
-	return nil, errors.ErrNotFound
+	return nil, notFound("Invite", id)
 }
 
 // InviteByEmail retrieves an invite for a specific email address.
@@ -83,7 +82,7 @@ func (orm *Datastore) InviteByEmail(email string) (*kolide.Invite, error) {
 			return invite, nil
 		}
 	}
-	return nil, errors.ErrNotFound
+	return nil, notFound("Invite", 0)
 }
 
 // SaveInvite saves an invitation in the datastore.
@@ -92,7 +91,7 @@ func (orm *Datastore) SaveInvite(invite *kolide.Invite) error {
 	defer orm.mtx.Unlock()
 
 	if _, ok := orm.invites[invite.ID]; !ok {
-		return errors.ErrNotFound
+		return notFound("Invite", invite.ID)
 	}
 
 	orm.invites[invite.ID] = invite
@@ -105,7 +104,7 @@ func (orm *Datastore) DeleteInvite(invite *kolide.Invite) error {
 	defer orm.mtx.Unlock()
 
 	if _, ok := orm.invites[invite.ID]; !ok {
-		return errors.ErrNotFound
+		return notFound("Invite", invite.ID)
 	}
 	delete(orm.invites, invite.ID)
 	return nil

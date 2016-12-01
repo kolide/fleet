@@ -2,12 +2,11 @@ package mysql
 
 import (
 	"database/sql"
-	"net/http"
 	"time"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
+	"github.com/pkg/errors"
 )
 
 func (d *Datastore) NewHost(host *kolide.Host) (*kolide.Host, error) {
@@ -31,14 +30,13 @@ func (d *Datastore) NewHost(host *kolide.Host) (*kolide.Host, error) {
 		host.NodeKey, host.HostName, host.UUID, host.Platform, host.OsqueryVersion,
 		host.OSVersion, host.Uptime, host.PhysicalMemory, host.PrimaryMAC, host.PrimaryIP)
 	if err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, "creating new host")
 	}
 	id, _ := result.LastInsertId()
 	host.ID = uint(id)
 	return host, nil
 }
 
-// TODO needs test
 func (d *Datastore) SaveHost(host *kolide.Host) error {
 	sqlStatement := `
 		UPDATE hosts SET
@@ -60,13 +58,12 @@ func (d *Datastore) SaveHost(host *kolide.Host) error {
 		host.OSVersion, host.Uptime, host.PhysicalMemory, host.PrimaryMAC,
 		host.PrimaryIP, host.ID)
 	if err != nil {
-		return errors.DatabaseError(err)
+		return errors.Wrap(err, "save host")
 	}
 
 	return nil
 }
 
-// TODO needs test
 func (d *Datastore) DeleteHost(host *kolide.Host) error {
 	sqlStatement := `
 		UPDATE hosts SET
@@ -76,29 +73,26 @@ func (d *Datastore) DeleteHost(host *kolide.Host) error {
 	`
 	_, err := d.db.Exec(sqlStatement, d.clock.Now(), host.ID)
 	if err != nil {
-		return errors.DatabaseError(err)
+		return errors.Wrap(err, "delete host")
 	}
 
 	return nil
 }
 
-// TODO needs test
 func (d *Datastore) Host(id uint) (*kolide.Host, error) {
 	sqlStatement := `
 		SELECT * FROM hosts
 		WHERE id = ? AND NOT deleted LIMIT 1
 	`
-	host := &kolide.Host{}
-	err := d.db.Get(host, sqlStatement, id)
-	if err != nil {
-		return nil, errors.DatabaseError(err)
+	var host kolide.Host
+	if err := d.db.Get(&host, sqlStatement, id); err != nil {
+		return nil, errors.Wrap(err, "get host")
 	}
 
-	return host, nil
+	return &host, nil
 
 }
 
-// TODO needs test
 func (d *Datastore) ListHosts(opt kolide.ListOptions) ([]*kolide.Host, error) {
 	sqlStatement := `
 		SELECT * FROM hosts
@@ -107,7 +101,7 @@ func (d *Datastore) ListHosts(opt kolide.ListOptions) ([]*kolide.Host, error) {
 	sqlStatement = appendListOptionsToSQL(sqlStatement, opt)
 	hosts := []*kolide.Host{}
 	if err := d.db.Select(&hosts, sqlStatement); err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, "list hosts")
 	}
 
 	return hosts, nil
@@ -116,7 +110,7 @@ func (d *Datastore) ListHosts(opt kolide.ListOptions) ([]*kolide.Host, error) {
 // EnrollHost enrolls a host
 func (d *Datastore) EnrollHost(uuid, hostname, ip, platform string, nodeKeySize int) (*kolide.Host, error) {
 	if uuid == "" {
-		return nil, errors.New("missing uuid for host enrollment", "programmer error")
+		return nil, errors.New("missing uuid for host enrollment, likely programmer error")
 	}
 	// REVIEW If a deleted host is enrolled, it is undeleted
 	sqlInsert := `
@@ -151,22 +145,21 @@ func (d *Datastore) EnrollHost(uuid, hostname, ip, platform string, nodeKeySize 
 	var result sql.Result
 
 	result, err = d.db.Exec(sqlInsert, args...)
-
 	if err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, "insert host")
 	}
 
 	id, _ := result.LastInsertId()
 	sqlSelect := `
 		SELECT * FROM hosts WHERE id = ? LIMIT 1
 	`
-	host := &kolide.Host{}
-	err = d.db.Get(host, sqlSelect, id)
+	var host kolide.Host
+	err = d.db.Get(&host, sqlSelect, id)
 	if err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, "get host")
 	}
 
-	return host, nil
+	return &host, nil
 
 }
 
@@ -179,16 +172,15 @@ func (d *Datastore) AuthenticateHost(nodeKey string) (*kolide.Host, error) {
 	if err := d.db.Get(host, sqlStatement, nodeKey); err != nil {
 		switch err {
 		case sql.ErrNoRows:
-			e := errors.NewFromError(err, http.StatusUnauthorized, "invalid node key")
-			e.Extra = map[string]interface{}{"node_invalid": "true"}
-			return nil, e
+			// TODO: test error with osqueryd
+			// possibly add custom error type here.
+			return nil, errors.Wrap(err, "invalid node key")
 		default:
-			return nil, errors.DatabaseError(err)
+			return nil, errors.Wrap(err, "authenticate host")
 		}
 	}
 
 	return host, nil
-
 }
 
 func (d *Datastore) MarkHostSeen(host *kolide.Host, t time.Time) error {
@@ -200,7 +192,7 @@ func (d *Datastore) MarkHostSeen(host *kolide.Host, t time.Time) error {
 
 	_, err := d.db.Exec(sqlStatement, t, host.NodeKey)
 	if err != nil {
-		return errors.DatabaseError(err)
+		return errors.Wrap(err, "mark host seen")
 	}
 
 	host.UpdatedAt = t
@@ -208,7 +200,7 @@ func (d *Datastore) MarkHostSeen(host *kolide.Host, t time.Time) error {
 }
 
 func (d *Datastore) searchHostsWithOmits(query string, omits ...uint) ([]kolide.Host, error) {
-	// The reason that string cocantenation is used to include query as opposed to a
+	// The reason that string concatenation is used to include query as opposed to a
 	// bindvar is that sqlx.In has a bug such that, if you have any bindvars other
 	// than those in the IN clause, sqlx.In returns an empty sql statement.
 	// I've submitted an issue https://github.com/jmoiron/sqlx/issues/260 about this
@@ -224,7 +216,7 @@ func (d *Datastore) searchHostsWithOmits(query string, omits ...uint) ([]kolide.
 
 	sql, args, err := sqlx.In(sqlStatement, omits)
 	if err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, "search hosts with omits: sqlx.In")
 	}
 
 	sql = d.db.Rebind(sql)
@@ -232,7 +224,7 @@ func (d *Datastore) searchHostsWithOmits(query string, omits ...uint) ([]kolide.
 	hosts := []kolide.Host{}
 
 	if err = d.db.Select(&hosts, sql, args...); err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, "search hosts with omits: select hosts")
 	}
 
 	return hosts, nil
@@ -255,7 +247,7 @@ func (d *Datastore) SearchHosts(query string, omit ...uint) ([]kolide.Host, erro
 	hosts := []kolide.Host{}
 
 	if err := d.db.Select(&hosts, sqlStatement, query); err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, "search hosts: select")
 	}
 
 	return hosts, nil
@@ -283,7 +275,7 @@ func (d *Datastore) DistributedQueriesForHost(host *kolide.Host) (map[uint]strin
 	rows, err := d.db.Query(sqlStatement, kolide.TargetLabel, kolide.TargetLabel,
 		kolide.TargetHost, kolide.QueryRunning, host.ID)
 	if err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, "distributed queries for host: query")
 	}
 	defer rows.Close()
 
@@ -294,9 +286,8 @@ func (d *Datastore) DistributedQueriesForHost(host *kolide.Host) (map[uint]strin
 			id    uint
 			query string
 		)
-		err = rows.Scan(&id, &query)
-		if err != nil {
-			return nil, errors.DatabaseError(err)
+		if err := rows.Scan(&id, &query); err != nil {
+			return nil, errors.Wrap(err, "distributed queries for host: scan")
 		}
 
 		results[id] = query

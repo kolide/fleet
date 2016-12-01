@@ -1,8 +1,8 @@
 package mysql
 
 import (
-	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
+	"github.com/pkg/errors"
 )
 
 // NewInvite generates a new invitation
@@ -33,9 +33,8 @@ func (d *Datastore) ListInvites(opt kolide.ListOptions) ([]*kolide.Invite, error
 	invites := []*kolide.Invite{}
 
 	sql := appendListOptionsToSQL("SELECT * FROM invites WHERE NOT deleted", opt)
-	err := d.db.Select(&invites, sql)
-	if err != nil {
-		return nil, errors.DatabaseError(err)
+	if err := d.db.Select(&invites, sql); err != nil {
+		return nil, errors.Wrap(err, "list invites")
 	}
 	return invites, nil
 }
@@ -45,7 +44,7 @@ func (d *Datastore) Invite(id uint) (*kolide.Invite, error) {
 	invite := &kolide.Invite{}
 	err := d.db.Get(invite, "SELECT * FROM invites WHERE id = ? AND NOT deleted", id)
 	if err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, "get invite")
 	}
 	return invite, nil
 }
@@ -55,7 +54,7 @@ func (d *Datastore) InviteByEmail(email string) (*kolide.Invite, error) {
 	invite := &kolide.Invite{}
 	err := d.db.Get(invite, "SELECT * FROM invites WHERE email = ? AND NOT deleted", email)
 	if err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, "get invite by email")
 	}
 	return invite, nil
 }
@@ -71,7 +70,7 @@ func (d *Datastore) SaveInvite(i *kolide.Invite) error {
 		i.Admin, i.Name, i.Position, i.Token, i.ID,
 	)
 	if err != nil {
-		return errors.DatabaseError(err)
+		return errors.Wrap(err, "save invite")
 	}
 
 	return nil
@@ -86,7 +85,7 @@ func (d *Datastore) DeleteInvite(i *kolide.Invite) error {
 	`
 	_, err := d.db.Exec(sql, i.DeletedAt, true, i.ID)
 	if err != nil {
-		return errors.DatabaseError(err)
+		return errors.Wrap(err, "delete invite")
 	}
 	return nil
 }

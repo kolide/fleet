@@ -3,7 +3,6 @@ package inmem
 import (
 	"sort"
 
-	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
 )
 
@@ -15,7 +14,7 @@ func (orm *Datastore) NewQuery(query *kolide.Query) (*kolide.Query, error) {
 
 	for _, q := range orm.queries {
 		if query.Name == q.Name {
-			return nil, errors.ErrExists
+			return nil, alreadyExists("Query", query.ID)
 		}
 	}
 
@@ -30,7 +29,7 @@ func (orm *Datastore) SaveQuery(query *kolide.Query) error {
 	defer orm.mtx.Unlock()
 
 	if _, ok := orm.queries[query.ID]; !ok {
-		return errors.ErrNotFound
+		return notFound("Query", query.ID)
 	}
 
 	orm.queries[query.ID] = query
@@ -42,7 +41,7 @@ func (orm *Datastore) DeleteQuery(query *kolide.Query) error {
 	defer orm.mtx.Unlock()
 
 	if _, ok := orm.queries[query.ID]; !ok {
-		return errors.ErrNotFound
+		return notFound("Query", query.ID)
 	}
 
 	delete(orm.queries, query.ID)
@@ -55,7 +54,7 @@ func (orm *Datastore) Query(id uint) (*kolide.Query, error) {
 
 	query, ok := orm.queries[id]
 	if !ok {
-		return nil, errors.ErrNotFound
+		return nil, notFound("Query", id)
 	}
 
 	return query, nil

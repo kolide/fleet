@@ -6,6 +6,7 @@ import (
 
 	"github.com/WatchBeam/clock"
 	"github.com/go-kit/kit/log"
+	"github.com/pkg/errors"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/kolide/kolide-ose/server/config"
@@ -40,7 +41,7 @@ func New(dbConnectString string, c clock.Clock, opts ...DBOption) (*Datastore, e
 
 	db, err := sqlx.Open("mysql", dbConnectString)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "sqlx Open")
 	}
 
 	var dbError error
@@ -76,7 +77,7 @@ func (d *Datastore) Migrate() error {
 	goose.SetDialect("mysql")
 
 	if err := goose.Run("up", d.db.DB, "."); err != nil {
-		return err
+		return errors.Wrap(err, "running up migration")
 	}
 
 	return nil

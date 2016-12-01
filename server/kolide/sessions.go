@@ -1,31 +1,32 @@
 package kolide
 
 import (
+	"errors"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
-	"github.com/kolide/kolide-ose/server/errors"
 	"golang.org/x/net/context"
 )
 
-const publicErrorMessage string = "Session error"
-
+// TODO: @groob add error type for these errors
+// the exported ones are only checked once
+// the private ones are not checked
 var (
 	// An error returned by SessionStore.Get() if no session record was found
 	// in the database
-	ErrNoActiveSession = errors.New(publicErrorMessage, "Active session is not present in the database")
+	ErrNoActiveSession = errors.New("session: active session is not present in the database")
 
 	// An error returned by SessionStore methods when no session object has
 	// been created yet but the requested action requires one
-	ErrSessionNotCreated = errors.New(publicErrorMessage, "The session has not been created")
+	ErrSessionNotCreated = errors.New("session: the session has not been created")
 
 	// An error returned by SessionStore.Get() when a session is requested but
 	// it has expired
-	ErrSessionExpired = errors.New(publicErrorMessage, "The session has expired")
+	ErrSessionExpired = errors.New("session: the session has expired")
 
 	// An error returned by SessionStore which indicates that the token
 	// or it's content were malformed
-	ErrSessionMalformed = errors.New(publicErrorMessage, "The session token was malformed")
+	errSessionMalformed = errors.New("session: the session token was malformed")
 )
 
 // SessionStore is the abstract interface that all session backends must
@@ -94,7 +95,7 @@ func ParseJWT(token, jwtKey string) (*jwt.Token, error) {
 	return jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
 		method, ok := t.Method.(*jwt.SigningMethodHMAC)
 		if !ok || method != jwt.SigningMethodHS256 {
-			return nil, errors.New(publicErrorMessage, "Unexpected signing method")
+			return nil, errors.New("session: unexpected signing method")
 		}
 		return []byte(jwtKey), nil
 	})
