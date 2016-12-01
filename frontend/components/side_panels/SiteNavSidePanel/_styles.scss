@@ -42,6 +42,10 @@
     &:hover {
       color: $text-dark;
     }
+
+    @include breakpoint(tablet) {
+      height: 50px;
+    }
   }
 
   &--active {
@@ -71,6 +75,12 @@
         &::before {
           display: none;
         }
+      }
+    }
+
+    @include breakpoint(tablet) {
+      .site-nav-item__icon {
+        @include transform(translate(-2px, 3px));
       }
     }
   }
@@ -141,9 +151,9 @@
     }
 
     @include breakpoint(tablet) {
-      padding: 0;
       text-align: center;
-      padding: 9px 0;
+      padding: 3px 0 9px;
+      height: 44px;
     }
   }
 
@@ -175,6 +185,10 @@
     @include breakpoint(tablet) {
       display: inline-block;
       font-size: 25px;
+
+      .kolidecon {
+        vertical-align: middle;
+      }
     }
   }
 
@@ -195,8 +209,8 @@
   position: relative;
 
   @include breakpoint(tablet) {
-    @include linear-gradient(to bottom, #9a61c6 0%, $brand 15%);
-    min-height: 55px;
+    @include linear-gradient(to bottom, #9a61c6 0%, $brand 18%, $brand 82%, #9a61c6 100%);
+    min-height: 50px;
     box-shadow: none;
   }
 
@@ -207,7 +221,7 @@
     @include breakpoint(tablet) {
       padding: 0;
       text-align: center;
-      width: 54px;
+      width: 100%;
     }
 
     &--expanded {
@@ -242,10 +256,10 @@
   position: fixed;
   top: 0;
   width: 240px;
-  z-index: 2;
+  z-index: 5;
 
   @include breakpoint(tablet) {
     padding-left: 0;
-    width: 54px;
+    width: 55px;
   }
 }
