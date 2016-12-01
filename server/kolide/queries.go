@@ -38,6 +38,7 @@ type Query struct {
 	UpdateCreateTimestamps
 	DeleteFields
 	ID           uint   `json:"id"`
+	Saved        bool   `json:"saved"`
 	Name         string `json:"name"`
 	Description  string `json:"description"`
 	Query        string `json:"query"`
