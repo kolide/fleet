@@ -187,7 +187,7 @@
       font-size: 25px;
 
       .kolidecon {
-        vertical-align: middle;
+        vertical-align: 1px;
       }
     }
   }
@@ -210,7 +210,6 @@
 
   @include breakpoint(tablet) {
     @include linear-gradient(to bottom, #9a61c6 0%, $brand 18%, $brand 82%, #9a61c6 100%);
-    min-height: 50px;
     box-shadow: none;
   }
 
