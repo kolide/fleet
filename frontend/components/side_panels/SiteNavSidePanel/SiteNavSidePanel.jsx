@@ -88,7 +88,7 @@ class SiteNavSidePanel extends Component {
 
       this.setState({ activeTab, activeSubItem });
 
-      const tabLocation = activeSubItem ? activeSubItem.path.location : activeTab.path.location
+      const tabLocation = activeSubItem ? activeSubItem.path.location : activeTab.path.location;
 
       dispatch(push(tabLocation));
 
