@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { get, keys, omit, values } from 'lodash';
 
 import campaignInterface from 'interfaces/campaign';
+import filterArrayByHash from 'utilities/filter_array_by_hash';
+import InputField from 'components/forms/fields/InputField';
 import ProgressBar from 'components/ProgressBar';
 
 const baseClass = 'query-results-table';
@@ -10,6 +12,27 @@ class QueryResultsTable extends Component {
   static propTypes = {
     campaign: campaignInterface.isRequired,
   };
+
+  constructor (props) {
+    super(props);
+
+    this.state = { resultsFilter: {} };
+  }
+
+  onFilterAttribute = (attribute) => {
+    return (value) => {
+      const { resultsFilter } = this.state;
+
+      this.setState({
+        resultsFilter: {
+          ...resultsFilter,
+          [attribute]: value,
+        },
+      });
+
+      return false;
+    };
+  }
 
   renderProgressDetails = () => {
     const { campaign } = this.props;
@@ -29,8 +52,21 @@ class QueryResultsTable extends Component {
     );
   }
 
+  renderTableHeaderRowData = (column, index) => {
+    const { onFilterAttribute } = this;
+    const { resultsFilter } = this.state;
+
+    return (
+      <th key={`query-results-table-header-${index}`}>
+        <span>{column}</span>
+        <InputField name={column} onChange={onFilterAttribute(column)} value={resultsFilter[column]} />
+      </th>
+    );
+  }
+
   renderTableHeaderRow = () => {
     const { campaign } = this.props;
+    const { renderTableHeaderRowData } = this;
     const { query_results: queryResults } = campaign;
 
     const queryAttrs = omit(queryResults[0], ['hostname']);
@@ -38,9 +74,9 @@ class QueryResultsTable extends Component {
 
     return (
       <tr>
-        <th>host</th>
-        {queryResultColumns.map((column) => {
-          return <th key={column}>{column}</th>;
+        {renderTableHeaderRowData('hostname', -1)}
+        {queryResultColumns.map((column, i) => {
+          return renderTableHeaderRowData(column, i);
         })}
       </tr>
     );
@@ -49,16 +85,18 @@ class QueryResultsTable extends Component {
   renderTableRows = () => {
     const { campaign } = this.props;
     const { query_results: queryResults } = campaign;
+    const { resultsFilter } = this.state;
+    const filteredQueryResults = filterArrayByHash(queryResults, resultsFilter);
 
-    return queryResults.map((row) => {
+    return filteredQueryResults.map((row, index) => {
       const queryAttrs = omit(row, ['hostname']);
       const queryResult = values(queryAttrs);
 
       return (
-        <tr>
+        <tr key={`query-results-table-row-${index}`}>
           <td>{row.hostname}</td>
           {queryResult.map((attribute, i) => {
-            return <td key={`query-results-table-row-${i}`}>{attribute}</td>;
+            return <td key={`query-results-table-row-data-${i}`}>{attribute}</td>;
           })}
         </tr>
       );
