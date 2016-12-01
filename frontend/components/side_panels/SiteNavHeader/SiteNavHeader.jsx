@@ -71,10 +71,10 @@ class SiteNavSidePanel extends Component {
     const headerBaseClass = 'site-nav-header';
 
     const headerToggleClass = classnames(
-      headerBaseClass,
+      `${headerBaseClass}__button`,
       'button',
       'button--unstyled',
-      { [`${headerBaseClass}--open`]: userMenuOpened }
+      { [`${headerBaseClass}__button--open`]: userMenuOpened }
     );
 
     const userStatusClass = classnames(
@@ -83,7 +83,7 @@ class SiteNavSidePanel extends Component {
     );
 
     return (
-      <header>
+      <header className={headerBaseClass}>
         <button className={headerToggleClass} onClick={toggleUserMenu} ref={(r) => { this.headerNav = r; }}>
           <div className={`${headerBaseClass}__org`}>
             <img

@@ -1,20 +1,84 @@
 .site-nav-header {
-  @include transition(background 150ms $ease-in-quad);
-  cursor: pointer;
-  padding: $pad-large $pad-medium 0;
   position: relative;
-  display: block;
-  width: 100%;
-  color: $text-ultradark;
-  text-align: left;
-  border-radius: 0;
 
-  &:hover {
-    background: $bg-medium;
-  }
+  &__button {
+    @include transition(background 150ms $ease-in-quad);
+    cursor: pointer;
+    padding: $pad-large $pad-medium 0;
+    position: relative;
+    display: block;
+    width: 100%;
+    color: $text-ultradark;
+    text-align: left;
+    border-radius: 0;
 
-  @media (max-width: 760px) {
-    padding: 0;
+    &:hover {
+      background: $bg-medium;
+    }
+
+    @include breakpoint(tablet) {
+      padding: 0;
+    }
+
+    &--open {
+      background-color: $text-dark;
+
+      .site-nav-header__org {
+        border-color: $text-ultradark;
+      }
+
+      .site-nav-header__org-name,
+      .site-nav-header__username {
+        color: $white;
+      }
+
+      .site-nav-header__org-chevron {
+        @include transform(rotate(180deg));
+      }
+
+      &:hover {
+        background-color: $text-dark;
+      }
+
+      @include breakpoint(tablet) {
+        width: 240px;
+
+        .site-nav-header__org,
+        .user-menu-toggle {
+          box-shadow: 1px 6px 15px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .user-menu-toggle {
+          span {
+            display: inline-block;
+          }
+        }
+
+        .site-nav-header__org-chevron {
+          float: right;
+          margin-right: 27px;
+        }
+
+        .site-nav-header__org-name {
+          display: block;
+        }
+
+        .site-nav-header__user-status,
+        .user-menu-toggle__name,
+        .user-menu-toggle__position,
+        .site-nav-header__username {
+          display: inline-block;
+        }
+
+        .site-nav-header__user-status {
+          margin-left: 11px;
+        }
+
+        .site-nav-header__logo {
+          margin-top: 0;
+        }
+      }
+    }
   }
 
   &__org {
@@ -34,8 +98,8 @@
     border: 1px solid $accent-medium;
     border-radius: 50%;
 
-    @media (max-width: 760px) {
-      margin: $pad-half 5px;
+    @include breakpoint(tablet) {
+      margin: 24px 5px 10px;
     }
   }
 
@@ -47,9 +111,11 @@
     padding: 0;
     display: block;
     white-space: nowrap;
+    text-transform: none;
 
-    @media (max-width: 760px) {
+    @include breakpoint(tablet) {
       display: none;
+      margin: 24px 0 5px 63px;
     }
   }
 
@@ -65,7 +131,7 @@
       background-color: $success;
     }
 
-    @media (max-width: 760px) {
+    @include breakpoint(tablet) {
       display: none;
     }
   }
@@ -80,7 +146,7 @@
     position: relative;
     line-height: 16px;
 
-    @media (max-width: 760px) {
+    @include breakpoint(tablet) {
       display: none;
     }
   }
@@ -91,32 +157,11 @@
     font-size: 12px;
     float: right;
 
-    @media (max-width: 760px) {
+    @include breakpoint(tablet) {
       float: none;
       text-align: center;
       display: block;
       clear: both;
-    }
-  }
-
-  &--open {
-    background-color: $text-dark;
-
-    .site-nav-header__org {
-      border-color: $text-ultradark;
-    }
-
-    .site-nav-header__org-name,
-    .site-nav-header__username {
-      color: $white;
-    }
-
-    .site-nav-header__org-chevron {
-      @include transform(rotate(180deg));
-    }
-
-    &:hover {
-      background-color: $text-dark;
     }
   }
 }
@@ -134,8 +179,8 @@
   opacity: 0;
   box-sizing: border-box;
 
-  @media (max-width: 760px) {
-    width: 53px;
+  @include breakpoint(tablet) {
+    width: 240px;
   }
 
   &--open {
@@ -151,22 +196,31 @@
     border-radius: 50%;
     margin: 0 10px 0 $pad-medium;
 
-    @media (max-width: 760px) {
+    @include breakpoint(tablet) {
       margin: $pad-xsmall 5px;
     }
   }
 
   &__name,
   &__position {
-    @include ellipsis(135px);
+    @include ellipsis(170px);
     color: $white;
     font-size: $small;
     margin: 0;
     line-height: $large;
     float: left;
+    text-transform: none;
+    font-weight: $normal;
 
-    @media (max-width: 760px) {
+    @include breakpoint(tablet) {
       display: none;
+      margin-left: 15px;
+    }
+  }
+
+  &__name {
+    @include breakpoint(tablet) {
+      margin-top: 4px;
     }
   }
 
@@ -204,7 +258,7 @@
       }
     }
 
-    @media (max-width: 760px) {
+    @include breakpoint(tablet) {
       span {
         display: none;
       }

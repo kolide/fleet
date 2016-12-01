@@ -242,6 +242,7 @@
   position: fixed;
   top: 0;
   width: 240px;
+  z-index: 2;
 
   @include breakpoint(tablet) {
     padding-left: 0;
