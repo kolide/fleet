@@ -19,7 +19,7 @@ const campaignWithResults = {
   id: 4,
   query_id: 12,
   query_results: [
-    { distributed_query_execution_id: 4, hosts: [], rows: [] },
+    { distributed_query_execution_id: 4, host: {}, rows: [] },
   ],
   status: 0,
   totals: {
@@ -34,7 +34,7 @@ const resultSocketData = {
   type: 'result',
   data: {
     distributed_query_execution_id: 5,
-    hosts: [],
+    host: {},
     rows: [],
   },
 };
@@ -63,7 +63,7 @@ describe('campaign entity - helpers', () => {
       updateFunc(campaignWithResults, resultSocketData)
         .then((response) => {
           expect(response.query_results).toEqual([
-            { distributed_query_execution_id: 4, hosts: [], rows: [] },
+            { distributed_query_execution_id: 4, host: {}, rows: [] },
             resultSocketData.data,
           ]);
           done();

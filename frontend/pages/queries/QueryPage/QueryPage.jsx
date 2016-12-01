@@ -123,10 +123,9 @@ class QueryPage extends Component {
 
             this.socket.onmessage = ({ data }) => {
               const socketData = JSON.parse(data);
+              const { previousSocketData } = this;
 
-              if (!this.previousSocketData) {
-                this.previousSocketData = socketData;
-              } else if (isEqual(socketData, this.previousSocketData)) {
+              if (previousSocketData && isEqual(socketData, previousSocketData)) {
                 this.previousSocketData = socketData;
 
                 return false;
@@ -134,6 +133,7 @@ class QueryPage extends Component {
 
               return dispatch(update(this.campaign, socketData))
                 .then((updatedCampaign) => {
+                  this.previousSocketData = socketData;
                   this.campaign = updatedCampaign;
                 });
             };
