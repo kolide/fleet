@@ -578,22 +578,6 @@ func TestDetailQueries(t *testing.T) {
 	// uptime
 	assert.Equal(t, 1730893*time.Second, host.Uptime)
 
-	// // network_interface
-	// assert.Equal(t, "5f:3d:4b:10:25:82", host.PrimaryMAC)
-	// assert.Equal(t, "192.168.0.1", host.PrimaryIP)
-	// assert.Equal(t, "192.168.0.255", host.Broadcast)
-	// assert.Equal(t, 1601207629, host.IBytes)
-	// assert.Equal(t, 314179, host.IErrors)
-	// assert.Equal(t, "en0", host.Interface)
-	// assert.Equal(t, 25698094, host.IPackets)
-	// assert.Equal(t, 1474233476, host.LastChange )
-	// assert.Equal(t, "255.255.255.0", host.Mask)
-	// assert.Equal(t, 1, host.Metric)
-	// assert.Equal(t, 1453, host.MTU)
-	// assert.Equal(t, 2607283152, host.OBytes)
-	// assert.Equal(t, 101010, host.OErrors)
-	// assert.Equals(t,12264603,host.OPackets )
-
 	ctx = hostctx.NewContext(ctx, *host)
 
 	// Now no detail queries should be required

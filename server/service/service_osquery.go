@@ -264,16 +264,10 @@ var detailQueries = map[string]struct {
 		},
 	},
 	"network_interface": {
-		// REVIEW: Do we want to account for multihomed/multi-interface networks?
 		Query: `select * from interface_details id join interface_addresses ia
                         on ia.interface = id.interface where broadcast != ""
                         order by (ibytes + obytes) desc`,
 		IngestFunc: func(host *kolide.Host, rows []map[string]string) (err error) {
-			if len(rows) == 0 {
-				return osqueryError{
-					message: "expected network interface rows, go none",
-				}
-			}
 
 			networkInterfaces := []*kolide.NetworkInterface{}
 

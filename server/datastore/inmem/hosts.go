@@ -200,8 +200,7 @@ func (orm *Datastore) SearchHosts(query string, omit ...uint) ([]kolide.Host, er
 		if len(results) == 10 {
 			break
 		}
-		// TODO: fix this so it uses network_interfaces for search
-		//	if (strings.Contains(h.HostName, query) || strings.Contains(h.PrimaryIP, query)) && !omitLookup[h.ID] {
+
 		if strings.Contains(h.HostName, query) && !omitLookup[h.ID] {
 			results = append(results, *h)
 			continue

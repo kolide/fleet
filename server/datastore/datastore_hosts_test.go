@@ -273,7 +273,6 @@ func testSearchHosts(t *testing.T, db kolide.Datastore) {
 	hits, err := db.SearchHosts("99.100.101")
 	require.Nil(t, err)
 	require.Equal(t, 1, len(hits))
-	// q.Q(hits[0])
 	assert.Equal(t, 2, len(hits[0].NetworkInterfaces))
 
 	hits, err = db.SearchHosts("99.100.111")
