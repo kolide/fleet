@@ -16,11 +16,30 @@ class QueriesListItem extends Component {
     query: queryInterface.isRequired,
   };
 
+  constructor (props) {
+    super(props);
+
+    this.state = { hover: false };
+  }
+
+  onHover = (hover) => {
+    return () => {
+      this.setState({ hover });
+    };
+  };
+
   renderCheckbox = () => {
     const { checked, configured, onSelect, query } = this.props;
+    const { hover } = this.state;
+    const { onHover } = this;
 
     if (configured) {
-      return <i className={`${baseClass}__check-icon kolidecon-success-check`} />;
+      return (
+        <span onMouseOver={onHover(true)} onMouseOut={onHover(false)}>
+          {!hover && <i className={`${baseClass}__check-icon kolidecon-success-check`} />}
+          {hover && <i className={`${baseClass}__check-icon kolidecon-filter`} />}
+        </span>
+      );
     }
 
     return (
