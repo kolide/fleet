@@ -21,6 +21,17 @@ const host = {
   uptime: 3600000000000,
   uuid: '1234-5678-9101',
 };
+const mockStore = reduxMockStore({
+  components: {
+    ManageHostsPage: {
+      display: 'Grid',
+      selectedLabel: { id: 100, display_text: 'All Hosts', type: 'all', count: 22 },
+    },
+    QueryPages: {
+      selectedOsqueryTable: stubbedOsqueryTable,
+    },
+  },
+});
 
 describe('ManageHostsPage - component', () => {
   const props = {
@@ -42,9 +53,9 @@ describe('ManageHostsPage - component', () => {
     });
 
     it('renders a QuerySidePanel when adding a new label', () => {
-      const page = mount(<ManageHostsPage {...props} />);
-
-      page.setState({ isAddLabel: true });
+      const ownProps = { location: { hash: '#new_label' } };
+      const component = connectedComponent(ConnectedManageHostsPage, { props: ownProps, mockStore });
+      const page = mount(component);
 
       expect(page.find('QuerySidePanel').length).toEqual(1);
     });
@@ -64,16 +75,8 @@ describe('ManageHostsPage - component', () => {
     });
 
     it('toggles between displays', () => {
-      const mockStore = reduxMockStore({
-        components: {
-          ManageHostsPage: {
-            display: 'Grid',
-            selectedLabel: { id: 100, display_text: 'All Hosts', type: 'all', count: 22 },
-          },
-          QueryPages: {},
-        },
-      });
-      const component = connectedComponent(ConnectedManageHostsPage, { mockStore });
+      const ownProps = { location: {} };
+      const component = connectedComponent(ConnectedManageHostsPage, { props: ownProps, mockStore });
       const page = mount(component);
       const button = page.find('Rocker').find('input');
       const toggleDisplayAction = {
