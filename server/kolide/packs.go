@@ -68,12 +68,12 @@ type PackQuery struct {
 	ID           uint
 	PackID       uint
 	QueryID      uint
-	Interval     uint   `json:"interval"`
-	Snapshot     bool   `json:"snapshot"`
-	Differential bool   `json:"differential"`
-	Platform     string `json:"platform"`
-	Version      string `json:"version"`
-	Shard        uint   `json:"shard"`
+	Interval     uint    `json:"interval"`
+	Snapshot     *bool   `json:"snapshot"`
+	Differential *bool   `json:"differential"`
+	Platform     *string `json:"platform"`
+	Version      *string `json:"version"`
+	Shard        *uint   `json:"shard"`
 }
 
 type PackTarget struct {

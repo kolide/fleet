@@ -89,10 +89,10 @@ func (svc service) GetClientConfig(ctx context.Context) (*kolide.OsqueryConfig, 
 		for _, query := range queries {
 			configQueries[query.Query.Name] = kolide.QueryContent{
 				Query:    query.Query.Query,
-				Interval: *query.Options.Interval,
-				Platform: *query.Options.Platform,
-				Version:  *query.Options.Version,
-				Snapshot: *query.Options.Snapshot,
+				Interval: query.Options.Interval,
+				Platform: query.Options.Platform,
+				Version:  query.Options.Version,
+				Snapshot: query.Options.Snapshot,
 			}
 		}
 

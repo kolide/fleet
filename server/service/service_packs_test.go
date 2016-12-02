@@ -7,6 +7,7 @@ import (
 	"github.com/kolide/kolide-ose/server/datastore/inmem"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
 )
 
@@ -155,12 +156,21 @@ func TestAddQueryToPack(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Len(t, queries, 0)
 
-	err = svc.AddQueryToPack(ctx, query.ID, pack.ID, kolide.QueryOptions{})
+	differential := true
+	err = svc.AddQueryToPack(ctx, query.ID, pack.ID, kolide.QueryOptions{
+		Interval:     10,
+		Differential: &differential,
+	})
 	assert.Nil(t, err)
 
 	queries, err = ds.ListQueriesInPack(pack)
 	assert.Nil(t, err)
 	assert.Len(t, queries, 1)
+
+	q := queries[0]
+	assert.Nil(t, q.Options.Snapshot)
+	require.NotNil(t, q.Options.Differential)
+	assert.True(t, *q.Options.Differential)
 }
 
 func TestGetQueriesInPack(t *testing.T) {

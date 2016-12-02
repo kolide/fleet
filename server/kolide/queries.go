@@ -42,7 +42,7 @@ type QueryService interface {
 }
 
 type QueryOptions struct {
-	Interval     *uint
+	Interval     uint
 	Snapshot     *bool
 	Differential *bool
 	Platform     *string

@@ -427,7 +427,7 @@ func TestGetClientConfig(t *testing.T) {
 	_, err = ds.NewPack(monitoringPack)
 	assert.Nil(t, err)
 
-	err = ds.AddQueryToPack(infoQuery.ID, monitoringPack.ID, kolide.QueryOptions{Interval: &infoQueryInterval})
+	err = ds.AddQueryToPack(infoQuery.ID, monitoringPack.ID, kolide.QueryOptions{Interval: infoQueryInterval})
 	assert.Nil(t, err)
 
 	mysqlLabel := &kolide.Label{

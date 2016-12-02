@@ -117,7 +117,7 @@ func (d *Datastore) ListQueriesInPack(pack *kolide.Pack) ([]kolide.QueryWithOpti
 		Description  string         `json:"description"`
 		Query        string         `json:"query"`
 		Saved        bool           `json:"saved"`
-		Interval     sql.NullInt64  `json:"interval"`
+		Interval     uint           `json:"interval"`
 		Snapshot     sql.NullBool   `json:"snapshot"`
 		Differential sql.NullBool   `json:"differential"`
 		Platform     sql.NullString `json:"platform"`
@@ -157,12 +157,9 @@ func (d *Datastore) ListQueriesInPack(pack *kolide.Pack) ([]kolide.QueryWithOpti
 				Description: row.Description,
 				Query:       row.Query,
 			},
-			Options: kolide.QueryOptions{},
-		}
-
-		if row.Interval.Valid {
-			interval := uint(row.Interval.Int64)
-			query.Options.Interval = &interval
+			Options: kolide.QueryOptions{
+				Interval: row.Interval,
+			},
 		}
 
 		if row.Snapshot.Valid {

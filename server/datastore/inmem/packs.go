@@ -99,32 +99,14 @@ func (orm *Datastore) ListPacks(opt kolide.ListOptions) ([]*kolide.Pack, error) 
 
 func (orm *Datastore) AddQueryToPack(qid uint, pid uint, opts kolide.QueryOptions) error {
 	packQuery := &kolide.PackQuery{
-		PackID:  pid,
-		QueryID: qid,
-	}
-
-	if opts.Interval != nil {
-		packQuery.Interval = *opts.Interval
-	}
-
-	if opts.Differential != nil {
-		packQuery.Differential = *opts.Differential
-	}
-
-	if opts.Snapshot != nil {
-		packQuery.Snapshot = *opts.Snapshot
-	}
-
-	if opts.Platform != nil {
-		packQuery.Platform = *opts.Platform
-	}
-
-	if opts.Version != nil {
-		packQuery.Version = *opts.Platform
-	}
-
-	if opts.Shard != nil {
-		packQuery.Shard = *opts.Shard
+		PackID:       pid,
+		QueryID:      qid,
+		Interval:     opts.Interval,
+		Differential: opts.Differential,
+		Snapshot:     opts.Snapshot,
+		Platform:     opts.Platform,
+		Version:      opts.Version,
+		Shard:        opts.Shard,
 	}
 
 	orm.mtx.Lock()
@@ -141,19 +123,18 @@ func (orm *Datastore) ListQueriesInPack(pack *kolide.Pack) ([]kolide.QueryWithOp
 	// todo null semantics
 	orm.mtx.Lock()
 	for _, packQuery := range orm.packQueries {
-		queries = append(queries,
-			kolide.QueryWithOptions{
-				Query: *orm.queries[packQuery.QueryID],
-				Options: kolide.QueryOptions{
-					Differential: &packQuery.Differential,
-					Snapshot:     &packQuery.Snapshot,
-					Interval:     &packQuery.Interval,
-					Version:      &packQuery.Version,
-					Platform:     &packQuery.Platform,
-					Shard:        &packQuery.Shard,
-				},
+		query := kolide.QueryWithOptions{
+			Query: *orm.queries[packQuery.QueryID],
+			Options: kolide.QueryOptions{
+				Differential: packQuery.Differential,
+				Snapshot:     packQuery.Snapshot,
+				Interval:     packQuery.Interval,
+				Version:      packQuery.Version,
+				Platform:     packQuery.Platform,
+				Shard:        packQuery.Shard,
 			},
-		)
+		}
+		queries = append(queries, query)
 	}
 	orm.mtx.Unlock()
 
