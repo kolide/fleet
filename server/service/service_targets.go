@@ -42,7 +42,7 @@ func (svc service) CountHostsInTargets(ctx context.Context, hostIDs []uint, labe
 	for _, host := range hosts {
 		if !hostLookup[host.ID] {
 			hostLookup[host.ID] = true
-			if svc.HostStatus(ctx, host) == "online" {
+			if svc.HostStatus(ctx, host) == StatusOnline {
 				online++
 			}
 		}

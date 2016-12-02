@@ -61,8 +61,9 @@ func (svc service) NewDistributedQueryCampaign(ctx context.Context, queryString 
 }
 
 type targetTotals struct {
-	Total  uint `json:"count"`
-	Online uint `json:"online"`
+	Total           uint `json:"count"`
+	Online          uint `json:"online"`
+	MissingInAction uint `json:"missing_in_action"`
 }
 
 func (svc service) StreamCampaignResults(ctx context.Context, conn *websocket.Conn, campaignID uint) {
