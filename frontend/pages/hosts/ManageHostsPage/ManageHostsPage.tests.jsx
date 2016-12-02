@@ -91,4 +91,19 @@ describe('ManageHostsPage - component', () => {
       expect(mockStore.getActions()).toInclude(toggleDisplayAction);
     });
   });
+
+  describe('Adding a new label', () => {
+    beforeEach(() => createAceSpy());
+    const ownProps = { location: { hash: '#new_label' } };
+    const component = connectedComponent(ConnectedManageHostsPage, { props: ownProps, mockStore });
+    const page = mount(component);
+
+    it('renders a QueryComposer component', () => {
+      expect(page.find('QueryComposer').length).toEqual(1);
+    });
+
+    it('displays "New Label Query" as the query form header', () => {
+      expect(page.find('QueryComposer').text()).toInclude('New Label Query');
+    });
+  });
 });
