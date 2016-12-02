@@ -1,5 +1,5 @@
 import React from 'react';
-import expect from 'expect';
+import expect, { restoreSpies } from 'expect';
 import { mount } from 'enzyme';
 import { noop } from 'lodash';
 
@@ -44,6 +44,7 @@ describe('ManageHostsPage - component', () => {
   beforeEach(() => {
     createAceSpy();
   });
+  afterEach(restoreSpies);
 
   describe('side panels', () => {
     it('renders a HostSidePanel when not adding a new label', () => {
@@ -94,6 +95,8 @@ describe('ManageHostsPage - component', () => {
 
   describe('Adding a new label', () => {
     beforeEach(() => createAceSpy());
+    afterEach(restoreSpies);
+
     const ownProps = { location: { hash: '#new_label' } };
     const component = connectedComponent(ConnectedManageHostsPage, { props: ownProps, mockStore });
     const page = mount(component);
