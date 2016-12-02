@@ -3,6 +3,12 @@
   margin-top: 29px;
   padding: $pad-base;
 
+  &__filter-icon {
+    &--is-active {
+      color: $brand;
+    }
+  }
+
   &__progress-details {
     display: inline-block;
     width: 378px;

@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
+import classnames from 'classnames';
 import { get, keys, omit, values } from 'lodash';
 
 import campaignInterface from 'interfaces/campaign';
 import filterArrayByHash from 'utilities/filter_array_by_hash';
+import Icon from 'components/Icon';
 import InputField from 'components/forms/fields/InputField';
 import ProgressBar from 'components/ProgressBar';
 
@@ -34,6 +36,12 @@ class QueryResultsTable extends Component {
     };
   }
 
+  onSetActiveColumn = (activeColumn) => {
+    return () => {
+      this.setState({ activeColumn });
+    };
+  }
+
   renderProgressDetails = () => {
     const { campaign } = this.props;
     const totalHostsCount = get(campaign, 'totals.count', 0);
@@ -53,13 +61,21 @@ class QueryResultsTable extends Component {
   }
 
   renderTableHeaderRowData = (column, index) => {
-    const { onFilterAttribute } = this;
-    const { resultsFilter } = this.state;
+    const { onFilterAttribute, onSetActiveColumn } = this;
+    const { activeColumn, resultsFilter } = this.state;
+    const filterIconClassName = classnames(`${baseClass}__filter-icon`, {
+      [`${baseClass}__filter-icon--is-active`]: activeColumn === column,
+    });
 
     return (
       <th key={`query-results-table-header-${index}`}>
-        <span>{column}</span>
-        <InputField name={column} onChange={onFilterAttribute(column)} value={resultsFilter[column]} />
+        <span><Icon className={filterIconClassName} name="filter" />{column}</span>
+        <InputField
+          name={column}
+          onChange={onFilterAttribute(column)}
+          onFocus={onSetActiveColumn(column)}
+          value={resultsFilter[column]}
+        />
       </th>
     );
   }
