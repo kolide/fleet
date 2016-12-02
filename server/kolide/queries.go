@@ -42,12 +42,12 @@ type QueryService interface {
 }
 
 type QueryOptions struct {
-	Interval     uint
-	Snapshot     *bool
-	Differential *bool
-	Platform     *string
-	Version      *string
-	Shard        *uint
+	Interval     uint    `json:"interval"`
+	Snapshot     *bool   `json:"snapshot,omitempty"`
+	Differential *bool   `json:"differential,omitempty"`
+	Platform     *string `json:"platform,omitempty"`
+	Version      *string `json:"version,omitempty"`
+	Shard        *uint   `json:"shard,omitempty"`
 }
 
 type QueryPayload struct {

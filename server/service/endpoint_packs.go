@@ -184,7 +184,7 @@ func makeDeletePackEndpoint(svc kolide.Service) endpoint.Endpoint {
 type addQueryToPackRequest struct {
 	QueryID uint
 	PackID  uint
-	Options kolide.QueryOptions
+	Options kolide.QueryOptions `json:"options,omitempty"`
 }
 
 type addQueryToPackResponse struct {

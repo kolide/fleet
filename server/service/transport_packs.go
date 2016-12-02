@@ -58,6 +58,11 @@ func decodeListPacksRequest(ctx context.Context, r *http.Request) (interface{}, 
 }
 
 func decodeAddQueryToPackRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	var req addQueryToPackRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+
 	qid, err := idFromRequest(r, "qid")
 	if err != nil {
 		return nil, err
@@ -66,9 +71,10 @@ func decodeAddQueryToPackRequest(ctx context.Context, r *http.Request) (interfac
 	if err != nil {
 		return nil, err
 	}
-	var req addQueryToPackRequest
-	req.PackID = pid
+
 	req.QueryID = qid
+	req.PackID = pid
+
 	return req, nil
 }
 

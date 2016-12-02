@@ -8,6 +8,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
 )
 
@@ -99,11 +100,24 @@ func TestDecodeAddQueryToPackRequest(t *testing.T) {
 		params := r.(addQueryToPackRequest)
 		assert.Equal(t, uint(1), params.PackID)
 		assert.Equal(t, uint(2), params.QueryID)
-	}).Methods("GET")
+		require.NotNil(t, params.Options)
+		assert.Equal(t, uint(10), params.Options.Interval)
+		assert.Nil(t, params.Options.Differential)
+		require.NotNil(t, params.Options.Snapshot)
+		assert.True(t, *params.Options.Snapshot)
+	}).Methods("POST")
+
+	var body bytes.Buffer
+	body.Write([]byte(`{
+		"options": {
+			"interval": 10,
+			"snapshot": true
+		}
+    }`))
 
 	router.ServeHTTP(
 		httptest.NewRecorder(),
-		httptest.NewRequest("GET", "/api/v1/kolide/packs/1/queries/2", nil),
+		httptest.NewRequest("POST", "/api/v1/kolide/packs/1/queries/2", &body),
 	)
 }
 
