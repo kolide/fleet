@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import moment from 'moment';
 
 import Checkbox from 'components/forms/fields/Checkbox';
+import Icon from 'components/Icon';
 import { platformIconClass } from 'utilities/icon_class';
 import queryInterface from 'interfaces/query';
 
@@ -24,7 +25,7 @@ class QueriesListItem extends Component {
 
     return (
       <Checkbox
-        onClick={onSelect}
+        onChange={onSelect}
         name={query.name}
         checked={checked}
       />
@@ -43,7 +44,7 @@ class QueriesListItem extends Component {
         </td>
         <td>{query.name}</td>
         <td>{query.description}</td>
-        <td><i className={platformIconClass(query.platform)} /></td>
+        <td><Icon name={platformIconClass(query.platform)} /></td>
         <td />
         <td>{updatedTime.fromNow()}</td>
       </tr>

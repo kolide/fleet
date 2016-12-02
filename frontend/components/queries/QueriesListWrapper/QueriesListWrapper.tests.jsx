@@ -66,7 +66,7 @@ describe('QueriesListWrapper - component', () => {
     );
     const checkbox = component.find('Checkbox').first();
 
-    checkbox.simulate('change');
+    checkbox.find('input').simulate('change');
 
     expect(onSelectQuerySpy).toHaveBeenCalledWith(query);
   });
@@ -83,7 +83,7 @@ describe('QueriesListWrapper - component', () => {
     );
     const checkbox = component.find('Checkbox').first();
 
-    checkbox.simulate('change');
+    checkbox.find('input').simulate('change');
 
     expect(onDeselectQuerySpy).toHaveBeenCalledWith(query);
   });
