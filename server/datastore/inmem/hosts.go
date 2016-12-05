@@ -114,39 +114,33 @@ func (orm *Datastore) ListHosts(opt kolide.ListOptions) ([]*kolide.Host, error) 
 	return hosts, nil
 }
 
-func (orm *Datastore) EnrollHost(uuid, hostname, platform string, nodeKeySize int) (*kolide.Host, error) {
+func (orm *Datastore) EnrollHost(osQueryHostID string, nodeKeySize int) (*kolide.Host, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
 
-	if uuid == "" {
-		return nil, errors.New("missing uuid for host enrollment")
+	if osQueryHostID == "" {
+		return nil, errors.New("missing host identifier from osquery for host enrollment")
 	}
 
-	host := kolide.Host{
-		UUID:             uuid,
-		HostName:         hostname,
-		Platform:         platform,
-		DetailUpdateTime: time.Unix(0, 0).Add(24 * time.Hour),
-	}
-	for _, h := range orm.hosts {
-		if h.UUID == uuid {
-			host = *h
-			break
-		}
-	}
-
-	var err error
-	host.NodeKey, err = kolide.RandomText(nodeKeySize)
+	nodeKey, err := kolide.RandomText(nodeKeySize)
 	if err != nil {
 		return nil, err
 	}
 
-	if hostname != "" {
-		host.HostName = hostname
+	host := kolide.Host{
+		OSQueryHostID:    osQueryHostID,
+		NodeKey:          nodeKey,
+		DetailUpdateTime: time.Unix(0, 0).Add(24 * time.Hour),
 	}
 
-	if platform != "" {
-		host.Platform = platform
+	host.CreatedAt = time.Now().UTC()
+	host.UpdatedAt = host.CreatedAt
+
+	for _, h := range orm.hosts {
+		if h.OSQueryHostID == osQueryHostID {
+			host = *h
+			break
+		}
 	}
 
 	if host.ID == 0 {

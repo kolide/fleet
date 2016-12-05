@@ -14,6 +14,7 @@ import (
 func (d *Datastore) NewHost(host *kolide.Host) (*kolide.Host, error) {
 	sqlStatement := `
 	INSERT INTO hosts (
+		osquery_host_id,
 		detail_update_time,
 		node_key,
 		host_name,
@@ -24,9 +25,9 @@ func (d *Datastore) NewHost(host *kolide.Host) (*kolide.Host, error) {
 		uptime,
 		physical_memory
 	)
-	VALUES( ?,?,?,?,?,?,?,?,? )
+	VALUES( ?,?,?,?,?,?,?,?,?,? )
 	`
-	result, err := d.db.Exec(sqlStatement, host.DetailUpdateTime,
+	result, err := d.db.Exec(sqlStatement, host.OSQueryHostID, host.DetailUpdateTime,
 		host.NodeKey, host.HostName, host.UUID, host.Platform, host.OsqueryVersion,
 		host.OSVersion, host.Uptime, host.PhysicalMemory)
 	if err != nil {
@@ -211,6 +212,7 @@ func (d *Datastore) SaveHost(host *kolide.Host) error {
 		tx.Rollback()
 		return errors.DatabaseError(err)
 	}
+
 	if err = removedUnusedNics(tx, host); err != nil {
 		tx.Rollback()
 		return errors.DatabaseError(err)
@@ -219,9 +221,10 @@ func (d *Datastore) SaveHost(host *kolide.Host) error {
 	if needsUpdate := host.ResetPrimaryNetwork(); needsUpdate {
 		_, err = tx.Exec(
 			"UPDATE hosts SET primary_ip_id = ? WHERE id = ?",
-			*host.PrimaryNetworkInterfaceID,
+			host.PrimaryNetworkInterfaceID,
 			host.ID,
 		)
+
 		if err != nil {
 			tx.Rollback()
 			return errors.DatabaseError(err)
@@ -235,7 +238,6 @@ func (d *Datastore) SaveHost(host *kolide.Host) error {
 	return nil
 }
 
-// TODO needs test
 func (d *Datastore) DeleteHost(host *kolide.Host) error {
 	sqlStatement := `
 		UPDATE hosts SET
@@ -311,40 +313,31 @@ func (d *Datastore) getNetInterfacesForHost(host *kolide.Host) error {
 }
 
 // EnrollHost enrolls a host
-func (d *Datastore) EnrollHost(uuid, hostname, platform string, nodeKeySize int) (*kolide.Host, error) {
-	if uuid == "" {
-		return nil, errors.New("missing uuid for host enrollment", "programmer error")
+func (d *Datastore) EnrollHost(osqueryHostID string, nodeKeySize int) (*kolide.Host, error) {
+	if osqueryHostID == "" {
+		return nil, errors.InternalServerError(fmt.Errorf("missing osquery host identifier"))
 	}
-	// REVIEW If a deleted host is enrolled, it is undeleted
+
+	detailUpdateTime := time.Unix(0, 0).Add(24 * time.Hour)
+	nodeKey, err := kolide.RandomText(nodeKeySize)
+	if err != nil {
+		return nil, errors.InternalServerError(err)
+	}
+
 	sqlInsert := `
 		INSERT INTO hosts (
 			detail_update_time,
-			node_key,
-			host_name,
-			uuid,
-			platform
-		) VALUES (?, ?, ?, ?, ? )
+			osquery_host_id,
+			node_key
+		) VALUES (?, ?,?  )
 		ON DUPLICATE KEY UPDATE
-			updated_at = VALUES(updated_at),
-			detail_update_time = VALUES(detail_update_time),
 			node_key = VALUES(node_key),
-			host_name = VALUES(host_name),
-			platform = VALUES(platform),
 			deleted = FALSE
 	`
-	args := []interface{}{}
-	args = append(args, time.Unix(0, 0).Add(24*time.Hour))
-
-	nodeKey, err := kolide.RandomText(nodeKeySize)
-
-	args = append(args, nodeKey)
-	args = append(args, hostname)
-	args = append(args, uuid)
-	args = append(args, platform)
 
 	var result sql.Result
 
-	result, err = d.db.Exec(sqlInsert, args...)
+	result, err = d.db.Exec(sqlInsert, detailUpdateTime, osqueryHostID, nodeKey)
 
 	if err != nil {
 		return nil, errors.DatabaseError(err)
@@ -366,9 +359,11 @@ func (d *Datastore) EnrollHost(uuid, hostname, platform string, nodeKeySize int)
 
 func (d *Datastore) AuthenticateHost(nodeKey string) (*kolide.Host, error) {
 	sqlStatement := `
-		SELECT * FROM hosts
-		WHERE node_key = ? AND NOT DELETED LIMIT 1
+		SELECT *
+		FROM hosts
+		WHERE node_key = ? AND NOT deleted LIMIT 1
 	`
+
 	host := &kolide.Host{}
 	if err := d.db.Get(host, sqlStatement, nodeKey); err != nil {
 		switch err {
@@ -381,8 +376,18 @@ func (d *Datastore) AuthenticateHost(nodeKey string) (*kolide.Host, error) {
 		}
 	}
 
-	return host, nil
+	sqlStatement = `
+		SELECT ni.*
+		FROM network_interfaces AS ni JOIN hosts AS hst ON ( ni.host_id = hst.id )
+		WHERE hst.id = ?
+	`
+	nics := []*kolide.NetworkInterface{}
+	if err := d.db.Select(&nics, sqlStatement, host.ID); err != nil {
+		return nil, err
+	}
 
+	host.NetworkInterfaces = nics
+	return host, nil
 }
 
 func (d *Datastore) MarkHostSeen(host *kolide.Host, t time.Time) error {
