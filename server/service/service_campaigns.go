@@ -109,14 +109,17 @@ func (svc service) StreamCampaignResults(ctx context.Context, conn *websocket.Co
 				}
 			}
 
-			var totals targetTotals
-			totals.Total, totals.Online, err = svc.CountHostsInTargets(
-				context.Background(), hostIDs, labelIDs,
-			)
+			metrics, err := svc.CountHostsInTargets(context.Background(), hostIDs, labelIDs)
 			if err != nil {
 				if err = conn.WriteJSONError("error retrieving target counts"); err != nil {
 					return
 				}
+			}
+
+			totals := targetTotals{
+				Total:           metrics.TotalHosts,
+				Online:          metrics.OnlineHosts,
+				MissingInAction: metrics.MissingInActionHosts,
 			}
 
 			if err = conn.WriteJSONMessage("totals", totals); err != nil {
