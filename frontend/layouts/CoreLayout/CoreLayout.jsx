@@ -6,6 +6,7 @@ import { push } from 'react-router-redux';
 
 import configInterface from 'interfaces/config';
 import FlashMessage from 'components/FlashMessage';
+import { hideFlash } from 'redux/nodes/notifications/actions';
 import SiteNavHeader from 'components/side_panels/SiteNavHeader';
 import SiteNavSidePanel from 'components/side_panels/SiteNavSidePanel';
 import notificationInterface from 'interfaces/notification';
@@ -37,8 +38,29 @@ export class CoreLayout extends Component {
     return false;
   }
 
+  onRemoveFlash = () => {
+    const { dispatch } = this.props;
+
+    dispatch(hideFlash);
+
+    return false;
+  }
+
+  onUndoActionClick = (undoAction) => {
+    return (evt) => {
+      evt.preventDefault();
+
+      const { dispatch } = this.props;
+      const { onRemoveFlash } = this;
+
+      dispatch(undoAction);
+
+      return onRemoveFlash();
+    };
+  }
+
   render () {
-    const { children, config, dispatch, notifications, showRightSidePanel, user } = this.props;
+    const { children, config, notifications, showRightSidePanel, user } = this.props;
     const wrapperClass = classnames(
       'core-wrapper',
       { 'core-wrapper--show-panel': showRightSidePanel }
@@ -46,7 +68,7 @@ export class CoreLayout extends Component {
 
     if (!user) return false;
 
-    const { onLogoutUser, onNavItemClick } = this;
+    const { onLogoutUser, onNavItemClick, onRemoveFlash, onUndoActionClick } = this;
     const { pathname } = global.window.location;
 
     return (
@@ -65,7 +87,11 @@ export class CoreLayout extends Component {
           />
         </nav>
         <div className={wrapperClass}>
-          <FlashMessage notification={notifications} dispatch={dispatch} />
+          <FlashMessage
+            notification={notifications}
+            onRemoveFlash={onRemoveFlash}
+            onUndoActionClick={onUndoActionClick}
+          />
           {children}
         </div>
       </div>
