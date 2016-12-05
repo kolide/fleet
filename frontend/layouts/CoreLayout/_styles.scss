@@ -1,5 +1,13 @@
+.app-wrap {
+  @include display(flex);
+  min-height: calc(100% - #{$footer-height});
+
+
+}
+
 .core-wrapper {
-  margin: 0 0 0 241px;
+  @include flex-grow(1);
+  margin: 0;
   padding: $pad-base $pad-base 0;
 
   &--show-panel {
@@ -8,5 +16,18 @@
 
   @include breakpoint(tablet) {
     margin-left: 55px;
+  }
+}
+
+.site-nav {
+  background-color: $white;
+  border-right: 1px solid $border-medium;
+  box-shadow: 2px 0 8px 0 rgba($black, 0.1);
+  box-sizing: border-box;
+  width: 240px;
+
+  @include breakpoint(tablet) {
+    padding-left: 0;
+    width: 55px;
   }
 }

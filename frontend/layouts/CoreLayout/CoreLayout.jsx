@@ -31,7 +31,7 @@ export class CoreLayout extends Component {
     const { pathname } = global.window.location;
 
     return (
-      <div>
+      <div className="app-wrap">
         <nav className="site-nav">
           <SiteNavHeader
             config={config}
