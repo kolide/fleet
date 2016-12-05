@@ -72,15 +72,12 @@ export class ResetPasswordPage extends Component {
   }
 }
 
-const mapStateToProps = (state, ownProps) => {
-  const { query = {} } = ownProps.location || {};
-  const { token } = query;
+const mapStateToProps = (state) => {
   const { ResetPasswordPage: componentState } = state.components;
   const { user } = state.auth;
 
   return {
     ...componentState,
-    token,
     user,
   };
 };

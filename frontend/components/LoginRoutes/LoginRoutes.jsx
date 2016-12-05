@@ -27,11 +27,22 @@ export class LoginRoutes extends Component {
   }
 
   render () {
-    const { children, location: { pathname } } = this.props;
+    const {
+      children,
+      isResetPassPage,
+      isForgotPassPage,
+      pathname,
+      token,
+    } = this.props;
 
     return (
       <div className="login-routes">
-        <LoginPage pathname={pathname} />
+        <LoginPage
+          pathname={pathname}
+          token={token}
+          isForgotPassPage={isForgotPassPage}
+          isResetPassPage={isResetPassPage}
+        />
         <RouteTransition
           pathname={pathname}
           atEnter={{
@@ -60,9 +71,18 @@ export class LoginRoutes extends Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const { location } = ownProps;
+  const { location: { pathname, query } } = ownProps;
+  const { token } = query;
 
-  return { location };
+  const isForgotPassPage = pathname === '/login/forgot';
+  const isResetPassPage = pathname === '/login/reset';
+
+  return {
+    isForgotPassPage,
+    isResetPassPage,
+    pathname,
+    token,
+  };
 };
 
 export default connect(mapStateToProps)(LoginRoutes);

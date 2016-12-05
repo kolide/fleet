@@ -22,6 +22,9 @@ export class LoginPage extends Component {
     dispatch: PropTypes.func,
     error: PropTypes.string,
     pathname: PropTypes.string,
+    isForgotPassPage: PropTypes.bool,
+    isResetPassPage: PropTypes.bool,
+    token: PropTypes.string,
     redirectLocation: redirectLocationInterface,
     user: userInterface,
   };
@@ -98,30 +101,25 @@ export class LoginPage extends Component {
 
   render () {
     const { showLoginForm } = this;
-    const { isForgotPass, isResetPass } = this.props;
+    const { isForgotPassPage, isResetPassPage, token } = this.props;
 
     return (
       <AuthenticationFormWrapper>
         <LoginSuccessfulPage />
         {showLoginForm()}
-        { isForgotPass && <ForgotPasswordPage /> }
-        { isResetPass && <ResetPasswordPage /> }
+        { isForgotPassPage && <ForgotPasswordPage /> }
+        { isResetPassPage && <ResetPasswordPage token={token} /> }
       </AuthenticationFormWrapper>
     );
   }
 }
 
-const mapStateToProps = (state, { pathname }) => {
+const mapStateToProps = (state) => {
   const { error, loading, user } = state.auth;
   const { redirectLocation } = state;
 
-  const isForgotPass = pathname === '/login/forgot';
-  const isResetPass = pathname === '/login/reset';
-
   return {
     error,
-    isForgotPass,
-    isResetPass,
     loading,
     redirectLocation,
     user,
