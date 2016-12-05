@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
+import { logoutUser } from 'redux/nodes/auth/actions';
 import { push } from 'react-router-redux';
 
 import configInterface from 'interfaces/config';
@@ -20,6 +21,14 @@ export class CoreLayout extends Component {
     user: userInterface,
   };
 
+  onLogoutUser = () => {
+    const { dispatch } = this.props;
+
+    dispatch(logoutUser());
+
+    return false;
+  }
+
   onNavItemClick = (path) => {
     const { dispatch } = this.props;
 
@@ -37,7 +46,7 @@ export class CoreLayout extends Component {
 
     if (!user) return false;
 
-    const { onNavItemClick } = this;
+    const { onLogoutUser, onNavItemClick } = this;
     const { pathname } = global.window.location;
 
     return (
@@ -45,6 +54,7 @@ export class CoreLayout extends Component {
         <nav className="site-nav">
           <SiteNavHeader
             config={config}
+            onLogoutUser={onLogoutUser}
             user={user}
           />
           <SiteNavSidePanel
