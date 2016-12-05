@@ -4,14 +4,16 @@ import { RouteTransition } from 'react-router-transition';
 
 import { hideBackgroundImage, showBackgroundImage } from 'redux/nodes/app/actions';
 import LoginPage from 'pages/LoginPage';
-import redirectLocationInterface from 'interfaces/redirect_location';
 import Footer from 'components/Footer';
 
 export class LoginRoutes extends Component {
   static propTypes = {
     children: PropTypes.element,
     dispatch: PropTypes.func,
-    location: redirectLocationInterface,
+    isResetPassPage: PropTypes.bool,
+    isForgotPassPage: PropTypes.bool,
+    pathname: PropTypes.string,
+    token: PropTypes.string,
   };
 
   componentWillMount () {

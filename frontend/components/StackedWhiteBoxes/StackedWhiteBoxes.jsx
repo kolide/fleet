@@ -26,7 +26,7 @@ class StackedWhiteBoxes extends Component {
   }
 
   renderHeader = () => {
-    const { headerText, className } = this.props;
+    const { headerText } = this.props;
 
     return (
       <div className={`${baseClass}__header`}>
