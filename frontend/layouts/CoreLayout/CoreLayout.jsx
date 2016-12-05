@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
+import { push } from 'react-router-redux';
 
 import configInterface from 'interfaces/config';
 import FlashMessage from 'components/FlashMessage';
@@ -19,6 +20,14 @@ export class CoreLayout extends Component {
     user: userInterface,
   };
 
+  onNavItemClick = (path) => {
+    const { dispatch } = this.props;
+
+    dispatch(push(path));
+
+    return false;
+  }
+
   render () {
     const { children, config, dispatch, notifications, showRightSidePanel, user } = this.props;
     const wrapperClass = classnames(
@@ -28,6 +37,7 @@ export class CoreLayout extends Component {
 
     if (!user) return false;
 
+    const { onNavItemClick } = this;
     const { pathname } = global.window.location;
 
     return (
@@ -39,6 +49,7 @@ export class CoreLayout extends Component {
           />
           <SiteNavSidePanel
             config={config}
+            onNavItemClick={onNavItemClick}
             pathname={pathname}
             user={user}
           />
