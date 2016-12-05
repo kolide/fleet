@@ -99,13 +99,16 @@ describe('ManageHostsPage - component', () => {
 
     const ownProps = { location: { hash: '#new_label' } };
     const component = connectedComponent(ConnectedManageHostsPage, { props: ownProps, mockStore });
-    const page = mount(component);
 
     it('renders a QueryComposer component', () => {
+      const page = mount(component);
+
       expect(page.find('QueryComposer').length).toEqual(1);
     });
 
     it('displays "New Label Query" as the query form header', () => {
+      const page = mount(component);
+
       expect(page.find('QueryComposer').text()).toInclude('New Label Query');
     });
   });
