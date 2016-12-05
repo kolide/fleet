@@ -2,10 +2,10 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { RouteTransition } from 'react-router-transition';
 
-import { hideBackgroundImage, showBackgroundImage } from '../../redux/nodes/app/actions';
-import LoginPage from '../../pages/LoginPage';
-import redirectLocationInterface from '../../interfaces/redirect_location';
-
+import { hideBackgroundImage, showBackgroundImage } from 'redux/nodes/app/actions';
+import LoginPage from 'pages/LoginPage';
+import redirectLocationInterface from 'interfaces/redirect_location';
+import Footer from 'components/Footer';
 
 export class LoginRoutes extends Component {
   static propTypes = {
@@ -53,6 +53,7 @@ export class LoginRoutes extends Component {
         >
           {children}
         </RouteTransition>
+        <Footer />
       </div>
     );
   }

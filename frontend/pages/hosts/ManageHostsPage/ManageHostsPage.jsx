@@ -316,7 +316,7 @@ export class ManageHostsPage extends Component {
     const { renderForm, renderHeader, renderHosts, renderSidePanel } = this;
 
     return (
-      <div className="manage-hosts">
+      <div className="manage-hosts body-wrap">
         {renderHeader()}
         {renderForm()}
         {renderHosts()}

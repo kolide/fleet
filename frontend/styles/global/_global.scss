@@ -42,6 +42,13 @@ h3 {
   }
 }
 
+.body-wrap {
+  border-radius: 3px;
+  background-color: $white;
+  box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.1);
+  border: solid 1px $silver;
+}
+
 .cf {
   @include clearfix;
 }

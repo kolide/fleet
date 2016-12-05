@@ -9,6 +9,7 @@ import RegistrationForm from 'components/forms/RegistrationForm';
 import { setup } from 'redux/nodes/auth/actions';
 import { showBackgroundImage } from 'redux/nodes/app/actions';
 import userInterface from 'interfaces/user';
+import Footer from 'components/Footer';
 
 import kolideLogo from '../../../assets/images/kolide-logo-condensed.svg';
 
@@ -100,6 +101,7 @@ export class RegistrationPage extends Component {
         />
         <Breadcrumbs onClick={onSetPage} page={page} />
         <RegistrationForm page={page} onNextPage={onNextPage} onSubmit={onRegistrationFormSubmit} />
+        <Footer />
       </div>
     );
   }
