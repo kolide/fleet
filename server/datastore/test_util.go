@@ -37,8 +37,8 @@ func newPack(t *testing.T, ds kolide.Datastore, name string) *kolide.Pack {
 	return pack
 }
 
-func addQueryToPack(t *testing.T, ds kolide.Datastore, queryID, packID uint) {
-	err := ds.AddQueryToPack(queryID, packID)
+func addQueryToPack(t *testing.T, ds kolide.Datastore, queryID, packID uint, opts kolide.QueryOptions) {
+	err := ds.AddQueryToPack(queryID, packID, opts)
 	require.Nil(t, err)
 }
 
