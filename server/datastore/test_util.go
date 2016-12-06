@@ -114,3 +114,19 @@ func newLabel(t *testing.T, ds kolide.Datastore, name, query string) *kolide.Lab
 
 	return l
 }
+
+func newUser(t *testing.T, ds kolide.Datastore, name, username, email string, admin bool) *kolide.User {
+	u, err := ds.NewUser(&kolide.User{
+		Password: []byte("garbage"),
+		Salt:     "garbage",
+		Name:     name,
+		Username: username,
+		Email:    email,
+		Admin:    admin,
+	})
+
+	require.Nil(t, err)
+	require.NotZero(t, u.ID)
+
+	return u
+}

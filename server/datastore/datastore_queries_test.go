@@ -17,11 +17,11 @@ func testDeleteQuery(t *testing.T, ds kolide.Datastore) {
 		Interval: 123,
 	}
 	query, err := ds.NewQuery(query)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	assert.NotEqual(t, query.ID, 0)
 
 	err = ds.DeleteQuery(query)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	assert.NotEqual(t, query.ID, 0)
 	_, err = ds.Query(query.ID)
@@ -29,22 +29,26 @@ func testDeleteQuery(t *testing.T, ds kolide.Datastore) {
 }
 
 func testSaveQuery(t *testing.T, ds kolide.Datastore) {
+	author := newUser(t, ds, "Zach", "zwass", "zwass@kolide.co", true)
+
 	query := &kolide.Query{
-		Name:  "foo",
-		Query: "bar",
+		Name:     "foo",
+		Query:    "bar",
+		AuthorID: author.ID,
 	}
 	query, err := ds.NewQuery(query)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	assert.NotEqual(t, 0, query.ID)
 
 	query.Query = "baz"
 	err = ds.SaveQuery(query)
 
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	queryVerify, err := ds.Query(query.ID)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	assert.Equal(t, "baz", queryVerify.Query)
+	assert.Equal(t, "Zach", queryVerify.AuthorName)
 }
 
 func testListQuery(t *testing.T, ds kolide.Datastore) {

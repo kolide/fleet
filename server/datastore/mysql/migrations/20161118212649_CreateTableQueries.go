@@ -27,6 +27,7 @@ func Up_20161118212649(tx *sql.Tx) error {
 			"`differential` tinyint(1) NOT NULL DEFAULT FALSE," +
 			"`platform` varchar(255) DEFAULT NULL," +
 			"`version` varchar(255) DEFAULT NULL," +
+			"`author_id` int(10) unsigned NOT NULL," +
 			"PRIMARY KEY (`id`)" +
 			") ENGINE=InnoDB DEFAULT CHARSET=utf8;",
 	)
