@@ -16,6 +16,9 @@ type QueryStore interface {
 }
 
 type QueryService interface {
+	// ListQueries returns a list of saved queries. Note only saved queries
+	// (those that are created for distributed queries but not saved)
+	// should not be returned.
 	ListQueries(ctx context.Context, opt ListOptions) ([]*Query, error)
 	GetQuery(ctx context.Context, id uint) (*Query, error)
 	NewQuery(ctx context.Context, p QueryPayload) (*Query, error)
