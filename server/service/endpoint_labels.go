@@ -19,6 +19,7 @@ type labelResponse struct {
 	DisplayText     string `json:"display_text"`
 	Count           uint   `json:"count"`
 	Online          uint   `json:"online"`
+	Offline         uint   `json:"offline"`
 	MissingInAction uint   `json:"missing_in_action"`
 }
 
@@ -46,6 +47,7 @@ func makeGetLabelEndpoint(svc kolide.Service) endpoint.Endpoint {
 				label.Name,
 				metrics.TotalHosts,
 				metrics.OnlineHosts,
+				metrics.OfflineHosts,
 				metrics.MissingInActionHosts,
 			},
 		}, nil
@@ -87,6 +89,7 @@ func makeListLabelsEndpoint(svc kolide.Service) endpoint.Endpoint {
 					label.Name,
 					metrics.TotalHosts,
 					metrics.OnlineHosts,
+					metrics.OfflineHosts,
 					metrics.MissingInActionHosts,
 				},
 			)
@@ -127,6 +130,7 @@ func makeCreateLabelEndpoint(svc kolide.Service) endpoint.Endpoint {
 				label.Name,
 				metrics.TotalHosts,
 				metrics.OnlineHosts,
+				metrics.OfflineHosts,
 				metrics.MissingInActionHosts,
 			},
 		}, nil
