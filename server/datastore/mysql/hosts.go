@@ -484,6 +484,7 @@ func (d *Datastore) searchHostsWithOmits(query string, omit ...uint) ([]*kolide.
 	sql = d.db.Rebind(sql)
 
 	hosts := []*kolide.Host{}
+
 	err = d.db.Select(&hosts, sql, args...)
 	if err != nil {
 		return nil, errors.DatabaseError(err)
