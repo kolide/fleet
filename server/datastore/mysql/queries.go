@@ -1,6 +1,7 @@
 package mysql
 
 import (
+	"github.com/jmoiron/sqlx"
 	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
 )
@@ -87,4 +88,46 @@ func (d *Datastore) ListQueries(opt kolide.ListOptions) ([]*kolide.Query, error)
 
 	return results, nil
 
+}
+
+func (d *Datastore) LoadPacksForQueries(queries []*kolide.Query) error {
+	sql := `
+		SELECT p.*, pq.query_id AS query_id
+		FROM packs p
+		JOIN pack_queries pq
+			ON p.id = pq.pack_id
+		WHERE query_id IN (?)
+	`
+
+	// Used to map the results
+	id_queries := map[uint]*kolide.Query{}
+	// Used for the IN clause
+	ids := []uint{}
+	for _, q := range queries {
+		q.Packs = make([]kolide.Pack, 0)
+		ids = append(ids, q.ID)
+		id_queries[q.ID] = q
+	}
+
+	query, args, err := sqlx.In(sql, ids)
+	if err != nil {
+		return errors.DatabaseError(err)
+	}
+
+	rows := []struct {
+		QueryID uint `db:"query_id"`
+		kolide.Pack
+	}{}
+
+	err = d.db.Select(&rows, query, args...)
+	if err != nil {
+		return errors.DatabaseError(err)
+	}
+
+	for _, row := range rows {
+		q := id_queries[row.QueryID]
+		q.Packs = append(q.Packs, row.Pack)
+	}
+
+	return nil
 }

@@ -13,6 +13,9 @@ type QueryStore interface {
 	DeleteQuery(query *Query) error
 	Query(id uint) (*Query, error)
 	ListQueries(opt ListOptions) ([]*Query, error)
+	// LoadPacksForQueries loads the packs associated with the provided
+	// queries.
+	LoadPacksForQueries(queries []*Query) error
 }
 
 type QueryService interface {
@@ -47,6 +50,9 @@ type Query struct {
 	Differential bool   `json:"differential"`
 	Platform     string `json:"platform"`
 	Version      string `json:"version"`
+	// Packs is loaded via LoadPacksForQueries (requires a join in the
+	// MySQL backend)
+	Packs []Pack `json:"packs" db:"-"`
 }
 
 type Option struct {

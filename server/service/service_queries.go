@@ -2,15 +2,36 @@ package service
 
 import (
 	"github.com/kolide/kolide-ose/server/kolide"
+	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 )
 
 func (svc service) ListQueries(ctx context.Context, opt kolide.ListOptions) ([]*kolide.Query, error) {
-	return svc.ds.ListQueries(opt)
+	queries, err := svc.ds.ListQueries(opt)
+	if err != nil {
+		return nil, errors.Wrap(err, "listing queries")
+	}
+
+	err = svc.ds.LoadPacksForQueries(queries)
+	if err != nil {
+		return nil, errors.Wrap(err, "loading packs")
+	}
+
+	return queries, nil
 }
 
 func (svc service) GetQuery(ctx context.Context, id uint) (*kolide.Query, error) {
-	return svc.ds.Query(id)
+	query, err := svc.ds.Query(id)
+	if err != nil {
+		return nil, errors.Wrap(err, "loading query")
+	}
+
+	err = svc.ds.LoadPacksForQueries([]*kolide.Query{query})
+	if err != nil {
+		return nil, errors.Wrap(err, "loading packs")
+	}
+
+	return query, nil
 }
 
 func (svc service) NewQuery(ctx context.Context, p kolide.QueryPayload) (*kolide.Query, error) {
