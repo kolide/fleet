@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { browserHistory, Link } from 'react-router';
+import { Link } from 'react-router';
 import classnames from 'classnames';
 
 const baseClass = 'stacked-white-boxes';
@@ -10,6 +10,7 @@ class StackedWhiteBoxes extends Component {
     headerText: PropTypes.string,
     className: PropTypes.string,
     leadText: PropTypes.string,
+    onLeave: PropTypes.func,
     previousLocation: PropTypes.string,
   };
 
@@ -29,18 +30,18 @@ class StackedWhiteBoxes extends Component {
     });
   }
 
+  /* eslint-disable react/no-did-mount-set-state */
   componentDidMount () {
     this.setState({
       isLoading: false,
       isLoaded: true,
     });
-
-    return false;
   }
+  /* eslint-enable react/no-did-mount-set-state */
 
   nowLeaving = (evt) => {
     const { window } = global;
-    const { previousLocation } = this.props;
+    const { onLeave, previousLocation } = this.props;
     evt.preventDefault();
 
     this.setState({
@@ -51,7 +52,7 @@ class StackedWhiteBoxes extends Component {
 
     if (previousLocation) {
       window.setTimeout(
-        () => { browserHistory.push(previousLocation); },
+        () => { onLeave(previousLocation); },
         300
       );
     }
