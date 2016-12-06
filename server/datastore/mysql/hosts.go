@@ -9,6 +9,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
+	"github.com/patrickmn/sortutil"
 )
 
 func (d *Datastore) NewHost(host *kolide.Host) (*kolide.Host, error) {
@@ -27,7 +28,7 @@ func (d *Datastore) NewHost(host *kolide.Host) (*kolide.Host, error) {
 	)
 	VALUES( ?,?,?,?,?,?,?,?,?,? )
 	`
-	result, err := d.db.Exec(sqlStatement, host.OSQueryHostID, host.DetailUpdateTime,
+	result, err := d.db.Exec(sqlStatement, host.OsqueryHostID, host.DetailUpdateTime,
 		host.NodeKey, host.HostName, host.UUID, host.Platform, host.OsqueryVersion,
 		host.OSVersion, host.Uptime, host.PhysicalMemory)
 	if err != nil {
@@ -265,13 +266,8 @@ func (d *Datastore) Host(id uint) (*kolide.Host, error) {
 		return nil, errors.DatabaseError(err)
 	}
 
-	sqlStatement = `
-		SELECT * from network_interfaces
-		WHERE host_id = ?
-	`
-	err = d.db.Select(&host.NetworkInterfaces, sqlStatement, id)
-	if err != nil {
-		return nil, errors.DatabaseError(err)
+	if err := d.getNetInterfacesForHost(host); err != nil {
+		return nil, err
 	}
 
 	return host, nil
@@ -289,15 +285,63 @@ func (d *Datastore) ListHosts(opt kolide.ListOptions) ([]*kolide.Host, error) {
 		return nil, errors.DatabaseError(err)
 	}
 
-	// TODO: This should be changed so that hosts and network interfaces
-	// are grabbed in a single sql request,
-	for _, host := range hosts {
-		if err := d.getNetInterfacesForHost(host); err != nil {
-			return nil, errors.DatabaseError(err)
-		}
+	if err := d.getNetInterfacesForHosts(hosts); err != nil {
+		return nil, err
 	}
 
 	return hosts, nil
+}
+
+// Optimized network interface fetch for sets of hosts.  Instead of looping
+// through hosts and doing a select for each host to get nics, we get all
+// nics at once, so 2 db calls, and then assign nics to hosts here.
+func (d *Datastore) getNetInterfacesForHosts(hosts []*kolide.Host) error {
+	if len(hosts) == 0 {
+		return nil
+	}
+
+	sqlStatement := `
+		SELECT *
+		FROM network_interfaces
+		WHERE host_id IN (:hosts)
+		ORDER BY host_id ASC
+	`
+	hostIDs := make([]interface{}, len(hosts))
+
+	for _, host := range hosts {
+		hostIDs = append(hostIDs, host.ID)
+	}
+
+	arg := map[string]interface{}{
+		"hosts": hostIDs,
+	}
+	query, args, err := sqlx.Named(sqlStatement, arg)
+	if err != nil {
+		return err
+	}
+
+	query, args, err = sqlx.In(query, args...)
+	if err != nil {
+		return err
+	}
+
+	query = d.db.Rebind(query)
+	nics := []*kolide.NetworkInterface{}
+	err = d.db.Select(&nics, query, args...)
+	if err != nil {
+		return err
+	}
+
+	sortutil.AscByField(hosts, "ID")
+
+	i := 0
+	for _, host := range hosts {
+		for ; i < len(nics) && host.ID == nics[i].HostID; i++ {
+			host.NetworkInterfaces = append(host.NetworkInterfaces, nics[i])
+		}
+	}
+
+	return nil
 }
 
 func (d *Datastore) getNetInterfacesForHost(host *kolide.Host) error {
@@ -329,7 +373,7 @@ func (d *Datastore) EnrollHost(osqueryHostID string, nodeKeySize int) (*kolide.H
 			detail_update_time,
 			osquery_host_id,
 			node_key
-		) VALUES (?, ?,?  )
+		) VALUES (?, ?, ?)
 		ON DUPLICATE KEY UPDATE
 			node_key = VALUES(node_key),
 			deleted = FALSE
@@ -361,7 +405,8 @@ func (d *Datastore) AuthenticateHost(nodeKey string) (*kolide.Host, error) {
 	sqlStatement := `
 		SELECT *
 		FROM hosts
-		WHERE node_key = ? AND NOT deleted LIMIT 1
+		WHERE node_key = ? AND NOT deleted
+		LIMIT 1
 	`
 
 	host := &kolide.Host{}
@@ -376,17 +421,10 @@ func (d *Datastore) AuthenticateHost(nodeKey string) (*kolide.Host, error) {
 		}
 	}
 
-	sqlStatement = `
-		SELECT ni.*
-		FROM network_interfaces AS ni JOIN hosts AS hst ON ( ni.host_id = hst.id )
-		WHERE hst.id = ?
-	`
-	nics := []*kolide.NetworkInterface{}
-	if err := d.db.Select(&nics, sqlStatement, host.ID); err != nil {
-		return nil, err
+	if err := d.getNetInterfacesForHost(host); err != nil {
+		return nil, errors.DatabaseError(err)
 	}
 
-	host.NetworkInterfaces = nics
 	return host, nil
 }
 
@@ -406,7 +444,7 @@ func (d *Datastore) MarkHostSeen(host *kolide.Host, t time.Time) error {
 	return nil
 }
 
-func (d *Datastore) searchHostsWithOmits(query string, omit ...uint) ([]kolide.Host, error) {
+func (d *Datastore) searchHostsWithOmits(query string, omit ...uint) ([]*kolide.Host, error) {
 	hostnameQuery := query
 	if len(hostnameQuery) > 0 {
 		hostnameQuery += "*"
@@ -445,16 +483,14 @@ func (d *Datastore) searchHostsWithOmits(query string, omit ...uint) ([]kolide.H
 	}
 	sql = d.db.Rebind(sql)
 
-	hosts := []kolide.Host{}
+	hosts := []*kolide.Host{}
 	err = d.db.Select(&hosts, sql, args...)
 	if err != nil {
 		return nil, errors.DatabaseError(err)
 	}
 
-	for i := 0; i < len(hosts); i++ {
-		if err := d.getNetInterfacesForHost(&hosts[i]); err != nil {
-			return nil, errors.DatabaseError(err)
-		}
+	if err := d.getNetInterfacesForHosts(hosts); err != nil {
+		return nil, err
 	}
 
 	return hosts, nil
@@ -462,7 +498,7 @@ func (d *Datastore) searchHostsWithOmits(query string, omit ...uint) ([]kolide.H
 
 // SearchHosts find hosts by query containing an IP address or a host name. Optionally
 // pass a list of IDs to omit from the search
-func (d *Datastore) SearchHosts(query string, omit ...uint) ([]kolide.Host, error) {
+func (d *Datastore) SearchHosts(query string, omit ...uint) ([]*kolide.Host, error) {
 	if len(omit) > 0 {
 		return d.searchHostsWithOmits(query, omit...)
 	}
@@ -498,17 +534,14 @@ func (d *Datastore) SearchHosts(query string, omit ...uint) ([]kolide.Host, erro
 		AND NOT deleted
 		LIMIT 10
 	`
-	hosts := []kolide.Host{}
+	hosts := []*kolide.Host{}
 
 	if err := d.db.Select(&hosts, sqlStatement, hostnameQuery, ipQuery); err != nil {
 		return nil, errors.DatabaseError(err)
 	}
-	// We're not using range to avoid having to copy the hosts slice
-	// when we populate the host NetworkInterfaces
-	for i := 0; i < len(hosts); i++ {
-		if err := d.getNetInterfacesForHost(&hosts[i]); err != nil {
-			return nil, errors.DatabaseError(err)
-		}
+
+	if err := d.getNetInterfacesForHosts(hosts); err != nil {
+		return nil, err
 	}
 
 	return hosts, nil

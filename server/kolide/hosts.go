@@ -17,7 +17,7 @@ type HostStore interface {
 	EnrollHost(osqueryHostId string, nodeKeySize int) (*Host, error)
 	AuthenticateHost(nodeKey string) (*Host, error)
 	MarkHostSeen(host *Host, t time.Time) error
-	SearchHosts(query string, omit ...uint) ([]Host, error)
+	SearchHosts(query string, omit ...uint) ([]*Host, error)
 	// DistributedQueriesForHost retrieves the distributed queries that the
 	// given host should run. The result map is a mapping from campaign ID
 	// to query text.
@@ -35,10 +35,10 @@ type Host struct {
 	UpdateCreateTimestamps
 	DeleteFields
 	ID uint `json:"id"`
-	// OSQueryHostID is the key used in the request context that is
-	// used to retreive host inforamtion.  It is sent from osquery and may currently be
+	// OsqueryHostID is the key used in the request context that is
+	// used to retrieve host information.  It is sent from osquery and may currently be
 	// a GUID or a Host Name, but in either case, it MUST be unique
-	OSQueryHostID    string        `json:"-" db:"osquery_host_id"`
+	OsqueryHostID    string        `json:"-" db:"osquery_host_id"`
 	DetailUpdateTime time.Time     `json:"detail_updated_at" db:"detail_update_time"` // Time that the host details were last updated
 	NodeKey          string        `json:"-" db:"node_key"`
 	HostName         string        `json:"hostname" db:"host_name"` // there is a fulltext index on this field

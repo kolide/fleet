@@ -128,7 +128,7 @@ func (orm *Datastore) EnrollHost(osQueryHostID string, nodeKeySize int) (*kolide
 	}
 
 	host := kolide.Host{
-		OSQueryHostID:    osQueryHostID,
+		OsqueryHostID:    osQueryHostID,
 		NodeKey:          nodeKey,
 		DetailUpdateTime: time.Unix(0, 0).Add(24 * time.Hour),
 	}
@@ -137,7 +137,7 @@ func (orm *Datastore) EnrollHost(osQueryHostID string, nodeKeySize int) (*kolide
 	host.UpdatedAt = host.CreatedAt
 
 	for _, h := range orm.hosts {
-		if h.OSQueryHostID == osQueryHostID {
+		if h.OsqueryHostID == osQueryHostID {
 			host = *h
 			break
 		}
@@ -179,13 +179,13 @@ func (orm *Datastore) MarkHostSeen(host *kolide.Host, t time.Time) error {
 	return nil
 }
 
-func (orm *Datastore) SearchHosts(query string, omit ...uint) ([]kolide.Host, error) {
+func (orm *Datastore) SearchHosts(query string, omit ...uint) ([]*kolide.Host, error) {
 	omitLookup := map[uint]bool{}
 	for _, o := range omit {
 		omitLookup[o] = true
 	}
 
-	var results []kolide.Host
+	var results []*kolide.Host
 
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
@@ -196,13 +196,13 @@ func (orm *Datastore) SearchHosts(query string, omit ...uint) ([]kolide.Host, er
 		}
 
 		if strings.Contains(h.HostName, query) && !omitLookup[h.ID] {
-			results = append(results, *h)
+			results = append(results, h)
 			continue
 		}
 
 		for _, nic := range h.NetworkInterfaces {
 			if strings.Contains(nic.IPAddress, query) && !omitLookup[nic.HostID] {
-				results = append(results, *h)
+				results = append(results, h)
 				break
 			}
 		}

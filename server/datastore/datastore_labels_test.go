@@ -232,7 +232,7 @@ func testSearchLabelsLimit(t *testing.T, db kolide.Datastore) {
 func testListHostsInLabel(t *testing.T, db kolide.Datastore) {
 	h1, err := db.NewHost(&kolide.Host{
 		DetailUpdateTime: time.Now(),
-		OSQueryHostID:    "1",
+		OsqueryHostID:    "1",
 		NodeKey:          "1",
 		UUID:             "1",
 		HostName:         "foo.local",
@@ -241,7 +241,7 @@ func testListHostsInLabel(t *testing.T, db kolide.Datastore) {
 
 	h2, err := db.NewHost(&kolide.Host{
 		DetailUpdateTime: time.Now(),
-		OSQueryHostID:    "2",
+		OsqueryHostID:    "2",
 		NodeKey:          "2",
 		UUID:             "2",
 		HostName:         "bar.local",
@@ -250,7 +250,7 @@ func testListHostsInLabel(t *testing.T, db kolide.Datastore) {
 
 	h3, err := db.NewHost(&kolide.Host{
 		DetailUpdateTime: time.Now(),
-		OSQueryHostID:    "3",
+		OsqueryHostID:    "3",
 		NodeKey:          "3",
 		UUID:             "3",
 		HostName:         "baz.local",
@@ -305,7 +305,7 @@ func testListUniqueHostsInLabels(t *testing.T, db kolide.Datastore) {
 	for i := 0; i < 4; i++ {
 		h, err := db.NewHost(&kolide.Host{
 			DetailUpdateTime: time.Now(),
-			OSQueryHostID:    strconv.Itoa(i),
+			OsqueryHostID:    strconv.Itoa(i),
 			NodeKey:          strconv.Itoa(i),
 			UUID:             strconv.Itoa(i),
 			HostName:         fmt.Sprintf("host_%d", i),

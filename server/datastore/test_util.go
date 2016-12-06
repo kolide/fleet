@@ -96,7 +96,7 @@ func newHost(t *testing.T, ds kolide.Datastore, name, ip, key, uuid string, now 
 		NodeKey:          key,
 		UUID:             uuid,
 		DetailUpdateTime: now,
-		OSQueryHostID:    osqueryHostID,
+		OsqueryHostID:    osqueryHostID,
 	})
 
 	require.Nil(t, err)
