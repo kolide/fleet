@@ -70,6 +70,10 @@ func (d *Datastore) Query(id uint) (*kolide.Query, error) {
 		return nil, errors.DatabaseError(err)
 	}
 
+	if err := d.loadPacksForQueries([]*kolide.Query{query}); err != nil {
+		return nil, errors.DatabaseError(err)
+	}
+
 	return query, nil
 }
 
@@ -86,11 +90,16 @@ func (d *Datastore) ListQueries(opt kolide.ListOptions) ([]*kolide.Query, error)
 		return nil, errors.DatabaseError(err)
 	}
 
+	if err := d.loadPacksForQueries(results); err != nil {
+		return nil, errors.DatabaseError(err)
+	}
+
 	return results, nil
 
 }
 
-func (d *Datastore) LoadPacksForQueries(queries []*kolide.Query) error {
+// loadPacksForQueries loads the packs associated with the provided queries
+func (d *Datastore) loadPacksForQueries(queries []*kolide.Query) error {
 	sql := `
 		SELECT p.*, pq.query_id AS query_id
 		FROM packs p

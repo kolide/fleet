@@ -80,7 +80,9 @@ func testLoadPacksForQueries(t *testing.T, ds kolide.Datastore) {
 
 	addQueryToPack(t, ds, q1.ID, p2.ID)
 
-	err = ds.LoadPacksForQueries([]*kolide.Query{q1, q2})
+	q1, err = ds.Query(q1.ID)
+	require.Nil(t, err)
+	q2, err = ds.Query(q2.ID)
 	require.Nil(t, err)
 	checkPacks(t, []kolide.Pack{*p2}, q1.Packs)
 	checkPacks(t, []kolide.Pack{}, q2.Packs)
@@ -88,14 +90,18 @@ func testLoadPacksForQueries(t *testing.T, ds kolide.Datastore) {
 	addQueryToPack(t, ds, q2.ID, p1.ID)
 	addQueryToPack(t, ds, q2.ID, p3.ID)
 
-	err = ds.LoadPacksForQueries([]*kolide.Query{q1, q2})
+	q1, err = ds.Query(q1.ID)
+	require.Nil(t, err)
+	q2, err = ds.Query(q2.ID)
 	require.Nil(t, err)
 	checkPacks(t, []kolide.Pack{*p2}, q1.Packs)
 	checkPacks(t, []kolide.Pack{*p1, *p3}, q2.Packs)
 
 	addQueryToPack(t, ds, q1.ID, p3.ID)
 
-	err = ds.LoadPacksForQueries([]*kolide.Query{q1, q2})
+	q1, err = ds.Query(q1.ID)
+	require.Nil(t, err)
+	q2, err = ds.Query(q2.ID)
 	require.Nil(t, err)
 	checkPacks(t, []kolide.Pack{*p2, *p3}, q1.Packs)
 	checkPacks(t, []kolide.Pack{*p1, *p3}, q2.Packs)
