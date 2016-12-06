@@ -30,14 +30,17 @@ class StackedWhiteBoxes extends Component {
     });
   }
 
-  /* eslint-disable react/no-did-mount-set-state */
   componentDidMount () {
+    const { didLoad } = this;
+    setTimeout(didLoad());
+  }
+
+  didLoad = () => {
     this.setState({
       isLoading: false,
       isLoaded: true,
     });
   }
-  /* eslint-enable react/no-did-mount-set-state */
 
   nowLeaving = (evt) => {
     const { window } = global;
