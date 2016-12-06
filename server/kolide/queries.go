@@ -17,8 +17,8 @@ type QueryStore interface {
 
 type QueryService interface {
 	// ListQueries returns a list of saved queries. Note only saved queries
-	// (those that are created for distributed queries but not saved)
-	// should not be returned.
+	// should be returned (those that are created for distributed queries
+	// but not saved should not be returned).
 	ListQueries(ctx context.Context, opt ListOptions) ([]*Query, error)
 	GetQuery(ctx context.Context, id uint) (*Query, error)
 	NewQuery(ctx context.Context, p QueryPayload) (*Query, error)
@@ -41,11 +41,11 @@ type Query struct {
 	UpdateCreateTimestamps
 	DeleteFields
 	ID           uint   `json:"id"`
-	Saved        bool   `json:"saved"`
 	Name         string `json:"name"`
 	Description  string `json:"description"`
 	Query        string `json:"query"`
 	Interval     uint   `json:"interval"`
+	Saved        bool   `json:"saved"`
 	Snapshot     bool   `json:"snapshot"`
 	Differential bool   `json:"differential"`
 	Platform     string `json:"platform"`

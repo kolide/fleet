@@ -9,13 +9,14 @@ import (
 func (d *Datastore) NewQuery(query *kolide.Query) (*kolide.Query, error) {
 
 	sql := `
-		INSERT INTO queries  (saved, name, description, query,
-			snapshot, differential, platform, version, ` + "`interval`" + `)
+		INSERT INTO queries (name, description, query,
+			saved, snapshot, differential, platform, version, ` + "`interval`" + `)
 		VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ? )
 	`
 
-	result, err := d.db.Exec(sql, query.Saved, query.Name, query.Description, query.Query, query.Snapshot,
-		query.Differential, query.Platform, query.Version, query.Interval)
+	result, err := d.db.Exec(sql, query.Name, query.Description, query.Query,
+		query.Saved, query.Snapshot, query.Differential, query.Platform,
+		query.Version, query.Interval)
 	if err != nil {
 		return nil, errors.DatabaseError(err)
 	}
@@ -29,12 +30,12 @@ func (d *Datastore) NewQuery(query *kolide.Query) (*kolide.Query, error) {
 func (d *Datastore) SaveQuery(q *kolide.Query) error {
 	sql := `
 		UPDATE queries
-			SET  saved = ?, name = ?, description = ?, query = ?, ` + "`interval`" + ` = ?, snapshot = ?,
-			 	differential = ?, platform = ?, version = ?
+			SET name = ?, description = ?, query = ?, ` + "`interval`" + ` = ?,
+			 saved = ?, snapshot = ?, differential = ?, platform = ?, version = ?
 			WHERE id = ? AND NOT deleted
 	`
-	_, err := d.db.Exec(sql, q.Saved, q.Name, q.Description, q.Query, q.Interval,
-		q.Snapshot, q.Differential, q.Platform, q.Version, q.ID)
+	_, err := d.db.Exec(sql, q.Name, q.Description, q.Query, q.Interval,
+		q.Saved, q.Snapshot, q.Differential, q.Platform, q.Version, q.ID)
 	if err != nil {
 		return errors.DatabaseError(err)
 	}
