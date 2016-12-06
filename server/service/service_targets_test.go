@@ -135,6 +135,7 @@ func TestCountHostsInTargets(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, metrics)
 	assert.Equal(t, uint(6), metrics.TotalHosts)
+	assert.Equal(t, uint(1), metrics.OfflineHosts)
 	assert.Equal(t, uint(4), metrics.OnlineHosts)
 	assert.Equal(t, uint(1), metrics.MissingInActionHosts)
 
@@ -142,6 +143,7 @@ func TestCountHostsInTargets(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, metrics)
 	assert.Equal(t, uint(6), metrics.TotalHosts)
+	assert.Equal(t, uint(1), metrics.OfflineHosts)
 	assert.Equal(t, uint(4), metrics.OnlineHosts)
 	assert.Equal(t, uint(1), metrics.MissingInActionHosts)
 
@@ -150,6 +152,7 @@ func TestCountHostsInTargets(t *testing.T) {
 	require.NotNil(t, metrics)
 	assert.Equal(t, uint(2), metrics.TotalHosts)
 	assert.Equal(t, uint(1), metrics.OnlineHosts)
+	assert.Equal(t, uint(1), metrics.OfflineHosts)
 	assert.Equal(t, uint(0), metrics.MissingInActionHosts)
 
 	metrics, err = svc.CountHostsInTargets(ctx, []uint{h1.ID}, []uint{l2.ID})
@@ -157,6 +160,7 @@ func TestCountHostsInTargets(t *testing.T) {
 	require.NotNil(t, metrics)
 	assert.Equal(t, uint(4), metrics.TotalHosts)
 	assert.Equal(t, uint(4), metrics.OnlineHosts)
+	assert.Equal(t, uint(0), metrics.OfflineHosts)
 	assert.Equal(t, uint(0), metrics.MissingInActionHosts)
 
 	metrics, err = svc.CountHostsInTargets(ctx, nil, nil)
@@ -164,6 +168,7 @@ func TestCountHostsInTargets(t *testing.T) {
 	require.NotNil(t, metrics)
 	assert.Equal(t, uint(0), metrics.TotalHosts)
 	assert.Equal(t, uint(0), metrics.OnlineHosts)
+	assert.Equal(t, uint(0), metrics.OfflineHosts)
 	assert.Equal(t, uint(0), metrics.MissingInActionHosts)
 
 	// Advance clock so all hosts are offline
@@ -173,6 +178,7 @@ func TestCountHostsInTargets(t *testing.T) {
 	require.NotNil(t, metrics)
 	assert.Equal(t, uint(6), metrics.TotalHosts)
 	assert.Equal(t, uint(0), metrics.OnlineHosts)
+	assert.Equal(t, uint(5), metrics.OfflineHosts)
 	assert.Equal(t, uint(1), metrics.MissingInActionHosts)
 
 }

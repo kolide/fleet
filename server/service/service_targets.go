@@ -47,6 +47,8 @@ func (svc service) CountHostsInTargets(ctx context.Context, hostIDs []uint, labe
 			switch svc.HostStatus(ctx, host) {
 			case StatusOnline:
 				result.OnlineHosts++
+			case StatusOffline:
+				result.OfflineHosts++
 			case StatusMIA:
 				result.MissingInActionHosts++
 			}

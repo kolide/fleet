@@ -15,6 +15,8 @@ type TargetMetrics struct {
 	TotalHosts uint
 	// OnlineHosts have updated within the last 30 minutes
 	OnlineHosts uint
+	// OfflineHosts are hosts that haven't updated in 30 minutes
+	OfflineHosts uint
 	// MissingInActionHosts are hosts that haven't had an update for more
 	// than thirty days
 	MissingInActionHosts uint

@@ -20,7 +20,7 @@ const (
 	OfflineDuration time.Duration = 30 * time.Minute
 	// OfflineDuration if a host hasn't been in communition for this
 	// period it is considered MIA
-	MIADuration time.Duration = 720 * time.Hour
+	MIADuration time.Duration = 30 * 24 * time.Hour
 )
 
 type hostResponse struct {
