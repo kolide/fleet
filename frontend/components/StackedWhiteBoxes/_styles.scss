@@ -4,6 +4,21 @@
   margin: 75px 0 0 -262px;
   width: 524px;
 
+  &--loading {
+    @include transform(scale(1.3));
+    opacity: 0;
+  }
+
+  &--loaded {
+    @include transform(scale(1));
+    opacity: 1;
+  }
+
+  &--leaving {
+    @include transform(scale(1.3));
+    opacity: 0;
+  }
+
   &__box {
     background-color: $white;
     border-radius: 4px;

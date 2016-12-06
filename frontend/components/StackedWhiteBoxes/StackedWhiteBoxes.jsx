@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
+import { browserHistory, Link } from 'react-router';
 import classnames from 'classnames';
 
 const baseClass = 'stacked-white-boxes';
@@ -13,14 +13,61 @@ class StackedWhiteBoxes extends Component {
     previousLocation: PropTypes.string,
   };
 
+  constructor (props) {
+    super(props);
+
+    this.state = {
+      isLoading: false,
+      isLoaded: false,
+      isLeaving: false,
+    };
+  }
+
+  componentWillMount () {
+    this.setState({
+      isLoading: true,
+    });
+  }
+
+  componentDidMount () {
+    this.setState({
+      isLoading: false,
+      isLoaded: true,
+    });
+
+    return false;
+  }
+
+  nowLeaving = (evt) => {
+    const { window } = global;
+    const { previousLocation } = this.props;
+    evt.preventDefault();
+
+    this.setState({
+      isLoading: false,
+      isLoaded: false,
+      isLeaving: true,
+    });
+
+    if (previousLocation) {
+      window.setTimeout(
+        () => { browserHistory.push(previousLocation); },
+        300
+      );
+    }
+
+    return false;
+  }
+
   renderBackButton = () => {
     const { previousLocation } = this.props;
+    const { nowLeaving } = this;
 
     if (!previousLocation) return false;
 
     return (
       <div className={`${baseClass}__back`}>
-        <Link to={previousLocation} className={`${baseClass}__back-link`}>╳</Link>
+        <Link to={previousLocation} className={`${baseClass}__back-link`} onClick={nowLeaving}>╳</Link>
       </div>
     );
   }
@@ -37,11 +84,21 @@ class StackedWhiteBoxes extends Component {
 
   render () {
     const { children, className, leadText } = this.props;
+    const {
+      isLoading,
+      isLoaded,
+      isLeaving,
+    } = this.state;
     const { renderBackButton, renderHeader } = this;
 
     const boxClass = classnames(
       baseClass,
-      className
+      className,
+      {
+        [`${baseClass}--loading`]: isLoading,
+        [`${baseClass}--loaded`]: isLoaded,
+        [`${baseClass}--leaving`]: isLeaving,
+      }
     );
 
     return (

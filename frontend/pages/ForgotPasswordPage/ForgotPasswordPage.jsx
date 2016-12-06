@@ -75,7 +75,7 @@ export class ForgotPasswordPage extends Component {
         headerText="Forgot Password"
         leadText={leadText}
         previousLocation="/login"
-        className="forgot-password__header"
+        className="forgot-password"
       >
         {this.renderContent()}
       </StackedWhiteBoxes>
