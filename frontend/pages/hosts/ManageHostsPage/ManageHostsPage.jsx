@@ -110,8 +110,8 @@ export class ManageHostsPage extends Component {
 
       const { dispatch } = this.props;
       const { MANAGE_HOSTS } = paths;
-      const lowerDisplayText = selectedLabel.display_text.toLowerCase();
-      const nextLocation = lowerDisplayText === 'all hosts' ? MANAGE_HOSTS : `${MANAGE_HOSTS}/${lowerDisplayText}`;
+      const { slug } = selectedLabel;
+      const nextLocation = slug === 'all-hosts' ? MANAGE_HOSTS : `${MANAGE_HOSTS}/${slug}`;
 
       dispatch(push(nextLocation));
 
@@ -318,14 +318,14 @@ export class ManageHostsPage extends Component {
 }
 
 const mapStateToProps = (state, { location, params }) => {
-  const activeLabelDisplayText = params.active_label || 'All Hosts';
+  const activeLabelSlug = params.active_label || 'all-hosts';
   const { display } = state.components.ManageHostsPage;
   const { entities: hosts } = entityGetter(state).get('hosts');
   const labelEntities = entityGetter(state).get('labels');
   const { entities: labels } = labelEntities;
   const isAddLabel = location.hash === NEW_LABEL_HASH;
   const selectedLabel = labelEntities.findBy(
-    { display_text: activeLabelDisplayText },
+    { slug: activeLabelSlug },
     { ignoreCase: true },
   );
   const { selectedOsqueryTable } = state.components.QueryPages;

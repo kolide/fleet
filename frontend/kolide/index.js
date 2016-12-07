@@ -9,8 +9,11 @@ class Kolide extends Base {
 
     return this.authenticatedPost(this.endpoint(LABELS), JSON.stringify({ description, name, query }))
       .then((response) => {
+        const { label } = response;
+
         return {
-          ...response.label,
+          ...label,
+          slug: helpers.labelSlug(label),
           type: 'custom',
         };
       });
@@ -134,13 +137,14 @@ class Kolide extends Base {
         const labels = response.labels.map((label) => {
           return {
             ...label,
+            slug: helpers.labelSlug(label),
             type: labelTypeForDisplayText[label.display_text] || 'custom',
           };
         });
         const stubbedLabels = [
-          { id: 40, display_text: 'ONLINE', type: 'status', count: 20 },
-          { id: 50, display_text: 'OFFLINE', type: 'status', count: 2 },
-          { id: 55, display_text: 'MIA', description: '(offline > 30 days)', type: 'status', count: 3 },
+          { id: 40, display_text: 'ONLINE', slug: 'online', type: 'status', count: 20 },
+          { id: 50, display_text: 'OFFLINE', slug: 'offline', type: 'status', count: 2 },
+          { id: 55, display_text: 'MIA', description: '(offline > 30 days)', slug: 'mia', type: 'status', count: 3 },
         ];
 
         return labels.concat(stubbedLabels);
