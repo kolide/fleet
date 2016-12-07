@@ -20,6 +20,10 @@
   border-bottom: solid 1px #c38dec;
 }
 
+.ace-kolide .ace_content {
+  padding-left: 6px;
+}
+
 .ace-kolide .ace_gutter {
   background: #fff;
   color: #c38dec;
