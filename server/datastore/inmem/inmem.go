@@ -492,6 +492,13 @@ func (orm *Datastore) createDevOrgInfo() error {
 	devOrgInfo := &kolide.AppConfig{
 		OrgName:    "Kolide",
 		OrgLogoURL: fmt.Sprintf("%s/logo.png", orm.config.Server.Address),
+		SMTPConfig: kolide.SMTPConfig{
+			Port:               465,
+			AuthenticationType: kolide.UserNamePassword,
+			EnableSSLTLS:       true,
+			VerifySSLCerts:     true,
+			EnableStartTLS:     true,
+		},
 	}
 	_, err := orm.NewAppConfig(devOrgInfo)
 	if err != nil {

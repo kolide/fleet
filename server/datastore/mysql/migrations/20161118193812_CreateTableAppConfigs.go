@@ -12,10 +12,22 @@ func init() {
 
 func Up_20161118193812(tx *sql.Tx) error {
 	sqlStatement := "CREATE TABLE `app_configs` (" +
-		"`id` int(10) unsigned NOT NULL AUTO_INCREMENT," +
-		"`org_name` varchar(255) DEFAULT NULL," +
-		"`org_logo_url` varchar(255) DEFAULT NULL," +
-		"`kolide_server_url` varchar(255) DEFAULT NULL," +
+		"`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT," +
+		"`org_name` VARCHAR(255) NOT NULL DEFAULT ''," +
+		"`org_logo_url` VARCHAR(255) NOT NULL DEFAULT ''," +
+		"`kolide_server_url` VARCHAR(255) NOT NULL DEFAULT ''," +
+		"`smtp_configured` TINYINT(1) NOT NULL DEFAULT FALSE," +
+		"`smtp_sender_address` VARCHAR(255) NOT NULL DEFAULT ''," +
+		"`smtp_server` VARCHAR(255) NOT NULL DEFAULT ''," +
+		"`smtp_port` INT UNSIGNED NOT NULL DEFAULT 465," +
+		"`smtp_authentication_type` INT UNSIGNED NOT NULL DEFAULT 0," +
+		"`smtp_enable_ssl_tls` TINYINT(1) NOT NULL DEFAULT TRUE," +
+		"`smtp_authentication_method` INT UNSIGNED NOT NULL DEFAULT 0," +
+		"`smtp_domain` VARCHAR(255) NOT NULL DEFAULT ''," +
+		"`smtp_user_name` VARCHAR(255) NOT NULL DEFAULT ''," +
+		"`smtp_password` VARCHAR(255) NOT NULL DEFAULT ''," +
+		"`smtp_verify_ssl_certs` TINYINT(1) NOT NULL DEFAULT TRUE, " +
+		"`smtp_enable_start_tls` TINYINT(1) NOT NULL DEFAULT TRUE, " +
 		"PRIMARY KEY (`id`)" +
 		") ENGINE=InnoDB DEFAULT CHARSET=utf8;"
 	_, err := tx.Exec(sqlStatement)
