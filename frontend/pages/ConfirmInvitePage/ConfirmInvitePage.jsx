@@ -5,6 +5,7 @@ import { push } from 'react-router-redux';
 
 import AuthenticationFormWrapper from 'components/AuthenticationFormWrapper';
 import ConfirmInviteForm from 'components/forms/ConfirmInviteForm';
+import EnsureUnauthenticated from 'components/EnsureUnauthenticated';
 import paths from 'router/paths';
 import { renderFlash } from 'redux/nodes/notifications/actions';
 import userActions from 'redux/nodes/entities/users/actions';
@@ -83,4 +84,5 @@ const mapStateToProps = (state, { location: urlLocation, params }) => {
   return { inviteFormData };
 };
 
-export default connect(mapStateToProps)(ConfirmInvitePage);
+const ConnectedComponent = connect(mapStateToProps)(ConfirmInvitePage);
+export default EnsureUnauthenticated(ConnectedComponent);
