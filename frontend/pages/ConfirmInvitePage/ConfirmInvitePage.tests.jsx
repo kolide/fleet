@@ -6,9 +6,10 @@ import { connectedComponent, reduxMockStore } from 'test/helpers';
 
 describe('ConfirmInvitePage - component', () => {
   const inviteToken = 'abc123';
+  const location = { query: { email: 'hi@gnar.dog', name: 'Gnar Dog' } };
   const params = { invite_token: inviteToken };
   const component = connectedComponent(ConfirmInvitePage, {
-    props: { params },
+    props: { location, params },
     mockStore: reduxMockStore(),
   });
   const page = mount(component);
@@ -17,7 +18,11 @@ describe('ConfirmInvitePage - component', () => {
     expect(page.length).toEqual(1);
     expect(
       page.find('ConfirmInvitePage').prop('inviteFormData')
-    ).toEqual(params);
+    ).toEqual({
+      email: 'hi@gnar.dog',
+      invite_token: inviteToken,
+      name: 'Gnar Dog',
+    });
   });
 
   it('renders a ConfirmInviteForm', () => {
