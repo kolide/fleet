@@ -1,8 +1,10 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 
-import ConfirmInviteForm from 'components/forms/ConfirmInviteForm';
 import AuthenticationFormWrapper from 'components/AuthenticationFormWrapper';
+import ConfirmInviteForm from 'components/forms/ConfirmInviteForm';
+import { renderFlash } from 'redux/nodes/notifications/actions';
+import userActions from 'redux/nodes/entities/users/actions';
 
 const baseClass = 'confirm-invite-page';
 
@@ -15,7 +17,21 @@ class ConfirmInvitePage extends Component {
   };
 
   onSubmit = (formData) => {
-    console.log(formData);
+    const { create } = userActions;
+    const { dispatch } = this.props;
+
+    dispatch(create(formData))
+      .catch((error) => {
+        if (error === 'expired invite token') {
+          dispatch(renderFlash('error', 'Your invite token has expired'));
+
+          return false;
+        }
+
+        dispatch(renderFlash('error', error));
+
+        return false;
+      });
 
     return false;
   }
