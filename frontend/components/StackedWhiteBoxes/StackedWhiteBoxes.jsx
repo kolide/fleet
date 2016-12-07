@@ -32,7 +32,9 @@ class StackedWhiteBoxes extends Component {
 
   componentDidMount () {
     const { didLoad } = this;
-    setTimeout(didLoad());
+    didLoad();
+
+    return false;
   }
 
   didLoad = () => {
