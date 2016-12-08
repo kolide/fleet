@@ -147,7 +147,7 @@ class TargetDetails extends Component {
           <AceEditor
             editorProps={{ $blockScrolling: Infinity }}
             mode="kolide"
-            minLines={4}
+            minLines={1}
             maxLines={20}
             fontSize={13}
             name="label-query"

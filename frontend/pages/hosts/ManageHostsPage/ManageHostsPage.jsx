@@ -201,7 +201,7 @@ export class ManageHostsPage extends Component {
           <AceEditor
             editorProps={{ $blockScrolling: Infinity }}
             mode="kolide"
-            minLines={2}
+            minLines={1}
             maxLines={20}
             name="label-header"
             readOnly
