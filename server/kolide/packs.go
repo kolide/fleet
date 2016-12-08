@@ -62,20 +62,6 @@ type PackPayload struct {
 	Disabled    *bool
 }
 
-type PackQuery struct {
-	UpdateCreateTimestamps
-	DeleteFields
-	ID           uint
-	PackID       uint
-	QueryID      uint
-	Interval     uint    `json:"interval"`
-	Snapshot     *bool   `json:"snapshot"`
-	Differential *bool   `json:"differential"`
-	Platform     *string `json:"platform"`
-	Version      *string `json:"version"`
-	Shard        *uint   `json:"shard"`
-}
-
 type PackTarget struct {
 	ID     uint
 	PackID uint
