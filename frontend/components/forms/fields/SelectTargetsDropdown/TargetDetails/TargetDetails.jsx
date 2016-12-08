@@ -149,7 +149,6 @@ class TargetDetails extends Component {
             mode="kolide"
             minLines={1}
             maxLines={20}
-            fontSize={13}
             name="label-query"
             readOnly
             setOptions={{ wrap: true }}
