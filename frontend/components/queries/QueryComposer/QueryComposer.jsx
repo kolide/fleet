@@ -128,6 +128,7 @@ class QueryComposer extends Component {
             theme="kolide"
             value={queryText}
             width="100%"
+            fontSize={14}
           />
         </div>
         {renderTargetsInput()}

@@ -211,6 +211,7 @@ export class ManageHostsPage extends Component {
             theme="kolide"
             value={query}
             width="100%"
+            fontSize={14}
           />
         }
         <p>Description</p>

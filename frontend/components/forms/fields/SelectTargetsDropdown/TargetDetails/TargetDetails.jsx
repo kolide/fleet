@@ -158,6 +158,7 @@ class TargetDetails extends Component {
             theme="kolide"
             value={query}
             width="100%"
+            fontSize={14}
           />
         </div>
       </div>
