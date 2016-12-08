@@ -64,7 +64,6 @@ func testAddAndRemoveQueryFromPack(t *testing.T, ds kolide.Datastore) {
 
 	assert.NotEqual(t, q1.ID, q2.ID)
 
-	err = ds.AddQueryToPack(q2.ID, pack.ID)
 	err = ds.AddQueryToPack(q2.ID, pack.ID, kolide.QueryOptions{})
 	require.Nil(t, err)
 

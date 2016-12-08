@@ -23,6 +23,7 @@ func Up_20161118212758(tx *sql.Tx) error {
 			"`description` varchar(255) DEFAULT NULL," +
 			"`query` varchar(255) NOT NULL," +
 			"`author_id` int(10) unsigned DEFAULT NULL," +
+			"PRIMARY KEY (`id`)," +
 			"FOREIGN KEY (`author_id`) REFERENCES `users`(`id`) ON DELETE SET NULL" +
 			") ENGINE=InnoDB DEFAULT CHARSET=utf8;",
 	)

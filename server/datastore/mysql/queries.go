@@ -16,7 +16,7 @@ func (d *Datastore) NewQuery(query *kolide.Query) (*kolide.Query, error) {
 			query,
 			saved,
 			author_id
-		) VALUES ( ?, ?, ?, ? )
+		) VALUES ( ?, ?, ?, ?, ? )
 	`
 	result, err := d.db.Exec(sql, query.Name, query.Description, query.Query, query.Saved, query.AuthorID)
 	if err != nil {
