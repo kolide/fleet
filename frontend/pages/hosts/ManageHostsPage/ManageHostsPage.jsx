@@ -202,7 +202,7 @@ export class ManageHostsPage extends Component {
             editorProps={{ $blockScrolling: Infinity }}
             mode="kolide"
             minLines={2}
-            maxLines={4}
+            maxLines={20}
             name="label-header"
             readOnly
             setOptions={{ wrap: true }}

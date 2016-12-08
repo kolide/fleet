@@ -118,7 +118,7 @@ class QueryComposer extends Component {
             editorProps={{ $blockScrolling: Infinity }}
             mode="kolide"
             minLines={4}
-            maxLines={4}
+            maxLines={20}
             name="query-editor"
             onLoad={onLoad}
             onChange={onTextEditorInputChange}

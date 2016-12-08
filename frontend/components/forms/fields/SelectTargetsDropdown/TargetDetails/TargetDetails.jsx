@@ -148,7 +148,7 @@ class TargetDetails extends Component {
             editorProps={{ $blockScrolling: Infinity }}
             mode="kolide"
             minLines={4}
-            maxLines={4}
+            maxLines={20}
             fontSize={13}
             name="label-query"
             readOnly
