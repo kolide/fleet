@@ -1,9 +1,21 @@
 import React from 'react';
+import expect from 'expect';
 import configureStore from 'redux-mock-store';
 import expect, { spyOn } from 'expect';
 import { noop } from 'lodash';
 import { Provider } from 'react-redux';
 import thunk from 'redux-thunk';
+
+export const itBehavesLikeAFormInputElement = (form, inputName) => {
+  const inputField = form.find({ name: inputName }).find('input');
+  const inputText = 'some text';
+
+  expect(inputField.length).toEqual(1);
+
+  fillInFormInput(inputField, inputText);
+
+  expect(form.state().formData).toInclude({ [inputName]: inputText });
+};
 
 export const fillInFormInput = (inputComponent, value) => {
   return inputComponent.simulate('change', { target: { value } });
