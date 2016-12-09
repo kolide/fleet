@@ -82,8 +82,19 @@ func makeGetScheduledQueriesInPackEndpoint(svc kolide.Service) endpoint.Endpoint
 // Schedule Queries
 ////////////////////////////////////////////////////////////////////////////////
 
+type scheduleQuerySubmission struct {
+	PackID       uint    `json:"pack_id"`
+	QueryIDs     []uint  `json:"query_ids"`
+	Interval     uint    `json:"interval"`
+	Snapshot     *bool   `json:"snapshot"`
+	Differential *bool   `json:"differential"`
+	Platform     *string `json:"platform"`
+	Version      *string `json:"version"`
+	Shard        *uint   `json:"shard"`
+}
+
 type scheduleQueriesRequest struct {
-	// TODO: add fields
+	Options []scheduleQuerySubmission `json:"options"`
 }
 
 type scheduleQueriesResponse struct {
@@ -98,8 +109,26 @@ func makeScheduleQueriesEndpoint(svc kolide.Service) endpoint.Endpoint {
 		req := request.(scheduleQueriesRequest)
 		resp := getScheduledQueriesInPackResponse{Scheduled: []scheduledQueryResponse{}}
 
-		// TODO: call service
-		_ = req
+		for _, submission := range req.Options {
+			for _, queryID := range submission.QueryIDs {
+				scheduled, err := svc.ScheduleQuery(ctx, &kolide.PackQuery{
+					PackID:       submission.PackID,
+					QueryID:      queryID,
+					Interval:     submission.Interval,
+					Snapshot:     submission.Snapshot,
+					Differential: submission.Differential,
+					Platform:     submission.Platform,
+					Version:      submission.Version,
+					Shard:        submission.Shard,
+				})
+				if err != nil {
+					return scheduleQueriesResponse{Err: err}, nil
+				}
+				resp.Scheduled = append(resp.Scheduled, scheduledQueryResponse{
+					PackQuery: *scheduled,
+				})
+			}
+		}
 
 		return resp, nil
 	}
