@@ -1,6 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
+import { size } from 'lodash';
 
+import AppConfigForm from 'components/forms/admin/AppConfigForm';
 import configInterface from 'interfaces/config';
 import SmtpWarning from 'pages/admin/AppSettingsPage/SmtpWarning';
 
@@ -24,12 +26,22 @@ class AppSettingsPage extends Component {
     return false;
   }
 
+  onFormSubmit = (formData) => {
+    console.log(formData);
+
+    return false;
+  }
+
   render () {
     const { appConfig } = this.props;
-    const { onDismissSmtpWarning } = this;
+    const { onDismissSmtpWarning, onFormSubmit } = this;
     const { showSmtpWarning } = this.state;
     const { smtp_configured: smtpConfigured } = appConfig;
     const shouldShowWarning = !smtpConfigured && showSmtpWarning;
+
+    if (!size(appConfig)) {
+      return false;
+    }
 
     return (
       <div className={`${baseClass} body-wrap`}>
@@ -38,6 +50,7 @@ class AppSettingsPage extends Component {
           onDismiss={onDismissSmtpWarning}
           shouldShowWarning={shouldShowWarning}
         />
+        <AppConfigForm formData={appConfig} handleSubmit={onFormSubmit} />
       </div>
     );
   }
