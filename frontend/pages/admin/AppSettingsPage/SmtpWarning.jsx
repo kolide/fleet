@@ -26,6 +26,6 @@ const SmtpWarning = ({ onDismiss, shouldShowWarning }) => {
 SmtpWarning.propTypes = {
   onDismiss: PropTypes.func.isRequired,
   shouldShowWarning: PropTypes.bool.isRequired,
-}
+};
 
 export default SmtpWarning;

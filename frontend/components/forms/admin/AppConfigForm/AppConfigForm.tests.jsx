@@ -6,7 +6,7 @@ import { noop } from 'lodash';
 import AppConfigForm from 'components/forms/admin/AppConfigForm';
 import { itBehavesLikeAFormInputElement } from 'test/helpers';
 
-describe.only('AppConfigForm - form', () => {
+describe('AppConfigForm - form', () => {
   const form = mount(<AppConfigForm handleSubmit={noop} />);
 
   describe('Organization Name input', () => {
@@ -15,9 +15,64 @@ describe.only('AppConfigForm - form', () => {
     });
   });
 
-  describe('Organization Logo URL input', () => {
+  describe('Organization Avatar input', () => {
     it('renders an input field', () => {
       itBehavesLikeAFormInputElement(form, 'org_logo_url');
+    });
+  });
+
+  describe('Kolide App URL input', () => {
+    it('renders an input field', () => {
+      itBehavesLikeAFormInputElement(form, 'kolide_server_url');
+    });
+  });
+
+  describe('Sender Address input', () => {
+    it('renders an input field', () => {
+      itBehavesLikeAFormInputElement(form, 'sender_address');
+    });
+  });
+
+  describe('SMTP Server input', () => {
+    it('renders an input field', () => {
+      itBehavesLikeAFormInputElement(form, 'server');
+    });
+  });
+
+  describe('Port input', () => {
+    it('renders an input field', () => {
+      itBehavesLikeAFormInputElement(form, 'port');
+    });
+  });
+
+  describe('Enable SSL/TLS input', () => {
+    it('renders an input field', () => {
+      itBehavesLikeAFormInputElement(form, 'enable_ssl_tls', 'Checkbox');
+    });
+  });
+
+  describe('SMTP user name input', () => {
+    it('renders an input field', () => {
+      itBehavesLikeAFormInputElement(form, 'user_name');
+    });
+  });
+
+  describe('SMTP user password input', () => {
+    it('renders an input field', () => {
+      itBehavesLikeAFormInputElement(form, 'password');
+    });
+  });
+
+  describe('Advanced options', () => {
+    it('does not render advanced options by default', () => {
+      expect(form.find({ name: 'domain' }).length).toEqual(0);
+      expect(form.find('Slider').length).toEqual(0);
+    });
+
+    it('renders advanced options when "Advanced Options" is clicked', () => {
+      form.find('Button').first().simulate('click');
+      expect(form.find({ name: 'domain' }).length).toEqual(1);
+      expect(form.find('Slider').length).toEqual(2);
     });
   });
 });

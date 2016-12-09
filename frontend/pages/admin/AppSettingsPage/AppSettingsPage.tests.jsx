@@ -6,7 +6,7 @@ import testHelpers from 'test/helpers';
 
 const { connectedComponent, reduxMockStore } = testHelpers;
 
-describe.only('AppSettingsPage - component', () => {
+describe('AppSettingsPage - component', () => {
   it('renders', () => {
     const mockStore = reduxMockStore({ app: { config: {} } });
     const page = mount(connectedComponent(AppSettingsPage, { mockStore }));

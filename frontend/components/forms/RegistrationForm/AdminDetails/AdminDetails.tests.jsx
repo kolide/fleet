@@ -19,19 +19,19 @@ describe('AdminDetails - form', () => {
 
   describe('password input', () => {
     it('renders an input field', () => {
-      itBehavesLikeAFormInputElement(form, 'password')
+      itBehavesLikeAFormInputElement(form, 'password');
     });
   });
 
   describe('password confirmation input', () => {
     it('renders an input field', () => {
-      itBehavesLikeAFormInputElement(form, 'password_confirmation')
+      itBehavesLikeAFormInputElement(form, 'password_confirmation');
     });
   });
 
   describe('email input', () => {
     it('renders an input field', () => {
-      itBehavesLikeAFormInputElement(form, 'email')
+      itBehavesLikeAFormInputElement(form, 'email');
     });
   });
 
@@ -55,7 +55,7 @@ describe('AdminDetails - form', () => {
 
     it('validates the email field', () => {
       const onSubmitSpy = createSpy();
-      const form = mount(<AdminDetails handleSubmit={onSubmitSpy} />);
+      form = mount(<AdminDetails handleSubmit={onSubmitSpy} />);
       const emailField = form.find({ name: 'email' }).find('input');
       const submitBtn = form.find('Button');
 
@@ -68,7 +68,7 @@ describe('AdminDetails - form', () => {
 
     it('validates the password fields match', () => {
       const onSubmitSpy = createSpy();
-      const form = mount(<AdminDetails handleSubmit={onSubmitSpy} />);
+      form = mount(<AdminDetails handleSubmit={onSubmitSpy} />);
       const passwordConfirmationField = form.find({ name: 'password_confirmation' }).find('input');
       const passwordField = form.find({ name: 'password' }).find('input');
       const submitBtn = form.find('Button');
@@ -85,7 +85,7 @@ describe('AdminDetails - form', () => {
 
     it('submits the form when valid', () => {
       const onSubmitSpy = createSpy();
-      const form = mount(<AdminDetails handleSubmit={onSubmitSpy} />);
+      form = mount(<AdminDetails handleSubmit={onSubmitSpy} />);
       const emailField = form.find({ name: 'email' }).find('input');
       const passwordConfirmationField = form.find({ name: 'password_confirmation' }).find('input');
       const passwordField = form.find({ name: 'password' }).find('input');

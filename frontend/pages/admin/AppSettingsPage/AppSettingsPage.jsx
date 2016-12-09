@@ -50,7 +50,11 @@ class AppSettingsPage extends Component {
           onDismiss={onDismissSmtpWarning}
           shouldShowWarning={shouldShowWarning}
         />
-        <AppConfigForm formData={appConfig} handleSubmit={onFormSubmit} />
+        <AppConfigForm
+          formData={appConfig}
+          handleSubmit={onFormSubmit}
+          smtpConfigured={smtpConfigured}
+        />
       </div>
     );
   }

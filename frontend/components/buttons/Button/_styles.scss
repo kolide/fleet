@@ -132,6 +132,10 @@ $base-class: 'button';
       top: 0;
     }
 
+    &:focus {
+      outline: none;
+    }
+
     &:hover {
       background-color: transparent;
       box-shadow: none;
