@@ -494,7 +494,7 @@ func (orm *Datastore) createDevOrgInfo() error {
 		OrgLogoURL: fmt.Sprintf("%s/logo.png", orm.config.Server.Address),
 		SMTPConfig: kolide.SMTPConfig{
 			Port:               465,
-			AuthenticationType: kolide.UserNamePassword,
+			AuthenticationType: kolide.AuthTypeUserNamePassword,
 			EnableSSLTLS:       true,
 			VerifySSLCerts:     true,
 			EnableStartTLS:     true,

@@ -23,9 +23,10 @@ func (d *Datastore) NewAppConfig(info *kolide.AppConfig) (*kolide.AppConfig, err
 			smtp_user_name,
 			smtp_password,
 			smtp_verify_ssl_certs,
-			smtp_enable_start_tls
+			smtp_enable_start_tls,
+			smtp_disabled
 		)
-		VALUES( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
+		VALUES( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
 	`
 
 	err := d.db.Get(info, "SELECT * FROM app_configs LIMIT 1")
@@ -47,12 +48,14 @@ func (d *Datastore) NewAppConfig(info *kolide.AppConfig) (*kolide.AppConfig, err
 			info.Password,
 			info.VerifySSLCerts,
 			info.EnableSSLTLS,
+			info.Disabled,
 		)
 		if err != nil {
 			return nil, err
 		}
 
-		info.ID, _ = result.LastInsertId()
+		id, _ := result.LastInsertId()
+		info.ID = uint(id)
 		return info, nil
 	case nil:
 		return info, d.SaveAppConfig(info)
@@ -89,7 +92,8 @@ func (d *Datastore) SaveAppConfig(info *kolide.AppConfig) error {
 			smtp_user_name = ?,
 			smtp_password = ?,
 			smtp_verify_ssl_certs = ?,
-			smtp_enable_start_tls = ?
+			smtp_enable_start_tls = ?,
+			smtp_disabled = ?
 	`
 	_, err := d.db.Exec(sqlStatement,
 		info.OrgName,
@@ -107,6 +111,7 @@ func (d *Datastore) SaveAppConfig(info *kolide.AppConfig) error {
 		info.Password,
 		info.VerifySSLCerts,
 		info.EnableStartTLS,
+		info.Disabled,
 	)
 	return err
 }

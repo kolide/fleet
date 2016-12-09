@@ -1,6 +1,8 @@
 package kolide
 
-import "golang.org/x/net/context"
+import (
+	"golang.org/x/net/context"
+)
 
 // AppConfigStore contains method for saving and retrieving
 // application configuration
@@ -15,29 +17,23 @@ type AppConfigStore interface {
 type AppConfigService interface {
 	NewAppConfig(ctx context.Context, p AppConfigPayload) (info *AppConfig, err error)
 	AppConfig(ctx context.Context) (info *AppConfig, err error)
-	ModifyAppConfig(ctx context.Context, p AppConfigPayload) (info *AppConfig, err error)
+	ModifyAppConfig(ctx context.Context, r ModifyAppConfigRequest) (info *ModifyAppConfigPayload, err error)
 }
 
-// SMTPAuthenticationType defines whether or not a password will be required
-// for STMP
-type SMTPAuthenticationType uint
-
+// SMTP Authentication Typed
 const (
-	UserNamePassword SMTPAuthenticationType = iota
-	AuthNone
+	AuthTypeUserNamePassword = "username_password"
+	AuthTypeNone             = "none"
 )
 
-// STMPAuthenticationMethod values used to define method to authenticate
-// user
-type SMTPAuthenticationMethod uint
-
+// STMP Authentication Methods
 const (
-	Plain SMTPAuthenticationMethod = iota
-	Login
-	GSSAPI
-	DigestMD5
-	MD5
-	CramMD5
+	AuthMethodPlain     = "plain"
+	AuthMethodLogin     = "login"
+	AuthMethodGSSAPI    = "gssapi"
+	AuthMethodDigestMD5 = "digest_md5"
+	AuthMethodMD5       = "md5"
+	AuthMethodCramMD5   = "cram_md5"
 )
 
 type SMTPConfig struct {
@@ -52,7 +48,7 @@ type SMTPConfig struct {
 	// Port port SMTP server will use
 	Port uint `json:"port" db:"smtp_port"`
 	// AuthenticationType type of authentication for SMTP
-	AuthenticationType SMTPAuthenticationType `json:"authentication_type" db:"smtp_authentication_type"`
+	AuthenticationType string `json:"authentication_type" db:"smtp_authentication_type"`
 	// UserName must be provided if SMTPAuthenticationType is UserNamePassword
 	UserName string `json:"user_name" db:"smtp_user_name"`
 	// Password must be provided if SMTPAuthenticationType is UserNamePassword
@@ -60,7 +56,7 @@ type SMTPConfig struct {
 	// EnableSSLTLS whether to use SSL/TLS for SMTP
 	EnableSSLTLS bool `json:"enable_ssl_tls" db:"smtp_enable_ssl_tls"`
 	// SMTPAuthenticationMethod authentication method smtp server will use
-	AuthenticationMethod SMTPAuthenticationMethod `json:"authentication_method" db:"smtp_authentication_method"`
+	AuthenticationMethod string `json:"authentication_method" db:"smtp_authentication_method"`
 	// Advanced SMTP Options
 	// SMTPDomain optional domain for SMTP
 	Domain string `json:"domain,omitempty" db:"smtp_domain"`
@@ -69,16 +65,41 @@ type SMTPConfig struct {
 	VerifySSLCerts bool `json:"verify_ssl_certs" db:"smtp_verify_ssl_certs"`
 	// EnableStartTLS detects of TLS is enabled on mail server and starts to use it (default true)
 	EnableStartTLS bool `json:"enable_start_tls" db:"smtp_enable_start_tls"`
+	// Disabled if user sets this to TRUE emails will not be sent from the application
+	Disabled bool `json:"email_disabled" db:"smtp_disabled"`
 }
 
 // AppConfig holds configuration about the Kolide application.
 // AppConfig data can be managed by a Kolide API user.
 type AppConfig struct {
-	ID              int64  `json:"-"`
+	ID              uint   `json:"-"`
 	OrgName         string `json:"org_name,omitempty" db:"org_name"`
 	OrgLogoURL      string `json:"org_logo_url,omitempty" db:"org_logo_url"`
 	KolideServerURL string `json:"kolide_server_url" db:"kolide_server_url"`
 	SMTPConfig
+}
+
+type SMTPConfigResponse struct {
+	SMTPStatus map[string]string `json:"smtp_status"`
+	Success    bool              `json:"success"`
+}
+
+type ModifyAppConfigRequest struct {
+	// TestSMTP is this is set to true, the SMTP configuration will be tested
+	// with the results of the test returned to caller. No config changes
+	// will be applied.
+	TestSMTP  bool      `json:"test_smtp"`
+	AppConfig AppConfig `json:"app_config"`
+}
+
+type SMTPResponse struct {
+	Details map[string]string `json:"details"`
+	Success bool              `json:"success"`
+}
+
+type ModifyAppConfigPayload struct {
+	SMTPStatus SMTPResponse `json:"smtp_status"`
+	AppConfig  AppConfig    `json:"app_config"`
 }
 
 // AppConfigPayload contains request and response format of

@@ -6,6 +6,7 @@ import (
 )
 
 func (svc service) NewAppConfig(ctx context.Context, p kolide.AppConfigPayload) (*kolide.AppConfig, error) {
+
 	newConfig, err := svc.ds.NewAppConfig(fromPayload(p, kolide.AppConfig{}))
 	if err != nil {
 		return nil, err
@@ -17,18 +18,25 @@ func (svc service) AppConfig(ctx context.Context) (*kolide.AppConfig, error) {
 	return svc.ds.AppConfig()
 }
 
-func (svc service) ModifyAppConfig(ctx context.Context, p kolide.AppConfigPayload) (*kolide.AppConfig, error) {
+func (svc service) ModifyAppConfig(ctx context.Context, r kolide.ModifyAppConfigRequest) (*kolide.ModifyAppConfigPayload, error) {
 	config, err := svc.ds.AppConfig()
 	if err != nil {
 		return nil, err
 	}
 
-	updated := fromPayload(p, *config)
-
-	if err := svc.ds.SaveAppConfig(updated); err != nil {
+	if err := svc.ds.SaveAppConfig(&r.AppConfig); err != nil {
 		return nil, err
 	}
-	return config, nil
+
+	response := &kolide.ModifyAppConfigPayload{
+		AppConfig: *config,
+		SMTPStatus: kolide.SMTPResponse{
+			Details: map[string]string{},
+			Success: true,
+		},
+	}
+	return response, nil
+
 }
 
 func fromPayload(p kolide.AppConfigPayload, config kolide.AppConfig) *kolide.AppConfig {
