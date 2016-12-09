@@ -16,6 +16,8 @@ func Up_20161118212613(tx *sql.Tx) error {
 			"`id` int(10) unsigned NOT NULL AUTO_INCREMENT," +
 			"`created_at` timestamp DEFAULT CURRENT_TIMESTAMP," +
 			"`updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP," +
+			"`deleted_at` timestamp NULL DEFAULT NULL," +
+			"`deleted` tinyint(1) NOT NULL DEFAULT FALSE," +
 			"`pack_id` int(10) unsigned DEFAULT NULL," +
 			"`query_id` int(10) unsigned DEFAULT NULL," +
 			"`interval` int(10) unsigned DEFAULT NULL," +

@@ -31,7 +31,7 @@ func (d *Datastore) NewScheduledQuery(sq *kolide.PackQuery) (*kolide.PackQuery, 
 func (d *Datastore) SaveScheduledQuery(sq *kolide.PackQuery) (*kolide.PackQuery, error) {
 	sql := `
 		UPDATE pack_queries
-			SET pack_id = ?, query_id = ?, interval = ?, snapshot = ?, differential = ?, platform = ?, version = ?, shard = ?
+			SET pack_id = ?, query_id = ?, ` + "`interval`" + ` = ?, snapshot = ?, differential = ?, platform = ?, version = ?, shard = ?
 			WHERE id = ? AND NOT deleted
 	`
 	_, err := d.db.Exec(sql, sq.PackID, sq.QueryID, sq.Interval, sq.Snapshot, sq.Differential, sq.Platform, sq.Version, sq.Shard, sq.ID)
@@ -75,7 +75,7 @@ func (d *Datastore) ListScheduledQueriesInPack(id uint, opts kolide.ListOptions)
 	sql = appendListOptionsToSQL(sql, opts)
 	results := []*kolide.PackQuery{}
 
-	if err := d.db.Select(&results, sql); err != nil {
+	if err := d.db.Select(&results, sql, id); err != nil {
 		return nil, errors.DatabaseError(err)
 	}
 

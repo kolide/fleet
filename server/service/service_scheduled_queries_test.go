@@ -5,7 +5,6 @@ import (
 
 	"github.com/kolide/kolide-ose/server/config"
 	"github.com/kolide/kolide-ose/server/datastore/inmem"
-	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"github.com/kolide/kolide-ose/server/test"
 	"github.com/stretchr/testify/assert"
@@ -102,5 +101,4 @@ func TestDeleteScheduledQuery(t *testing.T) {
 
 	_, err = svc.GetScheduledQuery(ctx, sq1.ID)
 	require.NotNil(t, err)
-	require.Equal(t, errors.ErrNotFound, err)
 }
