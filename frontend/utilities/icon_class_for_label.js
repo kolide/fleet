@@ -12,8 +12,9 @@ export const iconClassForLabel = (label) => {
     case 'centos': return 'centos';
     case 'ubuntu': return 'ubuntu';
     case 'windows': return 'windows';
+    case 'unknown': return 'single-host';
     default: return 'label';
   }
 };
 
-export default { iconClassForLabel };
+export default iconClassForLabel;

@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 
 import osqueryTableInterface from 'interfaces/osquery_table';
 import { osqueryTableNames } from 'utilities/osquery_tables';
+import iconClassForLabel from 'utilities/icon_class_for_label';
 import Dropdown from 'components/forms/fields/Dropdown';
 import Icon from 'components/Icon';
 import SecondarySidePanelContainer from '../SecondarySidePanelContainer';
@@ -68,16 +69,17 @@ class QuerySidePanel extends Component {
     const { selectedOsqueryTable } = this.props;
     const { showAllColumns } = this.state;
     const columns = columnsToRender(selectedOsqueryTable, showAllColumns);
+    const columnBaseClass = 'query-column-list';
 
     return columns.map((column) => {
       return (
-        <div key={column.name} className={`${baseClass}__column-wrapper`}>
-          <span className={`${baseClass}__column-name`}>{column.name}</span>
-          <div>
-            <span>{displayTypeForDataType(column.type)}</span>
-            <Icon name="help" className={`${baseClass}__help`} title={column.description} />
+        <li key={column.name} className={`${columnBaseClass}__item`}>
+          <span className={`${columnBaseClass}__name`}>{column.name}</span>
+          <div className={`${columnBaseClass}__description`}>
+            <span className={`${columnBaseClass}__type`}>{displayTypeForDataType(column.type)}</span>
+            <Icon name="help-solid" className={`${columnBaseClass}__help`} title={column.description} />
           </div>
-        </div>
+        </li>
       );
     });
   }
@@ -143,26 +145,39 @@ class QuerySidePanel extends Component {
       renderSuggestedQueries,
     } = this;
     const { selectedOsqueryTable: { description, platform } } = this.props;
+    const platformArr = availability(platform);
 
     return (
       <SecondarySidePanelContainer className={baseClass}>
-        <p className={`${baseClass}__header`}>Choose a Table</p>
-        {renderTableSelect()}
-        <p className={`${baseClass}__table`}>{description}</p>
-        <div>
-          <p className={`${baseClass}__header`}>OS Availability</p>
-          <p className={`${baseClass}__platform`}>{availability(platform)}</p>
+        <div className={`${baseClass}__choose-table`}>
+          <h2 className={`${baseClass}__header`}>Choose a Table</h2>
+          {renderTableSelect()}
+          <p className={`${baseClass}__description`}>{description}</p>
         </div>
-        <div>
-          <p className={`${baseClass}__header`}>Columns</p>
-          {renderColumns()}
+
+        <div className={`${baseClass}__os-availability`}>
+          <h2 className={`${baseClass}__header`}>OS Availability</h2>
+          <ul className={`${baseClass}__platforms`}>
+            {platformArr.map((os, idx) => {
+              return <li key={idx}><Icon name={iconClassForLabel(os)} /> {os.display_text}</li>;
+            })}
+          </ul>
+        </div>
+
+        <div className={`${baseClass}__columns`}>
+          <h2 className={`${baseClass}__header`}>Columns</h2>
+          <ul className={`${baseClass}__column-list`}>
+            {renderColumns()}
+          </ul>
           {renderMoreColumns()}
         </div>
-        <div>
-          <p className={`${baseClass}__header`}>Joins</p>
+
+        <div className={`${baseClass}__joins`}>
+          <h2 className={`${baseClass}__header`}>Joins</h2>
         </div>
-        <div>
-          <p className={`${baseClass}__header`}>Suggested Queries</p>
+
+        <div className={`${baseClass}__suggested-queries`}>
+          <h2 className={`${baseClass}__header`}>Suggested Queries</h2>
           {renderSuggestedQueries()}
         </div>
       </SecondarySidePanelContainer>
