@@ -34,7 +34,7 @@ func testOrgInfo(t *testing.T, ds kolide.Datastore) {
 	info2.EnableSSLTLS = false
 	info2.AuthenticationMethod = kolide.AuthMethodDigestMD5
 	info2.VerifySSLCerts = true
-	info2.EnableSSLTLS = true
+	info2.EnableStartTLS = true
 	err = ds.SaveAppConfig(info2)
 	require.Nil(t, err)
 

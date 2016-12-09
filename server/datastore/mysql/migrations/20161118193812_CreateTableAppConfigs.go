@@ -12,7 +12,7 @@ func init() {
 
 func Up_20161118193812(tx *sql.Tx) error {
 	sqlStatement := "CREATE TABLE `app_configs` (" +
-		"`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT," +
+		"`id` INT(10) UNSIGNED NOT NULL DEFAULT 1," +
 		"`org_name` VARCHAR(255) NOT NULL DEFAULT ''," +
 		"`org_logo_url` VARCHAR(255) NOT NULL DEFAULT ''," +
 		"`kolide_server_url` VARCHAR(255) NOT NULL DEFAULT ''," +
