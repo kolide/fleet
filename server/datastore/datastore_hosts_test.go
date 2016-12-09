@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/kolide/kolide-ose/server/kolide"
+	"github.com/kolide/kolide-ose/server/test"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -354,7 +355,7 @@ func testSearchHostsLimit(t *testing.T, ds kolide.Datastore) {
 }
 
 func testDistributedQueriesForHost(t *testing.T, ds kolide.Datastore) {
-	user := newUser(t, ds, "Zach", "zwass", "zwass@kolide.co", true)
+	user := test.NewUser(t, ds, "Zach", "zwass", "zwass@kolide.co", true)
 
 	h1, err := ds.NewHost(&kolide.Host{
 		OsqueryHostID:    "1",

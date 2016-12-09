@@ -6,6 +6,7 @@ import (
 
 	"github.com/WatchBeam/clock"
 	"github.com/kolide/kolide-ose/server/kolide"
+	"github.com/kolide/kolide-ose/server/test"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -30,21 +31,19 @@ func testDeletePack(t *testing.T, ds kolide.Datastore) {
 }
 
 func testAddAndRemoveQueryFromPack(t *testing.T, ds kolide.Datastore) {
-	user := newUser(t, ds, "Zach", "zwass", "zwass@kolide.co", false)
+	user := test.NewUser(t, ds, "Zach", "zwass", "zwass@kolide.co", false)
 
-	pack := &kolide.Pack{
+	pack, err := ds.NewPack(&kolide.Pack{
 		Name: "foo",
-	}
-	_, err := ds.NewPack(pack)
+	})
 	assert.Nil(t, err)
 	assert.NotEqual(t, uint(0), pack.ID)
 
-	q1 := &kolide.Query{
+	q1, err := ds.NewQuery(&kolide.Query{
 		Name:     "bar",
 		Query:    "bar",
 		AuthorID: user.ID,
-	}
-	q1, err = ds.NewQuery(q1)
+	})
 	require.Nil(t, err)
 	assert.NotEqual(t, uint(0), q1.ID)
 
@@ -53,12 +52,11 @@ func testAddAndRemoveQueryFromPack(t *testing.T, ds kolide.Datastore) {
 	})
 	require.Nil(t, err)
 
-	q2 := &kolide.Query{
+	q2, err := ds.NewQuery(&kolide.Query{
 		Name:     "baz",
 		Query:    "baz",
 		AuthorID: user.ID,
-	}
-	q2, err = ds.NewQuery(q2)
+	})
 	require.Nil(t, err)
 	assert.NotEqual(t, uint(0), q2.ID)
 
@@ -80,7 +78,7 @@ func testAddAndRemoveQueryFromPack(t *testing.T, ds kolide.Datastore) {
 }
 
 func testGetHostsInPack(t *testing.T, ds kolide.Datastore) {
-	user := newUser(t, ds, "Zach", "zwass", "zwass@kolide.co", true)
+	user := test.NewUser(t, ds, "Zach", "zwass", "zwass@kolide.co", true)
 
 	mockClock := clock.NewMockClock()
 

@@ -112,17 +112,18 @@ func (d *Datastore) ListQueriesInPack(pack *kolide.Pack) ([]kolide.QueryWithOpti
 	type annotatedQuery struct {
 		kolide.UpdateCreateTimestamps
 		kolide.DeleteFields
-		ID           uint           `json:"id"`
-		Name         string         `json:"name"`
-		Description  string         `json:"description"`
-		Query        string         `json:"query"`
-		Saved        bool           `json:"saved"`
-		Interval     uint           `json:"interval"`
-		Snapshot     sql.NullBool   `json:"snapshot"`
-		Differential sql.NullBool   `json:"differential"`
-		Platform     sql.NullString `json:"platform"`
-		Version      sql.NullString `json:"version"`
-		Shard        sql.NullInt64  `json:"shard"`
+		ID           uint
+		Name         string
+		Description  string
+		Query        string
+		AuthorID     uint `db:"author_id"`
+		Saved        bool
+		Interval     uint
+		Snapshot     sql.NullBool
+		Differential sql.NullBool
+		Platform     sql.NullString
+		Version      sql.NullString
+		Shard        sql.NullInt64
 	}
 	sql := `
 	SELECT

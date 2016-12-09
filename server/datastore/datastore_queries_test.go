@@ -5,13 +5,14 @@ import (
 	"testing"
 
 	"github.com/kolide/kolide-ose/server/kolide"
+	"github.com/kolide/kolide-ose/server/test"
 	"github.com/patrickmn/sortutil"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func testDeleteQuery(t *testing.T, ds kolide.Datastore) {
-	user := newUser(t, ds, "Zach", "zwass", "zwass@kolide.co", true)
+	user := test.NewUser(t, ds, "Zach", "zwass", "zwass@kolide.co", true)
 
 	query := &kolide.Query{
 		Name:     "foo",
@@ -70,7 +71,7 @@ func testDeleteQueries(t *testing.T, ds kolide.Datastore) {
 }
 
 func testSaveQuery(t *testing.T, ds kolide.Datastore) {
-	user := newUser(t, ds, "Zach", "zwass", "zwass@kolide.co", true)
+	user := test.NewUser(t, ds, "Zach", "zwass", "zwass@kolide.co", true)
 
 	query := &kolide.Query{
 		Name:     "foo",
@@ -95,7 +96,7 @@ func testSaveQuery(t *testing.T, ds kolide.Datastore) {
 }
 
 func testListQuery(t *testing.T, ds kolide.Datastore) {
-	user := newUser(t, ds, "Zach", "zwass", "zwass@kolide.co", true)
+	user := test.NewUser(t, ds, "Zach", "zwass", "zwass@kolide.co", true)
 
 	for i := 0; i < 10; i++ {
 		_, err := ds.NewQuery(&kolide.Query{
@@ -129,18 +130,18 @@ func checkPacks(t *testing.T, expected []kolide.Pack, actual []kolide.Pack) {
 }
 
 func testLoadPacksForQueries(t *testing.T, ds kolide.Datastore) {
-	user := newUser(t, ds, "Zach", "zwass", "zwass@kolide.co", true)
+	user := test.NewUser(t, ds, "Zach", "zwass", "zwass@kolide.co", true)
 
-	q1 := newQuery(t, ds, "q1", "select * from time", user.ID, true)
-	q2 := newQuery(t, ds, "q2", "select * from osquery_info", user.ID, true)
+	q1 := test.NewQuery(t, ds, "q1", "select * from time", user.ID, true)
+	q2 := test.NewQuery(t, ds, "q2", "select * from osquery_info", user.ID, true)
 
-	p1 := newPack(t, ds, "p1")
-	p2 := newPack(t, ds, "p2")
-	p3 := newPack(t, ds, "p3")
+	p1 := test.NewPack(t, ds, "p1")
+	p2 := test.NewPack(t, ds, "p2")
+	p3 := test.NewPack(t, ds, "p3")
 
 	var err error
 
-	addQueryToPack(t, ds, q1.ID, p2.ID, kolide.QueryOptions{})
+	test.AddQueryToPack(t, ds, q1.ID, p2.ID, kolide.QueryOptions{})
 
 	q1, err = ds.Query(q1.ID)
 	require.Nil(t, err)
@@ -149,8 +150,8 @@ func testLoadPacksForQueries(t *testing.T, ds kolide.Datastore) {
 	checkPacks(t, []kolide.Pack{*p2}, q1.Packs)
 	checkPacks(t, []kolide.Pack{}, q2.Packs)
 
-	addQueryToPack(t, ds, q2.ID, p1.ID, kolide.QueryOptions{})
-	addQueryToPack(t, ds, q2.ID, p3.ID, kolide.QueryOptions{})
+	test.AddQueryToPack(t, ds, q2.ID, p1.ID, kolide.QueryOptions{})
+	test.AddQueryToPack(t, ds, q2.ID, p3.ID, kolide.QueryOptions{})
 
 	q1, err = ds.Query(q1.ID)
 	require.Nil(t, err)
@@ -159,7 +160,7 @@ func testLoadPacksForQueries(t *testing.T, ds kolide.Datastore) {
 	checkPacks(t, []kolide.Pack{*p2}, q1.Packs)
 	checkPacks(t, []kolide.Pack{*p1, *p3}, q2.Packs)
 
-	addQueryToPack(t, ds, q1.ID, p3.ID, kolide.QueryOptions{})
+	test.AddQueryToPack(t, ds, q1.ID, p3.ID, kolide.QueryOptions{})
 
 	q1, err = ds.Query(q1.ID)
 	require.Nil(t, err)
