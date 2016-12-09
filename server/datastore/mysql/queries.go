@@ -1,8 +1,6 @@
 package mysql
 
 import (
-	"fmt"
-
 	"github.com/jmoiron/sqlx"
 	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
@@ -167,7 +165,6 @@ func (d *Datastore) loadPacksForQueries(queries []*kolide.Query) error {
 
 	query, args, err := sqlx.In(sql, ids)
 	if err != nil {
-		fmt.Println("in", err)
 		return errors.DatabaseError(err)
 	}
 
@@ -178,7 +175,6 @@ func (d *Datastore) loadPacksForQueries(queries []*kolide.Query) error {
 
 	err = d.db.Select(&rows, query, args...)
 	if err != nil {
-		fmt.Println("select", err)
 		return errors.DatabaseError(err)
 	}
 
