@@ -1,7 +1,7 @@
 .new-host {
   &__section-wrap {
     margin-bottom: $pad-base;
-    padding: $pad-base;
+    padding: 30px;
   }
 
   &__title {
@@ -15,6 +15,7 @@
 
   &__input-wrap {
     position: relative;
+    margin: 0 0 23px;
   }
 
   &__input {
@@ -56,14 +57,17 @@
 
   &__text {
     color: $text-ultradark;
-    font-size: 15px;
-    line-height: $large;
+    font-size: 16px;
+    line-height: 32px;
     margin: 0 0 $large;
     max-width: 860px;
-    letter-spacing: 0.5px;
 
-    li {
-      margin-bottom: $large;
+    p {
+      margin: 0;
+    }
+
+    .kolide-ol {
+      margin: 0;
     }
   }
 
