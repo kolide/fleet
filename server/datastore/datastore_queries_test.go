@@ -141,7 +141,7 @@ func testLoadPacksForQueries(t *testing.T, ds kolide.Datastore) {
 
 	var err error
 
-	test.AddQueryToPack(t, ds, q1.ID, p2.ID, kolide.QueryOptions{})
+	test.NewScheduledQuery(t, ds, p2.ID, q1.ID, 60, false, true)
 
 	q1, err = ds.Query(q1.ID)
 	require.Nil(t, err)
@@ -150,8 +150,8 @@ func testLoadPacksForQueries(t *testing.T, ds kolide.Datastore) {
 	checkPacks(t, []kolide.Pack{*p2}, q1.Packs)
 	checkPacks(t, []kolide.Pack{}, q2.Packs)
 
-	test.AddQueryToPack(t, ds, q2.ID, p1.ID, kolide.QueryOptions{})
-	test.AddQueryToPack(t, ds, q2.ID, p3.ID, kolide.QueryOptions{})
+	test.NewScheduledQuery(t, ds, p1.ID, q2.ID, 60, false, true)
+	test.NewScheduledQuery(t, ds, p3.ID, q2.ID, 60, false, true)
 
 	q1, err = ds.Query(q1.ID)
 	require.Nil(t, err)
@@ -160,7 +160,7 @@ func testLoadPacksForQueries(t *testing.T, ds kolide.Datastore) {
 	checkPacks(t, []kolide.Pack{*p2}, q1.Packs)
 	checkPacks(t, []kolide.Pack{*p1, *p3}, q2.Packs)
 
-	test.AddQueryToPack(t, ds, q1.ID, p3.ID, kolide.QueryOptions{})
+	test.NewScheduledQuery(t, ds, p3.ID, q1.ID, 60, false, true)
 
 	q1, err = ds.Query(q1.ID)
 	require.Nil(t, err)

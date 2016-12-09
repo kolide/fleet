@@ -44,14 +44,11 @@ type KolideEndpoints struct {
 	CreatePack                     endpoint.Endpoint
 	ModifyPack                     endpoint.Endpoint
 	DeletePack                     endpoint.Endpoint
-	AddQueryToPack                 endpoint.Endpoint // TODO: delete
-	GetQueriesInPack               endpoint.Endpoint // TODO: delete
-	DeleteQueryFromPack            endpoint.Endpoint // TODO: delete
-	ScheduleQueries                endpoint.Endpoint // NEW
-	GetScheduledQueriesInPack      endpoint.Endpoint // NEW
-	GetScheduledQuery              endpoint.Endpoint // NEW
-	ModifyScheduledQuery           endpoint.Endpoint // NEW
-	DeleteScheduledQuery           endpoint.Endpoint // NEW
+	ScheduleQueries                endpoint.Endpoint
+	GetScheduledQueriesInPack      endpoint.Endpoint
+	GetScheduledQuery              endpoint.Endpoint
+	ModifyScheduledQuery           endpoint.Endpoint
+	DeleteScheduledQuery           endpoint.Endpoint
 	EnrollAgent                    endpoint.Endpoint
 	GetClientConfig                endpoint.Endpoint
 	GetDistributedQueries          endpoint.Endpoint
@@ -111,14 +108,11 @@ func MakeKolideServerEndpoints(svc kolide.Service, jwtKey string) KolideEndpoint
 		CreatePack:                authenticatedUser(jwtKey, svc, makeCreatePackEndpoint(svc)),
 		ModifyPack:                authenticatedUser(jwtKey, svc, makeModifyPackEndpoint(svc)),
 		DeletePack:                authenticatedUser(jwtKey, svc, makeDeletePackEndpoint(svc)),
-		AddQueryToPack:            authenticatedUser(jwtKey, svc, makeAddQueryToPackEndpoint(svc)),            // TODO: delete
-		GetQueriesInPack:          authenticatedUser(jwtKey, svc, makeGetQueriesInPackEndpoint(svc)),          // TODO: delete
-		DeleteQueryFromPack:       authenticatedUser(jwtKey, svc, makeDeleteQueryFromPackEndpoint(svc)),       // TODO: delete
-		ScheduleQueries:           authenticatedUser(jwtKey, svc, makeScheduleQueriesEndpoint(svc)),           // NEW
-		GetScheduledQueriesInPack: authenticatedUser(jwtKey, svc, makeGetScheduledQueriesInPackEndpoint(svc)), // NEW
-		GetScheduledQuery:         authenticatedUser(jwtKey, svc, makeGetScheduledQueryEndpoint(svc)),         // NEW
-		ModifyScheduledQuery:      authenticatedUser(jwtKey, svc, makeModifyScheduledQueryEndpoint(svc)),      // NEW
-		DeleteScheduledQuery:      authenticatedUser(jwtKey, svc, makeDeleteScheduledQueryEndpoint(svc)),      // NEW
+		ScheduleQueries:           authenticatedUser(jwtKey, svc, makeScheduleQueriesEndpoint(svc)),
+		GetScheduledQueriesInPack: authenticatedUser(jwtKey, svc, makeGetScheduledQueriesInPackEndpoint(svc)),
+		GetScheduledQuery:         authenticatedUser(jwtKey, svc, makeGetScheduledQueryEndpoint(svc)),
+		ModifyScheduledQuery:      authenticatedUser(jwtKey, svc, makeModifyScheduledQueryEndpoint(svc)),
+		DeleteScheduledQuery:      authenticatedUser(jwtKey, svc, makeDeleteScheduledQueryEndpoint(svc)),
 		GetHost:                   authenticatedUser(jwtKey, svc, makeGetHostEndpoint(svc)),
 		ListHosts:                 authenticatedUser(jwtKey, svc, makeListHostsEndpoint(svc)),
 		DeleteHost:                authenticatedUser(jwtKey, svc, makeDeleteHostEndpoint(svc)),
@@ -171,14 +165,11 @@ type kolideHandlers struct {
 	CreatePack                     *kithttp.Server
 	ModifyPack                     *kithttp.Server
 	DeletePack                     *kithttp.Server
-	AddQueryToPack                 *kithttp.Server // TODO: delete
-	GetQueriesInPack               *kithttp.Server // TODO: delete
-	DeleteQueryFromPack            *kithttp.Server // TODO: delete
-	ScheduleQueries                *kithttp.Server // NEW
-	GetScheduledQueriesInPack      *kithttp.Server // NEW
-	GetScheduledQuery              *kithttp.Server // NEW
-	ModifyScheduledQuery           *kithttp.Server // NEW
-	DeleteScheduledQuery           *kithttp.Server // NEW
+	ScheduleQueries                *kithttp.Server
+	GetScheduledQueriesInPack      *kithttp.Server
+	GetScheduledQuery              *kithttp.Server
+	ModifyScheduledQuery           *kithttp.Server
+	DeleteScheduledQuery           *kithttp.Server
 	EnrollAgent                    *kithttp.Server
 	GetClientConfig                *kithttp.Server
 	GetDistributedQueries          *kithttp.Server
@@ -232,14 +223,11 @@ func makeKolideKitHandlers(ctx context.Context, e KolideEndpoints, opts []kithtt
 		CreatePack:                    newServer(e.CreatePack, decodeCreatePackRequest),
 		ModifyPack:                    newServer(e.ModifyPack, decodeModifyPackRequest),
 		DeletePack:                    newServer(e.DeletePack, decodeDeletePackRequest),
-		AddQueryToPack:                newServer(e.AddQueryToPack, decodeAddQueryToPackRequest),                       // TODO: delete
-		GetQueriesInPack:              newServer(e.GetQueriesInPack, decodeGetQueriesInPackRequest),                   // TODO: delete
-		DeleteQueryFromPack:           newServer(e.DeleteQueryFromPack, decodeDeleteQueryFromPackRequest),             // TODO: delete
-		ScheduleQueries:               newServer(e.ScheduleQueries, decodeScheduleQueriesRequest),                     // NEW
-		GetScheduledQueriesInPack:     newServer(e.GetScheduledQueriesInPack, decodeGetScheduledQueriesInPackRequest), // NEW
-		GetScheduledQuery:             newServer(e.GetScheduledQuery, decodeGetScheduledQueryRequest),                 // NEW
-		ModifyScheduledQuery:          newServer(e.ModifyScheduledQuery, decodeModifyScheduledQueryRequest),           // NEW
-		DeleteScheduledQuery:          newServer(e.DeleteScheduledQuery, decodeDeleteScheduledQueryRequest),           // NEW
+		ScheduleQueries:               newServer(e.ScheduleQueries, decodeScheduleQueriesRequest),
+		GetScheduledQueriesInPack:     newServer(e.GetScheduledQueriesInPack, decodeGetScheduledQueriesInPackRequest),
+		GetScheduledQuery:             newServer(e.GetScheduledQuery, decodeGetScheduledQueryRequest),
+		ModifyScheduledQuery:          newServer(e.ModifyScheduledQuery, decodeModifyScheduledQueryRequest),
+		DeleteScheduledQuery:          newServer(e.DeleteScheduledQuery, decodeDeleteScheduledQueryRequest),
 		EnrollAgent:                   newServer(e.EnrollAgent, decodeEnrollAgentRequest),
 		GetClientConfig:               newServer(e.GetClientConfig, decodeGetClientConfigRequest),
 		GetDistributedQueries:         newServer(e.GetDistributedQueries, decodeGetDistributedQueriesRequest),
@@ -320,14 +308,11 @@ func attachKolideAPIRoutes(r *mux.Router, h kolideHandlers) {
 	r.Handle("/api/v1/kolide/packs", h.CreatePack).Methods("POST")
 	r.Handle("/api/v1/kolide/packs/{id}", h.ModifyPack).Methods("PATCH")
 	r.Handle("/api/v1/kolide/packs/{id}", h.DeletePack).Methods("DELETE")
-	r.Handle("/api/v1/kolide/packs/{pid}/queries/{qid}", h.AddQueryToPack).Methods("POST")        // TODO: delete
-	r.Handle("/api/v1/kolide/packs/{id}/queries", h.GetQueriesInPack).Methods("GET")              // TODO: delete
-	r.Handle("/api/v1/kolide/packs/{pid}/queries/{qid}", h.DeleteQueryFromPack).Methods("DELETE") // TODO: delete
-	r.Handle("/api/v1/kolide/packs/{id}/scheduled", h.GetScheduledQueriesInPack).Methods("GET")   // new
-	r.Handle("/api/v1/kolide/schedule", h.ScheduleQueries).Methods("POST")                        // new
-	r.Handle("/api/v1/kolide/schedule/{id}", h.GetScheduledQuery).Methods("GET")                  // new
-	r.Handle("/api/v1/kolide/schedule/{id}", h.ModifyScheduledQuery).Methods("PATCH")             // new
-	r.Handle("/api/v1/kolide/schedule/{id}", h.DeleteScheduledQuery).Methods("DELETE")            // new
+	r.Handle("/api/v1/kolide/packs/{id}/scheduled", h.GetScheduledQueriesInPack).Methods("GET")
+	r.Handle("/api/v1/kolide/schedule", h.ScheduleQueries).Methods("POST")
+	r.Handle("/api/v1/kolide/schedule/{id}", h.GetScheduledQuery).Methods("GET")
+	r.Handle("/api/v1/kolide/schedule/{id}", h.ModifyScheduledQuery).Methods("PATCH")
+	r.Handle("/api/v1/kolide/schedule/{id}", h.DeleteScheduledQuery).Methods("DELETE")
 	r.Handle("/api/v1/kolide/labels/{id}", h.GetLabel).Methods("GET")
 	r.Handle("/api/v1/kolide/labels", h.ListLabels).Methods("GET")
 	r.Handle("/api/v1/kolide/labels", h.CreateLabel).Methods("POST")

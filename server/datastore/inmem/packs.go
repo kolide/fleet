@@ -97,68 +97,6 @@ func (orm *Datastore) ListPacks(opt kolide.ListOptions) ([]*kolide.Pack, error) 
 	return packs, nil
 }
 
-func (orm *Datastore) AddQueryToPack(qid uint, pid uint, opts kolide.QueryOptions) error {
-	scheduledQuery := &kolide.ScheduledQuery{
-		PackID:       pid,
-		QueryID:      qid,
-		Interval:     opts.Interval,
-		Differential: opts.Differential,
-		Snapshot:     opts.Snapshot,
-		Platform:     opts.Platform,
-		Version:      opts.Version,
-		Shard:        opts.Shard,
-	}
-
-	orm.mtx.Lock()
-	scheduledQuery.ID = orm.nextID(scheduledQuery)
-	orm.scheduledQueries[scheduledQuery.ID] = scheduledQuery
-	orm.mtx.Unlock()
-
-	return nil
-}
-
-func (orm *Datastore) ListQueriesInPack(pack *kolide.Pack) ([]kolide.QueryWithOptions, error) {
-	var queries []kolide.QueryWithOptions
-
-	// todo null semantics
-	orm.mtx.Lock()
-	for _, scheduledQuery := range orm.scheduledQueries {
-		query := kolide.QueryWithOptions{
-			Query: *orm.queries[scheduledQuery.QueryID],
-			Options: kolide.QueryOptions{
-				Differential: scheduledQuery.Differential,
-				Snapshot:     scheduledQuery.Snapshot,
-				Interval:     scheduledQuery.Interval,
-				Version:      scheduledQuery.Version,
-				Platform:     scheduledQuery.Platform,
-				Shard:        scheduledQuery.Shard,
-			},
-		}
-		queries = append(queries, query)
-	}
-	orm.mtx.Unlock()
-
-	return queries, nil
-}
-
-func (orm *Datastore) RemoveQueryFromPack(query *kolide.Query, pack *kolide.Pack) error {
-	var scheduledQueriesToDelete []uint
-
-	orm.mtx.Lock()
-	for _, scheduledQuery := range orm.scheduledQueries {
-		if scheduledQuery.QueryID == query.ID && scheduledQuery.PackID == pack.ID {
-			scheduledQueriesToDelete = append(scheduledQueriesToDelete, scheduledQuery.ID)
-		}
-	}
-
-	for _, scheduledQueryToDelete := range scheduledQueriesToDelete {
-		delete(orm.scheduledQueries, scheduledQueryToDelete)
-	}
-	orm.mtx.Unlock()
-
-	return nil
-}
-
 func (orm *Datastore) AddLabelToPack(lid uint, pid uint) error {
 	pt := &kolide.PackTarget{
 		PackID: pid,

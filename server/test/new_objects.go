@@ -37,11 +37,6 @@ func NewPack(t *testing.T, ds kolide.Datastore, name string) *kolide.Pack {
 	return pack
 }
 
-func AddQueryToPack(t *testing.T, ds kolide.Datastore, queryID, packID uint, opts kolide.QueryOptions) {
-	err := ds.AddQueryToPack(queryID, packID, opts)
-	require.Nil(t, err)
-}
-
 func NewCampaign(t *testing.T, ds kolide.Datastore, queryID uint, status kolide.DistributedQueryStatus, now time.Time) *kolide.DistributedQueryCampaign {
 	campaign, err := ds.NewDistributedQueryCampaign(&kolide.DistributedQueryCampaign{
 		UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{

@@ -41,15 +41,6 @@ type QueryService interface {
 	DeleteQueries(ctx context.Context, ids []uint) (uint, error)
 }
 
-type QueryOptions struct {
-	Interval     uint    `json:"interval"`
-	Snapshot     *bool   `json:"snapshot,omitempty"`
-	Differential *bool   `json:"differential,omitempty"`
-	Platform     *string `json:"platform,omitempty"`
-	Version      *string `json:"version,omitempty"`
-	Shard        *uint   `json:"shard,omitempty"`
-}
-
 type QueryPayload struct {
 	Name        *string
 	Description *string
@@ -71,11 +62,6 @@ type Query struct {
 	// Packs is loaded when retrieving queries, but is stored in a join
 	// table in the MySQL backend.
 	Packs []Pack `json:"packs" db:"-"`
-}
-
-type QueryWithOptions struct {
-	Query   Query        `json:"query"`
-	Options QueryOptions `json:"options"`
 }
 
 type Option struct {

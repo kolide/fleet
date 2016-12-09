@@ -30,53 +30,6 @@ func testDeletePack(t *testing.T, ds kolide.Datastore) {
 	assert.NotNil(t, err)
 }
 
-func testAddAndRemoveQueryFromPack(t *testing.T, ds kolide.Datastore) {
-	user := test.NewUser(t, ds, "Zach", "zwass", "zwass@kolide.co", false)
-
-	pack, err := ds.NewPack(&kolide.Pack{
-		Name: "foo",
-	})
-	assert.Nil(t, err)
-	assert.NotEqual(t, uint(0), pack.ID)
-
-	q1, err := ds.NewQuery(&kolide.Query{
-		Name:     "bar",
-		Query:    "bar",
-		AuthorID: user.ID,
-	})
-	require.Nil(t, err)
-	assert.NotEqual(t, uint(0), q1.ID)
-
-	err = ds.AddQueryToPack(q1.ID, pack.ID, kolide.QueryOptions{
-		Interval: 10,
-	})
-	require.Nil(t, err)
-
-	q2, err := ds.NewQuery(&kolide.Query{
-		Name:     "baz",
-		Query:    "baz",
-		AuthorID: user.ID,
-	})
-	require.Nil(t, err)
-	assert.NotEqual(t, uint(0), q2.ID)
-
-	assert.NotEqual(t, q1.ID, q2.ID)
-
-	err = ds.AddQueryToPack(q2.ID, pack.ID, kolide.QueryOptions{})
-	require.Nil(t, err)
-
-	queries, err := ds.ListQueriesInPack(pack)
-	require.Nil(t, err)
-	assert.Len(t, queries, 2)
-
-	err = ds.RemoveQueryFromPack(q1, pack)
-	require.Nil(t, err)
-
-	queries, err = ds.ListQueriesInPack(pack)
-	require.Nil(t, err)
-	assert.Len(t, queries, 1)
-}
-
 func testGetHostsInPack(t *testing.T, ds kolide.Datastore) {
 	user := test.NewUser(t, ds, "Zach", "zwass", "zwass@kolide.co", true)
 
@@ -101,11 +54,8 @@ func testGetHostsInPack(t *testing.T, ds kolide.Datastore) {
 	})
 	require.Nil(t, err)
 
-	err = ds.AddQueryToPack(q1.ID, p1.ID, kolide.QueryOptions{})
-	require.Nil(t, err)
-
-	err = ds.AddQueryToPack(q2.ID, p1.ID, kolide.QueryOptions{})
-	require.Nil(t, err)
+	test.NewScheduledQuery(t, ds, p1.ID, q1.ID, 60, false, true)
+	test.NewScheduledQuery(t, ds, p1.ID, q2.ID, 60, false, true)
 
 	l1, err := ds.NewLabel(&kolide.Label{
 		Name: "foo",

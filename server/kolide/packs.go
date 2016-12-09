@@ -12,11 +12,6 @@ type PackStore interface {
 	Pack(pid uint) (*Pack, error)
 	ListPacks(opt ListOptions) ([]*Pack, error)
 
-	// Modifying the queries in packs
-	AddQueryToPack(qid uint, pid uint, opts QueryOptions) error
-	ListQueriesInPack(pack *Pack) ([]QueryWithOptions, error)
-	RemoveQueryFromPack(query *Query, pack *Pack) error
-
 	// Modifying the labels for packs
 	AddLabelToPack(lid uint, pid uint) error
 	ListLabelsForPack(pid uint) ([]*Label, error)
@@ -31,10 +26,6 @@ type PackService interface {
 	NewPack(ctx context.Context, p PackPayload) (*Pack, error)
 	ModifyPack(ctx context.Context, id uint, p PackPayload) (*Pack, error)
 	DeletePack(ctx context.Context, id uint) error
-
-	AddQueryToPack(ctx context.Context, qid, pid uint, opt QueryOptions) error
-	ListQueriesInPack(ctx context.Context, id uint) ([]QueryWithOptions, error)
-	RemoveQueryFromPack(ctx context.Context, qid, pid uint) error
 
 	AddLabelToPack(ctx context.Context, lid, pid uint) error
 	ListLabelsForPack(ctx context.Context, pid uint) ([]*Label, error)

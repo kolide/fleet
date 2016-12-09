@@ -8,7 +8,6 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
 )
 
@@ -88,68 +87,5 @@ func TestDecodeGetPackRequest(t *testing.T) {
 	router.ServeHTTP(
 		httptest.NewRecorder(),
 		httptest.NewRequest("GET", "/api/v1/kolide/packs/1", nil),
-	)
-}
-
-func TestDecodeAddQueryToPackRequest(t *testing.T) {
-	router := mux.NewRouter()
-	router.HandleFunc("/api/v1/kolide/packs/{pid}/queries/{qid}", func(writer http.ResponseWriter, request *http.Request) {
-		r, err := decodeAddQueryToPackRequest(context.Background(), request)
-		assert.Nil(t, err)
-
-		params := r.(addQueryToPackRequest)
-		assert.Equal(t, uint(1), params.PackID)
-		assert.Equal(t, uint(2), params.QueryID)
-		require.NotNil(t, params.Options)
-		assert.Equal(t, uint(10), params.Options.Interval)
-		assert.Nil(t, params.Options.Differential)
-		require.NotNil(t, params.Options.Snapshot)
-		assert.True(t, *params.Options.Snapshot)
-	}).Methods("POST")
-
-	var body bytes.Buffer
-	body.Write([]byte(`{
-		"options": {
-			"interval": 10,
-			"snapshot": true
-		}
-    }`))
-
-	router.ServeHTTP(
-		httptest.NewRecorder(),
-		httptest.NewRequest("POST", "/api/v1/kolide/packs/1/queries/2", &body),
-	)
-}
-
-func TestDecodeGetQueriesInPackRequest(t *testing.T) {
-	router := mux.NewRouter()
-	router.HandleFunc("/api/v1/kolide/packs/{id}/queries", func(writer http.ResponseWriter, request *http.Request) {
-		r, err := decodeGetQueriesInPackRequest(context.Background(), request)
-		assert.Nil(t, err)
-
-		params := r.(getQueriesInPackRequest)
-		assert.Equal(t, uint(1), params.ID)
-	}).Methods("GET")
-
-	router.ServeHTTP(
-		httptest.NewRecorder(),
-		httptest.NewRequest("GET", "/api/v1/kolide/packs/1/queries", nil),
-	)
-}
-
-func TestDecodeDeleteQueryFromPackRequest(t *testing.T) {
-	router := mux.NewRouter()
-	router.HandleFunc("/api/v1/kolide/packs/{pid}/queries/{qid}", func(writer http.ResponseWriter, request *http.Request) {
-		r, err := decodeDeleteQueryFromPackRequest(context.Background(), request)
-		assert.Nil(t, err)
-
-		params := r.(deleteQueryFromPackRequest)
-		assert.Equal(t, uint(1), params.PackID)
-		assert.Equal(t, uint(2), params.QueryID)
-	}).Methods("DELETE")
-
-	router.ServeHTTP(
-		httptest.NewRecorder(),
-		httptest.NewRequest("DELETE", "/api/v1/kolide/packs/1/queries/2", nil),
 	)
 }

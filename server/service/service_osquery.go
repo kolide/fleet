@@ -78,7 +78,7 @@ func (svc service) GetClientConfig(ctx context.Context) (*kolide.OsqueryConfig, 
 
 	for _, pack := range packs {
 		// first, we must figure out what queries are in this pack
-		queries, err := svc.ds.ListQueriesInPack(pack)
+		queries, err := svc.ds.ListScheduledQueriesInPack(pack.ID, kolide.ListOptions{})
 		if err != nil {
 			return nil, osqueryError{message: "database error: " + err.Error()}
 		}
@@ -87,12 +87,13 @@ func (svc service) GetClientConfig(ctx context.Context) (*kolide.OsqueryConfig, 
 		// particular format, so we do the conversion here
 		configQueries := kolide.Queries{}
 		for _, query := range queries {
-			configQueries[query.Query.Name] = kolide.QueryContent{
-				Query:    query.Query.Query,
-				Interval: query.Options.Interval,
-				Platform: query.Options.Platform,
-				Version:  query.Options.Version,
-				Snapshot: query.Options.Snapshot,
+			_ = query
+			configQueries[query.Name] = kolide.QueryContent{
+				Query:    query.Query,
+				Interval: query.Interval,
+				Platform: query.Platform,
+				Version:  query.Version,
+				Snapshot: query.Snapshot,
 			}
 		}
 

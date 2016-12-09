@@ -58,7 +58,12 @@ func (d *Datastore) DeleteScheduledQuery(id uint) error {
 
 func (d *Datastore) ScheduledQuery(id uint) (*kolide.ScheduledQuery, error) {
 	sql := `
-		SELECT * FROM scheduled_queries WHERE id = ? AND NOT deleted
+		SELECT sq.*, q.query, q.name
+		FROM scheduled_queries sq
+		JOIN queries q
+		ON sq.query_id = q.id
+		WHERE sq.id = ?
+		AND NOT sq.deleted
 	`
 	sq := &kolide.ScheduledQuery{}
 	if err := d.db.Get(sq, sql, id); err != nil {
@@ -70,7 +75,12 @@ func (d *Datastore) ScheduledQuery(id uint) (*kolide.ScheduledQuery, error) {
 
 func (d *Datastore) ListScheduledQueriesInPack(id uint, opts kolide.ListOptions) ([]*kolide.ScheduledQuery, error) {
 	sql := `
-		SELECT * FROM scheduled_queries WHERE pack_id = ? AND NOT deleted
+		SELECT sq.*, q.query, q.name
+		FROM scheduled_queries sq
+		JOIN queries q
+		ON sq.query_id = q.id
+		WHERE sq.pack_id = ?
+		AND NOT sq.deleted
 	`
 	sql = appendListOptionsToSQL(sql, opts)
 	results := []*kolide.ScheduledQuery{}

@@ -57,52 +57,6 @@ func decodeListPacksRequest(ctx context.Context, r *http.Request) (interface{}, 
 	return listPacksRequest{ListOptions: opt}, nil
 }
 
-func decodeAddQueryToPackRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	var req addQueryToPackRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		return nil, err
-	}
-
-	qid, err := idFromRequest(r, "qid")
-	if err != nil {
-		return nil, err
-	}
-	pid, err := idFromRequest(r, "pid")
-	if err != nil {
-		return nil, err
-	}
-
-	req.QueryID = qid
-	req.PackID = pid
-
-	return req, nil
-}
-
-func decodeGetQueriesInPackRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	id, err := idFromRequest(r, "id")
-	if err != nil {
-		return nil, err
-	}
-	var req getQueriesInPackRequest
-	req.ID = id
-	return req, nil
-}
-
-func decodeDeleteQueryFromPackRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	qid, err := idFromRequest(r, "qid")
-	if err != nil {
-		return nil, err
-	}
-	pid, err := idFromRequest(r, "pid")
-	if err != nil {
-		return nil, err
-	}
-	var req deleteQueryFromPackRequest
-	req.PackID = pid
-	req.QueryID = qid
-	return req, nil
-}
-
 func decodeAddLabelToPackRequest(ctx context.Context, r *http.Request) (interface{}, error) {
 	lid, err := idFromRequest(r, "lid")
 	if err != nil {

@@ -197,17 +197,31 @@ func (orm *Datastore) createDevPacksAndQueries() error {
 		return err
 	}
 
-	err = orm.AddQueryToPack(query1.ID, pack1.ID, kolide.QueryOptions{})
+	_, err = orm.NewScheduledQuery(&kolide.ScheduledQuery{
+		QueryID:  query1.ID,
+		PackID:   pack1.ID,
+		Interval: 60,
+	})
 	if err != nil {
 		return err
 	}
 
-	err = orm.AddQueryToPack(query3.ID, pack1.ID, kolide.QueryOptions{})
+	t := true
+	_, err = orm.NewScheduledQuery(&kolide.ScheduledQuery{
+		QueryID:  query3.ID,
+		PackID:   pack1.ID,
+		Interval: 60,
+		Snapshot: &t,
+	})
 	if err != nil {
 		return err
 	}
 
-	err = orm.AddQueryToPack(query2.ID, pack2.ID, kolide.QueryOptions{})
+	_, err = orm.NewScheduledQuery(&kolide.ScheduledQuery{
+		QueryID:  query2.ID,
+		PackID:   pack2.ID,
+		Interval: 60,
+	})
 	if err != nil {
 		return err
 	}

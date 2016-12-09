@@ -26,7 +26,6 @@ var testFunctions = [...]func(*testing.T, kolide.Datastore){
 	testSaveQuery,
 	testListQuery,
 	testDeletePack,
-	testAddAndRemoveQueryFromPack,
 	testEnrollHost,
 	testAuthenticateHost,
 	testLabels,

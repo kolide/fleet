@@ -52,6 +52,9 @@ func (orm *Datastore) ScheduledQuery(id uint) (*kolide.ScheduledQuery, error) {
 		return nil, errors.ErrNotFound
 	}
 
+	sq.Name = orm.queries[sq.QueryID].Name
+	sq.Query = orm.queries[sq.QueryID].Query
+
 	return sq, nil
 }
 
@@ -75,7 +78,10 @@ func (orm *Datastore) ListScheduledQueriesInPack(id uint, opt kolide.ListOptions
 
 	scheduledQueries := []*kolide.ScheduledQuery{}
 	for _, k := range keys {
-		scheduledQueries = append(scheduledQueries, orm.scheduledQueries[uint(k)])
+		q := orm.scheduledQueries[uint(k)]
+		q.Name = orm.queries[q.QueryID].Name
+		q.Query = orm.queries[q.QueryID].Query
+		scheduledQueries = append(scheduledQueries, q)
 	}
 
 	// Apply ordering
