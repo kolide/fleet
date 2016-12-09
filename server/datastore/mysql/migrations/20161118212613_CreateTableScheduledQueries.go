@@ -12,7 +12,7 @@ func init() {
 
 func Up_20161118212613(tx *sql.Tx) error {
 	_, err := tx.Exec(
-		"CREATE TABLE `pack_queries` (" +
+		"CREATE TABLE `scheduled_queries` (" +
 			"`id` int(10) unsigned NOT NULL AUTO_INCREMENT," +
 			"`created_at` timestamp DEFAULT CURRENT_TIMESTAMP," +
 			"`updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP," +
@@ -33,6 +33,6 @@ func Up_20161118212613(tx *sql.Tx) error {
 }
 
 func Down_20161118212613(tx *sql.Tx) error {
-	_, err := tx.Exec("DROP TABLE IF EXISTS `pack_queries`;")
+	_, err := tx.Exec("DROP TABLE IF EXISTS `scheduled_queries`;")
 	return err
 }

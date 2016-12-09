@@ -5,9 +5,9 @@ import (
 	"github.com/kolide/kolide-ose/server/kolide"
 )
 
-func (d *Datastore) NewScheduledQuery(sq *kolide.PackQuery) (*kolide.PackQuery, error) {
+func (d *Datastore) NewScheduledQuery(sq *kolide.ScheduledQuery) (*kolide.ScheduledQuery, error) {
 	sql := `
-	    INSERT INTO pack_queries (
+	    INSERT INTO scheduled_queries (
 		    pack_id,
 			query_id,
 			snapshot,
@@ -28,9 +28,9 @@ func (d *Datastore) NewScheduledQuery(sq *kolide.PackQuery) (*kolide.PackQuery, 
 	return sq, nil
 }
 
-func (d *Datastore) SaveScheduledQuery(sq *kolide.PackQuery) (*kolide.PackQuery, error) {
+func (d *Datastore) SaveScheduledQuery(sq *kolide.ScheduledQuery) (*kolide.ScheduledQuery, error) {
 	sql := `
-		UPDATE pack_queries
+		UPDATE scheduled_queries
 			SET pack_id = ?, query_id = ?, ` + "`interval`" + ` = ?, snapshot = ?, differential = ?, platform = ?, version = ?, shard = ?
 			WHERE id = ? AND NOT deleted
 	`
@@ -44,7 +44,7 @@ func (d *Datastore) SaveScheduledQuery(sq *kolide.PackQuery) (*kolide.PackQuery,
 
 func (d *Datastore) DeleteScheduledQuery(id uint) error {
 	sql := `
-		UPDATE pack_queries
+		UPDATE scheduled_queries
 			SET deleted_at = ?, deleted = ?
 			WHERE id = ?
 	`
@@ -56,11 +56,11 @@ func (d *Datastore) DeleteScheduledQuery(id uint) error {
 	return nil
 }
 
-func (d *Datastore) ScheduledQuery(id uint) (*kolide.PackQuery, error) {
+func (d *Datastore) ScheduledQuery(id uint) (*kolide.ScheduledQuery, error) {
 	sql := `
-		SELECT * FROM pack_queries WHERE id = ? AND NOT deleted
+		SELECT * FROM scheduled_queries WHERE id = ? AND NOT deleted
 	`
-	sq := &kolide.PackQuery{}
+	sq := &kolide.ScheduledQuery{}
 	if err := d.db.Get(sq, sql, id); err != nil {
 		return nil, errors.DatabaseError(err)
 	}
@@ -68,12 +68,12 @@ func (d *Datastore) ScheduledQuery(id uint) (*kolide.PackQuery, error) {
 	return sq, nil
 }
 
-func (d *Datastore) ListScheduledQueriesInPack(id uint, opts kolide.ListOptions) ([]*kolide.PackQuery, error) {
+func (d *Datastore) ListScheduledQueriesInPack(id uint, opts kolide.ListOptions) ([]*kolide.ScheduledQuery, error) {
 	sql := `
-		SELECT * FROM pack_queries WHERE pack_id = ? AND NOT deleted
+		SELECT * FROM scheduled_queries WHERE pack_id = ? AND NOT deleted
 	`
 	sql = appendListOptionsToSQL(sql, opts)
-	results := []*kolide.PackQuery{}
+	results := []*kolide.ScheduledQuery{}
 
 	if err := d.db.Select(&results, sql, id); err != nil {
 		return nil, errors.DatabaseError(err)

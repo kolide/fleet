@@ -26,7 +26,7 @@ type Datastore struct {
 	queries                         map[uint]*kolide.Query
 	packs                           map[uint]*kolide.Pack
 	hosts                           map[uint]*kolide.Host
-	packQueries                     map[uint]*kolide.PackQuery
+	scheduledQueries                map[uint]*kolide.ScheduledQuery
 	packTargets                     map[uint]*kolide.PackTarget
 	distributedQueryExecutions      map[uint]kolide.DistributedQueryExecution
 	distributedQueryCampaigns       map[uint]kolide.DistributedQueryCampaign
@@ -81,7 +81,7 @@ func (orm *Datastore) Migrate() error {
 	orm.queries = make(map[uint]*kolide.Query)
 	orm.packs = make(map[uint]*kolide.Pack)
 	orm.hosts = make(map[uint]*kolide.Host)
-	orm.packQueries = make(map[uint]*kolide.PackQuery)
+	orm.scheduledQueries = make(map[uint]*kolide.ScheduledQuery)
 	orm.packTargets = make(map[uint]*kolide.PackTarget)
 	orm.distributedQueryExecutions = make(map[uint]kolide.DistributedQueryExecution)
 	orm.distributedQueryCampaigns = make(map[uint]kolide.DistributedQueryCampaign)

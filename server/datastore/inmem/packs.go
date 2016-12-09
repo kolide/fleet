@@ -98,7 +98,7 @@ func (orm *Datastore) ListPacks(opt kolide.ListOptions) ([]*kolide.Pack, error) 
 }
 
 func (orm *Datastore) AddQueryToPack(qid uint, pid uint, opts kolide.QueryOptions) error {
-	packQuery := &kolide.PackQuery{
+	scheduledQuery := &kolide.ScheduledQuery{
 		PackID:       pid,
 		QueryID:      qid,
 		Interval:     opts.Interval,
@@ -110,8 +110,8 @@ func (orm *Datastore) AddQueryToPack(qid uint, pid uint, opts kolide.QueryOption
 	}
 
 	orm.mtx.Lock()
-	packQuery.ID = orm.nextID(packQuery)
-	orm.packQueries[packQuery.ID] = packQuery
+	scheduledQuery.ID = orm.nextID(scheduledQuery)
+	orm.scheduledQueries[scheduledQuery.ID] = scheduledQuery
 	orm.mtx.Unlock()
 
 	return nil
@@ -122,16 +122,16 @@ func (orm *Datastore) ListQueriesInPack(pack *kolide.Pack) ([]kolide.QueryWithOp
 
 	// todo null semantics
 	orm.mtx.Lock()
-	for _, packQuery := range orm.packQueries {
+	for _, scheduledQuery := range orm.scheduledQueries {
 		query := kolide.QueryWithOptions{
-			Query: *orm.queries[packQuery.QueryID],
+			Query: *orm.queries[scheduledQuery.QueryID],
 			Options: kolide.QueryOptions{
-				Differential: packQuery.Differential,
-				Snapshot:     packQuery.Snapshot,
-				Interval:     packQuery.Interval,
-				Version:      packQuery.Version,
-				Platform:     packQuery.Platform,
-				Shard:        packQuery.Shard,
+				Differential: scheduledQuery.Differential,
+				Snapshot:     scheduledQuery.Snapshot,
+				Interval:     scheduledQuery.Interval,
+				Version:      scheduledQuery.Version,
+				Platform:     scheduledQuery.Platform,
+				Shard:        scheduledQuery.Shard,
 			},
 		}
 		queries = append(queries, query)
@@ -142,17 +142,17 @@ func (orm *Datastore) ListQueriesInPack(pack *kolide.Pack) ([]kolide.QueryWithOp
 }
 
 func (orm *Datastore) RemoveQueryFromPack(query *kolide.Query, pack *kolide.Pack) error {
-	var packQueriesToDelete []uint
+	var scheduledQueriesToDelete []uint
 
 	orm.mtx.Lock()
-	for _, packQuery := range orm.packQueries {
-		if packQuery.QueryID == query.ID && packQuery.PackID == pack.ID {
-			packQueriesToDelete = append(packQueriesToDelete, packQuery.ID)
+	for _, scheduledQuery := range orm.scheduledQueries {
+		if scheduledQuery.QueryID == query.ID && scheduledQuery.PackID == pack.ID {
+			scheduledQueriesToDelete = append(scheduledQueriesToDelete, scheduledQuery.ID)
 		}
 	}
 
-	for _, packQueryToDelete := range packQueriesToDelete {
-		delete(orm.packQueries, packQueryToDelete)
+	for _, scheduledQueryToDelete := range scheduledQueriesToDelete {
+		delete(orm.scheduledQueries, scheduledQueryToDelete)
 	}
 	orm.mtx.Unlock()
 

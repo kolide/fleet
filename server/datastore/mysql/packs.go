@@ -82,7 +82,7 @@ func (d *Datastore) ListPacks(opt kolide.ListOptions) ([]*kolide.Pack, error) {
 // AddQueryToPack associates a kolide.Query with a kolide.Pack
 func (d *Datastore) AddQueryToPack(qid uint, pid uint, opts kolide.QueryOptions) error {
 	sql := `
-	    INSERT INTO pack_queries (
+	    INSERT INTO scheduled_queries (
 		    pack_id,
 			query_id,
 			snapshot,
@@ -128,20 +128,20 @@ func (d *Datastore) ListQueriesInPack(pack *kolide.Pack) ([]kolide.QueryWithOpti
 	sql := `
 	SELECT
 	  q.*,
-	  pq.interval,
-	  pq.snapshot,
-	  pq.differential,
-	  pq.platform,
-	  pq.version,
-	  pq.shard
+	  sq.interval,
+	  sq.snapshot,
+	  sq.differential,
+	  sq.platform,
+	  sq.version,
+	  sq.shard
 	FROM
 	  queries q
 	JOIN
-	  pack_queries pq
+	  scheduled_queries sq
 	ON
-	  pq.query_id = q.id
+	  sq.query_id = q.id
 	AND
-	  pq.pack_id = ?
+	  sq.pack_id = ?
 	AND NOT q.deleted
 	`
 	results := []annotatedQuery{}
@@ -193,7 +193,7 @@ func (d *Datastore) ListQueriesInPack(pack *kolide.Pack) ([]kolide.QueryWithOpti
 // RemoveQueryFromPack disassociated a kolide.Query from a kolide.Pack
 func (d *Datastore) RemoveQueryFromPack(query *kolide.Query, pack *kolide.Pack) error {
 	sql := `
-		DELETE FROM pack_queries
+		DELETE FROM scheduled_queries
 			WHERE pack_id = ? AND query_id = ?
 	`
 	if _, err := d.db.Exec(sql, pack.ID, query.ID); err != nil {

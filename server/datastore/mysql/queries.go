@@ -141,10 +141,10 @@ func (d *Datastore) loadPacksForQueries(queries []*kolide.Query) error {
 	}
 
 	sql := `
-		SELECT p.*, pq.query_id AS query_id
+		SELECT p.*, sq.query_id AS query_id
 		FROM packs p
-		JOIN pack_queries pq
-			ON p.id = pq.pack_id
+		JOIN scheduled_queries sq
+			ON p.id = sq.pack_id
 		WHERE query_id IN (?)
 	`
 

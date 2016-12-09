@@ -15,7 +15,7 @@ type getScheduledQueryRequest struct {
 }
 
 type scheduledQueryResponse struct {
-	kolide.PackQuery
+	kolide.ScheduledQuery
 }
 
 type getScheduledQueryResponse struct {
@@ -36,7 +36,7 @@ func makeGetScheduledQueryEndpoint(svc kolide.Service) endpoint.Endpoint {
 
 		return getScheduledQueryResponse{
 			Scheduled: scheduledQueryResponse{
-				PackQuery: *sq,
+				ScheduledQuery: *sq,
 			},
 		}, nil
 	}
@@ -70,7 +70,7 @@ func makeGetScheduledQueriesInPackEndpoint(svc kolide.Service) endpoint.Endpoint
 
 		for _, q := range queries {
 			resp.Scheduled = append(resp.Scheduled, scheduledQueryResponse{
-				PackQuery: *q,
+				ScheduledQuery: *q,
 			})
 		}
 
@@ -111,7 +111,7 @@ func makeScheduleQueriesEndpoint(svc kolide.Service) endpoint.Endpoint {
 
 		for _, submission := range req.Options {
 			for _, queryID := range submission.QueryIDs {
-				scheduled, err := svc.ScheduleQuery(ctx, &kolide.PackQuery{
+				scheduled, err := svc.ScheduleQuery(ctx, &kolide.ScheduledQuery{
 					PackID:       submission.PackID,
 					QueryID:      queryID,
 					Interval:     submission.Interval,
@@ -125,7 +125,7 @@ func makeScheduleQueriesEndpoint(svc kolide.Service) endpoint.Endpoint {
 					return scheduleQueriesResponse{Err: err}, nil
 				}
 				resp.Scheduled = append(resp.Scheduled, scheduledQueryResponse{
-					PackQuery: *scheduled,
+					ScheduledQuery: *scheduled,
 				})
 			}
 		}
@@ -140,7 +140,7 @@ func makeScheduleQueriesEndpoint(svc kolide.Service) endpoint.Endpoint {
 
 type modifyScheduledQueryRequest struct {
 	ID      uint
-	payload *kolide.PackQuery
+	payload *kolide.ScheduledQuery
 }
 
 type modifyScheduledQueryResponse struct {
@@ -164,7 +164,7 @@ func makeModifyScheduledQueryEndpoint(svc kolide.Service) endpoint.Endpoint {
 
 		return modifyScheduledQueryResponse{
 			Scheduled: scheduledQueryResponse{
-				PackQuery: *sq,
+				ScheduledQuery: *sq,
 			},
 		}, nil
 	}
