@@ -1,0 +1,25 @@
+.app-settings-page {
+  &__smtp-warning {
+    @include display(flex);
+    @include justify-content(space-between);
+    @include align-items(center);
+    background-color: $alert;
+    color: $white;
+    padding: 0 $pad-small;
+
+    &-label {
+      font-weight: $bold;
+      margin-left: 5px;
+    }
+
+    button {
+      color: white;
+      font-size: 15px;
+      text-decoration: underline;
+    }
+
+    span {
+      font-weight: 15px;
+    }
+  }
+}
