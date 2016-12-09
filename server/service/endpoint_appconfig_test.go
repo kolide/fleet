@@ -4,12 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-
-	"github.com/y0ssar1an/q"
 )
 
 func (s *EndpointTestSuite) TestGetAppConfig() {
-	q.Q(s.server.URL + "/api/v1/kolide/config")
 	req, err := http.NewRequest("GET", s.server.URL+"/api/v1/kolide/config", nil)
 	s.Require().Nil(err)
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", s.userToken))
