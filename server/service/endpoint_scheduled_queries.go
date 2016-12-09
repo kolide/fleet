@@ -29,11 +29,15 @@ func makeGetScheduledQueryEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(getScheduledQueryRequest)
 
-		// TODO: call service
-		_ = req
+		sq, err := svc.GetScheduledQuery(ctx, req.ID)
+		if err != nil {
+			return getScheduledQueryResponse{Err: err}, nil
+		}
 
 		return getScheduledQueryResponse{
-			Scheduled: scheduledQueryResponse{},
+			Scheduled: scheduledQueryResponse{
+				PackQuery: *sq,
+			},
 		}, nil
 	}
 }
@@ -43,7 +47,8 @@ func makeGetScheduledQueryEndpoint(svc kolide.Service) endpoint.Endpoint {
 ////////////////////////////////////////////////////////////////////////////////
 
 type getScheduledQueriesInPackRequest struct {
-	ID uint
+	ID          uint
+	ListOptions kolide.ListOptions
 }
 
 type getScheduledQueriesInPackResponse struct {
@@ -58,8 +63,16 @@ func makeGetScheduledQueriesInPackEndpoint(svc kolide.Service) endpoint.Endpoint
 		req := request.(getScheduledQueriesInPackRequest)
 		resp := getScheduledQueriesInPackResponse{Scheduled: []scheduledQueryResponse{}}
 
-		// TODO: call service
-		_ = req
+		queries, err := svc.GetScheduledQueriesInPack(ctx, req.ID, req.ListOptions)
+		if err != nil {
+			return getScheduledQueriesInPackResponse{Err: err}, nil
+		}
+
+		for _, q := range queries {
+			resp.Scheduled = append(resp.Scheduled, scheduledQueryResponse{
+				PackQuery: *q,
+			})
+		}
 
 		return resp, nil
 	}
@@ -97,9 +110,8 @@ func makeScheduleQueriesEndpoint(svc kolide.Service) endpoint.Endpoint {
 ////////////////////////////////////////////////////////////////////////////////
 
 type modifyScheduledQueryRequest struct {
-	ID uint
-	// payload kolide.PackQueryPayload ??
-	// TODO: add fields
+	ID      uint
+	payload *kolide.PackQuery
 }
 
 type modifyScheduledQueryResponse struct {
@@ -113,10 +125,19 @@ func makeModifyScheduledQueryEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(modifyScheduledQueryRequest)
 
-		// TDOD: call service
-		_ = req
+		sq := req.payload
+		sq.ID = req.ID
 
-		return modifyScheduledQueryResponse{}, nil
+		sq, err := svc.ModifyScheduledQuery(ctx, sq)
+		if err != nil {
+			return modifyScheduledQueryResponse{Err: err}, nil
+		}
+
+		return modifyScheduledQueryResponse{
+			Scheduled: scheduledQueryResponse{
+				PackQuery: *sq,
+			},
+		}, nil
 	}
 }
 
@@ -138,8 +159,10 @@ func makeDeleteScheduledQueryEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(deleteScheduledQueryRequest)
 
-		// TODO: call service
-		_ = req
+		err := svc.DeleteScheduledQuery(ctx, req.ID)
+		if err != nil {
+			return deleteScheduledQueryResponse{Err: err}, nil
+		}
 
 		return deleteScheduledQueryResponse{}, nil
 	}

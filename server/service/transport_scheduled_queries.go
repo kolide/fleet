@@ -1,6 +1,7 @@
 package service
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"golang.org/x/net/context"
@@ -24,10 +25,9 @@ func decodeModifyScheduledQueryRequest(ctx context.Context, r *http.Request) (in
 	}
 	var req modifyScheduledQueryRequest
 
-	// TODO: parse request body into req
-	// if err := json.NewDecoder(r.Body).Decode(&req.payload); err != nil {
-	//	return nil, err
-	// }
+	if err := json.NewDecoder(r.Body).Decode(&req.payload); err != nil {
+		return nil, err
+	}
 
 	req.ID = id
 	return req, nil
