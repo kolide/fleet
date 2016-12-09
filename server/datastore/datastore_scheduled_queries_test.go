@@ -11,7 +11,7 @@ import (
 
 func testScheduledQuery(t *testing.T, ds kolide.Datastore) {
 	u1 := test.NewUser(t, ds, "Admin", "admin", "admin@kolide.co", true)
-	q1 := test.NewQuery(t, ds, "foo", "select * from time;", u1.ID)
+	q1 := test.NewQuery(t, ds, "foo", "select * from time;", u1.ID, true)
 	p1 := test.NewPack(t, ds, "baz")
 	sq1 := test.NewScheduledQuery(t, ds, p1.ID, q1.ID, 60, false, true)
 
@@ -22,7 +22,7 @@ func testScheduledQuery(t *testing.T, ds kolide.Datastore) {
 
 func testDeleteScheduledQuery(t *testing.T, ds kolide.Datastore) {
 	u1 := test.NewUser(t, ds, "Admin", "admin", "admin@kolide.co", true)
-	q1 := test.NewQuery(t, ds, "foo", "select * from time;", u1.ID)
+	q1 := test.NewQuery(t, ds, "foo", "select * from time;", u1.ID, true)
 	p1 := test.NewPack(t, ds, "baz")
 	sq1 := test.NewScheduledQuery(t, ds, p1.ID, q1.ID, 60, false, true)
 
@@ -39,8 +39,8 @@ func testDeleteScheduledQuery(t *testing.T, ds kolide.Datastore) {
 
 func testListScheduledQueriesInPack(t *testing.T, ds kolide.Datastore) {
 	u1 := test.NewUser(t, ds, "Admin", "admin", "admin@kolide.co", true)
-	q1 := test.NewQuery(t, ds, "foo", "select * from time;", u1.ID)
-	q2 := test.NewQuery(t, ds, "bar", "select * from time;", u1.ID)
+	q1 := test.NewQuery(t, ds, "foo", "select * from time;", u1.ID, true)
+	q2 := test.NewQuery(t, ds, "bar", "select * from time;", u1.ID, true)
 	p1 := test.NewPack(t, ds, "baz")
 
 	test.NewScheduledQuery(t, ds, p1.ID, q1.ID, 60, false, true)
@@ -60,7 +60,7 @@ func testListScheduledQueriesInPack(t *testing.T, ds kolide.Datastore) {
 
 func testSaveScheduledQuery(t *testing.T, ds kolide.Datastore) {
 	u1 := test.NewUser(t, ds, "Admin", "admin", "admin@kolide.co", true)
-	q1 := test.NewQuery(t, ds, "foo", "select * from time;", u1.ID)
+	q1 := test.NewQuery(t, ds, "foo", "select * from time;", u1.ID, true)
 	p1 := test.NewPack(t, ds, "baz")
 	sq1 := test.NewScheduledQuery(t, ds, p1.ID, q1.ID, 60, false, true)
 

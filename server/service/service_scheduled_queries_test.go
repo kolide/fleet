@@ -20,8 +20,8 @@ func TestGetScheduledQueriesInPack(t *testing.T) {
 	ctx := context.Background()
 
 	u1 := test.NewUser(t, ds, "Admin", "admin", "admin@kolide.co", true)
-	q1 := test.NewQuery(t, ds, "foo", "select * from time;", u1.ID)
-	q2 := test.NewQuery(t, ds, "bar", "select * from time;", u1.ID)
+	q1 := test.NewQuery(t, ds, "foo", "select * from time;", u1.ID, true)
+	q2 := test.NewQuery(t, ds, "bar", "select * from time;", u1.ID, true)
 	p1 := test.NewPack(t, ds, "baz")
 	sq1 := test.NewScheduledQuery(t, ds, p1.ID, q1.ID, 60, false, true)
 
@@ -46,7 +46,7 @@ func TestGetScheduledQuery(t *testing.T) {
 	ctx := context.Background()
 
 	u1 := test.NewUser(t, ds, "Admin", "admin", "admin@kolide.co", true)
-	q1 := test.NewQuery(t, ds, "foo", "select * from time;", u1.ID)
+	q1 := test.NewQuery(t, ds, "foo", "select * from time;", u1.ID, true)
 	p1 := test.NewPack(t, ds, "baz")
 	sq1 := test.NewScheduledQuery(t, ds, p1.ID, q1.ID, 60, false, true)
 
@@ -63,7 +63,7 @@ func TestModifyScheduledQuery(t *testing.T) {
 	ctx := context.Background()
 
 	u1 := test.NewUser(t, ds, "Admin", "admin", "admin@kolide.co", true)
-	q1 := test.NewQuery(t, ds, "foo", "select * from time;", u1.ID)
+	q1 := test.NewQuery(t, ds, "foo", "select * from time;", u1.ID, true)
 	p1 := test.NewPack(t, ds, "baz")
 	sq1 := test.NewScheduledQuery(t, ds, p1.ID, q1.ID, 60, false, true)
 
@@ -88,7 +88,7 @@ func TestDeleteScheduledQuery(t *testing.T) {
 	ctx := context.Background()
 
 	u1 := test.NewUser(t, ds, "Admin", "admin", "admin@kolide.co", true)
-	q1 := test.NewQuery(t, ds, "foo", "select * from time;", u1.ID)
+	q1 := test.NewQuery(t, ds, "foo", "select * from time;", u1.ID, true)
 	p1 := test.NewPack(t, ds, "baz")
 	sq1 := test.NewScheduledQuery(t, ds, p1.ID, q1.ID, 60, false, true)
 

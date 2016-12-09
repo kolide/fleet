@@ -33,12 +33,12 @@ func testDeleteQuery(t *testing.T, ds kolide.Datastore) {
 }
 
 func testDeleteQueries(t *testing.T, ds kolide.Datastore) {
-	user := newUser(t, ds, "Zach", "zwass", "zwass@kolide.co", true)
+	user := test.NewUser(t, ds, "Zach", "zwass", "zwass@kolide.co", true)
 
-	q1 := newQuery(t, ds, "q1", "select * from time", user.ID, true)
-	q2 := newQuery(t, ds, "q2", "select * from processes", user.ID, true)
-	q3 := newQuery(t, ds, "q3", "select 1", user.ID, true)
-	q4 := newQuery(t, ds, "q4", "select * from osquery_info", user.ID, true)
+	q1 := test.NewQuery(t, ds, "q1", "select * from time", user.ID, true)
+	q2 := test.NewQuery(t, ds, "q2", "select * from processes", user.ID, true)
+	q3 := test.NewQuery(t, ds, "q3", "select 1", user.ID, true)
+	q4 := test.NewQuery(t, ds, "q4", "select * from osquery_info", user.ID, true)
 
 	queries, err := ds.ListQueries(kolide.ListOptions{})
 	require.Nil(t, err)
