@@ -58,7 +58,9 @@
     padding: 0 $pad-large;
 
     .Select {
-      margin-top: $pad-most;
+      position: absolute;
+      bottom: $pad-large;
+      width: calc(239px - (#{$pad-large} * 2));
     }
   }
 
