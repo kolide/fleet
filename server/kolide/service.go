@@ -13,4 +13,5 @@ type Service interface {
 	AppConfigService
 	InviteService
 	TargetService
+	SendEmail(mail Email) error
 }

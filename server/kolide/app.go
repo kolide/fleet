@@ -19,7 +19,7 @@ type AppConfigStore interface {
 type AppConfigService interface {
 	NewAppConfig(ctx context.Context, p AppConfigPayload) (info *AppConfig, err error)
 	AppConfig(ctx context.Context) (info *AppConfig, err error)
-	ModifyAppConfig(ctx context.Context, r ModifyAppConfigRequest) (info *ModifyAppConfigPayload, err error)
+	ModifyAppConfig(ctx context.Context, r ModifyAppConfigRequest) (info *AppConfig, err error)
 }
 
 // SMTP Authentication Typed
@@ -96,11 +96,6 @@ type ModifyAppConfigRequest struct {
 	AppConfig AppConfig `json:"app_config"`
 }
 
-type SMTPResponse struct {
-	Details map[string]string `json:"details"`
-	Success bool              `json:"success"`
-}
-
 type SMTPTestMailer struct {
 	KolideServerURL string
 }
@@ -120,8 +115,8 @@ func (m *SMTPTestMailer) Message() ([]byte, error) {
 }
 
 type ModifyAppConfigPayload struct {
-	SMTPStatus SMTPResponse `json:"smtp_status"`
-	AppConfig  AppConfig    `json:"app_config"`
+	SMTPStatus *SMTPConfigResponse `json:"smtp_status,omitempty"`
+	AppConfig  *AppConfig          `json:"app_config,omitempty"`
 }
 
 // AppConfigPayload contains request and response format of

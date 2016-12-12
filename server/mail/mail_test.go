@@ -1,6 +1,7 @@
 package mail
 
 import (
+	"os"
 	"testing"
 
 	"github.com/kolide/kolide-ose/server/kolide"
@@ -8,6 +9,9 @@ import (
 )
 
 func TestSMTPNoAuth(t *testing.T) {
+	if os.Getenv("MAIL_TEST") == "" {
+		t.Skip("Mail testing disabled")
+	}
 	mail := kolide.Email{
 		Subject: "test",
 		To:      []string{"bob@foo.com"},
@@ -30,5 +34,4 @@ func TestSMTPNoAuth(t *testing.T) {
 	mailService := NewService()
 	err := mailService.SendEmail(mail)
 	assert.Nil(t, err)
-
 }

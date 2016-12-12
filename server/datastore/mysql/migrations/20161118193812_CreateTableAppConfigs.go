@@ -31,9 +31,16 @@ func Up_20161118193812(tx *sql.Tx) error {
 		"`smtp_disabled` TINYINT(1) NOT NULL DEFAULT FALSE, " +
 		"PRIMARY KEY (`id`)" +
 		") ENGINE=InnoDB DEFAULT CHARSET=utf8;"
-	_, err := tx.Exec(sqlStatement)
-	return err
+	if _, err := tx.Exec(sqlStatement); err != nil {
+		return err
+	}
+	// create an app config record with defaults because there is only one, and it
+	// always needs to exist
+	if _, err := tx.Exec("INSERT INTO app_configs VALUES ()"); err != nil {
+		return err
+	}
 
+	return nil
 }
 
 func Down_20161118193812(tx *sql.Tx) error {

@@ -36,9 +36,9 @@ func (mw metricsMiddleware) AppConfig(ctx context.Context) (*kolide.AppConfig, e
 	return info, err
 }
 
-func (mw metricsMiddleware) ModifyAppConfig(ctx context.Context, p kolide.ModifyAppConfigRequest) (*kolide.ModifyAppConfigPayload, error) {
+func (mw metricsMiddleware) ModifyAppConfig(ctx context.Context, p kolide.ModifyAppConfigRequest) (*kolide.AppConfig, error) {
 	var (
-		info *kolide.ModifyAppConfigPayload
+		info *kolide.AppConfig
 		err  error
 	)
 	defer func(begin time.Time) {
