@@ -26,6 +26,7 @@ class UserSettingsForm extends Component {
       <form onSubmit={handleSubmit}>
         <InputField
           {...fields.username}
+          autofocus
           label="Username (required)"
         />
         <InputField
@@ -43,6 +44,7 @@ class UserSettingsForm extends Component {
         <Button
           onClick={onCancel}
           text="CANCEL"
+          type="button"
           variant="inverse"
         />
         <Button
