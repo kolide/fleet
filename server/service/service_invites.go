@@ -9,6 +9,12 @@ import (
 	"golang.org/x/net/context"
 )
 
+type inviteMailer struct{}
+
+func (m *inviteMailer) Message() ([]byte, error) {
+	return []byte("test message"), nil
+}
+
 func (svc service) InviteNewUser(ctx context.Context, payload kolide.InvitePayload) (*kolide.Invite, error) {
 	// verify that the user with the given email does not already exist
 	_, err := svc.ds.UserByEmail(*payload.Email)
@@ -48,11 +54,18 @@ func (svc service) InviteNewUser(ctx context.Context, payload kolide.InvitePaylo
 		return nil, err
 	}
 
-	inviteEmail := kolide.Email{
-		From: "no-reply@kolide.co",
-		To:   []string{invite.Email},
-		Msg:  invite,
+	config, err := svc.AppConfig(ctx)
+	if err != nil {
+		return nil, err
 	}
+
+	inviteEmail := kolide.Email{
+		Subject: "Kolide",
+		To:      []string{invite.Email},
+		Config:  &config.SMTPConfig,
+		Mailer:  &inviteMailer{},
+	}
+
 	err = svc.mailService.SendEmail(inviteEmail)
 	if err != nil {
 		return nil, err

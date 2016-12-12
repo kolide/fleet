@@ -43,3 +43,19 @@ func TestCreateAppConfig(t *testing.T) {
 		assert.Equal(t, *payload.ServerSettings.KolideServerURL, result.KolideServerURL)
 	}
 }
+
+func TestVerfiyNoAuthSMTPConnection(t *testing.T) {
+	config := &kolide.AppConfig{
+		SMTPConfig: kolide.SMTPConfig{
+			SenderAddress:      "foo@bar.com",
+			Server:             "localhost",
+			Port:               1025,
+			AuthenticationType: kolide.AuthTypeNone,
+		},
+	}
+
+	response := testSMTPConfiguration("bobdobbs@subgenuis.com", config)
+	require.NotNil(t, response)
+	assert.True(t, response.Success)
+
+}

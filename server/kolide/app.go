@@ -1,6 +1,8 @@
 package kolide
 
 import (
+	"bytes"
+
 	"golang.org/x/net/context"
 )
 
@@ -28,12 +30,8 @@ const (
 
 // STMP Authentication Methods
 const (
-	AuthMethodPlain     = "plain"
-	AuthMethodLogin     = "login"
-	AuthMethodGSSAPI    = "gssapi"
-	AuthMethodDigestMD5 = "digest_md5"
-	AuthMethodMD5       = "md5"
-	AuthMethodCramMD5   = "cram_md5"
+	AuthMethodPlain   = "plain"
+	AuthMethodCramMD5 = "cram_md5"
 )
 
 type SMTPConfig struct {
@@ -79,9 +77,15 @@ type AppConfig struct {
 	SMTPConfig
 }
 
+type SMTPError struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+}
+
+// SMTPConfigResponse contains information about the validation of SMTP parameters
 type SMTPConfigResponse struct {
-	SMTPStatus map[string]string `json:"smtp_status"`
-	Success    bool              `json:"success"`
+	Errors  []SMTPError `json:"errors,omitempty"`
+	Success bool        `json:"success"`
 }
 
 type ModifyAppConfigRequest struct {
@@ -95,6 +99,24 @@ type ModifyAppConfigRequest struct {
 type SMTPResponse struct {
 	Details map[string]string `json:"details"`
 	Success bool              `json:"success"`
+}
+
+type SMTPTestMailer struct {
+	KolideServerURL string
+}
+
+func (m *SMTPTestMailer) Message() ([]byte, error) {
+	t, err := getTemplate("server/mail/templates/smtp_setup.html")
+	if err != nil {
+		return nil, err
+	}
+
+	var msg bytes.Buffer
+	if err = t.Execute(&msg, m); err != nil {
+		return nil, err
+	}
+
+	return msg.Bytes(), nil
 }
 
 type ModifyAppConfigPayload struct {

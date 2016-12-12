@@ -18,6 +18,30 @@ func newTestServiceWithClock(ds kolide.Datastore, rs kolide.QueryResultStore, c 
 	return NewService(ds, rs, kitlog.NewNopLogger(), config.TestConfig(), nil, c)
 }
 
+func createTestAppConfig(t *testing.T, ds kolide.Datastore) *kolide.AppConfig {
+	config := &kolide.AppConfig{
+		OrgName:         "Tyrell Corp",
+		OrgLogoURL:      "https://tyrell.com/image.png",
+		KolideServerURL: "https://kolide.tyrell.com",
+		SMTPConfig: kolide.SMTPConfig{
+			Configured:         true,
+			Disabled:           false,
+			SenderAddress:      "kolide@tyrell.com",
+			Server:             "smtp.tyrell.com",
+			Port:               587,
+			AuthenticationType: kolide.AuthTypeUserNamePassword,
+			UserName:           "deckard",
+			Password:           "replicant",
+			VerifySSLCerts:     true,
+			EnableSSLTLS:       true,
+		},
+	}
+	result, err := ds.NewAppConfig(config)
+	require.Nil(t, err)
+	require.NotNil(t, result)
+	return result
+}
+
 func createTestUsers(t *testing.T, ds kolide.Datastore) map[string]kolide.User {
 	users := make(map[string]kolide.User)
 	for _, u := range testUsers {
