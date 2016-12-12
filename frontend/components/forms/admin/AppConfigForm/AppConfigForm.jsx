@@ -100,14 +100,23 @@ class AppConfigForm extends Component {
       <form className={baseClass}>
         <div className={`${baseClass}__section`}>
           <h2>Organization Info</h2>
-          <InputField
-            {...fields.org_name}
-            label="Organization Name"
-          />
-          <InputField
-            {...fields.org_logo_url}
-            label="Organization Avatar"
-          />
+          <div className={`${baseClass}__inputs`}>
+            <InputField
+              {...fields.org_name}
+              label="Organization Name"
+            />
+            <InputField
+              {...fields.org_logo_url}
+              label="Organization Avatar"
+            />
+          </div>
+          <div className={`${baseClass}__details ${baseClass}__avatar-preview`}>
+            <img
+              alt="Avatar preview"
+              src={fields.org_logo_url.value}
+            />
+            <p>Avatar Preview</p>
+          </div>
         </div>
         <div className={`${baseClass}__section`}>
           <h2>Kolide Web Address</h2>
