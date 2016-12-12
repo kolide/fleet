@@ -52,7 +52,13 @@
     list-style: none;
   }
 
+  &__column-wrapper {
+    @include display(flex);
+    margin: 0 0 15px;
+  }
+
   &__more-columns {
+    @include flex-grow(1);
     font-size: 14px;
     font-weight: $light;
     line-height: 1.43;
@@ -63,15 +69,41 @@
   &__show-columns {
     color: $brand;
     cursor: pointer;
+    font-size: 14px;
+    line-height: 1.43;
+  }
+
+  &__joins-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      font-size: 14px;
+      line-height: 2.29;
+      letter-spacing: 0.7px;
+      color: $text-dark;
+    }
+
+    .kolidecon {
+      color: $accent-dark;
+      font-size: 12px;
+    }
   }
 
   &__suggestion {
-    color: $text-medium;
-    font-size: px-to-rem(12);
+    @include flex-grow(1);
+    font-size: 14px;
+    line-height: 1.71;
+    letter-spacing: 0.5px;
+    text-align: left;
+    color: $text-light;
   }
 
   &__load-suggestion {
+    @include align-self(center);
     padding: 1px 5px;
+    margin: 0 0 0 10px;
   }
 }
 
