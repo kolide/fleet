@@ -111,7 +111,7 @@ class QueryComposer extends Component {
   }
 
   render () {
-    const { onTextEditorInputChange, queryText, queryType } = this.props;
+    const { onTextEditorInputChange, queryIsRunning, queryText, queryType } = this.props;
     const { onLoad, renderForm, renderTargetsInput } = this;
 
     return (
@@ -128,6 +128,7 @@ class QueryComposer extends Component {
             name="query-editor"
             onLoad={onLoad}
             onChange={onTextEditorInputChange}
+            readOnly={queryIsRunning}
             setOptions={{ enableLinking: true }}
             showGutter
             showPrintMargin={false}
