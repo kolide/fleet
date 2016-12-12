@@ -8,7 +8,7 @@ import formFieldInterface from 'interfaces/form_field';
 import Icon from 'components/Icon';
 import InputField from 'components/forms/fields/InputField';
 import Slider from 'components/buttons/Slider';
-import validate from 'components/forms/admin/AppConfigForm/validate';
+import validate from 'components/forms/Admin/AppConfigForm/validate';
 
 const authMethodOptions = [
   { label: 'Plain', value: 'plain' },

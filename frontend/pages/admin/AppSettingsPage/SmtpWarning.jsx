@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 
-import { baseClass } from 'pages/admin/AppSettingsPage/AppSettingsPage';
+import { baseClass } from 'pages/Admin/AppSettingsPage/AppSettingsPage';
 import Button from 'components/buttons/Button';
 import Icon from 'components/Icon';
 

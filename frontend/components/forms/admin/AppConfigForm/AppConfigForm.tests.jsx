@@ -3,7 +3,7 @@ import expect from 'expect';
 import { mount } from 'enzyme';
 import { noop } from 'lodash';
 
-import AppConfigForm from 'components/forms/admin/AppConfigForm';
+import AppConfigForm from 'components/forms/Admin/AppConfigForm';
 import { itBehavesLikeAFormInputElement } from 'test/helpers';
 
 describe('AppConfigForm - form', () => {

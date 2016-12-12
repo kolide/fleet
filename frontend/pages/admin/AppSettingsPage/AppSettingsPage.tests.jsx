@@ -1,7 +1,7 @@
 import expect from 'expect';
 import { mount } from 'enzyme';
 
-import AppSettingsPage from 'pages/admin/AppSettingsPage';
+import AppSettingsPage from 'pages/Admin/AppSettingsPage';
 import testHelpers from 'test/helpers';
 
 const { connectedComponent, reduxMockStore } = testHelpers;

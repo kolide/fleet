@@ -2,9 +2,9 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { size } from 'lodash';
 
-import AppConfigForm from 'components/forms/admin/AppConfigForm';
+import AppConfigForm from 'components/forms/Admin/AppConfigForm';
 import configInterface from 'interfaces/config';
-import SmtpWarning from 'pages/admin/AppSettingsPage/SmtpWarning';
+import SmtpWarning from 'pages/Admin/AppSettingsPage/SmtpWarning';
 
 export const baseClass = 'app-settings-page';
 
