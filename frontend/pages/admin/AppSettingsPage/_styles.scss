@@ -1,4 +1,6 @@
 .app-settings-page {
+  padding: $pad-small;
+
   &__smtp-warning {
     @include display(flex);
     @include justify-content(space-between);
@@ -21,5 +23,16 @@
     span {
       font-weight: 15px;
     }
+  }
+
+  h1 {
+    font-size: 24px;
+    font-weight: 300;
+  }
+
+  h2 {
+    border-bottom: 1px dashed $accent-dark;
+    font-size: 20px;
+    font-weight: $normal;
   }
 }
