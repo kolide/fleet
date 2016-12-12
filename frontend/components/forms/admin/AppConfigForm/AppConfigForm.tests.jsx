@@ -70,7 +70,9 @@ describe('AppConfigForm - form', () => {
     });
 
     it('renders advanced options when "Advanced Options" is clicked', () => {
-      form.find('Button').first().simulate('click');
+      form.find('Button').findWhere((button) => {
+        return button.prop('variant') === 'unstyled';
+      }).simulate('click');
       expect(form.find({ name: 'domain' }).length).toEqual(1);
       expect(form.find('Slider').length).toEqual(2);
     });

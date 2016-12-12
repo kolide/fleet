@@ -120,10 +120,17 @@ class AppConfigForm extends Component {
         </div>
         <div className={`${baseClass}__section`}>
           <h2>Kolide Web Address</h2>
-          <InputField
-            {...fields.kolide_server_url}
-            label="Kolide App URL"
-          />
+          <div className={`${baseClass}__inputs`}>
+            <InputField
+              {...fields.kolide_server_url}
+              label="Kolide App URL"
+            />
+          </div>
+          <div className={`${baseClass}__details`}>
+            <p>What base URL should <b>osqueryd</b> clients user to connect and register with <b>Kolide</b>?</p>
+            <p><b>Note:</b>Please ensure the URL you choose is accessible to all endpoints that need to communicate with Kolide, otherwise they will not be able to correctly register.</p>
+            <Button text="SEND TEST" variant="inverse" />
+          </div>
         </div>
         <div className={`${baseClass}__section`}>
           <h2>SMTP Options <small>STATUS: {smtpConfigured ? 'CONFIGURED' : 'NOT CONFIGURED'}</small></h2>
