@@ -1,9 +1,9 @@
 import React, { PropTypes } from 'react';
 
-import { baseClass } from 'pages/Admin/AppSettingsPage/AppSettingsPage';
 import Button from 'components/buttons/Button';
 import Icon from 'components/Icon';
 
+const baseClass = 'smtp-warning';
 
 const SmtpWarning = ({ onDismiss, shouldShowWarning }) => {
   if (!shouldShowWarning) {
@@ -11,14 +11,14 @@ const SmtpWarning = ({ onDismiss, shouldShowWarning }) => {
   }
 
   return (
-    <div className={`${baseClass}__smtp-warning`}>
-      <div>
+    <div className={baseClass}>
+      <div className={`${baseClass}__icon-wrap`}>
         <Icon name="warning-filled" />
-        <span className={`${baseClass}__smtp-warning-label`}>Warning!</span>
+        <span className={`${baseClass}__label`}>Warning!</span>
       </div>
-      <span>Email is not currently configured in Kolide. Many features rely on email to work.</span>
-      <Button onClick={onDismiss} text="DISMISS" variant="unstyled" />
-      <Button text="RESOLVE NOW" variant="unstyled" />
+      <span className={`${baseClass}__text`}>Email is not currently configured in Kolide. Many features rely on email to work.</span>
+      <Button onClick={onDismiss} text="Dismiss" variant="unstyled" />
+      <Button text="Resolve" variant="unstyled" />
     </div>
   );
 };

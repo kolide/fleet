@@ -7,7 +7,7 @@ import Form from 'components/forms/Form';
 import formFieldInterface from 'interfaces/form_field';
 import Icon from 'components/Icon';
 import InputField from 'components/forms/fields/InputField';
-import Slider from 'components/buttons/Slider';
+import Slider from 'components/forms/fields/Slider';
 import validate from 'components/forms/Admin/AppConfigForm/validate';
 
 const authMethodOptions = [
@@ -124,56 +124,84 @@ class AppConfigForm extends Component {
             <InputField
               {...fields.kolide_server_url}
               label="Kolide App URL"
+              hint={['Include base path only (eg. no ', <code>/v1</code>,')']}
             />
           </div>
           <div className={`${baseClass}__details`}>
-            <p>What base URL should <b>osqueryd</b> clients user to connect and register with <b>Kolide</b>?</p>
-            <p><b>Note:</b>Please ensure the URL you choose is accessible to all endpoints that need to communicate with Kolide, otherwise they will not be able to correctly register.</p>
+            <p>What base URL should <strong>osqueryd</strong> clients user to connect and register with <strong>Kolide</strong>?</p>
+            <p className={`${baseClass}__note`}><strong>Note:</strong>Please ensure the URL you choose is accessible to all endpoints that need to communicate with Kolide, otherwise they will not be able to correctly register.</p>
             <Button text="SEND TEST" variant="inverse" />
           </div>
         </div>
         <div className={`${baseClass}__section`}>
           <h2>SMTP Options <small>STATUS: {smtpConfigured ? 'CONFIGURED' : 'NOT CONFIGURED'}</small></h2>
-          <InputField
-            {...fields.sender_address}
-            label="Sender Address"
-          />
-          <InputField
-            {...fields.server}
-            label="SMTP Server"
-          />
-          <InputField {...fields.port} />
-          <Checkbox
-            {...fields.enable_ssl_tls}
-          >
-            User SSL/TLS to connect (recommended)
-          </Checkbox>
-          <Dropdown
-            {...fields.authentication_type}
-            options={authTypeOptions}
-          />
-          <div className={`${baseClass}__smtp-user-section`}>
+          <div className={`${baseClass}__inputs`}>
             <InputField
-              {...fields.user_name}
+              {...fields.sender_address}
+              label="Sender Address"
+            />
+          </div>
+          <div className={`${baseClass}__details`}>
+            <p>The address email recipients will see all messages that are sent from the <strong>Kolide</strong> application.</p>
+          </div>
+          <div className={`${baseClass}__inputs ${baseClass}__inputs--smtp`}>
+            <InputField
+              {...fields.server}
+              label="SMTP Server"
             />
             <InputField
-              {...fields.password}
+              {...fields.port}
+              label="&nbsp;"
             />
-            <Dropdown
-              {...fields.auth_method}
-              options={authMethodOptions}
-              placeholder=""
-            />
+            <Checkbox
+              {...fields.enable_ssl_tls}
+            >
+              User SSL/TLS to connect (recommended)
+            </Checkbox>
+          </div>
+          <div className={`${baseClass}__details`}>
+            <p>The hostname / IP address and corresponding port of your organization's SMTP server.</p>
+          </div>
+          <div className={`${baseClass}__inputs`}>
+            <div className="input-field__wrapper">
+              <label className="input-field__label">Authentication Type</label>
+              <Dropdown
+                {...fields.authentication_type}
+                options={authTypeOptions}
+              />
+            </div>
+            <div className={`${baseClass}__smtp-user-section`}>
+              <InputField
+                {...fields.user_name}
+                label="SMTP Username"
+              />
+              <InputField
+                {...fields.password}
+                label="SMTP Password"
+              />
+              <div className="input-field__wrapper">
+                <label className="input-field__label">Auth Method</label>
+                <Dropdown
+                  {...fields.auth_method}
+                  options={authMethodOptions}
+                  placeholder=""
+                />
+              </div>
+            </div>
+          </div>
+          <div className={`${baseClass}__details`}>
+            <p>If your mail server requires authentication, you need to specify the authentication type here.</p>
+            <p><strong>No Authentication</strong> - Select this if your SMTP is open.</p>
+            <p><strong>Username & Password</strong> - Select this if your SMTP server requires username and password before use.</p>
           </div>
         </div>
         <div className={`${baseClass}__section`}>
-          <h2>
-            <Button
-              onClick={onToggleAdvancedOptions}
-              text={<Header showAdvancedOptions={showAdvancedOptions} />}
-              variant="unstyled"
-            />
-          </h2>
+          <Button
+            onClick={onToggleAdvancedOptions}
+            text={<Header showAdvancedOptions={showAdvancedOptions} />}
+            variant="unstyled"
+            className={`${baseClass}__show-options`}
+          />
           {renderAdvancedOptions()}
         </div>
         <Button

@@ -6,7 +6,7 @@ import AppConfigForm from 'components/forms/Admin/AppConfigForm';
 import configInterface from 'interfaces/config';
 import SmtpWarning from 'pages/Admin/AppSettingsPage/SmtpWarning';
 
-export const baseClass = 'app-settings-page';
+export const baseClass = 'app-settings';
 
 class AppSettingsPage extends Component {
   static propTypes = {

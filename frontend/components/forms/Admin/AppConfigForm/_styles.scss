@@ -1,4 +1,56 @@
 .app-config-form {
+  &__section {
+    @include clearfix;
+  }
+
+  &__inputs {
+    width: 60%;
+    float: left;
+    padding: 0 40px 0 0;
+    box-sizing: border-box;
+
+    .input-field {
+      width: 100%;
+    }
+
+    &--smtp {
+      margin: 0 0 $pad-base;
+
+      .input-field__wrapper {
+        width: 18%;
+        float: right;
+
+        &:first-child {
+          float: left;
+          width: 78%;
+        }
+      }
+
+      .kolide-checkbox {
+        clear: left;
+        display: block;
+      }
+    }
+  }
+
+  &__details {
+    float: right;
+    width: 40%;
+
+    p {
+      font-size: 15px;
+      font-weight: $normal;
+      line-height: 1.6;
+      letter-spacing: 0.5px;
+      color: $text-dark;
+
+      &.app-config-form__note {
+        font-size: 13px;
+        color: $text-medium;
+      }
+    }
+  }
+
   &__avatar-preview {
     text-align: center;
 
@@ -13,6 +65,43 @@
       font-size: 18px;
       font-weight: $bold;
       margin-top: 0;
+    }
+  }
+
+  &__show-options {
+    color: $text-dark;
+  }
+
+  &__smtp-user-section {
+    border-radius: 2px;
+    background-color: $bg-medium;
+    border: solid 1px $accent-medium;
+    padding: 30px;
+
+    .input-field__wrapper {
+      @include clearfix;
+
+      &:last-child {
+        margin: 0;
+      }
+    }
+
+    .input-field__label {
+      float: left;
+      font-size: 15px;
+      font-weight: $bold;
+      letter-spacing: 0.6px;
+      text-align: right;
+      color: $text-dark;
+      width: 30%;
+      margin: 0;
+      line-height: 40px;
+    }
+
+    .input-field,
+    .Select {
+      width: 60%;
+      float: right;
     }
   }
 }
