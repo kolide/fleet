@@ -23,10 +23,18 @@ func (r getAppConfigResponse) error() error { return r.Err }
 func makeGetAppConfigEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		config, err := svc.AppConfig(ctx)
-
 		if err != nil {
 			return getAppConfigResponse{Err: err}, nil
 		}
+		// v, err := viewer.FromContext(ctx)
+		// if err != nil {
+		// 	return getAppConfigResponse{Err: err}, nil
+		// }
+		// if !v.IsAdmin() {
+		// 	// make a copy of config so we don't munge inmem
+		// 	copyConfig := *config
+		// 	copyConfig.SMTPConfig = &kolide.SMTPConfig{}
+		// }
 
 		return getAppConfigResponse{AppConfig: config}, nil
 	}

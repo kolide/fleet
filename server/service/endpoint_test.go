@@ -23,11 +23,12 @@ type EndpointTestSuite struct {
 	suite.Suite
 	server    *httptest.Server
 	userToken string
+	ds        kolide.Datastore
 }
 
-func (s *EndpointTestSuite) SetupSuite() {
+func (s *EndpointTestSuite) SetupTest() {
 	jwtKey := "CHANGEME"
-	ds, _ := inmem.New(config.TestConfig())
+	s.ds, _ = inmem.New(config.TestConfig())
 	devOrgInfo := &kolide.AppConfig{
 		OrgName:    "Kolide",
 		OrgLogoURL: "http://foo.bar/image.png",
@@ -39,9 +40,9 @@ func (s *EndpointTestSuite) SetupSuite() {
 			EnableStartTLS:     true,
 		},
 	}
-	ds.NewAppConfig(devOrgInfo)
-	svc, _ := newTestService(ds, nil)
-	createTestUsers(s.T(), ds)
+	s.ds.NewAppConfig(devOrgInfo)
+	svc, _ := newTestService(s.ds, nil)
+	createTestUsers(s.T(), s.ds)
 	logger := kitlog.NewLogfmtLogger(os.Stdout)
 
 	opts := []kithttp.ServerOption{
@@ -78,7 +79,7 @@ func (s *EndpointTestSuite) SetupSuite() {
 
 }
 
-func (s *EndpointTestSuite) TeardownSuite() {
+func (s *EndpointTestSuite) TeardownTest() {
 	s.server.Close()
 }
 

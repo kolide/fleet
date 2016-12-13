@@ -60,6 +60,8 @@ the way that the kolide server works.
 
 			var ds kolide.Datastore
 			var err error
+			var mailService kolide.MailService
+
 			if devMode {
 				fmt.Println(
 					"Dev mode enabled, using in-memory DB.\n",
@@ -69,6 +71,7 @@ the way that the kolide server works.
 				if ds, err = inmem.New(config); err != nil {
 					initFatal(err, "initializing inmem database")
 				}
+				mailService = mail.NewDevService()
 			} else {
 				const defaultMaxAttempts = 15
 
@@ -78,6 +81,7 @@ the way that the kolide server works.
 				if err != nil {
 					initFatal(err, "initializing datastore")
 				}
+				mailService = mail.NewService()
 			}
 
 			if initializingDS, ok := ds.(initializer); ok {
@@ -85,8 +89,6 @@ the way that the kolide server works.
 					initFatal(err, "loading built in data")
 				}
 			}
-
-			mailService := mail.NewService()
 
 			svc, err := service.NewService(ds, pubsub.NewInmemQueryResults(), logger, config, mailService, clock.C)
 			if err != nil {
