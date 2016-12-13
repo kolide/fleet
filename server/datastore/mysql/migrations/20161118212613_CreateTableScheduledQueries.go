@@ -22,7 +22,6 @@ func Up_20161118212613(tx *sql.Tx) error {
 			"`query_id` int(10) unsigned DEFAULT NULL," +
 			"`interval` int(10) unsigned DEFAULT NULL," +
 			"`snapshot` tinyint(1) DEFAULT NULL," +
-			"`differential` tinyint(1) DEFAULT NULL," +
 			"`removed` tinyint(1) DEFAULT NULL," +
 			"`platform` varchar(255) DEFAULT NULL," +
 			"`version` varchar(255) DEFAULT NULL," +

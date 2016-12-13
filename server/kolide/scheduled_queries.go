@@ -23,16 +23,15 @@ type ScheduledQueryService interface {
 type ScheduledQuery struct {
 	UpdateCreateTimestamps
 	DeleteFields
-	ID           uint
-	PackID       uint    `json:"pack_id" db:"pack_id"`
-	QueryID      uint    `json:"query_id" db:"query_id"`
-	Query        string  `json:"query"` // populated via a join on queries
-	Name         string  `json:"name"`  // populated via a join on queries
-	Interval     uint    `json:"interval"`
-	Snapshot     *bool   `json:"snapshot"`
-	Differential *bool   `json:"differential"`
-	Removed      *bool   `json:"removed"`
-	Platform     *string `json:"platform"`
-	Version      *string `json:"version"`
-	Shard        *uint   `json:"shard"`
+	ID       uint
+	PackID   uint    `json:"pack_id" db:"pack_id"`
+	QueryID  uint    `json:"query_id" db:"query_id"`
+	Query    string  `json:"query"` // populated via a join on queries
+	Name     string  `json:"name"`  // populated via a join on queries
+	Interval uint    `json:"interval"`
+	Snapshot *bool   `json:"snapshot"`
+	Removed  *bool   `json:"removed"`
+	Platform *string `json:"platform"`
+	Version  *string `json:"version"`
+	Shard    *uint   `json:"shard"`
 }

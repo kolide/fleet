@@ -33,13 +33,13 @@ func TestDecodeScheduleQueriesRequest(t *testing.T) {
 				accessed.Five = true
 				assert.Equal(t, uint(60), q.Interval)
 				assert.Equal(t, true, *q.Snapshot)
-				assert.Nil(t, q.Differential)
+				assert.Nil(t, q.Removed)
 				assert.Len(t, q.QueryIDs, 1)
 				assert.Equal(t, q.QueryIDs[0], uint(1))
 			case uint(6):
 				accessed.Six = true
 				assert.Equal(t, uint(120), q.Interval)
-				assert.Nil(t, q.Differential)
+				assert.Nil(t, q.Removed)
 				assert.Nil(t, q.Snapshot)
 				assert.Len(t, q.QueryIDs, 3)
 			default:
@@ -87,7 +87,7 @@ func TestDecodeModifyScheduledQueryRequest(t *testing.T) {
 		assert.Equal(t, uint(1), params.ID)
 		assert.Equal(t, uint(5), params.payload.PackID)
 		assert.Equal(t, uint(6), params.payload.QueryID)
-		assert.Equal(t, true, *params.payload.Differential)
+		assert.Equal(t, true, *params.payload.Removed)
 		assert.Equal(t, uint(60), params.payload.Interval)
 		assert.Equal(t, uint(1), *params.payload.Shard)
 	}).Methods("PATCH")
@@ -96,7 +96,7 @@ func TestDecodeModifyScheduledQueryRequest(t *testing.T) {
 	body.Write([]byte(`{
         "pack_id": 5,
 		"query_id": 6,
-		"differential": true,
+		"removed": true,
 		"interval": 60,
 		"shard": 1
     }`))

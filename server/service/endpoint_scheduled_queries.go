@@ -83,14 +83,14 @@ func makeGetScheduledQueriesInPackEndpoint(svc kolide.Service) endpoint.Endpoint
 ////////////////////////////////////////////////////////////////////////////////
 
 type scheduleQuerySubmission struct {
-	PackID       uint    `json:"pack_id"`
-	QueryIDs     []uint  `json:"query_ids"`
-	Interval     uint    `json:"interval"`
-	Snapshot     *bool   `json:"snapshot"`
-	Differential *bool   `json:"differential"`
-	Platform     *string `json:"platform"`
-	Version      *string `json:"version"`
-	Shard        *uint   `json:"shard"`
+	PackID   uint    `json:"pack_id"`
+	QueryIDs []uint  `json:"query_ids"`
+	Interval uint    `json:"interval"`
+	Snapshot *bool   `json:"snapshot"`
+	Removed  *bool   `json:"removed"`
+	Platform *string `json:"platform"`
+	Version  *string `json:"version"`
+	Shard    *uint   `json:"shard"`
 }
 
 type scheduleQueriesRequest struct {
@@ -112,14 +112,14 @@ func makeScheduleQueriesEndpoint(svc kolide.Service) endpoint.Endpoint {
 		for _, submission := range req.Options {
 			for _, queryID := range submission.QueryIDs {
 				scheduled, err := svc.ScheduleQuery(ctx, &kolide.ScheduledQuery{
-					PackID:       submission.PackID,
-					QueryID:      queryID,
-					Interval:     submission.Interval,
-					Snapshot:     submission.Snapshot,
-					Differential: submission.Differential,
-					Platform:     submission.Platform,
-					Version:      submission.Version,
-					Shard:        submission.Shard,
+					PackID:   submission.PackID,
+					QueryID:  queryID,
+					Interval: submission.Interval,
+					Snapshot: submission.Snapshot,
+					Removed:  submission.Removed,
+					Platform: submission.Platform,
+					Version:  submission.Version,
+					Shard:    submission.Shard,
 				})
 				if err != nil {
 					return scheduleQueriesResponse{Err: err}, nil

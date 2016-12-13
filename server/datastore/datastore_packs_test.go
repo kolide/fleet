@@ -54,8 +54,8 @@ func testGetHostsInPack(t *testing.T, ds kolide.Datastore) {
 	})
 	require.Nil(t, err)
 
-	test.NewScheduledQuery(t, ds, p1.ID, q1.ID, 60, false, true, false)
-	test.NewScheduledQuery(t, ds, p1.ID, q2.ID, 60, false, true, false)
+	test.NewScheduledQuery(t, ds, p1.ID, q1.ID, 60, false, false)
+	test.NewScheduledQuery(t, ds, p1.ID, q2.ID, 60, false, false)
 
 	l1, err := ds.NewLabel(&kolide.Label{
 		Name: "foo",

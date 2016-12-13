@@ -87,17 +87,16 @@ func (orm *Datastore) ListScheduledQueriesInPack(id uint, opt kolide.ListOptions
 	// Apply ordering
 	if opt.OrderKey != "" {
 		var fields = map[string]string{
-			"id":           "ID",
-			"created_at":   "CreatedAt",
-			"updated_at":   "UpdatedAt",
-			"name":         "Name",
-			"query":        "Query",
-			"interval":     "Interval",
-			"snapshot":     "Snapshot",
-			"differential": "Differential",
-			"removed":      "Removed",
-			"platform":     "Platform",
-			"version":      "Version",
+			"id":         "ID",
+			"created_at": "CreatedAt",
+			"updated_at": "UpdatedAt",
+			"name":       "Name",
+			"query":      "Query",
+			"interval":   "Interval",
+			"snapshot":   "Snapshot",
+			"removed":    "Removed",
+			"platform":   "Platform",
+			"version":    "Version",
 		}
 		if err := sortResults(scheduledQueries, opt, fields); err != nil {
 			return nil, err
