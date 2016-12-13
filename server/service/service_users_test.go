@@ -294,11 +294,13 @@ func TestChangePassword(t *testing.T) {
 				require.Equal(t, tt.wantErr, pkg_errors.Cause(err))
 			}
 
-			if err == nil {
-				// Attempt login after successful change
-				_, _, err := svc.Login(context.Background(), tt.user.Username, tt.newPassword)
-				require.Nil(t, err, "should be able to login with new password")
+			if err != nil {
+				return
 			}
+
+			// Attempt login after successful change
+			_, _, err = svc.Login(context.Background(), tt.user.Username, tt.newPassword)
+			require.Nil(t, err, "should be able to login with new password")
 		})
 	}
 }
