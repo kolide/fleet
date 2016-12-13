@@ -1,5 +1,4 @@
 import React from 'react';
-import expect, { spyOn } from 'expect';
 import configureStore from 'redux-mock-store';
 import expect, { spyOn } from 'expect';
 import { noop } from 'lodash';

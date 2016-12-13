@@ -3,7 +3,7 @@ import expect from 'expect';
 import { mount } from 'enzyme';
 import { noop } from 'lodash';
 
-import AppConfigForm from 'components/forms/Admin/AppConfigForm';
+import AppConfigForm from 'components/forms/admin/AppConfigForm';
 import { itBehavesLikeAFormInputElement } from 'test/helpers';
 
 describe('AppConfigForm - form', () => {
@@ -70,9 +70,8 @@ describe('AppConfigForm - form', () => {
     });
 
     it('renders advanced options when "Advanced Options" is clicked', () => {
-      form.find('Button').findWhere((button) => {
-        return button.prop('variant') === 'unstyled';
-      }).simulate('click');
+      form.find('.app-config-form__show-options').simulate('click');
+
       expect(form.find({ name: 'domain' }).length).toEqual(1);
       expect(form.find('Slider').length).toEqual(2);
     });

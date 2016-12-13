@@ -89,7 +89,12 @@ class AppConfigForm extends Component {
             <InputField {...fields.domain} label="Domain" />
 
             <div className="input-field__wrapper">
-              <label className="input-field__label">Verify SSL Certs?</label>
+              <label
+                className="input-field__label"
+                htmlFor={fields.verify_ssl_certs.name}
+              >
+                Verify SSL Certs?
+              </label>
               <div className="slide-wrapper">
                 <span className="slider-option slider-option--off">OFF</span>
                 <Slider {...fields.verify_ssl_certs} />
@@ -98,7 +103,12 @@ class AppConfigForm extends Component {
             </div>
 
             <div className="input-field__wrapper">
-              <label className="input-field__label">Verify SSL Certs?</label>
+              <label
+                className="input-field__label"
+                htmlFor={fields.enable_start_tls.name}
+              >
+                Enable STARTTLS?
+              </label>
               <div className="slide-wrapper">
                 <span className="slider-option slider-option--off">OFF</span>
                 <Slider {...fields.enable_start_tls} />
@@ -150,7 +160,7 @@ class AppConfigForm extends Component {
             <InputField
               {...fields.kolide_server_url}
               label="Kolide App URL"
-              hint={['Include base path only (eg. no ', <code>/v1</code>,')']}
+              hint={[`Include base path only (eg. no ${<code>/v1</code>})`]}
             />
           </div>
           <div className={`${baseClass}__details`}>
@@ -186,11 +196,16 @@ class AppConfigForm extends Component {
             </Checkbox>
           </div>
           <div className={`${baseClass}__details`}>
-            <p>The hostname / IP address and corresponding port of your organization's SMTP server.</p>
+            <p>The hostname / IP address and corresponding port of your organization&apos;s SMTP server.</p>
           </div>
           <div className={`${baseClass}__inputs`}>
             <div className="input-field__wrapper">
-              <label className="input-field__label">Authentication Type</label>
+              <label
+                className="input-field__label"
+                htmlFor={fields.authentication_type.name}
+              >
+                Authentication Type
+              </label>
               <Dropdown
                 {...fields.authentication_type}
                 options={authTypeOptions}
@@ -206,7 +221,12 @@ class AppConfigForm extends Component {
                 label="SMTP Password"
               />
               <div className="input-field__wrapper">
-                <label className="input-field__label">Auth Method</label>
+                <label
+                  className="input-field__label"
+                  htmlFor={fields.auth_method.name}
+                >
+                  Auth Method
+                </label>
                 <Dropdown
                   {...fields.auth_method}
                   options={authMethodOptions}
