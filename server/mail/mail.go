@@ -59,19 +59,6 @@ func (m mailService) SendEmail(e kolide.Email) error {
 			msg := []byte(subject + mime + content + "\r\n" + string(body) + "\r\n")
 			smtpHost := fmt.Sprintf("%s:%d", e.Config.Server, e.Config.Port)
 
-			var skipVerify bool
-			if e.Config.Port == PortTLS {
-				skipVerify = !e.Config.EnableStartTLS
-			}
-
-			if e.Config.Port == PortSSL {
-				skipVerify = !e.Config.EnableSSLTLS
-			}
-
-			if !e.Config.EnableSSLTLS && !e.Config.EnableStartTLS {
-				skipVerify = true
-			}
-
 			var auth smtp.Auth
 			if e.Config.AuthenticationType == kolide.AuthTypeUserNamePassword {
 				switch e.Config.AuthenticationMethod {
@@ -88,8 +75,8 @@ func (m mailService) SendEmail(e kolide.Email) error {
 				auth = nil // No Auth
 			}
 
-			if skipVerify {
-				return m.sendMailWithoutTLS(auth, smtpHost, e, msg)
+			if !e.Config.VerifySSLCerts {
+				return m.sendMailWithoutSSLCertVerify(auth, smtpHost, e, msg)
 			}
 
 			return smtp.SendMail(smtpHost, auth, e.Config.SenderAddress, e.To, msg)
@@ -98,7 +85,8 @@ func (m mailService) SendEmail(e kolide.Email) error {
 	return nil
 }
 
-func (m mailService) sendMailWithoutTLS(auth smtp.Auth, smtpHost string, e kolide.Email, msg []byte) error {
+// TODO: still need to write custom handlers for no tls, and no start tls
+func (m mailService) sendMailWithoutSSLCertVerify(auth smtp.Auth, smtpHost string, e kolide.Email, msg []byte) error {
 	client, err := smtp.Dial(smtpHost)
 	if err != nil {
 		return err

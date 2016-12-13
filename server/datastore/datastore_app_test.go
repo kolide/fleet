@@ -32,7 +32,7 @@ func testOrgInfo(t *testing.T, ds kolide.Datastore) {
 	info2.AuthenticationType = kolide.AuthTypeUserNamePassword
 	info2.UserName = "username"
 	info2.Password = "password"
-	info2.EnableSSLTLS = false
+	info2.EnableTLS = false
 	info2.AuthenticationMethod = kolide.AuthMethodCramMD5
 	info2.VerifySSLCerts = true
 	info2.EnableStartTLS = true
@@ -50,7 +50,7 @@ func testOrgInfo(t *testing.T, ds kolide.Datastore) {
 	assert.Equal(t, info3.AuthenticationType, info2.AuthenticationType)
 	assert.Equal(t, info3.UserName, info2.UserName)
 	assert.Equal(t, info3.Password, info2.Password)
-	assert.Equal(t, info3.EnableSSLTLS, info2.EnableSSLTLS)
+	assert.Equal(t, info3.EnableTLS, info2.EnableTLS)
 	assert.Equal(t, info3.AuthenticationMethod, info2.AuthenticationMethod)
 	assert.Equal(t, info3.VerifySSLCerts, info2.VerifySSLCerts)
 	assert.Equal(t, info3.EnableStartTLS, info2.EnableStartTLS)

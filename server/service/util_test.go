@@ -35,7 +35,7 @@ func createTestAppConfig(t *testing.T, ds kolide.Datastore) *kolide.AppConfig {
 			UserName:           "deckard",
 			Password:           "replicant",
 			VerifySSLCerts:     true,
-			EnableSSLTLS:       true,
+			EnableTLS:          true,
 		},
 	}
 	result, err := ds.NewAppConfig(config)

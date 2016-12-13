@@ -76,7 +76,7 @@ func (d *Datastore) SaveAppConfig(info *kolide.AppConfig) error {
 		info.Server,
 		info.Port,
 		info.AuthenticationType,
-		info.EnableSSLTLS,
+		info.EnableTLS,
 		info.AuthenticationMethod,
 		info.Domain,
 		info.UserName,

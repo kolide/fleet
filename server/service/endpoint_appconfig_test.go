@@ -49,7 +49,7 @@ func (s *EndpointTestSuite) TestModifyAppConfig() {
 				Port:               567,
 				AuthenticationType: kolide.AuthTypeNone,
 				Server:             "foo.com",
-				EnableSSLTLS:       true,
+				EnableTLS:          true,
 				VerifySSLCerts:     true,
 				EnableStartTLS:     true,
 			},
@@ -83,7 +83,7 @@ func (s *EndpointTestSuite) TestModifyAppConfigWithValidationFail() {
 			SMTPConfig: &kolide.SMTPConfig{
 				Port:               567,
 				AuthenticationType: kolide.AuthTypeNone,
-				EnableSSLTLS:       true,
+				EnableTLS:          true,
 				VerifySSLCerts:     true,
 				EnableStartTLS:     true,
 			},

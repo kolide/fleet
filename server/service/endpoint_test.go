@@ -35,7 +35,7 @@ func (s *EndpointTestSuite) SetupTest() {
 		SMTPConfig: &kolide.SMTPConfig{
 			Port:               465,
 			AuthenticationType: kolide.AuthTypeUserNamePassword,
-			EnableSSLTLS:       true,
+			EnableTLS:          true,
 			VerifySSLCerts:     true,
 			EnableStartTLS:     true,
 		},

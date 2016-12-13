@@ -52,7 +52,7 @@ type SMTPConfig struct {
 	// Password must be provided if SMTPAuthenticationType is UserNamePassword
 	Password string `json:"password" db:"smtp_password"`
 	// EnableSSLTLS whether to use SSL/TLS for SMTP
-	EnableSSLTLS bool `json:"enable_ssl_tls" db:"smtp_enable_ssl_tls"`
+	EnableTLS bool `json:"enable_ssl_tls" db:"smtp_enable_ssl_tls"`
 	// SMTPAuthenticationMethod authentication method smtp server will use
 	AuthenticationMethod string `json:"authentication_method" db:"smtp_authentication_method"`
 	// Advanced SMTP Options
