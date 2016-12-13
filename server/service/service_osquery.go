@@ -87,7 +87,6 @@ func (svc service) GetClientConfig(ctx context.Context) (*kolide.OsqueryConfig, 
 		// particular format, so we do the conversion here
 		configQueries := kolide.Queries{}
 		for _, query := range queries {
-			_ = query
 			configQueries[query.Name] = kolide.QueryContent{
 				Query:    query.Query,
 				Interval: query.Interval,
