@@ -1,0 +1,29 @@
+.form-field {
+  margin-bottom: $pad-small;
+
+  &__label {
+    display: block;
+    font-size: $base;
+    font-weight: $light;
+    color: $text-dark;
+
+    &--error {
+      color: $alert;
+    }
+  }
+
+  &__hint {
+    font-size: 14px;
+    font-weight: $normal;
+    line-height: 1.57;
+    letter-spacing: 1px;
+    color: $accent-text;
+
+    code {
+      color: $brand-light;
+      background-color: $accent-light;
+      padding: 2px;
+      font-family: 'SourceCodePro', $monospace;
+    }
+  }
+}
