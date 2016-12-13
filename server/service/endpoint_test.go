@@ -32,7 +32,7 @@ func (s *EndpointTestSuite) SetupTest() {
 	devOrgInfo := &kolide.AppConfig{
 		OrgName:    "Kolide",
 		OrgLogoURL: "http://foo.bar/image.png",
-		SMTPConfig: kolide.SMTPConfig{
+		SMTPConfig: &kolide.SMTPConfig{
 			Port:               465,
 			AuthenticationType: kolide.AuthTypeUserNamePassword,
 			EnableSSLTLS:       true,

@@ -214,7 +214,7 @@ func (svc service) RequestPasswordReset(ctx context.Context, email string) error
 	resetEmail := kolide.Email{
 		Subject: "Kolide",
 		To:      []string{user.Email},
-		Config:  &config.SMTPConfig,
+		Config:  config.SMTPConfig,
 		Mailer: &kolide.PasswordResetMailer{
 			KolideServerURL: config.KolideServerURL,
 			Token:           token,

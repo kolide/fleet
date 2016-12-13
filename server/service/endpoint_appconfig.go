@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/go-kit/kit/endpoint"
+	"github.com/kolide/kolide-ose/server/contexts/viewer"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"golang.org/x/net/context"
 )
@@ -26,15 +27,14 @@ func makeGetAppConfigEndpoint(svc kolide.Service) endpoint.Endpoint {
 		if err != nil {
 			return getAppConfigResponse{Err: err}, nil
 		}
-		// v, err := viewer.FromContext(ctx)
-		// if err != nil {
-		// 	return getAppConfigResponse{Err: err}, nil
-		// }
-		// if !v.IsAdmin() {
-		// 	// make a copy of config so we don't munge inmem
-		// 	copyConfig := *config
-		// 	copyConfig.SMTPConfig = &kolide.SMTPConfig{}
-		// }
+		v, _ := viewer.FromContext(ctx)
+
+		if !v.IsAdmin() {
+			// make a copy of config so we don't munge inmem
+			copyConfig := *config
+			copyConfig.SMTPConfig = nil
+			return getAppConfigResponse{AppConfig: &copyConfig}, nil
+		}
 
 		return getAppConfigResponse{AppConfig: config}, nil
 	}

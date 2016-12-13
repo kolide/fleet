@@ -74,7 +74,7 @@ type AppConfig struct {
 	OrgName         string `json:"org_name,omitempty" db:"org_name"`
 	OrgLogoURL      string `json:"org_logo_url,omitempty" db:"org_logo_url"`
 	KolideServerURL string `json:"kolide_server_url" db:"kolide_server_url"`
-	SMTPConfig
+	*SMTPConfig
 }
 
 type SMTPError struct {

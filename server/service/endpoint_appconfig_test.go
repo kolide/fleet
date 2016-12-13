@@ -45,7 +45,7 @@ func (s *EndpointTestSuite) TestModifyAppConfig() {
 			KolideServerURL: "https://foo.com",
 			OrgName:         "Zip",
 			OrgLogoURL:      "http://foo.bar/image.png",
-			SMTPConfig: kolide.SMTPConfig{
+			SMTPConfig: &kolide.SMTPConfig{
 				Port:               567,
 				AuthenticationType: kolide.AuthTypeNone,
 				Server:             "foo.com",
@@ -80,7 +80,7 @@ func (s *EndpointTestSuite) TestModifyAppConfigWithValidationFail() {
 		AppConfig: kolide.AppConfig{
 			OrgName:    "Zip",
 			OrgLogoURL: "http://foo.bar/image.png",
-			SMTPConfig: kolide.SMTPConfig{
+			SMTPConfig: &kolide.SMTPConfig{
 				Port:               567,
 				AuthenticationType: kolide.AuthTypeNone,
 				EnableSSLTLS:       true,

@@ -62,7 +62,7 @@ func (svc service) InviteNewUser(ctx context.Context, payload kolide.InvitePaylo
 	inviteEmail := kolide.Email{
 		Subject: "Kolide",
 		To:      []string{invite.Email},
-		Config:  &config.SMTPConfig,
+		Config:  config.SMTPConfig,
 		Mailer:  &inviteMailer{},
 	}
 

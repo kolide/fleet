@@ -12,6 +12,7 @@ func testOrgInfo(t *testing.T, ds kolide.Datastore) {
 	info := &kolide.AppConfig{
 		OrgName:    "Kolide",
 		OrgLogoURL: "localhost:8080/logo.png",
+		SMTPConfig: &kolide.SMTPConfig{},
 	}
 
 	info, err := ds.NewAppConfig(info)
