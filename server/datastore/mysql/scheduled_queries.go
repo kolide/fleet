@@ -8,7 +8,7 @@ import (
 func (d *Datastore) NewScheduledQuery(sq *kolide.ScheduledQuery) (*kolide.ScheduledQuery, error) {
 	sql := `
 	    INSERT INTO scheduled_queries (
-		    pack_id,
+			pack_id,
 			query_id,
 			snapshot,
 			differential,
