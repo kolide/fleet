@@ -7,34 +7,20 @@ import ConnectedPacksComposerPage, { PackComposerPage } from './PackComposerPage
 
 describe('PackComposerPage - component', () => {
   it('renders', () => {
-    const page = mount(<PackComposerPage />);
+    const page = mount(connectedComponent(ConnectedPacksComposerPage));
 
     expect(page.length).toEqual(1);
   });
 
   it('renders a PackForm component', () => {
-    const page = mount(<PackComposerPage />);
+    const page = mount(connectedComponent(ConnectedPacksComposerPage));
 
     expect(page.find('PackForm').length).toEqual(1);
   });
 
-  it('renders a QueriesListWrapper component', () => {
-    const page = mount(<PackComposerPage />);
+  it('renders a PackInfoSidePanel component', () => {
+    const page = mount(connectedComponent(ConnectedPacksComposerPage));
 
-    expect(page.find('QueriesListWrapper').length).toEqual(1);
-  });
-
-  it('loads all queries when it mounts', () => {
-    const mockStore = reduxMockStore({
-      components: {
-        PacksPages: {},
-      },
-    });
-    const page = mount(
-      connectedComponent(ConnectedPacksComposerPage, { mockStore })
-    );
-
-    expect(page.length).toEqual(1);
-    expect(mockStore.getActions()).toInclude({ type: 'queries_LOAD_REQUEST' });
+    expect(page.find('PackInfoSidePanel').length).toEqual(1);
   });
 });
