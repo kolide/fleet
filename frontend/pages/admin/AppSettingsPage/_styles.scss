@@ -18,6 +18,24 @@
     color: $text-dark;
     border-bottom: dashed 1px $accent-dark;
     margin: 0 0 15px;
+
+    a {
+      text-decoration: none;
+    }
+
+    .kolidecon {
+      font-size: 8px;
+      margin: 0 20px;
+      vertical-align: 4px;
+    }
+
+    small {
+      font-size: 15px;
+      font-weight: $normal;
+      line-height: 1.6;
+      letter-spacing: 0.5px;
+      color: $text-dark;
+    }
   }
 }
 

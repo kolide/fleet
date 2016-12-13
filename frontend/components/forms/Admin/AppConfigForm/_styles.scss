@@ -1,6 +1,31 @@
 .app-config-form {
   &__section {
     @include clearfix;
+
+    .smtp-options {
+      font-size: 15px;
+      font-weight: $bold;
+      line-height: 3.2;
+      letter-spacing: 0.6px;
+      color: $text-dark;
+      padding-left: 15px;
+
+      em {
+        font-style: normal;
+      }
+
+      &--configured {
+        em {
+          color: $success;
+        }
+      }
+
+      &--notconfigured {
+        em {
+          color: $alert;
+        }
+      }
+    }
   }
 
   &__inputs {
@@ -49,6 +74,14 @@
         color: $text-medium;
       }
     }
+
+    .hint {
+      color: $text-medium;
+
+      &--brand {
+        color: $brand;
+      }
+    }
   }
 
   &__avatar-preview {
@@ -72,7 +105,7 @@
     color: $text-dark;
   }
 
-  &__smtp-user-section {
+  &__smtp-section {
     border-radius: 2px;
     background-color: $bg-medium;
     border: solid 1px $accent-medium;
@@ -96,12 +129,39 @@
       width: 30%;
       margin: 0;
       line-height: 40px;
+
+      @media (min-width: $medium-width + 1) and (max-width: 1195px) {
+        line-height: 18px;
+      }
     }
 
     .input-field,
-    .Select {
+    .Select,
+    .slide-wrapper {
       width: 60%;
       float: right;
+    }
+
+    .slide-wrapper {
+      .slider-option {
+        font-size: 18px;
+        font-weight: $light;
+        letter-spacing: 1.3px;
+        text-align: left;
+        vertical-align: text-bottom;
+
+        &--off {
+          color: $text-light;
+        }
+
+        &--on {
+          color: $brand;
+        }
+      }
+
+      .button {
+        margin: 0 10px;
+      }
     }
   }
 }

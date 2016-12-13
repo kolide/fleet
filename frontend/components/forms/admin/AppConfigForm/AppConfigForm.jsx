@@ -31,7 +31,7 @@ const formFields = [
 const Header = ({ showAdvancedOptions }) => {
   const CaratIcon = <Icon name={showAdvancedOptions ? 'downcarat' : 'upcarat'} />;
 
-  return <span>Advanced Options {CaratIcon}</span>;
+  return <span>Advanced Options {CaratIcon} <small>You normally don’t need to change these settings they are for special setups.</small></span>;
 };
 
 Header.propTypes = { showAdvancedOptions: PropTypes.bool.isRequired };
@@ -84,9 +84,35 @@ class AppConfigForm extends Component {
 
     return (
       <div>
-        <InputField {...fields.domain} />
-        <Slider {...fields.verify_ssl_certs} />
-        <Slider {...fields.enable_start_tls} />
+        <div className={`${baseClass}__inputs`}>
+          <div className={`${baseClass}__smtp-section`}>
+            <InputField {...fields.domain} label="Domain" />
+
+            <div className="input-field__wrapper">
+              <label className="input-field__label">Verify SSL Certs?</label>
+              <div className="slide-wrapper">
+                <span className="slider-option slider-option--off">OFF</span>
+                <Slider {...fields.verify_ssl_certs} />
+                <span className="slider-option slider-option--on">ON</span>
+              </div>
+            </div>
+
+            <div className="input-field__wrapper">
+              <label className="input-field__label">Verify SSL Certs?</label>
+              <div className="slide-wrapper">
+                <span className="slider-option slider-option--off">OFF</span>
+                <Slider {...fields.enable_start_tls} />
+                <span className="slider-option slider-option--on">ON</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className={`${baseClass}__details`}>
+          <p><strong>Domain</strong> - If you need to specify a HELO domain, you can do it here <em className="hint hint--brand">(Default: <strong>Blank</strong>)</em></p>
+          <p><strong>Verify SSL Certs</strong> - Turn this off (not recommended) if you use a self-signed certificate <em className="hint hint--brand">(Default: <strong>On</strong>)</em></p>
+          <p><strong>Enable STARTTLS</strong> - Detects if STARTTLS is enabled in your SMTP server and starts to use it. <em className="hint hint--brand">(Default: <strong>On</strong>)</em></p>
+        </div>
       </div>
     );
   }
@@ -134,7 +160,7 @@ class AppConfigForm extends Component {
           </div>
         </div>
         <div className={`${baseClass}__section`}>
-          <h2>SMTP Options <small>STATUS: {smtpConfigured ? 'CONFIGURED' : 'NOT CONFIGURED'}</small></h2>
+          <h2>SMTP Options <small className={`smtp-options smtp-options--${smtpConfigured ? 'configured' : 'notconfigured'}`}>STATUS: <em>{smtpConfigured ? 'CONFIGURED' : 'NOT CONFIGURED'}</em></small></h2>
           <div className={`${baseClass}__inputs`}>
             <InputField
               {...fields.sender_address}
@@ -170,7 +196,7 @@ class AppConfigForm extends Component {
                 options={authTypeOptions}
               />
             </div>
-            <div className={`${baseClass}__smtp-user-section`}>
+            <div className={`${baseClass}__smtp-section`}>
               <InputField
                 {...fields.user_name}
                 label="SMTP Username"
@@ -196,13 +222,10 @@ class AppConfigForm extends Component {
           </div>
         </div>
         <div className={`${baseClass}__section`}>
-          <Button
-            onClick={onToggleAdvancedOptions}
-            text={<Header showAdvancedOptions={showAdvancedOptions} />}
-            variant="unstyled"
-            className={`${baseClass}__show-options`}
-          />
+          <h2><a href="#advancedOptions" onClick={onToggleAdvancedOptions} className={`${baseClass}__show-options`}><Header showAdvancedOptions={showAdvancedOptions} /></a></h2>
+
           {renderAdvancedOptions()}
+
         </div>
         <Button
           onClick={handleSubmit}
