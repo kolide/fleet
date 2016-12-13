@@ -95,6 +95,7 @@ func (orm *Datastore) ListScheduledQueriesInPack(id uint, opt kolide.ListOptions
 			"interval":     "Interval",
 			"snapshot":     "Snapshot",
 			"differential": "Differential",
+			"removed":      "Removed",
 			"platform":     "Platform",
 			"version":      "Version",
 		}

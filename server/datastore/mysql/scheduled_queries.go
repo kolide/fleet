@@ -12,13 +12,14 @@ func (d *Datastore) NewScheduledQuery(sq *kolide.ScheduledQuery) (*kolide.Schedu
 			query_id,
 			snapshot,
 			differential,
+			removed,
 			` + "`interval`" + `,
 			platform,
 			version,
 			shard
-		) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 		`
-	result, err := d.db.Exec(sql, sq.PackID, sq.QueryID, sq.Snapshot, sq.Differential, sq.Interval, sq.Platform, sq.Version, sq.Shard)
+	result, err := d.db.Exec(sql, sq.PackID, sq.QueryID, sq.Snapshot, sq.Differential, sq.Removed, sq.Interval, sq.Platform, sq.Version, sq.Shard)
 	if err != nil {
 		return nil, errors.DatabaseError(err)
 	}
@@ -31,10 +32,10 @@ func (d *Datastore) NewScheduledQuery(sq *kolide.ScheduledQuery) (*kolide.Schedu
 func (d *Datastore) SaveScheduledQuery(sq *kolide.ScheduledQuery) (*kolide.ScheduledQuery, error) {
 	sql := `
 		UPDATE scheduled_queries
-			SET pack_id = ?, query_id = ?, ` + "`interval`" + ` = ?, snapshot = ?, differential = ?, platform = ?, version = ?, shard = ?
+			SET pack_id = ?, query_id = ?, ` + "`interval`" + ` = ?, snapshot = ?, differential = ?, removed = ?, platform = ?, version = ?, shard = ?
 			WHERE id = ? AND NOT deleted
 	`
-	_, err := d.db.Exec(sql, sq.PackID, sq.QueryID, sq.Interval, sq.Snapshot, sq.Differential, sq.Platform, sq.Version, sq.Shard, sq.ID)
+	_, err := d.db.Exec(sql, sq.PackID, sq.QueryID, sq.Interval, sq.Snapshot, sq.Differential, sq.Removed, sq.Platform, sq.Version, sq.Shard, sq.ID)
 	if err != nil {
 		return nil, errors.DatabaseError(err)
 	}

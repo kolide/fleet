@@ -31,6 +31,7 @@ type ScheduledQuery struct {
 	Interval     uint    `json:"interval"`
 	Snapshot     *bool   `json:"snapshot"`
 	Differential *bool   `json:"differential"`
+	Removed      *bool   `json:"removed"`
 	Platform     *string `json:"platform"`
 	Version      *string `json:"version"`
 	Shard        *uint   `json:"shard"`

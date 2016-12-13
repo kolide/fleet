@@ -428,7 +428,7 @@ func TestGetClientConfig(t *testing.T) {
 	_, err = ds.NewPack(monitoringPack)
 	assert.Nil(t, err)
 
-	test.NewScheduledQuery(t, ds, monitoringPack.ID, infoQuery.ID, infoQueryInterval, false, true)
+	test.NewScheduledQuery(t, ds, monitoringPack.ID, infoQuery.ID, infoQueryInterval, false, true, false)
 
 	mysqlLabel := &kolide.Label{
 		Name:  "MySQL Monitoring",
