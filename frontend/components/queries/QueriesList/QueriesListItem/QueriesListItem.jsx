@@ -11,42 +11,20 @@ const baseClass = 'queries-list-item';
 class QueriesListItem extends Component {
   static propTypes = {
     checked: PropTypes.bool,
-    configured: PropTypes.bool,
+    disabled: PropTypes.bool,
     onSelect: PropTypes.func.isRequired,
     query: queryInterface.isRequired,
   };
 
-  constructor (props) {
-    super(props);
-
-    this.state = { hover: false };
-  }
-
-  onHover = (hover) => {
-    return () => {
-      this.setState({ hover });
-    };
-  };
-
   renderCheckbox = () => {
-    const { checked, configured, onSelect, query } = this.props;
-    const { hover } = this.state;
-    const { onHover } = this;
-
-    if (configured) {
-      return (
-        <span onMouseOver={onHover(true)} onMouseOut={onHover(false)}>
-          {!hover && <i className={`${baseClass}__check-icon kolidecon-success-check`} />}
-          {hover && <i className={`${baseClass}__check-icon kolidecon-filter`} />}
-        </span>
-      );
-    }
+    const { checked, disabled, onSelect, query } = this.props;
 
     return (
       <Checkbox
-        onChange={onSelect}
-        name={query.name}
         checked={checked}
+        disabled={disabled}
+        name={query.name}
+        onChange={onSelect}
       />
     );
   }
@@ -54,18 +32,16 @@ class QueriesListItem extends Component {
   render () {
     const { query } = this.props;
     const { renderCheckbox } = this;
-    const updatedTime = moment(query.updated_at);
+    const updatedTimeAgo = moment(query.updated_at).fromNow();
 
     return (
       <tr>
-        <td>
-          {renderCheckbox()}
-        </td>
+        <td>{renderCheckbox()}</td>
         <td>{query.name}</td>
         <td>{query.description}</td>
         <td><Icon name={platformIconClass(query.platform)} /></td>
-        <td />
-        <td>{updatedTime.fromNow()}</td>
+        <td>{query.author_name}</td>
+        <td>{updatedTimeAgo}</td>
       </tr>
     );
   }

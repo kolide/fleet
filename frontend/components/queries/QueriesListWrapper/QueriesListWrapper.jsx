@@ -1,9 +1,9 @@
 import React, { Component, PropTypes } from 'react';
-import { size } from 'lodash';
+import { pull } from 'lodash';
 
+import Button from 'components/buttons/Button';
 import helpers from 'components/queries/QueriesListWrapper/helpers';
 import InputField from 'components/forms/fields/InputField';
-import PackQueryConfigForm from 'components/forms/packs/PackQueryConfigForm';
 import QueriesList from 'components/queries/QueriesList';
 import queryInterface from 'interfaces/query';
 
@@ -11,13 +11,8 @@ const baseClass = 'queries-list-wrapper';
 
 class QueriesListWrapper extends Component {
   static propTypes = {
-    configuredQueryIDs: PropTypes.arrayOf(PropTypes.number),
-    onClearStagedQueries: PropTypes.func,
-    onConfigureQueries: PropTypes.func,
-    onDeselectQuery: PropTypes.func,
-    onSelectQuery: PropTypes.func,
-    queries: PropTypes.arrayOf(queryInterface),
-    stagedQueries: PropTypes.arrayOf(queryInterface),
+    allQueries: PropTypes.arrayOf(queryInterface),
+    scheduledQueries: PropTypes.arrayOf(queryInterface),
   };
 
   constructor (props) {
@@ -26,23 +21,36 @@ class QueriesListWrapper extends Component {
     this.state = {
       querySearchText: '',
       selectAll: false,
+      selectedQueries: [],
+      shouldShowPackForm: false,
     };
   }
 
+  onHidePackForm = () => {
+    this.setState({ shouldShowPackForm: false });
+
+    return false;
+  }
+
   onSelectQuery = (query) => {
-    return (shouldCheck) => {
-      const { onDeselectQuery, onSelectQuery } = this.props;
+    return (shouldAddQuery) => {
+      const { selectedQueries } = this.state;
+      const newSelectedQueries = shouldAddQuery ?
+        selectedQueries.concat(query) :
+        pull(selectedQueries, query);
 
-      if (shouldCheck) {
-        onSelectQuery(query);
-
-        return false;
-      }
-
-      onDeselectQuery(query);
+      this.setState({ selectedQueries: newSelectedQueries });
 
       return false;
     };
+  }
+
+  onShowPackForm = (evt) => {
+    evt.preventDefault();
+
+    this.setState({ shouldShowPackForm: true });
+
+    return false;
   }
 
   onUpdateQuerySearchText = (querySearchText) => {
@@ -50,65 +58,56 @@ class QueriesListWrapper extends Component {
   }
 
   getQueries = () => {
-    const { queries } = this.props;
+    const { scheduledQueries } = this.props;
     const { querySearchText } = this.state;
 
-    return helpers.filterQueries(queries, querySearchText);
+    return helpers.filterQueries(scheduledQueries, querySearchText);
   }
 
-  renderPackQueryConfigForm = () => {
-    const {
-      onClearStagedQueries,
-      onConfigureQueries,
-      stagedQueries,
-    } = this.props;
+  renderQueryCount = () => {
+    const { scheduledQueries } = this.props;
+    const queryCount = scheduledQueries.length;
+    const queryText = queryCount === 1 ? 'Query' : 'Queries';
 
-    const formData = { queries: stagedQueries };
-
-    return (
-      <PackQueryConfigForm
-        formData={formData}
-        handleSubmit={onConfigureQueries}
-        onCancel={onClearStagedQueries}
-      />
-    );
+    return <p className={`${baseClass}__query-count`}><span>{queryCount}</span> {queryText}</p>;
   }
 
   renderQueriesList = () => {
-    const { getQueries, onSelectQuery, renderPackQueryConfigForm } = this;
-    const { configuredQueryIDs, stagedQueries } = this.props;
-    const queryCount = size(getQueries());
-
-    if (!queryCount) {
-      return <p>There are no available queries for your pack</p>;
-    }
+    const { getQueries, onHidePackForm, onSelectQuery } = this;
+    const { selectedQueries, shouldShowPackForm } = this.state;
 
     return (
       <div className={`${baseClass}__queries-list-wrapper`}>
-        {renderPackQueryConfigForm()}
         <QueriesList
-          configuredQueryIDs={configuredQueryIDs}
+          onHidePackForm={onHidePackForm}
           onSelectQuery={onSelectQuery}
           queries={getQueries()}
-          selectedQueries={stagedQueries}
+          selectedQueries={selectedQueries}
+          shouldShowPackForm={shouldShowPackForm}
         />
       </div>
     );
   }
 
   render () {
-    const { onUpdateQuerySearchText, renderQueriesList } = this;
-    const { querySearchText } = this.state;
+    const { onShowPackForm, onUpdateQuerySearchText, renderQueryCount, renderQueriesList } = this;
+    const { querySearchText, shouldShowPackForm } = this.state;
 
     return (
       <div className={`${baseClass} ${baseClass}__wrapper`}>
-        <p>Add Queries to Pack</p>
+        {renderQueryCount()}
         <InputField
           className={`${baseClass}__search-queries-input`}
           name="search-queries"
           onChange={onUpdateQuerySearchText}
           placeholder="Search Queries"
           value={querySearchText}
+        />
+        <Button
+          disabled={shouldShowPackForm}
+          onClick={onShowPackForm}
+          text="Add New Query"
+          variant="brand"
         />
         {renderQueriesList()}
       </div>

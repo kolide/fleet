@@ -1,15 +1,20 @@
 .pack-query-config-form {
   &__body-section {
+    @include align-items(center);
     @include display(flex);
+    @include justify-content(space-between);
     background-color: $accent-light;
-    padding: 0 $pad-small;
+    padding: $pad-small $pad-base;
   }
 
   &__btn-wrapper {
     text-align: right;
 
     button {
-      color: $white;
+      &:focus {
+        outline: none;
+      }
+
       cursor: pointer;
       font-size: 15px;
       line-height: 34px;
@@ -18,35 +23,21 @@
 
   &__form-field {
     display: inline-block;
-  }
-
-  &__header-section {
-    @include display(flex);
-    @include justify-content(space-between);
-    background-color: $brand;
-    height: 34px;
-    padding: 0 $pad-small;
-
-    span {
-      color: $white;
-      font-size: 15px;
-      font-weight: $bold;
-      line-height: 34px;
-    }
+    margin: 0;
   }
 
   &__wrapper {
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
-    border: 1px solid $accent-dark;
     box-shadow: inset 0 0 8px 0 rgba(0, 0, 0, 0.12);
     box-sizing: border-box;
-    height: 122px;
-    max-height: 122px;
-    position: relative;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1;
+  }
+
+  &__cancel-btn {
+    color: $alert;
+  }
+
+  &__submit-btn {
+    color: $success;
   }
 }

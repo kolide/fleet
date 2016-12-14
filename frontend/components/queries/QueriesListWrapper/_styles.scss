@@ -1,4 +1,19 @@
 .queries-list-wrapper {
+  &__query-count {
+    font-size: 20px;
+
+    span {
+      background-color: $brand;
+      border-radius: 14px;
+      color: $white;
+      display: inline-block;
+      line-height: 26px;
+      height: 26px;
+      text-align: center;
+      width: 44px;
+    }
+  }
+
   &__queries-list-wrapper {
     position: relative;
   }

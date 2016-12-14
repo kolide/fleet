@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 
 import Button from 'components/buttons/Button';
 import Dropdown from 'components/forms/fields/Dropdown';
+import dropdownOptionInterface from 'interfaces/dropdownOption';
 import Form from 'components/forms/Form';
 import formFieldInterface from 'interfaces/form_field';
 import InputField from 'components/forms/fields/InputField';
@@ -9,7 +10,7 @@ import queryInterface from 'interfaces/query';
 import validate from 'components/forms/packs/PackQueryConfigForm/validate';
 
 const baseClass = 'pack-query-config-form';
-const fieldNames = ['queries', 'interval', 'platform', 'min_osquery_version', 'logging_type'];
+const fieldNames = ['query_id', 'interval', 'platform', 'min_osquery_version', 'logging_type'];
 const platformOptions = [
   { label: 'All', value: 'all' },
   { label: 'Windows', value: 'windows' },
@@ -29,13 +30,11 @@ class PackQueryConfigForm extends Component {
       logging_type: formFieldInterface.isRequired,
       min_osquery_version: formFieldInterface.isRequired,
       platform: formFieldInterface.isRequired,
-      queries: formFieldInterface.isRequired,
+      query_id: formFieldInterface.isRequired,
     }).isRequired,
-    formData: PropTypes.shape({
-      queries: PropTypes.arrayOf(queryInterface),
-    }),
     handleSubmit: PropTypes.func,
     onCancel: PropTypes.func,
+    queryOptions: PropTypes.arrayOf(dropdownOptionInterface),
   };
 
   onCancel = (evt) => {
@@ -47,39 +46,25 @@ class PackQueryConfigForm extends Component {
   }
 
   render () {
-    const { fields, formData, handleSubmit } = this.props;
+    const { fields, handleSubmit, queryOptions } = this.props;
     const { onCancel } = this;
-    const queryCount = formData.queries.length;
 
     return (
       <form className={`${baseClass}__wrapper`}>
-        <div className={`${baseClass}__header-section`}>
-          <span>Configure {queryCount} Selected {queryCount === 1 ? 'Query' : 'Queries'}</span>
-          <div className={`${baseClass}__btn-wrapper`}>
-            <Button
-              onClick={onCancel}
-              text="Cancel"
-              variant="unstyled"
-            />
-            <span> | </span>
-            <Button
-              onClick={handleSubmit}
-              text="Save and Close"
-              type="submit"
-              variant="unstyled"
-            />
-          </div>
-        </div>
         <div className={`${baseClass}__body-section`}>
+          <Dropdown
+            options={queryOptions}
+            onSelect={fields.query_id.onChange}
+            placeholder="Select Query"
+            wrapperClassName={`${baseClass}__form-field`}
+          />
           <InputField
             {...fields.interval}
             inputWrapperClass={`${baseClass}__form-field`}
-            label="Interval"
             placeholder="Interval (seconds)"
           />
           <Dropdown
             {...fields.platform}
-            label="Platform"
             options={platformOptions}
             onSelect={fields.platform.onChange}
             placeholder="Platform"
@@ -87,12 +72,26 @@ class PackQueryConfigForm extends Component {
           />
           <Dropdown
             {...fields.logging_type}
-            label="Logging Type"
             options={loggingTypeOptions}
             onSelect={fields.logging_type.onChange}
             placeholder="Logging type"
             wrapperClassName={`${baseClass}__form-field`}
           />
+          <div className={`${baseClass}__btn-wrapper`}>
+            <Button
+              className={`${baseClass}__cancel-btn`}
+              onClick={onCancel}
+              text="cancel"
+              variant="unstyled"
+            />
+            <Button
+              className={`${baseClass}__submit-btn`}
+              onClick={handleSubmit}
+              text="add to pack"
+              type="submit"
+              variant="unstyled"
+            />
+          </div>
         </div>
       </form>
     );

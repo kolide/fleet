@@ -45,6 +45,12 @@
       background-color: $white;
       visibility: visible;
     }
+
+    &--disabled {
+      &::after {
+        background-color: $border-medium;
+      }
+    }
   }
 
   &__label {

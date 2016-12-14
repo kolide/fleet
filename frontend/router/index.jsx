@@ -9,6 +9,7 @@ import App from 'components/App';
 import AuthenticatedAdminRoutes from 'components/AuthenticatedAdminRoutes';
 import AuthenticatedRoutes from 'components/AuthenticatedRoutes';
 import CoreLayout from 'layouts/CoreLayout';
+import EditPackPage from 'pages/packs/EditPackPage';
 import HomePage from 'pages/HomePage';
 import LoginRoutes from 'components/LoginRoutes';
 import LogoutPage from 'pages/LogoutPage';
@@ -47,6 +48,7 @@ const routes = (
             <Route path="packs" component={PackPageWrapper}>
               <Route path="all" component={AllPacksPage} />
               <Route path="new" component={PackComposerPage} />
+              <Route path=":id" component={EditPackPage} />
             </Route>
             <Route path="hosts">
               <Route path="new" component={NewHostPage} />
