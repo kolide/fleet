@@ -15,11 +15,17 @@
   }
 
   &__queries-list-wrapper {
-    position: relative;
+    margin-top: $pad-base;
   }
 
   &__search-queries-input {
+    float: left;
+    display: inline-block;
     width: '400px';
+  }
+
+  &__add-new-query-btn {
+    float: right;
   }
 
   &__wrapper {

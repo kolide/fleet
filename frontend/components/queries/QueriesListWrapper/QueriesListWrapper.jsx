@@ -96,19 +96,22 @@ class QueriesListWrapper extends Component {
     return (
       <div className={`${baseClass} ${baseClass}__wrapper`}>
         {renderQueryCount()}
-        <InputField
-          className={`${baseClass}__search-queries-input`}
-          name="search-queries"
-          onChange={onUpdateQuerySearchText}
-          placeholder="Search Queries"
-          value={querySearchText}
-        />
-        <Button
-          disabled={shouldShowPackForm}
-          onClick={onShowPackForm}
-          text="Add New Query"
-          variant="brand"
-        />
+        <div>
+          <InputField
+            inputClassName={`${baseClass}__search-queries-input`}
+            name="search-queries"
+            onChange={onUpdateQuerySearchText}
+            placeholder="Search Queries"
+            value={querySearchText}
+          />
+          <Button
+            className={`${baseClass}__add-new-query-btn`}
+            disabled={shouldShowPackForm}
+            onClick={onShowPackForm}
+            text="Add New Query"
+            variant="brand"
+          />
+        </div>
         {renderQueriesList()}
       </div>
     );
