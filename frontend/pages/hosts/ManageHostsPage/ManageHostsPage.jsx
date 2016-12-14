@@ -340,6 +340,10 @@ export class ManageHostsPage extends Component {
           {renderForm()}
           <div className={`${baseClass}__list ${baseClass}__list--${display.toLowerCase()}`}>
             {renderHosts()}
+            {renderHosts()}
+            {renderHosts()}
+            {renderHosts()}
+            {renderHosts()}
           </div>
         </div>
 
