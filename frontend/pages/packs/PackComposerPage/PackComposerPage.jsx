@@ -41,7 +41,8 @@ export class PackComposerPage extends Component {
     return dispatch(create(formData))
       .then((pack) => {
         const { id: packID } = pack;
-        return false;
+
+        return dispatch(push(`/packs/${packID}`));
       });
   }
 
