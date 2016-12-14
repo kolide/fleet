@@ -9,6 +9,7 @@ import packInterface from 'interfaces/pack';
 import queryActions from 'redux/nodes/entities/queries/actions';
 import queryInterface from 'interfaces/query';
 import QueriesListWrapper from 'components/queries/QueriesListWrapper';
+import scheduledQueryActions from 'redux/nodes/entities/scheduled_queries/actions';
 import ShowSidePanel from 'components/side_panels/ShowSidePanel';
 import stateEntityGetter from 'redux/utilities/entityGetter';
 
@@ -65,8 +66,22 @@ export class EditPackPage extends Component {
     return dispatch(update(formData));
   }
 
+  handleScheduledQueryFormSubmit = (formData) => {
+    const { create } = scheduledQueryActions;
+    const { dispatch, packID } = this.props;
+    const scheduledQueryData = {
+      ...formData,
+      pack_id: packID,
+    };
+
+    console.log('Scheduled query data', scheduledQueryData);
+    dispatch(create(scheduledQueryData));
+
+    return false;
+  }
+
   render () {
-    const { handlePackFormSubmit, onFetchTargets } = this;
+    const { handlePackFormSubmit, handleScheduledQueryFormSubmit, onFetchTargets } = this;
     const { selectedTargetsCount } = this.state;
     const { allQueries, pack, scheduledQueries } = this.props;
 
@@ -85,6 +100,7 @@ export class EditPackPage extends Component {
         />
         <QueriesListWrapper
           allQueries={allQueries}
+          onScheduledQueryFormSubmit={handleScheduledQueryFormSubmit}
           scheduledQueries={scheduledQueries}
         />
         <PackInfoSidePanel />
