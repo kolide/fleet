@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { noop, size } from 'lodash';
+import { filter, includes, noop, size } from 'lodash';
 
 import packActions from 'redux/nodes/entities/packs/actions';
 import PackForm from 'components/forms/packs/PackForm';
@@ -9,6 +9,7 @@ import packInterface from 'interfaces/pack';
 import queryActions from 'redux/nodes/entities/queries/actions';
 import queryInterface from 'interfaces/query';
 import QueriesListWrapper from 'components/queries/QueriesListWrapper';
+import { renderFlash } from 'redux/nodes/notifications/actions';
 import scheduledQueryActions from 'redux/nodes/entities/scheduled_queries/actions';
 import ShowSidePanel from 'components/side_panels/ShowSidePanel';
 import stateEntityGetter from 'redux/utilities/entityGetter';
@@ -36,12 +37,16 @@ export class EditPackPage extends Component {
   }
 
   componentWillMount () {
-    const { dispatch, loadingPack, pack, packID, allQueries } = this.props;
+    const { allQueries, dispatch, loadingPack, pack, packID, scheduledQueries  } = this.props;
     const { load } = packActions;
     const { loadAll } = queryActions;
 
     if (!pack && !loadingPack) {
       dispatch(load(packID));
+    }
+
+    if (!size(scheduledQueries)) {
+      dispatch(scheduledQueryActions.loadAll({ id: packID }));
     }
 
     if (!size(allQueries)) {
@@ -71,11 +76,17 @@ export class EditPackPage extends Component {
     const { dispatch, packID } = this.props;
     const scheduledQueryData = {
       ...formData,
+      snapshot: formData.logging_type === 'snapshot',
       pack_id: packID,
     };
 
-    console.log('Scheduled query data', scheduledQueryData);
-    dispatch(create(scheduledQueryData));
+    dispatch(create(scheduledQueryData))
+      .then(() => {
+        dispatch(renderFlash('success', 'Query scheduled!'));
+      })
+      .catch(() => {
+        dispatch(renderFlash('error', 'Unable to schedule your query.'));
+      });
 
     return false;
   }
@@ -115,9 +126,18 @@ const mapStateToProps = (state, { params }) => {
   const { id: packID } = params;
   const pack = entityGetter.get('packs').findBy({ id: packID });
   const { entities: allQueries } = entityGetter.get('queries');
-  const scheduledQueries = []
+  const { entities: allScheduledQueries } = entityGetter.get('scheduled_queries');
+  const scheduledQueries = filter(allScheduledQueries, (q) => {
+    if (!q.packs) {
+      return false;
+    }
 
-  return { loadingPack, pack, packID, allQueries, scheduledQueries };
+    const packIDs = q.packs.map(p => String(p.id));
+
+    return includes(packIDs, String(packID));
+  });
+
+  return { allQueries, loadingPack, pack, packID, scheduledQueries };
 };
 
 const ConnectedComponent = connect(mapStateToProps)(EditPackPage);

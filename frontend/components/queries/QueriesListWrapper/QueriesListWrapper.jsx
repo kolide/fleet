@@ -19,13 +19,11 @@ class QueriesListWrapper extends Component {
   constructor (props) {
     super(props);
 
-    const queryCount = props.scheduledQueries.length;
-
     this.state = {
       querySearchText: '',
       selectAll: false,
       selectedQueries: [],
-      shouldShowPackForm: queryCount === 0,
+      shouldShowPackForm: false,
     };
   }
 

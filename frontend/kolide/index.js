@@ -42,15 +42,23 @@ class Kolide extends Base {
   createScheduledQuery = ({ pack_id: packID, query_id: queryID, interval, snapshot }) => {
     const formData = {
       options: [{
-        interval,
-        pack_id: packID,
-        query_ids: [queryID],
+        interval: Number(interval),
+        pack_id: Number(packID),
+        query_ids: [Number(queryID)],
         snapshot,
       }],
     };
 
     return this.authenticatedPost(this.endpoint('/v1/kolide/schedule'), JSON.stringify(formData))
-      .then(response => response.scheduled);
+      .then(response => {
+        const { scheduled } = response;
+        return scheduled;
+
+        return {
+          ...scheduled,
+          id: scheduled.ID,
+        };
+      });
   }
 
   forgotPassword ({ email }) {
