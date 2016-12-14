@@ -27,11 +27,7 @@ class QueryPageWrapper extends Component {
   render () {
     const { children } = this.props;
 
-    return (
-      <div>
-        {children}
-      </div>
-    );
+    return children;
   }
 }
 

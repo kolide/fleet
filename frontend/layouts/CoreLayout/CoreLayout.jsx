@@ -1,6 +1,5 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import classnames from 'classnames';
 import { logoutUser } from 'redux/nodes/auth/actions';
 import { push } from 'react-router-redux';
 
@@ -61,10 +60,6 @@ export class CoreLayout extends Component {
 
   render () {
     const { children, config, notifications, showRightSidePanel, user } = this.props;
-    const wrapperClass = classnames(
-      'core-wrapper',
-      { 'core-wrapper--show-panel': showRightSidePanel }
-    );
 
     if (!user) return false;
 
@@ -86,7 +81,7 @@ export class CoreLayout extends Component {
             user={user}
           />
         </nav>
-        <div className={wrapperClass}>
+        <div className='core-wrapper'>
           <FlashMessage
             notification={notifications}
             onRemoveFlash={onRemoveFlash}
