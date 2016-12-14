@@ -17,7 +17,6 @@ export class CoreLayout extends Component {
     config: configInterface,
     dispatch: PropTypes.func,
     notifications: notificationInterface,
-    showRightSidePanel: PropTypes.bool,
     user: userInterface,
   };
 
@@ -59,7 +58,7 @@ export class CoreLayout extends Component {
   }
 
   render () {
-    const { children, config, notifications, showRightSidePanel, user } = this.props;
+    const { children, config, notifications, user } = this.props;
 
     if (!user) return false;
 
@@ -81,7 +80,7 @@ export class CoreLayout extends Component {
             user={user}
           />
         </nav>
-        <div className='core-wrapper'>
+        <div className="core-wrapper">
           <FlashMessage
             notification={notifications}
             onRemoveFlash={onRemoveFlash}
@@ -96,7 +95,7 @@ export class CoreLayout extends Component {
 
 const mapStateToProps = (state) => {
   const {
-    app: { config, showRightSidePanel },
+    app: { config },
     auth: { user },
     notifications,
   } = state;
@@ -104,7 +103,6 @@ const mapStateToProps = (state) => {
   return {
     config,
     notifications,
-    showRightSidePanel,
     user,
   };
 };
