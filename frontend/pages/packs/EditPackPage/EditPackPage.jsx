@@ -126,16 +126,7 @@ const mapStateToProps = (state, { params }) => {
   const { id: packID } = params;
   const pack = entityGetter.get('packs').findBy({ id: packID });
   const { entities: allQueries } = entityGetter.get('queries');
-  const { entities: allScheduledQueries } = entityGetter.get('scheduled_queries');
-  const scheduledQueries = filter(allScheduledQueries, (q) => {
-    if (!q.packs) {
-      return false;
-    }
-
-    const packIDs = q.packs.map(p => String(p.id));
-
-    return includes(packIDs, String(packID));
-  });
+  const scheduledQueries = entityGetter.get('scheduled_queries').where({ pack_id: packID });
 
   return { allQueries, loadingPack, pack, packID, scheduledQueries };
 };

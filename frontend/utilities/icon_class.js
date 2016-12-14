@@ -12,6 +12,8 @@ export const statusIconClass = (status = '') => {
 };
 
 export const platformIconClass = (platform = '') => {
+  if (!platform) return '';
+
   const lowerPlatform = platform.toLowerCase();
 
   switch (lowerPlatform) {
