@@ -6,7 +6,7 @@ import iconClassForLabel from 'utilities/icon_class_for_label';
 import Dropdown from 'components/forms/fields/Dropdown';
 import Icon from 'components/Icon';
 import SecondarySidePanelContainer from '../SecondarySidePanelContainer';
-import Button from '../../buttons/Button';
+
 import {
   availability,
   columnsToRender,
@@ -124,7 +124,6 @@ class QuerySidePanel extends Component {
       renderColumns,
       renderMoreColumns,
       renderTableSelect,
-      renderSuggestedQueries,
     } = this;
     const { selectedOsqueryTable: { description, platform } } = this.props;
     const platformArr = availability(platform);
