@@ -10,6 +10,7 @@ const {
   validCreateLabelRequest,
   validCreatePackRequest,
   validCreateQueryRequest,
+  validCreateScheduledQueryRequest,
   validForgotPasswordRequest,
   validGetConfigRequest,
   validGetHostsRequest,
@@ -170,6 +171,27 @@ describe('Kolide - API client', () => {
 
       Kolide.setBearerToken(bearerToken);
       Kolide.getQuery(queryID)
+        .then(() => {
+          expect(request.isDone()).toEqual(true);
+          done();
+        })
+        .catch(done);
+    });
+  });
+
+  describe('#createScheduledQuery', () => {
+    it('calls the appropriate endpoint with the correct parameters', (done) => {
+      const bearerToken = 'valid-bearer-token';
+      const formData = {
+        pack_id: 1,
+        query_id: 2,
+        interval: 60,
+        snapshot: true,
+      };
+      const request = validCreateScheduledQueryRequest(bearerToken, formData);
+
+      Kolide.setBearerToken(bearerToken);
+      Kolide.createScheduledQuery(formData)
         .then(() => {
           expect(request.isDone()).toEqual(true);
           done();

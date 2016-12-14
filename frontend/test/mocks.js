@@ -44,6 +44,26 @@ export const validCreateQueryRequest = (bearerToken, queryParams) => {
     .reply(201, { query: queryParams });
 };
 
+export const validCreateScheduledQueryRequest = (bearerToken, formData) => {
+  const { scheduledQueryStub } = stubs;
+  const scheduledQueryParams = {
+    options: [{
+      interval: formData.interval,
+      pack_id: formData.pack_id,
+      query_ids: [formData.query_id],
+      snapshot: formData.snapshot,
+    }],
+  };
+
+  return nock('http://localhost:8080', {
+    reqHeaders: {
+      Authorization: `Bearer ${bearerToken}`,
+    },
+  })
+    .post('/api/v1/kolide/schedule', JSON.stringify(scheduledQueryParams))
+    .reply(201, { scheduled_query: scheduledQueryStub });
+};
+
 export const invalidGetQueryRequest = (bearerToken, queryID) => {
   return nock('http://localhost:8080', {
     reqHeaders: {
@@ -279,6 +299,7 @@ export default {
   validCreateLabelRequest,
   validCreatePackRequest,
   validCreateQueryRequest,
+  validCreateScheduledQueryRequest,
   validForgotPasswordRequest,
   validGetConfigRequest,
   validGetHostsRequest,

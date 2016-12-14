@@ -39,6 +39,20 @@ class Kolide extends Base {
       .then((response) => { return response.query; });
   }
 
+  createScheduledQuery = ({ pack_id: packID, query_id: queryID, interval, snapshot }) => {
+    const formData = {
+      options: [{
+        interval,
+        pack_id: packID,
+        query_ids: [queryID],
+        snapshot,
+      }],
+    };
+
+    return this.authenticatedPost(this.endpoint('/v1/kolide/schedule'), JSON.stringify(formData))
+      .then(response => response.scheduled);
+  }
+
   forgotPassword ({ email }) {
     const { FORGOT_PASSWORD } = endpoints;
     const forgotPasswordEndpoint = this.baseURL + FORGOT_PASSWORD;
