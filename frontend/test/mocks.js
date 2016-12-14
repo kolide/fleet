@@ -1,6 +1,7 @@
 import nock from 'nock';
 
 import helpers from 'kolide/helpers';
+import stubs from 'test/stubs';
 
 export const validUser = {
   id: 1,
@@ -168,6 +169,18 @@ export const validGetUsersRequest = (bearerToken) => {
     .reply(200, { users: [validUser] });
 };
 
+export const validGetScheduledQueriesRequest = (bearerToken, pack) => {
+  const { scheduledQueryStub } = stubs;
+
+  return nock('http://localhost:8080', {
+    reqHeaders: {
+      Authorization: `Bearer ${bearerToken}`,
+    },
+  })
+    .get(`/api/v1/kolide/packs/${pack.id}/scheduled`)
+    .reply(200, { scheduled: [scheduledQueryStub] });
+};
+
 export const validLoginRequest = (bearerToken = 'abc123') => {
   return nock('http://localhost:8080')
   .post('/api/v1/kolide/login')
@@ -272,6 +285,7 @@ export default {
   validGetInvitesRequest,
   validGetQueriesRequest,
   validGetQueryRequest,
+  validGetScheduledQueriesRequest,
   validGetTargetsRequest,
   validGetUsersRequest,
   validInviteUserRequest,
