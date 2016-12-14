@@ -192,6 +192,14 @@ class Kolide extends Base {
       .then((response) => { return response.packs; });
   }
 
+  getScheduledQueries = (pack) => {
+    const { SCHEDULED_QUERIES } = endpoints;
+    const scheduledQueryPath = SCHEDULED_QUERIES(pack);
+
+    return this.authenticatedGet(this.endpoint(scheduledQueryPath))
+      .then(response => response.scheduled);
+  }
+
   getUsers = () => {
     const { USERS } = endpoints;
 

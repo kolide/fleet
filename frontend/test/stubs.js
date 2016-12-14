@@ -6,6 +6,14 @@ export const adminUserStub = {
   username: 'gnardog',
 };
 
+export const scheduledQueryStub = {
+  id: 1,
+  query_id: 5,
+  pack_id: 123,
+  interval: 60,
+  snapshot: true,
+};
+
 export const userStub = {
   id: 1,
   admin: false,
@@ -14,4 +22,4 @@ export const userStub = {
   username: 'gnardog',
 };
 
-export default { adminUserStub, userStub };
+export default { adminUserStub, scheduledQueryStub, userStub };
