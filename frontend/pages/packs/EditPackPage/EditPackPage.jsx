@@ -75,9 +75,9 @@ export class EditPackPage extends Component {
     }
 
     return (
-      <div className={`${baseClass} body-wrap`}>
+      <div className={`${baseClass}`}>
         <PackForm
-          className={`${baseClass}__pack-form`}
+          className={`${baseClass}__pack-form body-wrap`}
           handleSubmit={handlePackFormSubmit}
           formData={pack}
           onFetchTargets={onFetchTargets}
@@ -85,7 +85,7 @@ export class EditPackPage extends Component {
         />
         <QueriesListWrapper
           allQueries={allQueries}
-          scheduledQueries={allQueries}
+          scheduledQueries={scheduledQueries}
         />
         <PackInfoSidePanel />
       </div>
