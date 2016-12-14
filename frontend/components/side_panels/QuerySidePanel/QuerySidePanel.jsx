@@ -101,25 +101,6 @@ class QuerySidePanel extends Component {
     );
   }
 
-  renderSuggestedQueries = () => {
-    const { onSuggestedQueryClick } = this;
-    const { selectedOsqueryTable } = this.props;
-
-    return selectedOsqueryTable.examples.map((example) => {
-      return (
-        <div key={example} className={`${baseClass}__column-wrapper`}>
-          <span className={`${baseClass}__suggestion`}>{example}</span>
-          <Button
-            onClick={onSuggestedQueryClick(example)}
-            className={`${baseClass}__load-suggestion`}
-            text="LOAD"
-            variant="brand"
-          />
-        </div>
-      );
-    });
-  }
-
   renderTableSelect = () => {
     const { onSelectTable } = this;
     const { selectedOsqueryTable } = this.props;
@@ -185,11 +166,6 @@ class QuerySidePanel extends Component {
             <li><Icon name="join" /> package_bom</li>
             <li><Icon name="join" /> process_file_events</li>
           </ul>
-        </div>
-
-        <div className={`${baseClass}__suggested-queries`}>
-          <h2 className={`${baseClass}__header`}>Suggested Queries</h2>
-          {renderSuggestedQueries()}
         </div>
       </SecondarySidePanelContainer>
     );

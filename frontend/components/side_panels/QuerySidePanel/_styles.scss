@@ -8,13 +8,15 @@
     font-weight: $normal;
     letter-spacing: 0.9px;
     color: $text-medium;
-    display: inline-block;
     border-bottom: solid 1px $accent-light;
-    padding-right: 50px;
   }
 
   &__choose-table {
     margin-bottom: 24px;
+
+    .Select {
+      margin: 0 0 $pad-half;
+    }
   }
 
   &__description {
@@ -55,6 +57,8 @@
   &__column-wrapper {
     @include display(flex);
     margin: 0 0 15px;
+    padding-top: $pad-half;
+    border-top: 1px solid $accent-light;
   }
 
   &__more-columns {
@@ -115,8 +119,8 @@
     border-top: 1px solid $accent-light;
     color: $text-dark;
     font-size: px-to-rem(14);
-    padding-bottom: px-to-rem(9);
-    padding-top: px-to-rem(9);
+    padding-bottom: $pad-half;
+    padding-top: $pad-half;
 
     &:first-of-type {
       border: 0;
