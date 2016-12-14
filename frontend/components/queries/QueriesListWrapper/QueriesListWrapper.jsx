@@ -12,6 +12,7 @@ const baseClass = 'queries-list-wrapper';
 class QueriesListWrapper extends Component {
   static propTypes = {
     allQueries: PropTypes.arrayOf(queryInterface),
+    onScheduledQueryFormSubmit: PropTypes.func,
     scheduledQueries: PropTypes.arrayOf(queryInterface),
   };
 
@@ -76,14 +77,17 @@ class QueriesListWrapper extends Component {
 
   renderQueriesList = () => {
     const { getQueries, onHidePackForm, onSelectQuery } = this;
+    const { allQueries, onScheduledQueryFormSubmit } = this.props;
     const { selectedQueries, shouldShowPackForm } = this.state;
 
     return (
       <div className={`${baseClass}__queries-list-wrapper`}>
         <QueriesList
+          allQueries={allQueries}
           onHidePackForm={onHidePackForm}
+          onScheduledQueryFormSubmit={onScheduledQueryFormSubmit}
           onSelectQuery={onSelectQuery}
-          queries={getQueries()}
+          scheduledQueries={getQueries()}
           selectedQueries={selectedQueries}
           shouldShowPackForm={shouldShowPackForm}
         />

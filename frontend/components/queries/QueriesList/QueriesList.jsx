@@ -10,22 +10,24 @@ const baseClass = 'queries-list';
 
 class QueriesList extends Component {
   static propTypes = {
+    allQueries: PropTypes.arrayOf(queryInterface).isRequired,
     onHidePackForm: PropTypes.func.isRequired,
+    onScheduledQueryFormSubmit: PropTypes.func,
     onSelectQuery: PropTypes.func.isRequired,
-    queries: PropTypes.arrayOf(queryInterface).isRequired,
+    scheduledQueries: PropTypes.arrayOf(queryInterface).isRequired,
     selectedQueries: PropTypes.arrayOf(queryInterface).isRequired,
     shouldShowPackForm: PropTypes.bool,
   };
 
   renderPackQueryConfigForm = () => {
-    const { onHidePackForm, queries, shouldShowPackForm } = this.props;
+    const { onHidePackForm, onScheduledQueryFormSubmit, allQueries, shouldShowPackForm } = this.props;
 
     if (!shouldShowPackForm) {
       return false;
     }
 
     // TODO: Move this to state
-    const queryOptions = queries.map((query) => {
+    const queryOptions = allQueries.map((query) => {
       return { label: query.name, value: String(query.id) };
     });
 
@@ -33,7 +35,7 @@ class QueriesList extends Component {
       <tr>
         <td colSpan={6}>
           <PackQueryConfigForm
-            handleSubmit={() => {}}
+            handleSubmit={onScheduledQueryFormSubmit}
             onCancel={onHidePackForm}
             queryOptions={queryOptions}
           />
@@ -43,7 +45,7 @@ class QueriesList extends Component {
   }
 
   render () {
-    const { onSelectQuery, queries, selectedQueries, shouldShowPackForm } = this.props;
+    const { onSelectQuery, scheduledQueries, selectedQueries, shouldShowPackForm } = this.props;
     const { renderPackQueryConfigForm } = this;
 
     const wrapperClassName = classnames(`${baseClass}__wrapper`, {
@@ -64,7 +66,7 @@ class QueriesList extends Component {
         </thead>
         <tbody>
           {renderPackQueryConfigForm()}
-          {queries.map((query) => {
+          {scheduledQueries.map((query) => {
             return (
               <QueriesListItem
                 checked={includes(selectedQueries, query)}
