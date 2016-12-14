@@ -6,7 +6,7 @@ const { SCHEDULED_QUERIES: schema } = schemas;
 
 export default reduxConfig({
   createFunc: Kolide.createScheduledQuery,
-  entityName: 'queries',
+  entityName: 'scheduled_queries',
   loadAllFunc: Kolide.getScheduledQueries,
   schema,
 });
