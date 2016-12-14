@@ -52,12 +52,8 @@ class Kolide extends Base {
     return this.authenticatedPost(this.endpoint('/v1/kolide/schedule'), JSON.stringify(formData))
       .then(response => {
         const { scheduled } = response;
-        return scheduled;
 
-        return {
-          ...scheduled,
-          id: scheduled.ID,
-        };
+        return scheduled[0];
       });
   }
 
