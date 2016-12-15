@@ -5,8 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"testing"
 
 	"github.com/kolide/kolide-ose/server/kolide"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 type mockValidationItem struct {
@@ -18,27 +21,28 @@ type mockValidationError struct {
 	Errors  []mockValidationItem `json:"errors"`
 }
 
-func (s *EndpointTestSuite) TestGetAppConfig() {
-	req, err := http.NewRequest("GET", s.server.URL+"/api/v1/kolide/config", nil)
-	s.Require().Nil(err)
-	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", s.userToken))
+func testGetAppConfig(t *testing.T, r *testResource) {
+
+	req, err := http.NewRequest("GET", r.server.URL+"/api/v1/kolide/config", nil)
+	require.Nil(t, err)
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", r.userToken))
 	client := &http.Client{}
 	resp, err := client.Do(req)
-	s.Require().Nil(err)
+	require.Nil(t, err)
 
-	s.Require().Equal(http.StatusOK, resp.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 	var configInfo getAppConfigResponse
 	err = json.NewDecoder(resp.Body).Decode(&configInfo)
-	s.Require().Nil(err)
-	s.Require().NotNil(configInfo.AppConfig)
+	require.Nil(t, err)
+	require.NotNil(t, configInfo.AppConfig)
 	config := configInfo.AppConfig
-	s.Equal(uint(465), config.SMTPPort)
-	s.Equal("Kolide", config.OrgName)
-	s.Equal("http://foo.bar/image.png", config.OrgLogoURL)
+	assert.Equal(t, uint(465), config.SMTPPort)
+	assert.Equal(t, "Kolide", config.OrgName)
+	assert.Equal(t, "http://foo.bar/image.png", config.OrgLogoURL)
 
 }
 
-func (s *EndpointTestSuite) TestModifyAppConfig() {
+func testModifyAppConfig(t *testing.T, r *testResource) {
 	body := kolide.ModifyAppConfigRequest{
 		TestSMTP: false,
 		AppConfig: kolide.AppConfig{
@@ -55,23 +59,23 @@ func (s *EndpointTestSuite) TestModifyAppConfig() {
 	}
 	var buffer bytes.Buffer
 	err := json.NewEncoder(&buffer).Encode(body)
-	s.Require().Nil(err)
-	req, err := http.NewRequest("PATCH", s.server.URL+"/api/v1/kolide/config", &buffer)
-	s.Require().Nil(err)
-	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", s.userToken))
+	require.Nil(t, err)
+	req, err := http.NewRequest("PATCH", r.server.URL+"/api/v1/kolide/config", &buffer)
+	require.Nil(t, err)
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", r.userToken))
 	client := &http.Client{}
 	resp, err := client.Do(req)
-	s.Require().Nil(err)
+	require.Nil(t, err)
 
 	var respBody modifyAppConfigResponse
 
 	err = json.NewDecoder(resp.Body).Decode(&respBody)
-	s.Require().Nil(err)
-	s.Equal(body.AppConfig.OrgName, respBody.Response.OrgName)
+	require.Nil(t, err)
+	assert.Equal(t, body.AppConfig.OrgName, respBody.Response.OrgName)
 
 }
 
-func (s *EndpointTestSuite) TestModifyAppConfigWithValidationFail() {
+func testModifyAppConfigWithValidationFail(t *testing.T, r *testResource) {
 
 	body := kolide.ModifyAppConfigRequest{
 		TestSMTP: false,
@@ -87,24 +91,24 @@ func (s *EndpointTestSuite) TestModifyAppConfigWithValidationFail() {
 	}
 	var buffer bytes.Buffer
 	err := json.NewEncoder(&buffer).Encode(body)
-	s.Require().Nil(err)
-	req, err := http.NewRequest("PATCH", s.server.URL+"/api/v1/kolide/config", &buffer)
-	s.Require().Nil(err)
-	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", s.userToken))
+	require.Nil(t, err)
+	req, err := http.NewRequest("PATCH", r.server.URL+"/api/v1/kolide/config", &buffer)
+	require.Nil(t, err)
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", r.userToken))
 	client := &http.Client{}
 	resp, err := client.Do(req)
-	s.Require().Nil(err)
+	require.Nil(t, err)
 
 	var validationErrors mockValidationError
 	err = json.NewDecoder(resp.Body).Decode(&validationErrors)
-	s.Require().Nil(err)
-	s.Equal("Validation Failed", validationErrors.Message)
-	s.Equal(2, len(validationErrors.Errors))
-	s.Equal("kolide_server_url", validationErrors.Errors[0].Name)
-	s.Equal("url scheme must be https", validationErrors.Errors[0].Reason)
-	s.Equal("smtp_server", validationErrors.Errors[1].Name)
-	s.Equal("missing require argument", validationErrors.Errors[1].Reason)
+	require.Nil(t, err)
+	assert.Equal(t, "Validation Failed", validationErrors.Message)
+	assert.Equal(t, 2, len(validationErrors.Errors))
+	assert.Equal(t, "kolide_server_url", validationErrors.Errors[0].Name)
+	assert.Equal(t, "url scheme must be https", validationErrors.Errors[0].Reason)
+	assert.Equal(t, "smtp_server", validationErrors.Errors[1].Name)
+	assert.Equal(t, "missing require argument", validationErrors.Errors[1].Reason)
 	// verify no changes are not saved if validation fails
-	config, _ := s.ds.AppConfig()
-	s.NotEqual(config.OrgName, body.AppConfig.OrgName)
+	config, _ := r.ds.AppConfig()
+	assert.NotEqual(t, config.OrgName, body.AppConfig.OrgName)
 }

@@ -22,14 +22,11 @@ func (mw validationMiddleware) ModifyAppConfig(ctx context.Context, r kolide.Mod
 			invalid.Append("smtp_authentication_type", "invalid value")
 		}
 
-		if r.AppConfig.SMTPAuthenticationType != kolide.AuthTypeNone {
+		if r.AppConfig.SMTPAuthenticationType == kolide.AuthTypeUserNamePassword {
 			if r.AppConfig.SMTPAuthenticationMethod != kolide.AuthMethodCramMD5 &&
 				r.AppConfig.SMTPAuthenticationMethod != kolide.AuthMethodPlain {
 				invalid.Append("smtp_authentication_method", "invalid value")
 			}
-		}
-
-		if r.AppConfig.SMTPAuthenticationMethod == kolide.AuthTypeUserNamePassword {
 			if r.AppConfig.SMTPUserName == "" {
 				invalid.Append("smtp_user_name", "missing required argument")
 			}
@@ -42,29 +39,31 @@ func (mw validationMiddleware) ModifyAppConfig(ctx context.Context, r kolide.Mod
 			invalid.Append("smtp_server", "missing require argument")
 		}
 
-		if !invalid.HasErrors() {
-			if !r.AppConfig.SMTPConfigured || r.TestSMTP {
-				v, ok := viewer.FromContext(ctx)
-				if !ok {
-					invalid.Append("user", "missing user")
-					return nil, invalid
-				}
+		if invalid.HasErrors() {
+			return nil, invalid
+		}
 
-				mail := kolide.Email{
-					Subject: "Kolide",
-					To:      []string{v.User.Email},
-					Mailer: &kolide.SMTPTestMailer{
-						KolideServerURL: r.AppConfig.KolideServerURL,
-					},
-				}
-
-				if err := mw.Service.SendEmail(mail); err != nil {
-					invalid.Append("smtp connection", err.Error())
-				} else {
-					r.AppConfig.SMTPConfigured = true
-				}
-
+		if !r.AppConfig.SMTPConfigured || r.TestSMTP {
+			v, ok := viewer.FromContext(ctx)
+			if !ok {
+				invalid.Append("user", "missing user")
+				return nil, invalid
 			}
+
+			mail := kolide.Email{
+				Subject: "Kolide",
+				To:      []string{v.User.Email},
+				Mailer: &kolide.SMTPTestMailer{
+					KolideServerURL: r.AppConfig.KolideServerURL,
+				},
+			}
+
+			if err := mw.mailer.SendEmail(mail); err != nil {
+				invalid.Append("smtp connection", err.Error())
+			} else {
+				r.AppConfig.SMTPConfigured = true
+			}
+
 		}
 
 	}

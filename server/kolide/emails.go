@@ -46,11 +46,25 @@ type PasswordResetRequest struct {
 	Token     string
 }
 
-const passwordResetTemplate = `
-You requested a password reset,
-Follow the link below to reset your password:
-http://localhost:8080/login/reset?token={{.Token}}
-`
+// SMTPTestMailer is used to build an email message that will be used as
+// a test message when testing SMTP configuration
+type SMTPTestMailer struct {
+	KolideServerURL string
+}
+
+func (m *SMTPTestMailer) Message() ([]byte, error) {
+	t, err := getTemplate("server/mail/templates/smtp_setup.html")
+	if err != nil {
+		return nil, err
+	}
+
+	var msg bytes.Buffer
+	if err = t.Execute(&msg, m); err != nil {
+		return nil, err
+	}
+
+	return msg.Bytes(), nil
+}
 
 type PasswordResetMailer struct {
 	// URL for the Kolide application

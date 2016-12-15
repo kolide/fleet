@@ -75,7 +75,7 @@ func (m mailService) sendMail(e kolide.Email, msg []byte) error {
 			auth = smtp.PlainAuth("", e.Config.SMTPUserName, e.Config.SMTPPassword, e.Config.SMTPServer)
 
 		default:
-			return fmt.Errorf("Unknown SMTP auth type '%s'", e.Config.SMTPAuthenticationMethod)
+			return fmt.Errorf("Unknown SMTP auth type '%d'", e.Config.SMTPAuthenticationMethod)
 		}
 	} else {
 		auth = nil

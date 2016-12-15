@@ -26,7 +26,9 @@ func TestInviteNewUser(t *testing.T) {
 		config:      config.TestConfig(),
 		mailService: mailer,
 		clock:       clock.NewMockClock(),
-	}}
+	},
+		mailer,
+	}
 
 	var inviteTests = []struct {
 		payload kolide.InvitePayload

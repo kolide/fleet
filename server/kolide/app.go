@@ -1,10 +1,6 @@
 package kolide
 
-import (
-	"bytes"
-
-	"golang.org/x/net/context"
-)
+import "golang.org/x/net/context"
 
 // AppConfigStore contains method for saving and retrieving
 // application configuration
@@ -22,51 +18,19 @@ type AppConfigService interface {
 	ModifyAppConfig(ctx context.Context, r ModifyAppConfigRequest) (info *AppConfig, err error)
 }
 
-// SMTP Authentication Typed
+type SMTPAuthType int
+
 const (
-	AuthTypeUserNamePassword = "username_password"
-	AuthTypeNone             = "none"
+	AuthTypeUserNamePassword SMTPAuthType = iota
+	AuthTypeNone
 )
 
-// STMP Authentication Methods
-const (
-	AuthMethodPlain   = "plain"
-	AuthMethodCramMD5 = "cram_md5"
-)
+type SMTPAuthMethod int
 
-//
-// type SMTPConfig struct {
-// 	// Configured is a flag that indicates if smtp has been successfully
-// 	// tested with the settings provided by an admin user.
-// 	SMTPConfigured bool `json:"configured" db:"smtp_configured"`
-// 	// SenderAddress is the email address that will appear in emails sent
-// 	// from Kolide
-// 	SMTPSenderAddress string `json:"sender_address" db:"smtp_sender_address"`
-// 	// Server is the host name of the SMTP server Kolide will use to send mail
-// 	SMTPServer string `json:"server" db:"smtp_server"`
-// 	// Port port SMTP server will use
-// 	SMTPPort uint `json:"port" db:"smtp_port"`
-// 	// AuthenticationType type of authentication for SMTP
-// 	SMTPAuthenticationType string `json:"authentication_type" db:"smtp_authentication_type"`
-// 	// UserName must be provided if SMTPAuthenticationType is UserNamePassword
-// 	SMTPUserName string `json:"user_name" db:"smtp_user_name"`
-// 	// Password must be provided if SMTPAuthenticationType is UserNamePassword
-// 	SMTPPassword string `json:"password" db:"smtp_password"`
-// 	// EnableSSLTLS whether to use SSL/TLS for SMTP
-// 	SMTPEnableTLS bool `json:"enable_ssl_tls" db:"smtp_enable_ssl_tls"`
-// 	// SMTPAuthenticationMethod authentication method smtp server will use
-// 	SMTPAuthenticationMethod string `json:"authentication_method" db:"smtp_authentication_method"`
-// 	// Advanced SMTP Options
-// 	// SMTPDomain optional domain for SMTP
-// 	SMTPDomain string `json:"domain,omitempty" db:"smtp_domain"`
-// 	// VerifySSLCerts defaults to true but can be turned off if self signed
-// 	// SSL certs are used by the SMTP server
-// 	SMTPVerifySSLCerts bool `json:"verify_ssl_certs" db:"smtp_verify_ssl_certs"`
-// 	// EnableStartTLS detects of TLS is enabled on mail server and starts to use it (default true)
-// 	SMTPEnableStartTLS bool `json:"enable_start_tls" db:"smtp_enable_start_tls"`
-// 	// Disabled if user sets this to TRUE emails will not be sent from the application
-// 	SMTPDisabled bool `json:"email_disabled" db:"smtp_disabled"`
-// }
+const (
+	AuthMethodPlain SMTPAuthMethod = iota
+	AuthMethodCramMD5
+)
 
 // AppConfig holds configuration about the Kolide application.
 // AppConfig data can be managed by a Kolide API user.
@@ -86,7 +50,7 @@ type AppConfig struct {
 	// SMTPPort port SMTP server will use
 	SMTPPort uint `json:"port" db:"smtp_port"`
 	// SMTPAuthenticationType type of authentication for SMTP
-	SMTPAuthenticationType string `json:"authentication_type" db:"smtp_authentication_type"`
+	SMTPAuthenticationType SMTPAuthType `json:"authentication_type" db:"smtp_authentication_type"`
 	// SMTPUserName must be provided if SMTPAuthenticationType is UserNamePassword
 	SMTPUserName string `json:"user_name" db:"smtp_user_name"`
 	// SMTPPassword must be provided if SMTPAuthenticationType is UserNamePassword
@@ -94,7 +58,7 @@ type AppConfig struct {
 	// SMTPEnableSSLTLS whether to use SSL/TLS for SMTP
 	SMTPEnableTLS bool `json:"enable_ssl_tls" db:"smtp_enable_ssl_tls"`
 	// SMTPAuthenticationMethod authentication method smtp server will use
-	SMTPAuthenticationMethod string `json:"authentication_method" db:"smtp_authentication_method"`
+	SMTPAuthenticationMethod SMTPAuthMethod `json:"authentication_method" db:"smtp_authentication_method"`
 
 	// SMTPDomain optional domain for SMTP
 	SMTPDomain string `json:"domain,omitempty" db:"smtp_domain"`
@@ -107,46 +71,14 @@ type AppConfig struct {
 	SMTPDisabled bool `json:"email_disabled" db:"smtp_disabled"`
 }
 
-type SMTPError struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-}
-
-// SMTPConfigResponse contains information about the validation of SMTP parameters
-type SMTPConfigResponse struct {
-	Errors  []SMTPError `json:"errors,omitempty"`
-	Success bool        `json:"success"`
-}
-
+// ModifyAppConfigRequest contains application configuration information
+// sent from front end and used to change app config elements.
 type ModifyAppConfigRequest struct {
 	// TestSMTP is this is set to true, the SMTP configuration will be tested
 	// with the results of the test returned to caller. No config changes
 	// will be applied.
 	TestSMTP  bool      `json:"test_smtp"`
 	AppConfig AppConfig `json:"app_config"`
-}
-
-type SMTPTestMailer struct {
-	KolideServerURL string
-}
-
-func (m *SMTPTestMailer) Message() ([]byte, error) {
-	t, err := getTemplate("server/mail/templates/smtp_setup.html")
-	if err != nil {
-		return nil, err
-	}
-
-	var msg bytes.Buffer
-	if err = t.Execute(&msg, m); err != nil {
-		return nil, err
-	}
-
-	return msg.Bytes(), nil
-}
-
-type ModifyAppConfigPayload struct {
-	SMTPStatus *SMTPConfigResponse `json:"smtp_status,omitempty"`
-	AppConfig  *AppConfig          `json:"app_config,omitempty"`
 }
 
 // AppConfigPayload contains request and response format of

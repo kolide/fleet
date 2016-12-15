@@ -20,9 +20,9 @@ func Up_20161118193812(tx *sql.Tx) error {
 		"`smtp_sender_address` VARCHAR(255) NOT NULL DEFAULT ''," +
 		"`smtp_server` VARCHAR(255) NOT NULL DEFAULT ''," +
 		"`smtp_port` INT UNSIGNED NOT NULL DEFAULT 587," +
-		"`smtp_authentication_type` VARCHAR(50) NOT NULL DEFAULT ''," +
+		"`smtp_authentication_type` INT NOT NULL DEFAULT 0," +
 		"`smtp_enable_ssl_tls` TINYINT(1) NOT NULL DEFAULT TRUE," +
-		"`smtp_authentication_method` VARCHAR(50) NOT NULL DEFAULT ''," +
+		"`smtp_authentication_method` INT NOT NULL DEFAULT 0," +
 		"`smtp_domain` VARCHAR(255) NOT NULL DEFAULT ''," +
 		"`smtp_user_name` VARCHAR(255) NOT NULL DEFAULT ''," +
 		"`smtp_password` VARCHAR(255) NOT NULL DEFAULT ''," +

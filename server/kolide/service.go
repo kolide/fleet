@@ -14,5 +14,4 @@ type Service interface {
 	InviteService
 	TargetService
 	ScheduledQueryService
-	SendEmail(mail Email) error
 }

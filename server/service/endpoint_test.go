@@ -7,6 +7,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"reflect"
+	"runtime"
+	"strings"
 	"testing"
 
 	kitlog "github.com/go-kit/kit/log"
@@ -15,20 +18,19 @@ import (
 	"github.com/kolide/kolide-ose/server/config"
 	"github.com/kolide/kolide-ose/server/datastore/inmem"
 	"github.com/kolide/kolide-ose/server/kolide"
-
-	"github.com/stretchr/testify/suite"
 )
 
-type EndpointTestSuite struct {
-	suite.Suite
+type testResource struct {
 	server    *httptest.Server
 	userToken string
 	ds        kolide.Datastore
 }
 
-func (s *EndpointTestSuite) SetupTest() {
+func setupEndpointTest(t *testing.T) *testResource {
+	test := &testResource{}
+
 	jwtKey := "CHANGEME"
-	s.ds, _ = inmem.New(config.TestConfig())
+	test.ds, _ = inmem.New(config.TestConfig())
 	devOrgInfo := &kolide.AppConfig{
 		OrgName:                "Kolide",
 		OrgLogoURL:             "http://foo.bar/image.png",
@@ -38,9 +40,9 @@ func (s *EndpointTestSuite) SetupTest() {
 		SMTPVerifySSLCerts:     true,
 		SMTPEnableStartTLS:     true,
 	}
-	s.ds.NewAppConfig(devOrgInfo)
-	svc, _ := newTestService(s.ds, nil)
-	createTestUsers(s.T(), s.ds)
+	test.ds.NewAppConfig(devOrgInfo)
+	svc, _ := newTestService(test.ds, nil)
+	createTestUsers(t, test.ds)
 	logger := kitlog.NewLogfmtLogger(os.Stdout)
 
 	opts := []kithttp.ServerOption{
@@ -55,7 +57,7 @@ func (s *EndpointTestSuite) SetupTest() {
 	kh := makeKolideKitHandlers(ctxt, ke, opts)
 	attachKolideAPIRoutes(router, kh)
 
-	s.server = httptest.NewServer(router)
+	test.server = httptest.NewServer(router)
 
 	userParam := loginRequest{
 		Username: "admin1",
@@ -65,7 +67,7 @@ func (s *EndpointTestSuite) SetupTest() {
 	marshalledUser, _ := json.Marshal(&userParam)
 
 	requestBody := &nopCloser{bytes.NewBuffer(marshalledUser)}
-	resp, _ := http.Post(s.server.URL+"/api/v1/kolide/login", "application/json", requestBody)
+	resp, _ := http.Post(test.server.URL+"/api/v1/kolide/login", "application/json", requestBody)
 
 	var jsn = struct {
 		User  *kolide.User `json:"user"`
@@ -73,14 +75,26 @@ func (s *EndpointTestSuite) SetupTest() {
 		Err   string       `json:"error,omitempty"`
 	}{}
 	json.NewDecoder(resp.Body).Decode(&jsn)
-	s.userToken = jsn.Token
-
+	test.userToken = jsn.Token
+	return test
 }
 
-func (s *EndpointTestSuite) TeardownTest() {
-	s.server.Close()
+func functionName(f func(*testing.T, *testResource)) string {
+	fullName := runtime.FuncForPC(reflect.ValueOf(f).Pointer()).Name()
+	elements := strings.Split(fullName, ".")
+	return elements[len(elements)-1]
 }
 
-func TestHttpEndpoints(t *testing.T) {
-	suite.Run(t, new(EndpointTestSuite))
+var testFunctions = [...]func(*testing.T, *testResource){
+	testGetAppConfig,
+}
+
+func TestEndpoints(t *testing.T) {
+	for _, f := range testFunctions {
+		r := setupEndpointTest(t)
+		defer r.server.Close()
+		t.Run(functionName(f), func(t *testing.T) {
+			f(t, r)
+		})
+	}
 }
