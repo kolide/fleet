@@ -58,7 +58,7 @@ type SMTPConfig struct {
 	// Advanced SMTP Options
 	// SMTPDomain optional domain for SMTP
 	Domain string `json:"domain,omitempty" db:"smtp_domain"`
-	// VerifySSLCerts defaults to true but can be turned off of self signed
+	// VerifySSLCerts defaults to true but can be turned off if self signed
 	// SSL certs are used by the SMTP server
 	VerifySSLCerts bool `json:"verify_ssl_certs" db:"smtp_verify_ssl_certs"`
 	// EnableStartTLS detects of TLS is enabled on mail server and starts to use it (default true)

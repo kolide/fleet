@@ -134,7 +134,6 @@ deps:
 	npm install
 	go get github.com/jteeuwen/go-bindata/...
 	go get github.com/Masterminds/glide
-	go get github.com/pressly/goose/cmd/goose
 	glide install
 
 distclean:
