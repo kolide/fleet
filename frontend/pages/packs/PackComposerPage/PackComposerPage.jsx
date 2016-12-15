@@ -42,7 +42,10 @@ export class PackComposerPage extends Component {
       .then((pack) => {
         const { id: packID } = pack;
 
-        return dispatch(push(`/packs/${packID}`));
+        dispatch(push(`/packs/${packID}`));
+        dispatch(renderFlash('success', 'Pack created!'));
+
+        return false;
       });
   }
 

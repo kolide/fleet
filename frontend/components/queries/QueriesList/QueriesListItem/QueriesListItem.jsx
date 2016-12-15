@@ -6,8 +6,6 @@ import Icon from 'components/Icon';
 import { platformIconClass } from 'utilities/icon_class';
 import queryInterface from 'interfaces/query';
 
-const baseClass = 'queries-list-item';
-
 class QueriesListItem extends Component {
   static propTypes = {
     checked: PropTypes.bool,

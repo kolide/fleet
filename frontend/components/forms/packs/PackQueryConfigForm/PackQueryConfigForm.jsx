@@ -6,7 +6,6 @@ import dropdownOptionInterface from 'interfaces/dropdownOption';
 import Form from 'components/forms/Form';
 import formFieldInterface from 'interfaces/form_field';
 import InputField from 'components/forms/fields/InputField';
-import queryInterface from 'interfaces/query';
 import validate from 'components/forms/packs/PackQueryConfigForm/validate';
 
 const baseClass = 'pack-query-config-form';
