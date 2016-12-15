@@ -20,7 +20,8 @@ export class EditPackPage extends Component {
   static propTypes = {
     allQueries: PropTypes.arrayOf(queryInterface),
     dispatch: PropTypes.func,
-    loadingPack: PropTypes.bool,
+    isLoadingPack: PropTypes.bool,
+    isLoadingScheduledQueries: PropTypes.bool,
     pack: packInterface,
     packID: PropTypes.string,
     scheduledQueries: PropTypes.arrayOf(queryInterface),
@@ -37,11 +38,11 @@ export class EditPackPage extends Component {
   }
 
   componentWillMount () {
-    const { allQueries, dispatch, loadingPack, pack, packID, scheduledQueries  } = this.props;
+    const { allQueries, dispatch, isLoadingPack, pack, packID, scheduledQueries  } = this.props;
     const { load } = packActions;
     const { loadAll } = queryActions;
 
-    if (!pack && !loadingPack) {
+    if (!pack && !isLoadingPack) {
       dispatch(load(packID));
     }
 
@@ -57,7 +58,7 @@ export class EditPackPage extends Component {
   }
 
   onFetchTargets = (query, targetsResponse) => {
-    const { selected_targets_count: selectedTargetsCount } = targetsResponse;
+    const { targets_count: selectedTargetsCount } = targetsResponse;
 
     this.setState({ selectedTargetsCount });
 
@@ -94,9 +95,9 @@ export class EditPackPage extends Component {
   render () {
     const { handlePackFormSubmit, handleScheduledQueryFormSubmit, onFetchTargets } = this;
     const { selectedTargetsCount } = this.state;
-    const { allQueries, pack, scheduledQueries } = this.props;
+    const { allQueries, isLoadingScheduledQueries, pack, scheduledQueries } = this.props;
 
-    if (!pack) {
+    if (!pack || isLoadingScheduledQueries) {
       return false;
     }
 
@@ -120,15 +121,24 @@ export class EditPackPage extends Component {
   }
 }
 
-const mapStateToProps = (state, { params }) => {
+const mapStateToProps = (state, ownProps) => {
+  console.log(ownProps);
   const entityGetter = stateEntityGetter(state);
-  const loadingPack = state.entities.packs.loading;
-  const { id: packID } = params;
+  const isLoadingPack = state.entities.packs.loading;
+  const { id: packID } = ownProps.params;
   const pack = entityGetter.get('packs').findBy({ id: packID });
   const { entities: allQueries } = entityGetter.get('queries');
   const scheduledQueries = entityGetter.get('scheduled_queries').where({ pack_id: packID });
+  const isLoadingScheduledQueries = state.entities.scheduled_queries.loading;
 
-  return { allQueries, loadingPack, pack, packID, scheduledQueries };
+  return {
+    allQueries,
+    isLoadingPack,
+    isLoadingScheduledQueries,
+    pack,
+    packID,
+    scheduledQueries,
+  };
 };
 
 const ConnectedComponent = connect(mapStateToProps)(EditPackPage);
