@@ -6,8 +6,10 @@ var autoprefixer = require('autoprefixer');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 var bourbon = require('node-bourbon').includePaths;
 var WebpackBuildNotifierPlugin = require('webpack-build-notifier');
+var BitBarWebpackProgressPlugin = require("bitbar-webpack-progress-plugin");
 
 var plugins = [
+  new BitBarWebpackProgressPlugin(),
   new webpack.NoErrorsPlugin(),
   new webpack.optimize.DedupePlugin(),
   new ExtractTextPlugin("bundle.css", {allChunks: false})
