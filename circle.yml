@@ -9,6 +9,7 @@ dependencies:
   pre:
     - docker info
     - docker login -e $DOCKER_HUB_EMAIL -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
+    - curl -o- -L https://yarnpkg.com/install.sh | bash
   override:
     - docker pull redis
     - docker pull mysql:5.7
@@ -17,6 +18,8 @@ dependencies:
   cache_directories:
     - "vendor"
     - "node_modules"
+    - "~/.yarn-cache"
+
 
 test:
   override:
