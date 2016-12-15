@@ -53,6 +53,14 @@ h3 {
   box-sizing: border-box;
   margin-top: $pad-base;
   margin-right: $pad-base;
+
+  &--unstyled {
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    margin: 0;
+  }
 }
 
 .has-sidebar {
