@@ -41,21 +41,9 @@ func testOrgInfo(t *testing.T, ds kolide.Datastore) {
 
 	info3, err := ds.AppConfig()
 	require.Nil(t, err)
-	assert.Equal(t, info3.OrgName, info2.OrgName)
-	assert.Equal(t, info3.Domain, info2.Domain)
-	assert.Equal(t, info3.Configured, info2.Configured)
-	assert.Equal(t, info3.SenderAddress, info2.SenderAddress)
-	assert.Equal(t, info3.Server, info2.Server)
-	assert.Equal(t, info3.Port, info2.Port)
-	assert.Equal(t, info3.AuthenticationType, info2.AuthenticationType)
-	assert.Equal(t, info3.UserName, info2.UserName)
-	assert.Equal(t, info3.Password, info2.Password)
-	assert.Equal(t, info3.EnableTLS, info2.EnableTLS)
-	assert.Equal(t, info3.AuthenticationMethod, info2.AuthenticationMethod)
-	assert.Equal(t, info3.VerifySSLCerts, info2.VerifySSLCerts)
-	assert.Equal(t, info3.EnableStartTLS, info2.EnableStartTLS)
+	assert.Equal(t, info2, info3)
 
 	info4, err := ds.NewAppConfig(info3)
 	assert.Nil(t, err)
-	assert.Equal(t, info4.OrgName, info3.OrgName)
+	assert.Equal(t, info3, info4)
 }
