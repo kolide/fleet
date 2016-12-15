@@ -103,12 +103,13 @@ lint: lint-go lint-js lint-scss lint-ts
 test-go:
 	go test -cover $(shell glide nv)
 
+test-js: export NODE_PATH = ./frontend
 test-js:
-	NODE_PATH=./frontend _mocha --compilers js:babel-core/register,tsx:typescript-require  \
-		--recursive 'frontend/**/*.tests.js*' \
+	_mocha --compilers js:babel-core/register,tsx:typescript-require  \
+		--recursive "frontend/**/*.tests.js*" \
 		--require ignore-styles \
-		--require 'frontend/.test.setup.js' \
-		--require 'frontend/test/loaderMock.js'
+		--require "frontend/.test.setup.js" \
+		--require "frontend/test/loaderMock.js"
 
 test: lint test-go test-js
 
@@ -133,7 +134,6 @@ deps:
 	npm install
 	go get github.com/jteeuwen/go-bindata/...
 	go get github.com/Masterminds/glide
-	go get github.com/pressly/goose/cmd/goose
 	glide install
 
 distclean:
