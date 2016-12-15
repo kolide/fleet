@@ -6,8 +6,11 @@ import (
 )
 
 func (svc service) NewAppConfig(ctx context.Context, p kolide.AppConfigPayload) (*kolide.AppConfig, error) {
-
-	newConfig, err := svc.ds.NewAppConfig(fromPayload(p, kolide.AppConfig{}))
+	config, err := svc.ds.AppConfig()
+	if err != nil {
+		return nil, err
+	}
+	newConfig, err := svc.ds.NewAppConfig(fromPayload(p, *config))
 	if err != nil {
 		return nil, err
 	}

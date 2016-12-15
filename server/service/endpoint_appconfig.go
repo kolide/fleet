@@ -15,8 +15,10 @@ type modifyAppConfigResponse struct {
 func (m modifyAppConfigResponse) error() error { return m.Err }
 
 type getAppConfigResponse struct {
-	AppConfig *kolide.AppConfig `json:"app_config,omitempty"`
-	Err       error             `json:"error,omitempty"`
+	OrgInfo        *kolide.OrgInfo        `json:"org_info,omitemtpy"`
+	ServerSettings *kolide.ServerSettings `json:"server_settings,omitempty"`
+	AppConfig      *kolide.AppConfig      `json:"app_config,omitempty"`
+	Err            error                  `json:"error,omitempty"`
 }
 
 func (r getAppConfigResponse) error() error { return r.Err }
@@ -36,7 +38,20 @@ func makeGetAppConfigEndpoint(svc kolide.Service) endpoint.Endpoint {
 			return getAppConfigResponse{AppConfig: &copyConfig}, nil
 		}
 
-		return getAppConfigResponse{AppConfig: config}, nil
+		response := getAppConfigResponse{
+			// TODO: OrgInfo and ServerSettings should be removed once front end is updated to
+			// get OrgName and OrgLogoURL from AppConfig see Issue #649
+			OrgInfo: &kolide.OrgInfo{
+				OrgName:    &config.OrgName,
+				OrgLogoURL: &config.OrgLogoURL,
+			},
+			ServerSettings: &kolide.ServerSettings{
+				KolideServerURL: &config.KolideServerURL,
+			},
+			AppConfig: config,
+		}
+
+		return response, nil
 	}
 }
 

@@ -25,20 +25,26 @@ const (
 	PortTLS = 587
 )
 
+func getMessageBody(e kolide.Email) ([]byte, error) {
+	body, err := e.Mailer.Message()
+	if err != nil {
+		return nil, err
+	}
+	mime := `MIME-version: 1.0;` + "\r\n"
+	content := `Content-Type: text/html; charset="UTF-8";` + "\r\n"
+	subject := "Subject: " + e.Subject + "\r\n"
+	msg := []byte(subject + mime + content + "\r\n" + string(body) + "\r\n")
+	return msg, nil
+}
+
 func (dm devMailService) SendEmail(e kolide.Email) error {
 	if !e.Config.Disabled {
 		if e.Config.Configured {
-
-			body, err := e.Mailer.Message()
+			msg, err := getMessageBody(e)
 			if err != nil {
 				return err
 			}
-
-			mime := `MIME-version: 1.0;` + "\r\n"
-			content := `Content-Type: text/html; charset="UTF-8";` + "\r\n"
-			subject := "Subject: " + e.Subject + "\r\n"
-			msg := subject + mime + content + "\r\n" + string(body) + "\r\n"
-			fmt.Printf(msg)
+			fmt.Printf(string(msg))
 		}
 	}
 	return nil
@@ -47,46 +53,33 @@ func (dm devMailService) SendEmail(e kolide.Email) error {
 func (m mailService) SendEmail(e kolide.Email) error {
 	if !e.Config.Disabled {
 		if e.Config.Configured {
-
-			body, err := e.Mailer.Message()
+			msg, err := getMessageBody(e)
 			if err != nil {
 				return err
 			}
-
-			mime := `MIME-version: 1.0;` + "\r\n"
-			content := `Content-Type: text/html; charset="UTF-8";` + "\r\n"
-			subject := "Subject: " + e.Subject + "\r\n"
-			msg := []byte(subject + mime + content + "\r\n" + string(body) + "\r\n")
-			smtpHost := fmt.Sprintf("%s:%d", e.Config.Server, e.Config.Port)
-
-			var auth smtp.Auth
-			if e.Config.AuthenticationType == kolide.AuthTypeUserNamePassword {
-				switch e.Config.AuthenticationMethod {
-				case kolide.AuthMethodCramMD5:
-					auth = smtp.CRAMMD5Auth(e.Config.UserName, e.Config.Password)
-					return smtp.SendMail(smtpHost, auth, e.Config.SenderAddress, e.To, msg)
-				case kolide.AuthMethodPlain:
-					auth = smtp.PlainAuth("", e.Config.UserName, e.Config.Password, e.Config.Server)
-
-				default:
-					return fmt.Errorf("Unknown SMTP auth type '%s'", e.Config.AuthenticationMethod)
-				}
-			} else {
-				auth = nil // No Auth
-			}
-
-			if !e.Config.VerifySSLCerts {
-				return m.sendMailWithoutSSLCertVerify(auth, smtpHost, e, msg)
-			}
-
-			return smtp.SendMail(smtpHost, auth, e.Config.SenderAddress, e.To, msg)
+			return m.sendMail(e, msg)
 		}
 	}
 	return nil
 }
 
-// TODO: still need to write custom handlers for no tls, and no start tls
-func (m mailService) sendMailWithoutSSLCertVerify(auth smtp.Auth, smtpHost string, e kolide.Email, msg []byte) error {
+func (m mailService) sendMail(e kolide.Email, msg []byte) error {
+	smtpHost := fmt.Sprintf("%s:%d", e.Config.Server, e.Config.Port)
+	var auth smtp.Auth
+	if e.Config.AuthenticationType == kolide.AuthTypeUserNamePassword {
+		switch e.Config.AuthenticationMethod {
+		case kolide.AuthMethodCramMD5:
+			auth = smtp.CRAMMD5Auth(e.Config.UserName, e.Config.Password)
+			return smtp.SendMail(smtpHost, auth, e.Config.SenderAddress, e.To, msg)
+		case kolide.AuthMethodPlain:
+			auth = smtp.PlainAuth("", e.Config.UserName, e.Config.Password, e.Config.Server)
+
+		default:
+			return fmt.Errorf("Unknown SMTP auth type '%s'", e.Config.AuthenticationMethod)
+		}
+	} else {
+		auth = nil
+	}
 	client, err := smtp.Dial(smtpHost)
 	if err != nil {
 		return err
@@ -95,13 +88,15 @@ func (m mailService) sendMailWithoutSSLCertVerify(auth smtp.Auth, smtpHost strin
 	if err = client.Hello(""); err != nil {
 		return err
 	}
-	if ok, _ := client.Extension("STARTTLS"); ok {
-		config := &tls.Config{
-			ServerName:         e.Config.Server,
-			InsecureSkipVerify: true,
-		}
-		if err = client.StartTLS(config); err != nil {
-			return err
+	if e.Config.EnableStartTLS {
+		if ok, _ := client.Extension("STARTTLS"); ok {
+			config := &tls.Config{
+				ServerName:         e.Config.Server,
+				InsecureSkipVerify: !e.Config.VerifySSLCerts,
+			}
+			if err = client.StartTLS(config); err != nil {
+				return err
+			}
 		}
 	}
 	if auth != nil {

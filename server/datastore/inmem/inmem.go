@@ -86,6 +86,11 @@ func (orm *Datastore) Migrate() error {
 	orm.distributedQueryExecutions = make(map[uint]kolide.DistributedQueryExecution)
 	orm.distributedQueryCampaigns = make(map[uint]kolide.DistributedQueryCampaign)
 	orm.distributedQueryCampaignTargets = make(map[uint]kolide.DistributedQueryCampaignTarget)
+	orm.orginfo = &kolide.AppConfig{
+		ID:         1,
+		SMTPConfig: &kolide.SMTPConfig{},
+	}
+
 	return nil
 }
 
@@ -94,6 +99,7 @@ func (orm *Datastore) Drop() error {
 }
 
 func (orm *Datastore) Initialize() error {
+
 	if err := orm.createBuiltinLabels(); err != nil {
 		return err
 	}
