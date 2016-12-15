@@ -1,6 +1,6 @@
 .PHONY: build
 
-PATH := $(GOPATH)/bin:$(shell npm bin):$(PATH)
+PATH := $(GOPATH)/bin:./node_modules/.bin:$(PATH)
 
 ifeq ($(OS), Windows_NT)
 	GC_OFF = set GOGC=off &&
@@ -130,7 +130,7 @@ generate-dev: .prefix
 	webpack --progress --colors --watch --notify
 
 deps:
-	npm install
+	yarn
 	go get github.com/jteeuwen/go-bindata/...
 	go get github.com/Masterminds/glide
 	go get github.com/pressly/goose/cmd/goose
