@@ -38,8 +38,8 @@ func getMessageBody(e kolide.Email) ([]byte, error) {
 }
 
 func (dm devMailService) SendEmail(e kolide.Email) error {
-	if !e.Config.Disabled {
-		if e.Config.Configured {
+	if !e.Config.SMTPDisabled {
+		if e.Config.SMTPConfigured {
 			msg, err := getMessageBody(e)
 			if err != nil {
 				return err
@@ -51,8 +51,8 @@ func (dm devMailService) SendEmail(e kolide.Email) error {
 }
 
 func (m mailService) SendEmail(e kolide.Email) error {
-	if !e.Config.Disabled {
-		if e.Config.Configured {
+	if !e.Config.SMTPDisabled {
+		if e.Config.SMTPConfigured {
 			msg, err := getMessageBody(e)
 			if err != nil {
 				return err
@@ -64,18 +64,18 @@ func (m mailService) SendEmail(e kolide.Email) error {
 }
 
 func (m mailService) sendMail(e kolide.Email, msg []byte) error {
-	smtpHost := fmt.Sprintf("%s:%d", e.Config.Server, e.Config.Port)
+	smtpHost := fmt.Sprintf("%s:%d", e.Config.SMTPServer, e.Config.SMTPPort)
 	var auth smtp.Auth
-	if e.Config.AuthenticationType == kolide.AuthTypeUserNamePassword {
-		switch e.Config.AuthenticationMethod {
+	if e.Config.SMTPAuthenticationType == kolide.AuthTypeUserNamePassword {
+		switch e.Config.SMTPAuthenticationMethod {
 		case kolide.AuthMethodCramMD5:
-			auth = smtp.CRAMMD5Auth(e.Config.UserName, e.Config.Password)
-			return smtp.SendMail(smtpHost, auth, e.Config.SenderAddress, e.To, msg)
+			auth = smtp.CRAMMD5Auth(e.Config.SMTPUserName, e.Config.SMTPPassword)
+			return smtp.SendMail(smtpHost, auth, e.Config.SMTPSenderAddress, e.To, msg)
 		case kolide.AuthMethodPlain:
-			auth = smtp.PlainAuth("", e.Config.UserName, e.Config.Password, e.Config.Server)
+			auth = smtp.PlainAuth("", e.Config.SMTPUserName, e.Config.SMTPPassword, e.Config.SMTPServer)
 
 		default:
-			return fmt.Errorf("Unknown SMTP auth type '%s'", e.Config.AuthenticationMethod)
+			return fmt.Errorf("Unknown SMTP auth type '%s'", e.Config.SMTPAuthenticationMethod)
 		}
 	} else {
 		auth = nil
@@ -88,11 +88,11 @@ func (m mailService) sendMail(e kolide.Email, msg []byte) error {
 	if err = client.Hello(""); err != nil {
 		return err
 	}
-	if e.Config.EnableStartTLS {
+	if e.Config.SMTPEnableStartTLS {
 		if ok, _ := client.Extension("STARTTLS"); ok {
 			config := &tls.Config{
-				ServerName:         e.Config.Server,
-				InsecureSkipVerify: !e.Config.VerifySSLCerts,
+				ServerName:         e.Config.SMTPServer,
+				InsecureSkipVerify: !e.Config.SMTPVerifySSLCerts,
 			}
 			if err = client.StartTLS(config); err != nil {
 				return err
@@ -104,7 +104,7 @@ func (m mailService) sendMail(e kolide.Email, msg []byte) error {
 			return err
 		}
 	}
-	if err = client.Mail(e.Config.SenderAddress); err != nil {
+	if err = client.Mail(e.Config.SMTPSenderAddress); err != nil {
 		return err
 	}
 	for _, recip := range e.To {

@@ -22,21 +22,19 @@ func newTestServiceWithClock(ds kolide.Datastore, rs kolide.QueryResultStore, c 
 
 func createTestAppConfig(t *testing.T, ds kolide.Datastore) *kolide.AppConfig {
 	config := &kolide.AppConfig{
-		OrgName:         "Tyrell Corp",
-		OrgLogoURL:      "https://tyrell.com/image.png",
-		KolideServerURL: "https://kolide.tyrell.com",
-		SMTPConfig: &kolide.SMTPConfig{
-			Configured:         true,
-			Disabled:           false,
-			SenderAddress:      "kolide@tyrell.com",
-			Server:             "smtp.tyrell.com",
-			Port:               587,
-			AuthenticationType: kolide.AuthTypeUserNamePassword,
-			UserName:           "deckard",
-			Password:           "replicant",
-			VerifySSLCerts:     true,
-			EnableTLS:          true,
-		},
+		OrgName:                "Tyrell Corp",
+		OrgLogoURL:             "https://tyrell.com/image.png",
+		KolideServerURL:        "https://kolide.tyrell.com",
+		SMTPConfigured:         true,
+		SMTPDisabled:           false,
+		SMTPSenderAddress:      "kolide@tyrell.com",
+		SMTPServer:             "smtp.tyrell.com",
+		SMTPPort:               587,
+		SMTPAuthenticationType: kolide.AuthTypeUserNamePassword,
+		SMTPUserName:           "deckard",
+		SMTPPassword:           "replicant",
+		SMTPVerifySSLCerts:     true,
+		SMTPEnableTLS:          true,
 	}
 	result, err := ds.NewAppConfig(config)
 	require.Nil(t, err)

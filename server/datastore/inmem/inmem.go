@@ -87,8 +87,11 @@ func (orm *Datastore) Migrate() error {
 	orm.distributedQueryCampaigns = make(map[uint]kolide.DistributedQueryCampaign)
 	orm.distributedQueryCampaignTargets = make(map[uint]kolide.DistributedQueryCampaignTarget)
 	orm.orginfo = &kolide.AppConfig{
-		ID:         1,
-		SMTPConfig: &kolide.SMTPConfig{},
+		ID:                 1,
+		SMTPEnableTLS:      true,
+		SMTPPort:           587,
+		SMTPEnableStartTLS: true,
+		SMTPVerifySSLCerts: true,
 	}
 
 	return nil
@@ -496,15 +499,13 @@ func (orm *Datastore) createDevHosts() error {
 
 func (orm *Datastore) createDevOrgInfo() error {
 	devOrgInfo := &kolide.AppConfig{
-		OrgName:    "Kolide",
-		OrgLogoURL: fmt.Sprintf("%s/logo.png", orm.config.Server.Address),
-		SMTPConfig: &kolide.SMTPConfig{
-			Port:               465,
-			AuthenticationType: kolide.AuthTypeUserNamePassword,
-			EnableTLS:          true,
-			VerifySSLCerts:     true,
-			EnableStartTLS:     true,
-		},
+		OrgName:                "Kolide",
+		OrgLogoURL:             fmt.Sprintf("%s/logo.png", orm.config.Server.Address),
+		SMTPPort:               587,
+		SMTPAuthenticationType: kolide.AuthTypeUserNamePassword,
+		SMTPEnableTLS:          true,
+		SMTPVerifySSLCerts:     true,
+		SMTPEnableStartTLS:     true,
 	}
 	_, err := orm.NewAppConfig(devOrgInfo)
 	if err != nil {

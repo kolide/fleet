@@ -30,15 +30,13 @@ func (s *EndpointTestSuite) SetupTest() {
 	jwtKey := "CHANGEME"
 	s.ds, _ = inmem.New(config.TestConfig())
 	devOrgInfo := &kolide.AppConfig{
-		OrgName:    "Kolide",
-		OrgLogoURL: "http://foo.bar/image.png",
-		SMTPConfig: &kolide.SMTPConfig{
-			Port:               465,
-			AuthenticationType: kolide.AuthTypeUserNamePassword,
-			EnableTLS:          true,
-			VerifySSLCerts:     true,
-			EnableStartTLS:     true,
-		},
+		OrgName:                "Kolide",
+		OrgLogoURL:             "http://foo.bar/image.png",
+		SMTPPort:               465,
+		SMTPAuthenticationType: kolide.AuthTypeUserNamePassword,
+		SMTPEnableTLS:          true,
+		SMTPVerifySSLCerts:     true,
+		SMTPEnableStartTLS:     true,
 	}
 	s.ds.NewAppConfig(devOrgInfo)
 	svc, _ := newTestService(s.ds, nil)

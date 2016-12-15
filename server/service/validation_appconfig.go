@@ -12,38 +12,38 @@ func (mw validationMiddleware) ModifyAppConfig(ctx context.Context, r kolide.Mod
 		invalid.Append("kolide_server_url", err.Error())
 	}
 
-	if !r.AppConfig.Disabled {
-		if r.AppConfig.SenderAddress != "" {
+	if !r.AppConfig.SMTPDisabled {
+		if r.AppConfig.SMTPSenderAddress != "" {
 			invalid.Append("smtp_sender_address", "missing required argument")
 		}
 
-		if r.AppConfig.AuthenticationType != kolide.AuthTypeUserNamePassword &&
-			r.AppConfig.AuthenticationType != kolide.AuthTypeNone {
+		if r.AppConfig.SMTPAuthenticationType != kolide.AuthTypeUserNamePassword &&
+			r.AppConfig.SMTPAuthenticationType != kolide.AuthTypeNone {
 			invalid.Append("smtp_authentication_type", "invalid value")
 		}
 
-		if r.AppConfig.AuthenticationType != kolide.AuthTypeNone {
-			if r.AppConfig.AuthenticationMethod != kolide.AuthMethodCramMD5 &&
-				r.AppConfig.AuthenticationMethod != kolide.AuthMethodPlain {
+		if r.AppConfig.SMTPAuthenticationType != kolide.AuthTypeNone {
+			if r.AppConfig.SMTPAuthenticationMethod != kolide.AuthMethodCramMD5 &&
+				r.AppConfig.SMTPAuthenticationMethod != kolide.AuthMethodPlain {
 				invalid.Append("smtp_authentication_method", "invalid value")
 			}
 		}
 
-		if r.AppConfig.AuthenticationMethod == kolide.AuthTypeUserNamePassword {
-			if r.AppConfig.UserName == "" {
+		if r.AppConfig.SMTPAuthenticationMethod == kolide.AuthTypeUserNamePassword {
+			if r.AppConfig.SMTPUserName == "" {
 				invalid.Append("smtp_user_name", "missing required argument")
 			}
-			if r.AppConfig.Password == "" {
+			if r.AppConfig.SMTPPassword == "" {
 				invalid.Append("smtp_password", "missing required argument")
 			}
 		}
 
-		if r.AppConfig.Server == "" {
+		if r.AppConfig.SMTPServer == "" {
 			invalid.Append("smtp_server", "missing require argument")
 		}
 
 		if !invalid.HasErrors() {
-			if !r.AppConfig.Configured || r.TestSMTP {
+			if !r.AppConfig.SMTPConfigured || r.TestSMTP {
 				v, ok := viewer.FromContext(ctx)
 				if !ok {
 					invalid.Append("user", "missing user")
@@ -61,7 +61,7 @@ func (mw validationMiddleware) ModifyAppConfig(ctx context.Context, r kolide.Mod
 				if err := mw.Service.SendEmail(mail); err != nil {
 					invalid.Append("smtp connection", err.Error())
 				} else {
-					r.AppConfig.Configured = true
+					r.AppConfig.SMTPConfigured = true
 				}
 
 			}

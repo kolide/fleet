@@ -28,7 +28,7 @@ type Mailer interface {
 type Email struct {
 	Subject string
 	To      []string
-	Config  *SMTPConfig
+	Config  *AppConfig
 	Mailer  Mailer
 }
 

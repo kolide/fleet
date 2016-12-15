@@ -32,7 +32,7 @@ func (s *EndpointTestSuite) TestGetAppConfig() {
 	s.Require().Nil(err)
 	s.Require().NotNil(configInfo.AppConfig)
 	config := configInfo.AppConfig
-	s.Equal(uint(465), config.Port)
+	s.Equal(uint(465), config.SMTPPort)
 	s.Equal("Kolide", config.OrgName)
 	s.Equal("http://foo.bar/image.png", config.OrgLogoURL)
 
@@ -42,17 +42,15 @@ func (s *EndpointTestSuite) TestModifyAppConfig() {
 	body := kolide.ModifyAppConfigRequest{
 		TestSMTP: false,
 		AppConfig: kolide.AppConfig{
-			KolideServerURL: "https://foo.com",
-			OrgName:         "Zip",
-			OrgLogoURL:      "http://foo.bar/image.png",
-			SMTPConfig: &kolide.SMTPConfig{
-				Port:               567,
-				AuthenticationType: kolide.AuthTypeNone,
-				Server:             "foo.com",
-				EnableTLS:          true,
-				VerifySSLCerts:     true,
-				EnableStartTLS:     true,
-			},
+			KolideServerURL:        "https://foo.com",
+			OrgName:                "Zip",
+			OrgLogoURL:             "http://foo.bar/image.png",
+			SMTPPort:               567,
+			SMTPAuthenticationType: kolide.AuthTypeNone,
+			SMTPServer:             "foo.com",
+			SMTPEnableTLS:          true,
+			SMTPVerifySSLCerts:     true,
+			SMTPEnableStartTLS:     true,
 		},
 	}
 	var buffer bytes.Buffer
@@ -78,15 +76,13 @@ func (s *EndpointTestSuite) TestModifyAppConfigWithValidationFail() {
 	body := kolide.ModifyAppConfigRequest{
 		TestSMTP: false,
 		AppConfig: kolide.AppConfig{
-			OrgName:    "Zip",
-			OrgLogoURL: "http://foo.bar/image.png",
-			SMTPConfig: &kolide.SMTPConfig{
-				Port:               567,
-				AuthenticationType: kolide.AuthTypeNone,
-				EnableTLS:          true,
-				VerifySSLCerts:     true,
-				EnableStartTLS:     true,
-			},
+			OrgName:                "Zip",
+			OrgLogoURL:             "http://foo.bar/image.png",
+			SMTPPort:               567,
+			SMTPAuthenticationType: kolide.AuthTypeNone,
+			SMTPEnableTLS:          true,
+			SMTPVerifySSLCerts:     true,
+			SMTPEnableStartTLS:     true,
 		},
 	}
 	var buffer bytes.Buffer

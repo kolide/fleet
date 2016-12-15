@@ -25,22 +25,19 @@ func (r getAppConfigResponse) error() error { return r.Err }
 
 func makeGetAppConfigEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		config, err := svc.AppConfig(ctx)
-		if err != nil {
-			return getAppConfigResponse{Err: err}, nil
-		}
 		v, _ := viewer.FromContext(ctx)
-
-		if !v.IsAdmin() {
-			// make a copy of config so we don't munge inmem
-			copyConfig := *config
-			copyConfig.SMTPConfig = nil
-			return getAppConfigResponse{AppConfig: &copyConfig}, nil
+		var (
+			config *kolide.AppConfig
+			err    error
+		)
+		if v.IsAdmin() {
+			config, err = svc.AppConfig(ctx)
+			if err != nil {
+				return getAppConfigResponse{Err: err}, nil
+			}
 		}
 
 		response := getAppConfigResponse{
-			// TODO: OrgInfo and ServerSettings should be removed once front end is updated to
-			// get OrgName and OrgLogoURL from AppConfig see Issue #649
 			OrgInfo: &kolide.OrgInfo{
 				OrgName:    &config.OrgName,
 				OrgLogoURL: &config.OrgLogoURL,
