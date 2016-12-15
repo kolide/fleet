@@ -14,7 +14,7 @@ import userActions from 'redux/nodes/entities/users/actions';
 import userInterface from 'interfaces/user';
 import UserSettingsForm from 'components/forms/UserSettingsForm';
 
-const baseClass = 'user-settings-page';
+const baseClass = 'user-settings';
 
 class UserSettingsPage extends Component {
   static propTypes = {
@@ -117,12 +117,12 @@ class UserSettingsPage extends Component {
     const lastUpdatedAt = moment(updatedAt).fromNow();
 
     return (
-      <div>
-        <div className="body-wrap">
+      <div className={baseClass}>
+        <div className={`${baseClass}__manage body-wrap`}>
           <h1>Manage User Settings</h1>
           <UserSettingsForm formData={user} handleSubmit={handleSubmit} onCancel={onCancel} />
         </div>
-        <div className="body-wrap">
+        <div className={`${baseClass}__additional body-wrap`}>
           <h1>Additional Info</h1>
           <Avatar user={user} />
           <div className={`${baseClass}__change-avatar-text`}>
@@ -137,7 +137,7 @@ class UserSettingsPage extends Component {
             <b>Password</b>
           </div>
           <Button onClick={onShowModal} text="CHANGE PASSWORD" variant="brand" />
-          <small>Last changed: {lastUpdatedAt}</small>
+          <p><small>Last changed: {lastUpdatedAt}</small></p>
           <Button onClick={onLogout} text="LOGOUT" variant="alert" />
         </div>
         {renderModal()}
