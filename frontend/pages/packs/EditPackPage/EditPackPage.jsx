@@ -37,7 +37,7 @@ export class EditPackPage extends Component {
     this.state = { selectedTargetsCount: 0 };
   }
 
-  componentWillMount () {
+  componentDidMount () {
     const { allQueries, dispatch, isLoadingPack, pack, packID, scheduledQueries } = this.props;
     const { load } = packActions;
     const { loadAll } = queryActions;
@@ -102,19 +102,21 @@ export class EditPackPage extends Component {
     }
 
     return (
-      <div className={`${baseClass}`}>
-        <PackForm
-          className={`${baseClass}__pack-form body-wrap`}
-          handleSubmit={handlePackFormSubmit}
-          formData={pack}
-          onFetchTargets={onFetchTargets}
-          selectedTargetsCount={selectedTargetsCount}
-        />
-        <QueriesListWrapper
-          allQueries={allQueries}
-          onScheduledQueryFormSubmit={handleScheduledQueryFormSubmit}
-          scheduledQueries={scheduledQueries}
-        />
+      <div className={`${baseClass} has-sidebar`}>
+        <div className="body-wrap body-wrap--unstyled">
+          <PackForm
+            className={`${baseClass}__pack-form body-wrap`}
+            handleSubmit={handlePackFormSubmit}
+            formData={pack}
+            onFetchTargets={onFetchTargets}
+            selectedTargetsCount={selectedTargetsCount}
+          />
+          <QueriesListWrapper
+            allQueries={allQueries}
+            onScheduledQueryFormSubmit={handleScheduledQueryFormSubmit}
+            scheduledQueries={scheduledQueries}
+          />
+        </div>
         <PackInfoSidePanel />
       </div>
     );
@@ -122,7 +124,6 @@ export class EditPackPage extends Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  console.log(ownProps);
   const entityGetter = stateEntityGetter(state);
   const isLoadingPack = state.entities.packs.loading;
   const { id: packID } = ownProps.params;

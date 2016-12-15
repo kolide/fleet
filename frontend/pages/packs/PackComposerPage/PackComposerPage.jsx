@@ -54,9 +54,9 @@ export class PackComposerPage extends Component {
     const { selectedTargetsCount } = this.state;
 
     return (
-      <div className={`${baseClass} body-wrap`}>
+      <div className="has-sidebar">
         <PackForm
-          className={`${baseClass}__pack-form`}
+          className={`${baseClass}__pack-form body-wrap`}
           handleSubmit={handleSubmit}
           onFetchTargets={onFetchTargets}
           selectedTargetsCount={selectedTargetsCount}
