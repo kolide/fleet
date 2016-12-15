@@ -39,22 +39,21 @@ class Kolide extends Base {
       .then((response) => { return response.query; });
   }
 
-  createScheduledQuery = ({ pack_id: packID, query_id: queryID, interval, snapshot }) => {
+  createScheduledQuery = ({ interval, logging_type: loggingType, pack_id: packID, platform, query_id: queryID }) => {
+    const removed = loggingType === 'differential';
+    const snapshot = loggingType === 'snapshot';
+
     const formData = {
-      options: [{
-        interval: Number(interval),
-        pack_id: Number(packID),
-        query_ids: [Number(queryID)],
-        snapshot,
-      }],
+      interval: Number(interval),
+      pack_id: Number(packID),
+      platform,
+      query_id: Number(queryID),
+      removed,
+      snapshot,
     };
 
     return this.authenticatedPost(this.endpoint('/v1/kolide/schedule'), JSON.stringify(formData))
-      .then(response => {
-        const { scheduled } = response;
-
-        return scheduled[0];
-      });
+      .then(response => response.scheduled);
   }
 
   forgotPassword ({ email }) {

@@ -183,10 +183,11 @@ describe('Kolide - API client', () => {
     it('calls the appropriate endpoint with the correct parameters', (done) => {
       const bearerToken = 'valid-bearer-token';
       const formData = {
-        pack_id: 1,
-        query_id: 2,
         interval: 60,
-        snapshot: true,
+        logging_type: 'differential',
+        pack_id: 1,
+        platform: 'darwin',
+        query_id: 2,
       };
       const request = validCreateScheduledQueryRequest(bearerToken, formData);
 
