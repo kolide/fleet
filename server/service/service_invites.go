@@ -1,9 +1,8 @@
 package service
 
 import (
-	"errors"
+	"encoding/base64"
 
-	jwt "github.com/dgrijalva/jwt-go"
 	kolide_errors "github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"golang.org/x/net/context"
@@ -31,10 +30,11 @@ func (svc service) InviteNewUser(ctx context.Context, payload kolide.InvitePaylo
 		return nil, err
 	}
 
-	token, err := jwt.New(jwt.SigningMethodHS256).SignedString([]byte(svc.config.App.TokenKey))
+	random, err := kolide.RandomText(svc.config.App.TokenKeySize)
 	if err != nil {
 		return nil, err
 	}
+	token := base64.URLEncoding.EncodeToString([]byte(random))
 
 	invite := &kolide.Invite{
 		Email:     *payload.Email,
@@ -89,7 +89,7 @@ func (svc service) VerifyInvite(ctx context.Context, email, token string) error 
 
 	expiresAt := invite.CreatedAt.Add(svc.config.App.InviteTokenValidityPeriod)
 	if svc.clock.Now().After(expiresAt) {
-		return errors.New("expired invite token")
+		return newInvalidArgumentError("invite_token", "Invite token has expired.")
 	}
 
 	return nil

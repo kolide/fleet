@@ -1,6 +1,5 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import classnames from 'classnames';
 import { logoutUser } from 'redux/nodes/auth/actions';
 import { push } from 'react-router-redux';
 
@@ -18,7 +17,6 @@ export class CoreLayout extends Component {
     config: configInterface,
     dispatch: PropTypes.func,
     notifications: notificationInterface,
-    showRightSidePanel: PropTypes.bool,
     user: userInterface,
   };
 
@@ -30,12 +28,16 @@ export class CoreLayout extends Component {
     return false;
   }
 
-  onNavItemClick = (path) => {
-    const { dispatch } = this.props;
+  onRedirectTo = (path) => {
+    return (evt) => {
+      evt.preventDefault();
 
-    dispatch(push(path));
+      const { dispatch } = this.props;
 
-    return false;
+      dispatch(push(path));
+
+      return false;
+    };
   }
 
   onRemoveFlash = () => {
@@ -60,15 +62,11 @@ export class CoreLayout extends Component {
   }
 
   render () {
-    const { children, config, notifications, showRightSidePanel, user } = this.props;
-    const wrapperClass = classnames(
-      'core-wrapper',
-      { 'core-wrapper--show-panel': showRightSidePanel }
-    );
+    const { children, config, notifications, user } = this.props;
 
     if (!user) return false;
 
-    const { onLogoutUser, onNavItemClick, onRemoveFlash, onUndoActionClick } = this;
+    const { onLogoutUser, onRedirectTo, onRemoveFlash, onUndoActionClick } = this;
     const { pathname } = global.window.location;
 
     return (
@@ -77,16 +75,17 @@ export class CoreLayout extends Component {
           <SiteNavHeader
             config={config}
             onLogoutUser={onLogoutUser}
+            onRedirectTo={onRedirectTo}
             user={user}
           />
           <SiteNavSidePanel
             config={config}
-            onNavItemClick={onNavItemClick}
+            onRedirectTo={onRedirectTo}
             pathname={pathname}
             user={user}
           />
         </nav>
-        <div className={wrapperClass}>
+        <div className="core-wrapper">
           <FlashMessage
             notification={notifications}
             onRemoveFlash={onRemoveFlash}
@@ -101,7 +100,7 @@ export class CoreLayout extends Component {
 
 const mapStateToProps = (state) => {
   const {
-    app: { config, showRightSidePanel },
+    app: { config },
     auth: { user },
     notifications,
   } = state;
@@ -109,7 +108,6 @@ const mapStateToProps = (state) => {
   return {
     config,
     notifications,
-    showRightSidePanel,
     user,
   };
 };

@@ -25,13 +25,13 @@ class QueryComposer extends Component {
     query: queryInterface,
     queryType: PropTypes.string,
     selectedTargets: PropTypes.arrayOf(targetInterface),
-    selectedTargetsCount: PropTypes.number,
+    targetsCount: PropTypes.number,
     queryText: PropTypes.string,
   };
 
   static defaultProps = {
     queryType: 'query',
-    selectedTargetsCount: 0,
+    targetsCount: 0,
   };
 
   onLoad = (editor) => {
@@ -81,7 +81,7 @@ class QueryComposer extends Component {
       onTargetSelect,
       queryType,
       selectedTargets,
-      selectedTargetsCount,
+      targetsCount,
     } = this.props;
 
     if (queryType === 'label') {
@@ -93,7 +93,7 @@ class QueryComposer extends Component {
       <div>
         <p className={`${baseClass}__target-label`}>
           <span className={`${baseClass}__select-targets`}>Select Targets</span>
-          <span className={`${baseClass}__targets-count`}> {selectedTargetsCount} unique {selectedTargetsCount === 1 ? 'host' : 'hosts' }</span>
+          <span className={`${baseClass}__targets-count`}> {targetsCount} unique {targetsCount === 1 ? 'host' : 'hosts' }</span>
         </p>
         <SelectTargetsDropdown
           onFetchTargets={onFetchTargets}
@@ -117,8 +117,8 @@ class QueryComposer extends Component {
             enableLiveAutocompletion
             editorProps={{ $blockScrolling: Infinity }}
             mode="kolide"
-            minLines={4}
-            maxLines={4}
+            minLines={2}
+            maxLines={20}
             name="query-editor"
             onLoad={onLoad}
             onChange={onTextEditorInputChange}
@@ -128,6 +128,7 @@ class QueryComposer extends Component {
             theme="kolide"
             value={queryText}
             width="100%"
+            fontSize={14}
           />
         </div>
         {renderTargetsInput()}

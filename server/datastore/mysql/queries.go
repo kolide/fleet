@@ -10,14 +10,15 @@ import (
 func (d *Datastore) NewQuery(query *kolide.Query) (*kolide.Query, error) {
 
 	sql := `
-		INSERT INTO queries (name, description, query,
-			saved, snapshot, differential, platform, version, ` + "`interval`" + `)
-		VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ? )
+		INSERT INTO queries (
+			name,
+			description,
+			query,
+			saved,
+			author_id
+		) VALUES ( ?, ?, ?, ?, ? )
 	`
-
-	result, err := d.db.Exec(sql, query.Name, query.Description, query.Query,
-		query.Saved, query.Snapshot, query.Differential, query.Platform,
-		query.Version, query.Interval)
+	result, err := d.db.Exec(sql, query.Name, query.Description, query.Query, query.Saved, query.AuthorID)
 	if err != nil {
 		return nil, errors.DatabaseError(err)
 	}
@@ -31,12 +32,10 @@ func (d *Datastore) NewQuery(query *kolide.Query) (*kolide.Query, error) {
 func (d *Datastore) SaveQuery(q *kolide.Query) error {
 	sql := `
 		UPDATE queries
-			SET name = ?, description = ?, query = ?, ` + "`interval`" + ` = ?,
-			 saved = ?, snapshot = ?, differential = ?, platform = ?, version = ?
+			SET name = ?, description = ?, query = ?, author_id = ?, saved = ?
 			WHERE id = ? AND NOT deleted
 	`
-	_, err := d.db.Exec(sql, q.Name, q.Description, q.Query, q.Interval,
-		q.Saved, q.Snapshot, q.Differential, q.Platform, q.Version, q.ID)
+	_, err := d.db.Exec(sql, q.Name, q.Description, q.Query, q.AuthorID, q.Saved, q.ID)
 	if err != nil {
 		return errors.DatabaseError(err)
 	}
@@ -49,10 +48,10 @@ func (d *Datastore) DeleteQuery(query *kolide.Query) error {
 	query.MarkDeleted(d.clock.Now())
 	sql := `
 		UPDATE queries
-			SET deleted_at = ?, deleted = ?
+			SET deleted_at = ?, deleted = true
 			WHERE id = ?
 	`
-	_, err := d.db.Exec(sql, query.DeletedAt, true, query.ID)
+	_, err := d.db.Exec(sql, query.DeletedAt, query.ID)
 	if err != nil {
 		return errors.DatabaseError(err)
 	}
@@ -60,11 +59,42 @@ func (d *Datastore) DeleteQuery(query *kolide.Query) error {
 	return nil
 }
 
+// DeleteQueries (soft) deletes the existing query objects with the provided
+// IDs. The number of deleted queries is returned along with any error.
+func (d *Datastore) DeleteQueries(ids []uint) (uint, error) {
+	sql := `
+		UPDATE queries
+			SET deleted_at = NOW(), deleted = true
+			WHERE id IN (?)
+	`
+	query, args, err := sqlx.In(sql, ids)
+	if err != nil {
+		return 0, errors.DatabaseError(err)
+	}
+
+	result, err := d.db.Exec(query, args...)
+	if err != nil {
+		return 0, errors.DatabaseError(err)
+	}
+
+	deleted, err := result.RowsAffected()
+	if err != nil {
+		return 0, errors.DatabaseError(err)
+	}
+
+	return uint(deleted), nil
+}
+
 // Query returns a single Query identified by id, if such
 // exists
 func (d *Datastore) Query(id uint) (*kolide.Query, error) {
 	sql := `
-		SELECT * FROM queries WHERE id = ? AND NOT deleted
+		SELECT q.*, IFNULL(u.name, "") AS author_name
+		FROM queries q
+		LEFT JOIN users u
+			ON q.author_id = u.id
+		WHERE q.id = ?
+		AND NOT q.deleted
 	`
 	query := &kolide.Query{}
 	if err := d.db.Get(query, sql, id); err != nil {
@@ -82,9 +112,12 @@ func (d *Datastore) Query(id uint) (*kolide.Query, error) {
 // determined by passed in kolide.ListOptions
 func (d *Datastore) ListQueries(opt kolide.ListOptions) ([]*kolide.Query, error) {
 	sql := `
-		SELECT * FROM queries
+		SELECT q.*, IFNULL(u.name, "") AS author_name
+		FROM queries q
+		LEFT JOIN users u
+			ON q.author_id = u.id
 		WHERE saved = true
-		AND NOT deleted
+		AND NOT q.deleted
 	`
 	sql = appendListOptionsToSQL(sql, opt)
 	results := []*kolide.Query{}
@@ -103,11 +136,15 @@ func (d *Datastore) ListQueries(opt kolide.ListOptions) ([]*kolide.Query, error)
 
 // loadPacksForQueries loads the packs associated with the provided queries
 func (d *Datastore) loadPacksForQueries(queries []*kolide.Query) error {
+	if len(queries) == 0 {
+		return nil
+	}
+
 	sql := `
-		SELECT p.*, pq.query_id AS query_id
+		SELECT p.*, sq.query_id AS query_id
 		FROM packs p
-		JOIN pack_queries pq
-			ON p.id = pq.pack_id
+		JOIN scheduled_queries sq
+			ON p.id = sq.pack_id
 		WHERE query_id IN (?)
 	`
 

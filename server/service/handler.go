@@ -19,6 +19,7 @@ type KolideEndpoints struct {
 	ForgotPassword                 endpoint.Endpoint
 	ResetPassword                  endpoint.Endpoint
 	Me                             endpoint.Endpoint
+	ChangePassword                 endpoint.Endpoint
 	CreateUser                     endpoint.Endpoint
 	GetUser                        endpoint.Endpoint
 	ListUsers                      endpoint.Endpoint
@@ -37,15 +38,18 @@ type KolideEndpoints struct {
 	CreateQuery                    endpoint.Endpoint
 	ModifyQuery                    endpoint.Endpoint
 	DeleteQuery                    endpoint.Endpoint
+	DeleteQueries                  endpoint.Endpoint
 	CreateDistributedQueryCampaign endpoint.Endpoint
 	GetPack                        endpoint.Endpoint
 	ListPacks                      endpoint.Endpoint
 	CreatePack                     endpoint.Endpoint
 	ModifyPack                     endpoint.Endpoint
 	DeletePack                     endpoint.Endpoint
-	AddQueryToPack                 endpoint.Endpoint
-	GetQueriesInPack               endpoint.Endpoint
-	DeleteQueryFromPack            endpoint.Endpoint
+	ScheduleQuery                  endpoint.Endpoint
+	GetScheduledQueriesInPack      endpoint.Endpoint
+	GetScheduledQuery              endpoint.Endpoint
+	ModifyScheduledQuery           endpoint.Endpoint
+	DeleteScheduledQuery           endpoint.Endpoint
 	EnrollAgent                    endpoint.Endpoint
 	GetClientConfig                endpoint.Endpoint
 	GetDistributedQueries          endpoint.Endpoint
@@ -74,7 +78,14 @@ func MakeKolideServerEndpoints(svc kolide.Service, jwtKey string) KolideEndpoint
 		CreateUser:     makeCreateUserEndpoint(svc),
 
 		// Authenticated user endpoints
-		Me:                             authenticatedUser(jwtKey, svc, makeGetSessionUserEndpoint(svc)),
+		// Each of these endpoints should have exactly one
+		// authorization check around the make.*Endpoint method. At a
+		// minimum, canPerformActions. Some endpoints use
+		// stricter/different checks and should NOT also use
+		// canPerformActions (these other checks should also call
+		// canPerformActions if that is appropriate).
+		Me:                             authenticatedUser(jwtKey, svc, canPerformActions(makeGetSessionUserEndpoint(svc))),
+		ChangePassword:                 authenticatedUser(jwtKey, svc, canPerformActions(makeChangePasswordEndpoint(svc))),
 		GetUser:                        authenticatedUser(jwtKey, svc, canReadUser(makeGetUserEndpoint(svc))),
 		ListUsers:                      authenticatedUser(jwtKey, svc, canPerformActions(makeListUsersEndpoint(svc))),
 		ModifyUser:                     authenticatedUser(jwtKey, svc, validateModifyUserRequest(makeModifyUserEndpoint(svc))),
@@ -82,7 +93,7 @@ func MakeKolideServerEndpoints(svc kolide.Service, jwtKey string) KolideEndpoint
 		DeleteSessionsForUser:          authenticatedUser(jwtKey, svc, canModifyUser(makeDeleteSessionsForUserEndpoint(svc))),
 		GetSessionInfo:                 authenticatedUser(jwtKey, svc, mustBeAdmin(makeGetInfoAboutSessionEndpoint(svc))),
 		DeleteSession:                  authenticatedUser(jwtKey, svc, mustBeAdmin(makeDeleteSessionEndpoint(svc))),
-		GetAppConfig:                   authenticatedUser(jwtKey, svc, makeGetAppConfigEndpoint(svc)),
+		GetAppConfig:                   authenticatedUser(jwtKey, svc, canPerformActions(makeGetAppConfigEndpoint(svc))),
 		ModifyAppConfig:                authenticatedUser(jwtKey, svc, mustBeAdmin(makeModifyAppConfigRequest(svc))),
 		CreateInvite:                   authenticatedUser(jwtKey, svc, mustBeAdmin(makeCreateInviteEndpoint(svc))),
 		ListInvites:                    authenticatedUser(jwtKey, svc, mustBeAdmin(makeListInvitesEndpoint(svc))),
@@ -92,26 +103,29 @@ func MakeKolideServerEndpoints(svc kolide.Service, jwtKey string) KolideEndpoint
 		CreateQuery:                    authenticatedUser(jwtKey, svc, makeCreateQueryEndpoint(svc)),
 		ModifyQuery:                    authenticatedUser(jwtKey, svc, makeModifyQueryEndpoint(svc)),
 		DeleteQuery:                    authenticatedUser(jwtKey, svc, makeDeleteQueryEndpoint(svc)),
+		DeleteQueries:                  authenticatedUser(jwtKey, svc, makeDeleteQueriesEndpoint(svc)),
 		CreateDistributedQueryCampaign: authenticatedUser(jwtKey, svc, makeCreateDistributedQueryCampaignEndpoint(svc)),
-		GetPack:             authenticatedUser(jwtKey, svc, makeGetPackEndpoint(svc)),
-		ListPacks:           authenticatedUser(jwtKey, svc, makeListPacksEndpoint(svc)),
-		CreatePack:          authenticatedUser(jwtKey, svc, makeCreatePackEndpoint(svc)),
-		ModifyPack:          authenticatedUser(jwtKey, svc, makeModifyPackEndpoint(svc)),
-		DeletePack:          authenticatedUser(jwtKey, svc, makeDeletePackEndpoint(svc)),
-		AddQueryToPack:      authenticatedUser(jwtKey, svc, makeAddQueryToPackEndpoint(svc)),
-		GetQueriesInPack:    authenticatedUser(jwtKey, svc, makeGetQueriesInPackEndpoint(svc)),
-		DeleteQueryFromPack: authenticatedUser(jwtKey, svc, makeDeleteQueryFromPackEndpoint(svc)),
-		GetHost:             authenticatedUser(jwtKey, svc, makeGetHostEndpoint(svc)),
-		ListHosts:           authenticatedUser(jwtKey, svc, makeListHostsEndpoint(svc)),
-		DeleteHost:          authenticatedUser(jwtKey, svc, makeDeleteHostEndpoint(svc)),
-		GetLabel:            authenticatedUser(jwtKey, svc, makeGetLabelEndpoint(svc)),
-		ListLabels:          authenticatedUser(jwtKey, svc, makeListLabelsEndpoint(svc)),
-		CreateLabel:         authenticatedUser(jwtKey, svc, makeCreateLabelEndpoint(svc)),
-		DeleteLabel:         authenticatedUser(jwtKey, svc, makeDeleteLabelEndpoint(svc)),
-		AddLabelToPack:      authenticatedUser(jwtKey, svc, makeAddLabelToPackEndpoint(svc)),
-		GetLabelsForPack:    authenticatedUser(jwtKey, svc, makeGetLabelsForPackEndpoint(svc)),
-		DeleteLabelFromPack: authenticatedUser(jwtKey, svc, makeDeleteLabelFromPackEndpoint(svc)),
-		SearchTargets:       authenticatedUser(jwtKey, svc, makeSearchTargetsEndpoint(svc)),
+		GetPack:                   authenticatedUser(jwtKey, svc, makeGetPackEndpoint(svc)),
+		ListPacks:                 authenticatedUser(jwtKey, svc, makeListPacksEndpoint(svc)),
+		CreatePack:                authenticatedUser(jwtKey, svc, makeCreatePackEndpoint(svc)),
+		ModifyPack:                authenticatedUser(jwtKey, svc, makeModifyPackEndpoint(svc)),
+		DeletePack:                authenticatedUser(jwtKey, svc, makeDeletePackEndpoint(svc)),
+		ScheduleQuery:             authenticatedUser(jwtKey, svc, makeScheduleQueryEndpoint(svc)),
+		GetScheduledQueriesInPack: authenticatedUser(jwtKey, svc, makeGetScheduledQueriesInPackEndpoint(svc)),
+		GetScheduledQuery:         authenticatedUser(jwtKey, svc, makeGetScheduledQueryEndpoint(svc)),
+		ModifyScheduledQuery:      authenticatedUser(jwtKey, svc, makeModifyScheduledQueryEndpoint(svc)),
+		DeleteScheduledQuery:      authenticatedUser(jwtKey, svc, makeDeleteScheduledQueryEndpoint(svc)),
+		GetHost:                   authenticatedUser(jwtKey, svc, makeGetHostEndpoint(svc)),
+		ListHosts:                 authenticatedUser(jwtKey, svc, makeListHostsEndpoint(svc)),
+		DeleteHost:                authenticatedUser(jwtKey, svc, makeDeleteHostEndpoint(svc)),
+		GetLabel:                  authenticatedUser(jwtKey, svc, makeGetLabelEndpoint(svc)),
+		ListLabels:                authenticatedUser(jwtKey, svc, makeListLabelsEndpoint(svc)),
+		CreateLabel:               authenticatedUser(jwtKey, svc, makeCreateLabelEndpoint(svc)),
+		DeleteLabel:               authenticatedUser(jwtKey, svc, makeDeleteLabelEndpoint(svc)),
+		AddLabelToPack:            authenticatedUser(jwtKey, svc, makeAddLabelToPackEndpoint(svc)),
+		GetLabelsForPack:          authenticatedUser(jwtKey, svc, makeGetLabelsForPackEndpoint(svc)),
+		DeleteLabelFromPack:       authenticatedUser(jwtKey, svc, makeDeleteLabelFromPackEndpoint(svc)),
+		SearchTargets:             authenticatedUser(jwtKey, svc, makeSearchTargetsEndpoint(svc)),
 
 		// Osquery endpoints
 		EnrollAgent:                   makeEnrollAgentEndpoint(svc),
@@ -128,6 +142,7 @@ type kolideHandlers struct {
 	ForgotPassword                 *kithttp.Server
 	ResetPassword                  *kithttp.Server
 	Me                             *kithttp.Server
+	ChangePassword                 *kithttp.Server
 	CreateUser                     *kithttp.Server
 	GetUser                        *kithttp.Server
 	ListUsers                      *kithttp.Server
@@ -146,15 +161,18 @@ type kolideHandlers struct {
 	CreateQuery                    *kithttp.Server
 	ModifyQuery                    *kithttp.Server
 	DeleteQuery                    *kithttp.Server
+	DeleteQueries                  *kithttp.Server
 	CreateDistributedQueryCampaign *kithttp.Server
 	GetPack                        *kithttp.Server
 	ListPacks                      *kithttp.Server
 	CreatePack                     *kithttp.Server
 	ModifyPack                     *kithttp.Server
 	DeletePack                     *kithttp.Server
-	AddQueryToPack                 *kithttp.Server
-	GetQueriesInPack               *kithttp.Server
-	DeleteQueryFromPack            *kithttp.Server
+	ScheduleQuery                  *kithttp.Server
+	GetScheduledQueriesInPack      *kithttp.Server
+	GetScheduledQuery              *kithttp.Server
+	ModifyScheduledQuery           *kithttp.Server
+	DeleteScheduledQuery           *kithttp.Server
 	EnrollAgent                    *kithttp.Server
 	GetClientConfig                *kithttp.Server
 	GetDistributedQueries          *kithttp.Server
@@ -183,6 +201,7 @@ func makeKolideKitHandlers(ctx context.Context, e KolideEndpoints, opts []kithtt
 		ForgotPassword:                 newServer(e.ForgotPassword, decodeForgotPasswordRequest),
 		ResetPassword:                  newServer(e.ResetPassword, decodeResetPasswordRequest),
 		Me:                             newServer(e.Me, decodeNoParamsRequest),
+		ChangePassword:                 newServer(e.ChangePassword, decodeChangePasswordRequest),
 		CreateUser:                     newServer(e.CreateUser, decodeCreateUserRequest),
 		GetUser:                        newServer(e.GetUser, decodeGetUserRequest),
 		ListUsers:                      newServer(e.ListUsers, decodeListUsersRequest),
@@ -201,15 +220,18 @@ func makeKolideKitHandlers(ctx context.Context, e KolideEndpoints, opts []kithtt
 		CreateQuery:                    newServer(e.CreateQuery, decodeCreateQueryRequest),
 		ModifyQuery:                    newServer(e.ModifyQuery, decodeModifyQueryRequest),
 		DeleteQuery:                    newServer(e.DeleteQuery, decodeDeleteQueryRequest),
+		DeleteQueries:                  newServer(e.DeleteQueries, decodeDeleteQueriesRequest),
 		CreateDistributedQueryCampaign: newServer(e.CreateDistributedQueryCampaign, decodeCreateDistributedQueryCampaignRequest),
 		GetPack:                       newServer(e.GetPack, decodeGetPackRequest),
 		ListPacks:                     newServer(e.ListPacks, decodeListPacksRequest),
 		CreatePack:                    newServer(e.CreatePack, decodeCreatePackRequest),
 		ModifyPack:                    newServer(e.ModifyPack, decodeModifyPackRequest),
 		DeletePack:                    newServer(e.DeletePack, decodeDeletePackRequest),
-		AddQueryToPack:                newServer(e.AddQueryToPack, decodeAddQueryToPackRequest),
-		GetQueriesInPack:              newServer(e.GetQueriesInPack, decodeGetQueriesInPackRequest),
-		DeleteQueryFromPack:           newServer(e.DeleteQueryFromPack, decodeDeleteQueryFromPackRequest),
+		ScheduleQuery:                 newServer(e.ScheduleQuery, decodeScheduleQueryRequest),
+		GetScheduledQueriesInPack:     newServer(e.GetScheduledQueriesInPack, decodeGetScheduledQueriesInPackRequest),
+		GetScheduledQuery:             newServer(e.GetScheduledQuery, decodeGetScheduledQueryRequest),
+		ModifyScheduledQuery:          newServer(e.ModifyScheduledQuery, decodeModifyScheduledQueryRequest),
+		DeleteScheduledQuery:          newServer(e.DeleteScheduledQuery, decodeDeleteScheduledQueryRequest),
 		EnrollAgent:                   newServer(e.EnrollAgent, decodeEnrollAgentRequest),
 		GetClientConfig:               newServer(e.GetClientConfig, decodeGetClientConfigRequest),
 		GetDistributedQueries:         newServer(e.GetDistributedQueries, decodeGetDistributedQueriesRequest),
@@ -260,6 +282,7 @@ func attachKolideAPIRoutes(r *mux.Router, h kolideHandlers) {
 	r.Handle("/api/v1/kolide/forgot_password", h.ForgotPassword).Methods("POST")
 	r.Handle("/api/v1/kolide/reset_password", h.ResetPassword).Methods("POST")
 	r.Handle("/api/v1/kolide/me", h.Me).Methods("GET")
+	r.Handle("/api/v1/kolide/change_password", h.ChangePassword).Methods("POST")
 
 	r.Handle("/api/v1/kolide/users", h.ListUsers).Methods("GET")
 	r.Handle("/api/v1/kolide/users", h.CreateUser).Methods("POST")
@@ -282,6 +305,7 @@ func attachKolideAPIRoutes(r *mux.Router, h kolideHandlers) {
 	r.Handle("/api/v1/kolide/queries", h.CreateQuery).Methods("POST")
 	r.Handle("/api/v1/kolide/queries/{id}", h.ModifyQuery).Methods("PATCH")
 	r.Handle("/api/v1/kolide/queries/{id}", h.DeleteQuery).Methods("DELETE")
+	r.Handle("/api/v1/kolide/queries/delete", h.DeleteQueries).Methods("POST")
 	r.Handle("/api/v1/kolide/queries/run", h.CreateDistributedQueryCampaign).Methods("POST")
 
 	r.Handle("/api/v1/kolide/packs/{id}", h.GetPack).Methods("GET")
@@ -289,9 +313,11 @@ func attachKolideAPIRoutes(r *mux.Router, h kolideHandlers) {
 	r.Handle("/api/v1/kolide/packs", h.CreatePack).Methods("POST")
 	r.Handle("/api/v1/kolide/packs/{id}", h.ModifyPack).Methods("PATCH")
 	r.Handle("/api/v1/kolide/packs/{id}", h.DeletePack).Methods("DELETE")
-	r.Handle("/api/v1/kolide/packs/{pid}/queries/{qid}", h.AddQueryToPack).Methods("POST")
-	r.Handle("/api/v1/kolide/packs/{id}/queries", h.GetQueriesInPack).Methods("GET")
-	r.Handle("/api/v1/kolide/packs/{pid}/queries/{qid}", h.DeleteQueryFromPack).Methods("DELETE")
+	r.Handle("/api/v1/kolide/packs/{id}/scheduled", h.GetScheduledQueriesInPack).Methods("GET")
+	r.Handle("/api/v1/kolide/schedule", h.ScheduleQuery).Methods("POST")
+	r.Handle("/api/v1/kolide/schedule/{id}", h.GetScheduledQuery).Methods("GET")
+	r.Handle("/api/v1/kolide/schedule/{id}", h.ModifyScheduledQuery).Methods("PATCH")
+	r.Handle("/api/v1/kolide/schedule/{id}", h.DeleteScheduledQuery).Methods("DELETE")
 	r.Handle("/api/v1/kolide/labels/{id}", h.GetLabel).Methods("GET")
 	r.Handle("/api/v1/kolide/labels", h.ListLabels).Methods("GET")
 	r.Handle("/api/v1/kolide/labels", h.CreateLabel).Methods("POST")

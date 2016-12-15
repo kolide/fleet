@@ -7,33 +7,32 @@ import (
 )
 
 func init() {
-	goose.AddMigration(Up_20161118212649, Down_20161118212649)
+	goose.AddMigration(Up_20161118212613, Down_20161118212613)
 }
 
-func Up_20161118212649(tx *sql.Tx) error {
+func Up_20161118212613(tx *sql.Tx) error {
 	_, err := tx.Exec(
-		"CREATE TABLE `queries` (" +
+		"CREATE TABLE `scheduled_queries` (" +
 			"`id` int(10) unsigned NOT NULL AUTO_INCREMENT," +
 			"`created_at` timestamp DEFAULT CURRENT_TIMESTAMP," +
 			"`updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP," +
 			"`deleted_at` timestamp NULL DEFAULT NULL," +
 			"`deleted` tinyint(1) NOT NULL DEFAULT FALSE," +
-			"`saved` tinyint(1) NOT NULL DEFAULT FALSE," +
-			"`name` varchar(255) NOT NULL," +
-			"`description` varchar(255) DEFAULT NULL," +
-			"`query` varchar(255) NOT NULL," +
+			"`pack_id` int(10) unsigned DEFAULT NULL," +
+			"`query_id` int(10) unsigned DEFAULT NULL," +
 			"`interval` int(10) unsigned DEFAULT NULL," +
-			"`snapshot` tinyint(1) NOT NULL DEFAULT FALSE," +
-			"`differential` tinyint(1) NOT NULL DEFAULT FALSE," +
+			"`snapshot` tinyint(1) DEFAULT NULL," +
+			"`removed` tinyint(1) DEFAULT NULL," +
 			"`platform` varchar(255) DEFAULT NULL," +
 			"`version` varchar(255) DEFAULT NULL," +
+			"`shard` int(10) unsigned DEFAULT NULL," +
 			"PRIMARY KEY (`id`)" +
 			") ENGINE=InnoDB DEFAULT CHARSET=utf8;",
 	)
 	return err
 }
 
-func Down_20161118212649(tx *sql.Tx) error {
-	_, err := tx.Exec("DROP TABLE IF EXISTS `queries`;")
+func Down_20161118212613(tx *sql.Tx) error {
+	_, err := tx.Exec("DROP TABLE IF EXISTS `scheduled_queries`;")
 	return err
 }

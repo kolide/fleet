@@ -13,5 +13,6 @@ type Service interface {
 	AppConfigService
 	InviteService
 	TargetService
+	ScheduledQueryService
 	SendEmail(mail Email) error
 }

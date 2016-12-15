@@ -5,9 +5,9 @@ import (
 	"encoding/base64"
 	"time"
 
-	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/kolide/kolide-ose/server/contexts/viewer"
 	"github.com/kolide/kolide-ose/server/kolide"
+	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 )
 
@@ -131,27 +131,60 @@ func (svc service) ListUsers(ctx context.Context, opt kolide.ListOptions) ([]*ko
 	return svc.ds.ListUsers(opt)
 }
 
+// setNewPassword is a helper for changing a user's password. It should be
+// called to set the new password after proper authorization has been
+// performed.
+func (svc service) setNewPassword(ctx context.Context, user *kolide.User, password string) error {
+	err := user.SetPassword(password, svc.config.Auth.SaltKeySize, svc.config.Auth.BcryptCost)
+	if err != nil {
+		return errors.Wrap(err, "setting new password")
+	}
+
+	err = svc.saveUser(user)
+	if err != nil {
+		return errors.Wrap(err, "saving changed password")
+	}
+
+	return nil
+}
+
+func (svc service) ChangePassword(ctx context.Context, oldPass, newPass string) error {
+	vc, ok := viewer.FromContext(ctx)
+	if !ok {
+		return errNoContext
+	}
+
+	if err := vc.User.ValidatePassword(oldPass); err != nil {
+		return errors.Wrap(err, "password validation failed")
+	}
+
+	return errors.Wrap(svc.setNewPassword(ctx, vc.User, newPass), "setting new password")
+}
+
 func (svc service) ResetPassword(ctx context.Context, token, password string) error {
 	reset, err := svc.ds.FindPassswordResetByToken(token)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "looking up reset by token")
 	}
 	user, err := svc.User(ctx, reset.UserID)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "retrieving user")
 	}
 
-	err = user.SetPassword(password, svc.config.Auth.SaltKeySize, svc.config.Auth.BcryptCost)
+	err = svc.setNewPassword(ctx, user, password)
 	if err != nil {
-		return err
-	}
-	if err := svc.saveUser(user); err != nil {
-		return err
+		return errors.Wrap(err, "setting new password")
 	}
 
 	// delete password reset tokens for user
 	if err := svc.ds.DeletePasswordResetRequestsForUser(user.ID); err != nil {
-		return err
+		return errors.Wrap(err, "deleting password reset requests")
+	}
+
+	// Clear sessions so that any other browsers will have to log in with
+	// the new password
+	if err := svc.DeleteSessionsForUser(ctx, user.ID); err != nil {
+		return errors.Wrap(err, "deleting user sessions")
 	}
 
 	return nil
@@ -173,6 +206,8 @@ func (svc service) RequestPasswordReset(ctx context.Context, email string) error
 			if err := svc.saveUser(user); err != nil {
 				return err
 			}
+			// Sessions should only be cleared if this is an admin
+			// forced password reset
 			if err := svc.DeleteSessionsForUser(ctx, user.ID); err != nil {
 				return err
 			}
@@ -180,29 +215,19 @@ func (svc service) RequestPasswordReset(ctx context.Context, email string) error
 		}
 	}
 
-	token, err := jwt.New(jwt.SigningMethodHS256).SignedString([]byte(svc.config.App.TokenKey))
+	random, err := kolide.RandomText(svc.config.App.TokenKeySize)
 	if err != nil {
 		return err
 	}
+	token := base64.URLEncoding.EncodeToString([]byte(random))
 
 	request := &kolide.PasswordResetRequest{
-		UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
-			CreateTimestamp: kolide.CreateTimestamp{
-				CreatedAt: time.Now(),
-			},
-			UpdateTimestamp: kolide.UpdateTimestamp{
-				UpdatedAt: time.Now(),
-			},
-		},
 		ExpiresAt: time.Now().Add(time.Hour * 24),
 		UserID:    user.ID,
 		Token:     token,
 	}
 	request, err = svc.ds.NewPasswordResetRequest(request)
 	if err != nil {
-		return err
-	}
-	if err := svc.DeleteSessionsForUser(ctx, user.ID); err != nil {
 		return err
 	}
 

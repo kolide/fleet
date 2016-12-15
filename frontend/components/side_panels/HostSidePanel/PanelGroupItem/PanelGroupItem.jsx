@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import classnames from 'classnames';
 
 import Icon from 'components/Icon';
-import { iconClassForLabel } from './helpers';
+import iconClassForLabel from 'utilities/icon_class_for_label';
 
 const baseClass = 'panel-group-item';
 
@@ -39,12 +39,14 @@ class PanelGroupItem extends Component {
 
     return (
       <button className={wrapperClassName} onClick={onLabelClick}>
-        <Icon name={iconClassForLabel(item)} className={`${baseClass}__icon`} />
-        <span className={`${baseClass}__name`}>
-          {displayText}
-          {description && <span className={`${baseClass}__description`}>{description}</span>}
-        </span>
-        <span className={`${baseClass}__count`}>{count}</span>
+        <div className={`${baseClass}__flexy`}>
+          <Icon name={iconClassForLabel(item)} className={`${baseClass}__icon`} />
+          <span className={`${baseClass}__name`}>
+            {displayText}
+            {description && <span className={`${baseClass}__description`}>{description}</span>}
+          </span>
+          <span className={`${baseClass}__count`}>{count}</span>
+        </div>
       </button>
     );
   }

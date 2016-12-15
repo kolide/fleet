@@ -49,6 +49,30 @@ func (orm *Datastore) DeleteQuery(query *kolide.Query) error {
 	return nil
 }
 
+// DeleteQueries (soft) deletes the existing query objects with the provided
+// IDs. The number of deleted queries is returned along with any error.
+func (orm *Datastore) DeleteQueries(ids []uint) (uint, error) {
+	orm.mtx.Lock()
+	defer orm.mtx.Unlock()
+
+	deleted := uint(0)
+	for _, id := range ids {
+		if _, ok := orm.queries[id]; ok {
+			delete(orm.queries, id)
+			deleted++
+		}
+	}
+
+	return deleted, nil
+}
+
+func (orm *Datastore) getUserNameByID(id uint) string {
+	if u, ok := orm.users[id]; ok {
+		return u.Name
+	}
+	return ""
+}
+
 func (orm *Datastore) Query(id uint) (*kolide.Query, error) {
 	orm.mtx.Lock()
 	defer orm.mtx.Unlock()
@@ -57,6 +81,8 @@ func (orm *Datastore) Query(id uint) (*kolide.Query, error) {
 	if !ok {
 		return nil, errors.ErrNotFound
 	}
+
+	query.AuthorName = orm.getUserNameByID(query.AuthorID)
 
 	if err := orm.loadPacksForQueries([]*kolide.Query{query}); err != nil {
 		return nil, errors.DatabaseError(err)
@@ -78,8 +104,10 @@ func (orm *Datastore) ListQueries(opt kolide.ListOptions) ([]*kolide.Query, erro
 
 	queries := []*kolide.Query{}
 	for _, k := range keys {
-		if orm.queries[uint(k)].Saved {
-			queries = append(queries, orm.queries[uint(k)])
+		q := orm.queries[uint(k)]
+		if q.Saved {
+			q.AuthorName = orm.getUserNameByID(q.AuthorID)
+			queries = append(queries, q)
 		}
 	}
 
@@ -117,9 +145,9 @@ func (orm *Datastore) ListQueries(opt kolide.ListOptions) ([]*kolide.Query, erro
 func (orm *Datastore) loadPacksForQueries(queries []*kolide.Query) error {
 	for _, q := range queries {
 		q.Packs = make([]kolide.Pack, 0)
-		for _, pq := range orm.packQueries {
-			if pq.QueryID == q.ID {
-				q.Packs = append(q.Packs, *orm.packs[pq.PackID])
+		for _, sq := range orm.scheduledQueries {
+			if sq.QueryID == q.ID {
+				q.Packs = append(q.Packs, *orm.packs[sq.PackID])
 			}
 		}
 	}
