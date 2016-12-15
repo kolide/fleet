@@ -9,8 +9,11 @@ class Kolide extends Base {
 
     return this.authenticatedPost(this.endpoint(LABELS), JSON.stringify({ description, name, query }))
       .then((response) => {
+        const { label } = response;
+
         return {
-          ...response.label,
+          ...label,
+          slug: helpers.labelSlug(label),
           type: 'custom',
         };
       });
@@ -41,7 +44,13 @@ class Kolide extends Base {
     const { INVITES } = endpoints;
 
     return this.authenticatedGet(this.endpoint(INVITES))
-      .then((response) => { return response.invites; });
+      .then((response) => {
+        const { invites } = response;
+
+        return invites.map((invite) => {
+          return helpers.addGravatarUrlToResource(invite);
+        });
+      });
   }
 
   getHosts = () => {
@@ -124,18 +133,24 @@ class Kolide extends Base {
 
     return this.authenticatedGet(this.endpoint(LABELS))
       .then((response) => {
+        const labelTypeForDisplayText = {
+          'All Hosts': 'all',
+          'MS Windows': 'platform',
+          'CentOS Linux': 'platform',
+          'Mac OS X': 'platform',
+          'Ubuntu Linux': 'platform',
+        };
         const labels = response.labels.map((label) => {
-          return { ...label, type: 'custom' };
+          return {
+            ...label,
+            slug: helpers.labelSlug(label),
+            type: labelTypeForDisplayText[label.display_text] || 'custom',
+          };
         });
         const stubbedLabels = [
-          { id: 100, display_text: 'All Hosts', type: 'all', count: 22 },
-          { id: 40, display_text: 'ONLINE', type: 'status', count: 20 },
-          { id: 50, display_text: 'OFFLINE', type: 'status', count: 2 },
-          { id: 55, display_text: 'MIA', description: '(offline > 30 days)', type: 'status', count: 3 },
-          { id: 60, display_text: 'macOS', type: 'platform', count: 1 },
-          { id: 70, display_text: 'Windows', type: 'platform', count: 1 },
-          { id: 80, display_text: 'Ubuntu', type: 'platform', count: 10 },
-          { id: 90, display_text: 'Centos', type: 'platform', count: 10 },
+          { id: 40, display_text: 'ONLINE', slug: 'online', type: 'status', count: 20 },
+          { id: 50, display_text: 'OFFLINE', slug: 'offline', type: 'status', count: 2 },
+          { id: 55, display_text: 'MIA', description: '(offline > 30 days)', slug: 'mia', type: 'status', count: 3 },
         ];
 
         return labels.concat(stubbedLabels);
@@ -153,21 +168,40 @@ class Kolide extends Base {
     const { USERS } = endpoints;
 
     return this.authenticatedGet(this.endpoint(USERS))
-      .then((response) => { return response.users; });
+      .then((response) => {
+        const { users } = response;
+
+        return users.map((user) => {
+          return helpers.addGravatarUrlToResource(user);
+        });
+      });
   }
 
   inviteUser = (formData) => {
     const { INVITES } = endpoints;
 
     return this.authenticatedPost(this.endpoint(INVITES), JSON.stringify(formData))
-      .then((response) => { return response.invite; });
+      .then((response) => {
+        const { invite } = response;
+
+        return helpers.addGravatarUrlToResource(invite);
+      });
   }
 
   loginUser ({ username, password }) {
     const { LOGIN } = endpoints;
     const loginEndpoint = this.baseURL + LOGIN;
 
-    return Base.post(loginEndpoint, JSON.stringify({ username, password }));
+    return Base.post(loginEndpoint, JSON.stringify({ username, password }))
+      .then((response) => {
+        const { user } = response;
+        const userWithGravatarUrl = helpers.addGravatarUrlToResource(user);
+
+        return {
+          ...response,
+          user: userWithGravatarUrl,
+        };
+      });
   }
 
   logout () {
@@ -181,7 +215,12 @@ class Kolide extends Base {
     const { ME } = endpoints;
     const meEndpoint = this.baseURL + ME;
 
-    return this.authenticatedGet(meEndpoint);
+    return this.authenticatedGet(meEndpoint)
+      .then((response) => {
+        const { user } = response;
+
+        return helpers.addGravatarUrlToResource(user);
+      });
   }
 
   resetPassword (formData) {
@@ -218,7 +257,11 @@ class Kolide extends Base {
     const updateUserEndpoint = `${this.baseURL}${USERS}/${user.id}`;
 
     return this.authenticatedPatch(updateUserEndpoint, JSON.stringify(formData))
-      .then((response) => { return response.user; });
+      .then((response) => {
+        const { user: updatedUser } = response;
+
+        return helpers.addGravatarUrlToResource(updatedUser);
+      });
   }
 }
 

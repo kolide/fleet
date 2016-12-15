@@ -1,7 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import AceEditor from 'react-ace';
 import { connect } from 'react-redux';
-import { filter } from 'lodash';
 import { push } from 'react-router-redux';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
@@ -15,16 +14,19 @@ import HostSidePanel from 'components/side_panels/HostSidePanel';
 import HostsTable from 'components/hosts/HostsTable';
 import Icon from 'components/Icon';
 import osqueryTableInterface from 'interfaces/osquery_table';
+import paths from 'router/paths';
 import QueryComposer from 'components/queries/QueryComposer';
 import QuerySidePanel from 'components/side_panels/QuerySidePanel';
 import { renderFlash } from 'redux/nodes/notifications/actions';
 import Rocker from 'components/buttons/Rocker';
 import { selectOsqueryTable } from 'redux/nodes/components/QueryPages/actions';
-import { setDisplay, setSelectedLabel } from 'redux/nodes/components/ManageHostsPage/actions';
+import { setDisplay } from 'redux/nodes/components/ManageHostsPage/actions';
 import { showRightSidePanel, removeRightSidePanel } from 'redux/nodes/app/actions';
 import validateQuery from 'components/forms/validators/validate_query';
+import iconClassForLabel from 'utilities/icon_class_for_label';
 
 const NEW_LABEL_HASH = '#new_label';
+const baseClass = 'manage-hosts';
 
 export class ManageHostsPage extends Component {
   static propTypes = {
@@ -54,9 +56,7 @@ export class ManageHostsPage extends Component {
       dispatch,
       hosts,
       labels,
-      selectedLabel,
     } = this.props;
-    const allHostLabel = filter(labels, { type: 'all' })[0];
 
     dispatch(showRightSidePanel);
 
@@ -66,21 +66,6 @@ export class ManageHostsPage extends Component {
 
     if (!labels.length) {
       dispatch(labelActions.loadAll());
-    }
-
-    if (!selectedLabel) {
-      dispatch(setSelectedLabel(allHostLabel));
-    }
-
-    return false;
-  }
-
-  componentWillReceiveProps (nextProps) {
-    const { dispatch, labels, selectedLabel } = nextProps;
-    const allHostLabel = filter(labels, { type: 'all' })[0];
-
-    if (!selectedLabel && !!allHostLabel) {
-      dispatch(setSelectedLabel(allHostLabel));
     }
 
     return false;
@@ -126,8 +111,11 @@ export class ManageHostsPage extends Component {
       evt.preventDefault();
 
       const { dispatch } = this.props;
+      const { MANAGE_HOSTS } = paths;
+      const { slug } = selectedLabel;
+      const nextLocation = slug === 'all-hosts' ? MANAGE_HOSTS : `${MANAGE_HOSTS}/${slug}`;
 
-      dispatch(setSelectedLabel(selectedLabel));
+      dispatch(push(nextLocation));
 
       return false;
     };
@@ -194,9 +182,12 @@ export class ManageHostsPage extends Component {
     };
 
     return (
-      <div>
-        <Icon name="label" />
-        <span>{displayText}</span>
+      <div className={`${baseClass}__header`}>
+        <h1 className={`${baseClass}__title`}>
+          <Icon name={iconClassForLabel(selectedLabel)} />
+          <span>{displayText}</span>
+        </h1>
+
         { query &&
           <AceEditor
             editorProps={{ $blockScrolling: Infinity }}
@@ -214,10 +205,14 @@ export class ManageHostsPage extends Component {
             fontSize={14}
           />
         }
-        <p>Description</p>
-        <p>{description}</p>
-        <p>{count} Hosts Total</p>
-        <div>
+
+        <div className={`${baseClass}__description`}>
+          <h2>Description</h2>
+          <p>{description}</p>
+        </div>
+
+        <div className={`${baseClass}__topper`}>
+          <p className={`${baseClass}__host-count`}>{count} Hosts Total</p>
           <Rocker
             handleChange={onToggleDisplay}
             name="host-display-toggle"
@@ -322,23 +317,35 @@ export class ManageHostsPage extends Component {
 
   render () {
     const { renderForm, renderHeader, renderHosts, renderSidePanel } = this;
+    const { display } = this.props;
 
     return (
-      <div className="manage-hosts body-wrap">
-        {renderHeader()}
-        {renderForm()}
-        {renderHosts()}
+      <div className="has-sidebar">
+        <div className={`${baseClass} body-wrap`}>
+          {renderHeader()}
+          {renderForm()}
+          <div className={`${baseClass}__list ${baseClass}__list--${display.toLowerCase()}`}>
+            {renderHosts()}
+          </div>
+        </div>
+
         {renderSidePanel()}
       </div>
     );
   }
 }
 
-const mapStateToProps = (state, { location }) => {
-  const { display, selectedLabel } = state.components.ManageHostsPage;
+const mapStateToProps = (state, { location, params }) => {
+  const activeLabelSlug = params.active_label || 'all-hosts';
+  const { display } = state.components.ManageHostsPage;
   const { entities: hosts } = entityGetter(state).get('hosts');
-  const { entities: labels } = entityGetter(state).get('labels');
+  const labelEntities = entityGetter(state).get('labels');
+  const { entities: labels } = labelEntities;
   const isAddLabel = location.hash === NEW_LABEL_HASH;
+  const selectedLabel = labelEntities.findBy(
+    { slug: activeLabelSlug },
+    { ignoreCase: true },
+  );
   const { selectedOsqueryTable } = state.components.QueryPages;
 
   return {
