@@ -1,9 +1,8 @@
-import React from 'react';
 import expect from 'expect';
 import { mount } from 'enzyme';
 
-import { connectedComponent, reduxMockStore } from 'test/helpers';
-import ConnectedPacksComposerPage, { PackComposerPage } from './PackComposerPage';
+import { connectedComponent } from 'test/helpers';
+import ConnectedPacksComposerPage from './PackComposerPage';
 
 describe('PackComposerPage - component', () => {
   it('renders', () => {

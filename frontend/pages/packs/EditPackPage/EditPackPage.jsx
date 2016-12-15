@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { filter, includes, noop, size } from 'lodash';
+import { noop, size } from 'lodash';
 
 import packActions from 'redux/nodes/entities/packs/actions';
 import PackForm from 'components/forms/packs/PackForm';
@@ -38,7 +38,7 @@ export class EditPackPage extends Component {
   }
 
   componentWillMount () {
-    const { allQueries, dispatch, isLoadingPack, pack, packID, scheduledQueries  } = this.props;
+    const { allQueries, dispatch, isLoadingPack, pack, packID, scheduledQueries } = this.props;
     const { load } = packActions;
     const { loadAll } = queryActions;
 

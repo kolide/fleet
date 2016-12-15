@@ -1,6 +1,6 @@
 import { size } from 'lodash';
 
-const validate = (formData) => {
+const validate = () => {
   const errors = {};
 
   const valid = !size(errors);
