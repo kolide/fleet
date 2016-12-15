@@ -19,7 +19,7 @@ const platformOptions = [
 ];
 const loggingTypeOptions = [
   { label: 'Differential', value: 'differential' },
-  { label: 'Differential (with Removed)', value: 'differential_with_removed' },
+  { label: 'Differential (Ignore Removals)', value: 'differential_ignore_removals' },
   { label: 'Snapshot', value: 'snapshot' },
 ];
 

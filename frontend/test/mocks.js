@@ -47,12 +47,12 @@ export const validCreateQueryRequest = (bearerToken, queryParams) => {
 export const validCreateScheduledQueryRequest = (bearerToken, formData) => {
   const { scheduledQueryStub } = stubs;
   const scheduledQueryParams = {
-    options: [{
-      interval: formData.interval,
-      pack_id: formData.pack_id,
-      query_ids: [formData.query_id],
-      snapshot: formData.snapshot,
-    }],
+    interval: Number(formData.interval),
+    pack_id: Number(formData.pack_id),
+    platform: formData.platform,
+    query_id: Number(formData.query_id),
+    removed: true,
+    snapshot: false,
   };
 
   return nock('http://localhost:8080', {
