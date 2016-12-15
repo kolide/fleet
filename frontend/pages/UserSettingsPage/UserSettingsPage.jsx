@@ -124,10 +124,12 @@ class UserSettingsPage extends Component {
         </div>
         <div className={`${baseClass}__additional body-wrap`}>
           <h1>Additional Info</h1>
-          <Avatar user={user} />
-          <div className={`${baseClass}__change-avatar-text`}>
-            Change Photo at Gravatar
+
+          <div className={`${baseClass}__change-avatar`}>
+            <Avatar user={user} className={`${baseClass}__avatar`} />
+            <a href="http://en.gravatar.com/emails/">Change Photo at Gravatar</a>
           </div>
+
           <div className={`${baseClass}__more-info-detail`}>
             <Icon name="username" />
             <b>Role</b> - USER

@@ -2,11 +2,12 @@
   @include display(flex);
 
   h1 {
-    margin: 0;
+    font-size: 24px;
     font-weight: $light;
-    font-size: 20px;
+    line-height: 1.33;
     letter-spacing: 1px;
-    color: $text-medium;
+    color: $text-dark;
+    margin: 0;
   }
 
   &__manage {
