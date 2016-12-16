@@ -19,6 +19,7 @@ class SelectTargetsDropdown extends Component {
     onFetchTargets: PropTypes.func,
     onSelect: PropTypes.func.isRequired,
     selectedTargets: PropTypes.arrayOf(targetInterface),
+    targetsCount: PropTypes.number,
   };
 
   static defaultProps = {
@@ -126,7 +127,7 @@ class SelectTargetsDropdown extends Component {
   }
 
   renderLabel = () => {
-    const { error, label, labelClassName, name } = this.props;
+    const { error, label, labelClassName, name, targetsCount } = this.props;
     const labelWrapperClasses = classnames(
       `${baseClass}__label`,
       labelClassName,
@@ -138,12 +139,10 @@ class SelectTargetsDropdown extends Component {
     }
 
     return (
-      <label
-        className={labelWrapperClasses}
-        htmlFor={name}
-      >
-        {error || label}
-      </label>
+      <p className={`${baseClass}__label`}>
+        <span className={`${baseClass}__select-targets`}>{error || label}</span>
+        <span className={`${baseClass}__targets-count`}> {targetsCount} unique {targetsCount === 1 ? 'host' : 'hosts' }</span>
+      </p>
     );
   }
 
@@ -165,7 +164,7 @@ class SelectTargetsDropdown extends Component {
     });
 
     return (
-      <div>
+      <div className={baseClass}>
         {renderLabel()}
         <Input
           className={inputClasses}

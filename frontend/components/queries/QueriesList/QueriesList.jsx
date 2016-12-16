@@ -110,7 +110,7 @@ class QueriesList extends Component {
           <h2>Then we&apos;ll add the following:</h2>
           <p><b>interval:</b> the amount of time the query waits before running</p>
           <p><b>minimum <Icon name="osquery" /> version:</b> the minimum required <b>osqueryd</b> version installed on a host</p>
-          <p><b><Icon name="add-plus" /> differential:</b> show only what&apos; different from last run</p>
+          <p><b><Icon name="plus-minus" /> differential:</b> show only what&apos; different from last run</p>
           <p><b><Icon name="camera" /> snapshot:</b> show everything in its current state</p>
         </td>
       </tr>
@@ -121,40 +121,42 @@ class QueriesList extends Component {
     const { onSelectQuery, scheduledQueries, selectedScheduledQueryIDs, shouldShowPackForm } = this.props;
     const { renderHelpText, renderPackQueryConfigForm } = this;
 
-    const wrapperClassName = classnames(`${baseClass}__wrapper`, {
-      [`${baseClass}__wrapper--query-selected`]: size(selectedScheduledQueryIDs),
+    const wrapperClassName = classnames(`${baseClass}__table`, {
+      [`${baseClass}__table--query-selected`]: size(selectedScheduledQueryIDs),
     });
 
     return (
-      <table className={wrapperClassName}>
-        <thead>
-          <tr>
-            <td />
-            <td>Query Name</td>
-            <td>Interval</td>
-            <td>Platform</td>
-            <td>Version</td>
-            <td>Logging Type</td>
-            <td>Author</td>
-            <td>Last Modified</td>
-          </tr>
-        </thead>
-        <tbody>
-          {renderPackQueryConfigForm()}
-          {renderHelpText()}
-          {!!scheduledQueries.length && scheduledQueries.map((scheduledQuery) => {
-            return (
-              <QueriesListItem
-                checked={this.isChecked(scheduledQuery)}
-                disabled={shouldShowPackForm}
-                key={`scheduled-query-${scheduledQuery.id}`}
-                onSelect={onSelectQuery}
-                scheduledQuery={scheduledQuery}
-              />
-            );
-          })}
-        </tbody>
-      </table>
+      <div className={baseClass}>
+        <table className={wrapperClassName}>
+          <thead>
+            <tr>
+              <td />
+              <td>Query Name</td>
+              <td>Interval</td>
+              <td>Platform</td>
+              <td>Version</td>
+              <td>Logging Type</td>
+              <td>Author</td>
+              <td>Last Modified</td>
+            </tr>
+          </thead>
+          <tbody>
+            {renderPackQueryConfigForm()}
+            {renderHelpText()}
+            {!!scheduledQueries.length && scheduledQueries.map((scheduledQuery) => {
+              return (
+                <QueriesListItem
+                  checked={this.isChecked(scheduledQuery)}
+                  disabled={shouldShowPackForm}
+                  key={`scheduled-query-${scheduledQuery.id}`}
+                  onSelect={onSelectQuery}
+                  scheduledQuery={scheduledQuery}
+                />
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     );
   }
 }

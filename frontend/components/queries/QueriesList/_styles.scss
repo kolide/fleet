@@ -1,13 +1,15 @@
 .queries-list {
-  &__wrapper {
-    background-color: $white;
-    border: 1px solid $accent-dark;
-    border-bottom-left-radius: 3px;
-    border-bottom-right-radius: 3px;
+  padding: 30px;
+  background-color: $white;
+  border: 1px solid $accent-dark;
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  box-shadow: inset 0 0 8px 0 rgba(0, 0, 0, 0.12);
+  box-sizing: border-box;
+
+  &__table {
     border-collapse: collapse;
-    box-shadow: inset 0 0 8px 0 rgba(0, 0, 0, 0.12);
-    box-sizing: border-box;
-    min-height: 132px;
     width: 100%;
+    min-height: 132px;
   }
 }
