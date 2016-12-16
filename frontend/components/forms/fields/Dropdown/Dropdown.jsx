@@ -10,6 +10,7 @@ const baseClass = 'dropdown';
 
 class Dropdown extends Component {
   static propTypes = {
+    className: PropTypes.string,
     clearable: PropTypes.bool,
     error: PropTypes.string,
     hint: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
@@ -69,7 +70,7 @@ class Dropdown extends Component {
         <Select
           className={`${baseClass}__select ${className}`}
           clearable={clearable}
-          name={`${name}-select` || "targets"}
+          name={`${name}-select` || 'targets'}
           onChange={handleChange}
           options={options}
           placeholder={placeholder}

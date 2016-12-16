@@ -53,7 +53,7 @@ class Checkbox extends Component {
             onChange={handleChange}
             type="checkbox"
           />
-          <span className={`${checkBoxClass}__tick`} />
+          <span className={checkBoxTickClass} />
           <div className={`${checkBoxClass}__label`}>{children}</div>
         </label>
       </FormField>
