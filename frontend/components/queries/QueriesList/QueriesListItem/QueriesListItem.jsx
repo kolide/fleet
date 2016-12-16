@@ -54,10 +54,10 @@ class QueriesListItem extends Component {
       <tr>
         <td>
           <Checkbox
-            checked={checked}
             disabled={disabled}
             name={`scheduled-query-checkbox-${id}`}
             onChange={onCheck}
+            value={checked}
           />
         </td>
         <td>{name}</td>

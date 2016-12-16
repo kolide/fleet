@@ -17,17 +17,17 @@ describe('Checkbox - component', () => {
 
     const checkedComponent = mount(
       <Checkbox
-        checked
         name="checkbox"
         onChange={onCheckedComponentChangeSpy}
+        value
       />
     ).find('input');
 
     const uncheckedComponent = mount(
       <Checkbox
-        checked={false}
         name="checkbox"
         onChange={onUncheckedComponentChangeSpy}
+        value={false}
       />
     ).find('input');
 
