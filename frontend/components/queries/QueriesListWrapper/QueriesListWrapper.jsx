@@ -12,6 +12,7 @@ const baseClass = 'queries-list-wrapper';
 class QueriesListWrapper extends Component {
   static propTypes = {
     allQueries: PropTypes.arrayOf(queryInterface),
+    onRemoveScheduledQueries: PropTypes.func,
     onScheduledQueryFormSubmit: PropTypes.func,
     scheduledQueries: PropTypes.arrayOf(queryInterface),
   };
@@ -33,6 +34,17 @@ class QueriesListWrapper extends Component {
     return false;
   }
 
+  onRemoveScheduledQueries = (evt) => {
+    evt.preventDefault();
+
+    const { onRemoveScheduledQueries: handleRemoveScheduledQueries } = this.props;
+    const { selectedScheduledQueryIDs } = this.state;
+
+    this.setState({ selectedScheduledQueryIDs: [] });
+
+    return handleRemoveScheduledQueries(selectedScheduledQueryIDs);
+  }
+
   onSelectQuery = (shouldAddQuery, scheduledQueryID) => {
     const { selectedScheduledQueryIDs } = this.state;
     const newSelectedScheduledQueryIDs = shouldAddQuery ?
@@ -47,7 +59,10 @@ class QueriesListWrapper extends Component {
   onShowPackForm = (evt) => {
     evt.preventDefault();
 
-    this.setState({ shouldShowPackForm: true });
+    this.setState({
+      selectedScheduledQueryIDs: [],
+      shouldShowPackForm: true,
+    });
 
     return false;
   }
@@ -61,6 +76,36 @@ class QueriesListWrapper extends Component {
     const { querySearchText } = this.state;
 
     return helpers.filterQueries(scheduledQueries, querySearchText);
+  }
+
+  renderButton = () => {
+    const { onRemoveScheduledQueries, onShowPackForm } = this;
+    const { selectedScheduledQueryIDs, shouldShowPackForm } = this.state;
+
+    const scheduledQueryCount = selectedScheduledQueryIDs.length;
+
+    if (scheduledQueryCount) {
+      const queryText = scheduledQueryCount === 1 ? 'Query' : 'Queries';
+
+      return (
+        <Button
+          className={`${baseClass}__query-btn`}
+          onClick={onRemoveScheduledQueries}
+          text={`Remove ${queryText}`}
+          variant="alert"
+        />
+      );
+    }
+
+    return (
+      <Button
+        className={`${baseClass}__query-btn`}
+        disabled={shouldShowPackForm}
+        onClick={onShowPackForm}
+        text="Add New Query"
+        variant="brand"
+      />
+    );
   }
 
   renderQueryCount = () => {
@@ -93,27 +138,22 @@ class QueriesListWrapper extends Component {
   }
 
   render () {
-    const { onShowPackForm, onUpdateQuerySearchText, renderQueryCount, renderQueriesList } = this;
-    const { querySearchText, shouldShowPackForm } = this.state;
+    const { onUpdateQuerySearchText, renderButton, renderQueryCount, renderQueriesList } = this;
+    const { querySearchText } = this.state;
 
     return (
       <div className={baseClass}>
         {renderQueryCount()}
-        <InputField
-          inputClassName={`${baseClass}__search-queries-input`}
-          inputWrapperClass={`${baseClass}__search-queries`}
-          name="search-queries"
-          onChange={onUpdateQuerySearchText}
-          placeholder="Search Queries"
-          value={querySearchText}
-        />
-        <Button
-          className={`${baseClass}__add-new-query-btn`}
-          disabled={shouldShowPackForm}
-          onClick={onShowPackForm}
-          text="Add New Query"
-          variant="brand"
-        />
+        <div>
+          <InputField
+            inputClassName={`${baseClass}__search-queries-input`}
+            name="search-queries"
+            onChange={onUpdateQuerySearchText}
+            placeholder="Search Queries"
+            value={querySearchText}
+          />
+          {renderButton()}
+        </div>
         {renderQueriesList()}
       </div>
     );

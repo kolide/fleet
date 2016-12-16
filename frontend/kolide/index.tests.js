@@ -11,6 +11,7 @@ const {
   validCreatePackRequest,
   validCreateQueryRequest,
   validCreateScheduledQueryRequest,
+  validDestroyScheduledQueryRequest,
   validForgotPasswordRequest,
   validGetConfigRequest,
   validGetHostsRequest,
@@ -193,6 +194,22 @@ describe('Kolide - API client', () => {
 
       Kolide.setBearerToken(bearerToken);
       Kolide.createScheduledQuery(formData)
+        .then(() => {
+          expect(request.isDone()).toEqual(true);
+          done();
+        })
+        .catch(done);
+    });
+  });
+
+  describe('#destroyScheduledQuery', () => {
+    it('calls the appropriate endpoint with the correct parameters', (done) => {
+      const bearerToken = 'valid-bearer-token';
+      const scheduledQuery = { id: 1 };
+      const request = validDestroyScheduledQueryRequest(bearerToken, scheduledQuery);
+
+      Kolide.setBearerToken(bearerToken);
+      Kolide.destroyScheduledQuery(scheduledQuery)
         .then(() => {
           expect(request.isDone()).toEqual(true);
           done();
