@@ -9,7 +9,7 @@ import PackInfoSidePanel from 'components/side_panels/PackInfoSidePanel';
 import { renderFlash } from 'redux/nodes/notifications/actions';
 import ShowSidePanel from 'components/side_panels/ShowSidePanel';
 
-const baseClass = 'pack-composer-page';
+const baseClass = 'pack-composer';
 
 export class PackComposerPage extends Component {
   static propTypes = {

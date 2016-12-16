@@ -68,7 +68,7 @@ class QueriesListWrapper extends Component {
     const queryCount = scheduledQueries.length;
     const queryText = queryCount === 1 ? 'Query' : 'Queries';
 
-    return <p className={`${baseClass}__query-count`}><span>{queryCount}</span> {queryText}</p>;
+    return <h1 className={`${baseClass}__query-count`}><span>{queryCount}</span> {queryText}</h1>;
   }
 
   renderQueriesList = () => {
@@ -97,24 +97,23 @@ class QueriesListWrapper extends Component {
     const { querySearchText, shouldShowPackForm } = this.state;
 
     return (
-      <div className={`${baseClass} ${baseClass}__wrapper`}>
+      <div className={baseClass}>
         {renderQueryCount()}
-        <div>
-          <InputField
-            inputClassName={`${baseClass}__search-queries-input`}
-            name="search-queries"
-            onChange={onUpdateQuerySearchText}
-            placeholder="Search Queries"
-            value={querySearchText}
-          />
-          <Button
-            className={`${baseClass}__add-new-query-btn`}
-            disabled={shouldShowPackForm}
-            onClick={onShowPackForm}
-            text="Add New Query"
-            variant="brand"
-          />
-        </div>
+        <InputField
+          inputClassName={`${baseClass}__search-queries-input`}
+          inputWrapperClass={`${baseClass}__search-queries`}
+          name="search-queries"
+          onChange={onUpdateQuerySearchText}
+          placeholder="Search Queries"
+          value={querySearchText}
+        />
+        <Button
+          className={`${baseClass}__add-new-query-btn`}
+          disabled={shouldShowPackForm}
+          onClick={onShowPackForm}
+          text="Add New Query"
+          variant="brand"
+        />
         {renderQueriesList()}
       </div>
     );

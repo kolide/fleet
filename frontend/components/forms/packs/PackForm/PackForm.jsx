@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import classnames from 'classnames';
 
 import Button from 'components/buttons/Button';
 import Form from 'components/forms/Form';
@@ -8,6 +9,7 @@ import SelectTargetsDropdown from 'components/forms/fields/SelectTargetsDropdown
 import validate from './validate';
 
 const fieldNames = ['name', 'description', 'targets'];
+const baseClass = 'pack-form';
 
 class PackForm extends Component {
   static propTypes = {
@@ -31,29 +33,35 @@ class PackForm extends Component {
       selectedTargetsCount,
     } = this.props;
 
+    const packFormClass = classnames(baseClass, className);
+
     return (
-      <form className={className} onSubmit={handleSubmit}>
+      <form className={packFormClass} onSubmit={handleSubmit}>
+        <h1>New Pack</h1>
         <InputField
           {...fields.name}
           placeholder="Query Pack Title"
+          label="Query Pack Title"
+          inputWrapperClass={`${baseClass}__pack-title`}
         />
         <InputField
           {...fields.description}
-          label="Description"
+          inputWrapperClass={`${baseClass}__pack-description`}
+          label="Query Pack Description"
           placeholder="Add a description of your query"
           type="textarea"
         />
-        <div>
-          <span>{selectedTargetsCount} total hosts</span>
+        <div className={`${baseClass}__pack-targets`}>
           <SelectTargetsDropdown
             {...fields.targets}
             label="Select Pack Targets"
             onSelect={fields.targets.onChange}
             onFetchTargets={onFetchTargets}
             selectedTargets={fields.targets.value}
+            targetsCount={selectedTargetsCount}
           />
         </div>
-        <div>
+        <div className={`${baseClass}__pack-buttons`}>
           <Button
             text="Save Query pack"
             type="submit"
