@@ -22,7 +22,7 @@ class QueriesListWrapper extends Component {
     this.state = {
       querySearchText: '',
       selectAll: false,
-      selectedQueries: [],
+      selectedScheduledQueryIDs: [],
       shouldShowPackForm: false,
     };
   }
@@ -33,17 +33,15 @@ class QueriesListWrapper extends Component {
     return false;
   }
 
-  onSelectQuery = (query) => {
-    return (shouldAddQuery) => {
-      const { selectedQueries } = this.state;
-      const newSelectedQueries = shouldAddQuery ?
-        selectedQueries.concat(query) :
-        pull(selectedQueries, query);
+  onSelectQuery = (shouldAddQuery, scheduledQueryID) => {
+    const { selectedScheduledQueryIDs } = this.state;
+    const newSelectedScheduledQueryIDs = shouldAddQuery ?
+      selectedScheduledQueryIDs.concat(scheduledQueryID) :
+      pull(selectedScheduledQueryIDs, scheduledQueryID);
 
-      this.setState({ selectedQueries: newSelectedQueries });
+    this.setState({ selectedScheduledQueryIDs: newSelectedScheduledQueryIDs });
 
-      return false;
-    };
+    return false;
   }
 
   onShowPackForm = (evt) => {
@@ -75,8 +73,8 @@ class QueriesListWrapper extends Component {
 
   renderQueriesList = () => {
     const { getQueries, onHidePackForm, onSelectQuery } = this;
-    const { allQueries, onScheduledQueryFormSubmit } = this.props;
-    const { selectedQueries, shouldShowPackForm } = this.state;
+    const { allQueries, onScheduledQueryFormSubmit, scheduledQueries } = this.props;
+    const { selectedScheduledQueryIDs, shouldShowPackForm } = this.state;
 
     return (
       <div className={`${baseClass}__queries-list-wrapper`}>
@@ -86,8 +84,9 @@ class QueriesListWrapper extends Component {
           onScheduledQueryFormSubmit={onScheduledQueryFormSubmit}
           onSelectQuery={onSelectQuery}
           scheduledQueries={getQueries()}
-          selectedQueries={selectedQueries}
+          selectedScheduledQueryIDs={selectedScheduledQueryIDs}
           shouldShowPackForm={shouldShowPackForm}
+          isScheduledQueriesAvailable={!!scheduledQueries.length}
         />
       </div>
     );

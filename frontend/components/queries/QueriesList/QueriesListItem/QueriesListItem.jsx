@@ -3,42 +3,69 @@ import moment from 'moment';
 
 import Checkbox from 'components/forms/fields/Checkbox';
 import Icon from 'components/Icon';
+import { isEqual } from 'lodash';
 import { platformIconClass } from 'utilities/icon_class';
-import queryInterface from 'interfaces/query';
+import scheduledQueryInterface from 'interfaces/scheduled_query';
 
 class QueriesListItem extends Component {
   static propTypes = {
     checked: PropTypes.bool,
     disabled: PropTypes.bool,
     onSelect: PropTypes.func.isRequired,
-    query: queryInterface.isRequired,
+    scheduledQuery: scheduledQueryInterface.isRequired,
   };
 
-  renderCheckbox = () => {
-    const { checked, disabled, onSelect, query } = this.props;
+  shouldComponentUpdate (nextProps) {
+    if (isEqual(nextProps, this.props)) {
+      return false;
+    }
 
-    return (
-      <Checkbox
-        checked={checked}
-        disabled={disabled}
-        name={query.name}
-        onChange={onSelect}
-      />
-    );
+    return true;
+  }
+
+  onCheck = (value) => {
+    const { onSelect, scheduledQuery } = this.props;
+
+    return onSelect(value, scheduledQuery.id);
+  }
+
+  loggingTypeString = () => {
+    const { scheduledQuery: { snapshot, removed } } = this.props;
+
+    if (snapshot) {
+      return 'snapshot';
+    }
+
+    if (removed) {
+      return 'differential (ignore removes)';
+    }
+
+    return 'differential';
   }
 
   render () {
-    const { query } = this.props;
-    const { renderCheckbox } = this;
-    const updatedTimeAgo = moment(query.updated_at).fromNow();
+    const { checked, disabled, scheduledQuery } = this.props;
+    const { onCheck } = this;
+    const { id, name, interval, platform, updated_at: updatedAt, version } = scheduledQuery;
+    const { loggingTypeString } = this;
+    const updatedTimeAgo = moment(updatedAt).fromNow();
 
     return (
       <tr>
-        <td>{renderCheckbox()}</td>
-        <td>{query.name}</td>
-        <td>{query.description}</td>
-        <td><Icon name={platformIconClass(query.platform)} /></td>
-        <td>{query.author_name}</td>
+        <td>
+          <Checkbox
+            checked={checked}
+            disabled={disabled}
+            name={`scheduled-query-checkbox-${id}`}
+            onChange={onCheck}
+          />
+        </td>
+        <td>{name}</td>
+        <td>{interval}</td>
+        <td><Icon name={platformIconClass(platform)} /></td>
+        <td>{version}</td>
+        <td>{loggingTypeString()}</td>
+        <td />
         <td>{updatedTimeAgo}</td>
       </tr>
     );

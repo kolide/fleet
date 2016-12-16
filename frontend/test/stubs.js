@@ -8,9 +8,13 @@ export const adminUserStub = {
 
 export const scheduledQueryStub = {
   id: 1,
-  query_id: 5,
-  pack_id: 123,
   interval: 60,
+  name: 'Get all users',
+  pack_id: 123,
+  platform: 'darwin',
+  query: 'SELECT * FROM users',
+  query_id: 5,
+  removed: false,
   snapshot: true,
 };
 
@@ -22,4 +26,20 @@ export const userStub = {
   username: 'gnardog',
 };
 
-export default { adminUserStub, scheduledQueryStub, userStub };
+export const queryStub = {
+  created_at: '2016-10-17T07:06:00Z',
+  deleted: false,
+  deleted_at: null,
+  description: '',
+  differential: false,
+  id: 1,
+  interval: 0,
+  name: 'dev_query_1',
+  platform: '',
+  query: 'select * from processes',
+  snapshot: false,
+  updated_at: '2016-10-17T07:06:00Z',
+  version: '',
+};
+
+export default { adminUserStub, queryStub, scheduledQueryStub, userStub };
