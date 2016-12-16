@@ -23,7 +23,7 @@ class Modal extends Component {
           <div className={`${baseClass}__header`}>
             <span>{title}</span>
             <div className={`${baseClass}__ex`}>
-              <button className={`button button--unstyled`} onClick={onExit}>
+              <button className="button button--unstyled" onClick={onExit}>
                 <Icon name="x" />
               </button>
             </div>
