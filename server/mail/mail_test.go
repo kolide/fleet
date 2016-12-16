@@ -2,10 +2,13 @@ package mail
 
 import (
 	"os"
+	"reflect"
+	"runtime"
+	"strings"
 	"testing"
 
 	"github.com/kolide/kolide-ose/server/kolide"
-	"github.com/stretchr/testify/suite"
+	"github.com/stretchr/testify/assert"
 )
 
 type mockMailer struct{}
@@ -14,22 +17,37 @@ func (m *mockMailer) SendEmail(e kolide.Email) error {
 	return nil
 }
 
-type EmailTestSuite struct {
-	suite.Suite
-	mailService kolide.MailService
-}
-
-func (s *EmailTestSuite) SetupTest() {
+func getMailer() kolide.MailService {
 
 	if os.Getenv("MAIL_TEST") == "" {
-		s.mailService = &mockMailer{}
-	} else {
-		s.mailService = NewService()
+		return &mockMailer{}
 	}
-
+	return NewService()
 }
 
-func (s *EmailTestSuite) TestSMTPPlainAuth() {
+func functionName(f func(*testing.T, kolide.MailService)) string {
+	fullName := runtime.FuncForPC(reflect.ValueOf(f).Pointer()).Name()
+	elements := strings.Split(fullName, ".")
+	return elements[len(elements)-1]
+}
+
+var testFunctions = [...]func(*testing.T, kolide.MailService){
+	testSMTPPlainAuth,
+	testSMTPSkipVerify,
+	testSMTPNoAuth,
+}
+
+func TestMail(t *testing.T) {
+	for _, f := range testFunctions {
+		r := getMailer()
+
+		t.Run(functionName(f), func(t *testing.T) {
+			f(t, r)
+		})
+	}
+}
+
+func testSMTPPlainAuth(t *testing.T, mailer kolide.MailService) {
 	mail := kolide.Email{
 		Subject: "smtp plain auth",
 		To:      []string{"john@kolide.co"},
@@ -52,39 +70,11 @@ func (s *EmailTestSuite) TestSMTPPlainAuth() {
 		},
 	}
 
-	err := s.mailService.SendEmail(mail)
-	s.Nil(err)
+	err := mailer.SendEmail(mail)
+	assert.Nil(t, err)
 }
 
-// TODO: MailHog doesn't support cram md5
-// func (s *EmailTestSuite) TestSMTPCramMD5Auth() {
-// 	mail := kolide.Email{
-// 		Subject: "cram md5 auth",
-// 		To:      []string{"john@kolide.co"},
-// 		Config: &kolide.SMTPConfig{
-// 			Configured:           true,
-// 			Disabled:             false,
-// 			AuthenticationType:   kolide.AuthTypeUserNamePassword,
-// 			AuthenticationMethod: kolide.AuthMethodCramMD5,
-// 			UserName:             "bob",
-// 			Password:             "secret",
-// 			EnableSSLTLS:         true,
-// 			VerifySSLCerts:       true,
-// 			EnableStartTLS:       true,
-// 			Port:                 1025,
-// 			Server:               "localhost",
-// 			SenderAddress:        "kolide@kolide.com",
-// 		},
-// 		Mailer: &kolide.SMTPTestMailer{
-// 			KolideServerURL: "https://localhost:8080",
-// 		},
-// 	}
-//
-// 	err := s.mailService.SendEmail(mail)
-// 	s.Nil(err)
-// }
-
-func (s *EmailTestSuite) TestSMTPSkipVerify() {
+func testSMTPSkipVerify(t *testing.T, mailer kolide.MailService) {
 	mail := kolide.Email{
 		Subject: "skip verify",
 		To:      []string{"john@kolide.co"},
@@ -107,11 +97,11 @@ func (s *EmailTestSuite) TestSMTPSkipVerify() {
 		},
 	}
 
-	err := s.mailService.SendEmail(mail)
-	s.Nil(err)
+	err := mailer.SendEmail(mail)
+	assert.Nil(t, err)
 }
 
-func (s *EmailTestSuite) TestSMTPNoAuth() {
+func testSMTPNoAuth(t *testing.T, mailer kolide.MailService) {
 	mail := kolide.Email{
 		Subject: "no auth",
 		To:      []string{"bob@foo.com"},
@@ -130,10 +120,6 @@ func (s *EmailTestSuite) TestSMTPNoAuth() {
 		},
 	}
 
-	err := s.mailService.SendEmail(mail)
-	s.Nil(err)
-}
-
-func TestEmailSending(t *testing.T) {
-	suite.Run(t, new(EmailTestSuite))
+	err := mailer.SendEmail(mail)
+	assert.Nil(t, err)
 }

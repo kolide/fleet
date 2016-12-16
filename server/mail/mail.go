@@ -51,14 +51,12 @@ func (dm devMailService) SendEmail(e kolide.Email) error {
 }
 
 func (m mailService) SendEmail(e kolide.Email) error {
-	if !e.Config.SMTPDisabled {
-		if e.Config.SMTPConfigured {
-			msg, err := getMessageBody(e)
-			if err != nil {
-				return err
-			}
-			return m.sendMail(e, msg)
+	if !e.Config.SMTPDisabled && e.Config.SMTPConfigured {
+		msg, err := getMessageBody(e)
+		if err != nil {
+			return err
 		}
+		return m.sendMail(e, msg)
 	}
 	return nil
 }

@@ -10,7 +10,7 @@ import (
 )
 
 func decodeModifyAppConfigRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	var req kolide.ModifyAppConfigRequest
+	var req kolide.AppConfigPayload
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, err
 	}

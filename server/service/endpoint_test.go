@@ -87,6 +87,8 @@ func functionName(f func(*testing.T, *testResource)) string {
 
 var testFunctions = [...]func(*testing.T, *testResource){
 	testGetAppConfig,
+	testModifyAppConfig,
+	testModifyAppConfigWithValidationFail,
 }
 
 func TestEndpoints(t *testing.T) {

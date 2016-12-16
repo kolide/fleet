@@ -15,7 +15,7 @@ type AppConfigStore interface {
 type AppConfigService interface {
 	NewAppConfig(ctx context.Context, p AppConfigPayload) (info *AppConfig, err error)
 	AppConfig(ctx context.Context) (info *AppConfig, err error)
-	ModifyAppConfig(ctx context.Context, r ModifyAppConfigRequest) (info *AppConfig, err error)
+	ModifyAppConfig(ctx context.Context, p AppConfigPayload) (info *AppConfig, err error)
 }
 
 type SMTPAuthType int
@@ -69,6 +69,8 @@ type AppConfig struct {
 	SMTPEnableStartTLS bool `json:"enable_start_tls" db:"smtp_enable_start_tls"`
 	// SMTPDisabled if user sets this to TRUE emails will not be sent from the application
 	SMTPDisabled bool `json:"email_disabled" db:"smtp_disabled"`
+	// SMTPLastError contains error information  if email test fails
+	SMTPLastError string
 }
 
 // ModifyAppConfigRequest contains application configuration information
@@ -81,11 +83,51 @@ type ModifyAppConfigRequest struct {
 	AppConfig AppConfig `json:"app_config"`
 }
 
-// AppConfigPayload contains request and response format of
-// the AppConfig struct.
+// SMTPSettings is part of the AppConfigPayload which defines the wire representation
+// of the app config endpoints
+type SMTPSettings struct {
+	// SMTPConfigured is a flag that indicates if smtp has been successfully
+	// tested with the settings provided by an admin user.
+	SMTPConfigured bool `json:"configured"`
+	// SMTPSenderAddress is the email address that will appear in emails sent
+	// from Kolide
+	SMTPSenderAddress string `json:"sender_address"`
+	// SMTPServer is the host name of the SMTP server Kolide will use to send mail
+	SMTPServer string `json:"server"`
+	// SMTPPort port SMTP server will use
+	SMTPPort uint `json:"port"`
+	// SMTPAuthenticationType type of authentication for SMTP
+	SMTPAuthenticationType SMTPAuthType `json:"authentication_type"`
+	// SMTPUserName must be provided if SMTPAuthenticationType is UserNamePassword
+	SMTPUserName string `json:"user_name"`
+	// SMTPPassword must be provided if SMTPAuthenticationType is UserNamePassword
+	SMTPPassword string `json:"password"`
+	// SMTPEnableSSLTLS whether to use SSL/TLS for SMTP
+	SMTPEnableTLS bool `json:"enable_ssl_tls"`
+	// SMTPAuthenticationMethod authentication method smtp server will use
+	SMTPAuthenticationMethod SMTPAuthMethod `json:"authentication_method"`
+
+	// SMTPDomain optional domain for SMTP
+	SMTPDomain string `json:"domain,omitempty"`
+	// SMTPVerifySSLCerts defaults to true but can be turned off if self signed
+	// SSL certs are used by the SMTP server
+	SMTPVerifySSLCerts bool `json:"verify_ssl_certs"`
+	// SMTPEnableStartTLS detects of TLS is enabled on mail server and starts to use it (default true)
+	SMTPEnableStartTLS bool `json:"enable_start_tls"`
+	// SMTPDisabled if user sets this to TRUE emails will not be sent from the application
+	SMTPDisabled bool `json:"email_disabled"`
+}
+
+// AppConfigPayload contains request/response format of
+// the AppConfig endpoints.
 type AppConfigPayload struct {
 	OrgInfo        *OrgInfo        `json:"org_info,omitempty"`
 	ServerSettings *ServerSettings `json:"server_settings,omitempty"`
+	SMTPSettings   *SMTPSettings   `json:"smtp_settings,omitempty"`
+	// SMTPTest is a flag that if set will cause the server to test email configuration
+	SMTPTest *bool `json:"smtp_test,omitempty"`
+	// SMTPTestError if present gives reason smtp test failed
+	SMTPTestError string `json:smtp_test_error,omitempty`
 }
 
 // OrgInfo contains general info about the organization using Kolide.
