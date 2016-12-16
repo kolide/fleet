@@ -72,6 +72,20 @@ export class EditPackPage extends Component {
     return dispatch(update(formData));
   }
 
+  handleRemoveScheduledQueries = (scheduledQueryIDs) => {
+    const { destroy } = scheduledQueryActions;
+    const { dispatch } = this.props;
+
+    const promises = scheduledQueryIDs.map((id) => {
+      return dispatch(destroy({ id }));
+    });
+
+    return Promise.all(promises)
+      .then(() => {
+        dispatch(renderFlash('success', 'Scheduled queries removed'));
+      });
+  }
+
   handleScheduledQueryFormSubmit = (formData) => {
     const { create } = scheduledQueryActions;
     const { dispatch, packID } = this.props;
@@ -93,7 +107,12 @@ export class EditPackPage extends Component {
   }
 
   render () {
-    const { handlePackFormSubmit, handleScheduledQueryFormSubmit, onFetchTargets } = this;
+    const {
+      handlePackFormSubmit,
+      handleRemoveScheduledQueries,
+      handleScheduledQueryFormSubmit,
+      onFetchTargets,
+    } = this;
     const { selectedTargetsCount } = this.state;
     const { allQueries, isLoadingScheduledQueries, pack, scheduledQueries } = this.props;
 
@@ -113,6 +132,7 @@ export class EditPackPage extends Component {
           />
           <QueriesListWrapper
             allQueries={allQueries}
+            onRemoveScheduledQueries={handleRemoveScheduledQueries}
             onScheduledQueryFormSubmit={handleScheduledQueryFormSubmit}
             scheduledQueries={scheduledQueries}
           />

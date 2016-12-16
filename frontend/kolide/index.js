@@ -56,6 +56,12 @@ class Kolide extends Base {
       .then(response => response.scheduled);
   }
 
+  destroyScheduledQuery = ({ id }) => {
+    const endpoint = `${this.endpoint('/v1/kolide/scheduled')}/${id}`;
+
+    return this.authenticatedDelete(endpoint);
+  }
+
   forgotPassword ({ email }) {
     const { FORGOT_PASSWORD } = endpoints;
     const forgotPasswordEndpoint = this.baseURL + FORGOT_PASSWORD;
