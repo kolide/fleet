@@ -1,90 +1,47 @@
 import React from 'react';
-import expect, { createSpy, restoreSpies } from 'expect';
+import expect from 'expect';
 import { mount } from 'enzyme';
 
+import { queryStub, scheduledQueryStub } from 'test/stubs';
 import { fillInFormInput } from 'test/helpers';
 import QueriesListWrapper from './index';
 
-const query = {
-  created_at: '2016-10-17T07:06:00Z',
-  deleted: false,
-  deleted_at: null,
-  description: '',
-  differential: false,
-  id: 1,
-  interval: 0,
-  name: 'dev_query_1',
-  platform: '',
-  query: 'select * from processes',
-  snapshot: false,
-  updated_at: '2016-10-17T07:06:00Z',
-  version: '',
-};
-const queries = [query];
+const allQueries = [queryStub];
+const scheduledQueries = [
+  scheduledQueryStub,
+  { ...scheduledQueryStub, id: 100, name: 'mac hosts' },
+];
 
 describe('QueriesListWrapper - component', () => {
-  afterEach(restoreSpies);
-
-  it('renders the PackQueryConfigForm', () => {
+  it('renders the PackQueryConfigForm when "Add Query" is clicked', () => {
     const component = mount(
       <QueriesListWrapper
-        configuredQueries={[]}
-        queries={queries}
-        stagedQueries={[]}
+        allQueries={allQueries}
+        scheduledQueries={scheduledQueries}
       />
     );
 
+    const addQueryBtn = component.find('Button').first();
+
+    addQueryBtn.simulate('click');
     expect(component.find('PackQueryConfigForm').length).toEqual(1);
   });
 
   it('filters queries', () => {
     const component = mount(
       <QueriesListWrapper
-        configuredQueries={[]}
-        queries={queries}
-        stagedQueries={[]}
+        allQueries={allQueries}
+        scheduledQueries={scheduledQueries}
       />
     );
 
     const searchQueriesInput = component.find({ name: 'search-queries' });
+    const QueriesList = component.find('QueriesList');
 
-    fillInFormInput(searchQueriesInput, 'darwin');
+    expect(QueriesList.prop('scheduledQueries')).toEqual(scheduledQueries);
 
-    expect(component.find('QueriesList').length).toEqual(0);
-    expect(component.text()).toContain('There are no available queries for your pack');
-  });
+    fillInFormInput(searchQueriesInput, 'something that does not match');
 
-  it('calls the onSelectQuery prop when a query checkbox is selected', () => {
-    const onSelectQuerySpy = createSpy();
-    const component = mount(
-      <QueriesListWrapper
-        configuredQueries={[]}
-        onSelectQuery={onSelectQuerySpy}
-        queries={queries}
-        stagedQueries={[]}
-      />
-    );
-    const checkbox = component.find('Checkbox').first();
-
-    checkbox.find('input').simulate('change');
-
-    expect(onSelectQuerySpy).toHaveBeenCalledWith(query);
-  });
-
-  it('calls the onSelectQuery prop when a query checkbox is changed', () => {
-    const onDeselectQuerySpy = createSpy();
-    const component = mount(
-      <QueriesListWrapper
-        configuredQueries={[]}
-        onDeselectQuery={onDeselectQuerySpy}
-        queries={queries}
-        stagedQueries={queries}
-      />
-    );
-    const checkbox = component.find('Checkbox').first();
-
-    checkbox.find('input').simulate('change');
-
-    expect(onDeselectQuerySpy).toHaveBeenCalledWith(query);
+    expect(QueriesList.prop('scheduledQueries')).toEqual([]);
   });
 });
