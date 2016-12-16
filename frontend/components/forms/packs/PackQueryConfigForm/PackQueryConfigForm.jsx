@@ -52,8 +52,8 @@ class PackQueryConfigForm extends Component {
       <form className={`${baseClass}__wrapper`}>
         <div className={`${baseClass}__body-section`}>
           <Dropdown
+            {...fields.query_id}
             options={queryOptions}
-            onSelect={fields.query_id.onChange}
             placeholder="Select Query"
             wrapperClassName={`${baseClass}__form-field`}
           />
@@ -65,14 +65,12 @@ class PackQueryConfigForm extends Component {
           <Dropdown
             {...fields.platform}
             options={platformOptions}
-            onSelect={fields.platform.onChange}
             placeholder="Platform"
             wrapperClassName={`${baseClass}__form-field`}
           />
           <Dropdown
             {...fields.logging_type}
             options={loggingTypeOptions}
-            onSelect={fields.logging_type.onChange}
             placeholder="Logging type"
             wrapperClassName={`${baseClass}__form-field`}
           />
