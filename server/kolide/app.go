@@ -35,41 +35,41 @@ const (
 // AppConfig holds configuration about the Kolide application.
 // AppConfig data can be managed by a Kolide API user.
 type AppConfig struct {
-	ID              uint   `json:"-"`
-	OrgName         string `json:"org_name,omitempty" db:"org_name"`
-	OrgLogoURL      string `json:"org_logo_url,omitempty" db:"org_logo_url"`
-	KolideServerURL string `json:"kolide_server_url" db:"kolide_server_url"`
+	ID              uint
+	OrgName         string `db:"org_name"`
+	OrgLogoURL      string `db:"org_logo_url"`
+	KolideServerURL string `db:"kolide_server_url"`
 	// SMTPConfigured is a flag that indicates if smtp has been successfully
 	// tested with the settings provided by an admin user.
-	SMTPConfigured bool `json:"configured" db:"smtp_configured"`
+	SMTPConfigured bool `db:"smtp_configured"`
 	// SMTPSenderAddress is the email address that will appear in emails sent
 	// from Kolide
-	SMTPSenderAddress string `json:"sender_address" db:"smtp_sender_address"`
+	SMTPSenderAddress string `db:"smtp_sender_address"`
 	// SMTPServer is the host name of the SMTP server Kolide will use to send mail
-	SMTPServer string `json:"server" db:"smtp_server"`
+	SMTPServer string `db:"smtp_server"`
 	// SMTPPort port SMTP server will use
-	SMTPPort uint `json:"port" db:"smtp_port"`
+	SMTPPort uint `db:"smtp_port"`
 	// SMTPAuthenticationType type of authentication for SMTP
-	SMTPAuthenticationType SMTPAuthType `json:"authentication_type" db:"smtp_authentication_type"`
+	SMTPAuthenticationType SMTPAuthType `db:"smtp_authentication_type"`
 	// SMTPUserName must be provided if SMTPAuthenticationType is UserNamePassword
-	SMTPUserName string `json:"user_name" db:"smtp_user_name"`
+	SMTPUserName string `db:"smtp_user_name"`
 	// SMTPPassword must be provided if SMTPAuthenticationType is UserNamePassword
-	SMTPPassword string `json:"password" db:"smtp_password"`
+	SMTPPassword string `db:"smtp_password"`
 	// SMTPEnableSSLTLS whether to use SSL/TLS for SMTP
-	SMTPEnableTLS bool `json:"enable_ssl_tls" db:"smtp_enable_ssl_tls"`
+	SMTPEnableTLS bool `db:"smtp_enable_ssl_tls"`
 	// SMTPAuthenticationMethod authentication method smtp server will use
-	SMTPAuthenticationMethod SMTPAuthMethod `json:"authentication_method" db:"smtp_authentication_method"`
+	SMTPAuthenticationMethod SMTPAuthMethod `db:"smtp_authentication_method"`
 
 	// SMTPDomain optional domain for SMTP
-	SMTPDomain string `json:"domain,omitempty" db:"smtp_domain"`
+	SMTPDomain string `db:"smtp_domain"`
 	// SMTPVerifySSLCerts defaults to true but can be turned off if self signed
 	// SSL certs are used by the SMTP server
-	SMTPVerifySSLCerts bool `json:"verify_ssl_certs" db:"smtp_verify_ssl_certs"`
+	SMTPVerifySSLCerts bool `db:"smtp_verify_ssl_certs"`
 	// SMTPEnableStartTLS detects of TLS is enabled on mail server and starts to use it (default true)
-	SMTPEnableStartTLS bool `json:"enable_start_tls" db:"smtp_enable_start_tls"`
+	SMTPEnableStartTLS bool `db:"smtp_enable_start_tls"`
 	// SMTPDisabled if user sets this to TRUE emails will not be sent from the application
-	SMTPDisabled bool `json:"email_disabled" db:"smtp_disabled"`
-	// SMTPLastError contains error information  if email test fails
+	SMTPDisabled bool `db:"smtp_disabled"`
+	// SMTPLastError contains error information if email test fails, it's not persisted
 	SMTPLastError string
 }
 
@@ -126,14 +126,12 @@ type AppConfigPayload struct {
 	SMTPSettings   *SMTPSettings   `json:"smtp_settings,omitempty"`
 	// SMTPTest is a flag that if set will cause the server to test email configuration
 	SMTPTest *bool `json:"smtp_test,omitempty"`
-	// SMTPTestError if present gives reason smtp test failed
-	SMTPTestError string `json:smtp_test_error,omitempty`
 }
 
 // OrgInfo contains general info about the organization using Kolide.
 type OrgInfo struct {
-	OrgName    *string `json:"org_name,omitempty" db:"org_name"`
-	OrgLogoURL *string `json:"org_logo_url,omitempty" db:"org_logo_url"`
+	OrgName    *string `json:"org_name,omitempty"`
+	OrgLogoURL *string `json:"org_logo_url,omitempty"`
 }
 
 // ServerSettings contains general settings about the kolide App.

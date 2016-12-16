@@ -14,6 +14,8 @@ type appConfigResponse struct {
 	ServerSettings *kolide.ServerSettings `json:"server_settings,omitempty"`
 	SMTPSettings   *kolide.SMTPSettings   `json:"smtp_settings,omitempty"`
 	Err            error                  `json:"error,omitempty"`
+	// SMTPTestError if present gives reason smtp test failed
+	SMTPTestError string `json:"smtp_test_error,omitempty"`
 }
 
 func (r appConfigResponse) error() error { return r.Err }
@@ -62,7 +64,8 @@ func makeModifyAppConfigRequest(svc kolide.Service) endpoint.Endpoint {
 			ServerSettings: &kolide.ServerSettings{
 				KolideServerURL: &config.KolideServerURL,
 			},
-			SMTPSettings: smtpSettingsFromAppConfig(config),
+			SMTPSettings:  smtpSettingsFromAppConfig(config),
+			SMTPTestError: config.SMTPLastError,
 		}
 		return response, nil
 	}
