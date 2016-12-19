@@ -17,7 +17,7 @@ func Up_20161118212604(tx *sql.Tx) error {
 			"`id` INT UNSIGNED NOT NULL AUTO_INCREMENT," +
 			"`name` VARCHAR(255) NOT NULL," +
 			"`type` INT UNSIGNED NOT NULL," +
-			"`mutable` TINYINT(1) NOT NULL DEFAULT FALSE," +
+			"`required_for_kolide` TINYINT(1) NOT NULL DEFAULT FALSE," +
 			"PRIMARY KEY (`id`)," +
 			"UNIQUE KEY `idx_option_unique_name` (`name`)" +
 			") ENGINE=InnoDB DEFAULT CHARSET=utf8;",
