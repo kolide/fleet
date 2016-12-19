@@ -46,9 +46,9 @@ class FormField extends Component {
     const { renderLabel, renderHint } = this;
     const { children, className, type } = this.props;
 
-    const formFieldClass = classnames(baseClass, className, {
+    const formFieldClass = classnames(baseClass, {
       [`${baseClass}--${type}`]: type,
-    });
+    }, className);
 
     return (
       <div className={formFieldClass}>

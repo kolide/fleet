@@ -4,6 +4,7 @@ import Button from 'components/buttons/Button';
 import Dropdown from 'components/forms/fields/Dropdown';
 import dropdownOptionInterface from 'interfaces/dropdownOption';
 import Form from 'components/forms/Form';
+import Icon from 'components/Icon';
 import formFieldInterface from 'interfaces/form_field';
 import InputField from 'components/forms/fields/InputField';
 import validate from 'components/forms/packs/PackQueryConfigForm/validate';
@@ -12,9 +13,10 @@ const baseClass = 'pack-query-config-form';
 const fieldNames = ['query_id', 'interval', 'platform', 'min_osquery_version', 'logging_type'];
 const platformOptions = [
   { label: 'All', value: 'all' },
-  { label: 'Windows', value: 'windows' },
-  { label: 'Linux', value: 'linux' },
-  { label: 'Darwin', value: 'darwin' },
+  { label: <Icon name="windows" />, value: 'windows' },
+  { label: <Icon name="centos" />, value: 'centos' },
+  { label: <Icon name="ubuntu" />, value: 'ubuntu' },
+  { label: <Icon name="apple" />, value: 'darwin' },
 ];
 const loggingTypeOptions = [
   { label: 'Differential', value: 'differential' },
@@ -55,36 +57,36 @@ class PackQueryConfigForm extends Component {
             {...fields.query_id}
             options={queryOptions}
             placeholder="Select Query"
-            wrapperClassName={`${baseClass}__form-field`}
+            wrapperClassName={`${baseClass}__form-field ${baseClass}__form-field--select-query`}
           />
           <InputField
             {...fields.interval}
-            inputWrapperClass={`${baseClass}__form-field`}
+            inputWrapperClass={`${baseClass}__form-field ${baseClass}__form-field--interval`}
             placeholder="Interval (seconds)"
           />
           <Dropdown
             {...fields.platform}
             options={platformOptions}
             placeholder="Platform"
-            wrapperClassName={`${baseClass}__form-field`}
+            wrapperClassName={`${baseClass}__form-field ${baseClass}__form-field--platform`}
           />
           <Dropdown
             {...fields.logging_type}
             options={loggingTypeOptions}
             placeholder="Logging type"
-            wrapperClassName={`${baseClass}__form-field`}
+            wrapperClassName={`${baseClass}__form-field ${baseClass}__form-field--logging`}
           />
           <div className={`${baseClass}__btn-wrapper`}>
             <Button
               className={`${baseClass}__cancel-btn`}
               onClick={onCancel}
-              text="cancel"
+              text={<Icon name="offline" />}
               variant="unstyled"
             />
             <Button
               className={`${baseClass}__submit-btn`}
               onClick={handleSubmit}
-              text="add to pack"
+              text={<Icon name="add-button" />}
               type="submit"
               variant="unstyled"
             />

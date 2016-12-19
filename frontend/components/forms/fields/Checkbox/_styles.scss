@@ -1,6 +1,8 @@
 .kolide-checkbox {
   @include clearfix;
+  @include size(20px);
   position: relative;
+  display: block;
 
   &__input {
     visibility: hidden;

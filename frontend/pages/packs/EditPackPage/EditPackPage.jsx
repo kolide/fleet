@@ -1,10 +1,10 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { noop, size } from 'lodash';
+import { noop, size, find } from 'lodash';
 
 import EditPackFormWrapper from 'components/packs/EditPackFormWrapper';
 import packActions from 'redux/nodes/entities/packs/actions';
-import PackInfoSidePanel from 'components/side_panels/PackInfoSidePanel';
+import ScheduleQuerySidePanel from 'components/side_panels/ScheduleQuerySidePanel';
 import packInterface from 'interfaces/pack';
 import queryActions from 'redux/nodes/entities/queries/actions';
 import queryInterface from 'interfaces/query';
@@ -34,7 +34,9 @@ export class EditPackPage extends Component {
   constructor (props) {
     super(props);
 
-    this.state = { selectedTargetsCount: 0 };
+    this.state = {
+      selectedTargetsCount: 0,
+    };
   }
 
   componentDidMount () {
@@ -106,14 +108,23 @@ export class EditPackPage extends Component {
     return false;
   }
 
+  onSelectQuery = (query) => {
+    const { allQueries } = this.props;
+    const selectedQuery = find(allQueries, { id: Number(query) });
+    this.setState({ selectedQuery });
+
+    return false;
+  }
+
   render () {
     const {
       handlePackFormSubmit,
       handleRemoveScheduledQueries,
       handleScheduledQueryFormSubmit,
       onFetchTargets,
+      onSelectQuery,
     } = this;
-    const { selectedTargetsCount } = this.state;
+    const { selectedTargetsCount, selectedQuery } = this.state;
     const { allQueries, isLoadingScheduledQueries, pack, scheduledQueries } = this.props;
 
     if (!pack || isLoadingScheduledQueries) {
@@ -137,7 +148,11 @@ export class EditPackPage extends Component {
             scheduledQueries={scheduledQueries}
           />
         </div>
-        <PackInfoSidePanel />
+        <ScheduleQuerySidePanel
+          allQueries={allQueries}
+          onSelectQuery={onSelectQuery}
+          selectedQuery={selectedQuery}
+        />
       </div>
     );
   }
