@@ -1,7 +1,7 @@
 .dropdown {
   &__label {
     display: block;
-    font-size: $base;
+    font-size: 16px;
     font-weight: $light;
     color: $text-dark;
     margin-bottom: $pad-xsmall;
@@ -47,6 +47,18 @@
     }
   }
 
+  &.has-value {
+    > .Select-control,
+    &.is-pseudo-focused > .Select-control {
+      .Select-value {
+        .Select-value-label {
+          color: $text-dark;
+          font-size: 16px;
+        }
+      }
+    }
+  }
+
   &.is-open {
     .Select-control {
       box-shadow: inset 0 0 8px 0 rgba(0, 0, 0, 0.08);
@@ -85,6 +97,14 @@
 
   .Select-icon {
     color: $accent-medium;
+  }
+
+  .Select-placeholder {
+    color: $accent-text;
+    font-size: 16px;
+    line-height: 40px;
+    padding: 0 12px;
+    box-sizing: border-box;
   }
 
   &.Select--multi {
