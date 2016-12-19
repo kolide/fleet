@@ -12,6 +12,7 @@ const baseClass = 'target-select';
 
 class SelectTargetsDropdown extends Component {
   static propTypes = {
+    disabled: PropTypes.bool,
     error: PropTypes.string,
     label: PropTypes.string,
     labelClassName: PropTypes.string,
@@ -23,6 +24,7 @@ class SelectTargetsDropdown extends Component {
   };
 
   static defaultProps = {
+    disabled: false,
     onFetchTargets: noop,
   };
 
@@ -155,7 +157,7 @@ class SelectTargetsDropdown extends Component {
       onTargetSelectMoreInfo,
       renderLabel,
     } = this;
-    const { onSelect, selectedTargets } = this.props;
+    const { disabled, onSelect, selectedTargets } = this.props;
     const menuRenderer = Menu(onTargetSelectMoreInfo, moreInfoTarget, onBackToResults);
 
     const inputClasses = classnames({
@@ -168,6 +170,7 @@ class SelectTargetsDropdown extends Component {
         {renderLabel()}
         <Input
           className={inputClasses}
+          disabled={disabled}
           isLoading={isLoadingTargets}
           menuRenderer={menuRenderer}
           onClose={onInputClose}
