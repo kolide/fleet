@@ -65,8 +65,6 @@ class QueriesListItem extends Component {
         <td><Icon name={platformIconClass(platform)} /></td>
         <td>{version}</td>
         <td>{loggingTypeString()}</td>
-        <td />
-        <td>{updatedTimeAgo}</td>
       </tr>
     );
   }

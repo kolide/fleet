@@ -6,6 +6,7 @@ import Icon from 'components/Icon';
 import PackQueryConfigForm from 'components/forms/packs/PackQueryConfigForm';
 import queryInterface from 'interfaces/query';
 import QueriesListItem from 'components/queries/QueriesList/QueriesListItem';
+import Checkbox from 'components/forms/fields/Checkbox';
 
 const baseClass = 'queries-list';
 
@@ -24,7 +25,10 @@ class QueriesList extends Component {
   constructor (props) {
     super(props);
 
-    this.state = { queryDropdownOptions: [] };
+    this.state = {
+      queryDropdownOptions: [],
+      allQueriesSelected: false,
+    };
   }
 
   componentWillMount () {
@@ -75,7 +79,7 @@ class QueriesList extends Component {
 
     return (
       <tr>
-        <td colSpan={8}>
+        <td colSpan={6}>
           <PackQueryConfigForm
             handleSubmit={handleSubmit}
             onCancel={onHidePackForm}
@@ -84,6 +88,14 @@ class QueriesList extends Component {
         </td>
       </tr>
     );
+  }
+
+  handleSelectAllQueries = () => {
+    const { allQueriesSelected } = this.state;
+
+    this.setState({
+      allQueriesSelected: !allQueriesSelected,
+    })
   }
 
   renderHelpText = () => {
@@ -96,7 +108,7 @@ class QueriesList extends Component {
     if (isScheduledQueriesAvailable) {
       return (
         <tr>
-          <td colSpan={8}>
+          <td colSpan={6}>
             <p>No queries matched your search criteria.</p>
           </td>
         </tr>
@@ -105,13 +117,18 @@ class QueriesList extends Component {
 
     return (
       <tr>
-        <td colSpan={8}>
-          <h1>First let&apos;s <span>add a query</span></h1>
-          <h2>Then we&apos;ll add the following:</h2>
-          <p><b>interval:</b> the amount of time the query waits before running</p>
-          <p><b>minimum <Icon name="osquery" /> version:</b> the minimum required <b>osqueryd</b> version installed on a host</p>
-          <p><b><Icon name="plus-minus" /> differential:</b> show only what&apos; different from last run</p>
-          <p><b><Icon name="camera" /> snapshot:</b> show everything in its current state</p>
+        <td colSpan={6}>
+          <div className={`${baseClass}__first-query`}>
+            <h1>First let's <span>add a query</span>.</h1>
+            <h2>Then we'll set the following:</h2>
+            <p><strong>interval:</strong> the amount of time the query waits before running</p>
+            <p><strong>minimum <Icon name="osquery" /> version:</strong> the minimum required <strong>osqueryd</strong> version installed on a host</p>
+            <p><strong>logging type:</strong></p>
+            <ul>
+              <li><strong><Icon name="plus-minus" /> differential:</strong> show only what's different from last run</li>
+              <li><strong><Icon name="camera" /> snapshot:</strong> show everything in its current state</li>
+            </ul>
+          </div>
         </td>
       </tr>
     );
@@ -119,7 +136,8 @@ class QueriesList extends Component {
 
   render () {
     const { onSelectQuery, scheduledQueries, selectedScheduledQueryIDs, shouldShowPackForm } = this.props;
-    const { renderHelpText, renderPackQueryConfigForm } = this;
+    const { allQueriesSelected } = this.state;
+    const { renderHelpText, renderPackQueryConfigForm, handleSelectAllQueries } = this;
 
     const wrapperClassName = classnames(`${baseClass}__table`, {
       [`${baseClass}__table--query-selected`]: size(selectedScheduledQueryIDs),
@@ -130,14 +148,16 @@ class QueriesList extends Component {
         <table className={wrapperClassName}>
           <thead>
             <tr>
-              <td />
-              <td>Query Name</td>
-              <td>Interval</td>
-              <td>Platform</td>
-              <td>Version</td>
-              <td>Logging Type</td>
-              <td>Author</td>
-              <td>Last Modified</td>
+              <th><Checkbox
+                name="select-all-queries"
+                onChange={handleSelectAllQueries}
+                value={allQueriesSelected}
+              /></th>
+              <th>Query Name</th>
+              <th>Interval [s]</th>
+              <th>Platform</th>
+              <th><Icon name="osquery" /> Ver.</th>
+              <th>Log</th>
             </tr>
           </thead>
           <tbody>
