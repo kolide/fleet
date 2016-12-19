@@ -2,8 +2,8 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { noop, size } from 'lodash';
 
+import EditPackFormWrapper from 'components/packs/EditPackFormWrapper';
 import packActions from 'redux/nodes/entities/packs/actions';
-import PackForm from 'components/forms/packs/PackForm';
 import PackInfoSidePanel from 'components/side_panels/PackInfoSidePanel';
 import packInterface from 'interfaces/pack';
 import queryActions from 'redux/nodes/entities/queries/actions';
@@ -123,10 +123,10 @@ export class EditPackPage extends Component {
     return (
       <div className={`${baseClass} has-sidebar`}>
         <div className="body-wrap body-wrap--unstyled">
-          <PackForm
+          <EditPackFormWrapper
             className={`${baseClass}__pack-form body-wrap`}
             handleSubmit={handlePackFormSubmit}
-            formData={pack}
+            pack={pack}
             onFetchTargets={onFetchTargets}
             selectedTargetsCount={selectedTargetsCount}
           />
