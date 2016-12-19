@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { noop } from 'lodash';
 import { push } from 'react-router-redux';
 
+import Kolide from 'kolide';
 import packActions from 'redux/nodes/entities/packs/actions';
 import PackForm from 'components/forms/packs/PackForm';
 import PackInfoSidePanel from 'components/side_panels/PackInfoSidePanel';
@@ -36,14 +37,32 @@ export class PackComposerPage extends Component {
 
   handleSubmit = (formData) => {
     const { dispatch } = this.props;
-    const { create } = packActions;
+    const { create, load } = packActions;
 
     return dispatch(create(formData))
       .then((pack) => {
         const { id: packID } = pack;
+        const { targets } = formData;
 
-        dispatch(push(`/packs/${packID}`));
-        dispatch(renderFlash('success', 'Pack created!'));
+        const promises = targets.map((target) => {
+          const { id: targetID } = target;
+
+          if (target.target_type === 'labels') {
+            Kolide.addLabelToPack(packID, targetID);
+          }
+
+          // TODO: Add host to pack when API is available
+          return Promise.resolve();
+        });
+
+        Promise.all(promises)
+          .then(() => {
+            dispatch(load(packID))
+              .then(() => {
+                dispatch(push(`/packs/${packID}`));
+                dispatch(renderFlash('success', 'Pack created!'));
+              });
+          });
 
         return false;
       });

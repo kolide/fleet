@@ -4,6 +4,12 @@ import endpoints from 'kolide/endpoints';
 import helpers from 'kolide/helpers';
 
 class Kolide extends Base {
+  addLabelToPack = (packID, labelID) => {
+    const path = `/v1/kolide/packs/${packID}/labels/${labelID}`;
+
+    return this.authenticatedPost(this.endpoint(path));
+  }
+
   addQueryToPack = ({ packID, queryID }) => {
     const endpoint = `/v1/kolide/packs/${packID}/queries/${queryID}`;
 
