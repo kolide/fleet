@@ -11,22 +11,45 @@ func init() {
 }
 
 func Up_20161118212604(tx *sql.Tx) error {
+
 	_, err := tx.Exec(
 		"CREATE TABLE `options` (" +
+			"`id` INT UNSIGNED NOT NULL AUTO_INCREMENT," +
+			"`name` VARCHAR(255) NOT NULL," +
+			"`type` INT UNSIGNED NOT NULL," +
+			"`mutable` TINYINT(1) NOT NULL DEFAULT FALSE," +
+			"PRIMARY KEY (`id`)," +
+			"UNIQUE KEY `idx_option_unique_name` (`name`)" +
+			") ENGINE=InnoDB DEFAULT CHARSET=utf8;",
+	)
+
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.Exec(
+		"CREATE TABLE `option_values` (" +
 			"`id` int(10) unsigned NOT NULL AUTO_INCREMENT," +
 			"`created_at` timestamp DEFAULT CURRENT_TIMESTAMP," +
 			"`updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP," +
-			"`key` varchar(255) NOT NULL," +
+			"`option_id` INT UNSIGNED NULL," +
 			"`value` varchar(255) NOT NULL," +
-			"`platform` varchar(255) DEFAULT NULL," +
 			"PRIMARY KEY (`id`)," +
-			"UNIQUE KEY `idx_option_unique_key` (`key`)" +
+			"CONSTRAINT FOREIGN KEY `idx_options_fkey` (`option_id`) " +
+			"REFERENCES options(id) " +
 			") ENGINE=InnoDB DEFAULT CHARSET=utf8;",
 	)
+
 	return err
 }
 
 func Down_20161118212604(tx *sql.Tx) error {
-	_, err := tx.Exec("DROP TABLE IF EXISTS `options`;")
+	_, err := tx.Exec("DROP TABLE IF EXISTS `option_values`;")
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.Exec("DROP TABLE IF EXISTS `options`;")
+
 	return err
 }
