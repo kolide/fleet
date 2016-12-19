@@ -67,35 +67,14 @@ class QueriesList extends Component {
     return includes(selectedScheduledQueryIDs, scheduledQuery.id);
   }
 
-  renderPackQueryConfigForm = () => {
-    const { onHidePackForm, shouldShowPackForm } = this.props;
-    const { queryDropdownOptions } = this.state;
-
-    if (!shouldShowPackForm) {
-      return false;
-    }
-
-    const { handleSubmit } = this;
-
-    return (
-      <tr>
-        <td colSpan={6}>
-          <PackQueryConfigForm
-            handleSubmit={handleSubmit}
-            onCancel={onHidePackForm}
-            queryOptions={queryDropdownOptions}
-          />
-        </td>
-      </tr>
-    );
-  }
-
   handleSelectAllQueries = () => {
     const { allQueriesSelected } = this.state;
 
     this.setState({
       allQueriesSelected: !allQueriesSelected,
-    })
+    });
+
+    return false;
   }
 
   renderHelpText = () => {
@@ -119,16 +98,39 @@ class QueriesList extends Component {
       <tr>
         <td colSpan={6}>
           <div className={`${baseClass}__first-query`}>
-            <h1>First let's <span>add a query</span>.</h1>
-            <h2>Then we'll set the following:</h2>
+            <h1>First let&apos;s <span>add a query</span>.</h1>
+            <h2>Then we&apos;ll set the following:</h2>
             <p><strong>interval:</strong> the amount of time the query waits before running</p>
             <p><strong>minimum <Icon name="osquery" /> version:</strong> the minimum required <strong>osqueryd</strong> version installed on a host</p>
             <p><strong>logging type:</strong></p>
             <ul>
-              <li><strong><Icon name="plus-minus" /> differential:</strong> show only what's different from last run</li>
+              <li><strong><Icon name="plus-minus" /> differential:</strong> show only what&apos;s different from last run</li>
               <li><strong><Icon name="camera" /> snapshot:</strong> show everything in its current state</li>
             </ul>
           </div>
+        </td>
+      </tr>
+    );
+  }
+
+  renderPackQueryConfigForm = () => {
+    const { onHidePackForm, shouldShowPackForm } = this.props;
+    const { queryDropdownOptions } = this.state;
+
+    if (!shouldShowPackForm) {
+      return false;
+    }
+
+    const { handleSubmit } = this;
+
+    return (
+      <tr>
+        <td colSpan={6}>
+          <PackQueryConfigForm
+            handleSubmit={handleSubmit}
+            onCancel={onHidePackForm}
+            queryOptions={queryDropdownOptions}
+          />
         </td>
       </tr>
     );

@@ -12,15 +12,11 @@ class EditPackFormWrapper extends Component {
     className: PropTypes.string,
     handleSubmit: PropTypes.func,
     isEdit: PropTypes.bool.isRequired,
+    onEditPack: PropTypes.func.isRequired,
     onFetchTargets: PropTypes.func,
     pack: packInterface.isRequired,
     selectedTargetsCount: PropTypes.number,
   };
-
-  constructor (props) {
-    super(props);
-
-  }
 
   render () {
     const { className, handleSubmit, isEdit, onFetchTargets, onEditPack, pack, selectedTargetsCount } = this.props;

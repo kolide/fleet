@@ -1,5 +1,4 @@
 import React, { Component, PropTypes } from 'react';
-import classnames from 'classnames';
 import AceEditor from 'react-ace';
 import { isEqual } from 'lodash';
 
@@ -13,6 +12,10 @@ class SearchPackQuery extends Component {
     allQueries: PropTypes.arrayOf(queryInterface),
     onSelectQuery: PropTypes.func,
     selectedQuery: queryInterface,
+  };
+
+  static defaultProps = {
+    allQueries: [],
   };
 
   constructor (props) {
@@ -99,7 +102,7 @@ class SearchPackQuery extends Component {
 
   render () {
     const { renderHeader, renderQuery, renderDescription } = this;
-    const { onSelectQuery, selectedQuery } = this.props;
+    const { onSelectQuery } = this.props;
     const { queryDropdownOptions } = this.state;
 
     return (

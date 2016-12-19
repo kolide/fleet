@@ -21,6 +21,7 @@ export class EditPackPage extends Component {
   static propTypes = {
     allQueries: PropTypes.arrayOf(queryInterface),
     dispatch: PropTypes.func,
+    isEdit: PropTypes.bool,
     isLoadingPack: PropTypes.bool,
     isLoadingScheduledQueries: PropTypes.bool,
     pack: packInterface,
@@ -68,6 +69,24 @@ export class EditPackPage extends Component {
     return false;
   }
 
+  onSelectQuery = (query) => {
+    const { allQueries } = this.props;
+    const selectedQuery = find(allQueries, { id: Number(query) });
+    this.setState({ selectedQuery });
+
+    return false;
+  }
+
+  onToggleEdit = () => {
+    const { dispatch, isEdit, packID } = this.props;
+
+    if (isEdit) {
+      return dispatch(push(`/packs/${packID}`));
+    }
+
+    return dispatch(push(`/packs/${packID}/edit`));
+  }
+
   handlePackFormSubmit = (formData) => {
     const { dispatch } = this.props;
     const { update } = packActions;
@@ -107,24 +126,6 @@ export class EditPackPage extends Component {
       });
 
     return false;
-  }
-
-  onSelectQuery = (query) => {
-    const { allQueries } = this.props;
-    const selectedQuery = find(allQueries, { id: Number(query) });
-    this.setState({ selectedQuery });
-
-    return false;
-  }
-
-  onToggleEdit = () => {
-    const { dispatch, isEdit, packID } = this.props;
-
-    if (isEdit) {
-      return dispatch(push(`/packs/${packID}`));
-    }
-
-    return dispatch(push(`/packs/${packID}/edit`));
   }
 
   render () {

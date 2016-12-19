@@ -129,12 +129,7 @@ class SelectTargetsDropdown extends Component {
   }
 
   renderLabel = () => {
-    const { error, label, labelClassName, name, targetsCount } = this.props;
-    const labelWrapperClasses = classnames(
-      `${baseClass}__label`,
-      labelClassName,
-      { [`${baseClass}__label--error`]: error }
-    );
+    const { error, label, targetsCount } = this.props;
 
     if (!label) {
       return false;
