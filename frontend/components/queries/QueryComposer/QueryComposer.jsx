@@ -81,7 +81,6 @@ class QueryComposer extends Component {
       onTargetSelect,
       queryType,
       selectedTargets,
-      targetsCount,
     } = this.props;
 
     if (queryType === 'label') {

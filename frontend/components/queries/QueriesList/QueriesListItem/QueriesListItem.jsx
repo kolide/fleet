@@ -1,5 +1,4 @@
 import React, { Component, PropTypes } from 'react';
-import moment from 'moment';
 
 import Checkbox from 'components/forms/fields/Checkbox';
 import Icon from 'components/Icon';
@@ -46,9 +45,8 @@ class QueriesListItem extends Component {
   render () {
     const { checked, disabled, scheduledQuery } = this.props;
     const { onCheck } = this;
-    const { id, name, interval, platform, updated_at: updatedAt, version } = scheduledQuery;
+    const { id, name, interval, platform, version } = scheduledQuery;
     const { loggingTypeString } = this;
-    const updatedTimeAgo = moment(updatedAt).fromNow();
 
     return (
       <tr>

@@ -1,6 +1,5 @@
 import React, { PropTypes } from 'react';
 
-import Icon from 'components/Icon';
 import queryInterface from 'interfaces/query';
 import SearchPackQuery from './SearchPackQuery';
 import SecondarySidePanelContainer from '../SecondarySidePanelContainer';

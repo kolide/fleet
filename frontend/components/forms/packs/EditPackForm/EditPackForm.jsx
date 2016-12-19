@@ -2,15 +2,16 @@ import React, { Component, PropTypes } from 'react';
 
 import Button from 'components/buttons/Button';
 import Form from 'components/forms/Form';
+import formFieldInterface from 'interfaces/form_field';
 import InputField from 'components/forms/fields/InputField';
-import packInterface from 'interfaces/pack';
 
 const fieldNames = ['description', 'name'];
 
 class EditPackForm extends Component {
   static propTypes = {
     className: PropTypes.string,
-    formData: packInterface,
+    fields: PropTypes.arrayOf(formFieldInterface).isRequired,
+    handleSubmit: PropTypes.func.isRequired,
   };
 
   render () {

@@ -5,19 +5,19 @@ import { connectedComponent, reduxMockStore } from 'test/helpers';
 import { packStub } from 'test/stubs';
 import EditPackPage from './EditPackPage';
 
-describe.only('EditPackPage - component', () => {
+describe('EditPackPage - component', () => {
   const store = {
     entities: {
       packs: {
         data: {
-          [packStub.id]: packStub
-        }
+          [packStub.id]: packStub,
+        },
       },
       scheduled_queries: {},
     },
   };
   const page = mount(connectedComponent(EditPackPage, {
-    props: { params: { id: String(packStub.id) } },
+    props: { params: { id: String(packStub.id) }, route: {} },
     mockStore: reduxMockStore(store),
   }));
 

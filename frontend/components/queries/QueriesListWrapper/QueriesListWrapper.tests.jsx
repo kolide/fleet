@@ -38,7 +38,7 @@ describe('QueriesListWrapper - component', () => {
       />
     );
 
-    component.find('Checkbox').first().find('input').simulate('change');
+    component.find('Checkbox').last().find('input').simulate('change');
 
     const addQueryBtn = component.find('Button').findWhere(b => b.prop('text') === 'Add New Query');
     const removeQueryBtn = component.find('Button').findWhere(b => b.prop('text') === 'Remove Query');
@@ -57,7 +57,7 @@ describe('QueriesListWrapper - component', () => {
       />
     );
 
-    component.find('Checkbox').first().find('input').simulate('change');
+    component.find('Checkbox').last().find('input').simulate('change');
 
     const removeQueryBtn = component.find('Button').findWhere(b => b.prop('text') === 'Remove Query');
 
