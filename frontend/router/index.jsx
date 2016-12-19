@@ -48,7 +48,10 @@ const routes = (
             <Route path="packs" component={PackPageWrapper}>
               <Route path="all" component={AllPacksPage} />
               <Route path="new" component={PackComposerPage} />
-              <Route path=":id" component={EditPackPage} />
+              <Route path=":id">
+                <IndexRoute component={EditPackPage} />
+                <Route path="edit" component={EditPackPage} />
+              </Route>
             </Route>
             <Route path="hosts">
               <Route path="new" component={NewHostPage} />

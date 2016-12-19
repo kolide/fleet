@@ -1,36 +1,31 @@
 import React, { Component, PropTypes } from 'react';
+import { noop } from 'lodash';
 
 import Button from 'components/buttons/Button';
 import EditPackForm from 'components/forms/packs/EditPackForm';
+import Icon from 'components/Icon';
 import packInterface from 'interfaces/pack';
+import SelectTargetsDropdown from 'components/forms/fields/SelectTargetsDropdown';
 
 class EditPackFormWrapper extends Component {
   static propTypes = {
     className: PropTypes.string,
     handleSubmit: PropTypes.func,
+    isEdit: PropTypes.bool.isRequired,
+    onFetchTargets: PropTypes.func,
     pack: packInterface.isRequired,
+    selectedTargetsCount: PropTypes.number,
   };
 
   constructor (props) {
     super(props);
 
-    this.state = { isEditing: false };
-  }
-
-  onEditPack = (evt) => {
-    evt.preventDefault();
-
-    this.setState({ isEditing: true });
-
-    return false;
   }
 
   render () {
-    const { isEditing } = this.state;
-    const { onEditPack } = this;
-    const { className, handleSubmit, pack } = this.props;
+    const { className, handleSubmit, isEdit, onFetchTargets, onEditPack, pack, selectedTargetsCount } = this.props;
 
-    if (isEditing) {
+    if (isEdit) {
       return (
         <EditPackForm
           className={className}
@@ -47,6 +42,16 @@ class EditPackFormWrapper extends Component {
           text="EDIT"
           type="button"
           variant="brand"
+        />
+        <h1><Icon name="packs" /> {pack.name}</h1>
+        <p>{pack.description}</p>
+        <SelectTargetsDropdown
+          label="select pack targets"
+          name="selected-pack-targets"
+          onFetchTargets={onFetchTargets}
+          onSelect={noop}
+          selectedTargetsCount={selectedTargetsCount}
+          disabled
         />
       </div>
     );

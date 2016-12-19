@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { noop, size, find } from 'lodash';
+import { push } from 'react-router-redux';
 
 import EditPackFormWrapper from 'components/packs/EditPackFormWrapper';
 import packActions from 'redux/nodes/entities/packs/actions';
@@ -116,6 +117,16 @@ export class EditPackPage extends Component {
     return false;
   }
 
+  onToggleEdit = () => {
+    const { dispatch, isEdit, packID } = this.props;
+
+    if (isEdit) {
+      return dispatch(push(`/packs/${packID}`));
+    }
+
+    return dispatch(push(`/packs/${packID}/edit`));
+  }
+
   render () {
     const {
       handlePackFormSubmit,
@@ -123,9 +134,10 @@ export class EditPackPage extends Component {
       handleScheduledQueryFormSubmit,
       onFetchTargets,
       onSelectQuery,
+      onToggleEdit,
     } = this;
     const { selectedTargetsCount, selectedQuery } = this.state;
-    const { allQueries, isLoadingScheduledQueries, pack, scheduledQueries } = this.props;
+    const { allQueries, isEdit, isLoadingScheduledQueries, pack, scheduledQueries } = this.props;
 
     if (!pack || isLoadingScheduledQueries) {
       return false;
@@ -137,8 +149,10 @@ export class EditPackPage extends Component {
           <EditPackFormWrapper
             className={`${baseClass}__pack-form body-wrap`}
             handleSubmit={handlePackFormSubmit}
-            pack={pack}
+            isEdit={isEdit}
+            onEditPack={onToggleEdit}
             onFetchTargets={onFetchTargets}
+            pack={pack}
             selectedTargetsCount={selectedTargetsCount}
           />
           <QueriesListWrapper
@@ -158,17 +172,19 @@ export class EditPackPage extends Component {
   }
 }
 
-const mapStateToProps = (state, ownProps) => {
+const mapStateToProps = (state, { params, route }) => {
   const entityGetter = stateEntityGetter(state);
   const isLoadingPack = state.entities.packs.loading;
-  const { id: packID } = ownProps.params;
+  const { id: packID } = params;
   const pack = entityGetter.get('packs').findBy({ id: packID });
   const { entities: allQueries } = entityGetter.get('queries');
   const scheduledQueries = entityGetter.get('scheduled_queries').where({ pack_id: packID });
   const isLoadingScheduledQueries = state.entities.scheduled_queries.loading;
+  const isEdit = route.path === 'edit';
 
   return {
     allQueries,
+    isEdit,
     isLoadingPack,
     isLoadingScheduledQueries,
     pack,
