@@ -1,41 +1,47 @@
 import React, { Component, PropTypes } from 'react';
 
+import Icon from 'components/Icon';
 import Button from 'components/buttons/Button';
 import Dropdown from 'components/forms/fields/Dropdown';
-import dropdownOptionInterface from 'interfaces/dropdownOption';
 import Form from 'components/forms/Form';
-import Icon from 'components/Icon';
 import formFieldInterface from 'interfaces/form_field';
 import InputField from 'components/forms/fields/InputField';
-import validate from 'components/forms/packs/PackQueryConfigForm/validate';
+import validate from 'components/forms/ConfigurePackQueryForm/validate';
 
-const baseClass = 'pack-query-config-form';
+const baseClass = 'configure-pack-query-form';
 const fieldNames = ['query_id', 'interval', 'platform', 'min_osquery_version', 'logging_type'];
 const platformOptions = [
   { label: 'All', value: 'all' },
-  { label: <Icon name="windows" />, value: 'windows' },
-  { label: <Icon name="centos" />, value: 'centos' },
-  { label: <Icon name="ubuntu" />, value: 'ubuntu' },
-  { label: <Icon name="apple" />, value: 'darwin' },
+  { label: 'Windows', value: 'windows' },
+  { label: 'Linux', value: 'linux' },
+  { label: 'macOS', value: 'darwin' },
 ];
 const loggingTypeOptions = [
   { label: 'Differential', value: 'differential' },
   { label: 'Differential (Ignore Removals)', value: 'differential_ignore_removals' },
   { label: 'Snapshot', value: 'snapshot' },
 ];
+const minOsqueryVersionOptions = [
+  { label: 'All', value: 'all' },
+  { label: '1.8.1 +', value: '1.8.1' },
+  { label: '1.8.2 +', value: '1.8.2' },
+  { label: '2.0.0 +', value: '2.0.0' },
+  { label: '2.1.1 +', value: '2.1.1' },
+  { label: '2.1.2 +', value: '2.1.2' },
+  { label: '2.2.0 +', value: '2.2.0' },
+  { label: '2.2.1 +', value: '2.2.1' },
+];
 
-class PackQueryConfigForm extends Component {
+class ConfigurePackQueryForm extends Component {
   static propTypes = {
     fields: PropTypes.shape({
       interval: formFieldInterface.isRequired,
       logging_type: formFieldInterface.isRequired,
       min_osquery_version: formFieldInterface.isRequired,
       platform: formFieldInterface.isRequired,
-      query_id: formFieldInterface.isRequired,
     }).isRequired,
     handleSubmit: PropTypes.func,
     onCancel: PropTypes.func,
-    queryOptions: PropTypes.arrayOf(dropdownOptionInterface),
   };
 
   onCancel = (evt) => {
@@ -47,48 +53,54 @@ class PackQueryConfigForm extends Component {
   }
 
   render () {
-    const { fields, handleSubmit, queryOptions } = this.props;
+    const { fields, handleSubmit } = this.props;
     const { onCancel } = this;
 
     return (
-      <form className={`${baseClass}__wrapper`}>
-        <div className={`${baseClass}__body-section`}>
-          <Dropdown
-            {...fields.query_id}
-            options={queryOptions}
-            placeholder="Select Query"
-            wrapperClassName={`${baseClass}__form-field ${baseClass}__form-field--select-query`}
-          />
+      <form className={baseClass} onSubmit={handleSubmit}>
+        <h2 className={`${baseClass}__title`}>configuration</h2>
+        <div className={`${baseClass}__fields`}>
           <InputField
             {...fields.interval}
             inputWrapperClass={`${baseClass}__form-field ${baseClass}__form-field--interval`}
-            placeholder="Interval (seconds)"
+            placeholder="- - -"
+            label="Interval"
+            hint="Seconds"
+            type="number"
           />
           <Dropdown
             {...fields.platform}
             options={platformOptions}
-            placeholder="Platform"
+            placeholder="- - -"
+            label="Platform"
             wrapperClassName={`${baseClass}__form-field ${baseClass}__form-field--platform`}
+          />
+          <Dropdown
+            {...fields.min_osquery_version}
+            options={minOsqueryVersionOptions}
+            placeholder="- - -"
+            label={[<Icon name="osquery" key="min-osquery-vers" />, ' ver.']}
+            wrapperClassName={`${baseClass}__form-field ${baseClass}__form-field--osquer-vers`}
           />
           <Dropdown
             {...fields.logging_type}
             options={loggingTypeOptions}
-            placeholder="Logging type"
+            placeholder="- - -"
+            label="Logging"
             wrapperClassName={`${baseClass}__form-field ${baseClass}__form-field--logging`}
           />
           <div className={`${baseClass}__btn-wrapper`}>
             <Button
               className={`${baseClass}__cancel-btn`}
               onClick={onCancel}
-              text={<Icon name="offline" />}
-              variant="unstyled"
+              text="Cancel"
+              variant="inverse"
             />
             <Button
               className={`${baseClass}__submit-btn`}
-              onClick={handleSubmit}
-              text={<Icon name="add-button" />}
+              text="Save"
               type="submit"
-              variant="unstyled"
+              variant="brand"
             />
           </div>
         </div>
@@ -97,7 +109,7 @@ class PackQueryConfigForm extends Component {
   }
 }
 
-export default Form(PackQueryConfigForm, {
+export default Form(ConfigurePackQueryForm, {
   fields: fieldNames,
   validate,
 });

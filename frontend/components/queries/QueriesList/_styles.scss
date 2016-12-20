@@ -24,6 +24,10 @@
         color: $link;
         padding: 15px 10px;
 
+        .form-field {
+          margin: 0;
+        }
+
         &:nth-child(1) {
           border-top-left-radius: 3px;
           width: 20px;
@@ -39,19 +43,77 @@
 
         &:nth-child(4) {
           width: 18%;
+          text-align: center;
         }
 
         &:nth-child(5) {
           width: 18%;
+          text-align: center;
         }
 
         &:last-child {
           border-top-right-radius: 3px;
+          text-align: center;
         }
       }
+    }
 
-      .form-field {
+    tbody {
+      td {
+        padding: 0 10px;
         margin: 0;
+        border-bottom: 1px solid $accent-light;
+
+        .form-field {
+          margin: 0;
+        }
+
+        &:nth-child(1) {
+          text-align: center;
+          vertical-align: middle;
+        }
+
+        &:nth-child(2) {
+          font-size: 14px;
+          font-weight: $bold;
+          line-height: 2.71;
+          letter-spacing: -0.5px;
+          text-align: left;
+          color: $text-ultradark;
+        }
+
+        &:nth-child(3) {
+          font-size: 14px;
+          font-weight: $normal;
+          line-height: 2.71;
+          letter-spacing: -0.5px;
+          color: $text-ultradark;
+        }
+
+        &:nth-child(4) {
+          color: $text-light;
+          text-align: center;
+          font-size: 14px;
+
+          .kolidecon {
+            font-size: 18px;
+          }
+        }
+
+        &:nth-child(5) {
+          font-size: 14px;
+          font-weight: $normal;
+          line-height: 2.71;
+          letter-spacing: -0.5px;
+          text-align: center;
+          color: $text-ultradark;
+        }
+
+        &:nth-child(6) {
+          text-align: center;
+          font-size: 18px;
+          color: $text-ultradark;
+        }
       }
     }
   }

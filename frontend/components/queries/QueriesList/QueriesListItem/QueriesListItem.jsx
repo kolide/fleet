@@ -32,14 +32,14 @@ class QueriesListItem extends Component {
     const { scheduledQuery: { snapshot, removed } } = this.props;
 
     if (snapshot) {
-      return 'snapshot';
+      return 'camera';
     }
 
     if (removed) {
-      return 'differential (ignore removes)';
+      return 'bold-plus';
     }
 
-    return 'differential';
+    return 'plus-minus';
   }
 
   render () {
@@ -62,7 +62,7 @@ class QueriesListItem extends Component {
         <td>{interval}</td>
         <td><Icon name={platformIconClass(platform)} /></td>
         <td>{version}</td>
-        <td>{loggingTypeString()}</td>
+        <td><Icon name={loggingTypeString()} /></td>
       </tr>
     );
   }

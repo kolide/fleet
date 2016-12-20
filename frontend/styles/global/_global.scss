@@ -54,12 +54,8 @@ h3 {
   margin-top: $pad-base;
   margin-right: $pad-base;
 
-  &--unstyled {
-    background-color: transparent;
-    border: none;
-    border-radius: 0;
-    box-shadow: none;
-    margin: 0;
+  @at-root .has-sidebar & {
+    margin-right: 0;
   }
 }
 
@@ -67,10 +63,12 @@ h3 {
   @include display(flex);
   height: 100%;
 
-  .body-wrap {
-    @include flex-grow(1);
-    @include align-self(flex-start);
-    margin-right: 0;
+  > div {
+    &:first-child {
+      @include flex-grow(1);
+      @include align-self(flex-start);
+      margin-right: 0;
+    }
   }
 }
 
@@ -86,5 +84,15 @@ button {
   &:-webkit-autofill {
     -webkit-box-shadow: 0 0 0 1000px #fff inset;
     -webkit-text-fill-color: $text-dark !important;
+  }
+}
+
+input {
+  &[type=number] {
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
   }
 }

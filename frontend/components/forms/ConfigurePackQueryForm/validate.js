@@ -18,11 +18,11 @@ const validate = (formData) => {
   }
 
   if (!formData.platform) {
-    errors.query_id = 'A platform must be selected';
+    errors.platform = 'A platform must be selected';
   }
 
   if (!formData.logging_type) {
-    errors.query_id = 'A Logging Type must be selected';
+    errors.logging_type = 'A Logging Type must be selected';
   }
 
   const valid = !size(errors);

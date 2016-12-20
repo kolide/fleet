@@ -117,7 +117,7 @@ export class EditPackPage extends Component {
       });
   }
 
-  handleScheduledQueryFormSubmit = (formData) => {
+  handleConfigurePackQuerySubmit = (formData) => {
     const { create } = scheduledQueryActions;
     const { dispatch, packID } = this.props;
     const scheduledQueryData = {
@@ -139,6 +139,7 @@ export class EditPackPage extends Component {
 
   render () {
     const {
+      handleConfigurePackQuerySubmit,
       handlePackFormSubmit,
       handleRemoveScheduledQueries,
       handleScheduledQueryFormSubmit,
@@ -156,7 +157,7 @@ export class EditPackPage extends Component {
 
     return (
       <div className={`${baseClass} has-sidebar`}>
-        <div className="body-wrap body-wrap--unstyled">
+        <div className={`${baseClass}__content`}>
           <EditPackFormWrapper
             className={`${baseClass}__pack-form body-wrap`}
             handleSubmit={handlePackFormSubmit}
@@ -168,13 +169,13 @@ export class EditPackPage extends Component {
             selectedTargetsCount={selectedTargetsCount}
           />
           <QueriesListWrapper
-            allQueries={allQueries}
             onRemoveScheduledQueries={handleRemoveScheduledQueries}
             onScheduledQueryFormSubmit={handleScheduledQueryFormSubmit}
             scheduledQueries={scheduledQueries}
           />
         </div>
         <ScheduleQuerySidePanel
+          onConfigurePackQuerySubmit={handleConfigurePackQuerySubmit}
           allQueries={allQueries}
           onSelectQuery={onSelectQuery}
           selectedQuery={selectedQuery}
@@ -206,4 +207,3 @@ const mapStateToProps = (state, { params, route }) => {
 };
 
 export default connect(mapStateToProps)(EditPackPage);
-

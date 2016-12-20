@@ -15,21 +15,6 @@ const scheduledQueries = [
 describe('QueriesListWrapper - component', () => {
   afterEach(restoreSpies);
 
-  it('renders the "Add Query" button by default', () => {
-    const component = mount(
-      <QueriesListWrapper
-        allQueries={allQueries}
-        scheduledQueries={scheduledQueries}
-      />
-    );
-
-    const addQueryBtn = component.find('Button').findWhere(b => b.prop('text') === 'Add New Query');
-    const removeQueryBtn = component.find('Button').findWhere(b => b.prop('text') === 'Remove Query');
-
-    expect(addQueryBtn.length).toEqual(1);
-    expect(removeQueryBtn.length).toEqual(0);
-  });
-
   it('renders the "Remove Query" button when queries have been selected', () => {
     const component = mount(
       <QueriesListWrapper
@@ -64,20 +49,6 @@ describe('QueriesListWrapper - component', () => {
     removeQueryBtn.simulate('click');
 
     expect(spy).toHaveBeenCalledWith([scheduledQueryStub.id]);
-  });
-
-  it('renders the PackQueryConfigForm when "Add Query" is clicked', () => {
-    const component = mount(
-      <QueriesListWrapper
-        allQueries={allQueries}
-        scheduledQueries={scheduledQueries}
-      />
-    );
-
-    const addQueryBtn = component.find('Button').first();
-
-    addQueryBtn.simulate('click');
-    expect(component.find('PackQueryConfigForm').length).toEqual(1);
   });
 
   it('filters queries', () => {
