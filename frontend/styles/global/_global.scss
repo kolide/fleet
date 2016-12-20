@@ -63,7 +63,7 @@ h3 {
   @include display(flex);
   height: 100%;
 
-  > div {
+  > * {
     &:first-child {
       @include flex-grow(1);
       @include align-self(flex-start);
