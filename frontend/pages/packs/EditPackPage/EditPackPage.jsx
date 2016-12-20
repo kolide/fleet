@@ -36,7 +36,7 @@ export class EditPackPage extends Component {
     super(props);
 
     this.state = {
-      selectedTargetsCount: 0,
+      targetsCount: 0,
     };
   }
 
@@ -71,9 +71,9 @@ export class EditPackPage extends Component {
   }
 
   onFetchTargets = (query, targetsResponse) => {
-    const { targets_count: selectedTargetsCount } = targetsResponse;
+    const { targets_count: targetsCount } = targetsResponse;
 
-    this.setState({ selectedTargetsCount });
+    this.setState({ targetsCount });
 
     return false;
   }
@@ -148,7 +148,7 @@ export class EditPackPage extends Component {
       onSelectQuery,
       onToggleEdit,
     } = this;
-    const { selectedTargetsCount, selectedQuery } = this.state;
+    const { targetsCount, selectedQuery } = this.state;
     const { allQueries, isEdit, isLoadingScheduledQueries, pack, scheduledQueries } = this.props;
 
     if (!pack || isLoadingScheduledQueries) {
@@ -166,7 +166,7 @@ export class EditPackPage extends Component {
             onEditPack={onToggleEdit}
             onFetchTargets={onFetchTargets}
             pack={pack}
-            selectedTargetsCount={selectedTargetsCount}
+            targetsCount={targetsCount}
           />
           <QueriesListWrapper
             onRemoveScheduledQueries={handleRemoveScheduledQueries}

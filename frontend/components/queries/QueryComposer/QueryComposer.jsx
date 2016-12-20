@@ -81,6 +81,7 @@ class QueryComposer extends Component {
       onTargetSelect,
       queryType,
       selectedTargets,
+      targetsCount,
     } = this.props;
 
     if (queryType === 'label') {
@@ -94,6 +95,7 @@ class QueryComposer extends Component {
           onFetchTargets={onFetchTargets}
           onSelect={onTargetSelect}
           selectedTargets={selectedTargets}
+          targetsCount={targetsCount}
           label="Select Targets"
         />
       </div>

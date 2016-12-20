@@ -16,7 +16,7 @@ class EditPackFormWrapper extends Component {
     onEditPack: PropTypes.func.isRequired,
     onFetchTargets: PropTypes.func,
     pack: packInterface.isRequired,
-    selectedTargetsCount: PropTypes.number,
+    targetsCount: PropTypes.number,
   };
 
   render () {
@@ -28,7 +28,7 @@ class EditPackFormWrapper extends Component {
       onEditPack,
       onFetchTargets,
       pack,
-      selectedTargetsCount,
+      targetsCount,
     } = this.props;
 
     if (isEdit) {
@@ -57,7 +57,7 @@ class EditPackFormWrapper extends Component {
           name="selected-pack-targets"
           onFetchTargets={onFetchTargets}
           onSelect={noop}
-          selectedTargetsCount={selectedTargetsCount}
+          targetsCount={targetsCount}
           disabled
         />
       </div>
