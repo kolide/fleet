@@ -21,7 +21,6 @@ import { renderFlash } from 'redux/nodes/notifications/actions';
 import Rocker from 'components/buttons/Rocker';
 import { selectOsqueryTable } from 'redux/nodes/components/QueryPages/actions';
 import { setDisplay } from 'redux/nodes/components/ManageHostsPage/actions';
-import { showRightSidePanel, removeRightSidePanel } from 'redux/nodes/app/actions';
 import validateQuery from 'components/forms/validators/validate_query';
 import iconClassForLabel from 'utilities/icon_class_for_label';
 
@@ -58,8 +57,6 @@ export class ManageHostsPage extends Component {
       labels,
     } = this.props;
 
-    dispatch(showRightSidePanel);
-
     if (!hosts.length) {
       dispatch(hostActions.loadAll());
     }
@@ -69,12 +66,6 @@ export class ManageHostsPage extends Component {
     }
 
     return false;
-  }
-
-  componentWillUnmount () {
-    const { dispatch } = this.props;
-
-    dispatch(removeRightSidePanel);
   }
 
   onCancelAddLabel = () => {
@@ -156,11 +147,10 @@ export class ManageHostsPage extends Component {
     return false;
   }
 
-  onToggleDisplay = () => {
-    const { dispatch, display } = this.props;
-    const newDisplay = display === 'Grid' ? 'List' : 'Grid';
+  onToggleDisplay = (val) => {
+    const { dispatch } = this.props;
 
-    dispatch(setDisplay(newDisplay));
+    dispatch(setDisplay(val));
 
     return false;
   }
@@ -175,10 +165,10 @@ export class ManageHostsPage extends Component {
     const { count, description, display_text: displayText, query } = selectedLabel;
     const { onToggleDisplay } = this;
     const buttonOptions = {
-      aIcon: 'grid-select',
-      aText: 'Grid',
-      bIcon: 'list-select',
-      bText: 'List',
+      rightIcon: 'grid-select',
+      rightText: 'Grid',
+      leftIcon: 'list-select',
+      leftText: 'List',
     };
 
     return (
@@ -214,8 +204,7 @@ export class ManageHostsPage extends Component {
         <div className={`${baseClass}__topper`}>
           <p className={`${baseClass}__host-count`}>{count} Hosts Total</p>
           <Rocker
-            handleChange={onToggleDisplay}
-            name="host-display-toggle"
+            onChange={onToggleDisplay}
             options={buttonOptions}
             value={display}
           />

@@ -8,7 +8,6 @@ import (
 	"github.com/kolide/kolide-ose/server/config"
 	"github.com/kolide/kolide-ose/server/contexts/viewer"
 	"github.com/kolide/kolide-ose/server/datastore/inmem"
-	kolide_errors "github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
 
 	"github.com/WatchBeam/clock"
@@ -159,7 +158,7 @@ func TestCreateUser(t *testing.T) {
 			NeedsPasswordReset: boolPtr(true),
 			Admin:              boolPtr(false),
 			InviteToken:        &invites["admin2@example.com"].Token,
-			wantErr:            kolide_errors.ErrNotFound,
+			wantErr:            errors.New("Invite was not found in the datastore"),
 		},
 		{
 			Username:           stringPtr("admin3"),
@@ -192,7 +191,9 @@ func TestCreateUser(t *testing.T) {
 				AdminForcedPasswordReset: tt.NeedsPasswordReset,
 			}
 			user, err := svc.NewUser(ctx, payload)
-			require.Equal(t, tt.wantErr, err)
+			if tt.wantErr != nil {
+				require.Equal(t, tt.wantErr.Error(), err.Error())
+			}
 			if err != nil {
 				// skip rest of the test if error is not nil
 				return
@@ -276,11 +277,11 @@ func TestChangePassword(t *testing.T) {
 		},
 		{ // missing old password
 			newPassword: "123cat!",
-			wantErr:     &invalidArgumentError{invalidArgument{name: "old_password", reason: "cannot be empty field"}},
+			wantErr:     &invalidArgumentError{invalidArgument{name: "old_password", reason: "cannot be empty"}},
 		},
 		{ // missing new password
 			oldPassword: "abcd",
-			wantErr:     &invalidArgumentError{invalidArgument{name: "new_password", reason: "cannot be empty field"}},
+			wantErr:     &invalidArgumentError{invalidArgument{name: "new_password", reason: "cannot be empty"}},
 		},
 	}
 
@@ -323,7 +324,7 @@ func TestResetPassword(t *testing.T) {
 		{ // bad token
 			token:       "dcbaz",
 			newPassword: "123cat!",
-			wantErr:     kolide_errors.ErrNotFound,
+			wantErr:     errors.New("PasswordResetRequest was not found in the datastore"),
 		},
 		{ // missing token
 			newPassword: "123cat!",
@@ -355,7 +356,11 @@ func TestResetPassword(t *testing.T) {
 			assert.Nil(t, err)
 
 			serr := svc.ResetPassword(ctx, tt.token, tt.newPassword)
-			assert.Equal(t, tt.wantErr, pkg_errors.Cause(serr))
+			if tt.wantErr != nil {
+				assert.Equal(t, tt.wantErr.Error(), pkg_errors.Cause(serr).Error())
+			} else {
+				assert.Nil(t, serr)
+			}
 		})
 	}
 }

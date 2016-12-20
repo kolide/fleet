@@ -6,84 +6,83 @@ import (
 	"strings"
 	"time"
 
-	kolide_errors "github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"github.com/patrickmn/sortutil"
 )
 
-func (orm *Datastore) NewHost(host *kolide.Host) (*kolide.Host, error) {
-	orm.mtx.Lock()
-	defer orm.mtx.Unlock()
+func (d *Datastore) NewHost(host *kolide.Host) (*kolide.Host, error) {
+	d.mtx.Lock()
+	defer d.mtx.Unlock()
 
-	for _, h := range orm.hosts {
+	for _, h := range d.hosts {
 		if host.NodeKey == h.NodeKey || host.UUID == h.UUID {
-			return nil, kolide_errors.ErrExists
+			return nil, alreadyExists("Host", host.ID)
 		}
 	}
 
-	host.ID = orm.nextID(host)
-	orm.hosts[host.ID] = host
+	host.ID = d.nextID(host)
+	d.hosts[host.ID] = host
 
 	return host, nil
 }
 
-func (orm *Datastore) SaveHost(host *kolide.Host) error {
-	orm.mtx.Lock()
-	defer orm.mtx.Unlock()
+func (d *Datastore) SaveHost(host *kolide.Host) error {
+	d.mtx.Lock()
+	defer d.mtx.Unlock()
 
-	if _, ok := orm.hosts[host.ID]; !ok {
-		return kolide_errors.ErrNotFound
+	if _, ok := d.hosts[host.ID]; !ok {
+		return notFound("Host").WithID(host.ID)
 	}
 
 	for _, nic := range host.NetworkInterfaces {
 		if nic.ID == 0 {
-			nic.ID = orm.nextID(nic)
+			nic.ID = d.nextID(nic)
 		}
 		nic.HostID = host.ID
 	}
 	host.ResetPrimaryNetwork()
-	orm.hosts[host.ID] = host
+	d.hosts[host.ID] = host
 	return nil
 }
 
-func (orm *Datastore) DeleteHost(host *kolide.Host) error {
-	orm.mtx.Lock()
-	defer orm.mtx.Unlock()
+func (d *Datastore) DeleteHost(host *kolide.Host) error {
+	d.mtx.Lock()
+	defer d.mtx.Unlock()
 
-	if _, ok := orm.hosts[host.ID]; !ok {
-		return kolide_errors.ErrNotFound
+	if _, ok := d.hosts[host.ID]; !ok {
+		return notFound("Host").WithID(host.ID)
 	}
 
-	delete(orm.hosts, host.ID)
+	delete(d.hosts, host.ID)
 	return nil
 }
 
-func (orm *Datastore) Host(id uint) (*kolide.Host, error) {
-	orm.mtx.Lock()
-	defer orm.mtx.Unlock()
+func (d *Datastore) Host(id uint) (*kolide.Host, error) {
+	d.mtx.Lock()
+	defer d.mtx.Unlock()
 
-	host, ok := orm.hosts[id]
+	host, ok := d.hosts[id]
 	if !ok {
-		return nil, kolide_errors.ErrNotFound
+		return nil, notFound("Host").WithID(id)
 	}
 
 	return host, nil
 }
 
-func (orm *Datastore) ListHosts(opt kolide.ListOptions) ([]*kolide.Host, error) {
-	orm.mtx.Lock()
-	defer orm.mtx.Unlock()
+func (d *Datastore) ListHosts(opt kolide.ListOptions) ([]*kolide.Host, error) {
+	d.mtx.Lock()
+	defer d.mtx.Unlock()
 
 	// We need to sort by keys to provide reliable ordering
 	keys := []int{}
-	for k, _ := range orm.hosts {
+	for k, _ := range d.hosts {
 		keys = append(keys, int(k))
 	}
 	sort.Ints(keys)
 
 	hosts := []*kolide.Host{}
 	for _, k := range keys {
-		hosts = append(hosts, orm.hosts[uint(k)])
+		hosts = append(hosts, d.hosts[uint(k)])
 	}
 
 	// Apply ordering
@@ -109,15 +108,15 @@ func (orm *Datastore) ListHosts(opt kolide.ListOptions) ([]*kolide.Host, error) 
 	}
 
 	// Apply limit/offset
-	low, high := orm.getLimitOffsetSliceBounds(opt, len(hosts))
+	low, high := d.getLimitOffsetSliceBounds(opt, len(hosts))
 	hosts = hosts[low:high]
 
 	return hosts, nil
 }
 
-func (orm *Datastore) EnrollHost(osQueryHostID string, nodeKeySize int) (*kolide.Host, error) {
-	orm.mtx.Lock()
-	defer orm.mtx.Unlock()
+func (d *Datastore) EnrollHost(osQueryHostID string, nodeKeySize int) (*kolide.Host, error) {
+	d.mtx.Lock()
+	defer d.mtx.Unlock()
 
 	if osQueryHostID == "" {
 		return nil, errors.New("missing host identifier from osquery for host enrollment")
@@ -137,7 +136,7 @@ func (orm *Datastore) EnrollHost(osQueryHostID string, nodeKeySize int) (*kolide
 	host.CreatedAt = time.Now().UTC()
 	host.UpdatedAt = host.CreatedAt
 
-	for _, h := range orm.hosts {
+	for _, h := range d.hosts {
 		if h.OsqueryHostID == osQueryHostID {
 			host = *h
 			break
@@ -145,33 +144,33 @@ func (orm *Datastore) EnrollHost(osQueryHostID string, nodeKeySize int) (*kolide
 	}
 
 	if host.ID == 0 {
-		host.ID = orm.nextID(host)
+		host.ID = d.nextID(host)
 	}
-	orm.hosts[host.ID] = &host
+	d.hosts[host.ID] = &host
 
 	return &host, nil
 }
 
-func (orm *Datastore) AuthenticateHost(nodeKey string) (*kolide.Host, error) {
-	orm.mtx.Lock()
-	defer orm.mtx.Unlock()
+func (d *Datastore) AuthenticateHost(nodeKey string) (*kolide.Host, error) {
+	d.mtx.Lock()
+	defer d.mtx.Unlock()
 
-	for _, host := range orm.hosts {
+	for _, host := range d.hosts {
 		if host.NodeKey == nodeKey {
 			return host, nil
 		}
 	}
 
-	return nil, kolide_errors.ErrNotFound
+	return nil, notFound("AuthenticateHost")
 }
 
-func (orm *Datastore) MarkHostSeen(host *kolide.Host, t time.Time) error {
-	orm.mtx.Lock()
-	defer orm.mtx.Unlock()
+func (d *Datastore) MarkHostSeen(host *kolide.Host, t time.Time) error {
+	d.mtx.Lock()
+	defer d.mtx.Unlock()
 
 	host.UpdatedAt = t
 
-	for _, h := range orm.hosts {
+	for _, h := range d.hosts {
 		if h.ID == host.ID {
 			h.UpdatedAt = t
 			break
@@ -180,7 +179,7 @@ func (orm *Datastore) MarkHostSeen(host *kolide.Host, t time.Time) error {
 	return nil
 }
 
-func (orm *Datastore) SearchHosts(query string, omit ...uint) ([]*kolide.Host, error) {
+func (d *Datastore) SearchHosts(query string, omit ...uint) ([]*kolide.Host, error) {
 	omitLookup := map[uint]bool{}
 	for _, o := range omit {
 		omitLookup[o] = true
@@ -188,10 +187,10 @@ func (orm *Datastore) SearchHosts(query string, omit ...uint) ([]*kolide.Host, e
 
 	var results []*kolide.Host
 
-	orm.mtx.Lock()
-	defer orm.mtx.Unlock()
+	d.mtx.Lock()
+	defer d.mtx.Unlock()
 
-	for _, h := range orm.hosts {
+	for _, h := range d.hosts {
 		if len(results) == 10 {
 			break
 		}
@@ -214,10 +213,10 @@ func (orm *Datastore) SearchHosts(query string, omit ...uint) ([]*kolide.Host, e
 	return results, nil
 }
 
-func (orm *Datastore) DistributedQueriesForHost(host *kolide.Host) (map[uint]string, error) {
+func (d *Datastore) DistributedQueriesForHost(host *kolide.Host) (map[uint]string, error) {
 	// lookup of executions for this host
 	hostExecutions := map[uint]kolide.DistributedQueryExecutionStatus{}
-	for _, e := range orm.distributedQueryExecutions {
+	for _, e := range d.distributedQueryExecutions {
 		if e.HostID == host.ID {
 			hostExecutions[e.DistributedQueryCampaignID] = e.Status
 		}
@@ -225,7 +224,7 @@ func (orm *Datastore) DistributedQueriesForHost(host *kolide.Host) (map[uint]str
 
 	// lookup of labels for this host (only including matching labels)
 	hostLabels := map[uint]bool{}
-	labels, err := orm.ListLabelsForHost(host.ID)
+	labels, err := d.ListLabelsForHost(host.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -234,16 +233,16 @@ func (orm *Datastore) DistributedQueriesForHost(host *kolide.Host) (map[uint]str
 	}
 
 	queries := map[uint]string{} // map campaign ID -> query string
-	for _, campaign := range orm.distributedQueryCampaigns {
+	for _, campaign := range d.distributedQueryCampaigns {
 		if campaign.Status != kolide.QueryRunning {
 			continue
 		}
-		for _, target := range orm.distributedQueryCampaignTargets {
+		for _, target := range d.distributedQueryCampaignTargets {
 			if campaign.ID == target.DistributedQueryCampaignID &&
 				((target.Type == kolide.TargetHost && target.TargetID == host.ID) ||
 					(target.Type == kolide.TargetLabel && hostLabels[target.TargetID])) &&
 				(hostExecutions[campaign.ID] == kolide.ExecutionWaiting) {
-				queries[campaign.ID] = orm.queries[campaign.QueryID].Query
+				queries[campaign.ID] = d.queries[campaign.QueryID].Query
 			}
 		}
 	}

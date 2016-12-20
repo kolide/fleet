@@ -1,106 +1,108 @@
 package inmem
 
 import (
-	"github.com/kolide/kolide-ose/server/errors"
+	"fmt"
+
 	"github.com/kolide/kolide-ose/server/kolide"
 )
 
-func (orm *Datastore) NewPasswordResetRequest(req *kolide.PasswordResetRequest) (*kolide.PasswordResetRequest, error) {
-	orm.mtx.Lock()
-	defer orm.mtx.Unlock()
+func (d *Datastore) NewPasswordResetRequest(req *kolide.PasswordResetRequest) (*kolide.PasswordResetRequest, error) {
+	d.mtx.Lock()
+	defer d.mtx.Unlock()
 
-	req.ID = orm.nextID(req)
-	orm.passwordResets[req.ID] = req
+	req.ID = d.nextID(req)
+	d.passwordResets[req.ID] = req
 	return req, nil
 }
 
-func (orm *Datastore) SavePasswordResetRequest(req *kolide.PasswordResetRequest) error {
-	orm.mtx.Lock()
-	defer orm.mtx.Unlock()
+func (d *Datastore) SavePasswordResetRequest(req *kolide.PasswordResetRequest) error {
+	d.mtx.Lock()
+	defer d.mtx.Unlock()
 
-	if _, ok := orm.passwordResets[req.ID]; !ok {
-		return errors.ErrNotFound
+	if _, ok := d.passwordResets[req.ID]; !ok {
+		return notFound("PasswordResetRequest").WithID(req.ID)
 	}
 
-	orm.passwordResets[req.ID] = req
+	d.passwordResets[req.ID] = req
 	return nil
 }
 
-func (orm *Datastore) DeletePasswordResetRequest(req *kolide.PasswordResetRequest) error {
-	orm.mtx.Lock()
-	defer orm.mtx.Unlock()
+func (d *Datastore) DeletePasswordResetRequest(req *kolide.PasswordResetRequest) error {
+	d.mtx.Lock()
+	defer d.mtx.Unlock()
 
-	if _, ok := orm.passwordResets[req.ID]; !ok {
-		return errors.ErrNotFound
+	if _, ok := d.passwordResets[req.ID]; !ok {
+		return notFound("PasswordResetRequest").WithID(req.ID)
 	}
 
-	delete(orm.passwordResets, req.ID)
+	delete(d.passwordResets, req.ID)
 	return nil
 }
 
-func (orm *Datastore) DeletePasswordResetRequestsForUser(userID uint) error {
-	orm.mtx.Lock()
-	defer orm.mtx.Unlock()
+func (d *Datastore) DeletePasswordResetRequestsForUser(userID uint) error {
+	d.mtx.Lock()
+	defer d.mtx.Unlock()
 
-	for _, pr := range orm.passwordResets {
+	for _, pr := range d.passwordResets {
 		if pr.UserID == userID {
-			delete(orm.passwordResets, pr.ID)
+			delete(d.passwordResets, pr.ID)
 		}
 	}
 	return nil
 }
 
-func (orm *Datastore) FindPassswordResetByID(id uint) (*kolide.PasswordResetRequest, error) {
-	orm.mtx.Lock()
-	defer orm.mtx.Unlock()
+func (d *Datastore) FindPassswordResetByID(id uint) (*kolide.PasswordResetRequest, error) {
+	d.mtx.Lock()
+	defer d.mtx.Unlock()
 
-	if req, ok := orm.passwordResets[id]; ok {
+	if req, ok := d.passwordResets[id]; ok {
 		return req, nil
 	}
 
-	return nil, errors.ErrNotFound
+	return nil, notFound("PasswordResetRequest").WithID(id)
 }
 
-func (orm *Datastore) FindPassswordResetsByUserID(userID uint) ([]*kolide.PasswordResetRequest, error) {
-	orm.mtx.Lock()
-	defer orm.mtx.Unlock()
+func (d *Datastore) FindPassswordResetsByUserID(userID uint) ([]*kolide.PasswordResetRequest, error) {
+	d.mtx.Lock()
+	defer d.mtx.Unlock()
 	resets := make([]*kolide.PasswordResetRequest, 0)
 
-	for _, pr := range orm.passwordResets {
+	for _, pr := range d.passwordResets {
 		if pr.UserID == userID {
 			resets = append(resets, pr)
 		}
 	}
 
 	if len(resets) == 0 {
-		return nil, errors.ErrNotFound
+		return nil, notFound("PasswordResetRequest").
+			WithMessage(fmt.Sprintf("for user id %d", userID))
 	}
 
 	return resets, nil
 }
 
-func (orm *Datastore) FindPassswordResetByToken(token string) (*kolide.PasswordResetRequest, error) {
-	orm.mtx.Lock()
-	defer orm.mtx.Unlock()
+func (d *Datastore) FindPassswordResetByToken(token string) (*kolide.PasswordResetRequest, error) {
+	d.mtx.Lock()
+	defer d.mtx.Unlock()
 
-	for _, pr := range orm.passwordResets {
+	for _, pr := range d.passwordResets {
 		if pr.Token == token {
 			return pr, nil
 		}
 	}
 
-	return nil, errors.ErrNotFound
+	return nil, notFound("PasswordResetRequest")
 }
 
-func (orm *Datastore) FindPassswordResetByTokenAndUserID(token string, userID uint) (*kolide.PasswordResetRequest, error) {
-	orm.mtx.Lock()
-	defer orm.mtx.Unlock()
+func (d *Datastore) FindPassswordResetByTokenAndUserID(token string, userID uint) (*kolide.PasswordResetRequest, error) {
+	d.mtx.Lock()
+	defer d.mtx.Unlock()
 
-	for _, pr := range orm.passwordResets {
+	for _, pr := range d.passwordResets {
 		if pr.Token == token && pr.UserID == userID {
 			return pr, nil
 		}
 	}
 
-	return nil, errors.ErrNotFound
+	return nil, notFound("PasswordResetRequest")
 }
