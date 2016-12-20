@@ -11,7 +11,6 @@ const baseClass = 'queries-list-wrapper';
 
 class QueriesListWrapper extends Component {
   static propTypes = {
-    allQueries: PropTypes.arrayOf(queryInterface),
     onRemoveScheduledQueries: PropTypes.func,
     onScheduledQueryFormSubmit: PropTypes.func,
     scheduledQueries: PropTypes.arrayOf(queryInterface),
@@ -24,14 +23,7 @@ class QueriesListWrapper extends Component {
       querySearchText: '',
       selectAll: false,
       selectedScheduledQueryIDs: [],
-      shouldShowPackForm: false,
     };
-  }
-
-  onHidePackForm = () => {
-    this.setState({ shouldShowPackForm: false });
-
-    return false;
   }
 
   onRemoveScheduledQueries = (evt) => {
@@ -56,17 +48,6 @@ class QueriesListWrapper extends Component {
     return false;
   }
 
-  onShowPackForm = (evt) => {
-    evt.preventDefault();
-
-    this.setState({
-      selectedScheduledQueryIDs: [],
-      shouldShowPackForm: true,
-    });
-
-    return false;
-  }
-
   onUpdateQuerySearchText = (querySearchText) => {
     this.setState({ querySearchText });
   }
@@ -79,8 +60,8 @@ class QueriesListWrapper extends Component {
   }
 
   renderButton = () => {
-    const { onRemoveScheduledQueries, onShowPackForm } = this;
-    const { selectedScheduledQueryIDs, shouldShowPackForm } = this.state;
+    const { onRemoveScheduledQueries } = this;
+    const { selectedScheduledQueryIDs } = this.state;
 
     const scheduledQueryCount = selectedScheduledQueryIDs.length;
 
@@ -97,15 +78,7 @@ class QueriesListWrapper extends Component {
       );
     }
 
-    return (
-      <Button
-        className={`${baseClass}__query-btn`}
-        disabled={shouldShowPackForm}
-        onClick={onShowPackForm}
-        text="Add New Query"
-        variant="brand"
-      />
-    );
+    return false;
   }
 
   renderQueryCount = () => {
@@ -118,19 +91,17 @@ class QueriesListWrapper extends Component {
 
   renderQueriesList = () => {
     const { getQueries, onHidePackForm, onSelectQuery } = this;
-    const { allQueries, onScheduledQueryFormSubmit, scheduledQueries } = this.props;
-    const { selectedScheduledQueryIDs, shouldShowPackForm } = this.state;
+    const { onScheduledQueryFormSubmit, scheduledQueries } = this.props;
+    const { selectedScheduledQueryIDs } = this.state;
 
     return (
       <div className={`${baseClass}__queries-list-wrapper`}>
         <QueriesList
-          allQueries={allQueries}
           onHidePackForm={onHidePackForm}
           onScheduledQueryFormSubmit={onScheduledQueryFormSubmit}
           onSelectQuery={onSelectQuery}
           scheduledQueries={getQueries()}
           selectedScheduledQueryIDs={selectedScheduledQueryIDs}
-          shouldShowPackForm={shouldShowPackForm}
           isScheduledQueriesAvailable={!!scheduledQueries.length}
         />
       </div>
@@ -144,15 +115,16 @@ class QueriesListWrapper extends Component {
     return (
       <div className={baseClass}>
         {renderQueryCount()}
-        <InputField
-          inputClassName={`${baseClass}__search-queries-input`}
-          inputWrapperClass={`${baseClass}__search-queries`}
-          name="search-queries"
-          onChange={onUpdateQuerySearchText}
-          placeholder="Search Queries"
-          value={querySearchText}
-        />
-        {renderButton()}
+        <div>
+          <InputField
+            inputClassName={`${baseClass}__search-queries-input`}
+            name="search-queries"
+            onChange={onUpdateQuerySearchText}
+            placeholder="Search Queries"
+            value={querySearchText}
+          />
+          {renderButton()}
+        </div>
         {renderQueriesList()}
       </div>
     );

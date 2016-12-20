@@ -1,10 +1,9 @@
 import React, { Component, PropTypes } from 'react';
 import classnames from 'classnames';
-import { includes, isEqual, size } from 'lodash';
+import { includes, size } from 'lodash';
 
-import Icon from 'components/Icon';
-import PackQueryConfigForm from 'components/forms/packs/PackQueryConfigForm';
 import queryInterface from 'interfaces/query';
+import Icon from 'components/Icon';
 import QueriesListItem from 'components/queries/QueriesList/QueriesListItem';
 import Checkbox from 'components/forms/fields/Checkbox';
 
@@ -12,53 +11,18 @@ const baseClass = 'queries-list';
 
 class QueriesList extends Component {
   static propTypes = {
-    allQueries: PropTypes.arrayOf(queryInterface).isRequired,
     isScheduledQueriesAvailable: PropTypes.bool,
-    onHidePackForm: PropTypes.func.isRequired,
-    onScheduledQueryFormSubmit: PropTypes.func,
     onSelectQuery: PropTypes.func.isRequired,
     scheduledQueries: PropTypes.arrayOf(queryInterface).isRequired,
     selectedScheduledQueryIDs: PropTypes.arrayOf(PropTypes.number).isRequired,
-    shouldShowPackForm: PropTypes.bool,
   };
 
   constructor (props) {
     super(props);
 
     this.state = {
-      queryDropdownOptions: [],
       allQueriesSelected: false,
     };
-  }
-
-  componentWillMount () {
-    const { allQueries } = this.props;
-
-    const queryDropdownOptions = allQueries.map((query) => {
-      return { label: query.name, value: String(query.id) };
-    });
-
-    this.setState({ queryDropdownOptions });
-  }
-
-  componentWillReceiveProps (nextProps) {
-    const { allQueries } = nextProps;
-
-    if (!isEqual(allQueries, this.props.allQueries)) {
-      const queryDropdownOptions = allQueries.map((query) => {
-        return { label: query.name, value: String(query.id) };
-      });
-
-      this.setState({ queryDropdownOptions });
-    }
-  }
-
-  handleSubmit = (formData) => {
-    const { onHidePackForm, onScheduledQueryFormSubmit } = this.props;
-
-    onHidePackForm();
-
-    return onScheduledQueryFormSubmit(formData);
   }
 
   isChecked = (scheduledQuery) => {
@@ -113,33 +77,10 @@ class QueriesList extends Component {
     );
   }
 
-  renderPackQueryConfigForm = () => {
-    const { onHidePackForm, shouldShowPackForm } = this.props;
-    const { queryDropdownOptions } = this.state;
-
-    if (!shouldShowPackForm) {
-      return false;
-    }
-
-    const { handleSubmit } = this;
-
-    return (
-      <tr>
-        <td colSpan={6}>
-          <PackQueryConfigForm
-            handleSubmit={handleSubmit}
-            onCancel={onHidePackForm}
-            queryOptions={queryDropdownOptions}
-          />
-        </td>
-      </tr>
-    );
-  }
-
   render () {
-    const { onSelectQuery, scheduledQueries, selectedScheduledQueryIDs, shouldShowPackForm } = this.props;
+    const { onSelectQuery, scheduledQueries, selectedScheduledQueryIDs } = this.props;
     const { allQueriesSelected } = this.state;
-    const { renderHelpText, renderPackQueryConfigForm, handleSelectAllQueries } = this;
+    const { renderHelpText, handleSelectAllQueries } = this;
 
     const wrapperClassName = classnames(`${baseClass}__table`, {
       [`${baseClass}__table--query-selected`]: size(selectedScheduledQueryIDs),
@@ -163,13 +104,11 @@ class QueriesList extends Component {
             </tr>
           </thead>
           <tbody>
-            {renderPackQueryConfigForm()}
             {renderHelpText()}
             {!!scheduledQueries.length && scheduledQueries.map((scheduledQuery) => {
               return (
                 <QueriesListItem
                   checked={this.isChecked(scheduledQuery)}
-                  disabled={shouldShowPackForm}
                   key={`scheduled-query-${scheduledQuery.id}`}
                   onSelect={onSelectQuery}
                   scheduledQuery={scheduledQuery}

@@ -15,8 +15,6 @@ class SelectTargetsDropdown extends Component {
     disabled: PropTypes.bool,
     error: PropTypes.string,
     label: PropTypes.string,
-    labelClassName: PropTypes.string,
-    name: PropTypes.string,
     onFetchTargets: PropTypes.func,
     onSelect: PropTypes.func.isRequired,
     selectedTargets: PropTypes.arrayOf(targetInterface),

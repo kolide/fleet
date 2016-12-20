@@ -13,9 +13,6 @@ class Checkbox extends Component {
     disabled: PropTypes.bool,
     name: PropTypes.string,
     onChange: PropTypes.func,
-    error: PropTypes.string,
-    hint: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
-    label: PropTypes.string,
     value: PropTypes.bool,
   };
 
