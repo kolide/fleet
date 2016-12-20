@@ -32,10 +32,10 @@ func Up_20161118212604(tx *sql.Tx) error {
 			"`id` int(10) unsigned NOT NULL AUTO_INCREMENT," +
 			"`created_at` timestamp DEFAULT CURRENT_TIMESTAMP," +
 			"`updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP," +
-			"`option_id` INT UNSIGNED NULL," +
+			"`option_id` INT UNSIGNED NOT NULL UNIQUE," +
 			"`value` varchar(255) NOT NULL," +
 			"PRIMARY KEY (`id`)," +
-			"CONSTRAINT FOREIGN KEY `idx_options_fkey` (`option_id`) " +
+			"FOREIGN KEY `idx_options_fkey` (`option_id`) " +
 			"REFERENCES options(id) " +
 			") ENGINE=InnoDB DEFAULT CHARSET=utf8;",
 	)
