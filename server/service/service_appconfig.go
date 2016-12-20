@@ -49,6 +49,9 @@ func (svc service) ModifyAppConfig(ctx context.Context, p kolide.AppConfigPayloa
 			// test mail set SMTPConfigured so we know if we can send mail
 			err = svc.mailService.SendEmail(testMail)
 			if err != nil {
+				// if the provided SMTP parameters don't work with the targeted SMTP server
+				// capture the error and return it to the front end so that GUI can
+				// display the problem to the end user to aid in diagnosis
 				newConfig.SMTPLastError = err.Error()
 			}
 			newConfig.SMTPConfigured = (err == nil)
