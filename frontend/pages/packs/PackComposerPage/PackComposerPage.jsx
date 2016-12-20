@@ -8,7 +8,6 @@ import packActions from 'redux/nodes/entities/packs/actions';
 import PackForm from 'components/forms/packs/PackForm';
 import PackInfoSidePanel from 'components/side_panels/PackInfoSidePanel';
 import { renderFlash } from 'redux/nodes/notifications/actions';
-import ShowSidePanel from 'components/side_panels/ShowSidePanel';
 
 const baseClass = 'pack-composer';
 
@@ -86,5 +85,4 @@ export class PackComposerPage extends Component {
   }
 }
 
-const ConnectedComponent = connect()(PackComposerPage);
-export default ShowSidePanel(ConnectedComponent);
+export default connect()(PackComposerPage);

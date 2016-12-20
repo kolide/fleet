@@ -12,7 +12,6 @@ import queryInterface from 'interfaces/query';
 import QueriesListWrapper from 'components/queries/QueriesListWrapper';
 import { renderFlash } from 'redux/nodes/notifications/actions';
 import scheduledQueryActions from 'redux/nodes/entities/scheduled_queries/actions';
-import ShowSidePanel from 'components/side_panels/ShowSidePanel';
 import stateEntityGetter from 'redux/utilities/entityGetter';
 
 const baseClass = 'edit-pack-page';
@@ -194,6 +193,5 @@ const mapStateToProps = (state, { params, route }) => {
   };
 };
 
-const ConnectedComponent = connect(mapStateToProps)(EditPackPage);
-export default ShowSidePanel(ConnectedComponent);
+export default connect(mapStateToProps)(EditPackPage);
 
