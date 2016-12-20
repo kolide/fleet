@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import AceEditor from 'react-ace';
 import { isEqual } from 'lodash';
 
+import Icon from 'components/Icon';
 import queryInterface from 'interfaces/query';
 import Dropdown from 'components/forms/fields/Dropdown';
 
@@ -53,7 +54,7 @@ class SearchPackQuery extends Component {
     if (selectedQuery) {
       return (
         <h1 className={`${baseClass}__title`}>
-          {selectedQuery.name}
+          <Icon name="query" /> {selectedQuery.name}
         </h1>
       );
     }
@@ -111,6 +112,7 @@ class SearchPackQuery extends Component {
         <Dropdown
           options={queryDropdownOptions}
           onChange={onSelectQuery}
+          placeholder={[<Icon name="search" size="lg" key="search-pack-query" />, ' Select Query...']}
         />
         {renderQuery()}
         {renderDescription()}

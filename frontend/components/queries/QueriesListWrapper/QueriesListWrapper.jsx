@@ -113,11 +113,11 @@ class QueriesListWrapper extends Component {
     const { querySearchText } = this.state;
 
     return (
-      <div className={baseClass}>
+      <div className={`${baseClass} body-wrap`}>
         {renderQueryCount()}
-        <div>
+        <div className={`${baseClass}__query-list-action`}>
           <InputField
-            inputClassName={`${baseClass}__search-queries-input`}
+            inputWrapperClass={`${baseClass}__search-queries-input`}
             name="search-queries"
             onChange={onUpdateQuerySearchText}
             placeholder="Search Queries"

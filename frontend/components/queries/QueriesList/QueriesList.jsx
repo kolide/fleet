@@ -27,6 +27,11 @@ class QueriesList extends Component {
 
   isChecked = (scheduledQuery) => {
     const { selectedScheduledQueryIDs } = this.props;
+    const { allQueriesSelected } = this.state;
+
+    if (allQueriesSelected) {
+      return true;
+    }
 
     return includes(selectedScheduledQueryIDs, scheduledQuery.id);
   }
@@ -100,7 +105,7 @@ class QueriesList extends Component {
               <th>Interval [s]</th>
               <th>Platform</th>
               <th><Icon name="osquery" /> Ver.</th>
-              <th>Log</th>
+              <th>Logging</th>
             </tr>
           </thead>
           <tbody>

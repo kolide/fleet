@@ -107,7 +107,7 @@ export class EditPackPage extends Component {
       });
   }
 
-  handleScheduledQueryFormSubmit = (formData) => {
+  handleConfigurePackQuerySubmit = (formData) => {
     const { create } = scheduledQueryActions;
     const { dispatch, packID } = this.props;
     const scheduledQueryData = {
@@ -126,10 +126,6 @@ export class EditPackPage extends Component {
 
     return false;
   }
-
-  handleConfigurePackQuerySubmit = (formData) => {
-    console.log(formData);
-  };
 
   render () {
     const {
@@ -150,7 +146,7 @@ export class EditPackPage extends Component {
 
     return (
       <div className={`${baseClass} has-sidebar`}>
-        <div className="body-wrap body-wrap--unstyled">
+        <div className={`${baseClass}__content`}>
           <EditPackFormWrapper
             className={`${baseClass}__pack-form body-wrap`}
             handleSubmit={handlePackFormSubmit}

@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 
+import Icon from 'components/Icon';
 import Button from 'components/buttons/Button';
 import Dropdown from 'components/forms/fields/Dropdown';
 import Form from 'components/forms/Form';
@@ -19,6 +20,16 @@ const loggingTypeOptions = [
   { label: 'Differential', value: 'differential' },
   { label: 'Differential (Ignore Removals)', value: 'differential_ignore_removals' },
   { label: 'Snapshot', value: 'snapshot' },
+];
+const minOsqueryVersionOptions = [
+  { label: 'All', value: 'all' },
+  { label: '1.8.1 +', value: '1.8.1' },
+  { label: '1.8.2 +', value: '1.8.2' },
+  { label: '2.0.0 +', value: '2.0.0' },
+  { label: '2.1.1 +', value: '2.1.1' },
+  { label: '2.1.2 +', value: '2.1.2' },
+  { label: '2.2.0 +', value: '2.2.0' },
+  { label: '2.2.1 +', value: '2.2.1' },
 ];
 
 class ConfigurePackQueryForm extends Component {
@@ -46,23 +57,36 @@ class ConfigurePackQueryForm extends Component {
     const { onCancel } = this;
 
     return (
-      <form className={`${baseClass}__wrapper`} onSubmit={handleSubmit}>
-        <div className={`${baseClass}__body-section`}>
+      <form className={baseClass} onSubmit={handleSubmit}>
+        <h2 className={`${baseClass}__title`}>configuration</h2>
+        <div className={`${baseClass}__fields`}>
           <InputField
             {...fields.interval}
             inputWrapperClass={`${baseClass}__form-field ${baseClass}__form-field--interval`}
-            placeholder="Interval (seconds)"
+            placeholder="- - -"
+            label="Interval"
+            hint="Seconds"
+            type="number"
           />
           <Dropdown
             {...fields.platform}
             options={platformOptions}
-            placeholder="Platform"
+            placeholder="- - -"
+            label="Platform"
             wrapperClassName={`${baseClass}__form-field ${baseClass}__form-field--platform`}
+          />
+          <Dropdown
+            {...fields.min_osquery_version}
+            options={minOsqueryVersionOptions}
+            placeholder="- - -"
+            label={[<Icon name="osquery" key="min-osquery-vers" />, ' ver.']}
+            wrapperClassName={`${baseClass}__form-field ${baseClass}__form-field--osquer-vers`}
           />
           <Dropdown
             {...fields.logging_type}
             options={loggingTypeOptions}
-            placeholder="Logging type"
+            placeholder="- - -"
+            label="Logging"
             wrapperClassName={`${baseClass}__form-field ${baseClass}__form-field--logging`}
           />
           <div className={`${baseClass}__btn-wrapper`}>
