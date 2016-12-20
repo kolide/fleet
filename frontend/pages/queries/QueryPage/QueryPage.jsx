@@ -63,10 +63,7 @@ class QueryPage extends Component {
   }
 
   componentWillUnmount () {
-    const { dispatch } = this.props;
     const { destroyCampaign, removeSocket } = this;
-
-    dispatch(removeRightSidePanel);
 
     removeSocket();
     destroyCampaign();

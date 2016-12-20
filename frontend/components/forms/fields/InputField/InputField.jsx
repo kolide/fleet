@@ -67,7 +67,7 @@ class InputField extends Component {
       type,
       value,
     } = this.props;
-    const { onInputChange, renderLabel } = this;
+    const { onInputChange } = this;
     const shouldShowPasswordClass = type === 'password';
     const inputClasses = classnames(baseClass, inputClassName, {
       [`${baseClass}--password`]: shouldShowPasswordClass,
