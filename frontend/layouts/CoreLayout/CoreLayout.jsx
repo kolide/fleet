@@ -13,7 +13,6 @@ export class CoreLayout extends Component {
     children: PropTypes.node,
     config: configInterface,
     dispatch: PropTypes.func,
-    notifications: notificationInterface,
     user: userInterface,
   };
 
@@ -25,7 +24,7 @@ export class CoreLayout extends Component {
     return false;
   }
 
-  onRedirectTo = (path) => {
+  onNavItemClick = (path) => {
     return (evt) => {
       evt.preventDefault();
 
@@ -38,11 +37,11 @@ export class CoreLayout extends Component {
   }
 
   render () {
-    const { children, config, notifications, user } = this.props;
+    const { children, config, user } = this.props;
 
     if (!user) return false;
 
-    const { onLogoutUser, onRedirectTo, onRemoveFlash, onUndoActionClick } = this;
+    const { onLogoutUser, onNavItemClick } = this;
     const { pathname } = global.window.location;
 
     return (
@@ -51,22 +50,17 @@ export class CoreLayout extends Component {
           <SiteNavHeader
             config={config}
             onLogoutUser={onLogoutUser}
-            onRedirectTo={onRedirectTo}
+            onNavItemClick={onNavItemClick}
             user={user}
           />
           <SiteNavSidePanel
             config={config}
-            onRedirectTo={onRedirectTo}
+            onNavItemClick={onNavItemClick}
             pathname={pathname}
             user={user}
           />
         </nav>
         <div className="core-wrapper">
-          <FlashMessage
-            notification={notifications}
-            onRemoveFlash={onRemoveFlash}
-            onUndoActionClick={onUndoActionClick}
-          />
           {children}
         </div>
       </div>
@@ -78,12 +72,10 @@ const mapStateToProps = (state) => {
   const {
     app: { config },
     auth: { user },
-    notifications,
   } = state;
 
   return {
     config,
-    notifications,
     user,
   };
 };
