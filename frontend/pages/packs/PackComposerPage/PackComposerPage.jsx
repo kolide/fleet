@@ -34,14 +34,28 @@ export class PackComposerPage extends Component {
     return false;
   }
 
-  handleSubmit = (formData) => {
+  visitPackPage = (packID) => {
     const { dispatch } = this.props;
+
+    dispatch(push(`/packs/${packID}`));
+    dispatch(renderFlash('success', 'Pack created!'));
+
+    return false;
+  }
+
+  handleSubmit = (formData) => {
     const { create, load } = packActions;
+    const { dispatch } = this.props;
+    const { visitPackPage } = this;
 
     return dispatch(create(formData))
       .then((pack) => {
         const { id: packID } = pack;
         const { targets } = formData;
+
+        if (!targets) {
+          return visitPackPage(packID);
+        }
 
         const promises = targets.map((target) => {
           const { id: targetID } = target;
@@ -54,16 +68,13 @@ export class PackComposerPage extends Component {
           return Promise.resolve();
         });
 
-        Promise.all(promises)
+        return Promise.all(promises)
           .then(() => {
             dispatch(load(packID))
               .then(() => {
-                dispatch(push(`/packs/${packID}`));
-                dispatch(renderFlash('success', 'Pack created!'));
+                return visitPackPage(packID);
               });
           });
-
-        return false;
       });
   }
 
