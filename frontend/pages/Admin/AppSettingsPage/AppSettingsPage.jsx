@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { size } from 'lodash';
 
@@ -11,7 +11,6 @@ export const baseClass = 'app-settings';
 class AppSettingsPage extends Component {
   static propTypes = {
     appConfig: configInterface,
-    dispatch: PropTypes.func,
   };
 
   constructor (props) {
