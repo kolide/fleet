@@ -10,12 +10,16 @@ const fieldNames = ['description', 'name'];
 class EditPackForm extends Component {
   static propTypes = {
     className: PropTypes.string,
-    fields: PropTypes.arrayOf(formFieldInterface).isRequired,
+    fields: PropTypes.shape({
+      description: formFieldInterface.isRequired,
+      name: formFieldInterface.isRequired,
+    }).isRequired,
     handleSubmit: PropTypes.func.isRequired,
+    onCancel: PropTypes.func.isRequired,
   };
 
   render () {
-    const { className, fields, handleSubmit } = this.props;
+    const { className, fields, handleSubmit, onCancel } = this.props;
 
     return (
       <form className={className} onSubmit={handleSubmit}>
@@ -24,6 +28,12 @@ class EditPackForm extends Component {
         />
         <InputField
           {...fields.description}
+        />
+        <Button
+          onClick={onCancel}
+          text="CANCEL"
+          type="button"
+          variant="inverse"
         />
         <Button
           text="SAVE"

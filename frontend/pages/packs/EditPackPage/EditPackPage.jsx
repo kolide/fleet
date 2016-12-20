@@ -60,6 +60,16 @@ export class EditPackPage extends Component {
     return false;
   }
 
+  onCancelEditPack = () => {
+    const { dispatch, isEdit, packID } = this.props;
+
+    if (!isEdit) {
+      return false;
+    }
+
+    return dispatch(push(`/packs/${packID}`));
+  }
+
   onFetchTargets = (query, targetsResponse) => {
     const { targets_count: selectedTargetsCount } = targetsResponse;
 
@@ -133,6 +143,7 @@ export class EditPackPage extends Component {
       handlePackFormSubmit,
       handleRemoveScheduledQueries,
       handleScheduledQueryFormSubmit,
+      onCancelEditPack,
       onFetchTargets,
       onSelectQuery,
       onToggleEdit,
@@ -151,6 +162,7 @@ export class EditPackPage extends Component {
             className={`${baseClass}__pack-form body-wrap`}
             handleSubmit={handlePackFormSubmit}
             isEdit={isEdit}
+            onCancelEditPack={onCancelEditPack}
             onEditPack={onToggleEdit}
             onFetchTargets={onFetchTargets}
             pack={pack}

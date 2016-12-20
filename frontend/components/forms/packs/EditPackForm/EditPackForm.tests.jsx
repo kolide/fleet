@@ -14,7 +14,7 @@ describe('EditPackForm - component', () => {
   afterEach(restoreSpies);
 
   describe('form fields', () => {
-    const form = mount(<EditPackForm formData={packStub} handleSubmit={noop} />);
+    const form = mount(<EditPackForm formData={packStub} handleSubmit={noop} onCancel={noop} />);
 
     it('has the correct form fields', () => {
       itBehavesLikeAFormInputElement(form, 'name');
@@ -25,7 +25,7 @@ describe('EditPackForm - component', () => {
   describe('form submission', () => {
     it('submits the forms with the form data', () => {
       const spy = createSpy();
-      const form = mount(<EditPackForm formData={packStub} handleSubmit={spy} />);
+      const form = mount(<EditPackForm formData={packStub} handleSubmit={spy} onCancel={noop} />);
 
       const nameInput = form.find({ name: 'name' }).find('input');
       const descriptionInput = form.find({ name: 'description' }).find('input');
@@ -39,6 +39,16 @@ describe('EditPackForm - component', () => {
         name: 'Updated pack name',
         description: 'Updated pack description',
       });
+    });
+
+    it('calls the onCancel prop when "CANCEL" is clicked', () => {
+      const spy = createSpy();
+      const form = mount(<EditPackForm formData={packStub} handleSubmit={noop} onCancel={spy} />);
+      const cancelBtn = form.find('Button').findWhere(f => f.prop('text') === 'CANCEL');
+
+      cancelBtn.simulate('click');
+
+      expect(spy).toHaveBeenCalled();
     });
   });
 });
