@@ -201,7 +201,7 @@ func (devMailService) SendEmail(e kolide.Email) error {
 // otherwise return the mock devMailService which prints the contents of an email to stdout.
 func createDevMailService(config config.KolideConfig) kolide.MailService {
 	smtp := config.SMTP
-	if smtp.Server != "" &&
+	if smtp.Address != "" &&
 		smtp.Username != "" &&
 		smtp.Password != "" {
 		return mail.NewService(config.SMTP)

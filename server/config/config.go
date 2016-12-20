@@ -52,7 +52,7 @@ type AppConfig struct {
 
 // SMTPConfig defines configs related to SMTP email
 type SMTPConfig struct {
-	Server          string
+	Address         string
 	Username        string
 	Password        string
 	PoolConnections int
@@ -126,7 +126,7 @@ func (man Manager) addConfigs() {
 	man.addConfigInt("app.token_key_size", 24)
 
 	// SMTP
-	man.addConfigString("smtp.server", "0.0.0.0:1025")
+	man.addConfigString("smtp.address", "0.0.0.0:1025")
 	man.addConfigString("smtp.username", "")
 	man.addConfigString("smtp.password", "")
 	man.addConfigInt("smtp.pool_connections", 4)
@@ -180,7 +180,7 @@ func (man Manager) LoadConfig() KolideConfig {
 			InviteTokenValidityPeriod: man.getConfigDuration("app.invite_token_validity_period"),
 		},
 		SMTP: SMTPConfig{
-			Server:          man.getConfigString("smtp.server"),
+			Address:         man.getConfigString("smtp.address"),
 			Username:        man.getConfigString("smtp.username"),
 			Password:        man.getConfigString("smtp.password"),
 			PoolConnections: man.getConfigInt("smtp.pool_connections"),
