@@ -101,7 +101,6 @@ func (d *Datastore) Drop() error {
 	return d.Migrate()
 }
 
-
 func (d *Datastore) Initialize() error {
 	if err := d.createBuiltinLabels(); err != nil {
 		return err
@@ -513,7 +512,7 @@ func (d *Datastore) createDevHosts() error {
 func (d *Datastore) createDevOrgInfo() error {
 	devOrgInfo := &kolide.AppConfig{
 		OrgName:                "Kolide",
-		OrgLogoURL:             fmt.Sprintf("%s/logo.png", orm.config.Server.Address),
+		OrgLogoURL:             fmt.Sprintf("%s/logo.png", d.config.Server.Address),
 		SMTPPort:               587,
 		SMTPAuthenticationType: kolide.AuthTypeUserNamePassword,
 		SMTPEnableTLS:          true,
