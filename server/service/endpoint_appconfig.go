@@ -22,7 +22,7 @@ func (r appConfigResponse) error() error { return r.Err }
 
 func makeGetAppConfigEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		v, ok := viewer.FromContext(ctx)
+		vc, ok := viewer.FromContext(ctx)
 		if !ok {
 			return nil, fmt.Errorf("could not fetch user")
 		}
@@ -32,7 +32,7 @@ func makeGetAppConfigEndpoint(svc kolide.Service) endpoint.Endpoint {
 		}
 		var smtpSettings *kolide.SMTPSettings
 		// only admin can see smtp settings
-		if v.IsAdmin() {
+		if vc.IsAdmin() {
 			smtpSettings = smtpSettingsFromAppConfig(config)
 		}
 		response := appConfigResponse{

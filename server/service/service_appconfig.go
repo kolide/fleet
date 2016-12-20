@@ -1,10 +1,9 @@
 package service
 
 import (
-	"fmt"
+	"reflect"
 
 	"github.com/kolide/kolide-ose/server/contexts/viewer"
-	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"golang.org/x/net/context"
 )
@@ -34,14 +33,14 @@ func (svc service) ModifyAppConfig(ctx context.Context, p kolide.AppConfigPayloa
 	if p.SMTPSettings != nil && !p.SMTPSettings.SMTPDisabled {
 		oldSettings := smtpSettingsFromAppConfig(oldConfig)
 		// anything changed?
-		if *oldSettings != *p.SMTPSettings {
-			v, ok := viewer.FromContext(ctx)
+		if !reflect.DeepEqual(oldSettings, p.SMTPSettings) {
+			vc, ok := viewer.FromContext(ctx)
 			if !ok {
-				return nil, errors.InternalServerError(fmt.Errorf("unable to retrieve viewer from context"))
+				return nil, errNoContext
 			}
 			testMail := kolide.Email{
 				Subject: "Hello from Kolide",
-				To:      []string{v.User.Email},
+				To:      []string{vc.User.Email},
 				Mailer: &kolide.SMTPTestMailer{
 					KolideServerURL: newConfig.KolideServerURL,
 				},
