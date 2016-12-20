@@ -83,7 +83,7 @@ button {
 
   &:-webkit-autofill {
     -webkit-box-shadow: 0 0 0 1000px #fff inset;
-    -webkit-text-fill-color: $text-dark !important;
+    -webkit-text-fill-color: $text-dark !important; //sass-lint:disable-line no-important
   }
 }
 
