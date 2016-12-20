@@ -12,6 +12,7 @@ class EditPackFormWrapper extends Component {
     className: PropTypes.string,
     handleSubmit: PropTypes.func,
     isEdit: PropTypes.bool.isRequired,
+    onCancelEditPack: PropTypes.func.isRequired,
     onEditPack: PropTypes.func.isRequired,
     onFetchTargets: PropTypes.func,
     pack: packInterface.isRequired,
@@ -19,7 +20,16 @@ class EditPackFormWrapper extends Component {
   };
 
   render () {
-    const { className, handleSubmit, isEdit, onFetchTargets, onEditPack, pack, selectedTargetsCount } = this.props;
+    const {
+      className,
+      handleSubmit,
+      isEdit,
+      onCancelEditPack,
+      onEditPack,
+      onFetchTargets,
+      pack,
+      selectedTargetsCount,
+    } = this.props;
 
     if (isEdit) {
       return (
@@ -27,6 +37,7 @@ class EditPackFormWrapper extends Component {
           className={className}
           formData={pack}
           handleSubmit={handleSubmit}
+          onCancel={onCancelEditPack}
         />
       );
     }
