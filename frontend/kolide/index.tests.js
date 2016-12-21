@@ -8,12 +8,17 @@ const {
   invalidForgotPasswordRequest,
   invalidResetPasswordRequest,
   validCreateLabelRequest,
+  validCreatePackRequest,
   validCreateQueryRequest,
+  validCreateScheduledQueryRequest,
+  validDestroyScheduledQueryRequest,
   validForgotPasswordRequest,
   validGetConfigRequest,
   validGetHostsRequest,
   validGetInvitesRequest,
+  validGetQueriesRequest,
   validGetQueryRequest,
+  validGetScheduledQueriesRequest,
   validGetTargetsRequest,
   validGetUsersRequest,
   validInviteUserRequest,
@@ -22,6 +27,7 @@ const {
   validMeRequest,
   validResetPasswordRequest,
   validRevokeInviteRequest,
+  validRunQueryRequest,
   validSetupRequest,
   validUpdateQueryRequest,
   validUpdateUserRequest,
@@ -56,6 +62,24 @@ describe('Kolide - API client', () => {
             slug: 'label-name',
             type: 'custom',
           });
+          done();
+        })
+        .catch(done);
+    });
+  });
+
+  describe('#createPack', () => {
+    it('calls the appropriate endpoint with the correct parameters', (done) => {
+      const bearerToken = 'valid-bearer-token';
+      const description = 'pack description';
+      const name = 'pack name';
+      const queryParams = { description, name };
+      const request = validCreatePackRequest(bearerToken, queryParams);
+
+      Kolide.setBearerToken(bearerToken);
+      Kolide.createPack(queryParams)
+        .then(() => {
+          expect(request.isDone()).toEqual(true);
           done();
         })
         .catch(done);
@@ -126,6 +150,21 @@ describe('Kolide - API client', () => {
     });
   });
 
+  describe('#getQueries', () => {
+    it('calls the appropriate endpoint with the correct parameters', (done) => {
+      const bearerToken = 'valid-bearer-token';
+      const request = validGetQueriesRequest(bearerToken);
+
+      Kolide.setBearerToken(bearerToken);
+      Kolide.getQueries()
+        .then(() => {
+          expect(request.isDone()).toEqual(true);
+          done();
+        })
+        .catch(done);
+    });
+  });
+
   describe('#getQuery', () => {
     it('calls the appropriate endpoint with the correct parameters', (done) => {
       const bearerToken = 'valid-bearer-token';
@@ -134,6 +173,60 @@ describe('Kolide - API client', () => {
 
       Kolide.setBearerToken(bearerToken);
       Kolide.getQuery(queryID)
+        .then(() => {
+          expect(request.isDone()).toEqual(true);
+          done();
+        })
+        .catch(done);
+    });
+  });
+
+  describe('#createScheduledQuery', () => {
+    it('calls the appropriate endpoint with the correct parameters', (done) => {
+      const bearerToken = 'valid-bearer-token';
+      const formData = {
+        interval: 60,
+        logging_type: 'differential',
+        pack_id: 1,
+        platform: 'darwin',
+        query_id: 2,
+      };
+      const request = validCreateScheduledQueryRequest(bearerToken, formData);
+
+      Kolide.setBearerToken(bearerToken);
+      Kolide.createScheduledQuery(formData)
+        .then(() => {
+          expect(request.isDone()).toEqual(true);
+          done();
+        })
+        .catch(done);
+    });
+  });
+
+  describe('#destroyScheduledQuery', () => {
+    it('calls the appropriate endpoint with the correct parameters', (done) => {
+      const bearerToken = 'valid-bearer-token';
+      const scheduledQuery = { id: 1 };
+      const request = validDestroyScheduledQueryRequest(bearerToken, scheduledQuery);
+
+      Kolide.setBearerToken(bearerToken);
+      Kolide.destroyScheduledQuery(scheduledQuery)
+        .then(() => {
+          expect(request.isDone()).toEqual(true);
+          done();
+        })
+        .catch(done);
+    });
+  });
+
+  describe('#getScheduledQueries', () => {
+    it('calls the appropriate endpoint with the correct parameters', (done) => {
+      const bearerToken = 'valid-bearer-token';
+      const pack = { id: 1 };
+      const request = validGetScheduledQueriesRequest(bearerToken, pack);
+
+      Kolide.setBearerToken(bearerToken);
+      Kolide.getScheduledQueries(pack)
         .then(() => {
           expect(request.isDone()).toEqual(true);
           done();
@@ -323,6 +416,22 @@ describe('Kolide - API client', () => {
 
       Kolide.setBearerToken(bearerToken);
       Kolide.revokeInvite({ entityID })
+        .then(() => {
+          expect(request.isDone()).toEqual(true);
+          done();
+        })
+        .catch(done);
+    });
+  });
+
+  describe('#runQuery', () => {
+    it('calls the appropriate endpoint with the correct parameters', (done) => {
+      const bearerToken = 'valid-bearer-token';
+      const data = { query: 'select * from users', selected: { hosts: [], labels: [] } };
+      const request = validRunQueryRequest(bearerToken, data);
+
+      Kolide.setBearerToken(bearerToken);
+      Kolide.runQuery(data)
         .then(() => {
           expect(request.isDone()).toEqual(true);
           done();

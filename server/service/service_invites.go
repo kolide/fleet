@@ -3,10 +3,15 @@ package service
 import (
 	"encoding/base64"
 
-	kolide_errors "github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"golang.org/x/net/context"
 )
+
+type inviteMailer struct{}
+
+func (m *inviteMailer) Message() ([]byte, error) {
+	return []byte("test message"), nil
+}
 
 func (svc service) InviteNewUser(ctx context.Context, payload kolide.InvitePayload) (*kolide.Invite, error) {
 	// verify that the user with the given email does not already exist
@@ -14,7 +19,8 @@ func (svc service) InviteNewUser(ctx context.Context, payload kolide.InvitePaylo
 	if err == nil {
 		return nil, newInvalidArgumentError("email", "a user with this account already exists")
 	}
-	if err != kolide_errors.ErrNotFound {
+
+	if _, ok := err.(kolide.NotFoundError); !ok {
 		return nil, err
 	}
 
@@ -48,11 +54,18 @@ func (svc service) InviteNewUser(ctx context.Context, payload kolide.InvitePaylo
 		return nil, err
 	}
 
-	inviteEmail := kolide.Email{
-		From: "no-reply@kolide.co",
-		To:   []string{invite.Email},
-		Msg:  invite,
+	config, err := svc.AppConfig(ctx)
+	if err != nil {
+		return nil, err
 	}
+
+	inviteEmail := kolide.Email{
+		Subject: "You're Invited to Kolide",
+		To:      []string{invite.Email},
+		Config:  config,
+		Mailer:  &inviteMailer{},
+	}
+
 	err = svc.mailService.SendEmail(inviteEmail)
 	if err != nil {
 		return nil, err

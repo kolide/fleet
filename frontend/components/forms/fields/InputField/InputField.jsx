@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import classnames from 'classnames';
-import { pick } from 'lodash';
+import { noop, pick } from 'lodash';
 
 import FormField from 'components/forms/FormField';
 
@@ -10,17 +10,15 @@ class InputField extends Component {
   static propTypes = {
     autofocus: PropTypes.bool,
     error: PropTypes.string,
-    hint: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
     inputClassName: PropTypes.string, // eslint-disable-line react/forbid-prop-types
     inputWrapperClass: PropTypes.string,
     inputOptions: PropTypes.object, // eslint-disable-line react/forbid-prop-types
-    label: PropTypes.string,
-    labelClassName: PropTypes.string,
     name: PropTypes.string,
     onChange: PropTypes.func,
+    onFocus: PropTypes.func,
     placeholder: PropTypes.string,
     type: PropTypes.string,
-    value: PropTypes.string.isRequired,
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   };
 
   static defaultProps = {
@@ -29,6 +27,7 @@ class InputField extends Component {
     inputOptions: {},
     label: null,
     labelClassName: '',
+    onFocus: noop,
     type: 'text',
     value: '',
   };
@@ -54,7 +53,17 @@ class InputField extends Component {
   }
 
   render () {
-    const { error, inputClassName, inputOptions, inputWrapperClass, name, placeholder, type, value } = this.props;
+    const {
+      error,
+      inputClassName,
+      inputOptions,
+      inputWrapperClass,
+      name,
+      onFocus,
+      placeholder,
+      type,
+      value,
+    } = this.props;
     const { onInputChange } = this;
     const shouldShowPasswordClass = type === 'password';
     const inputClasses = classnames(baseClass, inputClassName, {
@@ -87,6 +96,7 @@ class InputField extends Component {
         <input
           name={name}
           onChange={onInputChange}
+          onFocus={onFocus}
           className={inputClasses}
           placeholder={placeholder}
           ref={(r) => { this.input = r; }}

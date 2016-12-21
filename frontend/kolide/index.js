@@ -2,8 +2,21 @@ import { appendTargetTypeToTargets } from 'redux/nodes/entities/targets/helpers'
 import Base from 'kolide/base';
 import endpoints from 'kolide/endpoints';
 import helpers from 'kolide/helpers';
+import local from 'utilities/local';
 
 class Kolide extends Base {
+  addLabelToPack = (packID, labelID) => {
+    const path = `/v1/kolide/packs/${packID}/labels/${labelID}`;
+
+    return this.authenticatedPost(this.endpoint(path));
+  }
+
+  addQueryToPack = ({ packID, queryID }) => {
+    const endpoint = `/v1/kolide/packs/${packID}/queries/${queryID}`;
+
+    return this.authenticatedPost(this.endpoint(endpoint));
+  }
+
   createLabel = ({ description, name, query }) => {
     const { LABELS } = endpoints;
 
@@ -19,11 +32,42 @@ class Kolide extends Base {
       });
   }
 
+  createPack = ({ name, description }) => {
+    const { PACKS } = endpoints;
+
+    return this.authenticatedPost(this.endpoint(PACKS), JSON.stringify({ description, name }))
+      .then((response) => { return response.pack; });
+  }
+
   createQuery = ({ description, name, query }) => {
     const { QUERIES } = endpoints;
 
     return this.authenticatedPost(this.endpoint(QUERIES), JSON.stringify({ description, name, query }))
       .then((response) => { return response.query; });
+  }
+
+  createScheduledQuery = ({ interval, logging_type: loggingType, pack_id: packID, platform, query_id: queryID, version }) => {
+    const removed = loggingType === 'differential';
+    const snapshot = loggingType === 'snapshot';
+
+    const formData = {
+      interval: Number(interval),
+      pack_id: Number(packID),
+      platform,
+      query_id: Number(queryID),
+      removed,
+      snapshot,
+      version,
+    };
+
+    return this.authenticatedPost(this.endpoint('/v1/kolide/schedule'), JSON.stringify(formData))
+      .then(response => response.scheduled);
+  }
+
+  destroyScheduledQuery = ({ id }) => {
+    const endpoint = `${this.endpoint('/v1/kolide/schedule')}/${id}`;
+
+    return this.authenticatedDelete(endpoint);
   }
 
   forgotPassword ({ email }) {
@@ -103,12 +147,27 @@ class Kolide extends Base {
       .then((response) => { return response.hosts; });
   }
 
+  getPack = (packID) => {
+    const { PACKS } = endpoints;
+    const getPackEndpoint = `${this.baseURL}${PACKS}/${packID}`;
+
+    return this.authenticatedGet(getPackEndpoint)
+      .then((response) => { return response.pack; });
+  }
+
   getQuery = (queryID) => {
     const { QUERIES } = endpoints;
     const getQueryEndpoint = `${this.baseURL}${QUERIES}/${queryID}`;
 
     return this.authenticatedGet(getQueryEndpoint)
       .then((response) => { return response.query; });
+  }
+
+  getQueries = () => {
+    const { QUERIES } = endpoints;
+
+    return this.authenticatedGet(this.endpoint(QUERIES))
+      .then((response) => { return response.queries; });
   }
 
   getTargets = (query, selected = { hosts: [], labels: [] }) => {
@@ -148,9 +207,9 @@ class Kolide extends Base {
           };
         });
         const stubbedLabels = [
-          { id: 40, display_text: 'ONLINE', slug: 'online', type: 'status', count: 20 },
-          { id: 50, display_text: 'OFFLINE', slug: 'offline', type: 'status', count: 2 },
-          { id: 55, display_text: 'MIA', description: '(offline > 30 days)', slug: 'mia', type: 'status', count: 3 },
+          { id: 40, display_text: 'ONLINE', type: 'status', count: 20 },
+          { id: 50, display_text: 'OFFLINE', type: 'status', count: 2 },
+          { id: 55, display_text: 'MIA', description: '(offline > 30 days)', type: 'status', count: 3 },
         ];
 
         return labels.concat(stubbedLabels);
@@ -162,6 +221,14 @@ class Kolide extends Base {
 
     return this.authenticatedGet(this.endpoint(PACKS))
       .then((response) => { return response.packs; });
+  }
+
+  getScheduledQueries = (pack) => {
+    const { SCHEDULED_QUERIES } = endpoints;
+    const scheduledQueryPath = SCHEDULED_QUERIES(pack);
+
+    return this.authenticatedGet(this.endpoint(scheduledQueryPath))
+      .then(response => response.scheduled);
   }
 
   getUsers = () => {
@@ -235,6 +302,25 @@ class Kolide extends Base {
     const endpoint = `${this.endpoint(INVITES)}/${entityID}`;
 
     return this.authenticatedDelete(endpoint);
+  }
+
+  runQuery = ({ query, selected }) => {
+    const { RUN_QUERY } = endpoints;
+
+    return this.authenticatedPost(this.endpoint(RUN_QUERY), JSON.stringify({ query, selected }))
+      .then(response => response.campaign);
+  }
+
+  runQueryWebsocket = (campaignID) => {
+    return new Promise((resolve) => {
+      const socket = new global.WebSocket(`${this.websocketBaseURL}/v1/kolide/results/${campaignID}`);
+
+      socket.onopen = () => {
+        socket.send(JSON.stringify({ type: 'auth', data: { token: local.getItem('auth_token') } }));
+      };
+
+      return resolve(socket);
+    });
   }
 
   setup = (formData) => {
