@@ -22,6 +22,7 @@
 
     &--open {
       background-color: $text-dark;
+      z-index: 6;
 
       .site-nav-header__org {
         border-color: $text-ultradark;

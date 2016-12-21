@@ -19,5 +19,6 @@
   @include breakpoint(smalldesk) {
     padding-left: 0;
     min-width: 55px;
+    max-width: 55px;
   }
 }
