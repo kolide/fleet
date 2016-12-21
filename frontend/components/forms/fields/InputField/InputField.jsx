@@ -17,7 +17,7 @@ class InputField extends Component {
     onChange: PropTypes.func,
     placeholder: PropTypes.string,
     type: PropTypes.string,
-    value: PropTypes.string.isRequired,
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   };
 
   static defaultProps = {

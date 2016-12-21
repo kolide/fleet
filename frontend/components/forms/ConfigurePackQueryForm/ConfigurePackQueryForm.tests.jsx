@@ -42,11 +42,11 @@ describe('ConfigurePackQueryForm - component', () => {
       form.find('form').simulate('submit');
 
       expect(spy).toHaveBeenCalledWith({
-        query_id: 1,
         interval: 123,
         logging_type: 'differential',
         platform: 'all',
-        version: '1.8.1',
+        query_id: 1,
+        version: 'all',
       });
     });
   });
