@@ -35,7 +35,7 @@ class AppSettingsPage extends Component {
     const { appConfig } = this.props;
     const { onDismissSmtpWarning, onFormSubmit } = this;
     const { showSmtpWarning } = this.state;
-    const { smtp_configured: smtpConfigured } = appConfig;
+    const { configured: smtpConfigured } = appConfig;
     const shouldShowWarning = !smtpConfigured && showSmtpWarning;
 
     if (!size(appConfig)) {

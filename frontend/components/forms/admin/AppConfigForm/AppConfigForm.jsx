@@ -11,20 +11,16 @@ import Slider from 'components/forms/fields/Slider';
 import validate from 'components/forms/admin/AppConfigForm/validate';
 
 const authMethodOptions = [
-  { label: 'Plain', value: 'plain' },
-  { label: 'Login', value: 'login' },
-  { label: 'GSS API', value: 'gssapi' },
-  { label: 'Digest MD5', value: 'digest_md5' },
-  { label: 'MD5', value: 'md5' },
-  { label: 'Cram MD5', value: 'cram_md5' },
+  { label: 'Plain', value: 'authmethod_plain' },
+  { label: 'Cram MD5', value: 'authmethod_cram_md5' },
 ];
 const authTypeOptions = [
-  { label: 'Username and Password', value: 'username_and_password' },
-  { label: 'None', value: 'none' },
+  { label: 'Username and Password', value: 'authtype_username_password' },
+  { label: 'None', value: 'authtype_none' },
 ];
 const baseClass = 'app-config-form';
 const formFields = [
-  'auth_method', 'authentication_type', 'domain', 'enable_ssl_tls', 'enable_start_tls',
+  'authentication_method', 'authentication_type', 'domain', 'enable_ssl_tls', 'enable_start_tls',
   'kolide_server_url', 'org_logo_url', 'org_name', 'password', 'port', 'sender_address',
   'server', 'user_name', 'verify_ssl_certs',
 ];
@@ -39,7 +35,7 @@ Header.propTypes = { showAdvancedOptions: PropTypes.bool.isRequired };
 class AppConfigForm extends Component {
   static propTypes = {
     fields: PropTypes.shape({
-      auth_method: formFieldInterface.isRequired,
+      authentication_method: formFieldInterface.isRequired,
       authentication_type: formFieldInterface.isRequired,
       domain: formFieldInterface.isRequired,
       enable_ssl_tls: formFieldInterface.isRequired,
@@ -55,7 +51,7 @@ class AppConfigForm extends Component {
       verify_ssl_certs: formFieldInterface.isRequired,
     }).isRequired,
     handleSubmit: PropTypes.func,
-    smtpConfigured: PropTypes.bool,
+    smtpConfigured: PropTypes.bool.isRequired,
   };
 
   constructor (props) {
@@ -223,12 +219,12 @@ class AppConfigForm extends Component {
               <div className="input-field__wrapper">
                 <label
                   className="input-field__label"
-                  htmlFor={fields.auth_method.name}
+                  htmlFor={fields.authentication_method.name}
                 >
                   Auth Method
                 </label>
                 <Dropdown
-                  {...fields.auth_method}
+                  {...fields.authentication_method}
                   options={authMethodOptions}
                   placeholder=""
                 />
