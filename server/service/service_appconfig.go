@@ -30,7 +30,7 @@ func (svc service) ModifyAppConfig(ctx context.Context, p kolide.AppConfigPayloa
 		return nil, err
 	}
 	newConfig := fromPayload(p, *oldConfig)
-	if p.SMTPSettings != nil && !p.SMTPSettings.SMTPDisabled {
+	if p.SMTPSettings != nil && p.SMTPSettings.SMTPEnabled {
 		oldSettings := smtpSettingsFromAppConfig(oldConfig)
 		// anything changed?
 		if !reflect.DeepEqual(oldSettings, p.SMTPSettings) {
@@ -79,10 +79,10 @@ func fromPayload(p kolide.AppConfigPayload, config kolide.AppConfig) *kolide.App
 		config.KolideServerURL = *p.ServerSettings.KolideServerURL
 	}
 	if p.SMTPSettings != nil {
-		config.SMTPAuthenticationMethod = p.SMTPSettings.SMTPAuthenticationMethod
-		config.SMTPAuthenticationType = p.SMTPSettings.SMTPAuthenticationType
+		config.SMTPAuthenticationMethod = kolide.StringToAuthMethod(p.SMTPSettings.SMTPAuthenticationMethod)
+		config.SMTPAuthenticationType = kolide.StringToAuthType(p.SMTPSettings.SMTPAuthenticationType)
 		config.SMTPConfigured = p.SMTPSettings.SMTPConfigured
-		config.SMTPDisabled = p.SMTPSettings.SMTPDisabled
+		config.SMTPEnabled = p.SMTPSettings.SMTPEnabled
 		config.SMTPDomain = p.SMTPSettings.SMTPDomain
 		config.SMTPEnableStartTLS = p.SMTPSettings.SMTPEnableStartTLS
 		config.SMTPEnableTLS = p.SMTPSettings.SMTPEnableTLS
@@ -102,15 +102,15 @@ func smtpSettingsFromAppConfig(config *kolide.AppConfig) *kolide.SMTPSettings {
 		SMTPSenderAddress:        config.SMTPSenderAddress,
 		SMTPServer:               config.SMTPServer,
 		SMTPPort:                 config.SMTPPort,
-		SMTPAuthenticationType:   config.SMTPAuthenticationType,
+		SMTPAuthenticationType:   kolide.AuthTypeToString(config.SMTPAuthenticationType),
 		SMTPUserName:             config.SMTPUserName,
 		SMTPPassword:             config.SMTPPassword,
 		SMTPEnableTLS:            config.SMTPEnableTLS,
-		SMTPAuthenticationMethod: config.SMTPAuthenticationMethod,
+		SMTPAuthenticationMethod: kolide.AuthMethodToString(config.SMTPAuthenticationMethod),
 		SMTPDomain:               config.SMTPDomain,
 		SMTPVerifySSLCerts:       config.SMTPVerifySSLCerts,
 		SMTPEnableStartTLS:       config.SMTPEnableStartTLS,
-		SMTPDisabled:             config.SMTPDisabled,
+		SMTPEnabled:              config.SMTPEnabled,
 	}
 }
 

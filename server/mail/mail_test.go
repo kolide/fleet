@@ -53,7 +53,7 @@ func testSMTPPlainAuth(t *testing.T, mailer kolide.MailService) {
 		To:      []string{"john@kolide.co"},
 		Config: &kolide.AppConfig{
 			SMTPConfigured:           true,
-			SMTPDisabled:             false,
+			SMTPEnabled:              true,
 			SMTPAuthenticationType:   kolide.AuthTypeUserNamePassword,
 			SMTPAuthenticationMethod: kolide.AuthMethodPlain,
 			SMTPUserName:             "bob",
@@ -80,7 +80,7 @@ func testSMTPSkipVerify(t *testing.T, mailer kolide.MailService) {
 		To:      []string{"john@kolide.co"},
 		Config: &kolide.AppConfig{
 			SMTPConfigured:           true,
-			SMTPDisabled:             false,
+			SMTPEnabled:              true,
 			SMTPAuthenticationType:   kolide.AuthTypeUserNamePassword,
 			SMTPAuthenticationMethod: kolide.AuthMethodPlain,
 			SMTPUserName:             "bob",
@@ -107,7 +107,7 @@ func testSMTPNoAuth(t *testing.T, mailer kolide.MailService) {
 		To:      []string{"bob@foo.com"},
 		Config: &kolide.AppConfig{
 			SMTPConfigured:         true,
-			SMTPDisabled:           false,
+			SMTPEnabled:            true,
 			SMTPAuthenticationType: kolide.AuthTypeNone,
 			SMTPEnableTLS:          true,
 			SMTPVerifySSLCerts:     true,
