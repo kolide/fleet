@@ -37,6 +37,21 @@ class QueriesListWrapper extends Component {
     return handleRemoveScheduledQueries(selectedScheduledQueryIDs);
   }
 
+  onSelectAllQueries = (shouldSelectAll) => {
+    if (shouldSelectAll) {
+      const allScheduledQueries = this.getQueries();
+      const selectedScheduledQueryIDs = allScheduledQueries.map(sq => sq.id);
+
+      this.setState({ selectedScheduledQueryIDs });
+
+      return false;
+    }
+
+    this.setState({ selectedScheduledQueryIDs: [] });
+
+    return false;
+  }
+
   onSelectQuery = (shouldAddQuery, scheduledQueryID) => {
     const { selectedScheduledQueryIDs } = this.state;
     const newSelectedScheduledQueryIDs = shouldAddQuery ?
@@ -90,7 +105,7 @@ class QueriesListWrapper extends Component {
   }
 
   renderQueriesList = () => {
-    const { getQueries, onHidePackForm, onSelectQuery } = this;
+    const { getQueries, onHidePackForm, onSelectAllQueries, onSelectQuery } = this;
     const { onScheduledQueryFormSubmit, scheduledQueries } = this.props;
     const { selectedScheduledQueryIDs } = this.state;
 
@@ -99,6 +114,7 @@ class QueriesListWrapper extends Component {
         <QueriesList
           onHidePackForm={onHidePackForm}
           onScheduledQueryFormSubmit={onScheduledQueryFormSubmit}
+          onSelectAllQueries={onSelectAllQueries}
           onSelectQuery={onSelectQuery}
           scheduledQueries={getQueries()}
           selectedScheduledQueryIDs={selectedScheduledQueryIDs}

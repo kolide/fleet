@@ -68,4 +68,23 @@ describe('QueriesListWrapper - component', () => {
 
     expect(QueriesList.prop('scheduledQueries')).toEqual([]);
   });
+
+  it('allows selecting all scheduled queries at once', () => {
+    const allScheduledQueryIDs = scheduledQueries.map(sq => sq.id);
+    const component = mount(
+      <QueriesListWrapper
+        allQueries={allQueries}
+        scheduledQueries={scheduledQueries}
+      />
+    );
+    const selectAllCheckbox = component.find({ name: 'select-all-queries' });
+
+    selectAllCheckbox.simulate('change');
+
+    expect(component.state('selectedScheduledQueryIDs')).toEqual(allScheduledQueryIDs);
+
+    selectAllCheckbox.simulate('change');
+
+    expect(component.state('selectedScheduledQueryIDs')).toEqual([]);
+  });
 });

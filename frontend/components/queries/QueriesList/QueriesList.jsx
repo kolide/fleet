@@ -12,6 +12,7 @@ const baseClass = 'queries-list';
 class QueriesList extends Component {
   static propTypes = {
     isScheduledQueriesAvailable: PropTypes.bool,
+    onSelectAllQueries: PropTypes.func.isRequired,
     onSelectQuery: PropTypes.func.isRequired,
     scheduledQueries: PropTypes.arrayOf(queryInterface).isRequired,
     selectedScheduledQueryIDs: PropTypes.arrayOf(PropTypes.number).isRequired,
@@ -20,9 +21,7 @@ class QueriesList extends Component {
   constructor (props) {
     super(props);
 
-    this.state = {
-      allQueriesSelected: false,
-    };
+    this.state = { allQueriesSelected: false };
   }
 
   isChecked = (scheduledQuery) => {
@@ -36,14 +35,13 @@ class QueriesList extends Component {
     return includes(selectedScheduledQueryIDs, scheduledQuery.id);
   }
 
-  handleSelectAllQueries = () => {
+  handleSelectAllQueries = (shouldSelectAllQueries) => {
+    const { onSelectAllQueries } = this.props;
     const { allQueriesSelected } = this.state;
 
-    this.setState({
-      allQueriesSelected: !allQueriesSelected,
-    });
+    this.setState({ allQueriesSelected: !allQueriesSelected });
 
-    return false;
+    return onSelectAllQueries(shouldSelectAllQueries);
   }
 
   renderHelpText = () => {
