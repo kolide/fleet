@@ -70,7 +70,7 @@ export const validDestroyScheduledQueryRequest = (bearerToken, scheduledQuery) =
       Authorization: `Bearer ${bearerToken}`,
     },
   })
-    .delete(`/api/v1/kolide/scheduled/${scheduledQuery.id}`)
+    .delete(`/api/v1/kolide/schedule/${scheduledQuery.id}`)
     .reply(200, {});
 };
 
