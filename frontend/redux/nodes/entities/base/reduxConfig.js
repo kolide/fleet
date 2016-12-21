@@ -208,7 +208,9 @@ const reduxConfig = ({
           if (!response) return {};
           const { entities } = normalize(parse([response]), arrayOf(schema));
 
-          return dispatch(updateSuccess(entities));
+          dispatch(updateSuccess(entities));
+
+          return response;
         })
         .catch((response) => {
           const { errors } = response;
