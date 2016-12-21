@@ -9,7 +9,7 @@ import InputField from 'components/forms/fields/InputField';
 import validate from 'components/forms/ConfigurePackQueryForm/validate';
 
 const baseClass = 'configure-pack-query-form';
-const fieldNames = ['query_id', 'interval', 'platform', 'min_osquery_version', 'logging_type'];
+const fieldNames = ['query_id', 'interval', 'logging_type', 'platform', 'version'];
 const platformOptions = [
   { label: 'All', value: 'all' },
   { label: 'Windows', value: 'windows' },
@@ -37,8 +37,8 @@ class ConfigurePackQueryForm extends Component {
     fields: PropTypes.shape({
       interval: formFieldInterface.isRequired,
       logging_type: formFieldInterface.isRequired,
-      min_osquery_version: formFieldInterface.isRequired,
       platform: formFieldInterface.isRequired,
+      version: formFieldInterface.isRequired,
     }).isRequired,
     handleSubmit: PropTypes.func,
     onCancel: PropTypes.func,
@@ -76,7 +76,7 @@ class ConfigurePackQueryForm extends Component {
             wrapperClassName={`${baseClass}__form-field ${baseClass}__form-field--platform`}
           />
           <Dropdown
-            {...fields.min_osquery_version}
+            {...fields.version}
             options={minOsqueryVersionOptions}
             placeholder="- - -"
             label={[<Icon name="osquery" key="min-osquery-vers" />, ' ver.']}

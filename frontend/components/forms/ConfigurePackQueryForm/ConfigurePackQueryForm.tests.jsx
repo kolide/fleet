@@ -18,8 +18,9 @@ describe('ConfigurePackQueryForm - component', () => {
 
     it('updates form state', () => {
       itBehavesLikeAFormInputElement(form, 'interval');
-      itBehavesLikeAFormDropdownElement(form, 'platform');
       itBehavesLikeAFormDropdownElement(form, 'logging_type');
+      itBehavesLikeAFormDropdownElement(form, 'platform');
+      itBehavesLikeAFormDropdownElement(form, 'version');
     });
   });
 
@@ -34,16 +35,18 @@ describe('ConfigurePackQueryForm - component', () => {
 
     it('submits the form with the form data', () => {
       itBehavesLikeAFormInputElement(form, 'interval', 'InputField', 123);
-      itBehavesLikeAFormDropdownElement(form, 'platform');
       itBehavesLikeAFormDropdownElement(form, 'logging_type');
+      itBehavesLikeAFormDropdownElement(form, 'platform');
+      itBehavesLikeAFormDropdownElement(form, 'version');
 
       form.find('form').simulate('submit');
 
       expect(spy).toHaveBeenCalledWith({
         query_id: 1,
         interval: 123,
-        platform: 'all',
         logging_type: 'differential',
+        platform: 'all',
+        version: '1.8.1',
       });
     });
   });
