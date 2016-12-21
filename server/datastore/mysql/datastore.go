@@ -115,7 +115,8 @@ func (d *Datastore) Drop() error {
 
 // HealthCheck returns an error if the MySQL backend is not healthy.
 func (d *Datastore) HealthCheck() error {
-	return d.db.Ping()
+	_, err := d.db.Exec("select 1")
+	return err
 }
 
 // Close frees resources associated with underlying mysql connection
