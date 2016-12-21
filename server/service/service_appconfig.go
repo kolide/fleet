@@ -5,6 +5,7 @@ import (
 
 	"github.com/kolide/kolide-ose/server/contexts/viewer"
 	"github.com/kolide/kolide-ose/server/kolide"
+	"github.com/kolide/kolide-ose/server/mail"
 	"golang.org/x/net/context"
 )
 
@@ -38,15 +39,17 @@ func (svc service) ModifyAppConfig(ctx context.Context, p kolide.AppConfigPayloa
 			if !ok {
 				return nil, errNoContext
 			}
+
 			testMail := kolide.Email{
 				Subject: "Hello from Kolide",
 				To:      []string{vc.User.Email},
 				Mailer: &kolide.SMTPTestMailer{
 					KolideServerURL: newConfig.KolideServerURL,
 				},
+				Config: newConfig,
 			}
-			// test mail set SMTPConfigured so we know if we can send mail
-			err = svc.mailService.SendEmail(testMail)
+
+			err = mail.Test(svc.mailService, testMail)
 			if err != nil {
 				// if the provided SMTP parameters don't work with the targeted SMTP server
 				// capture the error and return it to the front end so that GUI can
@@ -79,8 +82,16 @@ func fromPayload(p kolide.AppConfigPayload, config kolide.AppConfig) *kolide.App
 		config.KolideServerURL = *p.ServerSettings.KolideServerURL
 	}
 	if p.SMTPSettings != nil {
-		config.SMTPAuthenticationMethod = kolide.StringToAuthMethod(p.SMTPSettings.SMTPAuthenticationMethod)
-		config.SMTPAuthenticationType = kolide.StringToAuthType(p.SMTPSettings.SMTPAuthenticationType)
+		if p.SMTPSettings.SMTPAuthenticationMethod == kolide.AuthMethodNameCramMD5 {
+			config.SMTPAuthenticationMethod = kolide.AuthMethodCramMD5
+		} else {
+			config.SMTPAuthenticationMethod = kolide.AuthMethodPlain
+		}
+		if p.SMTPSettings.SMTPAuthenticationType == kolide.AuthTypeNameUserNamePassword {
+			config.SMTPAuthenticationType = kolide.AuthTypeUserNamePassword
+		} else {
+			config.SMTPAuthenticationType = kolide.AuthTypeNone
+		}
 		config.SMTPConfigured = p.SMTPSettings.SMTPConfigured
 		config.SMTPEnabled = p.SMTPSettings.SMTPEnabled
 		config.SMTPDomain = p.SMTPSettings.SMTPDomain
@@ -102,11 +113,11 @@ func smtpSettingsFromAppConfig(config *kolide.AppConfig) *kolide.SMTPSettings {
 		SMTPSenderAddress:        config.SMTPSenderAddress,
 		SMTPServer:               config.SMTPServer,
 		SMTPPort:                 config.SMTPPort,
-		SMTPAuthenticationType:   kolide.AuthTypeToString(config.SMTPAuthenticationType),
+		SMTPAuthenticationType:   config.SMTPAuthenticationType.String(),
 		SMTPUserName:             config.SMTPUserName,
 		SMTPPassword:             config.SMTPPassword,
 		SMTPEnableTLS:            config.SMTPEnableTLS,
-		SMTPAuthenticationMethod: kolide.AuthMethodToString(config.SMTPAuthenticationMethod),
+		SMTPAuthenticationMethod: config.SMTPAuthenticationMethod.String(),
 		SMTPDomain:               config.SMTPDomain,
 		SMTPVerifySSLCerts:       config.SMTPVerifySSLCerts,
 		SMTPEnableStartTLS:       config.SMTPEnableStartTLS,

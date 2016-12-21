@@ -34,13 +34,15 @@ const (
 	AuthTypeNone
 )
 
-// Map string to AuthType, we expect string to be validated in
-// middleware prior to call to this func
-func StringToAuthType(val string) SMTPAuthType {
-	if val == AuthTypeNameUserNamePassword {
-		return AuthTypeUserNamePassword
+func (a SMTPAuthType) String() string {
+	switch a {
+	case AuthTypeUserNamePassword:
+		return AuthTypeNameUserNamePassword
+	case AuthTypeNone:
+		return AuthTypeNameNone
+	default:
+		return ""
 	}
-	return AuthTypeNone
 }
 
 type SMTPAuthMethod int
@@ -50,28 +52,15 @@ const (
 	AuthMethodCramMD5
 )
 
-// Map string, previously validated in middlewhere to SMTPAuthMethod
-func StringToAuthMethod(val string) SMTPAuthMethod {
-	if val == AuthMethodNameCramMD5 {
-		return AuthMethodCramMD5
-	}
-	return AuthMethodPlain
-}
-
-// Map AuthMethod to human readable string
-func AuthMethodToString(val SMTPAuthMethod) string {
-	if val == AuthMethodCramMD5 {
+func (m SMTPAuthMethod) String() string {
+	switch m {
+	case AuthMethodPlain:
+		return AuthMethodNamePlain
+	case AuthMethodCramMD5:
 		return AuthMethodNameCramMD5
+	default:
+		return ""
 	}
-	return AuthMethodNamePlain
-}
-
-// Map AuthType to human readable string
-func AuthTypeToString(val SMTPAuthType) string {
-	if val == AuthTypeUserNamePassword {
-		return AuthTypeNameUserNamePassword
-	}
-	return AuthTypeNameNone
 }
 
 // AppConfig holds configuration about the Kolide application.
