@@ -24,7 +24,7 @@ const FlashMessage = ({ notification, onRemoveFlash, onUndoActionClick }) => {
             className={`${baseClass}__undo`}
             variant="unstyled"
             onClick={onUndoActionClick(undoAction)}
-            text='undo'
+            text="undo"
           />
         }
 
