@@ -16,7 +16,7 @@
   box-sizing: border-box;
   min-width: 240px;
 
-  @include breakpoint(tablet) {
+  @include breakpoint(smalldesk) {
     padding-left: 0;
     min-width: 55px;
   }
