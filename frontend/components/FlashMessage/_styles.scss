@@ -1,50 +1,88 @@
 .flash-message {
   @include display(flex);
   @include align-items(center);
-  @include justify-content(space-between);
+  @include justify-content(center);
   @include position(fixed, 0 0 null 240px);
   color: $white;
   height: 50px;
   padding: 0 $pad-half;
   z-index: 2;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+  background-color: #3d4758;
 
   @include breakpoint(tablet) {
     left: 55px;
   }
 
   &--success {
-    background-color: $success;
+    .kolidecon {
+      color: $success;
+    }
   }
 
   &--error {
-    background-color: $alert;
+    .kolidecon {
+      color: $alert;
+    }
+  }
+
+  &__content {
+    @include flex-grow(1);
+    text-align: center;
+
+    span {
+      margin-left: 15px;
+    }
+
+    .kolidecon {
+      font-size: 24px;
+    }
   }
 
   &__action {
     @include display(flex);
-    @include justify-content(space-between);
-    width: 96px;
+    @include align-items(center);
   }
 
   &__remove {
+    @include transition(background-color 150ms ease-in-out);
     @include size(30px);
     border-radius: 50%;
     color: $white;
     cursor: pointer;
     text-align: center;
+    margin-left: 15px;
 
     &--success {
       background-color: $success-light;
+
+      &:hover {
+        .kolidecon {
+          color: $success-light;
+        }
+      }
     }
 
     &--error {
       background-color: $alert-light;
+
+      &:hover {
+        .kolidecon {
+          color: $alert-light;
+        }
+      }
+    }
+
+    .kolidecon {
+      @include transition(background-color 150ms ease-in-out, color 150ms ease-in-out);
+      color: $text-dark;
+      font-size: 24px;
     }
   }
 
   &__undo {
     color: $white;
     cursor: pointer;
+    font-size: 16px;
   }
 }
-
