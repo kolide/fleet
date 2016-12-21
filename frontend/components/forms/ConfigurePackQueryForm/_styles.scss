@@ -2,7 +2,7 @@
   .form-field {
     .input-field,
     .dropdown__select {
-      width: 175px;
+      width: 166px;
       float: right;
     }
 
@@ -37,6 +37,10 @@
         width: 70px;
         text-transform: lowercase;
         padding-left: 12px;
+
+        @include breakpoint(ltdesktop) {
+          padding-left: 6px;
+        }
       }
 
       &__hint {

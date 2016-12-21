@@ -293,15 +293,7 @@ export class ManageHostsPage extends Component {
       );
     }
 
-    return (
-      <ReactCSSTransitionGroup
-        transitionName="hosts-page-side-panel"
-        transitionEnterTimeout={500}
-        transitionLeaveTimeout={0}
-      >
-        {SidePanel}
-      </ReactCSSTransitionGroup>
-    );
+    return SidePanel;
   }
 
   render () {

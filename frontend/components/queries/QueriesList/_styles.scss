@@ -8,7 +8,6 @@
   &__table {
     border-collapse: collapse;
     width: 100%;
-    min-height: 132px;
     border-radius: 3px;
 
     thead {
@@ -120,6 +119,7 @@
 
   &__first-query {
     padding: 30px 30px 100px;
+    text-align: left;
 
     h1 {
       color: $text-dark;

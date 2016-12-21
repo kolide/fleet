@@ -7,6 +7,8 @@ import Icon from 'components/Icon';
 import packInterface from 'interfaces/pack';
 import SelectTargetsDropdown from 'components/forms/fields/SelectTargetsDropdown';
 
+const baseClass = 'edit-pack-form';
+
 class EditPackFormWrapper extends Component {
   static propTypes = {
     className: PropTypes.string,
@@ -43,15 +45,18 @@ class EditPackFormWrapper extends Component {
     }
 
     return (
-      <div className={className}>
+      <div className={`${className} ${baseClass}`}>
         <Button
           onClick={onEditPack}
           text="EDIT"
           type="button"
           variant="brand"
+          className={`${baseClass}__edit-btn`}
         />
-        <h1><Icon name="packs" /> {pack.name}</h1>
-        <p>{pack.description}</p>
+        <h1 className={`${baseClass}__title`}><Icon name="packs" /> <span>{pack.name}</span></h1>
+        <div className={`${baseClass}__description`}>
+          <p>{pack.description}</p>
+        </div>
         <SelectTargetsDropdown
           label="select pack targets"
           name="selected-pack-targets"
@@ -59,6 +64,7 @@ class EditPackFormWrapper extends Component {
           onSelect={noop}
           targetsCount={targetsCount}
           disabled
+          className={`${baseClass}__select-targets`}
         />
       </div>
     );
