@@ -1,7 +1,7 @@
 import { PropTypes } from 'react';
 
 export default PropTypes.shape({
-  auth_method: PropTypes.string,
+  authentication_method: PropTypes.string,
   authentication_type: PropTypes.string,
   domain: PropTypes.string,
   enable_sll_tls: PropTypes.bool,

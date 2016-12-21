@@ -16,26 +16,6 @@ export const reduxMockStore = (store = {}) => {
   return mockStore(store);
 };
 
-export const itBehavesLikeAFormInputElement = (form, inputName, inputType = 'InputField') => {
-  const inputField = form.find({ name: inputName }).find('input');
-
-  expect(inputField.length).toEqual(1);
-
-  if (inputType === 'Checkbox') {
-    const inputValue = form.state().formData[inputName];
-
-    inputField.simulate('change');
-
-    expect(form.state().formData[inputName]).toEqual(!inputValue);
-  } else {
-    const inputText = 'some text';
-
-    fillInFormInput(inputField, inputText);
-
-    expect(form.state().formData).toInclude({ [inputName]: inputText });
-  }
-};
-
 export const connectedComponent = (ComponentClass, options = {}) => {
   const { mockStore = reduxMockStore(), props = {} } = options;
 

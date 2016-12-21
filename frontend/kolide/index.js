@@ -80,29 +80,7 @@ class Kolide extends Base {
   getConfig = () => {
     const { CONFIG } = endpoints;
 
-    return this.authenticatedGet(this.endpoint(CONFIG))
-      .then(() => {
-        const stubbedResponse = {
-          app_config: {
-            org_name: 'Kolide',
-            org_logo_url: '0.0.0.0:8080/logo.png',
-            kolide_server_url: 'https://kolide.kolide.co',
-            sender_address: 'mike@gnar.dog',
-            server: 'localhost',
-            port: '8080',
-            authentication_type: 'username_and_password',
-            user_name: 'gnarmike',
-            auth_method: 'none',
-            enable_ssl_tls: true,
-            domain: '',
-            verify_ssl_certs: true,
-            enable_start_tls: true,
-            smtp_configured: true,
-          },
-        };
-
-        return stubbedResponse.app_config;
-      });
+    return this.authenticatedGet(this.endpoint(CONFIG));
   }
 
   getInvites = () => {

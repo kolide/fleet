@@ -1,4 +1,6 @@
-import Kolide from '../../../kolide';
+import Kolide from 'kolide';
+
+import { frontendFormattedConfig } from 'redux/nodes/app/helpers';
 
 export const CONFIG_FAILURE = 'CONFIG_FAILURE';
 export const CONFIG_START = 'CONFIG_START';
@@ -25,9 +27,11 @@ export const getConfig = () => {
 
     return Kolide.getConfig()
       .then((config) => {
-        dispatch(configSuccess(config));
+        const formattedConfig = frontendFormattedConfig(config);
 
-        return config;
+        dispatch(configSuccess(formattedConfig));
+
+        return formattedConfig;
       })
       .catch((error) => {
         dispatch(configFailure(error));
