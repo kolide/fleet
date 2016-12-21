@@ -19,6 +19,8 @@ export const platformIconClass = (platform = '') => {
   switch (lowerPlatform) {
     case 'darwin':
       return 'apple';
+    case 'linux':
+      return 'ubuntu';
     default:
       return lowerPlatform;
   }
