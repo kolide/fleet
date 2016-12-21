@@ -19,17 +19,17 @@ const FlashMessage = ({ notification, onRemoveFlash, onUndoActionClick }) => {
     <div className={`${baseClass} ${baseClass}--${alertType}`}>
       <div className={`${baseClass}__content`}>
         <Icon name={alertIcon} /> <span>{message}</span>
-      </div>
-      <div className={`${baseClass}__action`}>
+
         {undoAction &&
           <Button
             className={`${baseClass}__undo`}
             variant="unstyled"
             onClick={onUndoActionClick(undoAction)}
-            text='undo'
+            text="undo"
           />
         }
-
+      </div>
+      <div className={`${baseClass}__action`}>
         <Button
           className={`${baseClass}__remove ${baseClass}__remove--${alertType}`}
           variant="unstyled"
