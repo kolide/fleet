@@ -15,7 +15,7 @@ describe('AppSettingsPage - component', () => {
   });
 
   it('renders a warning if SMTP has not been configured', () => {
-    const storeWithoutSMTPConfig = { app: { config: { smtp_configured: false } } };
+    const storeWithoutSMTPConfig = { app: { config: { configured: false } } };
 
     const mockStore = reduxMockStore(storeWithoutSMTPConfig);
     const page = mount(
@@ -30,7 +30,7 @@ describe('AppSettingsPage - component', () => {
   });
 
   it('dismisses the smtp warning when "DISMISS" is clicked', () => {
-    const storeWithoutSMTPConfig = { app: { config: { smtp_configured: false } } };
+    const storeWithoutSMTPConfig = { app: { config: { configured: false } } };
 
     const mockStore = reduxMockStore(storeWithoutSMTPConfig);
     const page = mount(
@@ -46,7 +46,7 @@ describe('AppSettingsPage - component', () => {
   });
 
   it('does not render a warning if SMTP has been configured', () => {
-    const storeWithoutSMTPConfig = { app: { config: { smtp_configured: true } } };
+    const storeWithoutSMTPConfig = { app: { config: { configured: true } } };
 
     const mockStore = reduxMockStore(storeWithoutSMTPConfig);
     const page = mount(

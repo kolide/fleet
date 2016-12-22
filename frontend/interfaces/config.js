@@ -11,7 +11,7 @@ export default PropTypes.shape({
   org_logo_url: PropTypes.string,
   org_name: PropTypes.string,
   password: PropTypes.string,
-  port: PropTypes.string,
+  port: PropTypes.number,
   sender_address: PropTypes.string,
   server: PropTypes.string,
   user_name: PropTypes.string,
