@@ -40,3 +40,22 @@ export const getConfig = () => {
       });
   };
 };
+export const updateConfig = (configData) => {
+  return (dispatch) => {
+    dispatch(loadConfig);
+
+    return Kolide.updateConfig(configData)
+      .then((config) => {
+        const formattedConfig = frontendFormattedConfig(config);
+
+        dispatch(configSuccess(formattedConfig));
+
+        return formattedConfig;
+      })
+      .catch((error) => {
+        dispatch(configFailure(error));
+
+        return false;
+      });
+  };
+};
