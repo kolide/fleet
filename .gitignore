@@ -1,7 +1,3 @@
-# binaries
-kolide-ose
-*.exe
-
 # output directories
 build
 vendor
