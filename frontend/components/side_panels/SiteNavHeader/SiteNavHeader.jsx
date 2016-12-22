@@ -5,7 +5,6 @@ import configInterface from 'interfaces/config';
 import userInterface from 'interfaces/user';
 import Icon from 'components/icons/Icon';
 
-import kolideLogo from '../../../../assets/images/kolide-logo.svg';
 import UserMenu from './UserMenu';
 
 class SiteNavHeader extends Component {
@@ -49,6 +48,7 @@ class SiteNavHeader extends Component {
     const {
       config: {
         org_name: orgName,
+        org_logo_url: orgLogoURL,
       },
       onLogoutUser,
       onRedirectTo,
@@ -79,7 +79,7 @@ class SiteNavHeader extends Component {
           <div className={`${headerBaseClass}__org`}>
             <img
               alt="Company logo"
-              src={kolideLogo}
+              src={orgLogoURL}
               className={`${headerBaseClass}__logo`}
             />
             <h1 className={`${headerBaseClass}__org-name`}>{orgName}</h1>
