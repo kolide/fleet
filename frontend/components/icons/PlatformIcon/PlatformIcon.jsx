@@ -22,6 +22,7 @@ export class PlatformIcon extends Component {
       case 'mac os x': return 'apple';
       case 'mac osx': return 'apple';
       case 'mac os': return 'apple';
+      case 'darwin': return 'apple';
       case 'centos': return 'centos';
       case 'centos linux': return 'centos';
       case 'ubuntu': return 'ubuntu';
