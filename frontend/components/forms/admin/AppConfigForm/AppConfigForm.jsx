@@ -5,7 +5,7 @@ import Checkbox from 'components/forms/fields/Checkbox';
 import Dropdown from 'components/forms/fields/Dropdown';
 import Form from 'components/forms/Form';
 import formFieldInterface from 'interfaces/form_field';
-import Icon from 'components/Icon';
+import Icon from 'components/icons/Icon';
 import InputField from 'components/forms/fields/InputField';
 import Slider from 'components/forms/fields/Slider';
 import validate from 'components/forms/admin/AppConfigForm/validate';
