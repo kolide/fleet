@@ -130,7 +130,7 @@ class AppConfigForm extends Component {
             <InputField
               {...fields.kolide_server_url}
               label="Kolide App URL"
-              hint={[`Include base path only (eg. no ${<code>/v1</code>})`]}
+              hint={<span>Include base path only (eg. no <code>/v1</code>)</span>}
             />
           </div>
           <div className={`${baseClass}__details`}>
