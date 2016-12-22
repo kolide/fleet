@@ -83,34 +83,8 @@ class AppConfigForm extends Component {
         <div className={`${baseClass}__inputs`}>
           <div className={`${baseClass}__smtp-section`}>
             <InputField {...fields.domain} label="Domain" />
-
-            <div className="input-field__wrapper">
-              <label
-                className="input-field__label"
-                htmlFor={fields.verify_ssl_certs.name}
-              >
-                Verify SSL Certs?
-              </label>
-              <div className="slide-wrapper">
-                <span className="slider-option slider-option--off">OFF</span>
-                <Slider {...fields.verify_ssl_certs} />
-                <span className="slider-option slider-option--on">ON</span>
-              </div>
-            </div>
-
-            <div className="input-field__wrapper">
-              <label
-                className="input-field__label"
-                htmlFor={fields.enable_start_tls.name}
-              >
-                Enable STARTTLS?
-              </label>
-              <div className="slide-wrapper">
-                <span className="slider-option slider-option--off">OFF</span>
-                <Slider {...fields.enable_start_tls} />
-                <span className="slider-option slider-option--on">ON</span>
-              </div>
-            </div>
+            <Slider {...fields.verify_ssl_certs} label="Verify SSL Certs?" />
+            <Slider {...fields.enable_start_tls} label="Enable STARTTLSomething?" />
           </div>
         </div>
 
