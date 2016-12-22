@@ -36,7 +36,7 @@ func (d *Datastore) NewScheduledQuery(sq *kolide.ScheduledQuery) (*kolide.Schedu
 
 	err = d.db.Select(&metadata, query, sq.QueryID)
 	if err != nil && err == sql.ErrNoRows {
-		return nil, notFound("Query")
+		return nil, notFound("Query").WithID(sq.QueryID)
 	} else if err != nil {
 		return nil, errors.Wrap(err, "select query by ID")
 	}
