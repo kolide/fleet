@@ -7,6 +7,9 @@ type OptionStore interface {
 	Options() ([]Option, error)
 	SetOptionValues([]OptionValue) ([]OptionValue, error)
 	OptionValues() ([]OptionValue, error)
+	GetOptionInt(name string) (int, error)
+	GetOptionFlag(name string) (bool, error)
+	GetOptionString(name string) (string, error)
 }
 
 type OptionService interface {
@@ -70,80 +73,173 @@ type OptionValuesPayload struct {
 }
 
 // InitializeOptions creates osquery option values
-func InitializeOptions(ds Datastore) error {
-	if _, err := ds.NewOption("aws_access_key_id", OptionTypeString, false); err != nil {
+func CreateOptions(ds Datastore) error {
+	if _, err := ds.NewOption("aws_access_key_id", OptionTypeString, OptionChangable); err != nil {
 		return err
 	}
-	if _, err := ds.NewOption("aws_firehose_period", OptionTypeInt, false); err != nil {
+	if _, err := ds.NewOption("aws_firehose_period", OptionTypeInt, OptionChangable); err != nil {
 		return err
 	}
-	if _, err := ds.NewOption("aws_firehose_stream", OptionTypeString, false); err != nil {
+	if _, err := ds.NewOption("aws_firehose_stream", OptionTypeString, OptionChangable); err != nil {
 		return err
 	}
-	if _, err := ds.NewOption("aws_kinesis_period", OptionTypeInt, false); err != nil {
+	if _, err := ds.NewOption("aws_kinesis_period", OptionTypeInt, OptionChangable); err != nil {
 		return err
 	}
-	if _, err := ds.NewOption("aws_kinesis_random_partition_key", OptionTypeFlag, false); err != nil {
+	if _, err := ds.NewOption("aws_kinesis_random_partition_key", OptionTypeFlag, OptionChangable); err != nil {
 		return err
 	}
-	if _, err := ds.NewOption("aws_kinesis_stream", OptionTypeString, false); err != nil {
+	if _, err := ds.NewOption("aws_kinesis_stream", OptionTypeString, OptionChangable); err != nil {
 		return err
 	}
-	if _, err := ds.NewOption("aws_profile_name", OptionTypeString, false); err != nil {
+	if _, err := ds.NewOption("aws_profile_name", OptionTypeString, OptionChangable); err != nil {
 		return err
 	}
-	if _, err := ds.NewOption("aws_region", OptionTypeString, false); err != nil {
+	if _, err := ds.NewOption("aws_region", OptionTypeString, OptionChangable); err != nil {
 		return err
 	}
-	if _, err := ds.NewOption("aws_secret_access_key", OptionTypeString, false); err != nil {
+	if _, err := ds.NewOption("aws_secret_access_key", OptionTypeString, OptionChangable); err != nil {
 		return err
 	}
-	if _, err := ds.NewOption("aws_sts_arn_role", OptionTypeString, false); err != nil {
+	if _, err := ds.NewOption("aws_sts_arn_role", OptionTypeString, OptionChangable); err != nil {
 		return err
 	}
-	if _, err := ds.NewOption("aws_sts_region", OptionTypeString, false); err != nil {
+	if _, err := ds.NewOption("aws_sts_region", OptionTypeString, OptionChangable); err != nil {
 		return err
 	}
-	if _, err := ds.NewOption("aws_sts_session_name", OptionTypeString, false); err != nil {
+	if _, err := ds.NewOption("aws_sts_session_name", OptionTypeString, OptionChangable); err != nil {
 		return err
 	}
-	if _, err := ds.NewOption("aws_sts_timeout", OptionTypeInt, false); err != nil {
+	if _, err := ds.NewOption("aws_sts_timeout", OptionTypeInt, OptionChangable); err != nil {
 		return err
 	}
-	if _, err := ds.NewOption("buffered_log_max", OptionTypeInt, false); err != nil {
+	if _, err := ds.NewOption("buffered_log_max", OptionTypeInt, OptionChangable); err != nil {
 		return err
 	}
-	if _, err := ds.NewOption("decorations_top_level", OptionTypeFlag, false); err != nil {
+	if _, err := ds.NewOption("decorations_top_level", OptionTypeFlag, OptionChangable); err != nil {
 		return err
 	}
-	if _, err := ds.NewOption("disable_caching", OptionTypeFlag, false); err != nil {
+	if _, err := ds.NewOption("disable_caching", OptionTypeFlag, OptionChangable); err != nil {
 		return err
 	}
-	if _, err := ds.NewOption("disable_database", OptionTypeFlag, false); err != nil {
+	if _, err := ds.NewOption("disable_database", OptionTypeFlag, OptionChangable); err != nil {
 		return err
 	}
-	if _, err := ds.NewOption("disable_decorators", OptionTypeFlag, false); err != nil {
+	if _, err := ds.NewOption("disable_decorators", OptionTypeFlag, OptionChangable); err != nil {
 		return err
 	}
-	if _, err := ds.NewOption("disable_distributed", OptionTypeFlag, true); err != nil {
+	if _, err := ds.NewOption("disable_distributed", OptionTypeFlag, RequiredByKolide); err != nil {
 		return err
 	}
-	if _, err := ds.NewOption("disable_events", OptionTypeFlag, true); err != nil {
+	if _, err := ds.NewOption("disable_events", OptionTypeFlag, RequiredByKolide); err != nil {
 		return err
 	}
-	if _, err := ds.NewOption("disable_kernel", OptionTypeFlag, false); err != nil {
+	if _, err := ds.NewOption("disable_kernel", OptionTypeFlag, OptionChangable); err != nil {
 		return err
 	}
-	if _, err := ds.NewOption("disable_logging", OptionTypeFlag, false); err != nil {
+	if _, err := ds.NewOption("disable_logging", OptionTypeFlag, OptionChangable); err != nil {
 		return err
 	}
-	if _, err := ds.NewOption("disable_tables", OptionTypeString, false); err != nil {
+	if _, err := ds.NewOption("disable_tables", OptionTypeString, OptionChangable); err != nil {
 		return err
 	}
-	if _, err := ds.NewOption("distributed_interval", OptionTypeInt, false); err != nil {
+	if _, err := ds.NewOption("distributed_interval", OptionTypeInt, OptionChangable); err != nil {
 		return err
 	}
-	if _, err := ds.NewOption("distributed_plugin", OptionTypeString, true); err != nil {
+	if _, err := ds.NewOption("distributed_plugin", OptionTypeString, RequiredByKolide); err != nil {
+		return err
+	}
+	if _, err := ds.NewOption("distributed_tls_max_attempts", OptionTypeInt, OptionChangable); err != nil {
+		return err
+	}
+	if _, err := ds.NewOption("distributed_tls_read_endpoint", OptionTypeString, RequiredByKolide); err != nil {
+		return err
+	}
+	if _, err := ds.NewOption("distributed_tls_write_endpoint", OptionTypeString, RequiredByKolide); err != nil {
+		return err
+	}
+	if _, err := ds.NewOption("enable_foreign", OptionTypeFlag, OptionChangable); err != nil {
+		return err
+	}
+	if _, err := ds.NewOption("enable_monitor", OptionTypeFlag, RequiredByKolide); err != nil {
+		return err
+	}
+	if _, err := ds.NewOption("ephemeral", OptionTypeFlag, OptionChangable); err != nil {
+		return err
+	}
+	if _, err := ds.NewOption("events_expiry", OptionTypeInt, OptionChangable); err != nil {
+		return err
+	}
+	if _, err := ds.NewOption("events_max", OptionTypeInt, OptionChangable); err != nil {
+		return err
+	}
+	if _, err := ds.NewOption("events_optimize", OptionTypeFlag, OptionChangable); err != nil {
+		return err
+	}
+	if _, err := ds.NewOption("host_identifier", OptionTypeString, OptionChangable); err != nil {
+		return err
+	}
+	if _, err := ds.NewOption("logger_event_type", OptionTypeFlag, OptionChangable); err != nil {
+		return err
+	}
+	if _, err := ds.NewOption("logger_mode", OptionTypeString, OptionChangable); err != nil {
+		return err
+	}
+	if _, err := ds.NewOption("logger_path", OptionTypeString, OptionChangable); err != nil {
+		return err
+	}
+	if _, err := ds.NewOption("logger_plugin", OptionTypeString, OptionChangable); err != nil {
+		return err
+	}
+	if _, err := ds.NewOption("logger_secondary_status_only", OptionTypeFlag, OptionChangable); err != nil {
+		return err
+	}
+	if _, err := ds.NewOption("logger_syslog_facility", OptionTypeInt, OptionChangable); err != nil {
+		return err
+	}
+	if _, err := ds.NewOption("logger_tls_compress", OptionTypeFlag, OptionChangable); err != nil {
+		return err
+	}
+	if _, err := ds.NewOption("logger_tls_endpoint", OptionTypeString, RequiredByKolide); err != nil {
+		return err
+	}
+	if _, err := ds.NewOption("logger_tls_max", OptionTypeInt, OptionChangable); err != nil {
+		return err
+	}
+	if _, err := ds.NewOption("logger_tls_period", OptionTypeInt, OptionChangable); err != nil {
+		return err
+	}
+	if _, err := ds.NewOption("pack_delimiter", OptionTypeString, OptionChangable); err != nil {
+		return err
+	}
+	if _, err := ds.NewOption("pack_refresh_interval", OptionTypeInt, OptionChangable); err != nil {
+		return err
+	}
+	if _, err := ds.NewOption("read_max", OptionTypeInt, OptionChangable); err != nil {
+		return err
+	}
+	if _, err := ds.NewOption("read_user_max", OptionTypeInt, OptionChangable); err != nil {
+		return err
+	}
+	if _, err := ds.NewOption("schedule_default_interval", OptionTypeInt, OptionChangable); err != nil {
+		return err
+	}
+	if _, err := ds.NewOption("schedule_splay_percent", OptionTypeInt, OptionChangable); err != nil {
+		return err
+	}
+	if _, err := ds.NewOption("schedule_timeout", OptionTypeInt, OptionChangable); err != nil {
+		return err
+	}
+	if _, err := ds.NewOption("utc", OptionTypeFlag, OptionChangable); err != nil {
+		return err
+	}
+	if _, err := ds.NewOption("value_max", OptionTypeInt, OptionChangable); err != nil {
+		return err
+	}
+	if _, err := ds.NewOption("verbose", OptionTypeFlag, OptionChangable); err != nil {
+		return err
+	}
+	if _, err := ds.NewOption("worker_threads", OptionTypeInt, OptionChangable); err != nil {
 		return err
 	}
 	return nil

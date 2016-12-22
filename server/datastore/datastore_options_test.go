@@ -54,3 +54,8 @@ func testOptions(t *testing.T, ds kolide.Datastore) {
 	assert.Equal(t, 1, len(ovs))
 
 }
+
+func testOptionsSetup(t *testing.T, ds kolide.Datastore) {
+	err := kolide.CreateOptions(ds)
+	require.Nil(t, err)
+}

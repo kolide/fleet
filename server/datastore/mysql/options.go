@@ -102,3 +102,25 @@ func (d *Datastore) OptionValues() ([]kolide.OptionValue, error) {
 	}
 	return results, nil
 }
+
+type optionInfo struct {
+	Type  kolide.OptionType `db:"type"`
+	Value interface{}       `db:"value"`
+}
+
+func (d *Datastore) getOptionValueByName(name string) (*optionInfo, error) {
+	sqlStatement := `
+		SELECT opt.type, ov.value
+		FROM options AS opt
+		JOIN option_value AS ov
+		ON opt.id = ov.option_id
+		WHERE opt.name = ?
+		LIMIT 1
+	`
+	var opt optionInfo
+	if err := d.db.Get(&opt, sqlStatement, name); err != nil {
+		return nil, err
+	}
+
+	return &opt, nil
+}
