@@ -43,7 +43,7 @@ class QuerySidePanel extends Component {
     return false;
   }
 
-  onSelectTable = ({ value }) => {
+  onSelectTable = (value) => {
     const { onOsqueryTableSelect } = this.props;
 
     onOsqueryTableSelect(value);
@@ -144,7 +144,7 @@ class QuerySidePanel extends Component {
                 return <li key={idx}><Icon name="hosts" /> {os.display_text}</li>;
               }
 
-              return <li key={idx}><PlatformIcon name={os.type} /> {os.display_text}</li>;
+              return <li key={idx}><PlatformIcon name={os.display_text} /> {os.display_text}</li>;
             })}
           </ul>
         </div>
