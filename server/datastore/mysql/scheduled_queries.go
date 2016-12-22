@@ -25,6 +25,23 @@ func (d *Datastore) NewScheduledQuery(sq *kolide.ScheduledQuery) (*kolide.Schedu
 
 	id, _ := result.LastInsertId()
 	sq.ID = uint(id)
+
+	sql = `SELECT query, name FROM queries WHERE id = ? LIMIT 1`
+	metadata := []struct {
+		Query string
+		Name  string
+	}{}
+	if err := d.db.Select(&metadata, sql, sq.QueryID); err != nil {
+		return nil, errors.DatabaseError(err)
+	}
+
+	if len(metadata) != 1 {
+		return nil, errors.DatabaseError(errors.New("Unexpected MySQL error", "Wrong number of results returned from database"))
+	}
+
+	sq.Query = metadata[0].Query
+	sq.Name = metadata[0].Name
+
 	return sq, nil
 }
 
