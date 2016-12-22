@@ -316,6 +316,8 @@ export class ManageHostsPage extends Component {
             {renderHeader()}
             <div className={`${baseClass}__list ${baseClass}__list--${display.toLowerCase()}`}>
               {renderHosts()}
+              {renderHosts()}
+              {renderHosts()}
             </div>
           </div>
         }

@@ -5,7 +5,6 @@
   border-radius: 3px;
   box-shadow: 0 2px 8px 0 rgba($black, 0.05);
   box-sizing: border-box;
-  height: 300px;
   padding: $pad-half;
   margin: 30px 15px 0 0;
   position: relative;
@@ -124,41 +123,6 @@
     &--osquery,
     &--uptime {
       @include flex-basis(50%);
-    }
-  }
-
-  &__tag-list {
-    margin: 0;
-    padding: 0 0 0 40px;
-    list-style: none;
-    position: relative;
-
-    &::before {
-      @extend %kolidecon;
-      content: '\f033';
-      font-size: 24px;
-      position: absolute;
-      left: 6px;
-      top: 12px;
-      color: $text-medium;
-    }
-  }
-
-  &__tag {
-    font-size: 14px;
-    font-weight: $light;
-    color: $text-ultradark;
-    float: left;
-
-    &::after {
-      content: ',';
-      margin-right: 3px;
-    }
-
-    &:last-child {
-      &::after {
-        display: none;
-      }
     }
   }
 }

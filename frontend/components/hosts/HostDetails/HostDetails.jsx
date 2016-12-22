@@ -76,21 +76,6 @@ const HostDetails = ({ host, onQueryClick = noop, onDisableClick = noop }) => {
           <span className={`${baseClass}__host-content ${baseClass}__host-content--mono`}>{ip || '104.236.116.77'}</span>
         </li>
       </ul>
-
-      <ul className={`${baseClass}__tag-list`}>
-        <li className={`${baseClass}__tag`}>workstation</li>
-        <li className={`${baseClass}__tag`}>engineering</li>
-        <li className={`${baseClass}__tag`}>devops</li>
-        <li className={`${baseClass}__tag`}>vip</li>
-        <li className={`${baseClass}__tag`}>workstation</li>
-        <li className={`${baseClass}__tag`}>engineering</li>
-        <li className={`${baseClass}__tag`}>devops</li>
-        <li className={`${baseClass}__tag`}>vip</li>
-        <li className={`${baseClass}__tag`}>workstation</li>
-        <li className={`${baseClass}__tag`}>engineering</li>
-        <li className={`${baseClass}__tag`}>devops</li>
-        <li className={`${baseClass}__tag`}>vip</li>
-      </ul>
     </div>
   );
 };
