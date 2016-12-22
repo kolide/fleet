@@ -103,7 +103,7 @@ class AppConfigForm extends Component {
     const { showAdvancedOptions } = this.state;
 
     return (
-      <form className={baseClass}>
+      <form className={baseClass} onSubmit={handleSubmit}>
         <div className={`${baseClass}__section`}>
           <h2>Organization Info</h2>
           <div className={`${baseClass}__inputs`}>
@@ -202,8 +202,8 @@ class AppConfigForm extends Component {
           {renderAdvancedOptions()}
         </div>
         <Button
-          onClick={handleSubmit}
           text="UPDATE SETTINGS"
+          type="submit"
           variant="brand"
         />
       </form>
