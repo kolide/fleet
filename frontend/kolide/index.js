@@ -329,6 +329,13 @@ class Kolide extends Base {
     return Base.post(this.endpoint(SETUP), JSON.stringify(setupData));
   }
 
+  updateConfig = (formData) => {
+    const { CONFIG } = endpoints;
+    const configData = helpers.formatConfigDataForServer(formData);
+
+    return this.authenticatedPatch(this.endpoint(CONFIG), JSON.stringify(configData));
+  }
+
   updateQuery = ({ id: queryID }, updateParams) => {
     const { QUERIES } = endpoints;
     const updateQueryEndpoint = `${this.baseURL}${QUERIES}/${queryID}`;

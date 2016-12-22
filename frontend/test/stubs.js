@@ -26,7 +26,7 @@ export const configStub = {
     authentication_method: 'authmethod_plain',
     verify_ssl_certs: true,
     enable_start_tls: true,
-    email_disabled: false,
+    email_enabled: false,
   },
 };
 
