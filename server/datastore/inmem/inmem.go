@@ -32,7 +32,6 @@ type Datastore struct {
 	distributedQueryCampaigns       map[uint]kolide.DistributedQueryCampaign
 	distributedQueryCampaignTargets map[uint]kolide.DistributedQueryCampaignTarget
 	options                         map[uint]*kolide.Option
-	optionValues                    map[uint]*kolide.OptionValue
 	orginfo                         *kolide.AppConfig
 	config                          *config.KolideConfig
 }

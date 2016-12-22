@@ -9,49 +9,23 @@ import (
 )
 
 func testOptions(t *testing.T, ds kolide.Datastore) {
-	option, err := ds.NewOption("optString", kolide.OptionTypeString, false)
+	opt, err := kolide.NewOption("name", "option", kolide.OptionTypeString, true)
 	require.Nil(t, err)
-	assert.NotNil(t, option)
-	opts, err := ds.Options()
+	require.NotNil(t, opt)
+	opt2, err := ds.SaveOption(*opt)
 	require.Nil(t, err)
-	assert.Equal(t, 1, len(opts))
+	assert.NotEqual(t, 0, opt2.ID)
+	assert.Equal(t, opt.Name, opt2.Name)
+	assert.Equal(t, opt.RawValue, opt2.RawValue)
 
-	_, err = ds.NewOption("optInt", kolide.OptionTypeInt, false)
-	require.Nil(t, err)
-	_, err = ds.NewOption("optFlag", kolide.OptionTypeFlag, false)
-	require.Nil(t, err)
-	// can't create dup option
-	_, err = ds.NewOption("optFlag", kolide.OptionTypeFlag, false)
-	assert.NotNil(t, err)
-	opts, err = ds.Options()
-	require.Nil(t, err)
-	assert.Equal(t, 3, len(opts))
-	optVals := []kolide.OptionValue{
-		kolide.OptionValue{
-			OptionID: opts[0].ID,
-			Value:    "text",
-		},
-		kolide.OptionValue{
-			OptionID: opts[1].ID,
-			Value:    "23",
-		},
-	}
-	result, err := ds.SetOptionValues(optVals)
-	require.Nil(t, err)
-	assert.Equal(t, 2, len(result))
+	_, err = kolide.NewOption("name2", 3, kolide.OptionTypeString, true)
+	require.NotNil(t, err)
+	assert.Equal(t, "type mismatch", err.Error())
 
-	optVals = []kolide.OptionValue{
-		kolide.OptionValue{
-			OptionID: opts[0].ID,
-			Value:    "text",
-		},
-	}
-	_, err = ds.SetOptionValues(optVals)
+	opt3, err := kolide.NewOption("name3", nil, kolide.OptionTypeFlag, false)
+	opt4, err := ds.SaveOption(*opt3)
 	require.Nil(t, err)
-
-	ovs, err := ds.OptionValues()
-	require.Nil(t, err)
-	assert.Equal(t, 1, len(ovs))
+	assert.Nil(t, opt4.RawValue)
 
 }
 

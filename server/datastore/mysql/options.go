@@ -1,33 +1,55 @@
 package mysql
 
 import (
-	"fmt"
+	"database/sql"
 
-	"github.com/jmoiron/sqlx"
-	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
+	"github.com/pkg/errors"
 )
 
-func (d *Datastore) NewOption(name string, optType kolide.OptionType, kolideRequires bool) (*kolide.Option, error) {
+func (d *Datastore) SaveOption(opt kolide.Option) (*kolide.Option, error) {
 	sqlStatement := `
     INSERT INTO options (
       name,
       type,
-      required_for_kolide
-    ) VALUES ( ?, ?, ? )
+			value,
+      read_only
+    ) VALUES ( ?, ?, ?, ? )
+		ON DUPLICATE KEY UPDATE
+			value = VALUES(value)
     `
-	opt := &kolide.Option{
-		Name:              name,
-		Type:              optType,
-		RequiredForKolide: kolideRequires,
-	}
-	result, err := d.db.Exec(sqlStatement, name, optType, kolideRequires)
+	result, err := d.db.Exec(
+		sqlStatement,
+		opt.Name,
+		opt.Type,
+		opt.RawValue,
+		opt.ReadOnly,
+	)
 	if err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, err
 	}
 	id, _ := result.LastInsertId()
-	opt.ID = uint(id)
-	return opt, nil
+	if id != 0 {
+		// assign id if we inserted a record
+		opt.ID = uint(id)
+	}
+	return &opt, nil
+}
+
+func (d *Datastore) Option(id uint) (*kolide.Option, error) {
+	sqlStatement := `
+		SELECT *
+		FROM options
+		WHERE id = ?
+	`
+	var opt kolide.Option
+	if err := d.db.Get(opt, sqlStatement, id); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, notFound("Option").WithID(id)
+		}
+		return nil, errors.Wrap(err, "select option by ID")
+	}
+	return &opt, nil
 }
 
 func (d *Datastore) Options() ([]kolide.Option, error) {
@@ -38,89 +60,10 @@ func (d *Datastore) Options() ([]kolide.Option, error) {
   `
 	var opts []kolide.Option
 	if err := d.db.Select(&opts, sqlStatement); err != nil {
-		return nil, errors.DatabaseError(err)
+		if err == sql.ErrNoRows {
+			return nil, notFound("Option")
+		}
+		return nil, errors.Wrap(err, "select from options")
 	}
 	return opts, nil
-}
-
-func (d *Datastore) SetOptionValues(opts []kolide.OptionValue) ([]kolide.OptionValue, error) {
-	sqlStatement := `
-    INSERT INTO option_values (
-      option_id,
-      value
-    ) VALUES%s
-    ON DUPLICATE KEY
-    UPDATE
-      value = VALUES(value),
-			option_id = VALUES(option_id)
-  `
-
-	inList := []uint{}
-	valuesClause := ""
-	values := []interface{}{}
-	for _, opt := range opts {
-		if valuesClause != "" {
-			valuesClause += ","
-		}
-		valuesClause += "(?, ?)"
-		inList = append(inList, opt.OptionID)
-		values = append(values, opt.OptionID, opt.Value)
-	}
-	sqlStatement = fmt.Sprintf(sqlStatement, valuesClause)
-	_, err := d.db.Exec(sqlStatement, values...)
-	if err != nil {
-		return nil, errors.DatabaseError(err)
-	}
-	// remove option values that weren't changed/created
-	sqlStatement = `
-    DELETE FROM option_values
-    WHERE option_id NOT IN (?)
-  `
-	query, args, err := sqlx.In(sqlStatement, inList)
-	if err != nil {
-		return nil, errors.DatabaseError(err)
-	}
-	query = d.db.Rebind(query)
-	_, err = d.db.Exec(query, args...)
-	if err != nil {
-		return nil, errors.DatabaseError(err)
-	}
-
-	results, err := d.OptionValues()
-	if err != nil {
-		return nil, err
-	}
-
-	return results, nil
-
-}
-
-func (d *Datastore) OptionValues() ([]kolide.OptionValue, error) {
-	var results []kolide.OptionValue
-	if err := d.db.Select(&results, "SELECT * FROM option_values"); err != nil {
-		return nil, errors.DatabaseError(err)
-	}
-	return results, nil
-}
-
-type optionInfo struct {
-	Type  kolide.OptionType `db:"type"`
-	Value interface{}       `db:"value"`
-}
-
-func (d *Datastore) getOptionValueByName(name string) (*optionInfo, error) {
-	sqlStatement := `
-		SELECT opt.type, ov.value
-		FROM options AS opt
-		JOIN option_value AS ov
-		ON opt.id = ov.option_id
-		WHERE opt.name = ?
-		LIMIT 1
-	`
-	var opt optionInfo
-	if err := d.db.Get(&opt, sqlStatement, name); err != nil {
-		return nil, err
-	}
-
-	return &opt, nil
 }

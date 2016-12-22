@@ -6,23 +6,36 @@ import (
 	"github.com/kolide/kolide-ose/server/kolide"
 )
 
-func (d *Datastore) NewOption(name string, optType kolide.OptionType, kolideRequires bool) (*kolide.Option, error) {
+func (d *Datastore) SaveOption(opt kolide.Option) (*kolide.Option, error) {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
-	option := &kolide.Option{
-		Name:              name,
-		Type:              optType,
-		RequiredForKolide: kolideRequires,
-	}
-	// don't allow dupe names
-	for _, opt := range d.options {
-		if opt.Name == name {
-			return nil, fmt.Errorf("name '%s' is already in use", name)
+
+	if opt.ID == 0 {
+		// don't allow dupe names
+		for _, o := range d.options {
+			if opt.Name == o.Name {
+				return nil, fmt.Errorf("name '%s' is already in use", opt.Name)
+			}
 		}
+		opt.ID = d.nextID(opt)
+		d.options[opt.ID] = &opt
+		return &opt, nil
 	}
-	option.ID = d.nextID(option)
-	d.options[option.ID] = option
-	return option, nil
+
+	saved := d.options[opt.ID]
+	saved.RawValue = opt.RawValue
+	return saved, nil
+
+}
+
+func (d *Datastore) Option(id uint) (*kolide.Option, error) {
+	d.mtx.Lock()
+	defer d.mtx.Unlock()
+	saved, ok := d.options[id]
+	if !ok {
+		return nil, notFound("Option").WithID(id)
+	}
+	return saved, nil
 }
 
 func (d *Datastore) Options() ([]kolide.Option, error) {
@@ -33,27 +46,4 @@ func (d *Datastore) Options() ([]kolide.Option, error) {
 		result = append(result, *opt)
 	}
 	return result, nil
-}
-
-func (d *Datastore) SetOptionValues(vals []kolide.OptionValue) ([]kolide.OptionValue, error) {
-	d.mtx.Lock()
-	defer d.mtx.Unlock()
-	d.optionValues = map[uint]*kolide.OptionValue{}
-	for _, val := range vals {
-		if val.ID == 0 {
-			val.ID = d.nextID(val)
-		}
-		d.optionValues[val.ID] = &val
-	}
-	return vals, nil
-}
-
-func (d *Datastore) OptionValues() ([]kolide.OptionValue, error) {
-	d.mtx.Lock()
-	defer d.mtx.Unlock()
-	response := []kolide.OptionValue{}
-	for _, optVal := range d.optionValues {
-		response = append(response, *optVal)
-	}
-	return response, nil
 }
