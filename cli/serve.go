@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"net/http"
@@ -21,6 +22,7 @@ import (
 	"github.com/kolide/kolide-ose/server/service"
 	"github.com/kolide/kolide-ose/server/version"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/cobra"
 	"golang.org/x/net/context"
 )
@@ -63,9 +65,15 @@ the way that the kolide server works.
 			var mailService kolide.MailService
 
 			if devMode {
-				fmt.Println(
-					"Dev mode enabled, using in-memory DB.\n",
-					"Warning: Changes will not be saved across process restarts. This should NOT be used in production.",
+				fmt.Print(
+					"********************************************************************************\n",
+					"* Warning:                                                                     *\n",
+					"*                                                                              *\n",
+					"*    Developer mode is currently enabled, so Kolide is using a transient,      *\n",
+					"*    in-memory DB. Any changes you make to the database will not be saved      *\n",
+					"*    across process restarts. This should NOT be used in production.           *\n",
+					"*                                                                              *\n",
+					"********************************************************************************\n",
 				)
 
 				if ds, err = inmem.New(config); err != nil {
@@ -141,11 +149,19 @@ the way that the kolide server works.
 					apiHandler = service.WithSetup(svc, logger, apiHandler)
 				}
 			}
+
+			// a list of dependencies which could affect the status of the app if unavailable
+			healthCheckers := map[string]interface{}{
+				"datastore":          ds,
+				"query_result_store": resultStore,
+			}
+
+			http.Handle("/healthz", prometheus.InstrumentHandler("healthz", healthz(healthCheckers)))
+			http.Handle("/version", prometheus.InstrumentHandler("version", version.Handler()))
+			http.Handle("/assets/", prometheus.InstrumentHandler("static_assets", service.ServeStaticAssets("/assets/")))
+			http.Handle("/metrics", prometheus.InstrumentHandler("metrics", promhttp.Handler()))
 			http.Handle("/api/", apiHandler)
-			http.Handle("/version", version.Handler())
-			http.Handle("/metrics", prometheus.Handler())
-			http.Handle("/assets/", service.ServeStaticAssets("/assets/"))
-			http.Handle("/", service.ServeFrontend())
+			http.Handle("/", prometheus.InstrumentHandler("get_frontend", service.ServeFrontend()))
 
 			errs := make(chan error, 2)
 			go func() {
@@ -175,4 +191,34 @@ the way that the kolide server works.
 	serveCmd.PersistentFlags().BoolVar(&devMode, "dev", false, "Use dev settings (in-mem DB, etc.)")
 
 	return serveCmd
+}
+
+// healthz is an http handler which responds with either
+// 200 OK if the server can successfuly communicate with it's backends or
+// 500 if any of the backends are reporting an issue.
+func healthz(deps map[string]interface{}) http.HandlerFunc {
+	type healthChecker interface {
+		HealthCheck() error
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		errs := make(map[string]string)
+		for name, dep := range deps {
+			if hc, ok := dep.(healthChecker); ok {
+				err := hc.HealthCheck()
+				if err != nil {
+					errs[name] = err.Error()
+				}
+			}
+		}
+
+		if len(errs) > 0 {
+			w.WriteHeader(http.StatusInternalServerError)
+			enc := json.NewEncoder(w)
+			enc.SetIndent("", "  ")
+			enc.Encode(map[string]interface{}{
+				"errors": errs,
+			})
+		}
+	}
 }
