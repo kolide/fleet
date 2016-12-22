@@ -1,5 +1,6 @@
 import Kolide from 'kolide';
 
+import formatApiErrors from 'utilities/format_api_errors';
 import { frontendFormattedConfig } from 'redux/nodes/app/helpers';
 
 export const CONFIG_FAILURE = 'CONFIG_FAILURE';
@@ -53,7 +54,9 @@ export const updateConfig = (configData) => {
         return formattedConfig;
       })
       .catch((error) => {
-        dispatch(configFailure(error));
+        const formattedErrors = formatApiErrors(error);
+
+        dispatch(configFailure(formattedErrors));
 
         return false;
       });
