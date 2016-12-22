@@ -2,10 +2,9 @@ import React, { Component, PropTypes } from 'react';
 import classnames from 'classnames';
 
 import configInterface from 'interfaces/config';
-import userInterface from 'interfaces/user';
 import Icon from 'components/icons/Icon';
-
-import UserMenu from './UserMenu';
+import userInterface from 'interfaces/user';
+import UserMenu from 'components/side_panels/SiteNavHeader/UserMenu';
 
 class SiteNavHeader extends Component {
   static propTypes = {
@@ -18,30 +17,40 @@ class SiteNavHeader extends Component {
   constructor (props) {
     super(props);
 
-    this.state = {
-      userMenuOpened: false,
-    };
+    this.state = { userMenuOpened: false };
   }
 
   componentDidMount = () => {
     const { document } = global;
     const { closeUserMenu } = this;
+
     document.addEventListener('mousedown', closeUserMenu, false);
   }
 
-  closeUserMenu = (evt) => {
+  setHeaderNav = (ref) => {
+    this.headerNav = ref;
+
+    return false;
+  }
+
+  closeUserMenu = ({ target }) => {
     const { headerNav } = this;
 
-    if (headerNav && !headerNav.contains(evt.target)) {
+    if (headerNav && !headerNav.contains(target)) {
       this.setState({ userMenuOpened: false });
     }
+
+    return false;
   }
 
   toggleUserMenu = (evt) => {
     evt.preventDefault();
+
     const { userMenuOpened } = this.state;
 
     this.setState({ userMenuOpened: !userMenuOpened });
+
+    return false;
   }
 
   render () {
@@ -56,7 +65,7 @@ class SiteNavHeader extends Component {
     } = this.props;
 
     const { userMenuOpened } = this.state;
-    const { toggleUserMenu } = this;
+    const { setHeaderNav, toggleUserMenu } = this;
     const { enabled, username } = user;
 
     const headerBaseClass = 'site-nav-header';
@@ -75,7 +84,7 @@ class SiteNavHeader extends Component {
 
     return (
       <header className={headerBaseClass}>
-        <button className={headerToggleClass} onClick={toggleUserMenu} ref={(r) => { this.headerNav = r; }}>
+        <button className={headerToggleClass} onClick={toggleUserMenu} ref={setHeaderNav}>
           <div className={`${headerBaseClass}__org`}>
             <img
               alt="Company logo"
