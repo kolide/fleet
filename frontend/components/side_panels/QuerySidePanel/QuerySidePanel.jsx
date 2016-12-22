@@ -43,7 +43,7 @@ class QuerySidePanel extends Component {
     return false;
   }
 
-  onSelectTable = ({ value }) => {
+  onSelectTable = (value) => {
     const { onOsqueryTableSelect } = this.props;
 
     onOsqueryTableSelect(value);
