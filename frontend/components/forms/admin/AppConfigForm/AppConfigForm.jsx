@@ -169,18 +169,11 @@ class AppConfigForm extends Component {
             <p>The hostname / IP address and corresponding port of your organization&apos;s SMTP server.</p>
           </div>
           <div className={`${baseClass}__inputs`}>
-            <div className="input-field__wrapper">
-              <label
-                className="input-field__label"
-                htmlFor={fields.authentication_type.name}
-              >
-                Authentication Type
-              </label>
-              <Dropdown
-                {...fields.authentication_type}
-                options={authTypeOptions}
-              />
-            </div>
+            <Dropdown
+              {...fields.authentication_type}
+              label="Authentication Type"
+              options={authTypeOptions}
+            />
             <div className={`${baseClass}__smtp-section`}>
               <InputField
                 {...fields.user_name}
@@ -190,19 +183,12 @@ class AppConfigForm extends Component {
                 {...fields.password}
                 label="SMTP Password"
               />
-              <div className="input-field__wrapper">
-                <label
-                  className="input-field__label"
-                  htmlFor={fields.authentication_method.name}
-                >
-                  Auth Method
-                </label>
-                <Dropdown
-                  {...fields.authentication_method}
-                  options={authMethodOptions}
-                  placeholder=""
-                />
-              </div>
+              <Dropdown
+                {...fields.authentication_method}
+                label="Auth Method"
+                options={authMethodOptions}
+                placeholder=""
+              />
             </div>
           </div>
           <div className={`${baseClass}__details`}>
@@ -213,9 +199,7 @@ class AppConfigForm extends Component {
         </div>
         <div className={`${baseClass}__section`}>
           <h2><a href="#advancedOptions" onClick={onToggleAdvancedOptions} className={`${baseClass}__show-options`}><Header showAdvancedOptions={showAdvancedOptions} /></a></h2>
-
           {renderAdvancedOptions()}
-
         </div>
         <Button
           onClick={handleSubmit}
