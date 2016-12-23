@@ -1,4 +1,4 @@
-import { size } from 'lodash';
+import { size, some } from 'lodash';
 
 export default (formData) => {
   const errors = {};
@@ -15,21 +15,23 @@ export default (formData) => {
     errors.kolide_server_url = 'Kolide Server URL must be present';
   }
 
-  if (!smtpSenderAddress) {
-    errors.sender_address = 'SMTP Sender Address must be present';
-  }
-
-  if (!smtpServer) {
-    errors.server = 'SMTP Server must be present';
-  }
-
-  if (authType !== 'authtype_none') {
-    if (!smtpUserName) {
-      errors.user_name = 'SMTP Username must be present';
+  if (some([smtpSenderAddress, smtpPassword, smtpServer, smtpUserName])) {
+    if (!smtpSenderAddress) {
+      errors.sender_address = 'SMTP Sender Address must be present';
     }
 
-    if (!smtpPassword) {
-      errors.password = 'SMTP Password must be present';
+    if (!smtpServer) {
+      errors.server = 'SMTP Server must be present';
+    }
+
+    if (authType !== 'authtype_none') {
+      if (!smtpUserName) {
+        errors.user_name = 'SMTP Username must be present';
+      }
+
+      if (!smtpPassword) {
+        errors.password = 'SMTP Password must be present';
+      }
     }
   }
 

@@ -85,7 +85,7 @@ class AppConfigForm extends Component {
           <div className={`${baseClass}__smtp-section`}>
             <InputField {...fields.domain} label="Domain" />
             <Slider {...fields.verify_ssl_certs} label="Verify SSL Certs?" />
-            <Slider {...fields.enable_start_tls} label="Enable STARTTLSomething?" />
+            <Slider {...fields.enable_start_tls} label="Enable STARTTLS?" />
           </div>
         </div>
 
