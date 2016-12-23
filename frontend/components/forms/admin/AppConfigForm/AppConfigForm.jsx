@@ -98,9 +98,36 @@ class AppConfigForm extends Component {
     );
   }
 
+  renderSmtpSection = () => {
+    const { fields } = this.props;
+
+    if (fields.authentication_type.value === 'authtype_none') {
+      return false;
+    }
+
+    return (
+      <div className={`${baseClass}__smtp-section`}>
+        <InputField
+          {...fields.user_name}
+          label="SMTP Username"
+        />
+        <InputField
+          {...fields.password}
+          label="SMTP Password"
+        />
+        <Dropdown
+          {...fields.authentication_method}
+          label="Auth Method"
+          options={authMethodOptions}
+          placeholder=""
+        />
+      </div>
+    );
+  }
+
   render () {
     const { fields, handleSubmit, smtpConfigured } = this.props;
-    const { onToggleAdvancedOptions, renderAdvancedOptions } = this;
+    const { onToggleAdvancedOptions, renderAdvancedOptions, renderSmtpSection } = this;
     const { showAdvancedOptions } = this.state;
 
     return (
@@ -172,22 +199,7 @@ class AppConfigForm extends Component {
               label="Authentication Type"
               options={authTypeOptions}
             />
-            <div className={`${baseClass}__smtp-section`}>
-              <InputField
-                {...fields.user_name}
-                label="SMTP Username"
-              />
-              <InputField
-                {...fields.password}
-                label="SMTP Password"
-              />
-              <Dropdown
-                {...fields.authentication_method}
-                label="Auth Method"
-                options={authMethodOptions}
-                placeholder=""
-              />
-            </div>
+            {renderSmtpSection()}
           </div>
           <div className={`${baseClass}__details`}>
             <p>If your mail server requires authentication, you need to specify the authentication type here.</p>
