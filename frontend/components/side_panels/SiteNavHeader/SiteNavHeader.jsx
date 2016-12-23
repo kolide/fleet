@@ -3,6 +3,7 @@ import classnames from 'classnames';
 
 import configInterface from 'interfaces/config';
 import Icon from 'components/icons/Icon';
+import OrgLogoIcon from 'components/icons/OrgLogoIcon';
 import userInterface from 'interfaces/user';
 import UserMenu from 'components/side_panels/SiteNavHeader/UserMenu';
 
@@ -86,11 +87,7 @@ class SiteNavHeader extends Component {
       <header className={headerBaseClass}>
         <button className={headerToggleClass} onClick={toggleUserMenu} ref={setHeaderNav}>
           <div className={`${headerBaseClass}__org`}>
-            <img
-              alt="Company logo"
-              src={orgLogoURL}
-              className={`${headerBaseClass}__logo`}
-            />
+            <OrgLogoIcon className={`${headerBaseClass}__logo`} src={orgLogoURL} />
             <h1 className={`${headerBaseClass}__org-name`}>{orgName}</h1>
             <div className={userStatusClass} />
             <h2 className={`${headerBaseClass}__username`}>{username}</h2>
