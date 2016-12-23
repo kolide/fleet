@@ -14,7 +14,7 @@ export const STATUSES = {
   offline: 'OFFLINE',
 };
 
-const HostDetails = ({ host, onQueryClick = noop, onDisableClick = noop }) => {
+const HostDetails = ({ host, onQueryClick = noop }) => {
   const {
     hostname,
     ip,
@@ -82,7 +82,6 @@ const HostDetails = ({ host, onQueryClick = noop, onDisableClick = noop }) => {
 
 HostDetails.propTypes = {
   host: hostInterface.isRequired,
-  onDisableClick: PropTypes.func,
   onQueryClick: PropTypes.func,
 };
 
