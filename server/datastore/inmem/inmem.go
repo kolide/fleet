@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/kolide/kolide-ose/server/config"
+	"github.com/kolide/kolide-ose/server/datastore/internal/appstate"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"github.com/patrickmn/sortutil"
 )
@@ -87,6 +88,25 @@ func (d *Datastore) Migrate() error {
 	d.distributedQueryCampaigns = make(map[uint]kolide.DistributedQueryCampaign)
 	d.distributedQueryCampaignTargets = make(map[uint]kolide.DistributedQueryCampaignTarget)
 	d.options = make(map[uint]*kolide.Option)
+
+	for _, initData := range appstate.Options {
+		opt := kolide.Option{
+			Name: initData.Name,
+			Value: func(v interface{}) *string {
+				var s *string
+				if v != nil {
+					s = new(string)
+					*s = v.(string)
+				}
+				return s
+			}(initData.Value),
+			Type:     initData.Type,
+			ReadOnly: initData.ReadOnly,
+		}
+		opt.ID = d.nextID(opt)
+		d.options[opt.ID] = &opt
+	}
+
 	d.orginfo = &kolide.AppConfig{
 		ID:                 1,
 		SMTPEnableTLS:      true,

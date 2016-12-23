@@ -1,0 +1,69 @@
+package appstate
+
+import (
+	"github.com/kolide/kolide-ose/server/kolide"
+)
+
+var Options = []struct {
+	Name     string
+	Value    interface{}
+	Type     kolide.OptionType
+	ReadOnly bool
+}{
+	{"aws_access_key_id", nil, kolide.OptionTypeString, kolide.NotReadOnly},
+	{"aws_firehose_period", nil, kolide.OptionTypeInt, kolide.NotReadOnly},
+	{"aws_firehose_stream", nil, kolide.OptionTypeString, kolide.NotReadOnly},
+	{"aws_kinesis_period", nil, kolide.OptionTypeInt, kolide.NotReadOnly},
+	{"aws_kinesis_random_partition_key", nil, kolide.OptionTypeFlag, kolide.NotReadOnly},
+	{"aws_kinesis_stream", nil, kolide.OptionTypeString, kolide.NotReadOnly},
+	{"aws_profile_name", nil, kolide.OptionTypeString, kolide.NotReadOnly},
+	{"aws_region", nil, kolide.OptionTypeString, kolide.NotReadOnly},
+	{"aws_secret_access_key", nil, kolide.OptionTypeString, kolide.NotReadOnly},
+	{"aws_sts_arn_role", nil, kolide.OptionTypeString, kolide.NotReadOnly},
+	{"aws_sts_region", nil, kolide.OptionTypeString, kolide.NotReadOnly},
+	{"aws_sts_session_name", nil, kolide.OptionTypeString, kolide.NotReadOnly},
+	{"aws_sts_timeout", nil, kolide.OptionTypeInt, kolide.NotReadOnly},
+	{"buffered_log_max", nil, kolide.OptionTypeInt, kolide.NotReadOnly},
+	{"decorations_top_level", nil, kolide.OptionTypeFlag, kolide.NotReadOnly},
+	{"disable_caching", nil, kolide.OptionTypeFlag, kolide.NotReadOnly},
+	{"disable_database", nil, kolide.OptionTypeFlag, kolide.NotReadOnly},
+	{"disable_decorators", nil, kolide.OptionTypeFlag, kolide.NotReadOnly},
+	{"disable_distributed", "false", kolide.OptionTypeFlag, kolide.ReadOnly},
+	{"disable_events", nil, kolide.OptionTypeFlag, kolide.ReadOnly},
+	{"disable_kernel", nil, kolide.OptionTypeFlag, kolide.NotReadOnly},
+	{"disable_logging", nil, kolide.OptionTypeFlag, kolide.NotReadOnly},
+	{"disable_tables", nil, kolide.OptionTypeString, kolide.NotReadOnly},
+	{"distributed_interval", "10", kolide.OptionTypeInt, kolide.NotReadOnly},
+	{"distributed_plugin", "tls", kolide.OptionTypeString, kolide.ReadOnly},
+	{"distributed_tls_max_attempts", "3", kolide.OptionTypeInt, kolide.NotReadOnly},
+	{"distributed_tls_read_endpoint", "/api/v1/osquery/distributed/read", kolide.OptionTypeString, kolide.ReadOnly},
+	{"distributed_tls_write_endpoint", "/api/v1/osquery/distributed/write", kolide.OptionTypeString, kolide.ReadOnly},
+	{"enable_foreign", nil, kolide.OptionTypeFlag, kolide.NotReadOnly},
+	{"enable_monitor", nil, kolide.OptionTypeFlag, kolide.ReadOnly},
+	{"ephemeral", nil, kolide.OptionTypeFlag, kolide.NotReadOnly},
+	{"events_expiry", nil, kolide.OptionTypeInt, kolide.NotReadOnly},
+	{"events_max", nil, kolide.OptionTypeInt, kolide.NotReadOnly},
+	{"events_optimize", nil, kolide.OptionTypeFlag, kolide.NotReadOnly},
+	{"host_identifier", nil, kolide.OptionTypeString, kolide.NotReadOnly},
+	{"logger_event_type", nil, kolide.OptionTypeFlag, kolide.NotReadOnly},
+	{"logger_mode", nil, kolide.OptionTypeString, kolide.NotReadOnly},
+	{"logger_path", nil, kolide.OptionTypeString, kolide.NotReadOnly},
+	{"logger_plugin", "tls", kolide.OptionTypeString, kolide.ReadOnly},
+	{"logger_secondary_status_only", nil, kolide.OptionTypeFlag, kolide.NotReadOnly},
+	{"logger_syslog_facility", nil, kolide.OptionTypeInt, kolide.NotReadOnly},
+	{"logger_tls_compress", nil, kolide.OptionTypeFlag, kolide.NotReadOnly},
+	{"logger_tls_endpoint", "/api/v1/osquery/log", kolide.OptionTypeString, kolide.ReadOnly},
+	{"logger_tls_max", nil, kolide.OptionTypeInt, kolide.NotReadOnly},
+	{"logger_tls_period", "10", kolide.OptionTypeInt, kolide.NotReadOnly},
+	{"pack_delimiter", "/", kolide.OptionTypeString, kolide.ReadOnly},
+	{"pack_refresh_interval", nil, kolide.OptionTypeInt, kolide.NotReadOnly},
+	{"read_max", nil, kolide.OptionTypeInt, kolide.NotReadOnly},
+	{"read_user_max", nil, kolide.OptionTypeInt, kolide.NotReadOnly},
+	{"schedule_default_interval", nil, kolide.OptionTypeInt, kolide.NotReadOnly},
+	{"schedule_splay_percent", nil, kolide.OptionTypeInt, kolide.NotReadOnly},
+	{"schedule_timeout", nil, kolide.OptionTypeInt, kolide.NotReadOnly},
+	{"utc", nil, kolide.OptionTypeFlag, kolide.NotReadOnly},
+	{"value_max", nil, kolide.OptionTypeInt, kolide.NotReadOnly},
+	{"verbose", nil, kolide.OptionTypeFlag, kolide.NotReadOnly},
+	{"worker_threads", nil, kolide.OptionTypeInt, kolide.NotReadOnly},
+}

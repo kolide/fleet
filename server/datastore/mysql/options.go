@@ -7,33 +7,53 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (d *Datastore) SaveOption(opt kolide.Option) (*kolide.Option, error) {
+func (d *Datastore) OptionByName(name string) (*kolide.Option, error) {
 	sqlStatement := `
-    INSERT INTO options (
-      name,
-      type,
-			value,
-      read_only
-    ) VALUES ( ?, ?, ?, ? )
-		ON DUPLICATE KEY UPDATE
-			value = VALUES(value)
-    `
-	result, err := d.db.Exec(
+			SELECT *
+			FROM options
+			WHERE name = ?
+		`
+	var option kolide.Option
+	if err := d.db.Get(&option, sqlStatement, name); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, notFound("option")
+		}
+		return nil, errors.Wrap(err, sqlStatement)
+	}
+	return &option, nil
+}
+
+func (d *Datastore) SaveOption(opt kolide.Option) error {
+	var existing kolide.Option
+	err := d.db.Get(&existing, "SELECT * FROM options WHERE id = ?", opt.ID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return notFound("option").WithID(opt.ID)
+		}
+		return errors.Wrap(err, "select from options")
+	}
+	// since we validate with passed in type verify that the passed
+	// in type matches the type we have
+	if existing.Type != opt.Type {
+		return errors.New("type mismatch")
+	}
+	if existing.ReadOnly {
+		return errors.New("readonly option can't be changed")
+	}
+	sqlStatement := `
+    UPDATE options
+		SET value = ?
+		WHERE id = ?
+	`
+	_, err = d.db.Exec(
 		sqlStatement,
-		opt.Name,
-		opt.Type,
 		opt.RawValue,
-		opt.ReadOnly,
+		opt.ID,
 	)
 	if err != nil {
-		return nil, err
+		return errors.Wrap(err, "update options")
 	}
-	id, _ := result.LastInsertId()
-	if id != 0 {
-		// assign id if we inserted a record
-		opt.ID = uint(id)
-	}
-	return &opt, nil
+	return nil
 }
 
 func (d *Datastore) Option(id uint) (*kolide.Option, error) {
@@ -43,7 +63,7 @@ func (d *Datastore) Option(id uint) (*kolide.Option, error) {
 		WHERE id = ?
 	`
 	var opt kolide.Option
-	if err := d.db.Get(opt, sqlStatement, id); err != nil {
+	if err := d.db.Get(&opt, sqlStatement, id); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, notFound("Option").WithID(id)
 		}

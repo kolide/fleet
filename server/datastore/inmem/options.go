@@ -1,31 +1,47 @@
 package inmem
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/kolide/kolide-ose/server/kolide"
 )
 
-func (d *Datastore) SaveOption(opt kolide.Option) (*kolide.Option, error) {
+func (d *Datastore) OptionByName(name string) (*kolide.Option, error) {
+	d.mtx.Lock()
+	defer d.mtx.Unlock()
+	for _, opt := range d.options {
+		if opt.Name == name {
+			return opt, nil
+		}
+	}
+	return nil, notFound("options")
+}
+
+func (d *Datastore) SaveOption(opt kolide.Option) error {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
-	if opt.ID == 0 {
-		// don't allow dupe names
-		for _, o := range d.options {
-			if opt.Name == o.Name {
-				return nil, fmt.Errorf("name '%s' is already in use", opt.Name)
-			}
-		}
-		opt.ID = d.nextID(opt)
-		d.options[opt.ID] = &opt
-		return &opt, nil
+	existing, ok := d.options[opt.ID]
+	if !ok {
+		return notFound("option").WithID(opt.ID)
+	}
+	// since we will validate against the passed in type in the validation layer
+	// we need to make sure that the passed in type matches the type we have
+	if existing.Type != opt.Type {
+		return fmt.Errorf("type mismatch")
+	}
+	if existing.ReadOnly {
+		return errors.New("readonly option can't be changed")
+	}
+	if opt.RawValue == nil {
+		existing.RawValue = nil
+		return nil
 	}
 
-	saved := d.options[opt.ID]
-	saved.RawValue = opt.RawValue
-	return saved, nil
-
+	existing.RawValue = new(string)
+	*existing.RawValue = *opt.RawValue
+	return nil
 }
 
 func (d *Datastore) Option(id uint) (*kolide.Option, error) {
