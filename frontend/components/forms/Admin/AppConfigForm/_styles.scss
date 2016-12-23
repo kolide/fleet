@@ -1,6 +1,7 @@
 .app-config-form {
   &__section {
     @include clearfix;
+    margin: 0 0 15px;
 
     .smtp-options {
       font-size: 15px;
@@ -92,6 +93,7 @@
       border-radius: 80px;
       height: 160px;
       width: 160px;
+      border: 1px solid $accent-medium;
     }
 
     p {
