@@ -7,6 +7,7 @@ import Form from 'components/forms/Form';
 import formFieldInterface from 'interfaces/form_field';
 import Icon from 'components/icons/Icon';
 import InputField from 'components/forms/fields/InputField';
+import OrgLogoIcon from 'components/icons/OrgLogoIcon';
 import Slider from 'components/forms/fields/Slider';
 import validate from 'components/forms/admin/AppConfigForm/validate';
 
@@ -117,10 +118,7 @@ class AppConfigForm extends Component {
             />
           </div>
           <div className={`${baseClass}__details ${baseClass}__avatar-preview`}>
-            <img
-              alt="Avatar preview"
-              src={fields.org_logo_url.value}
-            />
+            <OrgLogoIcon src={fields.org_logo_url.value} />
             <p>Avatar Preview</p>
           </div>
         </div>
