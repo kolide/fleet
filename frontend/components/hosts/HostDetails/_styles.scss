@@ -6,29 +6,12 @@
   box-shadow: 0 2px 8px 0 rgba($black, 0.05);
   box-sizing: border-box;
   padding: $pad-half;
-  margin: 30px 15px 0 0;
+  margin: 30px 7px 0;
   position: relative;
   text-align: center;
   min-width: 240px;
   max-width: 300px;
-
-  @media (min-width: 1619px) {
-    &:nth-child(4n) {
-      margin-right: 0;
-    }
-  }
-
-  @media (min-width: 1364px) and (max-width: 1618px) {
-    &:nth-child(3n) {
-      margin-right: 0;
-    }
-  }
-
-  @media (max-width: 1363px) {
-    &:nth-child(2n) {
-      margin-right: 0;
-    }
-  }
+  display: inline-block;
 
   &--online {
     border-top: 6px solid $success;
@@ -96,7 +79,7 @@
     list-style: none;
     margin: 8px auto;
     padding: 8px 0;
-    max-width: 80%;
+    max-width: 222px;
   }
 
   &__detail {
