@@ -9,6 +9,7 @@ import entityGetter from 'redux/utilities/entityGetter';
 import InputField from 'components/forms/fields/InputField';
 import NumberPill from 'components/NumberPill';
 import packActions from 'redux/nodes/entities/packs/actions';
+import PackInfoSidePanel from 'components/side_panels/PackInfoSidePanel';
 import packInterface from 'interfaces/pack';
 import paths from 'router/paths';
 
@@ -23,7 +24,10 @@ class AllPacksPage extends Component {
   constructor (props) {
     super(props);
 
-    this.state = { packFilter: '' };
+    this.state = {
+      packFilter: '',
+      selectedPack: undefined,
+    };
   }
 
   componentWillMount() {
@@ -87,15 +91,32 @@ class AllPacksPage extends Component {
     );
   }
 
+  renderSidePanel = () => {
+    const { selectedPack } = this.state;
+
+    if (!selectedPack) {
+      return <PackInfoSidePanel />;
+    }
+
+    // TODO: render PackDetailSidePanel
+    return false;
+  }
+
   render () {
-    const { getPacks, goToNewPackPage, onFilterPacks, renderPack } = this;
+    const {
+      getPacks,
+      goToNewPackPage,
+      onFilterPacks,
+      renderPack,
+      renderSidePanel,
+    } = this;
     const { packFilter } = this.state;
     const packs = getPacks();
     const packsCount = packs.length;
 
     return (
-      <div className={`${baseClass} body-wrap`}>
-        <div className={`${baseClass}__wrapper`}>
+      <div className={`${baseClass} has-sidebar`}>
+        <div className={`${baseClass}__wrapper body-wrap`}>
           <p className={`${baseClass}__title`}>
             <NumberPill number={packsCount} /> Query Packs
           </p>
@@ -133,6 +154,7 @@ class AllPacksPage extends Component {
             </tbody>
           </table>
         </div>
+        {renderSidePanel()}
       </div>
     );
   }
