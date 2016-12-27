@@ -91,7 +91,7 @@ var testFunctions = [...]func(*testing.T, *testResource){
 	testModifyAppConfigWithValidationFail,
 	testGetOptions,
 	testModifyOptions,
-	testModifyOptionsBadJSON,
+	testModifyOptionsValidationFail,
 }
 
 func TestEndpoints(t *testing.T) {

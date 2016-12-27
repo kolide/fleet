@@ -8,6 +8,7 @@ import (
 	"golang.org/x/net/context"
 )
 
+// OptionStore interface describes methods to access datastore
 type OptionStore interface {
 	SaveOptions(opts []Option) error
 	Options() ([]Option, error)
@@ -15,6 +16,7 @@ type OptionStore interface {
 	OptionByName(name string) (*Option, error)
 }
 
+// OptionsService interface describes methods that operate on osquery options
 type OptionService interface {
 	GetOptions(ctx context.Context) ([]Option, error)
 	ModifyOptions(ctx context.Context, req OptionRequest) ([]Option, error)
@@ -34,6 +36,7 @@ const (
 	OptionTypeFlag
 )
 
+// Used to marshal OptionType to human readable strings used in JSON payloads
 func (ot OptionType) String() string {
 	switch ot {
 	case OptionTypeString:
@@ -57,10 +60,27 @@ type Option struct {
 	Type OptionType
 	// RawValue is string representation of option value, may be nil to
 	// indicate the option is not set
-	Value *string `db:"value"`
+	Value interface{} `db:"value"`
 	// ReadOnly if true, this option is required for Kolide to function
 	// properly and cannot be modified by the end user
 	ReadOnly bool `db:"read_only"`
+}
+
+// ValueAsString is a convenience method that converts the Value field of an
+// option to a string.
+func (opt *Option) ValueAsString() (val string, isDefined bool) {
+	if opt.Value == nil {
+		return "", false
+	}
+	switch opt.Value.(type) {
+	case []uint8:
+		return string(opt.Value.([]uint8)), true
+	case *string:
+		return *(opt.Value.(*string)), true
+	case string:
+		return opt.Value.(string), true
+	}
+	panic("unknown option type")
 }
 
 // OptionRequest contains options that are passed to modify options requests.
@@ -79,25 +99,33 @@ type transform struct {
 func (opt *Option) MarshalJSON() ([]byte, error) {
 	var val interface{}
 	if opt.Value == nil {
-		val = opt.Value
+		val = nil
 	} else {
-		switch opt.Type {
-		case OptionTypeString:
-			val = *opt.Value
-		case OptionTypeInt:
-			i, err := strconv.ParseInt(*opt.Value, 10, 64)
-			if err != nil {
-				return nil, err
+		strPtr, ok := opt.Value.(*string)
+		if !ok {
+			return nil, fmt.Errorf("option value is not expected type")
+		}
+		if strPtr == nil {
+			val = strPtr
+		} else {
+			switch opt.Type {
+			case OptionTypeString:
+				val = *strPtr
+			case OptionTypeInt:
+				i, err := strconv.ParseInt(*strPtr, 10, 64)
+				if err != nil {
+					return nil, err
+				}
+				val = i
+			case OptionTypeFlag:
+				b, err := strconv.ParseBool(*strPtr)
+				if err != nil {
+					return nil, err
+				}
+				val = b
+			default:
+				panic("unimplemented option type")
 			}
-			val = i
-		case OptionTypeFlag:
-			b, err := strconv.ParseBool(*opt.Value)
-			if err != nil {
-				return nil, err
-			}
-			val = b
-		default:
-			panic("unimplemented option type")
 		}
 	}
 	transform := &transform{
@@ -108,7 +136,6 @@ func (opt *Option) MarshalJSON() ([]byte, error) {
 		opt.ReadOnly,
 	}
 	return json.Marshal(transform)
-
 }
 
 func (opt *Option) UnmarshalJSON(b []byte) error {
@@ -134,27 +161,6 @@ func (opt *Option) UnmarshalJSON(b []byte) error {
 		opt.Value = nil
 		return nil
 	}
-
-	opt.Value = new(string)
-	switch opt.Type {
-	case OptionTypeFlag:
-		v, ok := transform.Value.(bool)
-		if !ok {
-			return fmt.Errorf("option value type mismatch")
-		}
-		*opt.Value = strconv.FormatBool(v)
-	case OptionTypeInt:
-		v, ok := transform.Value.(float64)
-		if !ok {
-			return fmt.Errorf("option value type mismatch")
-		}
-		*opt.Value = strconv.Itoa(int(v))
-	case OptionTypeString:
-		v, ok := transform.Value.(string)
-		if !ok {
-			return fmt.Errorf("option value type mismatch")
-		}
-		*opt.Value = v
-	}
+	opt.Value = transform.Value
 	return nil
 }

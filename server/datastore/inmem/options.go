@@ -12,7 +12,7 @@ func (d *Datastore) OptionByName(name string) (*kolide.Option, error) {
 	defer d.mtx.Unlock()
 	for _, opt := range d.options {
 		if opt.Name == name {
-			result := cloneOption(*opt)
+			result := *opt
 			return &result, nil
 		}
 	}
@@ -49,13 +49,10 @@ func (d *Datastore) SaveOptions(opts []kolide.Option) error {
 				pair.existingOpt.Value = nil
 				continue
 			}
-			pair.existingOpt.Value = new(string)
-			*pair.existingOpt.Value = *pair.newOpt.Value
+			pair.existingOpt.Value = pair.newOpt.Value
 		}
 	}
-
 	return nil
-
 }
 
 func (d *Datastore) Option(id uint) (*kolide.Option, error) {
@@ -77,17 +74,5 @@ func (d *Datastore) Options() ([]kolide.Option, error) {
 		result = append(result, *opt)
 	}
 	sortutil.AscByField(result, "Name")
-
 	return result, nil
-}
-
-func cloneOption(optIn kolide.Option) kolide.Option {
-	optOut := optIn
-
-	if optOut.Value != nil {
-		optOut.Value = new(string)
-		*optOut.Value = *optIn.Value
-	}
-
-	return optOut
 }

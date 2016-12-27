@@ -1,8 +1,6 @@
 package appstate
 
-import (
-	"github.com/kolide/kolide-ose/server/kolide"
-)
+import "github.com/kolide/kolide-ose/server/kolide"
 
 var Options = []struct {
 	Name     string
