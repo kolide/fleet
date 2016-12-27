@@ -1,37 +1,33 @@
 import React from 'react';
-import expect from 'expect';
+import expect, { createSpy, restoreSpies } from 'expect';
 import { mount } from 'enzyme';
 
 import PacksList from 'components/packs/PacksList';
 import { packStub } from 'test/stubs';
 
 describe('PacksList - component', () => {
+  afterEach(restoreSpies);
+
   it('renders', () => {
     expect(mount(<PacksList packs={[packStub]} />).length).toEqual(1);
   });
 
-  it('selects all packs when the Checkbox is checked', () => {
-    const component = mount(<PacksList packs={[packStub]} />);
-
-    expect(component.state('allPacksChecked')).toEqual(false);
+  it('calls the onCheckAllPacks prop when select all packs checkbox is checked', () => {
+    const spy = createSpy();
+    const component = mount(<PacksList onCheckAllPacks={spy} packs={[packStub]} />);
 
     component.find({ name: 'select-all-packs' }).simulate('change');
 
-    expect(component.state('allPacksChecked')).toEqual(true);
+    expect(spy).toHaveBeenCalledWith(true);
   });
 
-  it('updates the checked pack IDs when an individual pack is checked', () => {
-    const component = mount(<PacksList packs={[packStub]} />);
+  it('calls the onCheckPack prop when a pack checkbox is checked', () => {
+    const spy = createSpy();
+    const component = mount(<PacksList onCheckPack={spy} packs={[packStub]} />);
     const packCheckbox = component.find({ name: `select-pack-${packStub.id}` });
 
-    expect(component.state('checkedPackIDs')).toEqual([]);
-
     packCheckbox.simulate('change');
 
-    expect(component.state('checkedPackIDs')).toEqual([packStub.id]);
-
-    packCheckbox.simulate('change');
-
-    expect(component.state('checkedPackIDs')).toEqual([]);
+    expect(spy).toHaveBeenCalledWith(true, packStub.id);
   });
 });

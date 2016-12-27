@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { filter, includes } from 'lodash';
+import { filter, includes, noop, pull } from 'lodash';
 import { push } from 'react-router-redux';
 
 import Button from 'components/buttons/Button';
@@ -15,16 +15,22 @@ import paths from 'router/paths';
 
 const baseClass = 'all-packs-page';
 
-class AllPacksPage extends Component {
+export class AllPacksPage extends Component {
   static propTypes = {
     dispatch: PropTypes.func,
     packs: PropTypes.arrayOf(packInterface),
   }
 
+  static defaultProps = {
+    dispatch: noop,
+  };
+
   constructor (props) {
     super(props);
 
     this.state = {
+      allPacksChecked: false,
+      checkedPackIDs: [],
       packFilter: '',
       selectedPack: undefined,
     };
@@ -36,6 +42,30 @@ class AllPacksPage extends Component {
     if (!packs.length) {
       dispatch(packActions.loadAll());
     }
+
+    return false;
+  }
+
+  onCheckAllPacks = (shouldCheck) => {
+    if (shouldCheck) {
+      const packs = this.getPacks();
+      const checkedPackIDs = packs.map(pack => pack.id);
+
+      this.setState({ allPacksChecked: true, checkedPackIDs });
+
+      return false;
+    }
+
+    this.setState({ allPacksChecked: false, checkedPackIDs: [] });
+
+    return false;
+  }
+
+  onCheckPack = (checked, id) => {
+    const { checkedPackIDs } = this.state;
+    const newCheckedPackIDs = checked ? checkedPackIDs.concat(id) : pull(checkedPackIDs, id);
+
+    this.setState({ allPacksChecked: false, checkedPackIDs: newCheckedPackIDs });
 
     return false;
   }
@@ -91,10 +121,12 @@ class AllPacksPage extends Component {
     const {
       getPacks,
       goToNewPackPage,
+      onCheckAllPacks,
+      onCheckPack,
       onFilterPacks,
       renderSidePanel,
     } = this;
-    const { packFilter } = this.state;
+    const { allPacksChecked, checkedPackIDs, packFilter } = this.state;
     const packs = getPacks();
     const packsCount = packs.length;
 
@@ -120,7 +152,14 @@ class AllPacksPage extends Component {
               onClick={goToNewPackPage}
             />
           </div>
-          <PacksList className={`${baseClass}__table`} packs={packs} />
+          <PacksList
+            allPacksChecked={allPacksChecked}
+            checkedPackIDs={checkedPackIDs}
+            className={`${baseClass}__table`}
+            onCheckAllPacks={onCheckAllPacks}
+            onCheckPack={onCheckPack}
+            packs={packs}
+          />
         </div>
         {renderSidePanel()}
       </div>

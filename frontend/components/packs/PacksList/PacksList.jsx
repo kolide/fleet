@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { includes, pull } from 'lodash';
+import { includes } from 'lodash';
 
 import Checkbox from 'components/forms/fields/Checkbox';
 import packInterface from 'interfaces/pack';
@@ -9,39 +9,22 @@ const baseClass = 'packs-list';
 
 class PacksList extends Component {
   static propTypes = {
+    allPacksChecked: PropTypes.bool,
+    checkedPackIDs: PropTypes.arrayOf(PropTypes.number),
     className: PropTypes.string,
+    onCheckAllPacks: PropTypes.func.isRequired,
+    onCheckPack: PropTypes.func.isRequired,
     packs: PropTypes.arrayOf(packInterface),
   };
 
   static defaultProps = {
+    checkedPackIDs: [],
     packs: [],
   };
 
-  constructor (props) {
-    super(props);
-
-    this.state = { allPacksChecked: false, checkedPackIDs: [] };
-  }
-
-  onCheckAllPacks = (shouldCheck) => {
-    this.setState({ allPacksChecked: shouldCheck });
-
-    return false;
-  }
-
-  onCheckPack = (checked, id) => {
-    const { checkedPackIDs } = this.state;
-    const newCheckedPackIDs = checked ? checkedPackIDs.concat(id) : pull(checkedPackIDs, id);
-
-    this.setState({ checkedPackIDs: newCheckedPackIDs });
-
-    return false;
-  }
-
   renderPack = (pack) => {
-    const { allPacksChecked, checkedPackIDs } = this.state;
-    const { onCheckPack } = this;
-    const checked = allPacksChecked || includes(checkedPackIDs, pack.id);
+    const { checkedPackIDs, onCheckPack } = this.props;
+    const checked = includes(checkedPackIDs, pack.id);
 
     return (
       <Row
@@ -54,9 +37,8 @@ class PacksList extends Component {
   }
 
   render () {
-    const { allPacksChecked } = this.state;
-    const { className, packs } = this.props;
-    const { onCheckAllPacks, renderPack } = this;
+    const { allPacksChecked, className, onCheckAllPacks, packs } = this.props;
+    const { renderPack } = this;
 
     return (
       <table className={`${baseClass} ${className}`}>
