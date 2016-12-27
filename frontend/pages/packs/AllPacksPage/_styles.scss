@@ -1,4 +1,9 @@
 .all-packs-page {
+  &__search-create-section {
+    @include display(flex);
+    @include justify-content(space-between);
+  }
+
   &__title {
     color: $text-medium;
     display: inline-block;
