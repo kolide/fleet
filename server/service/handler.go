@@ -66,6 +66,8 @@ type KolideEndpoints struct {
 	DeleteHost                     endpoint.Endpoint
 	ListHosts                      endpoint.Endpoint
 	SearchTargets                  endpoint.Endpoint
+	GetOptions                     endpoint.Endpoint
+	ModifyOptions                  endpoint.Endpoint
 }
 
 // MakeKolideServerEndpoints creates the Kolide API endpoints.
@@ -126,6 +128,8 @@ func MakeKolideServerEndpoints(svc kolide.Service, jwtKey string) KolideEndpoint
 		GetLabelsForPack:          authenticatedUser(jwtKey, svc, makeGetLabelsForPackEndpoint(svc)),
 		DeleteLabelFromPack:       authenticatedUser(jwtKey, svc, makeDeleteLabelFromPackEndpoint(svc)),
 		SearchTargets:             authenticatedUser(jwtKey, svc, makeSearchTargetsEndpoint(svc)),
+		GetOptions:                authenticatedUser(jwtKey, svc, mustBeAdmin(makeGetOptionsEndpoint(svc))),
+		ModifyOptions:             authenticatedUser(jwtKey, svc, mustBeAdmin(makeModifyOptionsEndpoint(svc))),
 
 		// Osquery endpoints
 		EnrollAgent:                   makeEnrollAgentEndpoint(svc),
@@ -189,6 +193,8 @@ type kolideHandlers struct {
 	DeleteHost                     *kithttp.Server
 	ListHosts                      *kithttp.Server
 	SearchTargets                  *kithttp.Server
+	GetOptions                     *kithttp.Server
+	ModifyOptions                  *kithttp.Server
 }
 
 func makeKolideKitHandlers(ctx context.Context, e KolideEndpoints, opts []kithttp.ServerOption) kolideHandlers {
@@ -248,6 +254,8 @@ func makeKolideKitHandlers(ctx context.Context, e KolideEndpoints, opts []kithtt
 		DeleteHost:                    newServer(e.DeleteHost, decodeDeleteHostRequest),
 		ListHosts:                     newServer(e.ListHosts, decodeListHostsRequest),
 		SearchTargets:                 newServer(e.SearchTargets, decodeSearchTargetsRequest),
+		GetOptions:                    newServer(e.GetOptions, decodeNoParamsRequest),
+		ModifyOptions:                 newServer(e.ModifyOptions, decodeModifyOptionsRequest),
 	}
 }
 
@@ -329,6 +337,9 @@ func attachKolideAPIRoutes(r *mux.Router, h kolideHandlers) {
 	r.Handle("/api/v1/kolide/hosts", h.ListHosts).Methods("GET")
 	r.Handle("/api/v1/kolide/hosts/{id}", h.GetHost).Methods("GET")
 	r.Handle("/api/v1/kolide/hosts/{id}", h.DeleteHost).Methods("DELETE")
+
+	r.Handle("/api/v1/kolide/options", h.GetOptions).Methods("GET")
+	r.Handle("/api/v1/kolide/options", h.ModifyOptions).Methods("PATCH")
 
 	r.Handle("/api/v1/kolide/targets", h.SearchTargets).Methods("POST")
 

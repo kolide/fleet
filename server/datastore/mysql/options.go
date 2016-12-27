@@ -23,36 +23,43 @@ func (d *Datastore) OptionByName(name string) (*kolide.Option, error) {
 	return &option, nil
 }
 
-func (d *Datastore) SaveOption(opt kolide.Option) error {
-	var existing kolide.Option
-	err := d.db.Get(&existing, "SELECT * FROM options WHERE id = ?", opt.ID)
+func (d *Datastore) SaveOptions(opts []kolide.Option) error {
+	sqlStatement := `
+		UPDATE options
+		SET value = ?
+		WHERE id = ? AND type = ? AND NOT read_only
+	`
+	success := new(bool)
+	txn, err := d.db.Begin()
 	if err != nil {
-		if err == sql.ErrNoRows {
+		return errors.Wrap(err, "update options begin transaction")
+	}
+	defer func(success *bool) {
+		if *success {
+			if err := txn.Commit(); err == nil {
+				return
+			}
+		}
+		txn.Rollback()
+	}(success)
+
+	for _, opt := range opts {
+		result, err := txn.Exec(sqlStatement, opt.Value, opt.ID, opt.Type)
+		if err != nil {
+			return errors.Wrap(err, "update options")
+		}
+		rowsChanged, err := result.RowsAffected()
+		if err != nil {
+			return errors.Wrap(err, "option rows affected")
+		}
+		if rowsChanged != 1 {
 			return notFound("option").WithID(opt.ID)
 		}
-		return errors.Wrap(err, "select from options")
 	}
-	// since we validate with passed in type verify that the passed
-	// in type matches the type we have
-	if existing.Type != opt.Type {
-		return errors.New("type mismatch")
-	}
-	if existing.ReadOnly {
-		return errors.New("readonly option can't be changed")
-	}
-	sqlStatement := `
-    UPDATE options
-		SET value = ?
-		WHERE id = ?
-	`
-	_, err = d.db.Exec(
-		sqlStatement,
-		opt.RawValue,
-		opt.ID,
-	)
-	if err != nil {
-		return errors.Wrap(err, "update options")
-	}
+	// If all the updates succeed, set the success flag, this will cause the
+	// function we defined in defer to commit the transaction. Otherwise, all
+	// changes will be rolled back
+	*success = true
 	return nil
 }
 

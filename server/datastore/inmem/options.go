@@ -1,10 +1,10 @@
 package inmem
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/kolide/kolide-ose/server/kolide"
+	"github.com/patrickmn/sortutil"
 )
 
 func (d *Datastore) OptionByName(name string) (*kolide.Option, error) {
@@ -12,36 +12,50 @@ func (d *Datastore) OptionByName(name string) (*kolide.Option, error) {
 	defer d.mtx.Unlock()
 	for _, opt := range d.options {
 		if opt.Name == name {
-			return opt, nil
+			result := cloneOption(*opt)
+			return &result, nil
 		}
 	}
 	return nil, notFound("options")
 }
 
-func (d *Datastore) SaveOption(opt kolide.Option) error {
+type optPair struct {
+	newOpt      kolide.Option
+	existingOpt *kolide.Option
+}
+
+func (d *Datastore) SaveOptions(opts []kolide.Option) error {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
+	validPairs := []optPair{}
+	for _, opt := range opts {
+		if opt.ReadOnly {
+			return fmt.Errorf("readonly option can't be changed")
+		}
+		existing, ok := d.options[opt.ID]
+		if !ok {
+			return notFound("option")
+		}
+		if existing.Type != opt.Type {
+			return fmt.Errorf("type mismatch for option")
+		}
+		validPairs = append(validPairs, optPair{opt, existing})
+	}
+	// if all the options to be modified pass validation copy values over to
+	// existing options
+	if len(validPairs) == len(opts) {
+		for _, pair := range validPairs {
+			if pair.newOpt.Value == nil {
+				pair.existingOpt.Value = nil
+				continue
+			}
+			pair.existingOpt.Value = new(string)
+			*pair.existingOpt.Value = *pair.newOpt.Value
+		}
+	}
 
-	existing, ok := d.options[opt.ID]
-	if !ok {
-		return notFound("option").WithID(opt.ID)
-	}
-	// since we will validate against the passed in type in the validation layer
-	// we need to make sure that the passed in type matches the type we have
-	if existing.Type != opt.Type {
-		return fmt.Errorf("type mismatch")
-	}
-	if existing.ReadOnly {
-		return errors.New("readonly option can't be changed")
-	}
-	if opt.RawValue == nil {
-		existing.RawValue = nil
-		return nil
-	}
-
-	existing.RawValue = new(string)
-	*existing.RawValue = *opt.RawValue
 	return nil
+
 }
 
 func (d *Datastore) Option(id uint) (*kolide.Option, error) {
@@ -51,7 +65,8 @@ func (d *Datastore) Option(id uint) (*kolide.Option, error) {
 	if !ok {
 		return nil, notFound("Option").WithID(id)
 	}
-	return saved, nil
+	result := *saved
+	return &result, nil
 }
 
 func (d *Datastore) Options() ([]kolide.Option, error) {
@@ -61,5 +76,18 @@ func (d *Datastore) Options() ([]kolide.Option, error) {
 	for _, opt := range d.options {
 		result = append(result, *opt)
 	}
+	sortutil.AscByField(result, "Name")
+
 	return result, nil
+}
+
+func cloneOption(optIn kolide.Option) kolide.Option {
+	optOut := optIn
+
+	if optOut.Value != nil {
+		optOut.Value = new(string)
+		*optOut.Value = *optIn.Value
+	}
+
+	return optOut
 }

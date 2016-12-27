@@ -7,8 +7,6 @@ import (
 	"github.com/pressly/goose"
 )
 
-//nilString *string = nil
-
 func init() {
 	goose.AddMigration(Up_20161223115449, Down_20161223115449)
 }
