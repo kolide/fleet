@@ -37,14 +37,14 @@ func (im *inmemQueryResults) getChannel(id uint) chan interface{} {
 func (im *inmemQueryResults) WriteResult(result kolide.DistributedQueryResult) error {
 	channel, ok := im.resultChannels[result.DistributedQueryCampaignID]
 	if !ok {
-		return NoSubscriberError{strconv.Itoa(int(result.DistributedQueryCampaignID))}
+		return noSubscriberError{strconv.Itoa(int(result.DistributedQueryCampaignID))}
 	}
 
 	select {
 	case channel <- result:
 		// intentionally do nothing
 	default:
-		return NoSubscriberError{strconv.Itoa(int(result.DistributedQueryCampaignID))}
+		return noSubscriberError{strconv.Itoa(int(result.DistributedQueryCampaignID))}
 	}
 
 	return nil

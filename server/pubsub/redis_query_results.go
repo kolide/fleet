@@ -74,7 +74,7 @@ func (r *redisQueryResults) WriteResult(result kolide.DistributedQueryResult) er
 		return errors.Wrap(err, "PUBLISH failed to channel "+channelName)
 	}
 	if n == 0 {
-		return NoSubscriberError{channelName}
+		return noSubscriberError{channelName}
 	}
 
 	return nil

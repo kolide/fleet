@@ -108,8 +108,8 @@ func testQueryResultsStoreErrors(t *testing.T, store kolide.QueryResultStore) {
 		},
 	)
 	assert.NotNil(t, err)
-	castErr, ok := err.(NoSubscriberError)
-	if assert.True(t, ok, "err should be NoSubscriberError") {
+	castErr, ok := err.(Error)
+	if assert.True(t, ok, "err should be pubsub.Error") {
 		assert.True(t, castErr.NoSubscriber(), "NoSubscriber() should be true")
 	}
 }

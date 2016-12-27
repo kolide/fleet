@@ -421,7 +421,7 @@ func (svc service) ingestDistributedQuery(host kolide.Host, name string, rows []
 
 	err = svc.resultStore.WriteResult(res)
 	if err != nil {
-		nErr, ok := err.(pubsub.NoSubscriber)
+		nErr, ok := err.(pubsub.Error)
 		if !ok || !nErr.NoSubscriber() {
 			return osqueryError{message: "writing results: " + err.Error()}
 		}
