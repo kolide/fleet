@@ -176,6 +176,31 @@ func makeModifyUserEndpoint(svc kolide.Service) endpoint.Endpoint {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Require Password Reset
+////////////////////////////////////////////////////////////////////////////////
+
+type requirePasswordResetRequest struct {
+	ID uint `json:"id"`
+}
+
+type requirePasswordResetResponse struct {
+	Err error `json:"error,omitempty"`
+}
+
+func (r requirePasswordResetResponse) error() error { return r.Err }
+
+func makeRequirePasswordResetEndpoint(svc kolide.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(requirePasswordResetRequest)
+		err := svc.RequirePasswordReset(ctx, req.ID)
+		if err != nil {
+			return requirePasswordResetResponse{Err: err}, nil
+		}
+		return requirePasswordResetResponse{}, nil
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Forgot Password
 ////////////////////////////////////////////////////////////////////////////////
 

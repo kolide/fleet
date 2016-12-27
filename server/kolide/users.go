@@ -31,25 +31,28 @@ type UserService interface {
 	// User returns a valid User given a User ID
 	User(ctx context.Context, id uint) (user *User, err error)
 
-	// AuthenticatedUser returns the current user
-	// from the viewer context
+	// AuthenticatedUser returns the current user from the viewer context
 	AuthenticatedUser(ctx context.Context) (user *User, err error)
 
-	// Users returns all users
+	// ListUsers returns all users
 	ListUsers(ctx context.Context, opt ListOptions) (users []*User, err error)
 
 	// ChangePassword validates the existing password, and sets the new
 	// password. User is retrieved from the viewer context.
 	ChangePassword(ctx context.Context, oldPass, newPass string) error
 
-	// RequestPasswordReset generates a password reset request for
-	// a user. The request results in a token emailed to the user.
-	// If the person making the request is an admin the AdminForcedPasswordReset
-	// parameter is enabled instead of sending an email with a password reset token
+	// RequestPasswordReset generates a password reset request for the user
+	// specified by email. The request results in a token emailed to the
+	// user.
 	RequestPasswordReset(ctx context.Context, email string) (err error)
 
-	// ResetPassword validate a password reset token and updates
-	// a user's password
+	// RequirePasswordReset requires a password reset for the user
+	// specified by ID. It deletes all of the user's sessions, and requires
+	// that their password be reset upon the next login.
+	RequirePasswordReset(ctx context.Context, uid uint) error
+
+	// ResetPassword validates the provided password reset token and
+	// updates the user's password
 	ResetPassword(ctx context.Context, token, password string) (err error)
 
 	// ModifyUser updates a user's parameters given a UserPayload

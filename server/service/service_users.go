@@ -85,18 +85,6 @@ func (svc service) ModifyUser(ctx context.Context, userID uint, p kolide.UserPay
 		user.GravatarURL = *p.GravatarURL
 	}
 
-	if p.Password != nil {
-		err := user.SetPassword(
-			*p.Password,
-			svc.config.Auth.SaltKeySize,
-			svc.config.Auth.BcryptCost,
-		)
-		if err != nil {
-			return nil, err
-		}
-		user.AdminForcedPasswordReset = false
-	}
-
 	err = svc.saveUser(user)
 	if err != nil {
 		return nil, err
@@ -201,29 +189,30 @@ func (svc service) ResetPassword(ctx context.Context, token, password string) er
 	return nil
 }
 
+func (svc service) RequirePasswordReset(ctx context.Context, uid uint) error {
+	user, err := svc.ds.UserByID(uid)
+	if err != nil {
+		return errors.Wrap(err, "loading user by ID")
+	}
+
+	// Require reset on next login
+	user.AdminForcedPasswordReset = true
+	if err := svc.saveUser(user); err != nil {
+		return errors.Wrap(err, "saving user")
+	}
+
+	// Clear all of the existing sessions
+	if err := svc.DeleteSessionsForUser(ctx, user.ID); err != nil {
+		return errors.Wrap(err, "deleting user sessions")
+	}
+
+	return nil
+}
+
 func (svc service) RequestPasswordReset(ctx context.Context, email string) error {
-	// the password reset is different depending on whether performed by an
-	// admin or a user
-	// if an admin requests a password reset, then no token is
-	// generated, instead the AdminForcedPasswordReset flag is set
 	user, err := svc.ds.UserByEmail(email)
 	if err != nil {
 		return err
-	}
-	vc, ok := viewer.FromContext(ctx)
-	if ok {
-		if vc.IsAdmin() {
-			user.AdminForcedPasswordReset = true
-			if err := svc.saveUser(user); err != nil {
-				return err
-			}
-			// Sessions should only be cleared if this is an admin
-			// forced password reset
-			if err := svc.DeleteSessionsForUser(ctx, user.ID); err != nil {
-				return err
-			}
-			return nil
-		}
 	}
 
 	random, err := kolide.RandomText(svc.config.App.TokenKeySize)
