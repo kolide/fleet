@@ -5,6 +5,7 @@ import { push } from 'react-router-redux';
 
 import Button from 'components/buttons/Button';
 import entityGetter from 'redux/utilities/entityGetter';
+import NumberPill from 'components/NumberPill';
 import packActions from 'redux/nodes/entities/packs/actions';
 import packInterface from 'interfaces/pack';
 import paths from 'router/paths';
@@ -55,12 +56,13 @@ class AllPacksPage extends Component {
   render () {
     const { goToNewPackPage, renderPack } = this;
     const { packs } = this.props;
+    const packsCount = packs.length;
 
     return (
       <div className={`${baseClass} body-wrap`}>
         <div className={`${baseClass}__wrapper`}>
           <p className={`${baseClass}__title`}>
-            Query Packs
+            <NumberPill number={packsCount} /> Query Packs
           </p>
           <div className={`${baseClass}__new_pack`}>
             <Button variant="brand" onClick={goToNewPackPage}>
