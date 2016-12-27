@@ -106,6 +106,21 @@ export class AllPacksPage extends Component {
     return false;
   }
 
+  renderCTAs = () => {
+    const { goToNewPackPage } = this;
+    const checkedPackCount = this.state.checkedPackIDs.length;
+
+    if (checkedPackCount) {
+      return (
+        <span>{checkedPackCount} {checkedPackCount === 1 ? 'Pack' : 'Packs'} Selected</span>
+      );
+    }
+
+    return (
+      <Button variant="brand" onClick={goToNewPackPage}>CREATE NEW PACK</Button>
+    );
+  }
+
   renderSidePanel = () => {
     const { selectedPack } = this.state;
 
@@ -120,10 +135,10 @@ export class AllPacksPage extends Component {
   render () {
     const {
       getPacks,
-      goToNewPackPage,
       onCheckAllPacks,
       onCheckPack,
       onFilterPacks,
+      renderCTAs,
       renderSidePanel,
     } = this;
     const { allPacksChecked, checkedPackIDs, packFilter } = this.state;
@@ -143,14 +158,7 @@ export class AllPacksPage extends Component {
               placeholder="Search Packs"
               value={packFilter}
             />
-            <Button variant="brand" onClick={goToNewPackPage}>
-              CREATE NEW PACK
-            </Button>
-            <Button
-              text="CREATE NEW PACK"
-              variant="brand"
-              onClick={goToNewPackPage}
-            />
+            {renderCTAs()}
           </div>
           <PacksList
             allPacksChecked={allPacksChecked}
