@@ -1,7 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { filter, includes } from 'lodash';
-import moment from 'moment';
 import { push } from 'react-router-redux';
 
 import Button from 'components/buttons/Button';
@@ -11,6 +10,7 @@ import NumberPill from 'components/NumberPill';
 import packActions from 'redux/nodes/entities/packs/actions';
 import PackInfoSidePanel from 'components/side_panels/PackInfoSidePanel';
 import packInterface from 'interfaces/pack';
+import PacksList from 'components/packs/PacksList';
 import paths from 'router/paths';
 
 const baseClass = 'all-packs-page';
@@ -76,21 +76,6 @@ class AllPacksPage extends Component {
     return false;
   }
 
-  renderPack = (pack) => {
-    const updatedTime = moment(pack.updated_at);
-
-    return (
-      <tr key={`pack-${pack.id}-table`}>
-        <td>{pack.name}</td>
-        <td>{pack.query_count}</td>
-        <td>Enabled?</td>
-        <td>Jason Meller?</td>
-        <td>{pack.hosts_count}</td>
-        <td>{updatedTime.fromNow()}</td>
-      </tr>
-    );
-  }
-
   renderSidePanel = () => {
     const { selectedPack } = this.state;
 
@@ -107,7 +92,6 @@ class AllPacksPage extends Component {
       getPacks,
       goToNewPackPage,
       onFilterPacks,
-      renderPack,
       renderSidePanel,
     } = this;
     const { packFilter } = this.state;
@@ -136,23 +120,7 @@ class AllPacksPage extends Component {
               onClick={goToNewPackPage}
             />
           </div>
-          <table className={`${baseClass}__table`}>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Queries</th>
-                <th>Status</th>
-                <th>Author</th>
-                <th>Number of Hosts</th>
-                <th>Last Updated</th>
-              </tr>
-            </thead>
-            <tbody>
-              {packs.map((pack) => {
-                return renderPack(pack);
-              })}
-            </tbody>
-          </table>
+          <PacksList className={`${baseClass}__table`} packs={packs} />
         </div>
         {renderSidePanel()}
       </div>

@@ -1,0 +1,11 @@
+.packs-list-row {
+  &__status-icon {
+    &--enabled {
+      color: $success;
+    }
+
+    &--disabled {
+      color: $alert;
+    }
+  }
+}

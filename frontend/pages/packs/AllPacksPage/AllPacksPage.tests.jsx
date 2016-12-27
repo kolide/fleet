@@ -34,6 +34,12 @@ describe('AllPacksPage - component', () => {
     expect(page.node.getPacks().length).toEqual(1);
   });
 
+  it('renders a PacksList component', () => {
+    const page = mount(connectedComponent(AllPacksPage));
+
+    expect(page.find('PacksList').length).toEqual(1);
+  });
+
   it('renders the PackInfoSidePanel by default', () => {
     const page = mount(connectedComponent(AllPacksPage));
 
