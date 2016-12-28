@@ -17,8 +17,8 @@ const Description = ({ pack }) => {
 
   return (
     <div>
-      <p>Description</p>
-      <p>{pack.description}</p>
+      <p className={`${baseClass}__section-label`}>Description</p>
+      <p className={`${baseClass}__description`}>{pack.description}</p>
     </div>
   );
 };
@@ -31,15 +31,17 @@ const PackDetailsSidePanel = ({ onUpdateSelectedPack, pack, scheduledQueries = [
 
   return (
     <SecondarySidePanelContainer className={baseClass}>
-      <Icon name="packs" /><span>{pack.name}</span>
+      <Icon className={`${baseClass}__pack-icon`} name="packs" />
+      <span className={`${baseClass}__pack-name`}>{pack.name}</span>
       <Slider
         activeText="ENABLED"
         inactiveText="DISABLED"
-        label="Status"
         onChange={updatePackStatus}
         value={!disabled}
       />
-      <Link className="button button--inverse" to={`/packs/${pack.id}`}>Edit Pack</Link>
+      <Link className={`${baseClass}__edit-pack-link button button--inverse`} to={`/packs/${pack.id}`}>
+        Edit Pack
+      </Link>
       <Description pack={pack} />
       <ScheduledQueriesSection scheduledQueries={scheduledQueries} />
     </SecondarySidePanelContainer>

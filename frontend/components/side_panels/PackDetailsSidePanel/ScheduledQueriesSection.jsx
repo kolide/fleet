@@ -5,6 +5,7 @@ import Button from 'components/buttons/Button';
 import Icon from 'components/icons/Icon';
 import scheduledQueryInterface from 'interfaces/scheduled_query';
 
+const baseClass = 'pack-details-side-panel';
 const DEFAULT_NUM_QUERIES = 6;
 
 class ScheduledQueriesSection extends Component {
@@ -35,7 +36,7 @@ class ScheduledQueriesSection extends Component {
       const queryText = numMoreQueries === 1 ? 'Query' : 'Queries';
 
       return (
-        <div>
+        <div className={`${baseClass}__more-queries-section`}>
           <span>{numMoreQueries} More {queryText}</span>
           <Button onClick={onShowAll} variant="unstyled">SHOW</Button>
         </div>
@@ -53,11 +54,12 @@ class ScheduledQueriesSection extends Component {
 
     return (
       <div>
-        <p>Queries</p>
+        <p className={`${baseClass}__section-label`}>Queries</p>
         {queriesToRender.map((scheduledQuery) => {
           return (
             <div key={`scheduled-query-${scheduledQuery.id}`}>
-              <Icon name="query" /> {scheduledQuery.name}
+              <Icon className={`${baseClass}__query-icon`} name="query" />
+              <span className={`${baseClass}__query-name`}>{scheduledQuery.name}</span>
             </div>
           );
         })}
