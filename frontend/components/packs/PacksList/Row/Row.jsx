@@ -4,6 +4,7 @@ import { isEqual } from 'lodash';
 import moment from 'moment';
 
 import Checkbox from 'components/forms/fields/Checkbox';
+import ClickableTd from 'components/ClickableTd';
 import Icon from 'components/icons/Icon';
 import packInterface from 'interfaces/pack';
 
@@ -13,6 +14,7 @@ class Row extends Component {
   static propTypes = {
     checked: PropTypes.bool,
     onCheck: PropTypes.func,
+    onSelect: PropTypes.func,
     pack: packInterface.isRequired,
   };
 
@@ -26,24 +28,38 @@ class Row extends Component {
     return onCheck(shouldCheck, pack.id);
   }
 
+  handleSelect = () => {
+    const { onSelect, pack } = this.props;
+
+    return onSelect(pack);
+  }
+
   renderStatusData = () => {
     const { disabled } = this.props.pack;
-
+    const { handleSelect } = this;
     const iconClassName = classNames(`${baseClass}__status-icon`, {
       [`${baseClass}__status-icon--enabled`]: !disabled,
       [`${baseClass}__status-icon--disabled`]: disabled,
     });
 
     if (disabled) {
-      return <td><Icon className={iconClassName} name="offline" /> Disabled</td>;
+      return (
+        <ClickableTd onClick={handleSelect} tabIndex={-1}>
+          <Icon className={iconClassName} name="offline" /> Disabled
+        </ClickableTd>
+      );
     }
 
-    return <td><Icon className={iconClassName} name="success-check" /> Enabled</td>;
+    return (
+      <ClickableTd onClick={handleSelect}>
+        <Icon className={iconClassName} name="success-check" /> Enabled
+      </ClickableTd>
+    );
   }
 
   render () {
     const { checked, pack } = this.props;
-    const { handleChange, renderStatusData } = this;
+    const { handleChange, handleSelect, renderStatusData } = this;
     const updatedTime = moment(pack.updated_at);
 
     return (
@@ -55,11 +71,11 @@ class Row extends Component {
             value={checked}
           />
         </td>
-        <td>{pack.name}</td>
-        <td>{pack.query_count}</td>
+        <ClickableTd onClick={handleSelect}>{pack.name}</ClickableTd>
+        <ClickableTd onClick={handleSelect}>{pack.query_count}</ClickableTd>
         {renderStatusData()}
         <td />
-        <td>{updatedTime.fromNow()}</td>
+        <ClickableTd onClick={handleSelect}>{updatedTime.fromNow()}</ClickableTd>
       </tr>
     );
   }

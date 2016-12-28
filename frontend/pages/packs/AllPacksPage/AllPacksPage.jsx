@@ -96,6 +96,12 @@ export class AllPacksPage extends Component {
     return false;
   }
 
+  onSelectPack = (selectedPack) => {
+    this.setState({ selectedPack });
+
+    return false;
+  }
+
   onFilterPacks = (packFilter) => {
     this.setState({ packFilter });
 
@@ -189,6 +195,7 @@ export class AllPacksPage extends Component {
       getPacks,
       onCheckAllPacks,
       onCheckPack,
+      onSelectPack,
       onFilterPacks,
       renderCTAs,
       renderSidePanel,
@@ -218,6 +225,7 @@ export class AllPacksPage extends Component {
             className={`${baseClass}__table`}
             onCheckAllPacks={onCheckAllPacks}
             onCheckPack={onCheckPack}
+            onSelectPack={onSelectPack}
             packs={packs}
           />
         </div>

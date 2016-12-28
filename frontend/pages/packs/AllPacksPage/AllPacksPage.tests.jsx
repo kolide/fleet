@@ -144,4 +144,19 @@ describe('AllPacksPage - component', () => {
       expect(dispatchedActions).toInclude({ type: 'packs_DESTROY_REQUEST' });
     });
   });
+
+  describe('selecting a pack', () => {
+    const packs = [packStub, { ...packStub, id: 101, name: 'My unique pack name' }];
+
+    it('updates state when a pack is selected', () => {
+      const page = mount(<AllPacksPage packs={packs} />);
+      const firstRow = page.find('Row').first();
+
+      expect(page.state('selectedPack')).toNotExist();
+
+      firstRow.find('ClickableTd').first().find('a').simulate('click');
+
+      expect(page.state('selectedPack')).toEqual(packStub);
+    });
+  });
 });

@@ -14,6 +14,7 @@ class PacksList extends Component {
     className: PropTypes.string,
     onCheckAllPacks: PropTypes.func.isRequired,
     onCheckPack: PropTypes.func.isRequired,
+    onSelectPack: PropTypes.func.isRequired,
     packs: PropTypes.arrayOf(packInterface),
   };
 
@@ -23,7 +24,7 @@ class PacksList extends Component {
   };
 
   renderPack = (pack) => {
-    const { checkedPackIDs, onCheckPack } = this.props;
+    const { checkedPackIDs, onCheckPack, onSelectPack } = this.props;
     const checked = includes(checkedPackIDs, pack.id);
 
     return (
@@ -31,6 +32,7 @@ class PacksList extends Component {
         checked={checked}
         key={`pack-row-${pack.id}`}
         onCheck={onCheckPack}
+        onSelect={onSelectPack}
         pack={pack}
       />
     );
