@@ -13,6 +13,7 @@ import PackInfoSidePanel from 'components/side_panels/PackInfoSidePanel';
 import packInterface from 'interfaces/pack';
 import PacksList from 'components/packs/PacksList';
 import paths from 'router/paths';
+import { renderFlash } from 'redux/nodes/notifications/actions';
 
 const baseClass = 'all-packs-page';
 
@@ -45,6 +46,30 @@ export class AllPacksPage extends Component {
     }
 
     return false;
+  }
+
+  onBulkAction = (actionType) => {
+    return (evt) => {
+      evt.preventDefault();
+
+      const { checkedPackIDs } = this.state;
+      const { dispatch } = this.props;
+      const { destroy, update } = packActions;
+
+      const promises = checkedPackIDs.map((packID) => {
+        const disabled = actionType === 'disable';
+
+        if (actionType === 'delete') {
+          return dispatch(destroy({ id: packID }));
+        }
+
+        return dispatch(update({ id: packID }, { disabled }));
+      });
+
+      return Promise.all(promises)
+        .then(() => dispatch(renderFlash('success', 'Packs updated!')))
+        .catch(() => dispatch(renderFlash('error', 'Something went wrong.')));
+    };
   }
 
   onCheckAllPacks = (shouldCheck) => {
@@ -108,9 +133,9 @@ export class AllPacksPage extends Component {
   }
 
   renderCTAs = () => {
-    const { goToNewPackPage } = this;
-    const checkedPackCount = this.state.checkedPackIDs.length;
+    const { goToNewPackPage, onBulkAction } = this;
     const btnClass = `${baseClass}__bulk-action-btn`;
+    const checkedPackCount = this.state.checkedPackIDs.length;
 
     if (checkedPackCount) {
       const packText = checkedPackCount === 1 ? 'Pack' : 'Packs';
@@ -118,13 +143,25 @@ export class AllPacksPage extends Component {
       return (
         <div>
           <p className={`${baseClass}__pack-count`}>{checkedPackCount} {packText} Selected</p>
-          <Button className={`${btnClass} ${btnClass}--disable`} variant="unstyled">
+          <Button
+            className={`${btnClass} ${btnClass}--disable`}
+            onClick={onBulkAction('disable')}
+            variant="unstyled"
+          >
             <Icon name="offline" /> Disable
           </Button>
-          <Button className={`${btnClass} ${btnClass}--enable`} variant="unstyled">
+          <Button
+            className={`${btnClass} ${btnClass}--enable`}
+            onClick={onBulkAction('enable')}
+            variant="unstyled"
+          >
             <Icon name="success-check" /> Enable
           </Button>
-          <Button className={`${btnClass} ${btnClass}--delete`} variant="unstyled">
+          <Button
+            className={`${btnClass} ${btnClass}--delete`}
+            onClick={onBulkAction('delete')}
+            variant="unstyled"
+          >
             <Icon name="delete-cloud" /> Delete
           </Button>
         </div>

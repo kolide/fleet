@@ -77,4 +77,71 @@ describe('AllPacksPage - component', () => {
 
     expect(page.state('checkedPackIDs')).toEqual([]);
   });
+
+  describe('bulk actions', () => {
+    const packs = [packStub, { ...packStub, id: 101, name: 'My unique pack name' }];
+
+    it('displays the bulk action buttons when a pack is checked', () => {
+      const page = mount(<AllPacksPage packs={packs} />);
+      const selectAllPacks = page.find({ name: 'select-all-packs' });
+
+      selectAllPacks.simulate('change');
+
+      expect(page.state('checkedPackIDs')).toEqual([packStub.id, 101]);
+      expect(page.find('.all-packs-page__bulk-action-btn--disable').length).toEqual(1);
+      expect(page.find('.all-packs-page__bulk-action-btn--enable').length).toEqual(1);
+      expect(page.find('.all-packs-page__bulk-action-btn--delete').length).toEqual(1);
+    });
+
+    it('dispatches the pack update function when disable is clicked', () => {
+      const mockStore = reduxMockStore(store);
+      const Component = connectedComponent(ConnectedAllPacksPage, { mockStore });
+      const page = mount(Component).find('AllPacksPage');
+      const selectAllPacks = page.find({ name: 'select-all-packs' });
+
+      selectAllPacks.simulate('change');
+
+      const disableBtn = page.find('.all-packs-page__bulk-action-btn--disable');
+
+      disableBtn.simulate('click');
+
+      const dispatchedActions = mockStore.getActions();
+
+      expect(dispatchedActions).toInclude({ type: 'packs_UPDATE_REQUEST' });
+    });
+
+    it('dispatches the pack update function when enable is clicked', () => {
+      const mockStore = reduxMockStore(store);
+      const Component = connectedComponent(ConnectedAllPacksPage, { mockStore });
+      const page = mount(Component).find('AllPacksPage');
+      const selectAllPacks = page.find({ name: 'select-all-packs' });
+
+      selectAllPacks.simulate('change');
+
+      const enableBtn = page.find('.all-packs-page__bulk-action-btn--enable');
+
+      enableBtn.simulate('click');
+
+      const dispatchedActions = mockStore.getActions();
+
+      expect(dispatchedActions).toInclude({ type: 'packs_UPDATE_REQUEST' });
+    });
+
+    it('dispatches the pack destroy function when delete is clicked', () => {
+      const mockStore = reduxMockStore(store);
+      const Component = connectedComponent(ConnectedAllPacksPage, { mockStore });
+      const page = mount(Component).find('AllPacksPage');
+      const selectAllPacks = page.find({ name: 'select-all-packs' });
+
+      selectAllPacks.simulate('change');
+
+      const deleteBtn = page.find('.all-packs-page__bulk-action-btn--delete');
+
+      deleteBtn.simulate('click');
+
+      const dispatchedActions = mockStore.getActions();
+
+      expect(dispatchedActions).toInclude({ type: 'packs_DESTROY_REQUEST' });
+    });
+  });
 });
