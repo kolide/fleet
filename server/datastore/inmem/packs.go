@@ -9,7 +9,7 @@ import (
 func (d *Datastore) NewPack(pack *kolide.Pack) (*kolide.Pack, error) {
 	newPack := *pack
 
-	for _, q := range d.packs {
+	for _, q := range d.Packs {
 		if pack.Name == q.Name {
 			return nil, alreadyExists("Pack", q.ID)
 		}
@@ -17,7 +17,7 @@ func (d *Datastore) NewPack(pack *kolide.Pack) (*kolide.Pack, error) {
 
 	d.mtx.Lock()
 	newPack.ID = d.nextID(pack)
-	d.packs[newPack.ID] = &newPack
+	d.Packs[newPack.ID] = &newPack
 	d.mtx.Unlock()
 
 	pack.ID = newPack.ID
@@ -26,24 +26,12 @@ func (d *Datastore) NewPack(pack *kolide.Pack) (*kolide.Pack, error) {
 }
 
 func (d *Datastore) SavePack(pack *kolide.Pack) error {
-	if _, ok := d.packs[pack.ID]; !ok {
+	if _, ok := d.Packs[pack.ID]; !ok {
 		return notFound("Pack").WithID(pack.ID)
 	}
 
 	d.mtx.Lock()
-	d.packs[pack.ID] = pack
-	d.mtx.Unlock()
-
-	return nil
-}
-
-func (d *Datastore) DeletePack(pid uint) error {
-	if _, ok := d.packs[pid]; !ok {
-		return notFound("Pack").WithID(pid)
-	}
-
-	d.mtx.Lock()
-	delete(d.packs, pid)
+	d.Packs[pack.ID] = pack
 	d.mtx.Unlock()
 
 	return nil
@@ -51,7 +39,7 @@ func (d *Datastore) DeletePack(pid uint) error {
 
 func (d *Datastore) Pack(id uint) (*kolide.Pack, error) {
 	d.mtx.Lock()
-	pack, ok := d.packs[id]
+	pack, ok := d.Packs[id]
 	d.mtx.Unlock()
 	if !ok {
 		return nil, notFound("Pack").WithID(id)
@@ -64,14 +52,14 @@ func (d *Datastore) ListPacks(opt kolide.ListOptions) ([]*kolide.Pack, error) {
 	// We need to sort by keys to provide reliable ordering
 	keys := []int{}
 	d.mtx.Lock()
-	for k, _ := range d.packs {
+	for k, _ := range d.Packs {
 		keys = append(keys, int(k))
 	}
 	sort.Ints(keys)
 
 	packs := []*kolide.Pack{}
 	for _, k := range keys {
-		packs = append(packs, d.packs[uint(k)])
+		packs = append(packs, d.Packs[uint(k)])
 	}
 	d.mtx.Unlock()
 
@@ -119,7 +107,7 @@ func (d *Datastore) ListLabelsForPack(pid uint) ([]*kolide.Label, error) {
 	d.mtx.Lock()
 	for _, pt := range d.packTargets {
 		if pt.Type == kolide.TargetLabel && pt.PackID == pid {
-			labels = append(labels, d.labels[pt.TargetID])
+			labels = append(labels, d.Labels[pt.TargetID])
 		}
 	}
 	d.mtx.Unlock()
@@ -159,13 +147,13 @@ func (d *Datastore) ListHostsInPack(pid uint, opt kolide.ListOptions) ([]*kolide
 		case kolide.TargetHost:
 			if !hostLookup[pt.TargetID] {
 				hostLookup[pt.TargetID] = true
-				hosts = append(hosts, d.hosts[pt.TargetID])
+				hosts = append(hosts, d.Hosts[pt.TargetID])
 			}
 		case kolide.TargetLabel:
 			for _, lqe := range d.labelQueryExecutions {
 				if lqe.LabelID == pt.TargetID && lqe.Matches && !hostLookup[lqe.HostID] {
 					hostLookup[lqe.HostID] = true
-					hosts = append(hosts, d.hosts[lqe.HostID])
+					hosts = append(hosts, d.Hosts[lqe.HostID])
 				}
 			}
 		}

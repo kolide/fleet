@@ -27,9 +27,6 @@ type InviteStore interface {
 
 	// SaveInvite saves an invitation in the datastore.
 	SaveInvite(i *Invite) error
-
-	// DeleteInvite deletes an invitation.
-	DeleteInvite(i *Invite) error
 }
 
 // InviteService contains methods for a service which deals with
@@ -69,6 +66,14 @@ type Invite struct {
 	Name      string `json:"name"`
 	Position  string `json:"position,omitempty"`
 	Token     string `json:"-"`
+}
+
+func (i *Invite) EntityID() uint {
+	return i.ID
+}
+
+func (i *Invite) EntityType() string {
+	return "invites"
 }
 
 // InviteMailer is used to build an email template for the invite email.

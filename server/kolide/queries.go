@@ -10,10 +10,10 @@ type QueryStore interface {
 	// NewQuery creates a new query object in thie datastore. The returned
 	// query should have the ID updated.
 	NewQuery(query *Query) (*Query, error)
+
 	// SaveQuery saves changes to an existing query object.
 	SaveQuery(query *Query) error
-	// DeleteQuery (soft) deletes an existing query object.
-	DeleteQuery(query *Query) error
+
 	// DeleteQueries (soft) deletes the existing query objects with the
 	// provided IDs. The number of deleted queries is returned along with
 	// any error.

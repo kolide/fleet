@@ -9,7 +9,6 @@ import (
 type LabelStore interface {
 	// Label methods
 	NewLabel(Label *Label) (*Label, error)
-	DeleteLabel(lid uint) error
 	Label(lid uint) (*Label, error)
 	ListLabels(opt ListOptions) ([]*Label, error)
 

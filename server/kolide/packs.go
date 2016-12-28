@@ -8,7 +8,6 @@ type PackStore interface {
 	// Pack methods
 	NewPack(pack *Pack) (*Pack, error)
 	SavePack(pack *Pack) error
-	DeletePack(pid uint) error
 	Pack(pid uint) (*Pack, error)
 	ListPacks(opt ListOptions) ([]*Pack, error)
 

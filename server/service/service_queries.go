@@ -68,12 +68,8 @@ func (svc service) ModifyQuery(ctx context.Context, id uint, p kolide.QueryPaylo
 }
 
 func (svc service) DeleteQuery(ctx context.Context, id uint) error {
-	query, err := svc.ds.Query(id)
-	if err != nil {
-		return err
-	}
-
-	err = svc.ds.DeleteQuery(query)
+	query := &entity{"queries", id}
+	err := svc.ds.Delete(query)
 	if err != nil {
 		return err
 	}

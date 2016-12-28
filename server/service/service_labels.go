@@ -42,5 +42,6 @@ func (svc service) NewLabel(ctx context.Context, p kolide.LabelPayload) (*kolide
 }
 
 func (svc service) DeleteLabel(ctx context.Context, id uint) error {
-	return svc.ds.DeleteLabel(id)
+	label := &entity{"labels", id}
+	return svc.ds.Delete(label)
 }

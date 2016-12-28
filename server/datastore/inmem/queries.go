@@ -13,14 +13,14 @@ func (d *Datastore) NewQuery(query *kolide.Query) (*kolide.Query, error) {
 
 	newQuery := *query
 
-	for _, q := range d.queries {
+	for _, q := range d.Queries {
 		if query.Name == q.Name {
 			return nil, alreadyExists("Query", q.ID)
 		}
 	}
 
 	newQuery.ID = d.nextID(newQuery)
-	d.queries[newQuery.ID] = &newQuery
+	d.Queries[newQuery.ID] = &newQuery
 
 	return &newQuery, nil
 }
@@ -29,11 +29,11 @@ func (d *Datastore) SaveQuery(query *kolide.Query) error {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
-	if _, ok := d.queries[query.ID]; !ok {
+	if _, ok := d.Queries[query.ID]; !ok {
 		return notFound("Query").WithID(query.ID)
 	}
 
-	d.queries[query.ID] = query
+	d.Queries[query.ID] = query
 	return nil
 }
 
@@ -41,11 +41,11 @@ func (d *Datastore) DeleteQuery(query *kolide.Query) error {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
-	if _, ok := d.queries[query.ID]; !ok {
+	if _, ok := d.Queries[query.ID]; !ok {
 		return notFound("Query").WithID(query.ID)
 	}
 
-	delete(d.queries, query.ID)
+	delete(d.Queries, query.ID)
 	return nil
 }
 
@@ -57,8 +57,8 @@ func (d *Datastore) DeleteQueries(ids []uint) (uint, error) {
 
 	deleted := uint(0)
 	for _, id := range ids {
-		if _, ok := d.queries[id]; ok {
-			delete(d.queries, id)
+		if _, ok := d.Queries[id]; ok {
+			delete(d.Queries, id)
 			deleted++
 		}
 	}
@@ -77,7 +77,7 @@ func (d *Datastore) Query(id uint) (*kolide.Query, error) {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
-	query, ok := d.queries[id]
+	query, ok := d.Queries[id]
 	if !ok {
 		return nil, notFound("Query").WithID(id)
 	}
@@ -97,14 +97,14 @@ func (d *Datastore) ListQueries(opt kolide.ListOptions) ([]*kolide.Query, error)
 
 	// We need to sort by keys to provide reliable ordering
 	keys := []int{}
-	for k, _ := range d.queries {
+	for k, _ := range d.Queries {
 		keys = append(keys, int(k))
 	}
 	sort.Ints(keys)
 
 	queries := []*kolide.Query{}
 	for _, k := range keys {
-		q := d.queries[uint(k)]
+		q := d.Queries[uint(k)]
 		if q.Saved {
 			q.AuthorName = d.getUserNameByID(q.AuthorID)
 			queries = append(queries, q)
@@ -147,7 +147,7 @@ func (d *Datastore) loadPacksForQueries(queries []*kolide.Query) error {
 		q.Packs = make([]kolide.Pack, 0)
 		for _, sq := range d.scheduledQueries {
 			if sq.QueryID == q.ID {
-				q.Packs = append(q.Packs, *d.packs[sq.PackID])
+				q.Packs = append(q.Packs, *d.Packs[sq.PackID])
 			}
 		}
 	}

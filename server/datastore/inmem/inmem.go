@@ -21,12 +21,12 @@ type Datastore struct {
 	users                           map[uint]*kolide.User
 	sessions                        map[uint]*kolide.Session
 	passwordResets                  map[uint]*kolide.PasswordResetRequest
-	invites                         map[uint]*kolide.Invite
-	labels                          map[uint]*kolide.Label
+	Invites                         map[uint]*kolide.Invite
+	Labels                          map[uint]*kolide.Label
 	labelQueryExecutions            map[uint]*kolide.LabelQueryExecution
-	queries                         map[uint]*kolide.Query
-	packs                           map[uint]*kolide.Pack
-	hosts                           map[uint]*kolide.Host
+	Queries                         map[uint]*kolide.Query
+	Packs                           map[uint]*kolide.Pack
+	Hosts                           map[uint]*kolide.Host
 	scheduledQueries                map[uint]*kolide.ScheduledQuery
 	packTargets                     map[uint]*kolide.PackTarget
 	distributedQueryExecutions      map[uint]kolide.DistributedQueryExecution
@@ -76,12 +76,12 @@ func (d *Datastore) Migrate() error {
 	d.users = make(map[uint]*kolide.User)
 	d.sessions = make(map[uint]*kolide.Session)
 	d.passwordResets = make(map[uint]*kolide.PasswordResetRequest)
-	d.invites = make(map[uint]*kolide.Invite)
-	d.labels = make(map[uint]*kolide.Label)
+	d.Invites = make(map[uint]*kolide.Invite)
+	d.Labels = make(map[uint]*kolide.Label)
 	d.labelQueryExecutions = make(map[uint]*kolide.LabelQueryExecution)
-	d.queries = make(map[uint]*kolide.Query)
-	d.packs = make(map[uint]*kolide.Pack)
-	d.hosts = make(map[uint]*kolide.Host)
+	d.Queries = make(map[uint]*kolide.Query)
+	d.Packs = make(map[uint]*kolide.Pack)
+	d.Hosts = make(map[uint]*kolide.Host)
 	d.scheduledQueries = make(map[uint]*kolide.ScheduledQuery)
 	d.packTargets = make(map[uint]*kolide.PackTarget)
 	d.distributedQueryExecutions = make(map[uint]kolide.DistributedQueryExecution)

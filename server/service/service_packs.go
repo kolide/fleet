@@ -78,7 +78,8 @@ func (svc service) ModifyPack(ctx context.Context, id uint, p kolide.PackPayload
 }
 
 func (svc service) DeletePack(ctx context.Context, id uint) error {
-	return svc.ds.DeletePack(id)
+	pack := &entity{"packs", id}
+	return svc.ds.Delete(pack)
 }
 
 func (svc service) AddLabelToPack(ctx context.Context, lid, pid uint) error {

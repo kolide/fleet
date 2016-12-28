@@ -108,7 +108,8 @@ func testSaveHosts(t *testing.T, ds kolide.Datastore) {
 	require.NotNil(t, host)
 	assert.Nil(t, host.PrimaryNetworkInterfaceID)
 
-	err = ds.DeleteHost(host)
+	e := &entity{"hosts", host.ID}
+	err = ds.Delete(e)
 	assert.Nil(t, err)
 
 	host, err = ds.Host(host.ID)
@@ -126,7 +127,8 @@ func testDeleteHost(t *testing.T, ds kolide.Datastore) {
 	require.Nil(t, err)
 	require.NotNil(t, host)
 
-	err = ds.DeleteHost(host)
+	e := &entity{"hosts", host.ID}
+	err = ds.Delete(e)
 	assert.Nil(t, err)
 
 	host, err = ds.Host(host.ID)
@@ -183,7 +185,8 @@ func testListHost(t *testing.T, ds kolide.Datastore) {
 	assert.Equal(t, "en1", hosts2[1].NetworkInterfaces[1].Interface)
 	assert.Equal(t, "en2", hosts2[3].NetworkInterfaces[0].Interface)
 
-	err = ds.DeleteHost(hosts[0])
+	e := &entity{"hosts", hosts[0].ID}
+	err = ds.Delete(e)
 	require.Nil(t, err)
 	hosts2, err = ds.ListHosts(kolide.ListOptions{})
 	require.Nil(t, err)
@@ -328,6 +331,10 @@ func testSearchHosts(t *testing.T, ds kolide.Datastore) {
 	hits, err = ds.SearchHosts("99.100.101")
 	require.Nil(t, err)
 	assert.Equal(t, 2, len(hits))
+<<<<<<< HEAD
+=======
+
+>>>>>>> 251ad84... add generic way of soft deleting datastore entities
 	hits, err = ds.SearchHosts("99.100.101", h3.ID)
 	require.Nil(t, err)
 	assert.Equal(t, 1, len(hits))

@@ -11,7 +11,6 @@ import (
 type HostStore interface {
 	NewHost(host *Host) (*Host, error)
 	SaveHost(host *Host) error
-	DeleteHost(host *Host) error
 	Host(id uint) (*Host, error)
 	ListHosts(opt ListOptions) ([]*Host, error)
 	EnrollHost(osqueryHostId string, nodeKeySize int) (*Host, error)

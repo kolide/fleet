@@ -15,8 +15,8 @@ func (d *Datastore) NewScheduledQuery(sq *kolide.ScheduledQuery) (*kolide.Schedu
 	newScheduledQuery.ID = d.nextID(newScheduledQuery)
 	d.scheduledQueries[newScheduledQuery.ID] = &newScheduledQuery
 
-	newScheduledQuery.Query = d.queries[newScheduledQuery.QueryID].Query
-	newScheduledQuery.Name = d.queries[newScheduledQuery.QueryID].Name
+	newScheduledQuery.Query = d.Queries[newScheduledQuery.QueryID].Query
+	newScheduledQuery.Name = d.Queries[newScheduledQuery.QueryID].Name
 
 	return &newScheduledQuery, nil
 }
@@ -54,8 +54,8 @@ func (d *Datastore) ScheduledQuery(id uint) (*kolide.ScheduledQuery, error) {
 		return nil, notFound("ScheduledQuery").WithID(id)
 	}
 
-	sq.Name = d.queries[sq.QueryID].Name
-	sq.Query = d.queries[sq.QueryID].Query
+	sq.Name = d.Queries[sq.QueryID].Name
+	sq.Query = d.Queries[sq.QueryID].Query
 
 	return sq, nil
 }
@@ -81,8 +81,8 @@ func (d *Datastore) ListScheduledQueriesInPack(id uint, opt kolide.ListOptions) 
 	scheduledQueries := []*kolide.ScheduledQuery{}
 	for _, k := range keys {
 		q := d.scheduledQueries[uint(k)]
-		q.Name = d.queries[q.QueryID].Name
-		q.Query = d.queries[q.QueryID].Query
+		q.Name = d.Queries[q.QueryID].Name
+		q.Query = d.Queries[q.QueryID].Query
 		scheduledQueries = append(scheduledQueries, q)
 	}
 

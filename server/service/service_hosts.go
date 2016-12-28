@@ -25,12 +25,8 @@ func (svc service) HostStatus(ctx context.Context, host kolide.Host) string {
 }
 
 func (svc service) DeleteHost(ctx context.Context, id uint) error {
-	host, err := svc.ds.Host(id)
-	if err != nil {
-		return err
-	}
-
-	err = svc.ds.DeleteHost(host)
+	host := &entity{"hosts", id}
+	err := svc.ds.Delete(host)
 	if err != nil {
 		return err
 	}

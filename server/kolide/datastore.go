@@ -17,6 +17,8 @@ type Datastore interface {
 	Name() string
 	Drop() error
 	Migrate() error
+
+	Delete(Entity) error
 }
 
 // NotFoundError is returned when the datastore resource cannot be found.
@@ -30,4 +32,9 @@ type NotFoundError interface {
 type AlreadyExistsError interface {
 	error
 	IsExists() bool
+}
+
+type Entity interface {
+	EntityID() uint
+	EntityType() string
 }
