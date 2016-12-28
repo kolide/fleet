@@ -64,6 +64,13 @@ class Kolide extends Base {
       .then(response => response.scheduled);
   }
 
+  destroyPack = ({ id }) => {
+    const { PACKS } = endpoints;
+    const endpoint = `${this.endpoint(PACKS)}/${id}`;
+
+    return this.authenticatedDelete(endpoint);
+  }
+
   destroyScheduledQuery = ({ id }) => {
     const endpoint = `${this.endpoint('/v1/kolide/schedule')}/${id}`;
 

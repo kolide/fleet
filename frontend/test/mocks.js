@@ -64,6 +64,16 @@ export const validCreateScheduledQueryRequest = (bearerToken, formData) => {
     .reply(201, { scheduled_query: scheduledQueryStub });
 };
 
+export const validDestroyPackRequest = (bearerToken, pack) => {
+  return nock('http://localhost:8080', {
+    reqHeaders: {
+      Authorization: `Bearer ${bearerToken}`,
+    },
+  })
+    .delete(`/api/v1/kolide/packs/${pack.id}`)
+    .reply(200, {});
+};
+
 export const validDestroyScheduledQueryRequest = (bearerToken, scheduledQuery) => {
   return nock('http://localhost:8080', {
     reqHeaders: {
@@ -340,6 +350,7 @@ export default {
   validCreatePackRequest,
   validCreateQueryRequest,
   validCreateScheduledQueryRequest,
+  validDestroyPackRequest,
   validDestroyScheduledQueryRequest,
   validForgotPasswordRequest,
   validGetConfigRequest,
