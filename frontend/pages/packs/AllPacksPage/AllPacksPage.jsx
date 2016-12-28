@@ -5,6 +5,7 @@ import { push } from 'react-router-redux';
 
 import Button from 'components/buttons/Button';
 import entityGetter from 'redux/utilities/entityGetter';
+import Icon from 'components/icons/Icon';
 import InputField from 'components/forms/fields/InputField';
 import NumberPill from 'components/NumberPill';
 import packActions from 'redux/nodes/entities/packs/actions';
@@ -109,10 +110,24 @@ export class AllPacksPage extends Component {
   renderCTAs = () => {
     const { goToNewPackPage } = this;
     const checkedPackCount = this.state.checkedPackIDs.length;
+    const btnClass = `${baseClass}__bulk-action-btn`;
 
     if (checkedPackCount) {
+      const packText = checkedPackCount === 1 ? 'Pack' : 'Packs';
+
       return (
-        <span>{checkedPackCount} {checkedPackCount === 1 ? 'Pack' : 'Packs'} Selected</span>
+        <div>
+          <p className={`${baseClass}__pack-count`}>{checkedPackCount} {packText} Selected</p>
+          <Button className={`${btnClass} ${btnClass}--disable`} variant="unstyled">
+            <Icon name="offline" /> Disable
+          </Button>
+          <Button className={`${btnClass} ${btnClass}--enable`} variant="unstyled">
+            <Icon name="success-check" /> Enable
+          </Button>
+          <Button className={`${btnClass} ${btnClass}--delete`} variant="unstyled">
+            <Icon name="delete-cloud" /> Delete
+          </Button>
+        </div>
       );
     }
 
