@@ -1,5 +1,7 @@
 package kolide
 
+import "golang.org/x/net/context"
+
 // service a interface stub
 type Service interface {
 	UserService
@@ -15,4 +17,6 @@ type Service interface {
 	TargetService
 	ScheduledQueryService
 	OptionService
+
+	Delete(ctx context.Context, entity Entity) (err error)
 }

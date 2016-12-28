@@ -331,10 +331,6 @@ func testSearchHosts(t *testing.T, ds kolide.Datastore) {
 	hits, err = ds.SearchHosts("99.100.101")
 	require.Nil(t, err)
 	assert.Equal(t, 2, len(hits))
-<<<<<<< HEAD
-=======
-
->>>>>>> 251ad84... add generic way of soft deleting datastore entities
 	hits, err = ds.SearchHosts("99.100.101", h3.ID)
 	require.Nil(t, err)
 	assert.Equal(t, 1, len(hits))

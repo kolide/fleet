@@ -24,7 +24,6 @@ type PackService interface {
 	GetPack(ctx context.Context, id uint) (*Pack, error)
 	NewPack(ctx context.Context, p PackPayload) (*Pack, error)
 	ModifyPack(ctx context.Context, id uint, p PackPayload) (*Pack, error)
-	DeletePack(ctx context.Context, id uint) error
 
 	AddLabelToPack(ctx context.Context, lid, pid uint) error
 	ListLabelsForPack(ctx context.Context, pid uint) ([]*Label, error)

@@ -35,9 +35,6 @@ type InviteService interface {
 	// InviteNewUser creates an invite for a new user to join Kolide.
 	InviteNewUser(ctx context.Context, payload InvitePayload) (invite *Invite, err error)
 
-	// DeleteInvite removes an invite.
-	DeleteInvite(ctx context.Context, id uint) (err error)
-
 	// Invites returns a list of all invites.
 	ListInvites(ctx context.Context, opt ListOptions) (invites []*Invite, err error)
 

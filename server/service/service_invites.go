@@ -94,8 +94,3 @@ func (svc service) VerifyInvite(ctx context.Context, token string) (*kolide.Invi
 	return invite, nil
 
 }
-
-func (svc service) DeleteInvite(ctx context.Context, id uint) error {
-	invite := &entity{"invites", id}
-	return svc.ds.Delete(invite)
-}

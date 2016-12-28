@@ -136,28 +136,3 @@ func makeCreateLabelEndpoint(svc kolide.Service) endpoint.Endpoint {
 		}, nil
 	}
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// Delete Label
-////////////////////////////////////////////////////////////////////////////////
-
-type deleteLabelRequest struct {
-	ID uint
-}
-
-type deleteLabelResponse struct {
-	Err error `json:"error,omitempty"`
-}
-
-func (r deleteLabelResponse) error() error { return r.Err }
-
-func makeDeleteLabelEndpoint(svc kolide.Service) endpoint.Endpoint {
-	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(deleteLabelRequest)
-		err := svc.DeleteLabel(ctx, req.ID)
-		if err != nil {
-			return deleteLabelResponse{Err: err}, nil
-		}
-		return deleteLabelResponse{}, nil
-	}
-}

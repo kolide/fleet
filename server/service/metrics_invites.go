@@ -22,16 +22,16 @@ func (mw metricsMiddleware) InviteNewUser(ctx context.Context, payload kolide.In
 	return invite, err
 }
 
-func (mw metricsMiddleware) DeleteInvite(ctx context.Context, id uint) error {
+func (mw metricsMiddleware) Delete(ctx context.Context, e kolide.Entity) error {
 	var (
 		err error
 	)
 	defer func(begin time.Time) {
-		lvs := []string{"method", "DeleteInvite", "error", fmt.Sprint(err != nil)}
+		lvs := []string{"method", "Delete", "error", fmt.Sprint(err != nil)}
 		mw.requestCount.With(lvs...).Add(1)
 		mw.requestLatency.With(lvs...).Observe(time.Since(begin).Seconds())
 	}(time.Now())
-	err = mw.Service.DeleteInvite(ctx, id)
+	err = mw.Service.Delete(ctx, e)
 	return err
 }
 

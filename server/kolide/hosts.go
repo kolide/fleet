@@ -27,7 +27,6 @@ type HostService interface {
 	ListHosts(ctx context.Context, opt ListOptions) ([]*Host, error)
 	GetHost(ctx context.Context, id uint) (*Host, error)
 	HostStatus(ctx context.Context, host Host) string
-	DeleteHost(ctx context.Context, id uint) error
 }
 
 type Host struct {

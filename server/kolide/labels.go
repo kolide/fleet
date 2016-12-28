@@ -38,7 +38,6 @@ type LabelService interface {
 	ListLabels(ctx context.Context, opt ListOptions) ([]*Label, error)
 	GetLabel(ctx context.Context, id uint) (*Label, error)
 	NewLabel(ctx context.Context, p LabelPayload) (*Label, error)
-	DeleteLabel(ctx context.Context, id uint) error
 }
 
 type LabelPayload struct {
