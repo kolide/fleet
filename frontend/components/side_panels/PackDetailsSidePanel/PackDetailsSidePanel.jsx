@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 
 import Icon from 'components/icons/Icon';
+import { Link } from 'react-router';
 import packInterface from 'interfaces/pack';
 import SecondarySidePanelContainer from 'components/side_panels/SecondarySidePanelContainer';
 import Slider from 'components/forms/fields/Slider';
@@ -24,6 +25,7 @@ const PackDetailsSidePanel = ({ onUpdateSelectedPack, pack }) => {
           onChange={updatePackStatus}
           value={!disabled}
         />
+        <Link className="button button--inverse" to={`/packs/${pack.id}`}>Edit Pack</Link>
       </div>
     </SecondarySidePanelContainer>
   );
