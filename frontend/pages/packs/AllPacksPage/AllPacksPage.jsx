@@ -9,6 +9,7 @@ import Icon from 'components/icons/Icon';
 import InputField from 'components/forms/fields/InputField';
 import NumberPill from 'components/NumberPill';
 import packActions from 'redux/nodes/entities/packs/actions';
+import PackDetailsSidePanel from 'components/side_panels/PackDetailsSidePanel';
 import PackInfoSidePanel from 'components/side_panels/PackInfoSidePanel';
 import packInterface from 'interfaces/pack';
 import PacksList from 'components/packs/PacksList';
@@ -96,16 +97,28 @@ export class AllPacksPage extends Component {
     return false;
   }
 
+  onFilterPacks = (packFilter) => {
+    this.setState({ packFilter });
+
+    return false;
+  }
+
   onSelectPack = (selectedPack) => {
     this.setState({ selectedPack });
 
     return false;
   }
 
-  onFilterPacks = (packFilter) => {
-    this.setState({ packFilter });
+  onUpdateSelectedPack = (pack, updatedAttrs) => {
+    const { dispatch } = this.props;
+    const { update } = packActions;
 
-    return false;
+    return dispatch(update(pack, updatedAttrs))
+      .then((selectedPack) => {
+        this.setState({ selectedPack });
+
+        return false;
+      });
   }
 
   getPacks = () => {
@@ -180,14 +193,14 @@ export class AllPacksPage extends Component {
   }
 
   renderSidePanel = () => {
+    const { onUpdateSelectedPack } = this;
     const { selectedPack } = this.state;
 
     if (!selectedPack) {
       return <PackInfoSidePanel />;
     }
 
-    // TODO: render PackDetailSidePanel
-    return false;
+    return <PackDetailsSidePanel onUpdateSelectedPack={onUpdateSelectedPack} pack={selectedPack} />;
   }
 
   render () {
