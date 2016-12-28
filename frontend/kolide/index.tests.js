@@ -31,6 +31,7 @@ const {
   validRunQueryRequest,
   validSetupRequest,
   validUpdateConfigRequest,
+  validUpdatePackRequest,
   validUpdateQueryRequest,
   validUpdateUserRequest,
   validUser,
@@ -490,6 +491,23 @@ describe('Kolide - API client', () => {
 
       Kolide.setBearerToken(bearerToken);
       Kolide.updateConfig(formData)
+        .then(() => {
+          expect(request.isDone()).toEqual(true);
+          done();
+        })
+        .catch(done);
+    });
+  });
+
+  describe('#updatePack', () => {
+    it('calls the appropriate endpoint with the correct parameters', (done) => {
+      const bearerToken = 'valid-bearer-token';
+      const pack = { id: 1, name: 'Pack Name', description: 'Pack Description' };
+      const updatePackParams = { name: 'New Pack Name' };
+      const request = validUpdatePackRequest(bearerToken, pack, updatePackParams);
+
+      Kolide.setBearerToken(bearerToken);
+      Kolide.updatePack(pack, updatePackParams)
         .then(() => {
           expect(request.isDone()).toEqual(true);
           done();

@@ -305,6 +305,16 @@ export const validUpdateConfigRequest = (bearerToken, configData) => {
   .reply(200, {});
 };
 
+export const validUpdatePackRequest = (bearerToken, pack, formData) => {
+  return nock('http://localhost:8080', {
+    reqHeaders: {
+      Authorization: `Bearer ${bearerToken}`,
+    },
+  })
+  .patch(`/api/v1/kolide/packs/${pack.id}`, JSON.stringify(formData))
+  .reply(200, { pack: { ...pack, ...formData } });
+};
+
 export const validUpdateQueryRequest = (bearerToken, query, formData) => {
   return nock('http://localhost:8080', {
     reqHeaders: {
@@ -349,6 +359,7 @@ export default {
   validRunQueryRequest,
   validSetupRequest,
   validUpdateConfigRequest,
+  validUpdatePackRequest,
   validUpdateQueryRequest,
   validUpdateUserRequest,
   validUser,

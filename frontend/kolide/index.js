@@ -343,6 +343,14 @@ class Kolide extends Base {
     return this.authenticatedPatch(this.endpoint(CONFIG), JSON.stringify(configData));
   }
 
+  updatePack = ({ id: packID }, updateParams) => {
+    const { PACKS } = endpoints;
+    const updatePackEndpoint = `${this.baseURL}${PACKS}/${packID}`;
+
+    return this.authenticatedPatch(updatePackEndpoint, JSON.stringify(updateParams))
+      .then((response) => { return response.pack; });
+  }
+
   updateQuery = ({ id: queryID }, updateParams) => {
     const { QUERIES } = endpoints;
     const updateQueryEndpoint = `${this.baseURL}${QUERIES}/${queryID}`;
