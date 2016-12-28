@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { filter, includes, noop, pull } from 'lodash';
+import { filter, get, includes, noop, pull } from 'lodash';
 import { push } from 'react-router-redux';
 
 import Button from 'components/buttons/Button';
@@ -22,6 +22,7 @@ export class AllPacksPage extends Component {
   static propTypes = {
     dispatch: PropTypes.func,
     packs: PropTypes.arrayOf(packInterface),
+    selectedPack: packInterface,
   }
 
   static defaultProps = {
@@ -35,7 +36,6 @@ export class AllPacksPage extends Component {
       allPacksChecked: false,
       checkedPackIDs: [],
       packFilter: '',
-      selectedPack: undefined,
     };
   }
 
@@ -104,7 +104,13 @@ export class AllPacksPage extends Component {
   }
 
   onSelectPack = (selectedPack) => {
-    this.setState({ selectedPack });
+    const { dispatch } = this.props;
+    const locationObject = {
+      pathname: '/packs/manage',
+      query: { selectedPack: selectedPack.id },
+    };
+
+    dispatch(push(locationObject));
 
     return false;
   }
@@ -113,12 +119,7 @@ export class AllPacksPage extends Component {
     const { dispatch } = this.props;
     const { update } = packActions;
 
-    return dispatch(update(pack, updatedAttrs))
-      .then((selectedPack) => {
-        this.setState({ selectedPack });
-
-        return false;
-      });
+    return dispatch(update(pack, updatedAttrs));
   }
 
   getPacks = () => {
@@ -194,7 +195,7 @@ export class AllPacksPage extends Component {
 
   renderSidePanel = () => {
     const { onUpdateSelectedPack } = this;
-    const { selectedPack } = this.state;
+    const { selectedPack } = this.props;
 
     if (!selectedPack) {
       return <PackInfoSidePanel />;
@@ -248,10 +249,13 @@ export class AllPacksPage extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
-  const { entities: packs } = entityGetter(state).get('packs');
+const mapStateToProps = (state, { location }) => {
+  const packEntities = entityGetter(state).get('packs');
+  const { entities: packs } = packEntities;
+  const selectedPackID = get(location, 'query.selectedPack');
+  const selectedPack = selectedPackID && packEntities.findBy({ id: selectedPackID });
 
-  return { packs };
+  return { packs, selectedPack };
 };
 
 export default connect(mapStateToProps)(AllPacksPage);

@@ -1,5 +1,6 @@
 import React from 'react';
 import expect from 'expect';
+import { find } from 'lodash';
 import { mount } from 'enzyme';
 
 import ConnectedAllPacksPage, { AllPacksPage } from 'pages/packs/AllPacksPage/AllPacksPage';
@@ -146,17 +147,32 @@ describe('AllPacksPage - component', () => {
   });
 
   describe('selecting a pack', () => {
-    const packs = [packStub, { ...packStub, id: 101, name: 'My unique pack name' }];
-
-    it('updates state when a pack is selected', () => {
-      const page = mount(<AllPacksPage packs={packs} />);
+    it('updates the URL when a pack is selected', () => {
+      const mockStore = reduxMockStore(store);
+      const Component = connectedComponent(ConnectedAllPacksPage, { mockStore });
+      const page = mount(Component).find('AllPacksPage');
       const firstRow = page.find('Row').first();
 
-      expect(page.state('selectedPack')).toNotExist();
+      expect(page.prop('selectedPack')).toNotExist();
 
       firstRow.find('ClickableTd').first().find('a').simulate('click');
 
-      expect(page.state('selectedPack')).toEqual(packStub);
+      const dispatchedActions = mockStore.getActions();
+      const locationChangeAction = find(dispatchedActions, { type: '@@router/CALL_HISTORY_METHOD' });
+
+      expect(locationChangeAction.payload.args).toEqual([{
+        pathname: '/packs/manage',
+        query: { selectedPack: packStub.id },
+      }]);
+    });
+
+    it('sets the selectedPack prop', () => {
+      const mockStore = reduxMockStore(store);
+      const props = { location: { query: { selectedPack: packStub.id } } };
+      const Component = connectedComponent(ConnectedAllPacksPage, { mockStore, props });
+      const page = mount(Component).find('AllPacksPage');
+
+      expect(page.prop('selectedPack')).toEqual(packStub);
     });
   });
 });
