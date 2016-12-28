@@ -1,7 +1,6 @@
 package mysql
 
 import (
-	"database/sql"
 	"fmt"
 
 	"github.com/kolide/kolide-ose/server/kolide"
@@ -17,11 +16,13 @@ func (d *Datastore) Delete(e kolide.Entity) error {
 		`,
 		e.EntityType(), e.EntityID(),
 	)
-	_, err := d.db.Exec(deleteStmt)
-	if err != nil && err == sql.ErrNoRows {
-		return notFound(e.EntityType()).WithID(e.EntityID())
-	} else if err != nil {
+	result, err := d.db.Exec(deleteStmt)
+	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("delete %s", e.EntityType()))
+	}
+	rows, _ := result.RowsAffected()
+	if rows != 1 {
+		return notFound(e.EntityType()).WithID(e.EntityID())
 	}
 	return nil
 }
