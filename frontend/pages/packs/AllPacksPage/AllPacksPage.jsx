@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { filter, get, includes, noop, pull } from 'lodash';
+import { filter, get, includes, isEqual, noop, pull } from 'lodash';
 import { push } from 'react-router-redux';
 
 import Button from 'components/buttons/Button';
@@ -15,6 +15,8 @@ import packInterface from 'interfaces/pack';
 import PacksList from 'components/packs/PacksList';
 import paths from 'router/paths';
 import { renderFlash } from 'redux/nodes/notifications/actions';
+import scheduledQueryActions from 'redux/nodes/entities/scheduled_queries/actions';
+import scheduledQueryInterface from 'interfaces/scheduled_query';
 
 const baseClass = 'all-packs-page';
 
@@ -23,6 +25,7 @@ export class AllPacksPage extends Component {
     dispatch: PropTypes.func,
     packs: PropTypes.arrayOf(packInterface),
     selectedPack: packInterface,
+    selectedScheduledQueries: PropTypes.arrayOf(scheduledQueryInterface),
   }
 
   static defaultProps = {
@@ -40,10 +43,22 @@ export class AllPacksPage extends Component {
   }
 
   componentWillMount() {
-    const { dispatch, packs } = this.props;
+    const { dispatch, packs, selectedPack } = this.props;
 
     if (!packs.length) {
       dispatch(packActions.loadAll());
+    }
+
+    if (selectedPack) {
+      this.getScheduledQueriesForPack(selectedPack);
+    }
+
+    return false;
+  }
+
+  componentWillReceiveProps ({ selectedPack }) {
+    if (!isEqual(this.props.selectedPack, selectedPack)) {
+      this.getScheduledQueriesForPack(selectedPack);
     }
 
     return false;
@@ -143,6 +158,19 @@ export class AllPacksPage extends Component {
     });
   }
 
+  getScheduledQueriesForPack = (pack) => {
+    const { dispatch } = this.props;
+    const { loadAll } = scheduledQueryActions;
+
+    if (!pack) {
+      return false;
+    }
+
+    dispatch(loadAll(pack));
+
+    return false;
+  }
+
   goToNewPackPage = () => {
     const { dispatch } = this.props;
     const { NEW_PACK } = paths;
@@ -195,13 +223,19 @@ export class AllPacksPage extends Component {
 
   renderSidePanel = () => {
     const { onUpdateSelectedPack } = this;
-    const { selectedPack } = this.props;
+    const { selectedPack, selectedScheduledQueries } = this.props;
 
     if (!selectedPack) {
       return <PackInfoSidePanel />;
     }
 
-    return <PackDetailsSidePanel onUpdateSelectedPack={onUpdateSelectedPack} pack={selectedPack} />;
+    return (
+      <PackDetailsSidePanel
+        onUpdateSelectedPack={onUpdateSelectedPack}
+        pack={selectedPack}
+        scheduledQueries={selectedScheduledQueries}
+      />
+    );
   }
 
   render () {
@@ -251,11 +285,13 @@ export class AllPacksPage extends Component {
 
 const mapStateToProps = (state, { location }) => {
   const packEntities = entityGetter(state).get('packs');
+  const scheduledQueryEntities = entityGetter(state).get('scheduled_queries');
   const { entities: packs } = packEntities;
   const selectedPackID = get(location, 'query.selectedPack');
   const selectedPack = selectedPackID && packEntities.findBy({ id: selectedPackID });
+  const selectedScheduledQueries = selectedPack && scheduledQueryEntities.where({ pack_id: selectedPack.id });
 
-  return { packs, selectedPack };
+  return { packs, selectedPack, selectedScheduledQueries };
 };
 
 export default connect(mapStateToProps)(AllPacksPage);
