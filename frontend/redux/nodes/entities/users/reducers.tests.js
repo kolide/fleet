@@ -4,7 +4,7 @@ import reducer from './reducer';
 import {
   requirePasswordResetRequest,
   requirePasswordResetFailure,
-  requirePasswordResetSuccess
+  requirePasswordResetSuccess,
 } from './actions';
 
 describe('Users - reducer', () => {
@@ -25,7 +25,7 @@ describe('Users - reducer', () => {
   });
 
   it('updates state when request is successful', () => {
-    let initState = {
+    const initState = {
       loading: true,
       errors: {},
       data: {},
@@ -45,7 +45,7 @@ describe('Users - reducer', () => {
 
     expect(newState).toEqual({
       loading: false,
-      errors: errors,
+      errors,
       data: {},
     });
   });

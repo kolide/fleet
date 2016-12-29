@@ -1,9 +1,10 @@
-import config from './config';
 import Kolide from 'kolide';
 
-export const REQUIRE_PASSWORD_RESET_FAILURE = "REQUIRE_PASSWORD_RESET_FAILURE";
-export const REQUIRE_PASSWORD_RESET_REQUEST = "REQUIRE_PASSWORD_RESET_REQUEST";
-export const REQUIRE_PASSWORD_RESET_SUCCESS = "REQUIRE_PASSWORD_RESET_SUCCESS";
+import config from './config';
+
+export const REQUIRE_PASSWORD_RESET_FAILURE = 'REQUIRE_PASSWORD_RESET_FAILURE';
+export const REQUIRE_PASSWORD_RESET_REQUEST = 'REQUIRE_PASSWORD_RESET_REQUEST';
+export const REQUIRE_PASSWORD_RESET_SUCCESS = 'REQUIRE_PASSWORD_RESET_SUCCESS';
 
 export const requirePasswordResetFailure = (errors) => {
   return {
@@ -35,4 +36,4 @@ export const requirePasswordReset = (user, require = true) => {
   };
 };
 
-export default {...config.actions, requirePasswordReset};
+export default { ...config.actions, requirePasswordReset };

@@ -387,9 +387,9 @@ class Kolide extends Base {
 
   requirePasswordReset = (user, require) => {
     const { USERS } = endpoints;
-    const requirePasswordResetEndpoint = `${this.baseURL}${USERS}/${user.id}/require_password_reset`
+    const requirePasswordResetEndpoint = `${this.baseURL}${USERS}/${user.id}/require_password_reset`;
 
-    return this.authenticatedPost(requirePasswordResetEndpoint, JSON.stringify({require: require}))
+    return this.authenticatedPost(requirePasswordResetEndpoint, JSON.stringify({ require }));
   }
 }
 

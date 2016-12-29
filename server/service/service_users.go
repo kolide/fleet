@@ -190,6 +190,8 @@ func (svc service) ResetPassword(ctx context.Context, token, password string) er
 }
 
 func (svc service) RequirePasswordReset(ctx context.Context, uid uint) error {
+	time.Sleep(1 * time.Second)
+	return errors.New("nope")
 	user, err := svc.ds.UserByID(uid)
 	if err != nil {
 		return errors.Wrap(err, "loading user by ID")
