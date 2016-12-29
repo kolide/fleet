@@ -1,4 +1,4 @@
-import expect, { spyOn } from 'expect';
+import expect, { restoreSpies, spyOn } from 'expect';
 
 import * as Kolide from 'kolide';
 
@@ -19,21 +19,21 @@ describe('Users - actions', () => {
     describe('successful request', () => {
       const mockStore = reduxMockStore(store);
 
-      it('calls the resetFunc', () => {
-        const resetFunc = spyOn(Kolide.default, 'requirePasswordReset').andCall(() => {
-          return Promise.resolve();
-        });
-
-        mockStore.dispatch(requirePasswordReset(user, true));
-
-        expect(resetFunc).toHaveBeenCalledWith(user, true);
-      });
-
-      it('dispatches the correct actions', () => {
+      beforeEach(() => {
         spyOn(Kolide.default, 'requirePasswordReset').andCall(() => {
           return Promise.resolve();
         });
+      });
 
+      afterEach(restoreSpies);
+
+      it('calls the resetFunc', () => {
+        mockStore.dispatch(requirePasswordReset(user, true));
+
+        expect(Kolide.default.requirePasswordReset).toHaveBeenCalledWith(user, true);
+      });
+
+      it('dispatches the correct actions', () => {
         mockStore.dispatch(requirePasswordReset());
 
         const dispatchedActions = mockStore.getActions();
@@ -49,21 +49,21 @@ describe('Users - actions', () => {
       const mockStore = reduxMockStore(store);
       const errors = { base: 'Unable to require password reset' };
 
-      it('calls the resetFunc', () => {
-        const resetFunc = spyOn(Kolide.default, 'requirePasswordReset').andCall(() => {
-          return Promise.reject({ errors });
-        });
-
-        mockStore.dispatch(requirePasswordReset(user, true));
-
-        expect(resetFunc).toHaveBeenCalledWith(user, true);
-      });
-
-      it('dispatches the correct actions', () => {
+      beforeEach(() => {
         spyOn(Kolide.default, 'requirePasswordReset').andCall(() => {
           return Promise.reject({ errors });
         });
+      });
 
+      afterEach(restoreSpies);
+
+      it('calls the resetFunc', () => {
+        mockStore.dispatch(requirePasswordReset(user, true));
+
+        expect(Kolide.default.requirePasswordReset).toHaveBeenCalledWith(user, true);
+      });
+
+      it('dispatches the correct actions', () => {
         mockStore.dispatch(requirePasswordReset());
 
         const dispatchedActions = mockStore.getActions();
