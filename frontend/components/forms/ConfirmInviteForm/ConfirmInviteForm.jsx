@@ -50,12 +50,9 @@ class ConfirmInviteForm extends Component {
             type="password"
           />
         </div>
-        <Button
-          onClick={handleSubmit}
-          text="Submit"
-          type="Submit"
-          variant="gradient"
-        />
+        <Button onClick={handleSubmit} type="Submit" variant="gradient">
+          Submit
+        </Button>
       </form>
     );
   }
