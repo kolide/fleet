@@ -91,7 +91,15 @@ export const invalidGetQueryRequest = (bearerToken, queryID) => {
     },
   })
     .get(`/api/v1/kolide/queries/${queryID}`)
-    .reply(404, { error: 'resource not found' });
+    .reply(404, {
+      message: 'Resource not found',
+      errors: [
+        {
+          name: 'base',
+          reason: 'Resource not found',
+        },
+      ],
+    });
 };
 
 export const validGetQueriesRequest = (bearerToken) => {

@@ -1,7 +1,7 @@
 import { noop } from 'lodash';
 import { normalize, arrayOf } from 'normalizr';
 
-import { entitiesExceptID } from './helpers';
+import { entitiesExceptID, formatErrorResponse } from 'redux/nodes/entities/base/helpers';
 
 const initialState = {
   loading: false,
@@ -124,13 +124,11 @@ const reduxConfig = ({
           return response;
         })
         .catch((response) => {
-          const { errors } = response;
-          const { errors: error } = response.message || {};
-          const errorMessage = errors || error;
+          const errorsObject = formatErrorResponse(response);
 
-          dispatch(createFailure(errorMessage));
+          dispatch(createFailure(errorsObject));
 
-          throw errorMessage;
+          throw errorsObject;
         });
     };
   };
@@ -146,13 +144,11 @@ const reduxConfig = ({
           return dispatch(destroySuccess(entityID));
         })
         .catch((response) => {
-          const { errors } = response;
-          const { error } = response.message || {};
-          const errorMessage = errors || error;
+          const errorsObject = formatErrorResponse(response);
 
-          dispatch(destroyFailure(errorMessage));
+          dispatch(destroyFailure(errorsObject));
 
-          throw error;
+          throw errorsObject;
         });
     };
   };
@@ -170,10 +166,11 @@ const reduxConfig = ({
           return dispatch(loadSuccess(entities));
         })
         .catch((response) => {
-          const { errors } = response;
+          const errorsObject = formatErrorResponse(response);
 
-          dispatch(loadFailure(errors));
-          throw response;
+          dispatch(loadFailure(errorsObject));
+
+          throw errorsObject;
         });
     };
   };
@@ -191,10 +188,11 @@ const reduxConfig = ({
           return dispatch(loadSuccess(entities));
         })
         .catch((response) => {
-          const { errors } = response;
+          const errorsObject = formatErrorResponse(response);
 
-          dispatch(loadFailure(errors));
-          throw response;
+          dispatch(loadFailure(errorsObject));
+
+          throw errorsObject;
         });
     };
   };
@@ -213,10 +211,11 @@ const reduxConfig = ({
           return response;
         })
         .catch((response) => {
-          const { errors } = response;
+          const errorsObject = formatErrorResponse(response);
 
-          dispatch(updateFailure(errors));
-          throw response;
+          dispatch(updateFailure(errorsObject));
+
+          throw errorsObject;
         });
     };
   };
