@@ -4,7 +4,6 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
-	"strconv"
 	"strings"
 
 	"golang.org/x/net/context"
@@ -98,31 +97,12 @@ type OptionValue struct {
 // Value is called by the DB driver.  Note that we store data as JSON
 // types, so we can use the JSON marshaller to assign the appropriate
 // type when we fetch it from the db
-func (ov OptionValue) Value() (driver.Value, error) {
-	if ov.Val == nil {
-		return "null", nil
-	}
-	switch v := ov.Val.(type) {
-	case string:
-		return fmt.Sprintf(`"%s"`, v), nil
-	case int64:
-		return strconv.FormatInt(v, 10), nil
-	case bool:
-		return strconv.FormatBool(v), nil
-	case float64:
-		return strconv.FormatInt(int64(v), 10), nil
-	case int:
-		return strconv.Itoa(v), nil
-	}
-	return nil, fmt.Errorf("unrecognized type %T", ov.Val)
+func (ov OptionValue) Value() (dv driver.Value, err error) {
+	return json.Marshal(ov.Val)
 }
 
 // Scan takes db string and turns it into an option type
 func (ov *OptionValue) Scan(src interface{}) error {
-	if src == nil {
-		ov.Val = nil
-		return nil
-	}
 	return json.Unmarshal(src.([]byte), &ov.Val)
 }
 
