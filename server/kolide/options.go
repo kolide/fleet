@@ -1,24 +1,36 @@
 package kolide
 
 import (
+	"database/sql/driver"
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"golang.org/x/net/context"
 )
 
 // OptionStore interface describes methods to access datastore
 type OptionStore interface {
+	// SaveOptions transactional write of options to storage.  If one or more
+	// values fails validation none of the writes will succeed. Note only option
+	// values are written.  Other option fields are created in migration and do
+	// not change. Attempting to write ReadOnly options will cause an error.
 	SaveOptions(opts []Option) error
+	// Options returns all options
 	Options() ([]Option, error)
+	// Option return an option by ID
 	Option(id uint) (*Option, error)
+	// OptionByName returns an option uniquely identified by name
 	OptionByName(name string) (*Option, error)
 }
 
-// OptionsService interface describes methods that operate on osquery options
+// OptionService interface describes methods that operate on osquery options
 type OptionService interface {
+	// GetOptions retrieves all options
 	GetOptions(ctx context.Context) ([]Option, error)
+	// ModifyOptions will change values of the options in OptionRequest.  Note
+	// passing ReadOnly options will cause an error.
 	ModifyOptions(ctx context.Context, req OptionRequest) ([]Option, error)
 }
 
@@ -33,134 +45,129 @@ type OptionType int
 const (
 	OptionTypeString OptionType = iota
 	OptionTypeInt
-	OptionTypeFlag
+	OptionTypeBool
 )
 
-// Used to marshal OptionType to human readable strings used in JSON payloads
+// String values that map from JSON to OptionType
+const (
+	optionTypeString = "string"
+	optionTypeInt    = "int"
+	optionTypeBool   = "bool"
+)
+
+// MarshalJSON marshals option type to strings
+func (ot OptionType) MarshalJSON() ([]byte, error) {
+	s := fmt.Sprintf(`"%s"`, ot.String())
+	return []byte(s), nil
+}
+
+// UnmarshalJSON converts json to OptionType
+func (ot *OptionType) UnmarshalJSON(b []byte) error {
+	switch typ := string(b); strings.Trim(typ, `"`) {
+	case optionTypeString:
+		*ot = OptionTypeString
+	case optionTypeBool:
+		*ot = OptionTypeBool
+	case optionTypeInt:
+		*ot = OptionTypeInt
+	default:
+		return fmt.Errorf("unsupported option type '%s'", typ)
+	}
+	return nil
+}
+
+// String is used to marshal OptionType to human readable strings used in JSON payloads
 func (ot OptionType) String() string {
 	switch ot {
 	case OptionTypeString:
-		return "string"
+		return optionTypeString
 	case OptionTypeInt:
-		return "int"
-	case OptionTypeFlag:
-		return "flag"
+		return optionTypeInt
+	case OptionTypeBool:
+		return optionTypeBool
 	}
 	panic("stringer not implemented for OptionType")
+}
+
+// OptionValue supports Valuer and Scan interfaces for reading and writing
+// to the database, and also JSON marshaling
+type OptionValue struct {
+	Val interface{}
+}
+
+// Value is called by the DB driver.  Note that we store data as JSON
+// types, so we can use the JSON marshaller to assign the appropriate
+// type when we fetch it from the db
+func (ov OptionValue) Value() (driver.Value, error) {
+	if ov.Val == nil {
+		return "null", nil
+	}
+	switch v := ov.Val.(type) {
+	case string:
+		return fmt.Sprintf(`"%s"`, v), nil
+	case int64:
+		return strconv.FormatInt(v, 10), nil
+	case bool:
+		return strconv.FormatBool(v), nil
+	case float64:
+		return strconv.FormatInt(int64(v), 10), nil
+	case int:
+		return strconv.Itoa(v), nil
+	}
+	return nil, fmt.Errorf("unrecognized type %T", ov.Val)
+}
+
+// Scan takes db string and turns it into an option type
+func (ov *OptionValue) Scan(src interface{}) error {
+	if src == nil {
+		ov.Val = nil
+		return nil
+	}
+	return json.Unmarshal(src.([]byte), &ov.Val)
+}
+
+// MarshalJSON implements the json.Marshaler interface
+func (ov OptionValue) MarshalJSON() ([]byte, error) {
+	return json.Marshal(ov.Val)
+}
+
+// UnmarshalJSON implements the json.Unmarshaler interface
+func (ov *OptionValue) UnmarshalJSON(b []byte) error {
+	return json.Unmarshal(b, &ov.Val)
 }
 
 // Option represents a possible osquery confguration option
 // See https://osquery.readthedocs.io/en/stable/deployment/configuration/
 type Option struct {
 	// ID unique identifier for option assigned by the dbms
-	ID uint
-	// Name the name of the option which must be unique
-	Name string
-	// Type of value expected for the option, db only
-	Type OptionType
-	// RawValue is string representation of option value, may be nil to
-	// indicate the option is not set
-	Value interface{} `db:"value"`
+	ID uint `json:"id"`
+	// Name of the option which must be unique
+	Name string `json:"name"`
+	// Type of value for the option
+	Type OptionType `json:"type"`
+	// Value of the option which may be nil, bool, int, or string.
+	Value OptionValue `json:"value"`
 	// ReadOnly if true, this option is required for Kolide to function
 	// properly and cannot be modified by the end user
-	ReadOnly bool `db:"read_only"`
+	ReadOnly bool `json:"read_only" db:"read_only"`
 }
 
-// ValueAsString is a convenience method that converts the Value field of an
-// option to a string.
-func (opt *Option) ValueAsString() (val string, isDefined bool) {
-	if opt.Value == nil {
-		return "", false
-	}
-	switch opt.Value.(type) {
-	case []uint8:
-		return string(opt.Value.([]uint8)), true
-	case *string:
-		return *(opt.Value.(*string)), true
-	case string:
-		return opt.Value.(string), true
-	}
-	panic("unknown option type")
+// SetValue sets the value associated with the option
+func (opt *Option) SetValue(v interface{}) {
+	opt.Value.Val = v
+}
+
+// OptionSet returns true if the option has a value assigned to it
+func (opt *Option) OptionSet() bool {
+	return opt.Value.Val != nil
+}
+
+// GetValue returns the value associated with the option
+func (opt Option) GetValue() interface{} {
+	return opt.Value.Val
 }
 
 // OptionRequest contains options that are passed to modify options requests.
 type OptionRequest struct {
 	Options []Option `json:"options"`
-}
-
-type transform struct {
-	ID       uint        `json:"id"`
-	Name     string      `json:"name"`
-	Type     string      `json:"type"`
-	Value    interface{} `json:"value"`
-	ReadOnly bool        `json:"read_only"`
-}
-
-func (opt *Option) MarshalJSON() ([]byte, error) {
-	var val interface{}
-	if opt.Value == nil {
-		val = nil
-	} else {
-		strPtr, ok := opt.Value.(*string)
-		if !ok {
-			return nil, fmt.Errorf("option value is not expected type")
-		}
-		if strPtr == nil {
-			val = strPtr
-		} else {
-			switch opt.Type {
-			case OptionTypeString:
-				val = *strPtr
-			case OptionTypeInt:
-				i, err := strconv.ParseInt(*strPtr, 10, 64)
-				if err != nil {
-					return nil, err
-				}
-				val = i
-			case OptionTypeFlag:
-				b, err := strconv.ParseBool(*strPtr)
-				if err != nil {
-					return nil, err
-				}
-				val = b
-			default:
-				panic("unimplemented option type")
-			}
-		}
-	}
-	transform := &transform{
-		opt.ID,
-		opt.Name,
-		opt.Type.String(),
-		val,
-		opt.ReadOnly,
-	}
-	return json.Marshal(transform)
-}
-
-func (opt *Option) UnmarshalJSON(b []byte) error {
-	transform := &transform{}
-	err := json.Unmarshal(b, transform)
-	if err != nil {
-		return err
-	}
-	opt.ID = transform.ID
-	opt.Name = transform.Name
-	opt.ReadOnly = transform.ReadOnly
-	switch transform.Type {
-	case "flag":
-		opt.Type = OptionTypeFlag
-	case "int":
-		opt.Type = OptionTypeInt
-	case "string":
-		opt.Type = OptionTypeString
-	default:
-		return fmt.Errorf("option type '%s' invalid", transform.Type)
-	}
-	if transform.Value == nil {
-		opt.Value = nil
-		return nil
-	}
-	opt.Value = transform.Value
-	return nil
 }

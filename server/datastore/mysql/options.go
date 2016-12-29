@@ -16,32 +16,32 @@ func (d *Datastore) OptionByName(name string) (*kolide.Option, error) {
 	var option kolide.Option
 	if err := d.db.Get(&option, sqlStatement, name); err != nil {
 		if err == sql.ErrNoRows {
-			return nil, notFound("option")
+			return nil, notFound("Option")
 		}
 		return nil, errors.Wrap(err, sqlStatement)
 	}
 	return &option, nil
 }
 
-func (d *Datastore) SaveOptions(opts []kolide.Option) error {
+func (d *Datastore) SaveOptions(opts []kolide.Option) (err error) {
 	sqlStatement := `
 		UPDATE options
 		SET value = ?
 		WHERE id = ? AND type = ? AND NOT read_only
 	`
-	success := new(bool)
+	var success bool
 	txn, err := d.db.Begin()
 	if err != nil {
 		return errors.Wrap(err, "update options begin transaction")
 	}
-	defer func(success *bool) {
-		if *success {
-			if err := txn.Commit(); err == nil {
+	defer func() {
+		if success {
+			if err = txn.Commit(); err == nil {
 				return
 			}
 		}
 		txn.Rollback()
-	}(success)
+	}()
 
 	for _, opt := range opts {
 		result, err := txn.Exec(sqlStatement, opt.Value, opt.ID, opt.Type)
@@ -53,14 +53,14 @@ func (d *Datastore) SaveOptions(opts []kolide.Option) error {
 			return errors.Wrap(err, "option rows affected")
 		}
 		if rowsChanged != 1 {
-			return notFound("option").WithID(opt.ID)
+			return notFound("Option").WithID(opt.ID)
 		}
 	}
 	// If all the updates succeed, set the success flag, this will cause the
 	// function we defined in defer to commit the transaction. Otherwise, all
 	// changes will be rolled back
-	*success = true
-	return nil
+	success = true
+	return err
 }
 
 func (d *Datastore) Option(id uint) (*kolide.Option, error) {

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 
 	"github.com/kolide/kolide-ose/server/datastore/internal/appstate"
+	"github.com/kolide/kolide-ose/server/kolide"
 	"github.com/pressly/goose"
 )
 
@@ -22,7 +23,15 @@ func Up_20161223115449(tx *sql.Tx) error {
   `
 
 	for _, opt := range appstate.Options {
-		_, err := tx.Exec(sqlStatement, opt.Name, opt.Type, opt.Value, opt.ReadOnly)
+		ov := kolide.Option{
+			Name:     opt.Name,
+			ReadOnly: opt.ReadOnly,
+			Type:     opt.Type,
+			Value: kolide.OptionValue{
+				Val: opt.Value,
+			},
+		}
+		_, err := tx.Exec(sqlStatement, ov.Name, ov.Type, ov.Value, ov.ReadOnly)
 		if err != nil {
 			return err
 		}

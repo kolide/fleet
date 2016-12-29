@@ -1,6 +1,7 @@
 package datastore
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/kolide/kolide-ose/server/datastore/internal/appstate"
@@ -21,36 +22,37 @@ func testOptions(t *testing.T, ds kolide.Datastore) {
 	opt2, err := ds.Option(opt.ID)
 	require.Nil(t, err)
 	require.NotNil(t, opt2)
-	assert.Equal(t, opt.Name, opt2.Name)
-	assert.Equal(t, opt.Value, opt2.Value)
+	assert.True(t, reflect.DeepEqual(opt, opt2))
 
-	opt.Value = "true"
+	opt.SetValue("somekey")
 	err = ds.SaveOptions([]kolide.Option{*opt})
 	require.Nil(t, err)
+	opt, err = ds.Option(opt.ID)
+	require.Nil(t, err)
+	assert.Equal(t, "somekey", opt.GetValue())
 
 	// can't change a read only option
 	opt, err = ds.OptionByName("disable_distributed")
 	require.Nil(t, err)
-	opt.Value = "true"
+	opt.SetValue(true)
 	err = ds.SaveOptions([]kolide.Option{*opt})
 	require.NotNil(t, err)
 
 	opt, _ = ds.OptionByName("aws_profile_name")
-	assert.Nil(t, opt.Value)
-	opt.Value = "zip"
+	assert.False(t, opt.OptionSet())
+	opt.SetValue("zip")
 	opt2, _ = ds.OptionByName("disable_distributed")
-	val, _ := opt2.ValueAsString()
-	assert.Equal(t, "false", val)
-	opt2.Value = "true"
+	assert.Equal(t, false, opt2.GetValue())
+	opt2.SetValue(true)
 	modList := []kolide.Option{*opt, *opt2}
 	// The aws access key option can be saved but because the disable_events can't
 	// be we want to verify that the whole transaction is rolled back
 	err = ds.SaveOptions(modList)
 	assert.NotNil(t, err)
 	opt, _ = ds.OptionByName("aws_profile_name")
-	assert.Nil(t, opt.Value)
+	assert.False(t, opt.OptionSet())
 	opt2, err = ds.OptionByName("disable_distributed")
-	val, _ = opt2.ValueAsString()
-	assert.Equal(t, "false", val)
+	require.Nil(t, err)
+	assert.Equal(t, false, opt2.GetValue())
 
 }

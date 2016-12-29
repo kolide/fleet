@@ -44,8 +44,8 @@ func testModifyOptions(t *testing.T, r *testResource) {
 	require.Nil(t, err)
 	require.NotNil(t, optsResp.Options)
 	require.Len(t, optsResp.Options, 2)
-	assert.Equal(t, "foo", optsResp.Options[0].Value)
-	assert.Equal(t, float64(23), optsResp.Options[1].Value)
+	assert.Equal(t, "foo", optsResp.Options[0].GetValue())
+	assert.Equal(t, float64(23), optsResp.Options[1].GetValue())
 }
 
 func testModifyOptionsValidationFail(t *testing.T, r *testResource) {

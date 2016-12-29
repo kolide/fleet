@@ -2,7 +2,6 @@ package kolide
 
 import (
 	"encoding/json"
-	"fmt"
 	"reflect"
 	"testing"
 
@@ -12,26 +11,18 @@ import (
 
 func TestOptionMarshaller(t *testing.T) {
 	tests := []struct {
-		value         string
-		typ           OptionType
-		expected      interface{}
-		expectSuccess bool
+		value    interface{}
+		typ      OptionType
+		expected interface{}
 	}{
-		{"23", OptionTypeInt, float64(23), true},
-		{"abc", OptionTypeInt, nil, false},
-		{"true", OptionTypeFlag, true, true},
-		{"false", OptionTypeFlag, false, true},
-		{"something", OptionTypeFlag, nil, false},
-		{"foobar", OptionTypeString, "foobar", true},
+		{23, OptionTypeInt, float64(23)},
+		{true, OptionTypeBool, true},
+		{"foobar", OptionTypeString, "foobar"},
 	}
 
 	for _, test := range tests {
-		optIn := &Option{1, "foo", test.typ, &test.value, true}
+		optIn := &Option{1, "foo", test.typ, OptionValue{test.value}, true}
 		buff, err := json.Marshal(optIn)
-		if !test.expectSuccess {
-			assert.NotNil(t, err)
-			continue
-		}
 		require.Nil(t, err)
 		optOut := &Option{}
 		err = json.Unmarshal(buff, optOut)
@@ -40,44 +31,17 @@ func TestOptionMarshaller(t *testing.T) {
 		assert.Equal(t, optIn.Name, optOut.Name)
 		assert.Equal(t, optIn.ReadOnly, optOut.ReadOnly)
 		assert.Equal(t, optIn.Type, optOut.Type)
-		assert.Equal(t, test.expected, optOut.Value)
+		assert.Equal(t, test.expected, optOut.Value.Val)
 
 	}
 
 	// test nil
-	optIn := &Option{1, "bar", OptionTypeString, nil, true}
+	optIn := &Option{1, "bar", OptionTypeString, OptionValue{nil}, true}
 	buff, err := json.Marshal(optIn)
 	require.Nil(t, err)
 	optOut := &Option{}
 	err = json.Unmarshal(buff, optOut)
 	require.Nil(t, err)
 	assert.True(t, reflect.DeepEqual(optIn, optOut))
-
-}
-
-func TestOptionUnmarshaller(t *testing.T) {
-	t.Skip("test option unmarshaller")
-	errTypeMismatch := fmt.Errorf("option value type mismatch")
-
-	tests := []struct {
-		data string
-		err  error
-	}{
-		{`{"id":1,"name":"foo","type":"string","value":"foobar","read_only":true}`, nil},
-		{`{"id":1,"name":"foo","type":"float","value":"foobar","read_only":true}`, fmt.Errorf("option type 'float' invalid")},
-		{`{"id":1,"name":"foo","type":"int","value":"foobar","read_only":true}`, errTypeMismatch},
-		{`{"id":1,"name":"foo","type":"flag","value":"foobar","read_only":true}`, errTypeMismatch},
-	}
-
-	for _, test := range tests {
-		buff := []byte(test.data)
-		opt := &Option{}
-		err := json.Unmarshal(buff, opt)
-		if test.err != nil {
-			assert.Equal(t, test.err.Error(), err.Error())
-		} else {
-			assert.Nil(t, err)
-		}
-	}
 
 }

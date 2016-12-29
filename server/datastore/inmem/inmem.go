@@ -33,7 +33,7 @@ type Datastore struct {
 	distributedQueryCampaigns       map[uint]kolide.DistributedQueryCampaign
 	distributedQueryCampaignTargets map[uint]kolide.DistributedQueryCampaignTarget
 	options                         map[uint]*kolide.Option
-	orginfo                         *kolide.AppConfig
+	appConfig                       *kolide.AppConfig
 	config                          *config.KolideConfig
 }
 
@@ -91,15 +91,8 @@ func (d *Datastore) Migrate() error {
 
 	for _, initData := range appstate.Options {
 		opt := kolide.Option{
-			Name: initData.Name,
-			Value: func(v interface{}) *string {
-				var s *string
-				if v != nil {
-					s = new(string)
-					*s = v.(string)
-				}
-				return s
-			}(initData.Value),
+			Name:     initData.Name,
+			Value:    kolide.OptionValue{Val: initData.Value},
 			Type:     initData.Type,
 			ReadOnly: initData.ReadOnly,
 		}
@@ -107,7 +100,7 @@ func (d *Datastore) Migrate() error {
 		d.options[opt.ID] = &opt
 	}
 
-	d.orginfo = &kolide.AppConfig{
+	d.appConfig = &kolide.AppConfig{
 		ID:                 1,
 		SMTPEnableTLS:      true,
 		SMTPPort:           587,

@@ -2,64 +2,54 @@ package service
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/kolide/kolide-ose/server/kolide"
 	"golang.org/x/net/context"
 )
 
 func (mw validationMiddleware) ModifyOptions(ctx context.Context, req kolide.OptionRequest) ([]kolide.Option, error) {
-	transformed := kolide.OptionRequest{Options: []kolide.Option{}}
 	invalid := &invalidArgumentError{}
 	for _, opt := range req.Options {
 		if opt.ReadOnly {
 			invalid.Append(opt.Name, "readonly option")
 			continue
 		}
-		val, err := optValToDB(opt.Value, opt.Type)
-		if err != nil {
+		if err := validateValueMapsToOptionType(opt); err != nil {
 			invalid.Append(opt.Name, err.Error())
-			continue
 		}
-		opt.Value = val
-		transformed.Options = append(transformed.Options, opt)
 	}
 	if invalid.HasErrors() {
 		return nil, invalid
 	}
-	return mw.Service.ModifyOptions(ctx, transformed)
+	return mw.Service.ModifyOptions(ctx, req)
 }
 
 var errTypeMismatch = fmt.Errorf("type mismatch")
 var errInvalidType = fmt.Errorf("invalid option type")
 
-func optValToDB(v interface{}, typ kolide.OptionType) (interface{}, error) {
-	var str string
-	if v == nil {
-		return v, nil
+func validateValueMapsToOptionType(opt kolide.Option) error {
+	if !opt.OptionSet() {
+		return nil
 	}
-
-	switch typ {
-	case kolide.OptionTypeFlag:
-		flag, ok := v.(bool)
+	val := opt.GetValue()
+	switch opt.Type {
+	case kolide.OptionTypeBool:
+		_, ok := val.(bool)
 		if !ok {
-			return nil, errTypeMismatch
+			return errTypeMismatch
 		}
-		str = strconv.FormatBool(flag)
 	case kolide.OptionTypeString:
-		s, ok := v.(string)
+		_, ok := val.(string)
 		if !ok {
-			return nil, errTypeMismatch
+			return errTypeMismatch
 		}
-		str = s
 	case kolide.OptionTypeInt:
-		num, ok := v.(float64)
+		_, ok := val.(float64) // JSON unmarshaler represents all numbers in float64
 		if !ok {
-			return nil, errTypeMismatch
+			return errTypeMismatch
 		}
-		str = strconv.Itoa(int(num))
 	default:
-		return nil, errInvalidType
+		return errInvalidType
 	}
-	return &str, nil
+	return nil
 }

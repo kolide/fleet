@@ -27,7 +27,7 @@ type optPair struct {
 func (d *Datastore) SaveOptions(opts []kolide.Option) error {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
-	validPairs := []optPair{}
+	var validPairs []optPair
 	for _, opt := range opts {
 		if opt.ReadOnly {
 			return fmt.Errorf("readonly option can't be changed")
@@ -45,11 +45,7 @@ func (d *Datastore) SaveOptions(opts []kolide.Option) error {
 	// existing options
 	if len(validPairs) == len(opts) {
 		for _, pair := range validPairs {
-			if pair.newOpt.Value == nil {
-				pair.existingOpt.Value = nil
-				continue
-			}
-			pair.existingOpt.Value = pair.newOpt.Value
+			pair.existingOpt.Value.Val = pair.newOpt.Value.Val
 		}
 	}
 	return nil
