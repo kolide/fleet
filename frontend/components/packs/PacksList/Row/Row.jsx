@@ -44,15 +44,17 @@ class Row extends Component {
 
     if (disabled) {
       return (
-        <ClickableTd onClick={handleSelect} tabIndex={-1}>
-          <Icon className={iconClassName} name="offline" /> Disabled
+        <ClickableTd className={`${baseClass}__td`} onClick={handleSelect}>
+          <Icon className={iconClassName} name="offline" />
+          <span className={`${baseClass}__status-text`}>Disabled</span>
         </ClickableTd>
       );
     }
 
     return (
-      <ClickableTd onClick={handleSelect}>
-        <Icon className={iconClassName} name="success-check" /> Enabled
+      <ClickableTd className={`${baseClass}__td`} onClick={handleSelect}>
+        <Icon className={iconClassName} name="success-check" />
+        <span className={`${baseClass}__status-text`}>Enabled</span>
       </ClickableTd>
     );
   }
@@ -60,22 +62,23 @@ class Row extends Component {
   render () {
     const { checked, pack } = this.props;
     const { handleChange, handleSelect, renderStatusData } = this;
-    const updatedTime = moment(pack.updated_at);
+    const updatedTime = moment(pack.updated_at).format('MM/DD/YY');
 
     return (
-      <tr>
-        <td>
+      <tr className={baseClass}>
+        <td className={`${baseClass}__td`}>
           <Checkbox
             name={`select-pack-${pack.id}`}
             onChange={handleChange}
             value={checked}
+            wrapperClassName={`${baseClass}__checkbox`}
           />
         </td>
-        <ClickableTd onClick={handleSelect}>{pack.name}</ClickableTd>
-        <ClickableTd onClick={handleSelect}>{pack.query_count}</ClickableTd>
+        <ClickableTd className={`${baseClass}__td ${baseClass}__td-pack-name`} onClick={handleSelect}>{pack.name}</ClickableTd>
+        <ClickableTd className={`${baseClass}__td ${baseClass}__td-query-count`} onClick={handleSelect}>{pack.query_count}</ClickableTd>
         {renderStatusData()}
         <td />
-        <ClickableTd onClick={handleSelect}>{updatedTime.fromNow()}</ClickableTd>
+        <ClickableTd className={`${baseClass}__td`} onClick={handleSelect}>{updatedTime}</ClickableTd>
       </tr>
     );
   }

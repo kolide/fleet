@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import classnames from 'classnames';
 import { includes } from 'lodash';
 
 import Checkbox from 'components/forms/fields/Checkbox';
@@ -41,23 +42,25 @@ class PacksList extends Component {
   render () {
     const { allPacksChecked, className, onCheckAllPacks, packs } = this.props;
     const { renderPack } = this;
+    const tableClassName = classnames(baseClass, className);
 
     return (
-      <table className={`${baseClass} ${className}`}>
+      <table className={tableClassName}>
         <thead>
           <tr>
-            <th>
+            <th className={`${baseClass}__th`}>
               <Checkbox
                 name="select-all-packs"
                 onChange={onCheckAllPacks}
                 value={allPacksChecked}
+                wrapperClassName={`${baseClass}__select-all`}
               />
             </th>
-            <th>Pack Name</th>
-            <th>Queries</th>
-            <th>Status</th>
-            <th>Hosts</th>
-            <th>Last Modified</th>
+            <th className={`${baseClass}__th ${baseClass}__th-pack-name`}>Pack Name</th>
+            <th className={`${baseClass}__th`}>Queries</th>
+            <th className={`${baseClass}__th`}>Status</th>
+            <th className={`${baseClass}__th`}>Hosts</th>
+            <th className={`${baseClass}__th`}>Last Modified</th>
           </tr>
         </thead>
         <tbody>

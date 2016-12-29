@@ -38,8 +38,10 @@
     @include display(flex);
     @include justify-content(space-between);
 
-    input[name='pack-filter'] {
-      width: 240px;
+    input {
+      &[name='pack-filter'] {
+        width: 240px;
+      }
     }
   }
 
