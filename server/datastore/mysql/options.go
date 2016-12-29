@@ -29,11 +29,11 @@ func (d *Datastore) SaveOptions(opts []kolide.Option) (err error) {
 		SET value = ?
 		WHERE id = ? AND type = ? AND NOT read_only
 	`
-	var success bool
 	txn, err := d.db.Begin()
 	if err != nil {
 		return errors.Wrap(err, "update options begin transaction")
 	}
+	var success bool
 	defer func() {
 		if success {
 			if err = txn.Commit(); err == nil {
@@ -79,7 +79,7 @@ func (d *Datastore) Option(id uint) (*kolide.Option, error) {
 	return &opt, nil
 }
 
-func (d *Datastore) Options() ([]kolide.Option, error) {
+func (d *Datastore) ListOptions() ([]kolide.Option, error) {
 	sqlStatement := `
     SELECT *
     FROM options

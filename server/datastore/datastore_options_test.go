@@ -12,7 +12,7 @@ import (
 
 func testOptions(t *testing.T, ds kolide.Datastore) {
 	// were options pre-loaded?
-	opts, err := ds.Options()
+	opts, err := ds.ListOptions()
 	require.Nil(t, err)
 	assert.Len(t, opts, len(appstate.Options))
 

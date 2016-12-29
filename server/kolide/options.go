@@ -17,7 +17,7 @@ type OptionStore interface {
 	// not change. Attempting to write ReadOnly options will cause an error.
 	SaveOptions(opts []Option) error
 	// Options returns all options
-	Options() ([]Option, error)
+	ListOptions() ([]Option, error)
 	// Option return an option by ID
 	Option(id uint) (*Option, error)
 	// OptionByName returns an option uniquely identified by name
@@ -56,8 +56,7 @@ const (
 
 // MarshalJSON marshals option type to strings
 func (ot OptionType) MarshalJSON() ([]byte, error) {
-	s := fmt.Sprintf(`"%s"`, ot.String())
-	return []byte(s), nil
+	return []byte(fmt.Sprintf(`"%s"`, ot)), nil
 }
 
 // UnmarshalJSON converts json to OptionType
@@ -84,8 +83,9 @@ func (ot OptionType) String() string {
 		return optionTypeInt
 	case OptionTypeBool:
 		return optionTypeBool
+	default:
+		panic("stringer not implemented for OptionType")
 	}
-	panic("stringer not implemented for OptionType")
 }
 
 // OptionValue supports Valuer and Scan interfaces for reading and writing

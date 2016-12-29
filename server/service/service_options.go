@@ -7,7 +7,7 @@ import (
 )
 
 func (svc service) GetOptions(ctx context.Context) ([]kolide.Option, error) {
-	opts, err := svc.ds.Options()
+	opts, err := svc.ds.ListOptions()
 	if err != nil {
 		return nil, errors.Wrap(err, "options service")
 	}

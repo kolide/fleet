@@ -62,7 +62,7 @@ func (d *Datastore) Option(id uint) (*kolide.Option, error) {
 	return &result, nil
 }
 
-func (d *Datastore) Options() ([]kolide.Option, error) {
+func (d *Datastore) ListOptions() ([]kolide.Option, error) {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 	result := []kolide.Option{}

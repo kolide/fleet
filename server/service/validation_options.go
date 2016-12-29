@@ -24,8 +24,10 @@ func (mw validationMiddleware) ModifyOptions(ctx context.Context, req kolide.Opt
 	return mw.Service.ModifyOptions(ctx, req)
 }
 
-var errTypeMismatch = fmt.Errorf("type mismatch")
-var errInvalidType = fmt.Errorf("invalid option type")
+var (
+	errTypeMismatch = fmt.Errorf("type mismatch")
+	errInvalidType  = fmt.Errorf("invalid option type")
+)
 
 func validateValueMapsToOptionType(opt kolide.Option) error {
 	if !opt.OptionSet() {

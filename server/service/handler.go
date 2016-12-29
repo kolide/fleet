@@ -194,7 +194,7 @@ type kolideHandlers struct {
 	DeleteHost                     http.Handler
 	ListHosts                      http.Handler
 	SearchTargets                  http.Handler
-  GetOptions                     http.Handler
+	GetOptions                     http.Handler
 	ModifyOptions                  http.Handler
 }
 
@@ -351,8 +351,8 @@ func attachKolideAPIRoutes(r *mux.Router, h *kolideHandlers) {
 	r.Handle("/api/v1/kolide/hosts/{id}", h.GetHost).Methods("GET").Name("get_host")
 	r.Handle("/api/v1/kolide/hosts/{id}", h.DeleteHost).Methods("DELETE").Name("delete_host")
 
-	r.Handle("/api/v1/kolide/options", h.GetOptions).Methods("GET")
-	r.Handle("/api/v1/kolide/options", h.ModifyOptions).Methods("PATCH")
+	r.Handle("/api/v1/kolide/options", h.GetOptions).Methods("GET").Name("get_options")
+	r.Handle("/api/v1/kolide/options", h.ModifyOptions).Methods("PATCH").Name("modify_options")
 
 	r.Handle("/api/v1/kolide/targets", h.SearchTargets).Methods("POST").Name("search_targets")
 
