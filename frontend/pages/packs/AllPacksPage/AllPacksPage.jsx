@@ -83,7 +83,13 @@ export class AllPacksPage extends Component {
       });
 
       return Promise.all(promises)
-        .then(() => dispatch(renderFlash('success', 'Packs updated!')))
+        .then(() => {
+          if (actionType === 'delete') {
+            dispatch(renderFlash('success', 'Packs successfully deleted.'));
+          }
+
+          return false;
+        })
         .catch(() => dispatch(renderFlash('error', 'Something went wrong.')));
     };
   }
