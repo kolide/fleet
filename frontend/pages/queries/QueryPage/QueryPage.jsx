@@ -9,7 +9,7 @@ import campaignInterface from 'interfaces/campaign';
 import debounce from 'utilities/debounce';
 import entityGetter from 'redux/utilities/entityGetter';
 import { formatSelectedTargetsForApi } from 'kolide/helpers';
-import QueryComposer from 'components/queries/QueryComposer';
+import QueryForm from 'components/forms/queries/QueryForm';
 import osqueryTableInterface from 'interfaces/osquery_table';
 import queryActions from 'redux/nodes/entities/queries/actions';
 import queryInterface from 'interfaces/query';
@@ -24,6 +24,9 @@ class QueryPage extends Component {
   static propTypes = {
     campaign: campaignInterface,
     dispatch: PropTypes.func,
+    errors: PropTypes.shape({
+      base: PropTypes.string,
+    }),
     query: queryInterface,
     selectedOsqueryTable: osqueryTableInterface,
     selectedTargets: PropTypes.arrayOf(targetInterface),
@@ -152,7 +155,7 @@ class QueryPage extends Component {
         dispatch(push(`/queries/${query.id}`));
         dispatch(renderFlash('success', 'Query created'));
       })
-      .catch(() => false );
+      .catch(() => false);
   })
 
   onStopQuery = (evt) => {
@@ -234,18 +237,18 @@ class QueryPage extends Component {
 
     return (
       <div className="has-sidebar">
-        <QueryComposer
-          errors={errors}
+        <QueryForm
+          formData={query}
+          handleSubmit={onSaveQueryFormSubmit}
           onFetchTargets={onFetchTargets}
           onOsqueryTableSelect={onOsqueryTableSelect}
           onRunQuery={onRunQuery}
-          onSave={onSaveQueryFormSubmit}
           onStopQuery={onStopQuery}
           onTargetSelect={onTargetSelect}
           onUpdate={onUpdateQuery}
-          query={query}
           queryIsRunning={queryIsRunning}
           selectedTargets={selectedTargets}
+          serverErrors={errors}
           targetsCount={targetsCount}
           selectedOsqueryTable={selectedOsqueryTable}
         />
