@@ -14,4 +14,4 @@ $ kolide serve
 ```
 
 Check out this sweet image though.
-![Image of Kolide]('adding-hosts.png')
+![Image of Kolide](./images/adding-hosts.png)
