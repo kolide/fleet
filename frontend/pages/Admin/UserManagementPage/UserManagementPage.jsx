@@ -114,12 +114,6 @@ class UserManagementPage extends Component {
       .then(() => {
         dispatch(renderFlash('success', 'User invited'));
         return this.toggleInviteUserModal();
-      })
-      .catch((error) => {
-        const inviteError = error === 'resource already created'
-          ? 'User has already been invited'
-          : error;
-        this.setState({ inviteError });
       });
   }
 
@@ -157,8 +151,8 @@ class UserManagementPage extends Component {
   }
 
   renderModal = () => {
-    const { currentUser } = this.props;
-    const { inviteError, showInviteUserModal } = this.state;
+    const { currentUser, inviteErrors } = this.props;
+    const { showInviteUserModal } = this.state;
     const { onInviteCancel, onInviteUserSubmit, toggleInviteUserModal } = this;
 
     if (!showInviteUserModal) {
@@ -171,7 +165,7 @@ class UserManagementPage extends Component {
         onExit={toggleInviteUserModal}
       >
         <InviteUserForm
-          error={inviteError}
+          serverErrors={inviteErrors}
           invitedBy={currentUser}
           onCancel={onInviteCancel}
           onSubmit={onInviteUserSubmit}
@@ -214,8 +208,9 @@ const mapStateToProps = (state) => {
   const { user: currentUser } = state.auth;
   const { entities: users } = stateEntityGetter.get('users');
   const { entities: invites } = stateEntityGetter.get('invites');
+  const { errors: inviteErrors } = state.entities.invites;
 
-  return { currentUser, invites, users };
+  return { currentUser, inviteErrors, invites, users };
 };
 
 export default connect(mapStateToProps)(UserManagementPage);

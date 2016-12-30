@@ -236,6 +236,7 @@ const reduxConfig = ({
       case actionTypes.UPDATE_REQUEST:
         return {
           ...state,
+          errors: {},
           loading: true,
         };
       case actionTypes.CREATE_SUCCESS:
@@ -244,6 +245,7 @@ const reduxConfig = ({
         return {
           ...state,
           loading: false,
+          errors: {},
           data: {
             ...state.data,
             ...payload.data[entityName],
@@ -253,6 +255,7 @@ const reduxConfig = ({
         return {
           ...state,
           loading: false,
+          errors: {},
           data: {
             ...entitiesExceptID(state.data, payload.id),
           },
