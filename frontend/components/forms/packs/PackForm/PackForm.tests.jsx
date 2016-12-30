@@ -20,7 +20,7 @@ describe('PackForm - component', () => {
     const handleSubmitSpy = createSpy();
     const form = mount(<PackForm handleSubmit={handleSubmitSpy} />);
 
-    form.simulate('submit');
+    form.find('form').simulate('submit');
 
     expect(handleSubmitSpy).toNotHaveBeenCalled();
 
@@ -33,7 +33,7 @@ describe('PackForm - component', () => {
 
   it('calls the handleSubmit prop when a valid form is submitted', () => {
     const handleSubmitSpy = createSpy();
-    const form = mount(<PackForm handleSubmit={handleSubmitSpy} />);
+    const form = mount(<PackForm handleSubmit={handleSubmitSpy} />).find('form');
     const nameField = form.find('InputField').find({ name: 'name' });
 
     fillInFormInput(nameField, 'Mac OS Attacks');

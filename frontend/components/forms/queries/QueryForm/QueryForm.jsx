@@ -100,6 +100,7 @@ class QueryForm extends Component {
     const { fields } = this.props;
     const { onUpdate: handleUpdate } = this.props;
     const formData = {
+      description: fields.description.value,
       name: fields.name.value,
       query: fields.query.value,
     };
@@ -107,7 +108,7 @@ class QueryForm extends Component {
     const { valid, errors } = validate(formData);
 
     if (valid) {
-      handleUpdate(fields);
+      handleUpdate(formData);
 
       return false;
     }

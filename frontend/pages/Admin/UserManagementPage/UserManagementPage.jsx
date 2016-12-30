@@ -17,6 +17,10 @@ class UserManagementPage extends Component {
   static propTypes = {
     currentUser: userInterface,
     dispatch: PropTypes.func,
+    inviteErrors: PropTypes.shape({
+      base: PropTypes.string,
+      email: PropTypes.string,
+    }),
     invites: PropTypes.arrayOf(inviteInterface),
     users: PropTypes.arrayOf(userInterface),
   };

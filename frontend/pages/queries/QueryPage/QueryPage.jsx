@@ -16,7 +16,7 @@ import queryInterface from 'interfaces/query';
 import QueryResultsTable from 'components/queries/QueryResultsTable';
 import QuerySidePanel from 'components/side_panels/QuerySidePanel';
 import { renderFlash } from 'redux/nodes/notifications/actions';
-import { selectOsqueryTable, setQueryText, setSelectedTargets, setSelectedTargetsQuery } from 'redux/nodes/components/QueryPages/actions';
+import { selectOsqueryTable, setSelectedTargets, setSelectedTargetsQuery } from 'redux/nodes/components/QueryPages/actions';
 import targetInterface from 'interfaces/target';
 import validateQuery from 'components/forms/validators/validate_query';
 
@@ -39,16 +39,6 @@ class QueryPage extends Component {
       queryIsRunning: false,
       targetsCount: 0,
     };
-  }
-
-  componentWillMount () {
-    const { dispatch, query } = this.props;
-
-    if (query) {
-      dispatch(setQueryText(query.query));
-    }
-
-    return false;
   }
 
   componentWillUnmount () {
@@ -176,16 +166,10 @@ class QueryPage extends Component {
     return false;
   }
 
-  onUpdateQuery = (fields) => {
-    const { description, name, query: queryField } = fields;
+  onUpdateQuery = (formData) => {
     const { dispatch, query } = this.props;
-    const params = {
-      description: description.value,
-      name: name.value,
-      query: queryField.value,
-    };
 
-    dispatch(queryActions.update(query, params))
+    dispatch(queryActions.update(query, formData))
       .then(() => {
         dispatch(renderFlash('success', 'Query updated!'));
       });
