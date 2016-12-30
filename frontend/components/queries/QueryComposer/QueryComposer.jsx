@@ -1,11 +1,9 @@
 import React, { Component, PropTypes } from 'react';
-import AceEditor from 'react-ace';
 import 'brace/mode/sql';
 import 'brace/ext/linking';
 
 import QueryForm from 'components/forms/queries/QueryForm';
 import queryInterface from 'interfaces/query';
-import SelectTargetsDropdown from 'components/forms/fields/SelectTargetsDropdown';
 import targetInterface from 'interfaces/target';
 import './mode';
 import './theme';
@@ -21,14 +19,12 @@ class QueryComposer extends Component {
     onSave: PropTypes.func,
     onStopQuery: PropTypes.func,
     onTargetSelect: PropTypes.func,
-    onTextEditorInputChange: PropTypes.func,
     onUpdate: PropTypes.func,
     query: queryInterface,
     queryIsRunning: PropTypes.bool,
     queryType: PropTypes.string,
     selectedTargets: PropTypes.arrayOf(targetInterface),
     targetsCount: PropTypes.number,
-    queryText: PropTypes.string,
   };
 
   static defaultProps = {
@@ -36,107 +32,51 @@ class QueryComposer extends Component {
     targetsCount: 0,
   };
 
-  onLoad = (editor) => {
-    editor.setOptions({
-      enableLinking: true,
-    });
-
-    editor.on('linkClick', (data) => {
-      const { type, value } = data.token;
-      const { onOsqueryTableSelect } = this.props;
-
-      if (type === 'osquery-token') {
-        return onOsqueryTableSelect(value);
-      }
-
-      return false;
-    });
-  }
-
   renderForm = () => {
     const {
+      errors,
+      onFetchTargets,
       onFormCancel,
+      onOsqueryTableSelect,
       onRunQuery,
       onSave,
       onStopQuery,
+      onTargetSelect,
       onUpdate,
       query,
       queryIsRunning,
-      queryText,
-      queryType,
-    } = this.props;
-
-    return (
-      <QueryForm
-        onCancel={onFormCancel}
-        onRunQuery={onRunQuery}
-        onSave={onSave}
-        onStopQuery={onStopQuery}
-        onUpdate={onUpdate}
-        query={query}
-        queryIsRunning={queryIsRunning}
-        queryType={queryType}
-        queryText={queryText}
-      />
-    );
-  }
-
-  renderTargetsInput = () => {
-    const {
-      onFetchTargets,
-      onTargetSelect,
       queryType,
       selectedTargets,
       targetsCount,
     } = this.props;
 
-    if (queryType === 'label') {
-      return false;
-    }
-
-
     return (
-      <div>
-        <SelectTargetsDropdown
-          onFetchTargets={onFetchTargets}
-          onSelect={onTargetSelect}
-          selectedTargets={selectedTargets}
-          targetsCount={targetsCount}
-          label="Select Targets"
-        />
-      </div>
+      <QueryForm
+        onCancel={onFormCancel}
+        onFetchTargets={onFetchTargets}
+        onOsqueryTableSelect={onOsqueryTableSelect}
+        onRunQuery={onRunQuery}
+        handleSubmit={onSave}
+        onStopQuery={onStopQuery}
+        onTargetSelect={onTargetSelect}
+        onUpdate={onUpdate}
+        formData={query}
+        query={query}
+        queryIsRunning={queryIsRunning}
+        queryType={queryType}
+        selectedTargets={selectedTargets}
+        serverErrors={errors}
+        targetsCount={targetsCount}
+      />
     );
   }
 
   render () {
-    const { onTextEditorInputChange, queryIsRunning, queryText, queryType } = this.props;
+    const { queryIsRunning, queryText, queryType } = this.props;
     const { onLoad, renderForm, renderTargetsInput } = this;
 
     return (
       <div className={`${baseClass}__wrapper body-wrap`}>
-        <h1>{queryType === 'label' ? 'New Label Query' : 'New Query'}</h1>
-        <div className={`${baseClass}__text-editor-wrapper`}>
-          <AceEditor
-            enableBasicAutocompletion
-            enableLiveAutocompletion
-            editorProps={{ $blockScrolling: Infinity }}
-            mode="kolide"
-            minLines={2}
-            maxLines={20}
-            name="query-editor"
-            onLoad={onLoad}
-            onChange={onTextEditorInputChange}
-            readOnly={queryIsRunning}
-            setOptions={{ enableLinking: true }}
-            showGutter
-            showPrintMargin={false}
-            theme="kolide"
-            value={queryText}
-            width="100%"
-            fontSize={14}
-          />
-        </div>
-        {renderTargetsInput()}
         {renderForm()}
       </div>
     );

@@ -25,7 +25,6 @@ class QueryPage extends Component {
     campaign: campaignInterface,
     dispatch: PropTypes.func,
     query: queryInterface,
-    queryText: PropTypes.string,
     selectedOsqueryTable: osqueryTableInterface,
     selectedTargets: PropTypes.arrayOf(targetInterface),
   };
@@ -44,19 +43,6 @@ class QueryPage extends Component {
 
     if (query) {
       dispatch(setQueryText(query.query));
-    }
-
-    return false;
-  }
-
-  componentWillReceiveProps (nextProps) {
-    const { dispatch, query: newQuery } = nextProps;
-    const { query: oldQuery } = this.props;
-
-    if ((!oldQuery && newQuery) || (oldQuery && oldQuery.query !== newQuery.query)) {
-      const { query: queryText } = newQuery;
-
-      dispatch(setQueryText(queryText));
     }
 
     return false;
@@ -94,8 +80,8 @@ class QueryPage extends Component {
   onRunQuery = debounce((evt) => {
     evt.preventDefault();
 
-    const { dispatch, queryText, selectedTargets } = this.props;
-    const { error } = validateQuery(queryText);
+    const { dispatch, query, selectedTargets } = this.props;
+    const { error } = validateQuery(query.query);
 
     if (error) {
       dispatch(renderFlash('error', error));
@@ -110,7 +96,7 @@ class QueryPage extends Component {
     removeSocket();
     destroyCampaign();
 
-    dispatch(create({ query: queryText, selected }))
+    dispatch(create({ query: query.query, selected }))
       .then((campaignResponse) => {
         return Kolide.runQueryWebsocket(campaignResponse.id)
           .then((socket) => {
@@ -152,8 +138,8 @@ class QueryPage extends Component {
   })
 
   onSaveQueryFormSubmit = debounce((formData) => {
-    const { dispatch, queryText } = this.props;
-    const { error } = validateQuery(queryText);
+    const { dispatch } = this.props;
+    const { error } = validateQuery(formData.query);
 
     if (error) {
       dispatch(renderFlash('error', error));
@@ -161,17 +147,12 @@ class QueryPage extends Component {
       return false;
     }
 
-    const queryParams = { ...formData, query: queryText };
-
-    return dispatch(queryActions.create(queryParams))
+    return dispatch(queryActions.create(formData))
       .then((query) => {
         dispatch(push(`/queries/${query.id}`));
         dispatch(renderFlash('success', 'Query created'));
       })
-      .catch((errorResponse) => {
-        dispatch(renderFlash('error', errorResponse));
-        return false;
-      });
+      .catch(() => false );
   })
 
   onStopQuery = (evt) => {
@@ -192,18 +173,16 @@ class QueryPage extends Component {
     return false;
   }
 
-  onTextEditorInputChange = (queryText) => {
-    const { dispatch } = this.props;
-
-    dispatch(setQueryText(queryText));
-
-    return false;
-  }
-
-  onUpdateQuery = (formData) => {
+  onUpdateQuery = (fields) => {
+    const { description, name, query: queryField } = fields;
     const { dispatch, query } = this.props;
+    const params = {
+      description: description.value,
+      name: name.value,
+      query: queryField.value,
+    };
 
-    dispatch(queryActions.update(query, formData))
+    dispatch(queryActions.update(query, params))
       .then(() => {
         dispatch(renderFlash('success', 'Query updated!'));
       });
@@ -247,8 +226,8 @@ class QueryPage extends Component {
     const { queryIsRunning, targetsCount } = this.state;
     const {
       campaign,
+      errors,
       query,
-      queryText,
       selectedOsqueryTable,
       selectedTargets,
     } = this.props;
@@ -256,20 +235,19 @@ class QueryPage extends Component {
     return (
       <div className="has-sidebar">
         <QueryComposer
+          errors={errors}
           onFetchTargets={onFetchTargets}
           onOsqueryTableSelect={onOsqueryTableSelect}
           onRunQuery={onRunQuery}
           onSave={onSaveQueryFormSubmit}
           onStopQuery={onStopQuery}
           onTargetSelect={onTargetSelect}
-          onTextEditorInputChange={onTextEditorInputChange}
           onUpdate={onUpdateQuery}
           query={query}
           queryIsRunning={queryIsRunning}
           selectedTargets={selectedTargets}
           targetsCount={targetsCount}
           selectedOsqueryTable={selectedOsqueryTable}
-          queryText={queryText}
         />
         {campaign && <QueryResultsTable campaign={campaign} />}
         <QuerySidePanel
@@ -285,11 +263,14 @@ class QueryPage extends Component {
 const mapStateToProps = (state, { params }) => {
   const { id: queryID } = params;
   const { entities: campaigns } = entityGetter(state).get('campaigns');
-  const query = entityGetter(state).get('queries').findBy({ id: queryID });
+  const reduxQuery = entityGetter(state).get('queries').findBy({ id: queryID });
   const { queryText, selectedOsqueryTable, selectedTargets } = state.components.QueryPages;
   const campaign = first(values(campaigns));
+  const { errors } = state.entities.queries;
+  const queryStub = { description: '', name: '', query: queryText };
+  const query = reduxQuery || queryStub;
 
-  return { campaign, query, queryText, selectedOsqueryTable, selectedTargets };
+  return { campaign, errors, query, selectedOsqueryTable, selectedTargets };
 };
 
 export default connect(mapStateToProps)(QueryPage);

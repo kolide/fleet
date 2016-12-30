@@ -1,89 +1,59 @@
 import React, { Component, PropTypes } from 'react';
-import { isEqual } from 'lodash';
+import AceEditor from 'react-ace';
+import { isEqual, size } from 'lodash';
 
 import Button from 'components/buttons/Button';
 import DropdownButton from 'components/buttons/DropdownButton';
 import Dropdown from 'components/forms/fields/Dropdown';
+import Form from 'components/forms/Form';
+import formFieldInterface from 'interfaces/form_field';
 import helpers from 'components/forms/queries/QueryForm/helpers';
 import InputField from 'components/forms/fields/InputField';
 import queryInterface from 'interfaces/query';
+import SelectTargetsDropdown from 'components/forms/fields/SelectTargetsDropdown';
+import targetInterface from 'interfaces/target';
 import validatePresence from 'components/forms/validators/validate_presence';
 
 const baseClass = 'query-form';
 
+const validate = (formData) => {
+  const errors = {};
+
+  if (!formData.name) {
+    errors.name = 'Query title must be present';
+  }
+
+  const valid = !size(errors);
+
+  return { valid, errors };
+};
+
 class QueryForm extends Component {
   static propTypes = {
+    fields: PropTypes.shape({
+      description: formFieldInterface.isRequired,
+      name: formFieldInterface.isRequired,
+      query: formFieldInterface.isRequired,
+    }).isRequired,
     onCancel: PropTypes.func,
+    onFetchTargets: PropTypes.func,
+    onOsqueryTableSelect: PropTypes.func,
     onRunQuery: PropTypes.func,
     onSave: PropTypes.func,
     onStopQuery: PropTypes.func,
+    onTargetSelect: PropTypes.func,
     onUpdate: PropTypes.func,
     query: queryInterface,
     queryIsRunning: PropTypes.bool,
-    queryText: PropTypes.string.isRequired,
     queryType: PropTypes.string,
-  };
-
-  static defaultProps = {
-    query: {},
+    selectedTargets: PropTypes.arrayOf(targetInterface),
+    targetsCount: PropTypes.number,
   };
 
   constructor (props) {
     super(props);
 
-    const {
-      query: { description, name },
-      queryText,
-      queryType,
-    } = this.props;
-    const errors = { description: null, name: null };
-    const formData = { description, name, query: queryText };
-
-    if (queryType === 'label') {
-      const { allPlatforms: platform } = helpers;
-
-      this.state = {
-        errors: { ...errors, platform: null },
-        formData: { ...formData, platform: platform.value },
-      };
-    } else {
-      this.state = { errors, formData };
-    }
-  }
-
-  componentDidMount = () => {
-    const { query, queryText } = this.props;
-    const { description, name } = query;
-    const { formData } = this.state;
-
-    this.setState({
-      formData: {
-        ...formData,
-        description,
-        name,
-        query: queryText,
-      },
-    });
-  }
-
-  componentWillReceiveProps = (nextProps) => {
-    const { query, queryText } = nextProps;
-    const { query: staleQuery, queryText: staleQueryText } = this.props;
-
-    if (!isEqual(query, staleQuery) || !isEqual(queryText, staleQueryText)) {
-      const { formData } = this.state;
-
-      this.setState({
-        formData: {
-          ...formData,
-          description: query.description || formData.description,
-          name: query.name || formData.name,
-          query: queryText,
-        },
-      });
-    }
-
-    return false;
+    this.state = { errors: {} };
   }
 
   onCancel = (evt) => {
@@ -94,58 +64,42 @@ class QueryForm extends Component {
     return handleCancel();
   }
 
-  onFieldChange = (name) => {
-    return (value) => {
-      const { errors, formData } = this.state;
+  onLoad = (editor) => {
+    editor.setOptions({
+      enableLinking: true,
+    });
 
-      this.setState({
-        errors: {
-          ...errors,
-          [name]: null,
-        },
-        formData: {
-          ...formData,
-          [name]: value,
-        },
-      });
+    editor.on('linkClick', (data) => {
+      const { type, value } = data.token;
+      const { onOsqueryTableSelect } = this.props;
+
+      if (type === 'osquery-token') {
+        return onOsqueryTableSelect(value);
+      }
 
       return false;
-    };
-  }
-
-  onSave = (evt) => {
-    evt.preventDefault();
-
-    const { formData } = this.state;
-    const { valid } = this;
-    const { onSave: handleSave } = this.props;
-
-    if (valid()) {
-      handleSave(formData);
-    }
-
-    return false;
+    });
   }
 
   onUpdate = (evt) => {
     evt.preventDefault();
 
-    const { formData } = this.state;
+    const { fields } = this.props;
     const { valid } = this;
     const { onUpdate: handleUpdate } = this.props;
 
     if (valid()) {
-      handleUpdate(formData);
+      handleUpdate(fields);
     }
 
     return false;
   }
 
   valid = () => {
-    const { errors, formData: { name } } = this.state;
-    const { queryType } = this.props;
+    const { errors } = this.state;
+    const { fields, queryType } = this.props;
 
-    const namePresent = validatePresence(name);
+    const namePresent = validatePresence(fields.name.value);
 
     if (!namePresent) {
       this.setState({
@@ -165,8 +119,8 @@ class QueryForm extends Component {
 
   renderButtons = () => {
     const { canSaveAsNew, canSaveChanges } = helpers;
-    const { formData } = this.state;
     const {
+      fields,
       onRunQuery,
       onStopQuery,
       query,
@@ -221,8 +175,8 @@ class QueryForm extends Component {
           </Button>
           <Button
             className={`${baseClass}__save-as-new-btn`}
-            disabled={!canSaveAsNew(formData, query)}
-            onClick={onSave}
+            disabled={!canSaveAsNew(fields, query)}
+            type="submit"
             variant="brand"
           >
             Save Label
@@ -247,54 +201,89 @@ class QueryForm extends Component {
   }
 
   renderPlatformDropdown = () => {
-    const { queryType } = this.props;
+    const { fields, queryType } = this.props;
 
     if (queryType !== 'label') {
       return false;
     }
 
-    const { formData: { platform } } = this.state;
-    const { onFieldChange } = this;
     const { platformOptions } = helpers;
 
     return (
       <Dropdown
+        {...fields.platform}
         options={platformOptions}
-        onChange={onFieldChange('platform')}
-        value={platform}
       />
     );
   }
 
-  render () {
+  renderTargetsInput = () => {
     const {
-      errors,
-      formData: {
-        description,
-        name,
-      },
-    } = this.state;
-    const { onFieldChange, renderPlatformDropdown, renderButtons } = this;
-    const { queryType } = this.props;
+      onFetchTargets,
+      onTargetSelect,
+      queryType,
+      selectedTargets,
+      targetsCount,
+    } = this.props;
+
+    if (queryType === 'label') {
+      return false;
+    }
+
 
     return (
-      <form className={baseClass}>
+      <div>
+        <SelectTargetsDropdown
+          onFetchTargets={onFetchTargets}
+          onSelect={onTargetSelect}
+          selectedTargets={selectedTargets}
+          targetsCount={targetsCount}
+          label="Select Targets"
+        />
+      </div>
+    );
+  }
+
+  render () {
+    const { errors } = this.state;
+    const { fields, handleSubmit, queryIsRunning, queryType } = this.props;
+    const { onLoad, renderPlatformDropdown, renderButtons, renderTargetsInput } = this;
+
+    return (
+      <form className={baseClass} onSubmit={handleSubmit}>
+        <h1>{queryType === 'label' ? 'New Label Query' : 'New Query'}</h1>
+        <div className="query-composer__text-editor-wrapper">
+          <AceEditor
+            {...fields.query}
+            enableBasicAutocompletion
+            enableLiveAutocompletion
+            editorProps={{ $blockScrolling: Infinity }}
+            mode="kolide"
+            minLines={2}
+            maxLines={20}
+            name="query-editor"
+            onLoad={onLoad}
+            readOnly={queryIsRunning}
+            setOptions={{ enableLinking: true }}
+            showGutter
+            showPrintMargin={false}
+            theme="kolide"
+            width="100%"
+            fontSize={14}
+          />
+        </div>
+        {renderTargetsInput()}
         <InputField
-          error={errors.name}
-          label={queryType === 'label' ? 'Label title' : 'Query Title'}
-          name="name"
-          onChange={onFieldChange('name')}
-          value={name}
+          {...fields.name}
+          error={fields.name.error || errors.name}
           inputClassName={`${baseClass}__query-title`}
+          label={queryType === 'label' ? 'Label title' : 'Query Title'}
         />
         <InputField
-          error={errors.description}
-          label="Description"
-          name="description"
-          onChange={onFieldChange('description')}
-          value={description}
-          type="textarea"
+          {...fields.description}
           inputClassName={`${baseClass}__query-description`}
+          label="Description"
+          type="textarea"
         />
         {renderPlatformDropdown()}
         {renderButtons()}
@@ -303,4 +292,7 @@ class QueryForm extends Component {
   }
 }
 
-export default QueryForm;
+export default Form(QueryForm, {
+  fields: ['description', 'name', 'platform', 'query'],
+  validate,
+});
