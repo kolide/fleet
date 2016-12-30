@@ -44,6 +44,25 @@ func (svc service) NewPack(ctx context.Context, p kolide.PackPayload) (*kolide.P
 	if err != nil {
 		return nil, err
 	}
+
+	if p.HostIDs != nil {
+		for _, hostID := range *p.HostIDs {
+			err = svc.AddHostToPack(ctx, hostID, pack.ID)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	if p.LabelIDs != nil {
+		for _, labelID := range *p.LabelIDs {
+			err = svc.AddLabelToPack(ctx, labelID, pack.ID)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
 	return &pack, nil
 }
 
@@ -74,6 +93,26 @@ func (svc service) ModifyPack(ctx context.Context, id uint, p kolide.PackPayload
 		return nil, err
 	}
 
+	if p.HostIDs != nil {
+		for _, hostID := range *p.HostIDs {
+			err = svc.AddHostToPack(ctx, hostID, pack.ID)
+			if err != nil {
+				// check to see if it's already there
+				return nil, err
+			}
+		}
+	}
+
+	if p.LabelIDs != nil {
+		for _, labelID := range *p.LabelIDs {
+			err = svc.AddLabelToPack(ctx, labelID, pack.ID)
+			if err != nil {
+				// check to see if it's already there
+				return nil, err
+			}
+		}
+	}
+
 	return pack, err
 }
 
@@ -95,22 +134,15 @@ func (svc service) ListLabelsForPack(ctx context.Context, pid uint) ([]*kolide.L
 }
 
 func (svc service) RemoveLabelFromPack(ctx context.Context, lid, pid uint) error {
-	pack, err := svc.ds.Pack(pid)
-	if err != nil {
-		return err
-	}
+	return svc.ds.RemoveLabelFromPack(lid, pid)
+}
 
-	label, err := svc.ds.Label(lid)
-	if err != nil {
-		return err
-	}
+func (svc service) AddHostToPack(ctx context.Context, hid, pid uint) error {
+	return svc.ds.AddHostToPack(hid, pid)
+}
 
-	err = svc.ds.RemoveLabelFromPack(label, pack)
-	if err != nil {
-		return err
-	}
-
-	return nil
+func (svc service) RemoveHostFromPack(ctx context.Context, hid, pid uint) error {
+	return svc.ds.RemoveHostFromPack(hid, pid)
 }
 
 func (svc service) ListHostsInPack(ctx context.Context, pid uint, opt kolide.ListOptions) ([]*kolide.Host, error) {

@@ -96,12 +96,29 @@ func (d *Datastore) ListPacks(opt kolide.ListOptions) ([]*kolide.Pack, error) {
 	return packs, nil
 }
 
-func (d *Datastore) AddLabelToPack(lid uint, pid uint) error {
+func (d *Datastore) AddLabelToPack(lid, pid uint) error {
 	pt := &kolide.PackTarget{
 		PackID: pid,
 		Target: kolide.Target{
 			Type:     kolide.TargetLabel,
 			TargetID: lid,
+		},
+	}
+
+	d.mtx.Lock()
+	pt.ID = d.nextID(pt)
+	d.packTargets[pt.ID] = pt
+	d.mtx.Unlock()
+
+	return nil
+}
+
+func (d *Datastore) AddHostToPack(hid, pid uint) error {
+	pt := &kolide.PackTarget{
+		PackID: pid,
+		Target: kolide.Target{
+			Type:     kolide.TargetHost,
+			TargetID: hid,
 		},
 	}
 
@@ -127,17 +144,35 @@ func (d *Datastore) ListLabelsForPack(pid uint) ([]*kolide.Label, error) {
 	return labels, nil
 }
 
-func (d *Datastore) RemoveLabelFromPack(label *kolide.Label, pack *kolide.Pack) error {
+func (d *Datastore) RemoveLabelFromPack(lid, pid uint) error {
 	var labelsToDelete []uint
 
 	d.mtx.Lock()
 	for _, pt := range d.packTargets {
-		if pt.Type == kolide.TargetLabel && pt.TargetID == label.ID && pt.PackID == pack.ID {
+		if pt.Type == kolide.TargetLabel && pt.TargetID == lid && pt.PackID == pid {
 			labelsToDelete = append(labelsToDelete, pt.ID)
 		}
 	}
 
 	for _, id := range labelsToDelete {
+		delete(d.packTargets, id)
+	}
+	d.mtx.Unlock()
+
+	return nil
+}
+
+func (d *Datastore) RemoveHostFromPack(hid, pid uint) error {
+	var hostsToDelete []uint
+
+	d.mtx.Lock()
+	for _, pt := range d.packTargets {
+		if pt.Type == kolide.TargetHost && pt.TargetID == hid && pt.PackID == pid {
+			hostsToDelete = append(hostsToDelete, pt.ID)
+		}
+	}
+
+	for _, id := range hostsToDelete {
 		delete(d.packTargets, id)
 	}
 	d.mtx.Unlock()
