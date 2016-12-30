@@ -6,7 +6,7 @@ const defaultValidate = () => { return { valid: true, errors: {} }; };
 export default (WrappedComponent, { fields, validate = defaultValidate }) => {
   class Form extends Component {
     static propTypes = {
-      errors: PropTypes.object, // eslint-disable-line react/forbid-prop-types
+      serverErrors: PropTypes.object, // eslint-disable-line react/forbid-prop-types
       formData: PropTypes.object, // eslint-disable-line react/forbid-prop-types
       handleSubmit: PropTypes.func,
       onChangeFunc: PropTypes.func,
@@ -20,30 +20,40 @@ export default (WrappedComponent, { fields, validate = defaultValidate }) => {
     constructor (props) {
       super(props);
 
-      const { errors, formData } = props;
+      const { formData } = props;
 
-      if (!errors) {
-        this.state = { errors: {}, formData };
-
-        return false;
-      }
-
-      this.state = { errors, formData };
+      this.state = {
+        errors: {},
+        formData,
+      };
 
       return false;
     }
 
-    componentWillReceiveProps (nextProps) {
-      const { formData: formDataProp } = nextProps;
-      const { formData: oldFormDataProp } = this.props;
+    componentWillReceiveProps ({ formData, serverErrors }) {
+      const {
+        formData: oldFormDataProp,
+        serverErrors: oldServerErrors,
+      } = this.props;
 
-      if (!isEqual(formDataProp, oldFormDataProp)) {
-        const { formData } = this.state;
+      if (!isEqual(formData, oldFormDataProp)) {
+        const { formData: currentFormData } = this.state;
 
         this.setState({
           formData: {
+            ...currentFormData,
             ...formData,
-            ...formDataProp,
+          },
+        });
+      }
+
+      if (!isEqual(serverErrors, oldServerErrors)) {
+        const { errors } = this.state;
+
+        this.setState({
+          errors: {
+            ...errors,
+            ...serverErrors,
           },
         });
       }
@@ -87,11 +97,6 @@ export default (WrappedComponent, { fields, validate = defaultValidate }) => {
 
     getError = (fieldName) => {
       const { errors } = this.state;
-      const { errors: serverErrors } = this.props;
-
-      if (serverErrors) {
-        return errors[fieldName] || serverErrors[fieldName];
-      }
 
       return errors[fieldName];
     }
