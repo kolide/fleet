@@ -1,6 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import AceEditor from 'react-ace';
-import { isEqual, size } from 'lodash';
+import { size } from 'lodash';
 
 import Button from 'components/buttons/Button';
 import DropdownButton from 'components/buttons/DropdownButton';
@@ -9,18 +8,27 @@ import Form from 'components/forms/Form';
 import formFieldInterface from 'interfaces/form_field';
 import helpers from 'components/forms/queries/QueryForm/helpers';
 import InputField from 'components/forms/fields/InputField';
+import KolideAce from 'components/KolideAce';
 import queryInterface from 'interfaces/query';
 import SelectTargetsDropdown from 'components/forms/fields/SelectTargetsDropdown';
 import targetInterface from 'interfaces/target';
-import validatePresence from 'components/forms/validators/validate_presence';
+import validateQuery from 'components/forms/validators/validate_query';
 
 const baseClass = 'query-form';
 
 const validate = (formData) => {
   const errors = {};
+  const {
+    error: queryError,
+    valid: queryValid,
+  } = validateQuery(formData.query);
+
+  if (!queryValid) {
+    errors.query = queryError;
+  }
 
   if (!formData.name) {
-    errors.name = 'Query title must be present';
+    errors.name = 'Title must be present';
   }
 
   const valid = !size(errors);
@@ -35,19 +43,24 @@ class QueryForm extends Component {
       name: formFieldInterface.isRequired,
       query: formFieldInterface.isRequired,
     }).isRequired,
+    handleSubmit: PropTypes.func,
+    formData: queryInterface,
     onCancel: PropTypes.func,
     onFetchTargets: PropTypes.func,
     onOsqueryTableSelect: PropTypes.func,
     onRunQuery: PropTypes.func,
-    onSave: PropTypes.func,
     onStopQuery: PropTypes.func,
     onTargetSelect: PropTypes.func,
     onUpdate: PropTypes.func,
-    query: queryInterface,
     queryIsRunning: PropTypes.bool,
     queryType: PropTypes.string,
     selectedTargets: PropTypes.arrayOf(targetInterface),
     targetsCount: PropTypes.number,
+  };
+
+  static defaultProps = {
+    queryType: 'query',
+    targetsCount: 0,
   };
 
   constructor (props) {
@@ -85,45 +98,37 @@ class QueryForm extends Component {
     evt.preventDefault();
 
     const { fields } = this.props;
-    const { valid } = this;
     const { onUpdate: handleUpdate } = this.props;
+    const formData = {
+      name: fields.name.value,
+      query: fields.query.value,
+    };
 
-    if (valid()) {
+    const { valid, errors } = validate(formData);
+
+    if (valid) {
       handleUpdate(fields);
-    }
-
-    return false;
-  }
-
-  valid = () => {
-    const { errors } = this.state;
-    const { fields, queryType } = this.props;
-
-    const namePresent = validatePresence(fields.name.value);
-
-    if (!namePresent) {
-      this.setState({
-        errors: {
-          ...errors,
-          name: `${queryType === 'label' ? 'Label title' : 'Query title'} must be present`,
-        },
-      });
 
       return false;
     }
 
-    // TODO: validate queryText
+    this.setState({
+      errors: {
+        ...this.state.errors,
+        ...errors,
+      },
+    });
 
-    return true;
+    return false;
   }
 
   renderButtons = () => {
     const { canSaveAsNew, canSaveChanges } = helpers;
     const {
       fields,
+      formData,
       onRunQuery,
       onStopQuery,
-      query,
       queryIsRunning,
       queryType,
     } = this.props;
@@ -175,7 +180,7 @@ class QueryForm extends Component {
           </Button>
           <Button
             className={`${baseClass}__save-as-new-btn`}
-            disabled={!canSaveAsNew(fields, query)}
+            disabled={!canSaveAsNew(fields, formData)}
             type="submit"
             variant="brand"
           >
@@ -250,28 +255,15 @@ class QueryForm extends Component {
     const { onLoad, renderPlatformDropdown, renderButtons, renderTargetsInput } = this;
 
     return (
-      <form className={baseClass} onSubmit={handleSubmit}>
+      <form className={`${baseClass}__wrapper body-wrap`} onSubmit={handleSubmit}>
         <h1>{queryType === 'label' ? 'New Label Query' : 'New Query'}</h1>
-        <div className="query-composer__text-editor-wrapper">
-          <AceEditor
-            {...fields.query}
-            enableBasicAutocompletion
-            enableLiveAutocompletion
-            editorProps={{ $blockScrolling: Infinity }}
-            mode="kolide"
-            minLines={2}
-            maxLines={20}
-            name="query-editor"
-            onLoad={onLoad}
-            readOnly={queryIsRunning}
-            setOptions={{ enableLinking: true }}
-            showGutter
-            showPrintMargin={false}
-            theme="kolide"
-            width="100%"
-            fontSize={14}
-          />
-        </div>
+        <KolideAce
+          {...fields.query}
+          error={fields.query.error || errors.query}
+          onLoad={onLoad}
+          readOnly={queryIsRunning}
+          wrapperClassName={`${baseClass}__text-editor-wrapper`}
+        />
         {renderTargetsInput()}
         <InputField
           {...fields.name}

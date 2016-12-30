@@ -1,5 +1,3 @@
-import { isEmpty } from 'lodash';
-
 const formChanged = (fields, query) => {
   return query.name !== fields.name.value ||
     query.description !== fields.description.value ||
