@@ -137,7 +137,7 @@ class UserManagementPage extends Component {
     return false;
   }
 
-  renderUserBlock = (user, options = { invite: false }) => {
+  renderUserBlock = (user, idx, options = { invite: false }) => {
     const { currentUser } = this.props;
     const { invite } = options;
     const { onEditUser, onUserActionSelect } = this;
@@ -146,7 +146,7 @@ class UserManagementPage extends Component {
       <UserBlock
         currentUser={currentUser}
         invite={invite}
-        key={user.email}
+        key={`${user.email}-${idx}-${invite ? 'invite' : 'user'}`}
         onEditUser={onEditUser}
         onSelect={onUserActionSelect}
         user={user}
@@ -194,11 +194,11 @@ class UserManagementPage extends Component {
           </Button>
         </div>
         <div className={`${baseClass}__users`}>
-          {users.map((user) => {
-            return this.renderUserBlock(user);
+          {users.map((user, idx) => {
+            return this.renderUserBlock(user, idx);
           })}
-          {invites.map((user) => {
-            return this.renderUserBlock(user, { invite: true });
+          {invites.map((user, idx) => {
+            return this.renderUserBlock(user, idx, { invite: true });
           })}
         </div>
         {this.renderModal()}
