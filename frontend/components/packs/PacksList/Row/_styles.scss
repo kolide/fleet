@@ -1,5 +1,10 @@
 .packs-list-row {
   border-bottom: 1px solid $accent-medium;
+  cursor: pointer;
+
+  &--selected {
+    background-color: $accent-light;
+  }
 
   &:focus {
     outline: none;

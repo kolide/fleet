@@ -245,6 +245,7 @@ export class AllPacksPage extends Component {
   }
 
   render () {
+    const { allPacksChecked, checkedPackIDs, packFilter } = this.state;
     const {
       getPacks,
       onCheckAllPacks,
@@ -254,7 +255,7 @@ export class AllPacksPage extends Component {
       renderCTAs,
       renderSidePanel,
     } = this;
-    const { allPacksChecked, checkedPackIDs, packFilter } = this.state;
+    const { selectedPack } = this.props;
     const packs = getPacks();
     const packsCount = packs.length;
 
@@ -281,6 +282,7 @@ export class AllPacksPage extends Component {
             onCheckPack={onCheckPack}
             onSelectPack={onSelectPack}
             packs={packs}
+            selectedPack={selectedPack}
           />
         </div>
         {renderSidePanel()}

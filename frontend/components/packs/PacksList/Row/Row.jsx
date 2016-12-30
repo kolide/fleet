@@ -16,6 +16,7 @@ class Row extends Component {
     onCheck: PropTypes.func,
     onSelect: PropTypes.func,
     pack: packInterface.isRequired,
+    selected: PropTypes.bool,
   };
 
   shouldComponentUpdate (nextProps) {
@@ -59,12 +60,15 @@ class Row extends Component {
   }
 
   render () {
-    const { checked, pack } = this.props;
+    const { checked, pack, selected } = this.props;
     const { handleChange, handleSelect, renderStatusData } = this;
     const updatedTime = moment(pack.updated_at).format('MM/DD/YY');
+    const rowClass = classNames(baseClass, {
+      [`${baseClass}--selected`]: selected,
+    });
 
     return (
-      <ClickableTableRow className={baseClass} onClick={handleSelect}>
+      <ClickableTableRow className={rowClass} onClick={handleSelect}>
         <td className={`${baseClass}__td`}>
           <Checkbox
             name={`select-pack-${pack.id}`}
