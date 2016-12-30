@@ -10,18 +10,33 @@ import {
 import debounce from 'utilities/debounce';
 import ForgotPasswordForm from 'components/forms/ForgotPasswordForm';
 import Icon from 'components/icons/Icon';
+import { renderFlash } from 'redux/nodes/notifications/actions';
 import StackedWhiteBoxes from 'components/StackedWhiteBoxes';
 
 export class ForgotPasswordPage extends Component {
   static propTypes = {
     dispatch: PropTypes.func,
     email: PropTypes.string,
-    error: PropTypes.string,
+    errors: PropTypes.shape({
+      base: PropTypes.string,
+    }),
   };
 
   static defaultProps = {
     dispatch: noop,
   };
+
+  componentWillReceiveProps ({ dispatch, errors }) {
+    const { base } = errors;
+
+    if (!base) {
+      return false;
+    }
+
+    if (base !== this.props.errors.base) {
+      dispatch(renderFlash('error', base));
+    }
+  }
 
   handleLeave = (location) => {
     const { dispatch } = this.props;
@@ -32,7 +47,8 @@ export class ForgotPasswordPage extends Component {
   handleSubmit = debounce((formData) => {
     const { dispatch } = this.props;
 
-    return dispatch(forgotPasswordAction(formData));
+    return dispatch(forgotPasswordAction(formData))
+      .catch(() => false);
   })
 
   clearErrors = () => {
@@ -43,7 +59,7 @@ export class ForgotPasswordPage extends Component {
 
   renderContent = () => {
     const { clearErrors, handleSubmit } = this;
-    const { email, error } = this.props;
+    const { email, errors } = this.props;
 
     const baseClass = 'forgot-password';
 
@@ -67,9 +83,9 @@ export class ForgotPasswordPage extends Component {
 
     return (
       <ForgotPasswordForm
-        onChangeFunc={clearErrors}
-        errors={{ email: error }}
         handleSubmit={handleSubmit}
+        onChangeFunc={clearErrors}
+        serverErrors={errors}
       />
     );
   }

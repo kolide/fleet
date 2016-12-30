@@ -264,7 +264,7 @@ export const validForgotPasswordRequest = () => {
 export const invalidForgotPasswordRequest = (error) => {
   return nock('http://localhost:8080')
   .post('/api/v1/kolide/forgot_password')
-  .reply(422, { error });
+  .reply(422, error);
 };
 
 export const validResetPasswordRequest = (password, token) => {

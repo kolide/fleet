@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { includes } from 'lodash';
+import { includes, size } from 'lodash';
 import { push } from 'react-router-redux';
 
 import AuthenticationFormWrapper from 'components/AuthenticationFormWrapper';
@@ -10,6 +10,7 @@ import debounce from 'utilities/debounce';
 import LoginForm from 'components/forms/LoginForm';
 import LoginSuccessfulPage from 'pages/LoginSuccessfulPage';
 import ForgotPasswordPage from 'pages/ForgotPasswordPage';
+import { renderFlash } from 'redux/nodes/notifications/actions';
 import ResetPasswordPage from 'pages/ResetPasswordPage';
 import paths from 'router/paths';
 import redirectLocationInterface from 'interfaces/redirect_location';
@@ -20,7 +21,9 @@ const WHITELIST_ERRORS = ['Unable to authenticate the current user'];
 export class LoginPage extends Component {
   static propTypes = {
     dispatch: PropTypes.func,
-    error: PropTypes.string,
+    errors: PropTypes.shape({
+      base: PropTypes.string,
+    }),
     pathname: PropTypes.string,
     isForgotPassPage: PropTypes.bool,
     isResetPassPage: PropTypes.bool,
@@ -47,10 +50,22 @@ export class LoginPage extends Component {
     return false;
   }
 
-  onChange = () => {
-    const { dispatch, error } = this.props;
+  componentWillReceiveProps ({ dispatch, errors }) {
+    const { base } = errors;
 
-    if (error) {
+    if (!base) {
+      return false;
+    }
+
+    if (base !== this.props.errors.base) {
+      dispatch(renderFlash('error', base));
+    }
+  }
+
+  onChange = () => {
+    const { dispatch, errors } = this.props;
+
+    if (size(errors)) {
       return dispatch(clearAuthErrors);
     }
 
@@ -69,23 +84,12 @@ export class LoginPage extends Component {
           dispatch(clearRedirectLocation);
           return dispatch(push(nextLocation));
         }, redirectTime);
-      });
+      })
+      .catch(() => false);
   })
 
-  serverErrors = () => {
-    const { error } = this.props;
-
-    if (!error || includes(WHITELIST_ERRORS, error)) {
-      return {};
-    }
-
-    return {
-      username: error,
-      password: 'password',
-    };
-  }
-
   showLoginForm = () => {
+    const { errors } = this.props;
     const { loginVisible } = this.state;
     const { onChange, onSubmit, serverErrors } = this;
 
@@ -94,7 +98,7 @@ export class LoginPage extends Component {
         onChangeFunc={onChange}
         handleSubmit={onSubmit}
         isHidden={!loginVisible}
-        errors={serverErrors()}
+        serverErrors={errors}
       />
     );
   }
@@ -115,11 +119,11 @@ export class LoginPage extends Component {
 }
 
 const mapStateToProps = (state) => {
-  const { error, loading, user } = state.auth;
+  const { errors, loading, user } = state.auth;
   const { redirectLocation } = state;
 
   return {
-    error,
+    errors,
     loading,
     redirectLocation,
     user,
