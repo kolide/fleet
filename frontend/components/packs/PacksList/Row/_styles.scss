@@ -1,6 +1,10 @@
 .packs-list-row {
   border-bottom: 1px solid $accent-medium;
 
+  &:focus {
+    outline: none;
+  }
+
   &__td {
     color: $text-ultradark;
     font-weight: $bold;

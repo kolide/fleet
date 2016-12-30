@@ -155,7 +155,7 @@ describe('AllPacksPage - component', () => {
 
       expect(page.prop('selectedPack')).toNotExist();
 
-      firstRow.find('ClickableTd').first().find('a').simulate('click');
+      firstRow.find('ClickableTableRow').first().simulate('click');
 
       const dispatchedActions = mockStore.getActions();
       const locationChangeAction = find(dispatchedActions, { type: '@@router/CALL_HISTORY_METHOD' });

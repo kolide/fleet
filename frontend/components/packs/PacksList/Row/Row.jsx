@@ -4,7 +4,7 @@ import { isEqual } from 'lodash';
 import moment from 'moment';
 
 import Checkbox from 'components/forms/fields/Checkbox';
-import ClickableTd from 'components/ClickableTd';
+import ClickableTableRow from 'components/ClickableTableRow';
 import Icon from 'components/icons/Icon';
 import packInterface from 'interfaces/pack';
 
@@ -36,7 +36,6 @@ class Row extends Component {
 
   renderStatusData = () => {
     const { disabled } = this.props.pack;
-    const { handleSelect } = this;
     const iconClassName = classNames(`${baseClass}__status-icon`, {
       [`${baseClass}__status-icon--enabled`]: !disabled,
       [`${baseClass}__status-icon--disabled`]: disabled,
@@ -44,18 +43,18 @@ class Row extends Component {
 
     if (disabled) {
       return (
-        <ClickableTd className={`${baseClass}__td`} onClick={handleSelect}>
+        <td className={`${baseClass}__td`}>
           <Icon className={iconClassName} name="offline" />
           <span className={`${baseClass}__status-text`}>Disabled</span>
-        </ClickableTd>
+        </td>
       );
     }
 
     return (
-      <ClickableTd className={`${baseClass}__td`} onClick={handleSelect}>
+      <td className={`${baseClass}__td`}>
         <Icon className={iconClassName} name="success-check" />
         <span className={`${baseClass}__status-text`}>Enabled</span>
-      </ClickableTd>
+      </td>
     );
   }
 
@@ -65,7 +64,7 @@ class Row extends Component {
     const updatedTime = moment(pack.updated_at).format('MM/DD/YY');
 
     return (
-      <tr className={baseClass}>
+      <ClickableTableRow className={baseClass} onClick={handleSelect}>
         <td className={`${baseClass}__td`}>
           <Checkbox
             name={`select-pack-${pack.id}`}
@@ -74,12 +73,12 @@ class Row extends Component {
             wrapperClassName={`${baseClass}__checkbox`}
           />
         </td>
-        <ClickableTd className={`${baseClass}__td ${baseClass}__td-pack-name`} onClick={handleSelect}>{pack.name}</ClickableTd>
-        <ClickableTd className={`${baseClass}__td ${baseClass}__td-query-count`} onClick={handleSelect}>{pack.query_count}</ClickableTd>
+        <td className={`${baseClass}__td ${baseClass}__td-pack-name`}>{pack.name}</td>
+        <td className={`${baseClass}__td ${baseClass}__td-query-count`}>{pack.query_count}</td>
         {renderStatusData()}
         <td />
-        <ClickableTd className={`${baseClass}__td`} onClick={handleSelect}>{updatedTime}</ClickableTd>
-      </tr>
+        <td className={`${baseClass}__td`}>{updatedTime}</td>
+      </ClickableTableRow>
     );
   }
 }
