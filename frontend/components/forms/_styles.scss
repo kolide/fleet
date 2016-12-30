@@ -1,0 +1,9 @@
+.form-hoc {
+  &__base-error {
+    background-color: $alert;
+    color: $white;
+    font-size: 14px;
+    padding: 5px 0;
+    text-align: center;
+  }
+}

@@ -3,6 +3,8 @@ import { isEqual, noop } from 'lodash';
 
 const defaultValidate = () => { return { valid: true, errors: {} }; };
 
+const baseClass = 'form-hoc';
+
 export default (WrappedComponent, { fields, validate = defaultValidate }) => {
   class Form extends Component {
     static propTypes = {
@@ -123,8 +125,18 @@ export default (WrappedComponent, { fields, validate = defaultValidate }) => {
 
     render () {
       const { getFields, onSubmit, props } = this;
+      const { errors } = this.state;
 
-      return <WrappedComponent {...props} fields={getFields()} handleSubmit={onSubmit} />;
+      return (
+        <div>
+          {errors.base && <div className={`${baseClass}__base-error`}>{errors.base}</div>}
+          <WrappedComponent
+            {...props}
+            fields={getFields()}
+            handleSubmit={onSubmit}
+          />
+        </div>
+      );
     }
   }
 
