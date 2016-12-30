@@ -84,7 +84,7 @@ func TestDeleteScheduledQuery(t *testing.T) {
 	ds, err := inmem.New(config.TestConfig())
 	assert.Nil(t, err)
 	svc, err := newTestService(ds, nil)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	ctx := context.Background()
 
 	u1 := test.NewUser(t, ds, "Admin", "admin", "admin@kolide.co", true)
@@ -96,7 +96,7 @@ func TestDeleteScheduledQuery(t *testing.T) {
 	require.Nil(t, err)
 	assert.Equal(t, uint(60), query.Interval)
 
-	err = svc.DeleteScheduledQuery(ctx, sq1.ID)
+	err = svc.Delete(ctx, &kolide.ScheduledQuery{ID: sq1.ID})
 	require.Nil(t, err)
 
 	_, err = svc.GetScheduledQuery(ctx, sq1.ID)

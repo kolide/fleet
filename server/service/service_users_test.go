@@ -90,8 +90,6 @@ func TestRequestPasswordReset(t *testing.T) {
 
 	for _, tt := range requestPasswordResetTests {
 		t.Run("", func(t *testing.T) {
-			t.Parallel()
-			tt := tt
 			ctx := context.Background()
 			if tt.vc != nil {
 				ctx = viewer.NewContext(ctx, *tt.vc)

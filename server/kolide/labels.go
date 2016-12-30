@@ -69,6 +69,10 @@ type Label struct {
 	LabelType   LabelType `json:"label_type" db:"label_type"`
 }
 
+func (l *Label) EntityID() uint {
+	return l.ID
+}
+
 type LabelQueryExecution struct {
 	ID        uint
 	UpdatedAt time.Time

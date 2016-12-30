@@ -12,7 +12,7 @@ func (d *Datastore) NewDistributedQueryCampaign(camp *kolide.DistributedQueryCam
 	defer d.mtx.Unlock()
 
 	camp.ID = d.nextID(camp)
-	d.distributedQueryCampaigns[camp.ID] = *camp
+	d.DistributedQueryCampaigns[camp.ID] = *camp
 
 	return camp, nil
 }
@@ -21,7 +21,7 @@ func (d *Datastore) DistributedQueryCampaign(id uint) (*kolide.DistributedQueryC
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
-	campaign, ok := d.distributedQueryCampaigns[id]
+	campaign, ok := d.DistributedQueryCampaigns[id]
 	if !ok {
 		return nil, notFound("DistributedQueryCampaign").WithID(id)
 	}
@@ -33,11 +33,11 @@ func (d *Datastore) SaveDistributedQueryCampaign(camp *kolide.DistributedQueryCa
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
-	if _, ok := d.distributedQueryCampaigns[camp.ID]; !ok {
+	if _, ok := d.DistributedQueryCampaigns[camp.ID]; !ok {
 		return notFound("DistributedQueryCampaign").WithID(camp.ID)
 	}
 
-	d.distributedQueryCampaigns[camp.ID] = *camp
+	d.DistributedQueryCampaigns[camp.ID] = *camp
 	return nil
 }
 
@@ -47,7 +47,7 @@ func (d *Datastore) DistributedQueryCampaignTargetIDs(id uint) (hostIDs []uint, 
 
 	hostIDs = []uint{}
 	labelIDs = []uint{}
-	for _, target := range d.distributedQueryCampaignTargets {
+	for _, target := range d.DistributedQueryCampaignTargets {
 		if target.DistributedQueryCampaignID == id {
 			if target.Type == kolide.TargetHost {
 				hostIDs = append(hostIDs, target.TargetID)
@@ -67,7 +67,7 @@ func (d *Datastore) NewDistributedQueryCampaignTarget(target *kolide.Distributed
 	defer d.mtx.Unlock()
 
 	target.ID = d.nextID(target)
-	d.distributedQueryCampaignTargets[target.ID] = *target
+	d.DistributedQueryCampaignTargets[target.ID] = *target
 
 	return target, nil
 }
@@ -76,15 +76,15 @@ func (d *Datastore) NewDistributedQueryExecution(exec *kolide.DistributedQueryEx
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
-	for _, e := range d.distributedQueryExecutions {
+	for _, e := range d.DistributedQueryExecutions {
 		if exec.HostID == e.HostID && exec.DistributedQueryCampaignID == e.DistributedQueryCampaignID {
-			fmt.Printf("%+v -- %+v\n", exec, d.distributedQueryExecutions)
+			fmt.Printf("%+v -- %+v\n", exec, d.DistributedQueryExecutions)
 			return exec, alreadyExists("DistributedQueryExecution", exec.HostID)
 		}
 	}
 
 	exec.ID = d.nextID(exec)
-	d.distributedQueryExecutions[exec.ID] = *exec
+	d.DistributedQueryExecutions[exec.ID] = *exec
 
 	return exec, nil
 }
@@ -94,20 +94,20 @@ func (d *Datastore) CleanupDistributedQueryCampaigns(now time.Time) (expired uin
 	defer d.mtx.Unlock()
 
 	// First expire old waiting and running campaigns
-	for id, c := range d.distributedQueryCampaigns {
+	for id, c := range d.DistributedQueryCampaigns {
 		if (c.Status == kolide.QueryWaiting && c.CreatedAt.Before(now.Add(-1*time.Minute))) ||
 			(c.Status == kolide.QueryRunning && c.CreatedAt.Before(now.Add(-24*time.Hour))) {
 			c.Status = kolide.QueryComplete
-			d.distributedQueryCampaigns[id] = c
+			d.DistributedQueryCampaigns[id] = c
 			expired++
 		}
 	}
 
 	// Now delete executions for expired campaigns
-	for id, e := range d.distributedQueryExecutions {
-		c, ok := d.distributedQueryCampaigns[e.DistributedQueryCampaignID]
+	for id, e := range d.DistributedQueryExecutions {
+		c, ok := d.DistributedQueryCampaigns[e.DistributedQueryCampaignID]
 		if !ok || c.Status == kolide.QueryComplete {
-			delete(d.distributedQueryExecutions, id)
+			delete(d.DistributedQueryExecutions, id)
 			deleted++
 		}
 	}

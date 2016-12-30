@@ -69,10 +69,6 @@ func (i *Invite) EntityID() uint {
 	return i.ID
 }
 
-func (i *Invite) EntityType() string {
-	return "invites"
-}
-
 // InviteMailer is used to build an email template for the invite email.
 type InviteMailer struct {
 	*Invite

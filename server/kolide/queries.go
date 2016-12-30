@@ -34,7 +34,6 @@ type QueryService interface {
 	GetQuery(ctx context.Context, id uint) (*Query, error)
 	NewQuery(ctx context.Context, p QueryPayload) (*Query, error)
 	ModifyQuery(ctx context.Context, id uint, p QueryPayload) (*Query, error)
-	DeleteQuery(ctx context.Context, id uint) error
 	// DeleteQueries (soft) deletes the existing query objects with the
 	// provided IDs. The number of deleted queries is returned along with
 	// any error.
@@ -62,6 +61,10 @@ type Query struct {
 	// Packs is loaded when retrieving queries, but is stored in a join
 	// table in the MySQL backend.
 	Packs []Pack `json:"packs" db:"-"`
+}
+
+func (q *Query) EntityID() uint {
+	return q.ID
 }
 
 type DecoratorType int

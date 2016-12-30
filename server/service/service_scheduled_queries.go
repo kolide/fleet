@@ -20,7 +20,3 @@ func (svc service) ScheduleQuery(ctx context.Context, sq *kolide.ScheduledQuery)
 func (svc service) ModifyScheduledQuery(ctx context.Context, sq *kolide.ScheduledQuery) (*kolide.ScheduledQuery, error) {
 	return svc.ds.SaveScheduledQuery(sq)
 }
-
-func (svc service) DeleteScheduledQuery(ctx context.Context, id uint) error {
-	return svc.ds.DeleteScheduledQuery(id)
-}

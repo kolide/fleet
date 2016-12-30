@@ -204,7 +204,7 @@ func (d *Datastore) SearchHosts(query string, omit ...uint) ([]*kolide.Host, err
 func (d *Datastore) DistributedQueriesForHost(host *kolide.Host) (map[uint]string, error) {
 	// lookup of executions for this host
 	hostExecutions := map[uint]kolide.DistributedQueryExecutionStatus{}
-	for _, e := range d.distributedQueryExecutions {
+	for _, e := range d.DistributedQueryExecutions {
 		if e.HostID == host.ID {
 			hostExecutions[e.DistributedQueryCampaignID] = e.Status
 		}
@@ -221,11 +221,11 @@ func (d *Datastore) DistributedQueriesForHost(host *kolide.Host) (map[uint]strin
 	}
 
 	queries := map[uint]string{} // map campaign ID -> query string
-	for _, campaign := range d.distributedQueryCampaigns {
+	for _, campaign := range d.DistributedQueryCampaigns {
 		if campaign.Status != kolide.QueryRunning {
 			continue
 		}
-		for _, target := range d.distributedQueryCampaignTargets {
+		for _, target := range d.DistributedQueryCampaignTargets {
 			if campaign.ID == target.DistributedQueryCampaignID &&
 				((target.Type == kolide.TargetHost && target.TargetID == host.ID) ||
 					(target.Type == kolide.TargetLabel && hostLabels[target.TargetID])) &&

@@ -10,6 +10,7 @@ import (
 	"github.com/kolide/kolide-ose/server/test"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/net/context"
 )
 
 var enrollTests = []struct {
@@ -108,8 +109,7 @@ func testSaveHosts(t *testing.T, ds kolide.Datastore) {
 	require.NotNil(t, host)
 	assert.Nil(t, host.PrimaryNetworkInterfaceID)
 
-	e := &entity{"hosts", host.ID}
-	err = ds.Delete(e)
+	err = ds.Delete(context.Background(), host)
 	assert.Nil(t, err)
 
 	host, err = ds.Host(host.ID)
@@ -127,8 +127,7 @@ func testDeleteHost(t *testing.T, ds kolide.Datastore) {
 	require.Nil(t, err)
 	require.NotNil(t, host)
 
-	e := &entity{"hosts", host.ID}
-	err = ds.Delete(e)
+	err = ds.Delete(context.Background(), host)
 	assert.Nil(t, err)
 
 	host, err = ds.Host(host.ID)
@@ -185,8 +184,7 @@ func testListHost(t *testing.T, ds kolide.Datastore) {
 	assert.Equal(t, "en1", hosts2[1].NetworkInterfaces[1].Interface)
 	assert.Equal(t, "en2", hosts2[3].NetworkInterfaces[0].Interface)
 
-	e := &entity{"hosts", hosts[0].ID}
-	err = ds.Delete(e)
+	err = ds.Delete(context.Background(), hosts[0])
 	require.Nil(t, err)
 	hosts2, err = ds.ListHosts(kolide.ListOptions{})
 	require.Nil(t, err)

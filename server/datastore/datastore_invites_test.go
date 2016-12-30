@@ -1,6 +1,7 @@
 package datastore
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"testing"
@@ -96,7 +97,7 @@ func testDeleteInvite(t *testing.T, ds kolide.Datastore) {
 	assert.Nil(t, err)
 	assert.NotNil(t, invite)
 
-	err = ds.Delete(invite)
+	err = ds.Delete(context.Background(), invite)
 	assert.Nil(t, err)
 
 	invite, err = ds.InviteByEmail("user0@foo.com")

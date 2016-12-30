@@ -33,7 +33,7 @@ func (d *Datastore) ListLabelsForHost(hid uint) ([]kolide.Label, error) {
 	resLabels := []kolide.Label{}
 
 	d.mtx.Lock()
-	for _, lqe := range d.labelQueryExecutions {
+	for _, lqe := range d.LabelQueryExecutions {
 		if lqe.HostID == hid && lqe.Matches {
 			if label := d.Labels[lqe.LabelID]; label != nil {
 				resLabels = append(resLabels, *label)
@@ -50,7 +50,7 @@ func (d *Datastore) LabelQueriesForHost(host *kolide.Host, cutoff time.Time) (ma
 	execedIDs := map[uint]bool{}
 
 	d.mtx.Lock()
-	for _, lqe := range d.labelQueryExecutions {
+	for _, lqe := range d.LabelQueryExecutions {
 		if lqe.HostID == host.ID && (lqe.UpdatedAt == cutoff || lqe.UpdatedAt.After(cutoff)) {
 			execedIDs[lqe.LabelID] = true
 		}
@@ -94,7 +94,7 @@ func (d *Datastore) RecordLabelQueryExecutions(host *kolide.Host, results map[st
 
 		updated := false
 		d.mtx.Lock()
-		for _, lqe := range d.labelQueryExecutions {
+		for _, lqe := range d.LabelQueryExecutions {
 			if lqe.LabelID == label.ID && lqe.HostID == host.ID {
 				// Update existing execution values
 				lqe.UpdatedAt = t
@@ -113,7 +113,7 @@ func (d *Datastore) RecordLabelQueryExecutions(host *kolide.Host, results map[st
 				Matches:   matches,
 			}
 			lqe.ID = d.nextID(lqe)
-			d.labelQueryExecutions[lqe.ID] = &lqe
+			d.LabelQueryExecutions[lqe.ID] = &lqe
 		}
 		d.mtx.Unlock()
 	}
@@ -201,7 +201,7 @@ func (d *Datastore) ListHostsInLabel(lid uint) ([]kolide.Host, error) {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
-	for _, lqe := range d.labelQueryExecutions {
+	for _, lqe := range d.LabelQueryExecutions {
 		if lqe.LabelID == lid && lqe.Matches {
 			hosts = append(hosts, *d.Hosts[lqe.HostID])
 		}
@@ -223,7 +223,7 @@ func (d *Datastore) ListUniqueHostsInLabels(labels []uint) ([]kolide.Host, error
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
-	for _, lqe := range d.labelQueryExecutions {
+	for _, lqe := range d.LabelQueryExecutions {
 		if labelSet[lqe.LabelID] && lqe.Matches {
 			if !hostSet[lqe.HostID] {
 				hosts = append(hosts, *d.Hosts[lqe.HostID])

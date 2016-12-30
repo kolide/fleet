@@ -18,21 +18,21 @@ type Datastore struct {
 	mtx     sync.RWMutex
 	nextIDs map[interface{}]uint
 
-	users                           map[uint]*kolide.User
-	sessions                        map[uint]*kolide.Session
-	passwordResets                  map[uint]*kolide.PasswordResetRequest
+	Users                           map[uint]*kolide.User
+	Sessions                        map[uint]*kolide.Session
+	PasswordResets                  map[uint]*kolide.PasswordResetRequest
 	Invites                         map[uint]*kolide.Invite
 	Labels                          map[uint]*kolide.Label
-	labelQueryExecutions            map[uint]*kolide.LabelQueryExecution
+	LabelQueryExecutions            map[uint]*kolide.LabelQueryExecution
 	Queries                         map[uint]*kolide.Query
 	Packs                           map[uint]*kolide.Pack
 	Hosts                           map[uint]*kolide.Host
-	scheduledQueries                map[uint]*kolide.ScheduledQuery
-	packTargets                     map[uint]*kolide.PackTarget
-	distributedQueryExecutions      map[uint]kolide.DistributedQueryExecution
-	distributedQueryCampaigns       map[uint]kolide.DistributedQueryCampaign
-	distributedQueryCampaignTargets map[uint]kolide.DistributedQueryCampaignTarget
-	options                         map[uint]*kolide.Option
+	ScheduledQueries                map[uint]*kolide.ScheduledQuery
+	PackTargets                     map[uint]*kolide.PackTarget
+	DistributedQueryExecutions      map[uint]kolide.DistributedQueryExecution
+	DistributedQueryCampaigns       map[uint]kolide.DistributedQueryCampaign
+	DistributedQueryCampaignTargets map[uint]kolide.DistributedQueryCampaignTarget
+	Options                         map[uint]*kolide.Option
 	appConfig                       *kolide.AppConfig
 	config                          *config.KolideConfig
 }
@@ -73,21 +73,21 @@ func (d *Datastore) Migrate() error {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 	d.nextIDs = make(map[interface{}]uint)
-	d.users = make(map[uint]*kolide.User)
-	d.sessions = make(map[uint]*kolide.Session)
-	d.passwordResets = make(map[uint]*kolide.PasswordResetRequest)
+	d.Users = make(map[uint]*kolide.User)
+	d.Sessions = make(map[uint]*kolide.Session)
+	d.PasswordResets = make(map[uint]*kolide.PasswordResetRequest)
 	d.Invites = make(map[uint]*kolide.Invite)
 	d.Labels = make(map[uint]*kolide.Label)
-	d.labelQueryExecutions = make(map[uint]*kolide.LabelQueryExecution)
+	d.LabelQueryExecutions = make(map[uint]*kolide.LabelQueryExecution)
 	d.Queries = make(map[uint]*kolide.Query)
 	d.Packs = make(map[uint]*kolide.Pack)
 	d.Hosts = make(map[uint]*kolide.Host)
-	d.scheduledQueries = make(map[uint]*kolide.ScheduledQuery)
-	d.packTargets = make(map[uint]*kolide.PackTarget)
-	d.distributedQueryExecutions = make(map[uint]kolide.DistributedQueryExecution)
-	d.distributedQueryCampaigns = make(map[uint]kolide.DistributedQueryCampaign)
-	d.distributedQueryCampaignTargets = make(map[uint]kolide.DistributedQueryCampaignTarget)
-	d.options = make(map[uint]*kolide.Option)
+	d.ScheduledQueries = make(map[uint]*kolide.ScheduledQuery)
+	d.PackTargets = make(map[uint]*kolide.PackTarget)
+	d.DistributedQueryExecutions = make(map[uint]kolide.DistributedQueryExecution)
+	d.DistributedQueryCampaigns = make(map[uint]kolide.DistributedQueryCampaign)
+	d.DistributedQueryCampaignTargets = make(map[uint]kolide.DistributedQueryCampaignTarget)
+	d.Options = make(map[uint]*kolide.Option)
 
 	for _, initData := range appstate.Options {
 		opt := kolide.Option{
@@ -97,7 +97,7 @@ func (d *Datastore) Migrate() error {
 			ReadOnly: initData.ReadOnly,
 		}
 		opt.ID = d.nextID(opt)
-		d.options[opt.ID] = &opt
+		d.Options[opt.ID] = &opt
 	}
 
 	d.appConfig = &kolide.AppConfig{

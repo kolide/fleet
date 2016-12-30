@@ -98,6 +98,10 @@ func (h *Host) ResetPrimaryNetwork() bool {
 
 }
 
+func (h *Host) EntityID() uint {
+	return h.ID
+}
+
 // RandomText returns a stdEncoded string of
 // just what it says
 func RandomText(keySize int) (string, error) {

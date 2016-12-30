@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/gorilla/mux"
+	"github.com/kolide/kolide-ose/server/kolide"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -73,11 +74,12 @@ func TestDecodeModifyScheduledQueryRequest(t *testing.T) {
 func TestDecodeDeleteScheduledQueryRequest(t *testing.T) {
 	router := mux.NewRouter()
 	router.HandleFunc("/api/v1/kolide/scheduled/{id}", func(writer http.ResponseWriter, request *http.Request) {
-		r, err := decodeDeleteScheduledQueryRequest(context.Background(), request)
+		r, err := decodeDeleteEntityRequest(&kolide.ScheduledQuery{})(context.Background(), request)
 		assert.Nil(t, err)
 
-		params := r.(deleteScheduledQueryRequest)
+		params := r.(deleteEntityRequest)
 		assert.Equal(t, uint(1), params.ID)
+		assert.Equal(t, kolide.DBTable(&kolide.ScheduledQuery{}), params.EntityType())
 	}).Methods("DELETE")
 
 	router.ServeHTTP(

@@ -44,6 +44,10 @@ type Pack struct {
 	Disabled    bool   `json:"disabled"`
 }
 
+func (p *Pack) EntityID() uint {
+	return p.ID
+}
+
 type PackPayload struct {
 	Name        *string
 	Description *string

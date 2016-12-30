@@ -67,7 +67,7 @@ func (d *Datastore) DeleteQueries(ids []uint) (uint, error) {
 }
 
 func (d *Datastore) getUserNameByID(id uint) string {
-	if u, ok := d.users[id]; ok {
+	if u, ok := d.Users[id]; ok {
 		return u.Name
 	}
 	return ""
@@ -145,7 +145,7 @@ func (d *Datastore) ListQueries(opt kolide.ListOptions) ([]*kolide.Query, error)
 func (d *Datastore) loadPacksForQueries(queries []*kolide.Query) error {
 	for _, q := range queries {
 		q.Packs = make([]kolide.Pack, 0)
-		for _, sq := range d.scheduledQueries {
+		for _, sq := range d.ScheduledQueries {
 			if sq.QueryID == q.ID {
 				q.Packs = append(q.Packs, *d.Packs[sq.PackID])
 			}

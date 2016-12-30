@@ -98,7 +98,7 @@ func (d *Datastore) InviteByToken(token string) (*kolide.Invite, error) {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
-	for _, invite := range d.invites {
+	for _, invite := range d.Invites {
 		if invite.Token == token {
 			return invite, nil
 		}

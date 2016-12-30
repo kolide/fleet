@@ -118,8 +118,7 @@ func TestDeletePack(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotZero(t, pack.ID)
 
-	e := &entity{"packs", pack.ID}
-	err = svc.Delete(ctx, e)
+	err = svc.Delete(ctx, pack)
 	assert.Nil(t, err)
 
 	queries, err := ds.ListPacks(kolide.ListOptions{})

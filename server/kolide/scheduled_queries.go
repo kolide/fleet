@@ -7,7 +7,6 @@ import (
 type ScheduledQueryStore interface {
 	NewScheduledQuery(sq *ScheduledQuery) (*ScheduledQuery, error)
 	SaveScheduledQuery(sq *ScheduledQuery) (*ScheduledQuery, error)
-	DeleteScheduledQuery(id uint) error
 	ScheduledQuery(id uint) (*ScheduledQuery, error)
 	ListScheduledQueriesInPack(id uint, opts ListOptions) ([]*ScheduledQuery, error)
 }
@@ -16,7 +15,6 @@ type ScheduledQueryService interface {
 	GetScheduledQuery(ctx context.Context, id uint) (*ScheduledQuery, error)
 	GetScheduledQueriesInPack(ctx context.Context, id uint, opts ListOptions) ([]*ScheduledQuery, error)
 	ScheduleQuery(ctx context.Context, sq *ScheduledQuery) (*ScheduledQuery, error)
-	DeleteScheduledQuery(ctx context.Context, id uint) error
 	ModifyScheduledQuery(ctx context.Context, sq *ScheduledQuery) (*ScheduledQuery, error)
 }
 
@@ -34,4 +32,8 @@ type ScheduledQuery struct {
 	Platform *string `json:"platform"`
 	Version  *string `json:"version"`
 	Shard    *uint   `json:"shard"`
+}
+
+func (s *ScheduledQuery) EntityID() uint {
+	return s.ID
 }
