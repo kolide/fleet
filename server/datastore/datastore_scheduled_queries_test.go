@@ -7,7 +7,6 @@ import (
 	"github.com/kolide/kolide-ose/server/test"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/net/context"
 )
 
 func testNewScheduledQuery(t *testing.T, ds kolide.Datastore) {
@@ -45,7 +44,7 @@ func testDeleteScheduledQuery(t *testing.T, ds kolide.Datastore) {
 	require.Nil(t, err)
 	assert.Equal(t, uint(60), query.Interval)
 
-	err = ds.Delete(context.Background(), sq1)
+	err = ds.Delete(sq1)
 	require.Nil(t, err)
 
 	_, err = ds.ScheduledQuery(sq1.ID)

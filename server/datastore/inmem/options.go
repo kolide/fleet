@@ -77,7 +77,7 @@ func (d *Datastore) GetOsqueryConfigOptions() (map[string]interface{}, error) {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 	optConfig := map[string]interface{}{}
-	for _, opt := range d.options {
+	for _, opt := range d.Options {
 		if opt.OptionSet() {
 			optConfig[opt.Name] = opt.GetValue()
 		}

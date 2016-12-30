@@ -10,6 +10,8 @@ type Entity interface {
 // DBTable returns a database table which stores an entity.
 func DBTable(e Entity) string {
 	switch entity := e.(type) {
+	case *User:
+		return "users"
 	case *Query:
 		return "queries"
 	case *Host:

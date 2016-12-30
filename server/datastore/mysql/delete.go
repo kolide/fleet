@@ -5,11 +5,10 @@ import (
 
 	"github.com/kolide/kolide-ose/server/kolide"
 	"github.com/pkg/errors"
-	"golang.org/x/net/context"
 )
 
 // Delete updates a DB entity to mark it as deleted.
-func (d *Datastore) Delete(ctx context.Context, e kolide.Entity) error {
+func (d *Datastore) Delete(e kolide.Entity) error {
 	dbTable := kolide.DBTable(e)
 	deleteStmt := fmt.Sprintf(
 		`

@@ -71,12 +71,11 @@ func (d *Datastore) ListInvites(opt kolide.ListOptions) ([]*kolide.Invite, error
 }
 
 func (d *Datastore) Invite(id uint) (*kolide.Invite, error) {
-	d.mtx.Lock()
-	defer d.mtx.Unlock()
-	if invite, ok := d.Invites[id]; ok {
-		return invite, nil
+	i, err := d.byID(&kolide.Invite{ID: id})
+	if err != nil {
+		return nil, err
 	}
-	return nil, alreadyExists("Invite", id)
+	return i.(*kolide.Invite), nil
 }
 
 // InviteByEmail retrieves an invite for a specific email address.

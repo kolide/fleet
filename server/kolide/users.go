@@ -73,6 +73,10 @@ type User struct {
 	Position                 string `json:"position,omitempty"` // job role
 }
 
+func (u *User) EntityID() uint {
+	return u.ID
+}
+
 // UserPayload is used to modify an existing user
 type UserPayload struct {
 	Username                 *string `json:"username"`

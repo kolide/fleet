@@ -93,14 +93,11 @@ func (d *Datastore) UserByEmail(email string) (*kolide.User, error) {
 }
 
 func (d *Datastore) UserByID(id uint) (*kolide.User, error) {
-	d.mtx.Lock()
-	defer d.mtx.Unlock()
-
-	if user, ok := d.Users[id]; ok {
-		return user, nil
+	u, err := d.byID(&kolide.User{ID: id})
+	if err != nil {
+		return nil, err
 	}
-
-	return nil, notFound("User").WithID(id)
+	return u.(*kolide.User), nil
 }
 
 func (d *Datastore) SaveUser(user *kolide.User) error {

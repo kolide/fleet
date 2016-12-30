@@ -9,7 +9,6 @@ import (
 	"github.com/kolide/kolide-ose/server/test"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/net/context"
 )
 
 func testDeletePack(t *testing.T, ds kolide.Datastore) {
@@ -20,7 +19,7 @@ func testDeletePack(t *testing.T, ds kolide.Datastore) {
 	assert.Nil(t, err)
 	assert.NotEqual(t, uint(0), pack.ID)
 
-	err = ds.Delete(context.Background(), pack)
+	err = ds.Delete(pack)
 	require.Nil(t, err)
 
 	assert.NotEqual(t, uint(0), pack.ID)

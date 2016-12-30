@@ -6,5 +6,5 @@ import (
 )
 
 func (svc service) Delete(ctx context.Context, entity kolide.Entity) error {
-	return svc.ds.Delete(ctx, entity)
+	return svc.ds.Delete(entity)
 }

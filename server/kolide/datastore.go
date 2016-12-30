@@ -14,11 +14,10 @@ type Datastore interface {
 	InviteStore
 	ScheduledQueryStore
 	OptionStore
+	Delete(entity Entity) error
 	Name() string
 	Drop() error
 	Migrate() error
-
-	Deleter
 }
 
 // NotFoundError is returned when the datastore resource cannot be found.

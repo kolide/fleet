@@ -9,7 +9,6 @@ import (
 	"github.com/patrickmn/sortutil"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/net/context"
 )
 
 func testDeleteQuery(t *testing.T, ds kolide.Datastore) {
@@ -25,7 +24,7 @@ func testDeleteQuery(t *testing.T, ds kolide.Datastore) {
 	require.NotNil(t, query)
 	assert.NotEqual(t, query.ID, 0)
 
-	err = ds.Delete(context.Background(), query)
+	err = ds.Delete(query)
 	require.Nil(t, err)
 
 	assert.NotEqual(t, query.ID, 0)

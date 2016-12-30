@@ -46,15 +46,11 @@ func (d *Datastore) SaveHost(host *kolide.Host) error {
 }
 
 func (d *Datastore) Host(id uint) (*kolide.Host, error) {
-	d.mtx.Lock()
-	defer d.mtx.Unlock()
-
-	host, ok := d.Hosts[id]
-	if !ok {
-		return nil, notFound("Host").WithID(id)
+	h, err := d.byID(&kolide.Host{ID: id})
+	if err != nil {
+		return nil, err
 	}
-
-	return host, nil
+	return h.(*kolide.Host), nil
 }
 
 func (d *Datastore) ListHosts(opt kolide.ListOptions) ([]*kolide.Host, error) {

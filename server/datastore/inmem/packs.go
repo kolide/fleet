@@ -38,14 +38,11 @@ func (d *Datastore) SavePack(pack *kolide.Pack) error {
 }
 
 func (d *Datastore) Pack(id uint) (*kolide.Pack, error) {
-	d.mtx.Lock()
-	pack, ok := d.Packs[id]
-	d.mtx.Unlock()
-	if !ok {
-		return nil, notFound("Pack").WithID(id)
+	p, err := d.byID(&kolide.Pack{ID: id})
+	if err != nil {
+		return nil, err
 	}
-
-	return pack, nil
+	return p.(*kolide.Pack), nil
 }
 
 func (d *Datastore) ListPacks(opt kolide.ListOptions) ([]*kolide.Pack, error) {
