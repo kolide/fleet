@@ -117,10 +117,10 @@ func TestModifyPack(t *testing.T) {
 	assert.NotZero(t, pack.ID)
 
 	newName := "bar"
-	newLabelIDs := []uint{label.ID}
+	labelIDs := []uint{label.ID}
 	packVerify, err := svc.ModifyPack(ctx, pack.ID, kolide.PackPayload{
 		Name:     &newName,
-		LabelIDs: &newLabelIDs,
+		LabelIDs: &labelIDs,
 	})
 	assert.Nil(t, err)
 
@@ -131,6 +131,18 @@ func TestModifyPack(t *testing.T) {
 	assert.Nil(t, err)
 	require.Len(t, labels, 1)
 	assert.Equal(t, label.ID, labels[0].ID)
+
+	newLabelIDs := []uint{}
+	packVerify2, err := svc.ModifyPack(ctx, pack.ID, kolide.PackPayload{
+		LabelIDs: &newLabelIDs,
+	})
+	assert.Nil(t, err)
+
+	assert.Equal(t, pack.ID, packVerify2.ID)
+
+	labels, err = ds.ListLabelsForPack(pack.ID)
+	assert.Nil(t, err)
+	require.Len(t, labels, 0)
 }
 
 func TestDeletePack(t *testing.T) {
@@ -155,5 +167,4 @@ func TestDeletePack(t *testing.T) {
 	queries, err := ds.ListPacks(kolide.ListOptions{})
 	assert.Nil(t, err)
 	assert.Len(t, queries, 0)
-
 }
