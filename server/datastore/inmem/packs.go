@@ -97,6 +97,13 @@ func (d *Datastore) ListPacks(opt kolide.ListOptions) ([]*kolide.Pack, error) {
 }
 
 func (d *Datastore) AddLabelToPack(lid, pid uint) error {
+	d.mtx.Lock()
+	for _, pt := range d.packTargets {
+		if pt.PackID == pid && pt.Target.Type == kolide.TargetLabel && pt.Target.TargetID == lid {
+			d.mtx.Unlock()
+			return nil
+		}
+	}
 	pt := &kolide.PackTarget{
 		PackID: pid,
 		Target: kolide.Target{
@@ -104,8 +111,6 @@ func (d *Datastore) AddLabelToPack(lid, pid uint) error {
 			TargetID: lid,
 		},
 	}
-
-	d.mtx.Lock()
 	pt.ID = d.nextID(pt)
 	d.packTargets[pt.ID] = pt
 	d.mtx.Unlock()
@@ -114,6 +119,13 @@ func (d *Datastore) AddLabelToPack(lid, pid uint) error {
 }
 
 func (d *Datastore) AddHostToPack(hid, pid uint) error {
+	d.mtx.Lock()
+	for _, pt := range d.packTargets {
+		if pt.PackID == pid && pt.Target.Type == kolide.TargetHost && pt.Target.TargetID == hid {
+			d.mtx.Unlock()
+			return nil
+		}
+	}
 	pt := &kolide.PackTarget{
 		PackID: pid,
 		Target: kolide.Target{
@@ -121,8 +133,6 @@ func (d *Datastore) AddHostToPack(hid, pid uint) error {
 			TargetID: hid,
 		},
 	}
-
-	d.mtx.Lock()
 	pt.ID = d.nextID(pt)
 	d.packTargets[pt.ID] = pt
 	d.mtx.Unlock()
@@ -131,9 +141,8 @@ func (d *Datastore) AddHostToPack(hid, pid uint) error {
 }
 
 func (d *Datastore) ListLabelsForPack(pid uint) ([]*kolide.Label, error) {
-	var labels []*kolide.Label
-
 	d.mtx.Lock()
+	var labels []*kolide.Label
 	for _, pt := range d.packTargets {
 		if pt.Type == kolide.TargetLabel && pt.PackID == pid {
 			labels = append(labels, d.labels[pt.TargetID])

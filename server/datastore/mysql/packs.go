@@ -82,6 +82,7 @@ func (d *Datastore) AddLabelToPack(lid uint, pid uint) error {
 	sql := `
 		INSERT INTO pack_targets ( pack_id,	type, target_id )
 			VALUES ( ?, ?, ? )
+			ON DUPLICATE KEY UPDATE id=id
 	`
 	_, err := d.db.Exec(sql, pid, kolide.TargetLabel, lid)
 	if err != nil {
@@ -96,6 +97,7 @@ func (d *Datastore) AddHostToPack(hid, pid uint) error {
 	sql := `
 		INSERT INTO pack_targets ( pack_id, type, target_id )
 			VALUES ( ?, ?, ? )
+			ON DUPLICATE KEY UPDATE id=id
 	`
 	_, err := d.db.Exec(sql, pid, kolide.TargetHost, hid)
 	if err != nil {

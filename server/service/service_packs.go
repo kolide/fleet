@@ -97,7 +97,6 @@ func (svc service) ModifyPack(ctx context.Context, id uint, p kolide.PackPayload
 		for _, hostID := range *p.HostIDs {
 			err = svc.AddHostToPack(ctx, hostID, pack.ID)
 			if err != nil {
-				// check to see if it's already there
 				return nil, err
 			}
 		}
@@ -107,7 +106,6 @@ func (svc service) ModifyPack(ctx context.Context, id uint, p kolide.PackPayload
 		for _, labelID := range *p.LabelIDs {
 			err = svc.AddLabelToPack(ctx, labelID, pack.ID)
 			if err != nil {
-				// check to see if it's already there
 				return nil, err
 			}
 		}
