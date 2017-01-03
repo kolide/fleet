@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/WatchBeam/clock"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"github.com/patrickmn/sortutil"
 )
@@ -114,8 +115,23 @@ func (d *Datastore) ListHosts(opt kolide.ListOptions) ([]*kolide.Host, error) {
 	return hosts, nil
 }
 
-func (d *Datastore) GenerateHostStatusStatistics() (online, offline, mia uint, err error) {
-	return 0, 0, 0, nil
+func (d *Datastore) GenerateHostStatusStatistics(c clock.Clock) (online, offline, mia uint, err error) {
+	d.mtx.Lock()
+	defer d.mtx.Unlock()
+
+	for _, host := range d.hosts {
+		status := host.Status(c)
+		switch status {
+		case kolide.StatusMIA:
+			mia++
+		case kolide.StatusOffline:
+			offline++
+		default:
+			online++
+		}
+	}
+
+	return online, offline, mia, nil
 }
 
 func (d *Datastore) EnrollHost(osQueryHostID string, nodeKeySize int) (*kolide.Host, error) {

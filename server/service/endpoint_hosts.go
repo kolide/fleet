@@ -1,26 +1,9 @@
 package service
 
 import (
-	"time"
-
 	"github.com/go-kit/kit/endpoint"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"golang.org/x/net/context"
-)
-
-const (
-	// StatusOnline host is active
-	StatusOnline string = "online"
-	// StatusOffline no communication with host for OfflineDuration
-	StatusOffline string = "offline"
-	// StatusMIA no communition with host for MIADuration
-	StatusMIA string = "mia"
-	// OfflineDuration if a host hasn't been in communition for this
-	// period it is considered offline
-	OfflineDuration time.Duration = 30 * time.Minute
-	// OfflineDuration if a host hasn't been in communition for this
-	// period it is considered MIA
-	MIADuration time.Duration = 30 * 24 * time.Hour
 )
 
 type hostResponse struct {
@@ -50,7 +33,13 @@ func makeGetHostEndpoint(svc kolide.Service) endpoint.Endpoint {
 		if err != nil {
 			return getHostResponse{Err: err}, nil
 		}
-		return getHostResponse{&hostResponse{*host, svc.HostStatus(ctx, *host)}, nil}, nil
+		return getHostResponse{
+			&hostResponse{
+				Host:   *host,
+				Status: host.Status(svc.Clock()),
+			},
+			nil,
+		}, nil
 	}
 }
 
@@ -79,7 +68,13 @@ func makeListHostsEndpoint(svc kolide.Service) endpoint.Endpoint {
 
 		resp := listHostsResponse{Hosts: []hostResponse{}}
 		for _, host := range hosts {
-			resp.Hosts = append(resp.Hosts, hostResponse{*host, svc.HostStatus(ctx, *host)})
+			resp.Hosts = append(
+				resp.Hosts,
+				hostResponse{
+					Host:   *host,
+					Status: host.Status(svc.Clock()),
+				},
+			)
 		}
 		return resp, nil
 	}

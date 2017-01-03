@@ -13,19 +13,8 @@ func (svc service) GetHost(ctx context.Context, id uint) (*kolide.Host, error) {
 	return svc.ds.Host(id)
 }
 
-func (svc service) HostStatus(ctx context.Context, host kolide.Host) string {
-	switch {
-	case host.UpdatedAt.Add(MIADuration).Before(svc.clock.Now()):
-		return StatusMIA
-	case host.UpdatedAt.Add(OfflineDuration).Before(svc.clock.Now()):
-		return StatusOffline
-	default:
-		return StatusOnline
-	}
-}
-
 func (svc service) GetHostSummary(ctx context.Context) (*kolide.HostSummary, error) {
-	online, offline, mia, err := svc.ds.GenerateHostStatusStatistics()
+	online, offline, mia, err := svc.ds.GenerateHostStatusStatistics(svc.clock)
 	if err != nil {
 		return nil, err
 	}

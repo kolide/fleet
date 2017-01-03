@@ -5,7 +5,23 @@ import (
 	"encoding/base64"
 	"time"
 
+	"github.com/WatchBeam/clock"
 	"golang.org/x/net/context"
+)
+
+const (
+	// StatusOnline host is active
+	StatusOnline string = "online"
+	// StatusOffline no communication with host for OfflineDuration
+	StatusOffline string = "offline"
+	// StatusMIA no communition with host for MIADuration
+	StatusMIA string = "mia"
+	// OfflineDuration if a host hasn't been in communition for this
+	// period it is considered offline
+	OfflineDuration time.Duration = 30 * time.Minute
+	// OfflineDuration if a host hasn't been in communition for this
+	// period it is considered MIA
+	MIADuration time.Duration = 30 * 24 * time.Hour
 )
 
 type HostStore interface {
@@ -17,7 +33,7 @@ type HostStore interface {
 	EnrollHost(osqueryHostId string, nodeKeySize int) (*Host, error)
 	AuthenticateHost(nodeKey string) (*Host, error)
 	MarkHostSeen(host *Host, t time.Time) error
-	GenerateHostStatusStatistics() (online, offline, mia uint, err error)
+	GenerateHostStatusStatistics(c clock.Clock) (online, offline, mia uint, err error)
 	SearchHosts(query string, omit ...uint) ([]*Host, error)
 	// DistributedQueriesForHost retrieves the distributed queries that the
 	// given host should run. The result map is a mapping from campaign ID
@@ -29,7 +45,6 @@ type HostService interface {
 	ListHosts(ctx context.Context, opt ListOptions) ([]*Host, error)
 	GetHost(ctx context.Context, id uint) (*Host, error)
 	GetHostSummary(ctx context.Context) (*HostSummary, error)
-	HostStatus(ctx context.Context, host Host) string
 	DeleteHost(ctx context.Context, id uint) error
 }
 
@@ -118,4 +133,15 @@ func RandomText(keySize int) (string, error) {
 	}
 
 	return base64.StdEncoding.EncodeToString(key), nil
+}
+
+func (h *Host) Status(c clock.Clock) string {
+	switch {
+	case h.UpdatedAt.Add(MIADuration).Before(c.Now()):
+		return StatusMIA
+	case h.UpdatedAt.Add(OfflineDuration).Before(c.Now()):
+		return StatusOffline
+	default:
+		return StatusOnline
+	}
 }

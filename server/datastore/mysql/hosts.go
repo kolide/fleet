@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/WatchBeam/clock"
 	"github.com/jmoiron/sqlx"
 	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
@@ -281,7 +282,7 @@ func (d *Datastore) ListHosts(opt kolide.ListOptions) ([]*kolide.Host, error) {
 	return hosts, nil
 }
 
-func (d *Datastore) GenerateHostStatusStatistics() (online, offline, mia uint, err error) {
+func (d *Datastore) GenerateHostStatusStatistics(c clock.Clock) (online, offline, mia uint, err error) {
 	return 0, 0, 0, nil
 }
 
