@@ -1,6 +1,5 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { join, map } from 'lodash';
 import { push } from 'react-router-redux';
 
 import AuthenticationFormWrapper from 'components/AuthenticationFormWrapper';
@@ -24,6 +23,15 @@ class ConfirmInvitePage extends Component {
       base: PropTypes.string,
     }),
   };
+
+  componentWillUnmount () {
+    const { dispatch } = this.props;
+    const { clearErrors } = userActions;
+
+    dispatch(clearErrors);
+
+    return false;
+  }
 
   onSubmit = (formData) => {
     const { create } = userActions;
