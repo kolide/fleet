@@ -93,24 +93,27 @@ func (d *Datastore) Initialize() error {
 
 // Drop removes database
 func (d *Datastore) Drop() error {
-	goose.SetDialect("mysql")
+	tables := []struct {
+		Name string `db:"TABLE_NAME"`
+	}{}
 
-	for {
-		version, err := goose.EnsureDBVersion(d.db.DB)
-		if err != nil {
-			return err
-		}
+	sql := `
+		SELECT TABLE_NAME
+		FROM INFORMATION_SCHEMA.TABLES
+		WHERE TABLE_SCHEMA = 'kolide';
+	`
 
-		if version == 0 {
-			d.db.Exec("DROP TABLE IF EXISTS `goose_db_version`;")
-			return nil
-		}
-
-		if err = goose.Run("down", d.db.DB, "."); err != nil {
-			return err
-		}
+	if err := d.db.Select(&tables, sql); err != nil {
+		return err
 	}
 
+	tx := d.db.MustBegin()
+	tx.MustExec("SET FOREIGN_KEY_CHECKS = 0")
+	for _, table := range tables {
+		tx.MustExec(fmt.Sprintf("DROP TABLE %s;", table.Name))
+	}
+	tx.MustExec("SET FOREIGN_KEY_CHECKS = 1")
+	return tx.Commit()
 }
 
 // HealthCheck returns an error if the MySQL backend is not healthy.
