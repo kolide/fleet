@@ -26,6 +26,27 @@ const user = { id: 1, email: 'hi@thegnar.co' };
 describe('reduxConfig', () => {
   afterEach(restoreSpies);
 
+  describe('dispatching the clear errors action', () => {
+    it('sets the errors to an empty object', () => {
+      const initialState = {
+        data: {},
+        errors: {
+          base: 'Unable to find the current user',
+        },
+        loading: false,
+      };
+
+      const config = reduxConfig({
+        entityName: 'users',
+        schema: schemas.USERS,
+      });
+      const { actions, reducer } = config;
+      const newState = reducer(initialState, actions.clearErrors);
+
+      expect(newState.errors).toEqual({});
+    });
+  });
+
   describe('dispatching the create action', () => {
     describe('successful create call', () => {
       const mockStore = reduxMockStore(store);

@@ -21,6 +21,7 @@ const reduxConfig = ({
   updateFunc,
 }) => {
   const actionTypes = {
+    CLEAR_ERRORS: `${entityName}_CLEAR_ERRORS`,
     CREATE_FAILURE: `${entityName}_CREATE_FAILURE`,
     CREATE_REQUEST: `${entityName}_CREATE_REQUEST`,
     CREATE_SUCCESS: `${entityName}_CREATE_SUCCESS`,
@@ -33,6 +34,10 @@ const reduxConfig = ({
     UPDATE_FAILURE: `${entityName}_UPDATE_FAILURE`,
     UPDATE_REQUEST: `${entityName}_UPDATE_REQUEST`,
     UPDATE_SUCCESS: `${entityName}_UPDATE_SUCCESS`,
+  };
+
+  const clearErrors = {
+    type: actionTypes.CLEAR_ERRORS,
   };
 
   const createFailure = (errors) => {
@@ -221,6 +226,7 @@ const reduxConfig = ({
   };
 
   const actions = {
+    clearErrors,
     create,
     destroy,
     load,
@@ -230,6 +236,11 @@ const reduxConfig = ({
 
   const reducer = (state = initialState, { type, payload }) => {
     switch (type) {
+      case actionTypes.CLEAR_ERRORS:
+        return {
+          ...state,
+          errors: {},
+        };
       case actionTypes.CREATE_REQUEST:
       case actionTypes.DESTROY_REQUEST:
       case actionTypes.LOAD_REQUEST:
