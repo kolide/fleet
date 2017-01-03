@@ -4,12 +4,12 @@ import { includes, size } from 'lodash';
 
 import queryInterface from 'interfaces/query';
 import Icon from 'components/icons/Icon';
-import QueriesListItem from 'components/queries/QueriesList/QueriesListItem';
+import QueriesListItem from 'components/queries/ScheduledQueriesList/ScheduledQueriesListItem';
 import Checkbox from 'components/forms/fields/Checkbox';
 
-const baseClass = 'queries-list';
+const baseClass = 'scheduled-queries-list';
 
-class QueriesList extends Component {
+class ScheduledQueriesList extends Component {
   static propTypes = {
     isScheduledQueriesAvailable: PropTypes.bool,
     onSelectAllQueries: PropTypes.func.isRequired,
@@ -97,7 +97,7 @@ class QueriesList extends Component {
           <thead>
             <tr>
               <th><Checkbox
-                name="select-all-queries"
+                name="select-all-scheduled-queries"
                 onChange={handleSelectAllQueries}
                 value={allQueriesSelected}
               /></th>
@@ -127,4 +127,4 @@ class QueriesList extends Component {
   }
 }
 
-export default QueriesList;
+export default ScheduledQueriesList;
