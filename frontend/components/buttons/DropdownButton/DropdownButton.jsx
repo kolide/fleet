@@ -5,7 +5,7 @@ import classnames from 'classnames';
 import Icon from 'components/icons/Icon';
 import Button from 'components/buttons/Button';
 
-const baseClass = "dropdown-button";
+const baseClass = 'dropdown-button';
 
 class DropdownButton extends Component {
   static propTypes = {
