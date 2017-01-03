@@ -1,12 +1,22 @@
 import React from 'react';
 import expect, { createSpy, restoreSpies } from 'expect';
 import { mount } from 'enzyme';
+import { noop } from 'lodash';
 
 import { fillInFormInput } from 'test/helpers';
 import PackForm from './index';
 
 describe('PackForm - component', () => {
   afterEach(restoreSpies);
+
+  it('renders the base error', () => {
+    const baseError = 'Pack already exists';
+    const formWithError = mount(<PackForm serverErrors={{ base: baseError }} handleSubmit={noop} />);
+    const formWithoutError = mount(<PackForm handleSubmit={noop} />);
+
+    expect(formWithError.text()).toInclude(baseError);
+    expect(formWithoutError.text()).toNotInclude(baseError);
+  });
 
   it('renders the correct components', () => {
     const form = mount(<PackForm />);
