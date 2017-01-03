@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { isEqual } from 'lodash';
 
 import Button from 'components/buttons/Button';
+import DropdownButton from 'components/buttons/DropdownButton';
 import Dropdown from 'components/forms/fields/Dropdown';
 import helpers from 'components/forms/queries/QueryForm/helpers';
 import InputField from 'components/forms/fields/InputField';
@@ -221,6 +222,7 @@ class QueryForm extends Component {
 
     return (
       <div className={`${baseClass}__button-wrap`}>
+
         <Button
           className={`${baseClass}__save-changes-btn`}
           disabled={!canSaveChanges(formData, query)}
@@ -237,6 +239,22 @@ class QueryForm extends Component {
         >
           Save As New...
         </Button>
+
+        <DropdownButton
+          className={`${baseClass}__save`}
+          options={[{
+            disabled: !canSaveChanges(formData, query),
+            label: 'Save Changes',
+            onClick: onUpdate,
+          }, {
+            disabled: !canSaveAsNew(formData, query),
+            label: 'Save As New...',
+            onClick: onSave,
+          }]}
+          variant="success"
+        >
+          Save
+        </DropdownButton>
         {runQueryButton}
       </div>
     );
