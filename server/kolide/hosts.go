@@ -85,6 +85,9 @@ type Host struct {
 	NetworkInterfaces         []*NetworkInterface `json:"network_interfaces" db:"-"`
 }
 
+// HostSummary is a structure which represents a data summary about the total
+// set of hosts in the database. This structure is returned by the HostService
+// method GetHostSummary
 type HostSummary struct {
 	OnlineCount  uint `json:"online_count"`
 	OfflineCount uint `json:"offline_count"`
