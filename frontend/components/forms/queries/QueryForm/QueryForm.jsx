@@ -1,5 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import { isEqual } from 'lodash';
+import AceEditor from 'react-ace';
+import 'brace/mode/sql';
+import 'brace/ext/linking';
 
 import Button from 'components/buttons/Button';
 import Dropdown from 'components/forms/fields/Dropdown';
@@ -7,15 +10,16 @@ import helpers from 'components/forms/queries/QueryForm/helpers';
 import InputField from 'components/forms/fields/InputField';
 import queryInterface from 'interfaces/query';
 import validatePresence from 'components/forms/validators/validate_presence';
+import './mode';
+import './theme';
 
 const baseClass = 'query-form';
 
 class QueryForm extends Component {
   static propTypes = {
     onCancel: PropTypes.func,
-    onRunQuery: PropTypes.func,
     onSave: PropTypes.func,
-    onStopQuery: PropTypes.func,
+    onTextEditorInputChange: PropTypes.func,
     onUpdate: PropTypes.func,
     query: queryInterface,
     queryIsRunning: PropTypes.bool,
@@ -26,6 +30,23 @@ class QueryForm extends Component {
   static defaultProps = {
     query: {},
   };
+
+  onLoad = (editor) => {
+    editor.setOptions({
+      enableLinking: true,
+    });
+
+    editor.on('linkClick', (data) => {
+      const { type, value } = data.token;
+      const { onOsqueryTableSelect } = this.props;
+
+      if (type === 'osquery-token') {
+        return onOsqueryTableSelect(value);
+      }
+
+      return false;
+    });
+  }
 
   constructor (props) {
     super(props);
@@ -166,36 +187,10 @@ class QueryForm extends Component {
     const { canSaveAsNew, canSaveChanges } = helpers;
     const { formData } = this.state;
     const {
-      onRunQuery,
-      onStopQuery,
       query,
-      queryIsRunning,
       queryType,
     } = this.props;
     const { onCancel, onSave, onUpdate } = this;
-    let runQueryButton;
-
-    if (queryIsRunning) {
-      runQueryButton = (
-        <Button
-          className={`${baseClass}__stop-query-btn`}
-          onClick={onStopQuery}
-          variant="alert"
-        >
-          Stop Query
-        </Button>
-      );
-    } else {
-      runQueryButton = (
-        <Button
-          className={`${baseClass}__run-query-btn`}
-          onClick={onRunQuery}
-          variant="brand"
-        >
-          Run Query
-        </Button>
-      );
-    }
 
     if (queryType === 'label') {
       return (
@@ -237,7 +232,6 @@ class QueryForm extends Component {
         >
           Save As New...
         </Button>
-        {runQueryButton}
       </div>
     );
   }
@@ -270,11 +264,12 @@ class QueryForm extends Component {
         name,
       },
     } = this.state;
-    const { onFieldChange, renderPlatformDropdown, renderButtons } = this;
-    const { queryType } = this.props;
+    const { onLoad, onFieldChange, renderPlatformDropdown, renderButtons } = this;
+    const { queryType, onTextEditorInputChange, queryIsRunning, queryText } = this.props;
 
     return (
       <form className={baseClass}>
+        {renderButtons()}
         <InputField
           error={errors.name}
           label={queryType === 'label' ? 'Label title' : 'Query Title'}
@@ -283,6 +278,30 @@ class QueryForm extends Component {
           value={name}
           inputClassName={`${baseClass}__query-title`}
         />
+
+        <div className={`${baseClass}__text-editor-wrapper`}>
+          <label className="form-field__label">SQL</label>
+          <AceEditor
+            enableBasicAutocompletion
+            enableLiveAutocompletion
+            editorProps={{ $blockScrolling: Infinity }}
+            mode="kolide"
+            minLines={2}
+            maxLines={20}
+            name="query-editor"
+            onLoad={onLoad}
+            onChange={onTextEditorInputChange}
+            readOnly={queryIsRunning}
+            setOptions={{ enableLinking: true }}
+            showGutter
+            showPrintMargin={false}
+            theme="kolide"
+            value={queryText}
+            width="100%"
+            fontSize={14}
+          />
+        </div>
+
         <InputField
           error={errors.description}
           label="Description"
@@ -293,7 +312,6 @@ class QueryForm extends Component {
           inputClassName={`${baseClass}__query-description`}
         />
         {renderPlatformDropdown()}
-        {renderButtons()}
       </form>
     );
   }

@@ -8,10 +8,6 @@
     margin-right: $xsmall;
   }
 
-  &__text-editor-wrapper {
-    margin: $base 0;
-  }
-
   &__title {
     color: $text-medium;
     display: inline-block;
@@ -19,7 +15,9 @@
   }
 
   &__wrapper {
-    padding: $base;
+    .body-wrap {
+      padding: $base;
+    }
 
     h1 {
       font-size: $large;

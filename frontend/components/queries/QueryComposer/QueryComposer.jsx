@@ -1,14 +1,10 @@
 import React, { Component, PropTypes } from 'react';
-import AceEditor from 'react-ace';
-import 'brace/mode/sql';
-import 'brace/ext/linking';
 
+import Button from 'components/buttons/Button';
 import QueryForm from 'components/forms/queries/QueryForm';
 import queryInterface from 'interfaces/query';
 import SelectTargetsDropdown from 'components/forms/fields/SelectTargetsDropdown';
 import targetInterface from 'interfaces/target';
-import './mode';
-import './theme';
 
 const baseClass = 'query-composer';
 
@@ -36,29 +32,13 @@ class QueryComposer extends Component {
     targetsCount: 0,
   };
 
-  onLoad = (editor) => {
-    editor.setOptions({
-      enableLinking: true,
-    });
-
-    editor.on('linkClick', (data) => {
-      const { type, value } = data.token;
-      const { onOsqueryTableSelect } = this.props;
-
-      if (type === 'osquery-token') {
-        return onOsqueryTableSelect(value);
-      }
-
-      return false;
-    });
-  }
-
   renderForm = () => {
     const {
       onFormCancel,
       onRunQuery,
       onSave,
       onStopQuery,
+      onTextEditorInputChange,
       onUpdate,
       query,
       queryIsRunning,
@@ -72,6 +52,7 @@ class QueryComposer extends Component {
         onRunQuery={onRunQuery}
         onSave={onSave}
         onStopQuery={onStopQuery}
+        onTextEditorInputChange={onTextEditorInputChange}
         onUpdate={onUpdate}
         query={query}
         queryIsRunning={queryIsRunning}
@@ -108,36 +89,54 @@ class QueryComposer extends Component {
     );
   }
 
+  renderRunQueryButton = () => {
+    const {
+      onRunQuery,
+      onStopQuery,
+      queryIsRunning,
+    } = this.props;
+    let runQueryButton;
+
+    if (queryIsRunning) {
+      runQueryButton = (
+        <Button
+          className={`${baseClass}__stop-query-btn`}
+          onClick={onStopQuery}
+          variant="alert"
+        >
+          Stop Query
+        </Button>
+      );
+    } else {
+      runQueryButton = (
+        <Button
+          className={`${baseClass}__run-query-btn`}
+          onClick={onRunQuery}
+          variant="brand"
+        >
+          Run Query
+        </Button>
+      );
+    }
+
+    return runQueryButton;
+  };
+
   render () {
-    const { onTextEditorInputChange, queryIsRunning, queryText, queryType } = this.props;
-    const { onLoad, renderForm, renderTargetsInput } = this;
+    const { queryIsRunning, queryText, queryType } = this.props;
+    const { renderForm, renderTargetsInput, renderRunQueryButton } = this;
 
     return (
-      <div className={`${baseClass}__wrapper body-wrap`}>
-        <h1>{queryType === 'label' ? 'New Label Query' : 'New Query'}</h1>
-        <div className={`${baseClass}__text-editor-wrapper`}>
-          <AceEditor
-            enableBasicAutocompletion
-            enableLiveAutocompletion
-            editorProps={{ $blockScrolling: Infinity }}
-            mode="kolide"
-            minLines={2}
-            maxLines={20}
-            name="query-editor"
-            onLoad={onLoad}
-            onChange={onTextEditorInputChange}
-            readOnly={queryIsRunning}
-            setOptions={{ enableLinking: true }}
-            showGutter
-            showPrintMargin={false}
-            theme="kolide"
-            value={queryText}
-            width="100%"
-            fontSize={14}
-          />
+      <div className={`${baseClass}__wrapper`}>
+        <div className={`${baseClass}__query body-wrap`}>
+          <h1>{queryType === 'label' ? 'New Label Query' : 'New Query'}</h1>
+          {renderForm()}
         </div>
-        {renderTargetsInput()}
-        {renderForm()}
+
+        <div className={`${baseClass}__targets body-wrap`}>
+          {renderRunQueryButton()}
+          {renderTargetsInput()}
+        </div>
       </div>
     );
   }
