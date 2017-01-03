@@ -19,6 +19,7 @@ var testFunctions = [...]func(*testing.T, kolide.Datastore){
 	testOrgInfo,
 	testCreateInvite,
 	testInviteByEmail,
+	testInviteByToken,
 	testListInvites,
 	testDeleteInvite,
 	testSaveInvite,
@@ -55,5 +56,7 @@ var testFunctions = [...]func(*testing.T, kolide.Datastore){
 	testDeleteScheduledQuery,
 	testListScheduledQueriesInPack,
 	testSaveScheduledQuery,
+	testOptions,
 	testNewScheduledQuery,
+	testOptionsToConfig,
 }

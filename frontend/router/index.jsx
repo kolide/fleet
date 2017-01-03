@@ -1,16 +1,17 @@
 import React from 'react';
-import { browserHistory, IndexRoute, Route, Router } from 'react-router';
+import { browserHistory, IndexRedirect, IndexRoute, Route, Router } from 'react-router';
 import { Provider } from 'react-redux';
 import { syncHistoryWithStore } from 'react-router-redux';
 
+import AdminAppSettingsPage from 'pages/Admin/AppSettingsPage';
 import AdminUserManagementPage from 'pages/Admin/UserManagementPage';
 import AllPacksPage from 'pages/packs/AllPacksPage';
 import App from 'components/App';
 import AuthenticatedAdminRoutes from 'components/AuthenticatedAdminRoutes';
 import AuthenticatedRoutes from 'components/AuthenticatedRoutes';
+import ConfirmInvitePage from 'pages/ConfirmInvitePage';
 import CoreLayout from 'layouts/CoreLayout';
 import EditPackPage from 'pages/packs/EditPackPage';
-import HomePage from 'pages/HomePage';
 import LoginRoutes from 'components/LoginRoutes';
 import LogoutPage from 'pages/LogoutPage';
 import ManageHostsPage from 'pages/hosts/ManageHostsPage';
@@ -31,15 +32,17 @@ const routes = (
       <Route path="/" component={App}>
         <Route path="setup" component={RegistrationPage} />
         <Route path="login" component={LoginRoutes}>
+          <Route path="invites/:invite_token" component={ConfirmInvitePage} />
           <Route path="forgot" />
           <Route path="reset" />
         </Route>
         <Route component={AuthenticatedRoutes}>
           <Route path="logout" component={LogoutPage} />
           <Route component={CoreLayout}>
-            <IndexRoute component={HomePage} />
+            <IndexRedirect to="/hosts/manage" />
             <Route path="admin" component={AuthenticatedAdminRoutes}>
               <Route path="users" component={AdminUserManagementPage} />
+              <Route path="settings" component={AdminAppSettingsPage} />
             </Route>
             <Route path="hosts">
               <Route path="new" component={NewHostPage} />

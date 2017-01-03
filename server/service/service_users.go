@@ -3,6 +3,7 @@ package service
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"html/template"
 	"time"
 
 	"github.com/kolide/kolide-ose/server/contexts/viewer"
@@ -12,11 +13,7 @@ import (
 )
 
 func (svc service) NewUser(ctx context.Context, p kolide.UserPayload) (*kolide.User, error) {
-	err := svc.VerifyInvite(ctx, *p.Email, *p.InviteToken)
-	if err != nil {
-		return nil, err
-	}
-	invite, err := svc.ds.InviteByEmail(*p.Email)
+	invite, err := svc.VerifyInvite(ctx, *p.InviteToken)
 	if err != nil {
 		return nil, err
 	}
@@ -254,7 +251,7 @@ func (svc service) RequestPasswordReset(ctx context.Context, email string) error
 		To:      []string{user.Email},
 		Config:  config,
 		Mailer: &kolide.PasswordResetMailer{
-			KolideServerURL: config.KolideServerURL,
+			KolideServerURL: template.URL(config.KolideServerURL),
 			Token:           token,
 		},
 	}
