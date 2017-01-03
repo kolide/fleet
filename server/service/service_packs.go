@@ -201,12 +201,7 @@ func (svc service) AddLabelToPack(ctx context.Context, lid, pid uint) error {
 }
 
 func (svc service) ListLabelsForPack(ctx context.Context, pid uint) ([]*kolide.Label, error) {
-	labels, err := svc.ds.ListLabelsForPack(pid)
-	if err != nil {
-		return nil, err
-	}
-
-	return labels, nil
+	return svc.ds.ListLabelsForPack(pid)
 }
 
 func (svc service) RemoveLabelFromPack(ctx context.Context, lid, pid uint) error {
