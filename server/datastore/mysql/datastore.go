@@ -113,6 +113,12 @@ func (d *Datastore) Drop() error {
 
 }
 
+// HealthCheck returns an error if the MySQL backend is not healthy.
+func (d *Datastore) HealthCheck() error {
+	_, err := d.db.Exec("select 1")
+	return err
+}
+
 // Close frees resources associated with underlying mysql connection
 func (d *Datastore) Close() error {
 	return d.db.Close()
@@ -170,7 +176,6 @@ func (d *Datastore) createBuiltinLabels() error {
 
 	labels := []kolide.Label{
 		{
-			Platform:  "all",
 			Name:      "All Hosts",
 			Query:     "select 1;",
 			LabelType: kolide.LabelTypeBuiltIn,

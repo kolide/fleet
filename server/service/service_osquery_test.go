@@ -405,8 +405,16 @@ func TestGetClientConfig(t *testing.T) {
 	config, err := svc.GetClientConfig(ctx)
 	require.Nil(t, err)
 	assert.NotNil(t, config)
-	assert.False(t, config.Options.DisableDistributed)
-	assert.Equal(t, "/", config.Options.PackDelimiter)
+	val, ok := config.Options["disable_distributed"]
+	require.True(t, ok)
+	disabled, ok := val.(bool)
+	require.True(t, ok)
+	assert.False(t, disabled)
+	val, ok = config.Options["pack_delimiter"]
+	require.True(t, ok)
+	delim, ok := val.(string)
+	require.True(t, ok)
+	assert.Equal(t, "/", delim)
 
 	// this will be greater than 0 if we ever start inserting an administration
 	// pack
@@ -665,10 +673,6 @@ func TestDistributedQueries(t *testing.T) {
 		queryKey: expectedRows,
 	}
 
-	// Submit results (should error because no one is listening)
-	err = svc.SubmitDistributedQueryResults(ctx, results)
-	assert.NotNil(t, err)
-
 	// TODO use service method
 	readChan, err := rs.ReadChannel(ctx, *campaign)
 	require.Nil(t, err)
@@ -715,4 +719,61 @@ func TestDistributedQueries(t *testing.T) {
 	assert.NotContains(t, queries, queryKey)
 
 	waitComplete.Wait()
+}
+
+func TestOrphanedQueryCampaign(t *testing.T) {
+	ds, err := inmem.New(config.TestConfig())
+	require.Nil(t, err)
+
+	rs := pubsub.NewInmemQueryResults()
+
+	svc, err := newTestService(ds, rs)
+	require.Nil(t, err)
+
+	ctx := context.Background()
+
+	nodeKey, err := svc.EnrollAgent(ctx, "", "host123")
+	require.Nil(t, err)
+
+	host, err := ds.AuthenticateHost(nodeKey)
+	require.Nil(t, err)
+
+	ctx = viewer.NewContext(context.Background(), viewer.Viewer{
+		User: &kolide.User{
+			ID: 0,
+		},
+	})
+	q := "select year, month, day, hour, minutes, seconds from time"
+	campaign, err := svc.NewDistributedQueryCampaign(ctx, q, []uint{}, []uint{})
+	require.Nil(t, err)
+
+	campaign.Status = kolide.QueryRunning
+	err = ds.SaveDistributedQueryCampaign(campaign)
+	require.Nil(t, err)
+
+	queryKey := fmt.Sprintf("%s%d", hostDistributedQueryPrefix, campaign.ID)
+
+	expectedRows := []map[string]string{
+		{
+			"year":    "2016",
+			"month":   "11",
+			"day":     "11",
+			"hour":    "6",
+			"minutes": "12",
+			"seconds": "10",
+		},
+	}
+	results := map[string][]map[string]string{
+		queryKey: expectedRows,
+	}
+
+	// Submit results
+	ctx = hostctx.NewContext(context.Background(), *host)
+	err = svc.SubmitDistributedQueryResults(ctx, results)
+	require.Nil(t, err)
+
+	// The campaign should be set to completed because it is orphaned
+	campaign, err = ds.DistributedQueryCampaign(campaign.ID)
+	require.Nil(t, err)
+	assert.Equal(t, kolide.QueryComplete, campaign.Status)
 }

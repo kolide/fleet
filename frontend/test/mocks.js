@@ -265,7 +265,7 @@ export const validRevokeInviteRequest = (bearerToken, inviteID) => {
     },
   })
   .delete(`/api/v1/kolide/invites/${inviteID}`)
-  .reply(200);
+  .reply(200, {});
 };
 
 export const invalidResetPasswordRequest = (password, token, error) => {
@@ -293,6 +293,16 @@ export const validSetupRequest = (formData) => {
   return nock('http://localhost:8080')
     .post('/api/v1/setup', JSON.stringify(setupData))
     .reply(200, {});
+};
+
+export const validUpdateConfigRequest = (bearerToken, configData) => {
+  return nock('http://localhost:8080', {
+    reqHeaders: {
+      Authorization: `Bearer ${bearerToken}`,
+    },
+  })
+  .patch('/api/v1/kolide/config', JSON.stringify(configData))
+  .reply(200, {});
 };
 
 export const validUpdateQueryRequest = (bearerToken, query, formData) => {
@@ -338,6 +348,7 @@ export default {
   validRevokeInviteRequest,
   validRunQueryRequest,
   validSetupRequest,
+  validUpdateConfigRequest,
   validUpdateQueryRequest,
   validUpdateUserRequest,
   validUser,
