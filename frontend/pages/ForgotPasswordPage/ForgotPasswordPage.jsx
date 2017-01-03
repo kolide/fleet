@@ -10,7 +10,6 @@ import {
 import debounce from 'utilities/debounce';
 import ForgotPasswordForm from 'components/forms/ForgotPasswordForm';
 import Icon from 'components/icons/Icon';
-import { renderFlash } from 'redux/nodes/notifications/actions';
 import StackedWhiteBoxes from 'components/StackedWhiteBoxes';
 
 export class ForgotPasswordPage extends Component {
@@ -26,18 +25,8 @@ export class ForgotPasswordPage extends Component {
     dispatch: noop,
   };
 
-  componentWillReceiveProps ({ dispatch, errors }) {
-    const { base } = errors;
-
-    if (!base) {
-      return false;
-    }
-
-    if (base !== this.props.errors.base) {
-      dispatch(renderFlash('error', base));
-    }
-
-    return false;
+  componentWillUnmount () {
+    return this.clearErrors();
   }
 
   handleLeave = (location) => {

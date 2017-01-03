@@ -3,8 +3,6 @@ import { isEqual, noop } from 'lodash';
 
 const defaultValidate = () => { return { valid: true, errors: {} }; };
 
-const baseClass = 'form-hoc';
-
 export default (WrappedComponent, { fields, validate = defaultValidate }) => {
   class Form extends Component {
     static propTypes = {
@@ -15,7 +13,7 @@ export default (WrappedComponent, { fields, validate = defaultValidate }) => {
     };
 
     static defaultProps = {
-      errors: {},
+      serverErrors: {},
       formData: {},
     };
 
@@ -28,6 +26,14 @@ export default (WrappedComponent, { fields, validate = defaultValidate }) => {
         errors: {},
         formData,
       };
+
+      return false;
+    }
+
+    componentWillMount () {
+      const { serverErrors } = this.props;
+
+      this.setState({ errors: serverErrors });
 
       return false;
     }
@@ -71,7 +77,7 @@ export default (WrappedComponent, { fields, validate = defaultValidate }) => {
         onChangeFunc(fieldName, value);
 
         this.setState({
-          errors: { ...errors, [fieldName]: null },
+          errors: { ...errors, base: null, [fieldName]: null },
           formData: { ...formData, [fieldName]: value },
         });
 
@@ -129,9 +135,9 @@ export default (WrappedComponent, { fields, validate = defaultValidate }) => {
 
       return (
         <div>
-          {errors.base && <div className={`${baseClass}__base-error`}>{errors.base}</div>}
           <WrappedComponent
             {...props}
+            baseError={errors.base}
             fields={getFields()}
             handleSubmit={onSubmit}
           />

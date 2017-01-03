@@ -10,7 +10,6 @@ import debounce from 'utilities/debounce';
 import LoginForm from 'components/forms/LoginForm';
 import LoginSuccessfulPage from 'pages/LoginSuccessfulPage';
 import ForgotPasswordPage from 'pages/ForgotPasswordPage';
-import { renderFlash } from 'redux/nodes/notifications/actions';
 import ResetPasswordPage from 'pages/ResetPasswordPage';
 import paths from 'router/paths';
 import redirectLocationInterface from 'interfaces/redirect_location';
@@ -43,20 +42,6 @@ export class LoginPage extends Component {
 
     if (user && pathname === LOGIN) {
       return dispatch(push(HOME));
-    }
-
-    return false;
-  }
-
-  componentWillReceiveProps ({ dispatch, errors }) {
-    const { base } = errors;
-
-    if (!base) {
-      return false;
-    }
-
-    if (base !== this.props.errors.base) {
-      dispatch(renderFlash('error', base));
     }
 
     return false;
