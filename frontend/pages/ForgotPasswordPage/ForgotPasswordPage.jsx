@@ -36,6 +36,8 @@ export class ForgotPasswordPage extends Component {
     if (base !== this.props.errors.base) {
       dispatch(renderFlash('error', base));
     }
+
+    return false;
   }
 
   handleLeave = (location) => {

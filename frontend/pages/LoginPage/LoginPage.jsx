@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { includes, size } from 'lodash';
+import { size } from 'lodash';
 import { push } from 'react-router-redux';
 
 import AuthenticationFormWrapper from 'components/AuthenticationFormWrapper';
@@ -15,8 +15,6 @@ import ResetPasswordPage from 'pages/ResetPasswordPage';
 import paths from 'router/paths';
 import redirectLocationInterface from 'interfaces/redirect_location';
 import userInterface from 'interfaces/user';
-
-const WHITELIST_ERRORS = ['Unable to authenticate the current user'];
 
 export class LoginPage extends Component {
   static propTypes = {
@@ -60,6 +58,8 @@ export class LoginPage extends Component {
     if (base !== this.props.errors.base) {
       dispatch(renderFlash('error', base));
     }
+
+    return false;
   }
 
   onChange = () => {
@@ -91,7 +91,7 @@ export class LoginPage extends Component {
   showLoginForm = () => {
     const { errors } = this.props;
     const { loginVisible } = this.state;
-    const { onChange, onSubmit, serverErrors } = this;
+    const { onChange, onSubmit } = this;
 
     return (
       <LoginForm

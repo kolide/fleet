@@ -393,7 +393,7 @@ describe('Kolide - API client', () => {
 
       Kolide.forgotPassword({ email })
         .then(done)
-        .catch((errorResponse) => {
+        .catch(() => {
           expect(request.isDone()).toEqual(true);
           done();
         });

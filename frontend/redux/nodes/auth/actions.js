@@ -135,7 +135,7 @@ export const logoutUser = () => {
     dispatch(logoutRequest);
 
     return Kolide.logout()
-      .then(() =>  dispatch(logoutSuccess))
+      .then(() => dispatch(logoutSuccess))
       .catch((error) => {
         dispatch(logoutFailure({ base: 'Unable to log out of your account' }));
 

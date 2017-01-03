@@ -56,7 +56,7 @@ describe('ForgotPasswordPage - reducer', () => {
 
   describe('forgotPasswordErrorAction', () => {
     it('changes the loading state to false and sets the error state', () => {
-      const errors = { base: 'There was an error with your request'};
+      const errors = { base: 'There was an error with your request' };
 
       expect(reducer(initialState, forgotPasswordErrorAction(errors))).toEqual({
         ...initialState,
@@ -96,7 +96,7 @@ describe('ForgotPasswordPage - reducer', () => {
 
       store.dispatch(forgotPasswordAction(formData))
         .then(done)
-        .catch((errorResponse) => {
+        .catch(() => {
           const actions = store.getActions();
 
           expect(actions).toInclude(forgotPasswordErrorAction({ base: 'Something went wrong' }));
