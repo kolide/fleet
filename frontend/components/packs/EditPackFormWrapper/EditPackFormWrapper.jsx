@@ -48,11 +48,12 @@ class EditPackFormWrapper extends Component {
       <div className={`${className} ${baseClass}`}>
         <Button
           onClick={onEditPack}
-          text="EDIT"
           type="button"
           variant="brand"
           className={`${baseClass}__edit-btn`}
-        />
+        >
+          EDIT
+        </Button>
         <h1 className={`${baseClass}__title`}><Icon name="packs" /> <span>{pack.name}</span></h1>
         <div className={`${baseClass}__description`}>
           <p>{pack.description}</p>
