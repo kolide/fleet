@@ -281,6 +281,10 @@ func (d *Datastore) ListHosts(opt kolide.ListOptions) ([]*kolide.Host, error) {
 	return hosts, nil
 }
 
+func (d *Datastore) GenerateHostStatusStatistics() (online, offline, mia uint, err error) {
+	return 0, 0, 0, nil
+}
+
 // Optimized network interface fetch for sets of hosts.  Instead of looping
 // through hosts and doing a select for each host to get nics, we get all
 // nics at once, so 2 db calls, and then assign nics to hosts here.

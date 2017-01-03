@@ -24,6 +24,18 @@ func (svc service) HostStatus(ctx context.Context, host kolide.Host) string {
 	}
 }
 
+func (svc service) GetHostSummary(ctx context.Context) (*kolide.HostSummary, error) {
+	online, offline, mia, err := svc.ds.GenerateHostStatusStatistics()
+	if err != nil {
+		return nil, err
+	}
+	return &kolide.HostSummary{
+		OnlineCount:  online,
+		OfflineCount: offline,
+		MIACount:     mia,
+	}, nil
+}
+
 func (svc service) DeleteHost(ctx context.Context, id uint) error {
 	return svc.ds.DeleteHost(id)
 }

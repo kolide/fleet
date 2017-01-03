@@ -86,6 +86,31 @@ func makeListHostsEndpoint(svc kolide.Service) endpoint.Endpoint {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Get Host Summary
+////////////////////////////////////////////////////////////////////////////////
+
+type getHostSummaryResponse struct {
+	kolide.HostSummary
+	Err error `json:"error,omitempty"`
+}
+
+func (r getHostSummaryResponse) error() error { return r.Err }
+
+func makeGetHostSummaryEndpoint(svc kolide.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		summary, err := svc.GetHostSummary(ctx)
+		if err != nil {
+			return getHostSummaryResponse{Err: err}, nil
+		}
+
+		resp := getHostSummaryResponse{
+			HostSummary: *summary,
+		}
+		return resp, nil
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Delete Host
 ////////////////////////////////////////////////////////////////////////////////
 

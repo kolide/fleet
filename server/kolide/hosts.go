@@ -17,6 +17,7 @@ type HostStore interface {
 	EnrollHost(osqueryHostId string, nodeKeySize int) (*Host, error)
 	AuthenticateHost(nodeKey string) (*Host, error)
 	MarkHostSeen(host *Host, t time.Time) error
+	GenerateHostStatusStatistics() (online, offline, mia uint, err error)
 	SearchHosts(query string, omit ...uint) ([]*Host, error)
 	// DistributedQueriesForHost retrieves the distributed queries that the
 	// given host should run. The result map is a mapping from campaign ID
@@ -27,6 +28,7 @@ type HostStore interface {
 type HostService interface {
 	ListHosts(ctx context.Context, opt ListOptions) ([]*Host, error)
 	GetHost(ctx context.Context, id uint) (*Host, error)
+	GetHostSummary(ctx context.Context) (*HostSummary, error)
 	HostStatus(ctx context.Context, host Host) string
 	DeleteHost(ctx context.Context, id uint) error
 }
@@ -66,6 +68,12 @@ type Host struct {
 	// can be found in the NetworkInterfaces element with the same ip_address.
 	PrimaryNetworkInterfaceID *uint               `json:"primary_ip_id,omitempty" db:"primary_ip_id"`
 	NetworkInterfaces         []*NetworkInterface `json:"network_interfaces" db:"-"`
+}
+
+type HostSummary struct {
+	OnlineCount  uint `json:"online_count"`
+	OfflineCount uint `json:"offline_count"`
+	MIACount     uint `json:"mia_count"`
 }
 
 // ResetPrimaryNetwork will determine if the PrimaryNetworkInterfaceID

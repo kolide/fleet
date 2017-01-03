@@ -114,6 +114,10 @@ func (d *Datastore) ListHosts(opt kolide.ListOptions) ([]*kolide.Host, error) {
 	return hosts, nil
 }
 
+func (d *Datastore) GenerateHostStatusStatistics() (online, offline, mia uint, err error) {
+	return 0, 0, 0, nil
+}
+
 func (d *Datastore) EnrollHost(osQueryHostID string, nodeKeySize int) (*kolide.Host, error) {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
