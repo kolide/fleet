@@ -112,12 +112,26 @@ func (d *Datastore) Drop() error {
 		return err
 	}
 
-	tx := d.db.MustBegin()
-	tx.MustExec("SET FOREIGN_KEY_CHECKS = 0")
-	for _, table := range tables {
-		tx.MustExec(fmt.Sprintf("DROP TABLE %s;", table.Name))
+	tx, err := d.db.Begin()
+	if err != nil {
+		return err
 	}
-	tx.MustExec("SET FOREIGN_KEY_CHECKS = 1")
+
+	_, err = tx.Exec("SET FOREIGN_KEY_CHECKS = 0")
+	if err != nil {
+		return tx.Rollback()
+	}
+
+	for _, table := range tables {
+		_, err = tx.Exec(fmt.Sprintf("DROP TABLE %s;", table.Name))
+		if err != nil {
+			return tx.Rollback()
+		}
+	}
+	_, err = tx.Exec("SET FOREIGN_KEY_CHECKS = 1")
+	if err != nil {
+		return tx.Rollback()
+	}
 	return tx.Commit()
 }
 
