@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react';
 import classnames from 'classnames';
 
 import notificationInterface from 'interfaces/notification';
-import Icon from 'components/Icon';
+import Icon from 'components/icons/Icon';
 import Button from 'components/buttons/Button';
 
 const baseClass = 'flash-message';
