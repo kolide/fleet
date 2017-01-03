@@ -24,11 +24,11 @@ type Datastore struct {
 	db     *sqlx.DB
 	logger log.Logger
 	clock  clock.Clock
+	config config.MysqlConfig
 }
 
 // New creates an MySQL datastore.
-func New(dbConnectString string, c clock.Clock, opts ...DBOption) (*Datastore, error) {
-
+func New(config config.MysqlConfig, c clock.Clock, opts ...DBOption) (*Datastore, error) {
 	options := &dbOptions{
 		maxAttempts: defaultMaxAttempts,
 		logger:      log.NewNopLogger(),
@@ -38,7 +38,7 @@ func New(dbConnectString string, c clock.Clock, opts ...DBOption) (*Datastore, e
 		setOpt(options)
 	}
 
-	db, err := sqlx.Open("mysql", dbConnectString)
+	db, err := sqlx.Open("mysql", generateMysqlConnectionString(config))
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,12 @@ func New(dbConnectString string, c clock.Clock, opts ...DBOption) (*Datastore, e
 		return nil, dbError
 	}
 
-	ds := &Datastore{db, options.logger, c}
+	ds := &Datastore{
+		db:     db,
+		logger: options.logger,
+		clock:  c,
+		config: config,
+	}
 
 	return ds, nil
 
@@ -100,10 +105,10 @@ func (d *Datastore) Drop() error {
 	sql := `
 		SELECT TABLE_NAME
 		FROM INFORMATION_SCHEMA.TABLES
-		WHERE TABLE_SCHEMA = 'kolide';
+		WHERE TABLE_SCHEMA = ?;
 	`
 
-	if err := d.db.Select(&tables, sql); err != nil {
+	if err := d.db.Select(&tables, sql, d.config.Database); err != nil {
 		return err
 	}
 
@@ -158,9 +163,9 @@ func appendListOptionsToSQL(sql string, opts kolide.ListOptions) string {
 	return sql
 }
 
-// GetMysqlConnectionString returns a MySQL connection string using the
+// generateMysqlConnectionString returns a MySQL connection string using the
 // provided configuration.
-func GetMysqlConnectionString(conf config.MysqlConfig) string {
+func generateMysqlConnectionString(conf config.MysqlConfig) string {
 	return fmt.Sprintf(
 		"%s:%s@(%s)/%s?charset=utf8&parseTime=true&loc=UTC",
 		conf.Username,
