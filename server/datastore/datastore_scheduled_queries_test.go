@@ -44,7 +44,7 @@ func testDeleteScheduledQuery(t *testing.T, ds kolide.Datastore) {
 	require.Nil(t, err)
 	assert.Equal(t, uint(60), query.Interval)
 
-	err = ds.DeleteScheduledQuery(sq1.ID)
+	err = ds.Delete(sq1)
 	require.Nil(t, err)
 
 	_, err = ds.ScheduledQuery(sq1.ID)

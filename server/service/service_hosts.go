@@ -23,17 +23,3 @@ func (svc service) HostStatus(ctx context.Context, host kolide.Host) string {
 		return StatusOnline
 	}
 }
-
-func (svc service) DeleteHost(ctx context.Context, id uint) error {
-	host, err := svc.ds.Host(id)
-	if err != nil {
-		return err
-	}
-
-	err = svc.ds.DeleteHost(host)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}

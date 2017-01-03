@@ -11,7 +11,6 @@ import (
 type HostStore interface {
 	NewHost(host *Host) (*Host, error)
 	SaveHost(host *Host) error
-	DeleteHost(host *Host) error
 	Host(id uint) (*Host, error)
 	ListHosts(opt ListOptions) ([]*Host, error)
 	EnrollHost(osqueryHostId string, nodeKeySize int) (*Host, error)
@@ -28,7 +27,6 @@ type HostService interface {
 	ListHosts(ctx context.Context, opt ListOptions) ([]*Host, error)
 	GetHost(ctx context.Context, id uint) (*Host, error)
 	HostStatus(ctx context.Context, host Host) string
-	DeleteHost(ctx context.Context, id uint) error
 }
 
 type Host struct {
@@ -98,6 +96,10 @@ func (h *Host) ResetPrimaryNetwork() bool {
 
 	return false
 
+}
+
+func (h *Host) EntityID() uint {
+	return h.ID
 }
 
 // RandomText returns a stdEncoded string of

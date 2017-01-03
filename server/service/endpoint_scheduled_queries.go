@@ -156,30 +156,3 @@ func makeModifyScheduledQueryEndpoint(svc kolide.Service) endpoint.Endpoint {
 		}, nil
 	}
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// Delete Scheduled Query
-////////////////////////////////////////////////////////////////////////////////
-
-type deleteScheduledQueryRequest struct {
-	ID uint
-}
-
-type deleteScheduledQueryResponse struct {
-	Err error `json:"error,omitempty"`
-}
-
-func (r deleteScheduledQueryResponse) error() error { return r.Err }
-
-func makeDeleteScheduledQueryEndpoint(svc kolide.Service) endpoint.Endpoint {
-	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(deleteScheduledQueryRequest)
-
-		err := svc.DeleteScheduledQuery(ctx, req.ID)
-		if err != nil {
-			return deleteScheduledQueryResponse{Err: err}, nil
-		}
-
-		return deleteScheduledQueryResponse{}, nil
-	}
-}

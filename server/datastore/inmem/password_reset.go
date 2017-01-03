@@ -11,7 +11,7 @@ func (d *Datastore) NewPasswordResetRequest(req *kolide.PasswordResetRequest) (*
 	defer d.mtx.Unlock()
 
 	req.ID = d.nextID(req)
-	d.passwordResets[req.ID] = req
+	d.PasswordResets[req.ID] = req
 	return req, nil
 }
 
@@ -19,11 +19,11 @@ func (d *Datastore) SavePasswordResetRequest(req *kolide.PasswordResetRequest) e
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
-	if _, ok := d.passwordResets[req.ID]; !ok {
+	if _, ok := d.PasswordResets[req.ID]; !ok {
 		return notFound("PasswordResetRequest").WithID(req.ID)
 	}
 
-	d.passwordResets[req.ID] = req
+	d.PasswordResets[req.ID] = req
 	return nil
 }
 
@@ -31,11 +31,11 @@ func (d *Datastore) DeletePasswordResetRequest(req *kolide.PasswordResetRequest)
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
-	if _, ok := d.passwordResets[req.ID]; !ok {
+	if _, ok := d.PasswordResets[req.ID]; !ok {
 		return notFound("PasswordResetRequest").WithID(req.ID)
 	}
 
-	delete(d.passwordResets, req.ID)
+	delete(d.PasswordResets, req.ID)
 	return nil
 }
 
@@ -43,9 +43,9 @@ func (d *Datastore) DeletePasswordResetRequestsForUser(userID uint) error {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
-	for _, pr := range d.passwordResets {
+	for _, pr := range d.PasswordResets {
 		if pr.UserID == userID {
-			delete(d.passwordResets, pr.ID)
+			delete(d.PasswordResets, pr.ID)
 		}
 	}
 	return nil
@@ -55,7 +55,7 @@ func (d *Datastore) FindPassswordResetByID(id uint) (*kolide.PasswordResetReques
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
-	if req, ok := d.passwordResets[id]; ok {
+	if req, ok := d.PasswordResets[id]; ok {
 		return req, nil
 	}
 
@@ -67,7 +67,7 @@ func (d *Datastore) FindPassswordResetsByUserID(userID uint) ([]*kolide.Password
 	defer d.mtx.Unlock()
 	resets := make([]*kolide.PasswordResetRequest, 0)
 
-	for _, pr := range d.passwordResets {
+	for _, pr := range d.PasswordResets {
 		if pr.UserID == userID {
 			resets = append(resets, pr)
 		}
@@ -85,7 +85,7 @@ func (d *Datastore) FindPassswordResetByToken(token string) (*kolide.PasswordRes
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
-	for _, pr := range d.passwordResets {
+	for _, pr := range d.PasswordResets {
 		if pr.Token == token {
 			return pr, nil
 		}
@@ -98,7 +98,7 @@ func (d *Datastore) FindPassswordResetByTokenAndUserID(token string, userID uint
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
-	for _, pr := range d.passwordResets {
+	for _, pr := range d.PasswordResets {
 		if pr.Token == token && pr.UserID == userID {
 			return pr, nil
 		}

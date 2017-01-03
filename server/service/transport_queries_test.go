@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/gorilla/mux"
+	"github.com/kolide/kolide-ose/server/kolide"
 	"github.com/stretchr/testify/assert"
 
 	"golang.org/x/net/context"
@@ -60,11 +61,12 @@ func TestDecodeModifyQueryRequest(t *testing.T) {
 func TestDecodeDeleteQueryRequest(t *testing.T) {
 	router := mux.NewRouter()
 	router.HandleFunc("/api/v1/kolide/queries/{id}", func(writer http.ResponseWriter, request *http.Request) {
-		r, err := decodeDeleteQueryRequest(context.Background(), request)
+		r, err := decodeDeleteEntityRequest(&kolide.Query{})(context.Background(), request)
 		assert.Nil(t, err)
 
-		params := r.(deleteQueryRequest)
+		params := r.(deleteEntityRequest)
 		assert.Equal(t, uint(1), params.ID)
+		assert.Equal(t, kolide.DBTable(&kolide.Query{}), params.EntityType())
 	}).Methods("DELETE")
 
 	router.ServeHTTP(

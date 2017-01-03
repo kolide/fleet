@@ -8,7 +8,6 @@ type PackStore interface {
 	// Pack methods
 	NewPack(pack *Pack) (*Pack, error)
 	SavePack(pack *Pack) error
-	DeletePack(pid uint) error
 	Pack(pid uint) (*Pack, error)
 	ListPacks(opt ListOptions) ([]*Pack, error)
 
@@ -25,7 +24,6 @@ type PackService interface {
 	GetPack(ctx context.Context, id uint) (*Pack, error)
 	NewPack(ctx context.Context, p PackPayload) (*Pack, error)
 	ModifyPack(ctx context.Context, id uint, p PackPayload) (*Pack, error)
-	DeletePack(ctx context.Context, id uint) error
 
 	AddLabelToPack(ctx context.Context, lid, pid uint) error
 	ListLabelsForPack(ctx context.Context, pid uint) ([]*Label, error)
@@ -44,6 +42,10 @@ type Pack struct {
 	Platform    string `json:"platform"`
 	CreatedBy   uint   `json:"created_by" db:"created_by"`
 	Disabled    bool   `json:"disabled"`
+}
+
+func (p *Pack) EntityID() uint {
+	return p.ID
 }
 
 type PackPayload struct {

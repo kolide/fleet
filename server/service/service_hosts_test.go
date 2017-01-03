@@ -72,13 +72,12 @@ func TestDeleteHost(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotZero(t, host.ID)
 
-	err = svc.DeleteHost(ctx, host.ID)
+	err = svc.Delete(ctx, host)
 	assert.Nil(t, err)
 
 	hosts, err := ds.ListHosts(kolide.ListOptions{})
 	assert.Nil(t, err)
 	assert.Len(t, hosts, 0)
-
 }
 
 func TestHostStatus(t *testing.T) {

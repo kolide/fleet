@@ -9,7 +9,6 @@ import (
 type LabelStore interface {
 	// Label methods
 	NewLabel(Label *Label) (*Label, error)
-	DeleteLabel(lid uint) error
 	Label(lid uint) (*Label, error)
 	ListLabels(opt ListOptions) ([]*Label, error)
 
@@ -39,7 +38,6 @@ type LabelService interface {
 	ListLabels(ctx context.Context, opt ListOptions) ([]*Label, error)
 	GetLabel(ctx context.Context, id uint) (*Label, error)
 	NewLabel(ctx context.Context, p LabelPayload) (*Label, error)
-	DeleteLabel(ctx context.Context, id uint) error
 }
 
 type LabelPayload struct {
@@ -69,6 +67,10 @@ type Label struct {
 	Query       string    `json:"query"`
 	Platform    string    `json:"platform"`
 	LabelType   LabelType `json:"label_type" db:"label_type"`
+}
+
+func (l *Label) EntityID() uint {
+	return l.ID
 }
 
 type LabelQueryExecution struct {

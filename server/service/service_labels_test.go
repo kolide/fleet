@@ -99,7 +99,7 @@ func TestDeleteLabel(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotZero(t, label.ID)
 
-	err = svc.DeleteLabel(ctx, label.ID)
+	err = svc.Delete(ctx, label)
 	assert.Nil(t, err)
 
 	labels, err := ds.ListLabels(kolide.ListOptions{})

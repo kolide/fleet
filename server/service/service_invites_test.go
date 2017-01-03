@@ -45,7 +45,7 @@ func TestInviteNewUser(t *testing.T) {
 				InvitedBy: &nosuchAdminID,
 				Admin:     boolPtr(false),
 			},
-			wantErr: errors.New("User 999 was not found in the datastore"),
+			wantErr: errors.New("users 999 was not found in the datastore"),
 		},
 		{
 			payload: kolide.InvitePayload{

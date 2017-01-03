@@ -77,10 +77,6 @@ func (svc service) ModifyPack(ctx context.Context, id uint, p kolide.PackPayload
 	return pack, err
 }
 
-func (svc service) DeletePack(ctx context.Context, id uint) error {
-	return svc.ds.DeletePack(id)
-}
-
 func (svc service) AddLabelToPack(ctx context.Context, lid, pid uint) error {
 	return svc.ds.AddLabelToPack(lid, pid)
 }

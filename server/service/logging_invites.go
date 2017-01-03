@@ -31,26 +31,6 @@ func (mw loggingMiddleware) InviteNewUser(ctx context.Context, payload kolide.In
 	return invite, err
 }
 
-func (mw loggingMiddleware) DeleteInvite(ctx context.Context, id uint) error {
-	var (
-		err error
-	)
-	vc, ok := viewer.FromContext(ctx)
-	if !ok {
-		return errNoContext
-	}
-	defer func(begin time.Time) {
-		_ = mw.logger.Log(
-			"method", "DeleteInvite",
-			"deleted_by", vc.Username(),
-			"err", err,
-			"took", time.Since(begin),
-		)
-	}(time.Now())
-	err = mw.Service.DeleteInvite(ctx, id)
-	return err
-}
-
 func (mw loggingMiddleware) ListInvites(ctx context.Context, opt kolide.ListOptions) ([]*kolide.Invite, error) {
 	var (
 		invites []*kolide.Invite

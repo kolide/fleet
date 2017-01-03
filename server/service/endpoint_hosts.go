@@ -84,28 +84,3 @@ func makeListHostsEndpoint(svc kolide.Service) endpoint.Endpoint {
 		return resp, nil
 	}
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// Delete Host
-////////////////////////////////////////////////////////////////////////////////
-
-type deleteHostRequest struct {
-	ID uint `json:"id"`
-}
-
-type deleteHostResponse struct {
-	Err error `json:"error,omitempty"`
-}
-
-func (r deleteHostResponse) error() error { return r.Err }
-
-func makeDeleteHostEndpoint(svc kolide.Service) endpoint.Endpoint {
-	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(deleteHostRequest)
-		err := svc.DeleteHost(ctx, req.ID)
-		if err != nil {
-			return deleteHostResponse{Err: err}, nil
-		}
-		return deleteHostResponse{}, nil
-	}
-}

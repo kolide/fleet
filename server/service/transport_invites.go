@@ -21,14 +21,6 @@ func decodeCreateInviteRequest(ctx context.Context, r *http.Request) (interface{
 	return req, nil
 }
 
-func decodeDeleteInviteRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	id, err := idFromRequest(r, "id")
-	if err != nil {
-		return nil, err
-	}
-	return deleteInviteRequest{ID: id}, nil
-}
-
 func decodeVerifyInviteRequest(ctx context.Context, r *http.Request) (interface{}, error) {
 	vars := mux.Vars(r)
 	token, ok := vars["token"]

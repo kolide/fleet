@@ -55,27 +55,6 @@ func makeListInvitesEndpoint(svc kolide.Service) endpoint.Endpoint {
 	}
 }
 
-type deleteInviteRequest struct {
-	ID uint
-}
-
-type deleteInviteResponse struct {
-	Err error `json:"error,omitempty"`
-}
-
-func (r deleteInviteResponse) error() error { return r.Err }
-
-func makeDeleteInviteEndpoint(svc kolide.Service) endpoint.Endpoint {
-	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(deleteInviteRequest)
-		err := svc.DeleteInvite(ctx, req.ID)
-		if err != nil {
-			return deleteInviteResponse{Err: err}, nil
-		}
-		return deleteInviteResponse{}, nil
-	}
-}
-
 type verifyInviteRequest struct {
 	Token string
 }

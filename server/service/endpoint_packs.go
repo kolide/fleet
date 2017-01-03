@@ -189,31 +189,6 @@ func makeModifyPackEndpoint(svc kolide.Service) endpoint.Endpoint {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Delete Pack
-////////////////////////////////////////////////////////////////////////////////
-
-type deletePackRequest struct {
-	ID uint
-}
-
-type deletePackResponse struct {
-	Err error `json:"error,omitempty"`
-}
-
-func (r deletePackResponse) error() error { return r.Err }
-
-func makeDeletePackEndpoint(svc kolide.Service) endpoint.Endpoint {
-	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(deletePackRequest)
-		err := svc.DeletePack(ctx, req.ID)
-		if err != nil {
-			return deletePackResponse{Err: err}, nil
-		}
-		return deletePackResponse{}, nil
-	}
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // Add Label To Pack
 ////////////////////////////////////////////////////////////////////////////////
 

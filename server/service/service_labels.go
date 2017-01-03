@@ -40,7 +40,3 @@ func (svc service) NewLabel(ctx context.Context, p kolide.LabelPayload) (*kolide
 	}
 	return label, nil
 }
-
-func (svc service) DeleteLabel(ctx context.Context, id uint) error {
-	return svc.ds.DeleteLabel(id)
-}

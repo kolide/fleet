@@ -10,7 +10,7 @@ import (
 func (d *Datastore) OptionByName(name string) (*kolide.Option, error) {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
-	for _, opt := range d.options {
+	for _, opt := range d.Options {
 		if opt.Name == name {
 			result := *opt
 			return &result, nil
@@ -32,7 +32,7 @@ func (d *Datastore) SaveOptions(opts []kolide.Option) error {
 		if opt.ReadOnly {
 			return fmt.Errorf("readonly option can't be changed")
 		}
-		existing, ok := d.options[opt.ID]
+		existing, ok := d.Options[opt.ID]
 		if !ok {
 			return notFound("option")
 		}
@@ -54,7 +54,7 @@ func (d *Datastore) SaveOptions(opts []kolide.Option) error {
 func (d *Datastore) Option(id uint) (*kolide.Option, error) {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
-	saved, ok := d.options[id]
+	saved, ok := d.Options[id]
 	if !ok {
 		return nil, notFound("Option").WithID(id)
 	}
@@ -66,7 +66,7 @@ func (d *Datastore) ListOptions() ([]kolide.Option, error) {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 	result := []kolide.Option{}
-	for _, opt := range d.options {
+	for _, opt := range d.Options {
 		result = append(result, *opt)
 	}
 	sortutil.AscByField(result, "Name")
@@ -77,7 +77,7 @@ func (d *Datastore) GetOsqueryConfigOptions() (map[string]interface{}, error) {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 	optConfig := map[string]interface{}{}
-	for _, opt := range d.options {
+	for _, opt := range d.Options {
 		if opt.OptionSet() {
 			optConfig[opt.Name] = opt.GetValue()
 		}

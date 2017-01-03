@@ -43,22 +43,6 @@ func (d *Datastore) SaveQuery(q *kolide.Query) error {
 	return nil
 }
 
-// DeleteQuery soft deletes Query identified by Query.ID
-func (d *Datastore) DeleteQuery(query *kolide.Query) error {
-	query.MarkDeleted(d.clock.Now())
-	sql := `
-		UPDATE queries
-			SET deleted_at = ?, deleted = true
-			WHERE id = ?
-	`
-	_, err := d.db.Exec(sql, query.DeletedAt, query.ID)
-	if err != nil {
-		return errors.DatabaseError(err)
-	}
-
-	return nil
-}
-
 // DeleteQueries (soft) deletes the existing query objects with the provided
 // IDs. The number of deleted queries is returned along with any error.
 func (d *Datastore) DeleteQueries(ids []uint) (uint, error) {

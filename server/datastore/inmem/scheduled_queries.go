@@ -13,10 +13,10 @@ func (d *Datastore) NewScheduledQuery(sq *kolide.ScheduledQuery) (*kolide.Schedu
 	newScheduledQuery := *sq
 
 	newScheduledQuery.ID = d.nextID(newScheduledQuery)
-	d.scheduledQueries[newScheduledQuery.ID] = &newScheduledQuery
+	d.ScheduledQueries[newScheduledQuery.ID] = &newScheduledQuery
 
-	newScheduledQuery.Query = d.queries[newScheduledQuery.QueryID].Query
-	newScheduledQuery.Name = d.queries[newScheduledQuery.QueryID].Name
+	newScheduledQuery.Query = d.Queries[newScheduledQuery.QueryID].Query
+	newScheduledQuery.Name = d.Queries[newScheduledQuery.QueryID].Name
 
 	return &newScheduledQuery, nil
 }
@@ -25,11 +25,11 @@ func (d *Datastore) SaveScheduledQuery(sq *kolide.ScheduledQuery) (*kolide.Sched
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
-	if _, ok := d.scheduledQueries[sq.ID]; !ok {
+	if _, ok := d.ScheduledQueries[sq.ID]; !ok {
 		return nil, notFound("ScheduledQuery").WithID(sq.ID)
 	}
 
-	d.scheduledQueries[sq.ID] = sq
+	d.ScheduledQueries[sq.ID] = sq
 	return sq, nil
 }
 
@@ -37,11 +37,11 @@ func (d *Datastore) DeleteScheduledQuery(id uint) error {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
-	if _, ok := d.scheduledQueries[id]; !ok {
+	if _, ok := d.ScheduledQueries[id]; !ok {
 		return notFound("ScheduledQuery").WithID(id)
 	}
 
-	delete(d.scheduledQueries, id)
+	delete(d.ScheduledQueries, id)
 	return nil
 }
 
@@ -49,13 +49,13 @@ func (d *Datastore) ScheduledQuery(id uint) (*kolide.ScheduledQuery, error) {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
-	sq, ok := d.scheduledQueries[id]
+	sq, ok := d.ScheduledQueries[id]
 	if !ok {
 		return nil, notFound("ScheduledQuery").WithID(id)
 	}
 
-	sq.Name = d.queries[sq.QueryID].Name
-	sq.Query = d.queries[sq.QueryID].Query
+	sq.Name = d.Queries[sq.QueryID].Name
+	sq.Query = d.Queries[sq.QueryID].Query
 
 	return sq, nil
 }
@@ -66,7 +66,7 @@ func (d *Datastore) ListScheduledQueriesInPack(id uint, opt kolide.ListOptions) 
 
 	// We need to sort by keys to provide reliable ordering
 	keys := []int{}
-	for k, sq := range d.scheduledQueries {
+	for k, sq := range d.ScheduledQueries {
 		if sq.PackID == id {
 			keys = append(keys, int(k))
 		}
@@ -80,9 +80,9 @@ func (d *Datastore) ListScheduledQueriesInPack(id uint, opt kolide.ListOptions) 
 
 	scheduledQueries := []*kolide.ScheduledQuery{}
 	for _, k := range keys {
-		q := d.scheduledQueries[uint(k)]
-		q.Name = d.queries[q.QueryID].Name
-		q.Query = d.queries[q.QueryID].Query
+		q := d.ScheduledQueries[uint(k)]
+		q.Name = d.Queries[q.QueryID].Name
+		q.Query = d.Queries[q.QueryID].Query
 		scheduledQueries = append(scheduledQueries, q)
 	}
 

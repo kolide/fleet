@@ -11,14 +11,14 @@ func (d *Datastore) NewUser(user *kolide.User) (*kolide.User, error) {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
-	for _, in := range d.users {
+	for _, in := range d.Users {
 		if in.Username == user.Username {
 			return nil, alreadyExists("User", in.ID)
 		}
 	}
 
 	user.ID = d.nextID(user)
-	d.users[user.ID] = user
+	d.Users[user.ID] = user
 
 	return user, nil
 }
@@ -27,7 +27,7 @@ func (d *Datastore) User(username string) (*kolide.User, error) {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
-	for _, user := range d.users {
+	for _, user := range d.Users {
 		if user.Username == username {
 			return user, nil
 		}
@@ -43,14 +43,14 @@ func (d *Datastore) ListUsers(opt kolide.ListOptions) ([]*kolide.User, error) {
 
 	// We need to sort by keys to provide reliable ordering
 	keys := []int{}
-	for k, _ := range d.users {
+	for k, _ := range d.Users {
 		keys = append(keys, int(k))
 	}
 	sort.Ints(keys)
 
 	users := []*kolide.User{}
 	for _, k := range keys {
-		users = append(users, d.users[uint(k)])
+		users = append(users, d.Users[uint(k)])
 	}
 
 	// Apply ordering
@@ -82,7 +82,7 @@ func (d *Datastore) UserByEmail(email string) (*kolide.User, error) {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
-	for _, user := range d.users {
+	for _, user := range d.Users {
 		if user.Email == email {
 			return user, nil
 		}
@@ -93,24 +93,21 @@ func (d *Datastore) UserByEmail(email string) (*kolide.User, error) {
 }
 
 func (d *Datastore) UserByID(id uint) (*kolide.User, error) {
-	d.mtx.Lock()
-	defer d.mtx.Unlock()
-
-	if user, ok := d.users[id]; ok {
-		return user, nil
+	u, err := d.byID(&kolide.User{ID: id})
+	if err != nil {
+		return nil, err
 	}
-
-	return nil, notFound("User").WithID(id)
+	return u.(*kolide.User), nil
 }
 
 func (d *Datastore) SaveUser(user *kolide.User) error {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
-	if _, ok := d.users[user.ID]; !ok {
+	if _, ok := d.Users[user.ID]; !ok {
 		return notFound("User").WithID(user.ID)
 	}
 
-	d.users[user.ID] = user
+	d.Users[user.ID] = user
 	return nil
 }

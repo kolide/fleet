@@ -15,14 +15,14 @@ func (d *Datastore) NewLabel(label *kolide.Label) (*kolide.Label, error) {
 	newLabel := *label
 
 	d.mtx.Lock()
-	for _, l := range d.labels {
+	for _, l := range d.Labels {
 		if l.Name == label.Name {
 			return nil, alreadyExists("Label", l.ID)
 		}
 	}
 
 	newLabel.ID = d.nextID(label)
-	d.labels[newLabel.ID] = &newLabel
+	d.Labels[newLabel.ID] = &newLabel
 	d.mtx.Unlock()
 
 	return &newLabel, nil
@@ -33,9 +33,9 @@ func (d *Datastore) ListLabelsForHost(hid uint) ([]kolide.Label, error) {
 	resLabels := []kolide.Label{}
 
 	d.mtx.Lock()
-	for _, lqe := range d.labelQueryExecutions {
+	for _, lqe := range d.LabelQueryExecutions {
 		if lqe.HostID == hid && lqe.Matches {
-			if label := d.labels[lqe.LabelID]; label != nil {
+			if label := d.Labels[lqe.LabelID]; label != nil {
 				resLabels = append(resLabels, *label)
 			}
 		}
@@ -50,14 +50,14 @@ func (d *Datastore) LabelQueriesForHost(host *kolide.Host, cutoff time.Time) (ma
 	execedIDs := map[uint]bool{}
 
 	d.mtx.Lock()
-	for _, lqe := range d.labelQueryExecutions {
+	for _, lqe := range d.LabelQueryExecutions {
 		if lqe.HostID == host.ID && (lqe.UpdatedAt == cutoff || lqe.UpdatedAt.After(cutoff)) {
 			execedIDs[lqe.LabelID] = true
 		}
 	}
 
 	queries := map[string]string{}
-	for _, label := range d.labels {
+	for _, label := range d.Labels {
 		if (label.Platform == "" || strings.Contains(label.Platform, host.Platform)) && !execedIDs[label.ID] {
 			queries[strconv.Itoa(int(label.ID))] = label.Query
 		}
@@ -74,7 +74,7 @@ func (d *Datastore) getLabelByIDString(id string) (*kolide.Label, error) {
 	}
 
 	d.mtx.Lock()
-	label, ok := d.labels[uint(labelID)]
+	label, ok := d.Labels[uint(labelID)]
 	d.mtx.Unlock()
 
 	if !ok {
@@ -94,7 +94,7 @@ func (d *Datastore) RecordLabelQueryExecutions(host *kolide.Host, results map[st
 
 		updated := false
 		d.mtx.Lock()
-		for _, lqe := range d.labelQueryExecutions {
+		for _, lqe := range d.LabelQueryExecutions {
 			if lqe.LabelID == label.ID && lqe.HostID == host.ID {
 				// Update existing execution values
 				lqe.UpdatedAt = t
@@ -113,7 +113,7 @@ func (d *Datastore) RecordLabelQueryExecutions(host *kolide.Host, results map[st
 				Matches:   matches,
 			}
 			lqe.ID = d.nextID(lqe)
-			d.labelQueryExecutions[lqe.ID] = &lqe
+			d.LabelQueryExecutions[lqe.ID] = &lqe
 		}
 		d.mtx.Unlock()
 	}
@@ -121,17 +121,9 @@ func (d *Datastore) RecordLabelQueryExecutions(host *kolide.Host, results map[st
 	return nil
 }
 
-func (d *Datastore) DeleteLabel(lid uint) error {
-	d.mtx.Lock()
-	delete(d.labels, lid)
-	d.mtx.Unlock()
-
-	return nil
-}
-
 func (d *Datastore) Label(lid uint) (*kolide.Label, error) {
 	d.mtx.Lock()
-	label, ok := d.labels[lid]
+	label, ok := d.Labels[lid]
 	d.mtx.Unlock()
 
 	if !ok {
@@ -145,14 +137,14 @@ func (d *Datastore) ListLabels(opt kolide.ListOptions) ([]*kolide.Label, error) 
 	keys := []int{}
 
 	d.mtx.Lock()
-	for k, _ := range d.labels {
+	for k, _ := range d.Labels {
 		keys = append(keys, int(k))
 	}
 	sort.Ints(keys)
 
 	labels := []*kolide.Label{}
 	for _, k := range keys {
-		labels = append(labels, d.labels[uint(k)])
+		labels = append(labels, d.Labels[uint(k)])
 	}
 	d.mtx.Unlock()
 
@@ -187,7 +179,7 @@ func (d *Datastore) SearchLabels(query string, omit ...uint) ([]kolide.Label, er
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
-	for _, l := range d.labels {
+	for _, l := range d.Labels {
 		if len(results) == 10 {
 			break
 		}
@@ -209,9 +201,9 @@ func (d *Datastore) ListHostsInLabel(lid uint) ([]kolide.Host, error) {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
-	for _, lqe := range d.labelQueryExecutions {
+	for _, lqe := range d.LabelQueryExecutions {
 		if lqe.LabelID == lid && lqe.Matches {
-			hosts = append(hosts, *d.hosts[lqe.HostID])
+			hosts = append(hosts, *d.Hosts[lqe.HostID])
 		}
 	}
 
@@ -231,10 +223,10 @@ func (d *Datastore) ListUniqueHostsInLabels(labels []uint) ([]kolide.Host, error
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
-	for _, lqe := range d.labelQueryExecutions {
+	for _, lqe := range d.LabelQueryExecutions {
 		if labelSet[lqe.LabelID] && lqe.Matches {
 			if !hostSet[lqe.HostID] {
-				hosts = append(hosts, *d.hosts[lqe.HostID])
+				hosts = append(hosts, *d.Hosts[lqe.HostID])
 				hostSet[lqe.HostID] = true
 			}
 		}

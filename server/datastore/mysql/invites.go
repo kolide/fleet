@@ -100,16 +100,3 @@ func (d *Datastore) SaveInvite(i *kolide.Invite) error {
 	return nil
 
 }
-
-func (d *Datastore) DeleteInvite(i *kolide.Invite) error {
-	i.MarkDeleted(d.clock.Now())
-	sql := `
-	UPDATE invites SET deleted_at = ?, deleted = ?
-		WHERE id = ?
-	`
-	_, err := d.db.Exec(sql, i.DeletedAt, true, i.ID)
-	if err != nil {
-		return errors.Wrap(err, "delete invite")
-	}
-	return nil
-}

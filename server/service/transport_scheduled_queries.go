@@ -32,16 +32,6 @@ func decodeModifyScheduledQueryRequest(ctx context.Context, r *http.Request) (in
 	return req, nil
 }
 
-func decodeDeleteScheduledQueryRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	id, err := idFromRequest(r, "id")
-	if err != nil {
-		return nil, err
-	}
-	var req deleteScheduledQueryRequest
-	req.ID = id
-	return req, nil
-}
-
 func decodeGetScheduledQueryRequest(ctx context.Context, r *http.Request) (interface{}, error) {
 	id, err := idFromRequest(r, "id")
 	if err != nil {

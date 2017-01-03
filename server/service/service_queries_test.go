@@ -135,7 +135,7 @@ func TestDeleteQuery(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotZero(t, query.ID)
 
-	err = svc.DeleteQuery(ctx, query.ID)
+	err = svc.Delete(ctx, query)
 	assert.Nil(t, err)
 
 	queries, err := ds.ListQueries(kolide.ListOptions{})

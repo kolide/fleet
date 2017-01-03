@@ -14,6 +14,7 @@ type Datastore interface {
 	InviteStore
 	ScheduledQueryStore
 	OptionStore
+	Delete(entity Entity) error
 	Name() string
 	Drop() error
 	Migrate() error

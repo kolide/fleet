@@ -19,11 +19,8 @@ func testDeletePack(t *testing.T, ds kolide.Datastore) {
 	assert.Nil(t, err)
 	assert.NotEqual(t, uint(0), pack.ID)
 
-	pack, err = ds.Pack(pack.ID)
+	err = ds.Delete(pack)
 	require.Nil(t, err)
-
-	err = ds.DeletePack(pack.ID)
-	assert.Nil(t, err)
 
 	assert.NotEqual(t, uint(0), pack.ID)
 	pack, err = ds.Pack(pack.ID)

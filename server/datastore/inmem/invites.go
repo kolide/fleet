@@ -13,7 +13,7 @@ func (d *Datastore) NewInvite(invite *kolide.Invite) (*kolide.Invite, error) {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
-	for _, in := range d.invites {
+	for _, in := range d.Invites {
 		if in.Email == invite.Email {
 			return nil, alreadyExists("Invite", invite.ID)
 		}
@@ -24,8 +24,8 @@ func (d *Datastore) NewInvite(invite *kolide.Invite) (*kolide.Invite, error) {
 		invite.CreatedAt = time.Now()
 	}
 
-	invite.ID = uint(len(d.invites) + 1)
-	d.invites[invite.ID] = invite
+	invite.ID = uint(len(d.Invites) + 1)
+	d.Invites[invite.ID] = invite
 	return invite, nil
 }
 
@@ -36,14 +36,14 @@ func (d *Datastore) ListInvites(opt kolide.ListOptions) ([]*kolide.Invite, error
 
 	// We need to sort by keys to provide reliable ordering
 	keys := []int{}
-	for k, _ := range d.invites {
+	for k, _ := range d.Invites {
 		keys = append(keys, int(k))
 	}
 	sort.Ints(keys)
 
 	invites := []*kolide.Invite{}
 	for _, k := range keys {
-		invites = append(invites, d.invites[uint(k)])
+		invites = append(invites, d.Invites[uint(k)])
 	}
 
 	// Apply ordering
@@ -71,12 +71,11 @@ func (d *Datastore) ListInvites(opt kolide.ListOptions) ([]*kolide.Invite, error
 }
 
 func (d *Datastore) Invite(id uint) (*kolide.Invite, error) {
-	d.mtx.Lock()
-	defer d.mtx.Unlock()
-	if invite, ok := d.invites[id]; ok {
-		return invite, nil
+	i, err := d.byID(&kolide.Invite{ID: id})
+	if err != nil {
+		return nil, err
 	}
-	return nil, alreadyExists("Invite", id)
+	return i.(*kolide.Invite), nil
 }
 
 // InviteByEmail retrieves an invite for a specific email address.
@@ -84,7 +83,7 @@ func (d *Datastore) InviteByEmail(email string) (*kolide.Invite, error) {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
-	for _, invite := range d.invites {
+	for _, invite := range d.Invites {
 		if invite.Email == email {
 			return invite, nil
 		}
@@ -98,7 +97,7 @@ func (d *Datastore) InviteByToken(token string) (*kolide.Invite, error) {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
-	for _, invite := range d.invites {
+	for _, invite := range d.Invites {
 		if invite.Token == token {
 			return invite, nil
 		}
@@ -112,22 +111,10 @@ func (d *Datastore) SaveInvite(invite *kolide.Invite) error {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
-	if _, ok := d.invites[invite.ID]; !ok {
+	if _, ok := d.Invites[invite.ID]; !ok {
 		return notFound("Invite").WithID(invite.ID)
 	}
 
-	d.invites[invite.ID] = invite
-	return nil
-}
-
-// DeleteInvite deletes an invitation.
-func (d *Datastore) DeleteInvite(invite *kolide.Invite) error {
-	d.mtx.Lock()
-	defer d.mtx.Unlock()
-
-	if _, ok := d.invites[invite.ID]; !ok {
-		return notFound("Invite").WithID(invite.ID)
-	}
-	delete(d.invites, invite.ID)
+	d.Invites[invite.ID] = invite
 	return nil
 }
