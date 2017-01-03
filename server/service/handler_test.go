@@ -198,7 +198,7 @@ func TestAPIRoutes(t *testing.T) {
 		},
 		{
 			verb: "GET",
-			uri:  "/api/v1/kolide/hosts/summary",
+			uri:  "/api/v1/kolide/host_summary",
 		},
 	}
 
