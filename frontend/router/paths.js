@@ -7,5 +7,6 @@ export default {
   LOGOUT: '/logout',
   MANAGE_HOSTS: '/hosts/manage',
   NEW_PACK: '/packs/new',
+  NEW_QUERY: '/queries/new',
   RESET_PASSWORD: '/login/reset',
 };
