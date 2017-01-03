@@ -3,7 +3,7 @@ import { noop } from 'lodash';
 
 import Button from 'components/buttons/Button';
 import EditPackForm from 'components/forms/packs/EditPackForm';
-import Icon from 'components/Icon';
+import Icon from 'components/icons/Icon';
 import packInterface from 'interfaces/pack';
 import SelectTargetsDropdown from 'components/forms/fields/SelectTargetsDropdown';
 
@@ -44,12 +44,7 @@ class EditPackFormWrapper extends Component {
 
     return (
       <div className={className}>
-        <Button
-          onClick={onEditPack}
-          text="EDIT"
-          type="button"
-          variant="brand"
-        />
+        <Button onClick={onEditPack} variant="brand">EDIT</Button>
         <h1><Icon name="packs" /> {pack.name}</h1>
         <p>{pack.description}</p>
         <SelectTargetsDropdown

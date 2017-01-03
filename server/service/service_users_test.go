@@ -158,7 +158,7 @@ func TestCreateUser(t *testing.T) {
 			NeedsPasswordReset: boolPtr(true),
 			Admin:              boolPtr(false),
 			InviteToken:        &invites["admin2@example.com"].Token,
-			wantErr:            errors.New("Invite with email admin2@example.com was not found in the datastore"),
+			wantErr:            errors.New("Invite with token admin2@example.com was not found in the datastore"),
 		},
 		{
 			Username:           stringPtr("admin3"),
@@ -264,6 +264,12 @@ func TestChangePassword(t *testing.T) {
 			oldPassword: "foobar",
 			newPassword: "123cat!",
 		},
+		{ // prevent password reuse
+			user:        users["admin1"],
+			oldPassword: "foobar",
+			newPassword: "foobar",
+			wantErr:     &invalidArgumentError{invalidArgument{name: "new_password", reason: "cannot reuse old password"}},
+		},
 		{ // all good
 			user:        users["user1"],
 			oldPassword: "foobar",
@@ -320,6 +326,11 @@ func TestResetPassword(t *testing.T) {
 		{ // all good
 			token:       "abcd",
 			newPassword: "123cat!",
+		},
+		{ // prevent reuse
+			token:       "abcd",
+			newPassword: "123cat!",
+			wantErr:     &invalidArgumentError{invalidArgument{name: "new_password", reason: "cannot reuse old password"}},
 		},
 		{ // bad token
 			token:       "dcbaz",

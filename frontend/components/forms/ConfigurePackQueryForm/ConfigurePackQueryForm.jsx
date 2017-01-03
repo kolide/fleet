@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 
-import Icon from 'components/Icon';
+import Icon from 'components/icons/Icon';
 import Button from 'components/buttons/Button';
 import Dropdown from 'components/forms/fields/Dropdown';
 import Form from 'components/forms/Form';
@@ -90,18 +90,12 @@ class ConfigurePackQueryForm extends Component {
             wrapperClassName={`${baseClass}__form-field ${baseClass}__form-field--logging`}
           />
           <div className={`${baseClass}__btn-wrapper`}>
-            <Button
-              className={`${baseClass}__cancel-btn`}
-              onClick={onCancel}
-              text="Cancel"
-              variant="inverse"
-            />
-            <Button
-              className={`${baseClass}__submit-btn`}
-              text="Save"
-              type="submit"
-              variant="brand"
-            />
+            <Button className={`${baseClass}__cancel-btn`} onClick={onCancel} variant="inverse">
+              Cancel
+            </Button>
+            <Button className={`${baseClass}__submit-btn`} type="submit" variant="brand">
+              Save
+            </Button>
           </div>
         </div>
       </form>

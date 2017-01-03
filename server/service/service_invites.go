@@ -2,16 +2,11 @@ package service
 
 import (
 	"encoding/base64"
+	"html/template"
 
 	"github.com/kolide/kolide-ose/server/kolide"
 	"golang.org/x/net/context"
 )
-
-type inviteMailer struct{}
-
-func (m *inviteMailer) Message() ([]byte, error) {
-	return []byte("test message"), nil
-}
 
 func (svc service) InviteNewUser(ctx context.Context, payload kolide.InvitePayload) (*kolide.Invite, error) {
 	// verify that the user with the given email does not already exist
@@ -63,7 +58,11 @@ func (svc service) InviteNewUser(ctx context.Context, payload kolide.InvitePaylo
 		Subject: "You're Invited to Kolide",
 		To:      []string{invite.Email},
 		Config:  config,
-		Mailer:  &inviteMailer{},
+		Mailer: &kolide.InviteMailer{
+			Invite:            invite,
+			KolideServerURL:   template.URL(config.KolideServerURL),
+			InvitedByUsername: inviter.Name,
+		},
 	}
 
 	err = svc.mailService.SendEmail(inviteEmail)
@@ -77,22 +76,22 @@ func (svc service) ListInvites(ctx context.Context, opt kolide.ListOptions) ([]*
 	return svc.ds.ListInvites(opt)
 }
 
-func (svc service) VerifyInvite(ctx context.Context, email, token string) error {
-	invite, err := svc.ds.InviteByEmail(email)
+func (svc service) VerifyInvite(ctx context.Context, token string) (*kolide.Invite, error) {
+	invite, err := svc.ds.InviteByToken(token)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if invite.Token != token {
-		return newInvalidArgumentError("invite_token", "Invite Token does not match Email Address.")
+		return nil, newInvalidArgumentError("invite_token", "Invite Token does not match Email Address.")
 	}
 
 	expiresAt := invite.CreatedAt.Add(svc.config.App.InviteTokenValidityPeriod)
 	if svc.clock.Now().After(expiresAt) {
-		return newInvalidArgumentError("invite_token", "Invite token has expired.")
+		return nil, newInvalidArgumentError("invite_token", "Invite token has expired.")
 	}
 
-	return nil
+	return invite, nil
 
 }
 

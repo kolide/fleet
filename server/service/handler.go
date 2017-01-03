@@ -1,7 +1,6 @@
 package service
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/go-kit/kit/endpoint"
@@ -9,6 +8,7 @@ import (
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
 	"github.com/kolide/kolide-ose/server/kolide"
+	"github.com/prometheus/client_golang/prometheus"
 	"golang.org/x/net/context"
 )
 
@@ -33,6 +33,7 @@ type KolideEndpoints struct {
 	CreateInvite                   endpoint.Endpoint
 	ListInvites                    endpoint.Endpoint
 	DeleteInvite                   endpoint.Endpoint
+	VerifyInvite                   endpoint.Endpoint
 	GetQuery                       endpoint.Endpoint
 	ListQueries                    endpoint.Endpoint
 	CreateQuery                    endpoint.Endpoint
@@ -66,6 +67,8 @@ type KolideEndpoints struct {
 	DeleteHost                     endpoint.Endpoint
 	ListHosts                      endpoint.Endpoint
 	SearchTargets                  endpoint.Endpoint
+	GetOptions                     endpoint.Endpoint
+	ModifyOptions                  endpoint.Endpoint
 }
 
 // MakeKolideServerEndpoints creates the Kolide API endpoints.
@@ -76,6 +79,7 @@ func MakeKolideServerEndpoints(svc kolide.Service, jwtKey string) KolideEndpoint
 		ForgotPassword: makeForgotPasswordEndpoint(svc),
 		ResetPassword:  makeResetPasswordEndpoint(svc),
 		CreateUser:     makeCreateUserEndpoint(svc),
+		VerifyInvite:   makeVerifyInviteEndpoint(svc),
 
 		// Authenticated user endpoints
 		// Each of these endpoints should have exactly one
@@ -126,6 +130,8 @@ func MakeKolideServerEndpoints(svc kolide.Service, jwtKey string) KolideEndpoint
 		GetLabelsForPack:          authenticatedUser(jwtKey, svc, makeGetLabelsForPackEndpoint(svc)),
 		DeleteLabelFromPack:       authenticatedUser(jwtKey, svc, makeDeleteLabelFromPackEndpoint(svc)),
 		SearchTargets:             authenticatedUser(jwtKey, svc, makeSearchTargetsEndpoint(svc)),
+		GetOptions:                authenticatedUser(jwtKey, svc, mustBeAdmin(makeGetOptionsEndpoint(svc))),
+		ModifyOptions:             authenticatedUser(jwtKey, svc, mustBeAdmin(makeModifyOptionsEndpoint(svc))),
 
 		// Osquery endpoints
 		EnrollAgent:                   makeEnrollAgentEndpoint(svc),
@@ -137,65 +143,68 @@ func MakeKolideServerEndpoints(svc kolide.Service, jwtKey string) KolideEndpoint
 }
 
 type kolideHandlers struct {
-	Login                          *kithttp.Server
-	Logout                         *kithttp.Server
-	ForgotPassword                 *kithttp.Server
-	ResetPassword                  *kithttp.Server
-	Me                             *kithttp.Server
-	ChangePassword                 *kithttp.Server
-	CreateUser                     *kithttp.Server
-	GetUser                        *kithttp.Server
-	ListUsers                      *kithttp.Server
-	ModifyUser                     *kithttp.Server
-	GetSessionsForUserInfo         *kithttp.Server
-	DeleteSessionsForUser          *kithttp.Server
-	GetSessionInfo                 *kithttp.Server
-	DeleteSession                  *kithttp.Server
-	GetAppConfig                   *kithttp.Server
-	ModifyAppConfig                *kithttp.Server
-	CreateInvite                   *kithttp.Server
-	ListInvites                    *kithttp.Server
-	DeleteInvite                   *kithttp.Server
-	GetQuery                       *kithttp.Server
-	ListQueries                    *kithttp.Server
-	CreateQuery                    *kithttp.Server
-	ModifyQuery                    *kithttp.Server
-	DeleteQuery                    *kithttp.Server
-	DeleteQueries                  *kithttp.Server
-	CreateDistributedQueryCampaign *kithttp.Server
-	GetPack                        *kithttp.Server
-	ListPacks                      *kithttp.Server
-	CreatePack                     *kithttp.Server
-	ModifyPack                     *kithttp.Server
-	DeletePack                     *kithttp.Server
-	ScheduleQuery                  *kithttp.Server
-	GetScheduledQueriesInPack      *kithttp.Server
-	GetScheduledQuery              *kithttp.Server
-	ModifyScheduledQuery           *kithttp.Server
-	DeleteScheduledQuery           *kithttp.Server
-	EnrollAgent                    *kithttp.Server
-	GetClientConfig                *kithttp.Server
-	GetDistributedQueries          *kithttp.Server
-	SubmitDistributedQueryResults  *kithttp.Server
-	SubmitLogs                     *kithttp.Server
-	GetLabel                       *kithttp.Server
-	ListLabels                     *kithttp.Server
-	CreateLabel                    *kithttp.Server
-	DeleteLabel                    *kithttp.Server
-	AddLabelToPack                 *kithttp.Server
-	GetLabelsForPack               *kithttp.Server
-	DeleteLabelFromPack            *kithttp.Server
-	GetHost                        *kithttp.Server
-	DeleteHost                     *kithttp.Server
-	ListHosts                      *kithttp.Server
-	SearchTargets                  *kithttp.Server
+	Login                          http.Handler
+	Logout                         http.Handler
+	ForgotPassword                 http.Handler
+	ResetPassword                  http.Handler
+	Me                             http.Handler
+	ChangePassword                 http.Handler
+	CreateUser                     http.Handler
+	GetUser                        http.Handler
+	ListUsers                      http.Handler
+	ModifyUser                     http.Handler
+	GetSessionsForUserInfo         http.Handler
+	DeleteSessionsForUser          http.Handler
+	GetSessionInfo                 http.Handler
+	DeleteSession                  http.Handler
+	GetAppConfig                   http.Handler
+	ModifyAppConfig                http.Handler
+	CreateInvite                   http.Handler
+	ListInvites                    http.Handler
+	DeleteInvite                   http.Handler
+	VerifyInvite                   http.Handler
+	GetQuery                       http.Handler
+	ListQueries                    http.Handler
+	CreateQuery                    http.Handler
+	ModifyQuery                    http.Handler
+	DeleteQuery                    http.Handler
+	DeleteQueries                  http.Handler
+	CreateDistributedQueryCampaign http.Handler
+	GetPack                        http.Handler
+	ListPacks                      http.Handler
+	CreatePack                     http.Handler
+	ModifyPack                     http.Handler
+	DeletePack                     http.Handler
+	ScheduleQuery                  http.Handler
+	GetScheduledQueriesInPack      http.Handler
+	GetScheduledQuery              http.Handler
+	ModifyScheduledQuery           http.Handler
+	DeleteScheduledQuery           http.Handler
+	EnrollAgent                    http.Handler
+	GetClientConfig                http.Handler
+	GetDistributedQueries          http.Handler
+	SubmitDistributedQueryResults  http.Handler
+	SubmitLogs                     http.Handler
+	GetLabel                       http.Handler
+	ListLabels                     http.Handler
+	CreateLabel                    http.Handler
+	DeleteLabel                    http.Handler
+	AddLabelToPack                 http.Handler
+	GetLabelsForPack               http.Handler
+	DeleteLabelFromPack            http.Handler
+	GetHost                        http.Handler
+	DeleteHost                     http.Handler
+	ListHosts                      http.Handler
+	SearchTargets                  http.Handler
+	GetOptions                     http.Handler
+	ModifyOptions                  http.Handler
 }
 
-func makeKolideKitHandlers(ctx context.Context, e KolideEndpoints, opts []kithttp.ServerOption) kolideHandlers {
-	newServer := func(e endpoint.Endpoint, decodeFn kithttp.DecodeRequestFunc) *kithttp.Server {
+func makeKolideKitHandlers(ctx context.Context, e KolideEndpoints, opts []kithttp.ServerOption) *kolideHandlers {
+	newServer := func(e endpoint.Endpoint, decodeFn kithttp.DecodeRequestFunc) http.Handler {
 		return kithttp.NewServer(ctx, e, decodeFn, encodeResponse, opts...)
 	}
-	return kolideHandlers{
+	return &kolideHandlers{
 		Login:                          newServer(e.Login, decodeLoginRequest),
 		Logout:                         newServer(e.Logout, decodeNoParamsRequest),
 		ForgotPassword:                 newServer(e.ForgotPassword, decodeForgotPasswordRequest),
@@ -215,6 +224,7 @@ func makeKolideKitHandlers(ctx context.Context, e KolideEndpoints, opts []kithtt
 		CreateInvite:                   newServer(e.CreateInvite, decodeCreateInviteRequest),
 		ListInvites:                    newServer(e.ListInvites, decodeListInvitesRequest),
 		DeleteInvite:                   newServer(e.DeleteInvite, decodeDeleteInviteRequest),
+		VerifyInvite:                   newServer(e.VerifyInvite, decodeVerifyInviteRequest),
 		GetQuery:                       newServer(e.GetQuery, decodeGetQueryRequest),
 		ListQueries:                    newServer(e.ListQueries, decodeListQueriesRequest),
 		CreateQuery:                    newServer(e.CreateQuery, decodeCreateQueryRequest),
@@ -248,6 +258,8 @@ func makeKolideKitHandlers(ctx context.Context, e KolideEndpoints, opts []kithtt
 		DeleteHost:                    newServer(e.DeleteHost, decodeDeleteHostRequest),
 		ListHosts:                     newServer(e.ListHosts, decodeListHostsRequest),
 		SearchTargets:                 newServer(e.SearchTargets, decodeSearchTargetsRequest),
+		GetOptions:                    newServer(e.GetOptions, decodeNoParamsRequest),
+		ModifyOptions:                 newServer(e.ModifyOptions, decodeModifyOptionsRequest),
 	}
 }
 
@@ -270,73 +282,89 @@ func MakeHandler(ctx context.Context, svc kolide.Service, jwtKey string, logger 
 	r := mux.NewRouter()
 	attachKolideAPIRoutes(r, kolideHandlers)
 	r.HandleFunc("/api/v1/kolide/results/{id}",
-		makeStreamDistributedQueryCampaignResultsHandler(svc, jwtKey)).
-		Methods("GET")
+		makeStreamDistributedQueryCampaignResultsHandler(svc, jwtKey, logger)).
+		Methods("GET").Name("distributed_query_results")
+
+	addMetrics(r)
 
 	return r
 }
 
-func attachKolideAPIRoutes(r *mux.Router, h kolideHandlers) {
-	r.Handle("/api/v1/kolide/login", h.Login).Methods("POST")
-	r.Handle("/api/v1/kolide/logout", h.Logout).Methods("POST")
-	r.Handle("/api/v1/kolide/forgot_password", h.ForgotPassword).Methods("POST")
-	r.Handle("/api/v1/kolide/reset_password", h.ResetPassword).Methods("POST")
-	r.Handle("/api/v1/kolide/me", h.Me).Methods("GET")
-	r.Handle("/api/v1/kolide/change_password", h.ChangePassword).Methods("POST")
+// addMetrics decorates each hander with prometheus instrumentation
+func addMetrics(r *mux.Router) {
+	walkFn := func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
+		route.Handler(prometheus.InstrumentHandler(route.GetName(), route.GetHandler()))
+		return nil
+	}
+	r.Walk(walkFn)
 
-	r.Handle("/api/v1/kolide/users", h.ListUsers).Methods("GET")
-	r.Handle("/api/v1/kolide/users", h.CreateUser).Methods("POST")
-	r.Handle("/api/v1/kolide/users/{id}", h.GetUser).Methods("GET")
-	r.Handle("/api/v1/kolide/users/{id}", h.ModifyUser).Methods("PATCH")
-	r.Handle("/api/v1/kolide/users/{id}/sessions", h.GetSessionsForUserInfo).Methods("GET")
-	r.Handle("/api/v1/kolide/users/{id}/sessions", h.DeleteSessionsForUser).Methods("DELETE")
+}
 
-	r.Handle("/api/v1/kolide/sessions/{id}", h.GetSessionInfo).Methods("GET")
-	r.Handle("/api/v1/kolide/sessions/{id}", h.DeleteSession).Methods("DELETE")
+func attachKolideAPIRoutes(r *mux.Router, h *kolideHandlers) {
+	r.Handle("/api/v1/kolide/login", h.Login).Methods("POST").Name("login")
+	r.Handle("/api/v1/kolide/logout", h.Logout).Methods("POST").Name("logout")
+	r.Handle("/api/v1/kolide/forgot_password", h.ForgotPassword).Methods("POST").Name("forgot_password")
+	r.Handle("/api/v1/kolide/reset_password", h.ResetPassword).Methods("POST").Name("reset_password")
+	r.Handle("/api/v1/kolide/me", h.Me).Methods("GET").Name("me")
+	r.Handle("/api/v1/kolide/change_password", h.ChangePassword).Methods("POST").Name("change_password")
 
-	r.Handle("/api/v1/kolide/config", h.GetAppConfig).Methods("GET")
-	r.Handle("/api/v1/kolide/config", h.ModifyAppConfig).Methods("PATCH")
-	r.Handle("/api/v1/kolide/invites", h.CreateInvite).Methods("POST")
-	r.Handle("/api/v1/kolide/invites", h.ListInvites).Methods("GET")
-	r.Handle("/api/v1/kolide/invites/{id}", h.DeleteInvite).Methods("DELETE")
+	r.Handle("/api/v1/kolide/users", h.ListUsers).Methods("GET").Name("list_users")
+	r.Handle("/api/v1/kolide/users", h.CreateUser).Methods("POST").Name("create_user")
+	r.Handle("/api/v1/kolide/users/{id}", h.GetUser).Methods("GET").Name("get_user")
+	r.Handle("/api/v1/kolide/users/{id}", h.ModifyUser).Methods("PATCH").Name("modify_user")
+	r.Handle("/api/v1/kolide/users/{id}/sessions", h.GetSessionsForUserInfo).Methods("GET").Name("get_session_for_user")
+	r.Handle("/api/v1/kolide/users/{id}/sessions", h.DeleteSessionsForUser).Methods("DELETE").Name("delete_session_for_user")
 
-	r.Handle("/api/v1/kolide/queries/{id}", h.GetQuery).Methods("GET")
-	r.Handle("/api/v1/kolide/queries", h.ListQueries).Methods("GET")
-	r.Handle("/api/v1/kolide/queries", h.CreateQuery).Methods("POST")
-	r.Handle("/api/v1/kolide/queries/{id}", h.ModifyQuery).Methods("PATCH")
-	r.Handle("/api/v1/kolide/queries/{id}", h.DeleteQuery).Methods("DELETE")
-	r.Handle("/api/v1/kolide/queries/delete", h.DeleteQueries).Methods("POST")
-	r.Handle("/api/v1/kolide/queries/run", h.CreateDistributedQueryCampaign).Methods("POST")
+	r.Handle("/api/v1/kolide/sessions/{id}", h.GetSessionInfo).Methods("GET").Name("get_session_info")
+	r.Handle("/api/v1/kolide/sessions/{id}", h.DeleteSession).Methods("DELETE").Name("delete_session")
 
-	r.Handle("/api/v1/kolide/packs/{id}", h.GetPack).Methods("GET")
-	r.Handle("/api/v1/kolide/packs", h.ListPacks).Methods("GET")
-	r.Handle("/api/v1/kolide/packs", h.CreatePack).Methods("POST")
-	r.Handle("/api/v1/kolide/packs/{id}", h.ModifyPack).Methods("PATCH")
-	r.Handle("/api/v1/kolide/packs/{id}", h.DeletePack).Methods("DELETE")
-	r.Handle("/api/v1/kolide/packs/{id}/scheduled", h.GetScheduledQueriesInPack).Methods("GET")
-	r.Handle("/api/v1/kolide/schedule", h.ScheduleQuery).Methods("POST")
-	r.Handle("/api/v1/kolide/schedule/{id}", h.GetScheduledQuery).Methods("GET")
-	r.Handle("/api/v1/kolide/schedule/{id}", h.ModifyScheduledQuery).Methods("PATCH")
-	r.Handle("/api/v1/kolide/schedule/{id}", h.DeleteScheduledQuery).Methods("DELETE")
-	r.Handle("/api/v1/kolide/labels/{id}", h.GetLabel).Methods("GET")
-	r.Handle("/api/v1/kolide/labels", h.ListLabels).Methods("GET")
-	r.Handle("/api/v1/kolide/labels", h.CreateLabel).Methods("POST")
-	r.Handle("/api/v1/kolide/labels/{id}", h.DeleteLabel).Methods("DELETE")
-	r.Handle("/api/v1/kolide/packs/{pid}/labels/{lid}", h.AddLabelToPack).Methods("POST")
-	r.Handle("/api/v1/kolide/packs/{pid}/labels", h.GetLabelsForPack).Methods("GET")
-	r.Handle("/api/v1/kolide/packs/{pid}/labels/{lid}", h.DeleteLabelFromPack).Methods("DELETE")
+	r.Handle("/api/v1/kolide/config", h.GetAppConfig).Methods("GET").Name("get_app_config")
+	r.Handle("/api/v1/kolide/config", h.ModifyAppConfig).Methods("PATCH").Name("modify_app_config")
+	r.Handle("/api/v1/kolide/invites", h.CreateInvite).Methods("POST").Name("create_invite")
+	r.Handle("/api/v1/kolide/invites", h.ListInvites).Methods("GET").Name("list_invites")
+	r.Handle("/api/v1/kolide/invites/{id}", h.DeleteInvite).Methods("DELETE").Name("delete_invite")
+	r.Handle("/api/v1/kolide/invites/{token}", h.VerifyInvite).Methods("GET").Name("verify_invite")
 
-	r.Handle("/api/v1/kolide/hosts", h.ListHosts).Methods("GET")
-	r.Handle("/api/v1/kolide/hosts/{id}", h.GetHost).Methods("GET")
-	r.Handle("/api/v1/kolide/hosts/{id}", h.DeleteHost).Methods("DELETE")
+	r.Handle("/api/v1/kolide/queries/{id}", h.GetQuery).Methods("GET").Name("get_query")
+	r.Handle("/api/v1/kolide/queries", h.ListQueries).Methods("GET").Name("list_queries")
+	r.Handle("/api/v1/kolide/queries", h.CreateQuery).Methods("POST").Name("create_query")
+	r.Handle("/api/v1/kolide/queries/{id}", h.ModifyQuery).Methods("PATCH").Name("modify_query")
+	r.Handle("/api/v1/kolide/queries/{id}", h.DeleteQuery).Methods("DELETE").Name("delete_query")
+	r.Handle("/api/v1/kolide/queries/delete", h.DeleteQueries).Methods("POST").Name("delete_queries")
+	r.Handle("/api/v1/kolide/queries/run", h.CreateDistributedQueryCampaign).Methods("POST").Name("create_distributed_query_campaign")
 
-	r.Handle("/api/v1/kolide/targets", h.SearchTargets).Methods("POST")
+	r.Handle("/api/v1/kolide/packs/{id}", h.GetPack).Methods("GET").Name("get_pack")
+	r.Handle("/api/v1/kolide/packs", h.ListPacks).Methods("GET").Name("list_packs")
+	r.Handle("/api/v1/kolide/packs", h.CreatePack).Methods("POST").Name("create_pack")
+	r.Handle("/api/v1/kolide/packs/{id}", h.ModifyPack).Methods("PATCH").Name("modify_pack")
+	r.Handle("/api/v1/kolide/packs/{id}", h.DeletePack).Methods("DELETE").Name("delete_pack")
+	r.Handle("/api/v1/kolide/packs/{id}/scheduled", h.GetScheduledQueriesInPack).Methods("GET").Name("get_scheduled_queries_in_pack")
+	r.Handle("/api/v1/kolide/schedule", h.ScheduleQuery).Methods("POST").Name("schedule_query")
+	r.Handle("/api/v1/kolide/schedule/{id}", h.GetScheduledQuery).Methods("GET").Name("get_scheduled_query")
+	r.Handle("/api/v1/kolide/schedule/{id}", h.ModifyScheduledQuery).Methods("PATCH").Name("modify_scheduled_query")
+	r.Handle("/api/v1/kolide/schedule/{id}", h.DeleteScheduledQuery).Methods("DELETE").Name("delete_scheduled_query")
+	r.Handle("/api/v1/kolide/labels/{id}", h.GetLabel).Methods("GET").Name("get_label")
+	r.Handle("/api/v1/kolide/labels", h.ListLabels).Methods("GET").Name("list_labels")
+	r.Handle("/api/v1/kolide/labels", h.CreateLabel).Methods("POST").Name("create_label")
+	r.Handle("/api/v1/kolide/labels/{id}", h.DeleteLabel).Methods("DELETE").Name("delete_label")
+	r.Handle("/api/v1/kolide/packs/{pid}/labels/{lid}", h.AddLabelToPack).Methods("POST").Name("add_label_to_pack")
+	r.Handle("/api/v1/kolide/packs/{pid}/labels", h.GetLabelsForPack).Methods("GET").Name("get_labels_for_pack")
+	r.Handle("/api/v1/kolide/packs/{pid}/labels/{lid}", h.DeleteLabelFromPack).Methods("DELETE").Name("delete_label_from_pack")
 
-	r.Handle("/api/v1/osquery/enroll", h.EnrollAgent).Methods("POST")
-	r.Handle("/api/v1/osquery/config", h.GetClientConfig).Methods("POST")
-	r.Handle("/api/v1/osquery/distributed/read", h.GetDistributedQueries).Methods("POST")
-	r.Handle("/api/v1/osquery/distributed/write", h.SubmitDistributedQueryResults).Methods("POST")
-	r.Handle("/api/v1/osquery/log", h.SubmitLogs).Methods("POST")
+	r.Handle("/api/v1/kolide/hosts", h.ListHosts).Methods("GET").Name("list_hosts")
+	r.Handle("/api/v1/kolide/hosts/{id}", h.GetHost).Methods("GET").Name("get_host")
+	r.Handle("/api/v1/kolide/hosts/{id}", h.DeleteHost).Methods("DELETE").Name("delete_host")
+
+	r.Handle("/api/v1/kolide/options", h.GetOptions).Methods("GET").Name("get_options")
+	r.Handle("/api/v1/kolide/options", h.ModifyOptions).Methods("PATCH").Name("modify_options")
+
+	r.Handle("/api/v1/kolide/targets", h.SearchTargets).Methods("POST").Name("search_targets")
+
+	r.Handle("/api/v1/osquery/enroll", h.EnrollAgent).Methods("POST").Name("enroll_agent")
+	r.Handle("/api/v1/osquery/config", h.GetClientConfig).Methods("POST").Name("get_client_config")
+	r.Handle("/api/v1/osquery/distributed/read", h.GetDistributedQueries).Methods("POST").Name("get_distributed_queries")
+	r.Handle("/api/v1/osquery/distributed/write", h.SubmitDistributedQueryResults).Methods("POST").Name("submit_distributed_query_results")
+	r.Handle("/api/v1/osquery/log", h.SubmitLogs).Methods("POST").Name("submit_logs")
 }
 
 // WithSetup is an http middleware that checks if a database user exists.
@@ -345,7 +373,6 @@ func attachKolideAPIRoutes(r *mux.Router, h kolideHandlers) {
 func WithSetup(svc kolide.Service, logger kitlog.Logger, next http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		configRouter := http.NewServeMux()
-		configRouter.Handle("/api/v1/kolide/config", http.HandlerFunc(forceSetup))
 		configRouter.Handle("/api/v1/setup", kithttp.NewServer(
 			context.Background(),
 			makeSetupEndpoint(svc),
@@ -360,12 +387,24 @@ func WithSetup(svc kolide.Service, logger kitlog.Logger, next http.Handler) http
 	}
 }
 
-func forceSetup(w http.ResponseWriter, r *http.Request) {
-	response := map[string]bool{
-		"require_setup": true,
-	}
-	if err := json.NewEncoder(w).Encode(&response); err != nil {
-		encodeError(context.Background(), err, w)
+// RedirectLoginToSetup detects if the setup endpoint should be used. If setup is required it redirect all
+// frontend urls to /setup, otherwise the frontend router is used.
+func RedirectLoginToSetup(svc kolide.Service, logger kitlog.Logger, next http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		redirect := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.Path == "/setup" {
+				next.ServeHTTP(w, r)
+				return
+			}
+			newURL := r.URL
+			newURL.Path = "/setup"
+			http.Redirect(w, r, newURL.String(), http.StatusTemporaryRedirect)
+		})
+		if RequireSetup(svc, logger) {
+			redirect.ServeHTTP(w, r)
+		} else {
+			next.ServeHTTP(w, r)
+		}
 	}
 }
 
