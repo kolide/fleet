@@ -38,6 +38,7 @@ const validate = (formData) => {
 
 class QueryForm extends Component {
   static propTypes = {
+    baseError: PropTypes.string,
     fields: PropTypes.shape({
       description: formFieldInterface.isRequired,
       name: formFieldInterface.isRequired,
@@ -252,7 +253,7 @@ class QueryForm extends Component {
 
   render () {
     const { errors } = this.state;
-    const { fields, handleSubmit, queryIsRunning, queryType } = this.props;
+    const { baseError, fields, handleSubmit, queryIsRunning, queryType } = this.props;
     const { onLoad, renderPlatformDropdown, renderButtons, renderTargetsInput } = this;
 
     return (
@@ -265,6 +266,7 @@ class QueryForm extends Component {
           readOnly={queryIsRunning}
           wrapperClassName={`${baseClass}__text-editor-wrapper`}
         />
+        {baseError && <div className="form__base-error">{baseError}</div>}
         {renderTargetsInput()}
         <InputField
           {...fields.name}

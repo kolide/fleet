@@ -1,6 +1,7 @@
 import React from 'react';
 import expect, { createSpy, restoreSpies } from 'expect';
 import { mount } from 'enzyme';
+import { noop } from 'lodash';
 
 import { fillInFormInput } from 'test/helpers';
 import QueryForm from './index';
@@ -15,6 +16,15 @@ const queryText = 'SELECT * FROM users';
 
 describe('QueryForm - component', () => {
   afterEach(restoreSpies);
+
+  it('renders the base error', () => {
+    const baseError = 'Unable to authenticate the current user';
+    const formWithError = mount(<QueryForm serverErrors={{ base: baseError }} handleSubmit={noop} />);
+    const formWithoutError = mount(<QueryForm handleSubmit={noop} />);
+
+    expect(formWithError.text()).toInclude(baseError);
+    expect(formWithoutError.text()).toNotInclude(baseError);
+  });
 
   it('renders InputFields for the query name and description', () => {
     const form = mount(<QueryForm query={query} queryText={queryText} />);
