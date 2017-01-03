@@ -20,6 +20,9 @@ class ConfirmInvitePage extends Component {
       invite_token: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
     }).isRequired,
+    userErrors: PropTypes.shape({
+      base: PropTypes.string,
+    }),
   };
 
   onSubmit = (formData) => {
@@ -32,22 +35,13 @@ class ConfirmInvitePage extends Component {
         dispatch(push(LOGIN));
         dispatch(renderFlash('success', 'Registration successful! For security purposes, please log in.'));
       })
-      .catch((errors) => {
-        const errorMessages = map(errors, (error) => {
-          return `${error.name}: ${error.reason}`;
-        });
-        const formattedErrorMessage = join(errorMessages, ',');
-
-        dispatch(renderFlash('error', formattedErrorMessage));
-
-        return false;
-      });
+      .catch(() => false);
 
     return false;
   }
 
   render () {
-    const { inviteFormData } = this.props;
+    const { inviteFormData, userErrors } = this.props;
     const { onSubmit } = this;
 
     return (
@@ -69,6 +63,7 @@ class ConfirmInvitePage extends Component {
             className={`${baseClass}__form`}
             formData={inviteFormData}
             handleSubmit={onSubmit}
+            serverErrors={userErrors}
           />
         </div>
       </AuthenticationFormWrapper>
@@ -80,8 +75,9 @@ const mapStateToProps = (state, { location: urlLocation, params }) => {
   const { email, name } = urlLocation.query;
   const { invite_token: inviteToken } = params;
   const inviteFormData = { email, invite_token: inviteToken, name };
+  const { errors: userErrors } = state.entities.users;
 
-  return { inviteFormData };
+  return { inviteFormData, userErrors };
 };
 
 const ConnectedComponent = connect(mapStateToProps)(ConfirmInvitePage);
