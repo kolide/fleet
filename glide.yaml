@@ -60,5 +60,5 @@ import:
   - redis
 - package: github.com/jmoiron/sqlx
 - package: github.com/pressly/goose
-  repo: github.com/zwass/goose
-  version: fix_globals
+  repo: git@github.com:kolide/goose.git
+  vcs: git
