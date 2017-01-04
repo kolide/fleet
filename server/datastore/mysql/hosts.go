@@ -174,7 +174,7 @@ func (d *Datastore) SaveHost(host *kolide.Host) error {
 
 	tx, err := d.db.Beginx()
 	if err != nil {
-		return errors.Wrap(err, "Creating transaction in SaveHost")
+		return errors.Wrap(err, "creating transaction")
 	}
 
 	_, err = tx.Exec(sqlStatement,
@@ -204,18 +204,18 @@ func (d *Datastore) SaveHost(host *kolide.Host) error {
 		host.ID)
 	if err != nil {
 		tx.Rollback()
-		return errors.Wrap(err, "Executing main SQL statement in SaveHost")
+		return errors.Wrap(err, "executing main SQL statement")
 	}
 
 	host.NetworkInterfaces, err = updateNicsForHost(tx, host)
 	if err != nil {
 		tx.Rollback()
-		return errors.Wrap(err, "Updating nics in SaveHost")
+		return errors.Wrap(err, "updating nics")
 	}
 
 	if err = removedUnusedNics(tx, host); err != nil {
 		tx.Rollback()
-		return errors.Wrap(err, "removing unused nics in SaveHost")
+		return errors.Wrap(err, "removing unused nics")
 	}
 
 	if needsUpdate := host.ResetPrimaryNetwork(); needsUpdate {
@@ -227,13 +227,13 @@ func (d *Datastore) SaveHost(host *kolide.Host) error {
 
 		if err != nil {
 			tx.Rollback()
-			return errors.Wrap(err, "Resetting in SaveHost")
+			return errors.Wrap(err, "resetting primary network")
 		}
 	}
 
 	if err = tx.Commit(); err != nil {
 		tx.Rollback()
-		return errors.Wrap(err, "Committing transaction in SaveHost")
+		return errors.Wrap(err, "committing transaction")
 	}
 	return nil
 }
@@ -308,7 +308,7 @@ func (d *Datastore) GenerateHostStatusStatistics(now time.Time) (online, offline
 		Online  uint `db:"online"`
 	}{}
 	if err := d.db.Select(&rows, sqlStatement, now, now, now, now); err != nil {
-		e = errors.Wrap(err, "GenerateHostStatusStatistics")
+		e = errors.Wrap(err, "generating host statistics")
 		return
 	}
 
@@ -399,7 +399,7 @@ func (d *Datastore) EnrollHost(osqueryHostID string, nodeKeySize int) (*kolide.H
 	detailUpdateTime := time.Unix(0, 0).Add(24 * time.Hour)
 	nodeKey, err := kolide.RandomText(nodeKeySize)
 	if err != nil {
-		return nil, errors.Wrap(err, "generating random text in EnrollHost")
+		return nil, errors.Wrap(err, "generating random text")
 	}
 
 	sqlInsert := `
@@ -418,7 +418,7 @@ func (d *Datastore) EnrollHost(osqueryHostID string, nodeKeySize int) (*kolide.H
 	result, err = d.db.Exec(sqlInsert, detailUpdateTime, osqueryHostID, nodeKey)
 
 	if err != nil {
-		return nil, errors.Wrap(err, "inserting in EnrollHost")
+		return nil, errors.Wrap(err, "inserting")
 	}
 
 	id, _ := result.LastInsertId()
@@ -428,7 +428,7 @@ func (d *Datastore) EnrollHost(osqueryHostID string, nodeKeySize int) (*kolide.H
 	host := &kolide.Host{}
 	err = d.db.Get(host, sqlSelect, id)
 	if err != nil {
-		return nil, errors.Wrap(err, "getting the host to return in EnrollHost")
+		return nil, errors.Wrap(err, "getting the host to return")
 	}
 
 	return host, nil
@@ -447,14 +447,14 @@ func (d *Datastore) AuthenticateHost(nodeKey string) (*kolide.Host, error) {
 	if err := d.db.Get(host, sqlStatement, nodeKey); err != nil {
 		switch err {
 		case sql.ErrNoRows:
-			return nil, errors.Wrap(err, "host not found in AuthenticateHost")
+			return nil, errors.Wrap(err, "host not found")
 		default:
-			return nil, errors.New("finding host in AuthenticateHost")
+			return nil, errors.New("finding host")
 		}
 	}
 
 	if err := d.getNetInterfacesForHost(host); err != nil {
-		return nil, errors.Wrap(err, "Getting interfaces in AuthenticateHost")
+		return nil, errors.Wrap(err, "getting interfaces")
 	}
 
 	return host, nil
@@ -523,7 +523,7 @@ func (d *Datastore) searchHostsWithOmits(query string, omit ...uint) ([]*kolide.
 	}
 
 	if err := d.getNetInterfacesForHosts(hosts); err != nil {
-		return nil, errors.Wrap(err, "getting network interfaces in searchHostsWithOmits")
+		return nil, errors.Wrap(err, "getting network interfaces")
 	}
 
 	return hosts, nil
@@ -570,11 +570,11 @@ func (d *Datastore) SearchHosts(query string, omit ...uint) ([]*kolide.Host, err
 	hosts := []*kolide.Host{}
 
 	if err := d.db.Select(&hosts, sqlStatement, hostnameQuery, ipQuery); err != nil {
-		return nil, errors.Wrap(err, "SearchHosts")
+		return nil, errors.Wrap(err, "searching hosts")
 	}
 
 	if err := d.getNetInterfacesForHosts(hosts); err != nil {
-		return nil, errors.Wrap(err, "getting interfaces in SearchHosts")
+		return nil, errors.Wrap(err, "getting interfaces")
 	}
 
 	return hosts, nil
@@ -602,7 +602,7 @@ func (d *Datastore) DistributedQueriesForHost(host *kolide.Host) (map[uint]strin
 	rows, err := d.db.Query(sqlStatement, kolide.TargetLabel, kolide.TargetLabel,
 		kolide.TargetHost, kolide.QueryRunning, host.ID)
 	if err != nil {
-		return nil, errors.Wrap(err, "DistributedQueriesForHost")
+		return nil, errors.Wrap(err, "finding distributed queries for host")
 	}
 	defer rows.Close()
 
@@ -615,7 +615,7 @@ func (d *Datastore) DistributedQueriesForHost(host *kolide.Host) (map[uint]strin
 		)
 		err = rows.Scan(&id, &query)
 		if err != nil {
-			return nil, errors.Wrap(err, "Scanning in DistributedQueriesForHost")
+			return nil, errors.Wrap(err, "scanning query results")
 		}
 
 		results[id] = query
