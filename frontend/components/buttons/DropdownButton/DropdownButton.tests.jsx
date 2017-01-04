@@ -3,7 +3,7 @@ import expect, { createSpy, restoreSpies } from 'expect';
 import { mount } from 'enzyme';
 import { noop } from 'lodash';
 
-import DecoratedDropdownButton, { DropdownButton } from './DropdownButton';
+import { DropdownButton } from './DropdownButton';
 
 describe('DropdownButton - component', () => {
   afterEach(restoreSpies);
