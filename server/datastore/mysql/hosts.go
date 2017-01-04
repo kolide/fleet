@@ -461,10 +461,6 @@ func (d *Datastore) AuthenticateHost(nodeKey string) (*kolide.Host, error) {
 		return nil, errors.Wrap(err, "getting interfaces")
 	}
 
-	if err := d.MarkHostSeen(host, time.Now().UTC()); err != nil {
-		return nil, errors.Wrap(err, "marking host seen")
-	}
-
 	return host, nil
 }
 
