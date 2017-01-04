@@ -8,16 +8,13 @@
   @include display(flex);
   @include align-items(center);
   @include justify-content(center);
-  @include position(fixed, 0 0 null 240px);
+  @include position(absolute, 0 0 null 0);
   color: $white;
-  padding: 0 $pad-half;
+  padding: $pad-half;
   z-index: 2;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
   background-color: #3d4758;
-
-  @include breakpoint(tablet) {
-    left: 55px;
-  }
+  min-width: $min-width;
 
   &--full-width {
     left: 0;
@@ -67,8 +64,6 @@
     margin-left: 15px;
 
     &--success {
-      background-color: $success-light;
-
       &:hover {
         .kolidecon {
           color: $success-light;
@@ -77,8 +72,6 @@
     }
 
     &--error {
-      background-color: $alert-light;
-
       &:hover {
         .kolidecon {
           color: $alert-light;
