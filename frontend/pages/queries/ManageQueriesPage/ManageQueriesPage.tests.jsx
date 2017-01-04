@@ -43,10 +43,13 @@ describe('ManageQueriesPage - component', () => {
     expect(page.find('QueriesList').length).toEqual(1);
   });
 
-  it('renders the QueryInfoSidePanel by default', () => {
-    const page = mount(connectedComponent(ConnectedManageQueriesPage));
+  it('renders the QueryDetailsSidePanel when a query is selected', () => {
+    const mockStore = reduxMockStore(store);
+    const props = { location: { query: { selectedQuery: queryStub.id } } };
+    const Component = connectedComponent(ConnectedManageQueriesPage, { mockStore, props });
+    const page = mount(Component).find('ManageQueriesPage');
 
-    expect(page.find('QueryInfoSidePanel').length).toEqual(1);
+    expect(page.find('QueryDetailsSidePanel').length).toEqual(1);
   });
 
   it('updates checkedQueryIDs in state when the check all queries Checkbox is toggled', () => {

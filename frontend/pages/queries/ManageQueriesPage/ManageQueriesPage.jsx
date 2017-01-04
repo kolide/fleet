@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { filter, get, includes, isEqual, noop, pull } from 'lodash';
+import { filter, get, includes, noop, pull } from 'lodash';
 import { push } from 'react-router-redux';
 
 import Button from 'components/buttons/Button';
@@ -8,8 +8,9 @@ import entityGetter from 'redux/utilities/entityGetter';
 import Icon from 'components/icons/Icon';
 import InputField from 'components/forms/fields/InputField';
 import NumberPill from 'components/NumberPill';
-import packInterface from 'interfaces/pack';
+import PackInfoSidePanel from 'components/side_panels/PackInfoSidePanel';
 import paths from 'router/paths';
+import QueryDetailsSidePanel from 'components/side_panels/QueryDetailsSidePanel';
 import QueriesList from 'components/queries/QueriesList';
 import queryActions from 'redux/nodes/entities/queries/actions';
 import queryInterface from 'interfaces/query';
@@ -22,7 +23,6 @@ export class ManageQueriesPage extends Component {
     dispatch: PropTypes.func,
     queries: PropTypes.arrayOf(queryInterface),
     selectedQuery: queryInterface,
-    selectedPacks: PropTypes.arrayOf(packInterface),
   }
 
   static defaultProps = {
@@ -40,23 +40,9 @@ export class ManageQueriesPage extends Component {
   }
 
   componentWillMount() {
-    const { dispatch, queries, selectedQuery } = this.props;
+    const { dispatch } = this.props;
 
-    if (!queries.length) {
-      dispatch(queryActions.loadAll());
-    }
-
-    if (selectedQuery) {
-      // TODO: Get packs for the query
-    }
-
-    return false;
-  }
-
-  componentWillReceiveProps ({ selectedQuery }) {
-    if (!isEqual(this.props.selectedQuery, selectedQuery)) {
-      // TODO: Get packs for the query
-    }
+    dispatch(queryActions.loadAll());
 
     return false;
   }
@@ -181,11 +167,14 @@ export class ManageQueriesPage extends Component {
   }
 
   renderSidePanel = () => {
-    // const { selectedQuery, selectedPacks } = this.props;
+    const { selectedQuery } = this.props;
 
-    // TODO: Render QueryDetailsSidePanel
+    if (!selectedQuery) {
+      // FIXME: Render QueryDetailsSidePanel when Fritz has completed the mock
+      return <PackInfoSidePanel />;
+    }
 
-    return false;
+    return <QueryDetailsSidePanel query={selectedQuery} />;
   }
 
   render () {
@@ -237,13 +226,11 @@ export class ManageQueriesPage extends Component {
 
 const mapStateToProps = (state, { location }) => {
   const queryEntities = entityGetter(state).get('queries');
-  const packEntities = entityGetter(state).get('packs');
   const { entities: queries } = queryEntities;
   const selectedQueryID = get(location, 'query.selectedQuery');
   const selectedQuery = selectedQueryID && queryEntities.findBy({ id: selectedQueryID });
-  const selectedPacks = selectedQuery && packEntities.where({ query_id: selectedQuery.id });
 
-  return { queries, selectedQuery, selectedPacks };
+  return { queries, selectedQuery };
 };
 
 export default connect(mapStateToProps)(ManageQueriesPage);
