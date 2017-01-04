@@ -112,7 +112,7 @@ test-js:
 		--require "frontend/.test.setup.js" \
 		--require "frontend/test/loaderMock.js"
 
-test: lint test-go test-js test-analyze-go
+test: lint test-go test-js
 
 generate: .prefix
 	webpack --progress --colors
