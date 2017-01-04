@@ -8,15 +8,13 @@ import entityGetter from 'redux/utilities/entityGetter';
 import Icon from 'components/icons/Icon';
 import InputField from 'components/forms/fields/InputField';
 import NumberPill from 'components/NumberPill';
-import PackDetailsSidePanel from 'components/side_panels/PackDetailsSidePanel';
-import PackInfoSidePanel from 'components/side_panels/PackInfoSidePanel';
 import packInterface from 'interfaces/pack';
 import PacksList from 'components/packs/PacksList';
 import paths from 'router/paths';
+import QueriesList from 'components/queries/QueriesList';
 import queryActions from 'redux/nodes/entities/queries/actions';
 import queryInterface from 'interfaces/query';
 import { renderFlash } from 'redux/nodes/notifications/actions';
-import scheduledQueryActions from 'redux/nodes/entities/scheduled_queries/actions';
 
 const baseClass = 'manage-queries-page';
 
@@ -64,30 +62,24 @@ export class ManageQueriesPage extends Component {
     return false;
   }
 
-  onBulkAction = (actionType) => {
-    return (evt) => {
-      evt.preventDefault();
+  onDeleteQueries = (evt) => {
+    evt.preventDefault();
 
-      const { checkedQueryIDs } = this.state;
-      const { dispatch } = this.props;
-      const { destroy } = queryActions;
+    const { checkedQueryIDs } = this.state;
+    const { dispatch } = this.props;
+    const { destroy } = queryActions;
 
-      const promises = checkedQueryIDs.map((queryID) => {
-        if (actionType === 'delete') {
-          return dispatch(destroy({ id: queryID }));
-        }
-      });
+    const promises = checkedQueryIDs.map((queryID) => {
+      return dispatch(destroy({ id: queryID }));
+    });
 
-      return Promise.all(promises)
-        .then(() => {
-          if (actionType === 'delete') {
-            dispatch(renderFlash('success', 'Queries successfully deleted.'));
-          }
+    return Promise.all(promises)
+      .then(() => {
+        dispatch(renderFlash('success', 'Queries successfully deleted.'));
 
-          return false;
-        })
-        .catch(() => dispatch(renderFlash('error', 'Something went wrong.')));
-    };
+        return false;
+      })
+      .catch(() => dispatch(renderFlash('error', 'Something went wrong.')));
   }
 
   onCheckAllQueries = (shouldCheck) => {
@@ -132,13 +124,6 @@ export class ManageQueriesPage extends Component {
     return false;
   }
 
-  onUpdateSelectedQuery = (query, updatedAttrs) => {
-    const { dispatch } = this.props;
-    const { update } = queryActions;
-
-    return dispatch(update(query, updatedAttrs));
-  }
-
   getQueries = () => {
     const { queriesFilter } = this.state;
     const { queries } = this.props;
@@ -147,7 +132,7 @@ export class ManageQueriesPage extends Component {
       return queries;
     }
 
-    const lowerQueryFilter = queryFilter.toLowerCase();
+    const lowerQueryFilter = queriesFilter.toLowerCase();
 
     return filter(queries, (query) => {
       if (!query.name) {
@@ -170,8 +155,8 @@ export class ManageQueriesPage extends Component {
   }
 
   renderCTAs = () => {
-    const { goToNewQueryPage, onBulkAction } = this;
-    const btnClass = `${baseClass}__bulk-action-btn`;
+    const { goToNewQueryPage, onDeleteQueries } = this;
+    const btnClass = `${baseClass}__delete-queries-btn`;
     const checkedQueryCount = this.state.checkedQueryIDs.length;
 
     if (checkedQueryCount) {
@@ -181,9 +166,9 @@ export class ManageQueriesPage extends Component {
         <div>
           <p className={`${baseClass}__query-count`}>{checkedQueryCount} {queryText} Selected</p>
           <Button
-            className={`${btnClass} ${btnClass}--disable`}
-            onClick={onBulkAction('disable')}
-            variant="unstyled"
+            className={btnClass}
+            onClick={onDeleteQueries}
+            variant="alert"
           >
             <Icon name="offline" /> Disable
           </Button>
@@ -197,7 +182,6 @@ export class ManageQueriesPage extends Component {
   }
 
   renderSidePanel = () => {
-    const { onUpdateSelectedQuery } = this;
     const { selectedQuery, selectedPacks } = this.props;
 
     // TODO: Render QueryDetailsSidePanel
@@ -216,9 +200,10 @@ export class ManageQueriesPage extends Component {
       renderCTAs,
       renderSidePanel,
     } = this;
-    const { selectedQuery } = this.props;
+    const { queries: allQueries, selectedQuery } = this.props;
     const queries = getQueries();
     const queriesCount = queries.length;
+    const isQueriesAvailable = allQueries.length > 0;
 
     return (
       <div className={`${baseClass} has-sidebar`}>
@@ -235,15 +220,15 @@ export class ManageQueriesPage extends Component {
             />
             {renderCTAs()}
           </div>
-          <PacksList
-            allPacksChecked={allQueriesChecked}
-            checkedPackIDs={checkedQueryIDs}
+          <QueriesList
+            checkedQueryIDs={checkedQueryIDs}
             className={`${baseClass}__table`}
-            onCheckAllPacks={onCheckAllQueries}
-            onCheckPack={onCheckQuery}
-            onSelectPack={onSelectQuery}
-            packs={queries}
-            selectedPack={selectedQuery}
+            isQueriesAvailable={isQueriesAvailable}
+            onCheckAll={onCheckAllQueries}
+            onCheckQuery={onCheckQuery}
+            onSelectQuery={onSelectQuery}
+            queries={queries}
+            selectedQuery={selectedQuery}
           />
         </div>
         {renderSidePanel()}
