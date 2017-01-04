@@ -7,6 +7,7 @@
   &__carat {
     font-size: 6px;
     vertical-align: middle;
+    margin-left: 10px;
   }
 
   &__options {
@@ -42,6 +43,7 @@
       width: 100%;
       font-size: 15px;
       height: 38px;
+      letter-spacing: -0.5px;
 
       &:hover {
         background-color: $brand-light;
