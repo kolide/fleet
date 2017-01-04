@@ -140,9 +140,9 @@ func RandomText(keySize int) (string, error) {
 
 func (h *Host) Status(c clock.Clock) string {
 	switch {
-	case h.UpdatedAt.Add(MIADuration).Before(c.Now()):
+	case h.DetailUpdateTime.Add(MIADuration).Before(c.Now()):
 		return StatusMIA
-	case h.UpdatedAt.Add(OfflineDuration).Before(c.Now()):
+	case h.DetailUpdateTime.Add(OfflineDuration).Before(c.Now()):
 		return StatusOffline
 	default:
 		return StatusOnline

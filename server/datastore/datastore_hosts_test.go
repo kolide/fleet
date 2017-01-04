@@ -493,59 +493,43 @@ func testDistributedQueriesForHost(t *testing.T, ds kolide.Datastore) {
 func testGenerateHostStatusStatistics(t *testing.T, ds kolide.Datastore) {
 	mockClock := clock.NewMockClock()
 
+	// Online
 	_, err := ds.NewHost(&kolide.Host{
 		ID:               1,
 		OsqueryHostID:    "1",
 		UUID:             "1",
 		NodeKey:          "1",
 		DetailUpdateTime: mockClock.Now(),
-		UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
-			UpdateTimestamp: kolide.UpdateTimestamp{
-				UpdatedAt: mockClock.Now(),
-			},
-		},
 	})
 	assert.Nil(t, err)
 
+	// Online
 	_, err = ds.NewHost(&kolide.Host{
 		ID:               2,
 		OsqueryHostID:    "2",
 		UUID:             "2",
 		NodeKey:          "2",
 		DetailUpdateTime: mockClock.Now().Add(-1 * time.Minute),
-		UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
-			UpdateTimestamp: kolide.UpdateTimestamp{
-				UpdatedAt: mockClock.Now().Add(-1 * time.Minute),
-			},
-		},
 	})
 	assert.Nil(t, err)
 
+	// Offline
 	_, err = ds.NewHost(&kolide.Host{
 		ID:               3,
 		OsqueryHostID:    "3",
 		UUID:             "3",
 		NodeKey:          "3",
 		DetailUpdateTime: mockClock.Now().Add(-1 * time.Hour),
-		UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
-			UpdateTimestamp: kolide.UpdateTimestamp{
-				UpdatedAt: mockClock.Now().Add(-1 * time.Hour),
-			},
-		},
 	})
 	assert.Nil(t, err)
 
+	// MIA
 	_, err = ds.NewHost(&kolide.Host{
 		ID:               4,
 		OsqueryHostID:    "4",
 		UUID:             "4",
 		NodeKey:          "4",
-		DetailUpdateTime: mockClock.Now().Add(-24 * 35 * time.Hour),
-		UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
-			UpdateTimestamp: kolide.UpdateTimestamp{
-				UpdatedAt: mockClock.Now().Add(-24 * 35 * time.Hour),
-			},
-		},
+		DetailUpdateTime: mockClock.Now().Add(-35 * (24 * time.Hour)),
 	})
 	assert.Nil(t, err)
 

@@ -189,10 +189,12 @@ func (d *Datastore) MarkHostSeen(host *kolide.Host, t time.Time) error {
 	defer d.mtx.Unlock()
 
 	host.UpdatedAt = t
+	host.DetailUpdateTime = t
 
 	for _, h := range d.hosts {
 		if h.ID == host.ID {
 			h.UpdatedAt = t
+			h.DetailUpdateTime = t
 			break
 		}
 	}
