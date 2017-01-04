@@ -143,7 +143,7 @@ To update, use [`glide up`](https://github.com/Masterminds/glide#glide-update-al
 
   * From the project root run the following commands:
   ``` bash
-  > go get github.com/pressly/goose
+  > go get github.com/kolide/goose
   > cd server/datastore/mysql/migrations
   > goose create AddColumnFooToUsers
   ```
@@ -154,7 +154,7 @@ To update, use [`glide up`](https://github.com/Masterminds/glide#glide-update-al
   import (
   	"database/sql"
 
-  	"github.com/pressly/goose"
+  	"github.com/kolide/goose"
   )
 
   func init() {
