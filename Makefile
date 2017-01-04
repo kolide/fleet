@@ -100,7 +100,7 @@ lint: lint-go lint-js lint-scss lint-ts
 test-go:
 	go test $(shell glide nv)
 
-test-analyze-go:
+analyze-go:
 	go test -race -cover $(shell glide nv)
 
 
