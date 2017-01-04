@@ -29,8 +29,9 @@ const FlashMessage = ({ fullWidth, notification, onRemoveFlash, onUndoActionClic
             className={`${baseClass}__undo`}
             variant="unstyled"
             onClick={onUndoActionClick(undoAction)}
-            text="undo"
-          />
+          >
+            Undo
+          </Button>
         }
       </div>
       <div className={`${baseClass}__action`}>
@@ -38,8 +39,9 @@ const FlashMessage = ({ fullWidth, notification, onRemoveFlash, onUndoActionClic
           className={`${baseClass}__remove ${baseClass}__remove--${alertType}`}
           variant="unstyled"
           onClick={onRemoveFlash}
-          text={<Icon name="x" />}
-        />
+        >
+          <Icon name="x" />
+        </Button>
       </div>
     </div>
   );
