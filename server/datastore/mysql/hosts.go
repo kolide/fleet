@@ -305,27 +305,19 @@ func (d *Datastore) GenerateHostStatusStatistics(now time.Time) (online, offline
 		LIMIT 1;
 	`
 
-	rows := []struct {
+	counts := struct {
 		MIA     uint `db:"mia"`
 		Offline uint `db:"offline"`
 		Online  uint `db:"online"`
 	}{}
-	if err := d.db.Select(&rows, sqlStatement, now, now, now, now); err != nil {
+	if err := d.db.Get(&counts, sqlStatement, now, now, now, now); err != nil {
 		e = errors.Wrap(err, "generating host statistics")
 		return
 	}
 
-	if len(rows) != 1 {
-		e = fmt.Errorf(
-			"Unexpected number of rows returned from stats query. Got %d. Wanted %d",
-			len(rows),
-			1,
-		)
-		return
-	}
-	mia = rows[0].MIA
-	offline = rows[0].Offline
-	online = rows[0].Online
+	mia = counts.MIA
+	offline = counts.Offline
+	online = counts.Online
 	return online, offline, mia, nil
 }
 
