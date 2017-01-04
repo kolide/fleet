@@ -9,7 +9,6 @@ import Icon from 'components/icons/Icon';
 import InputField from 'components/forms/fields/InputField';
 import NumberPill from 'components/NumberPill';
 import packInterface from 'interfaces/pack';
-import PacksList from 'components/packs/PacksList';
 import paths from 'router/paths';
 import QueriesList from 'components/queries/QueriesList';
 import queryActions from 'redux/nodes/entities/queries/actions';
@@ -182,7 +181,7 @@ export class ManageQueriesPage extends Component {
   }
 
   renderSidePanel = () => {
-    const { selectedQuery, selectedPacks } = this.props;
+    // const { selectedQuery, selectedPacks } = this.props;
 
     // TODO: Render QueryDetailsSidePanel
 
@@ -190,7 +189,7 @@ export class ManageQueriesPage extends Component {
   }
 
   render () {
-    const { allQueriesChecked, checkedQueryIDs, queriesFilter } = this.state;
+    const { checkedQueryIDs, queriesFilter } = this.state;
     const {
       getQueries,
       onCheckAllQueries,
@@ -222,7 +221,6 @@ export class ManageQueriesPage extends Component {
           </div>
           <QueriesList
             checkedQueryIDs={checkedQueryIDs}
-            className={`${baseClass}__table`}
             isQueriesAvailable={isQueriesAvailable}
             onCheckAll={onCheckAllQueries}
             onCheckQuery={onCheckQuery}

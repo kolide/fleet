@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import classnames from 'classnames';
 import moment from 'moment';
 
 import Checkbox from 'components/forms/fields/Checkbox';
@@ -6,11 +7,15 @@ import ClickableTableRow from 'components/ClickableTableRow';
 import { isEqual } from 'lodash';
 import queryInterface from 'interfaces/query';
 
+const baseClass = 'queries-list-row';
+
 class QueriesListRow extends Component {
   static propTypes = {
     checked: PropTypes.bool,
+    onCheck: PropTypes.func.isRequired,
     onSelect: PropTypes.func.isRequired,
     query: queryInterface.isRequired,
+    selected: PropTypes.bool,
   };
 
   shouldComponentUpdate (nextProps) {
@@ -34,13 +39,16 @@ class QueriesListRow extends Component {
   }
 
   render () {
-    const { checked, query } = this.props;
+    const { checked, query, selected } = this.props;
     const { onCheck, onSelect } = this;
     const { author_name: authorName, id, name, updated_at: updatedAt } = query;
     const lastModifiedDate = moment(updatedAt).format('MM/DD/YY');
+    const rowClassName = classnames(baseClass, {
+      [`${baseClass}--selected`]: selected,
+    });
 
     return (
-      <ClickableTableRow onClick={onSelect}>
+      <ClickableTableRow className={rowClassName} onClick={onSelect}>
         <td>
           <Checkbox
             name={`query-checkbox-${id}`}
@@ -57,5 +65,3 @@ class QueriesListRow extends Component {
 }
 
 export default QueriesListRow;
-
-

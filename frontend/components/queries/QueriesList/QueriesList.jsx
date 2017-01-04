@@ -11,13 +11,16 @@ const baseClass = 'queries-list';
 class QueriesList extends Component {
   static propTypes = {
     checkedQueryIDs: PropTypes.arrayOf(PropTypes.number).isRequired,
-    className: PropTypes.string,
     isQueriesAvailable: PropTypes.bool,
     onCheckAll: PropTypes.func.isRequired,
     onCheckQuery: PropTypes.func.isRequired,
     onSelectQuery: PropTypes.func.isRequired,
     queries: PropTypes.arrayOf(queryInterface).isRequired,
     selectedQuery: queryInterface,
+  };
+
+  static defaultProps = {
+    selectedQuery: {},
   };
 
   constructor (props) {
@@ -106,6 +109,7 @@ class QueriesList extends Component {
                   onCheck={onCheckQuery}
                   onSelect={onSelectQuery}
                   query={query}
+                  selected={selectedQuery.id === query.id}
                 />
               );
             })}
