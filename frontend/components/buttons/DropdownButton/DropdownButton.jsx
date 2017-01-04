@@ -8,7 +8,7 @@ import Button from 'components/buttons/Button';
 
 const baseClass = 'dropdown-button';
 
-class DropdownButton extends Component {
+export class DropdownButton extends Component {
   static propTypes = {
     children: PropTypes.node,
     className: PropTypes.string,
@@ -56,7 +56,7 @@ class DropdownButton extends Component {
 
     return (
       <li className={`${baseClass}__option`} key={`dropdown-button-option-${idx}`}>
-        <Button variant="unstyled" onClick={(evt) => optionClick(evt, onClick)} disabled={disabled}>{label}</Button>
+        <Button variant="unstyled" onClick={evt => optionClick(evt, onClick)} disabled={disabled}>{label}</Button>
       </li>
     );
   };

@@ -118,8 +118,7 @@ describe('QueryForm - component', () => {
     const form = mount(<QueryForm query={query} queryText={queryText} />);
     const inputFields = form.find('InputField');
     const nameInput = inputFields.find({ name: 'name' });
-    const saveDropButton = form.find('.query-form__save');
-    const saveChangesOption = form.find('li').first().find('Button');
+    const saveChangesOption = form.find('li.dropdown-button__option').first().find('Button');
 
     expect(saveChangesOption.props()).toInclude({
       disabled: true,
@@ -136,8 +135,7 @@ describe('QueryForm - component', () => {
     const form = mount(<QueryForm query={query} queryText={queryText} />);
     const inputFields = form.find('InputField');
     const descriptionInput = inputFields.find({ name: 'description' });
-    const saveDropButton = form.find('.query-form__save');
-    const saveChangesOption = form.find('li').first().find('Button');
+    const saveChangesOption = form.find('li.dropdown-button__option').first().find('Button');
 
     expect(saveChangesOption.props()).toInclude({
       disabled: true,
@@ -155,8 +153,7 @@ describe('QueryForm - component', () => {
     const form = mount(<QueryForm query={query} queryText={queryText} onSave={onSaveAsNewSpy} />);
     const inputFields = form.find('InputField');
     const nameInput = inputFields.find({ name: 'name' });
-    const saveDropButton = form.find('.query-form__save');
-    const saveAsNewOption = form.find('li').last().find('Button');
+    const saveAsNewOption = form.find('li.dropdown-button__option').last().find('Button');
 
     fillInFormInput(nameInput, 'New query name');
 
@@ -174,8 +171,7 @@ describe('QueryForm - component', () => {
     const form = mount(<QueryForm query={query} queryText={queryText} onSave={onSaveAsNewSpy} />);
     const inputFields = form.find('InputField');
     const nameInput = inputFields.find({ name: 'name' });
-    const saveDropButton = form.find('.query-form__save');
-    const saveAsNewOption = form.find('li').last().find('Button');
+    const saveAsNewOption = form.find('li.dropdown-button__option').last().find('Button');
 
     fillInFormInput(nameInput, '');
 
