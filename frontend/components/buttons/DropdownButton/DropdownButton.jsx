@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { noop } from 'lodash';
 import classnames from 'classnames';
 
+import ClickOutside from 'components/ClickOutside';
 import Icon from 'components/icons/Icon';
 import Button from 'components/buttons/Button';
 
@@ -33,6 +34,10 @@ class DropdownButton extends Component {
     super(props);
 
     this.state = { isOpen: false };
+  }
+
+  setDOMNode = (DOMNode) => {
+    this.DOMNode = DOMNode;
   }
 
   toggleDropdown = () => {
@@ -68,7 +73,7 @@ class DropdownButton extends Component {
       variant,
     } = this.props;
     const { isOpen } = this.state;
-    const { toggleDropdown, renderOptions } = this;
+    const { toggleDropdown, renderOptions, setDOMNode } = this;
 
     const buttonClass = classnames(baseClass, className);
     const optionsClass = classnames(`${baseClass}__options`, {
@@ -76,7 +81,7 @@ class DropdownButton extends Component {
     });
 
     return (
-      <div className={`${baseClass}__wrapper`}>
+      <div className={`${baseClass}__wrapper`} ref={setDOMNode}>
         <Button
           className={buttonClass}
           disabled={disabled}
@@ -99,4 +104,15 @@ class DropdownButton extends Component {
   }
 }
 
-export default DropdownButton;
+export default ClickOutside(DropdownButton, {
+  getDOMNode: (component) => {
+    return component.DOMNode;
+  },
+  onOutsideClick: (component) => {
+    return () => {
+      component.setState({ isOpen: false });
+
+      return false;
+    };
+  },
+});
