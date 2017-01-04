@@ -56,18 +56,20 @@
   }
 
   &__add-query-icon {
-    color: $brand;
+    color: $link;
     font-size: 20px;
   }
 
   &__hostname {
-    font-size: 12px;
+    @include ellipsis;
+    font-size: 16px;
     font-weight: $bold;
     letter-spacing: 1px;
     text-align: center;
     color: $link;
     clear: both;
     margin: 0;
+    width: 100%;
   }
 
   &__details-list {
@@ -75,7 +77,6 @@
     @include flex-wrap(wrap);
     @include justify-content(space-around);
     border-top: 1px solid $accent-light;
-    border-bottom: 1px solid $accent-light;
     list-style: none;
     margin: 8px auto;
     padding: 8px 0;
@@ -86,7 +87,7 @@
     font-size: 14px;
     font-weight: $light;
     color: $text-ultradark;
-    padding: 4px 0;
+    padding: 7px 0;
     text-align: center;
 
     .kolidecon {
