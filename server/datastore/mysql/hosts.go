@@ -285,18 +285,18 @@ func (d *Datastore) GenerateHostStatusStatistics(now time.Time) (online, offline
 		SELECT (
 			SELECT count(id)
 			FROM hosts
-			WHERE DATE_ADD(detail_update_time, INTERVAL 30 DAY) <= ?
+			WHERE DATE_ADD(updated_at, INTERVAL 30 DAY) <= ?
 		) AS mia,
 		(
 			SELECT count(id)
 			FROM hosts
-			WHERE DATE_ADD(detail_update_time, INTERVAL 30 MINUTE) <= ?
-			AND DATE_ADD(detail_update_time, INTERVAL 30 DAY) >= ?
+			WHERE DATE_ADD(updated_at, INTERVAL 30 MINUTE) <= ?
+			AND DATE_ADD(updated_at, INTERVAL 30 DAY) >= ?
 		) AS offline,
 		(
 			SELECT count(id)
 			FROM hosts
-			WHERE DATE_ADD(detail_update_time, INTERVAL 30 MINUTE) > ?
+			WHERE DATE_ADD(updated_at, INTERVAL 30 MINUTE) > ?
 		) AS online
 		FROM hosts
 		LIMIT 1;
@@ -463,7 +463,7 @@ func (d *Datastore) AuthenticateHost(nodeKey string) (*kolide.Host, error) {
 func (d *Datastore) MarkHostSeen(host *kolide.Host, t time.Time) error {
 	sqlStatement := `
 		UPDATE hosts SET
-			detail_update_time = ?
+			updated_at = ?
 		WHERE node_key=?
 	`
 
