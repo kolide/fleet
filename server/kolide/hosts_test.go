@@ -50,14 +50,14 @@ func TestHostStatus(t *testing.T) {
 	host := Host{}
 
 	host.DetailUpdateTime = mockClock.Now()
-	assert.Equal(t, StatusOnline, host.Status(mockClock))
+	assert.Equal(t, StatusOnline, host.Status(mockClock.Now()))
 
 	host.DetailUpdateTime = mockClock.Now().Add(-1 * time.Minute)
-	assert.Equal(t, StatusOnline, host.Status(mockClock))
+	assert.Equal(t, StatusOnline, host.Status(mockClock.Now()))
 
 	host.DetailUpdateTime = mockClock.Now().Add(-1 * time.Hour)
-	assert.Equal(t, StatusOffline, host.Status(mockClock))
+	assert.Equal(t, StatusOffline, host.Status(mockClock.Now()))
 
 	host.DetailUpdateTime = mockClock.Now().Add(-35 * (24 * time.Hour)) // 35 days
-	assert.Equal(t, StatusMIA, host.Status(mockClock))
+	assert.Equal(t, StatusMIA, host.Status(mockClock.Now()))
 }

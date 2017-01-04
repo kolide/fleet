@@ -1,9 +1,5 @@
 package kolide
 
-import (
-	"github.com/WatchBeam/clock"
-)
-
 // service a interface stub
 type Service interface {
 	UserService
@@ -19,6 +15,4 @@ type Service interface {
 	TargetService
 	ScheduledQueryService
 	OptionService
-
-	Clock() clock.Clock
 }

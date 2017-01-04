@@ -1,6 +1,8 @@
 package service
 
 import (
+	"time"
+
 	"github.com/go-kit/kit/endpoint"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"golang.org/x/net/context"
@@ -36,7 +38,7 @@ func makeGetHostEndpoint(svc kolide.Service) endpoint.Endpoint {
 		return getHostResponse{
 			&hostResponse{
 				Host:   *host,
-				Status: host.Status(svc.Clock()),
+				Status: host.Status(time.Now()),
 			},
 			nil,
 		}, nil
@@ -72,7 +74,7 @@ func makeListHostsEndpoint(svc kolide.Service) endpoint.Endpoint {
 				resp.Hosts,
 				hostResponse{
 					Host:   *host,
-					Status: host.Status(svc.Clock()),
+					Status: host.Status(time.Now()),
 				},
 			)
 		}

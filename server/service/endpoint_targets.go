@@ -1,6 +1,8 @@
 package service
 
 import (
+	"time"
+
 	"github.com/go-kit/kit/endpoint"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"golang.org/x/net/context"
@@ -67,7 +69,7 @@ func makeSearchTargetsEndpoint(svc kolide.Service) endpoint.Endpoint {
 				hostSearchResult{
 					hostResponse{
 						Host:   host,
-						Status: host.Status(svc.Clock()),
+						Status: host.Status(time.Now()),
 					},
 					host.HostName,
 				},

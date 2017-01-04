@@ -6,7 +6,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/WatchBeam/clock"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"github.com/patrickmn/sortutil"
 )
@@ -115,12 +114,12 @@ func (d *Datastore) ListHosts(opt kolide.ListOptions) ([]*kolide.Host, error) {
 	return hosts, nil
 }
 
-func (d *Datastore) GenerateHostStatusStatistics(c clock.Clock) (online, offline, mia uint, err error) {
+func (d *Datastore) GenerateHostStatusStatistics(now time.Time) (online, offline, mia uint, err error) {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
 	for _, host := range d.hosts {
-		status := host.Status(c)
+		status := host.Status(now)
 		switch status {
 		case kolide.StatusMIA:
 			mia++

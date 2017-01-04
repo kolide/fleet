@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/WatchBeam/clock"
 	"github.com/jmoiron/sqlx"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"github.com/patrickmn/sortutil"
@@ -281,7 +280,7 @@ func (d *Datastore) ListHosts(opt kolide.ListOptions) ([]*kolide.Host, error) {
 	return hosts, nil
 }
 
-func (d *Datastore) GenerateHostStatusStatistics(c clock.Clock) (online, offline, mia uint, e error) {
+func (d *Datastore) GenerateHostStatusStatistics(now time.Time) (online, offline, mia uint, e error) {
 	sqlStatement := `
 		SELECT (
 			SELECT count(id)
@@ -291,7 +290,7 @@ func (d *Datastore) GenerateHostStatusStatistics(c clock.Clock) (online, offline
 		(
 			SELECT count(id)
 			FROM hosts
-			WHERE DATE_ADD(detail_update_time, INTERVAL 30 MINUTE) =< ?
+			WHERE DATE_ADD(detail_update_time, INTERVAL 30 MINUTE) <= ?
 			AND DATE_ADD(detail_update_time, INTERVAL 30 DAY) >= ?
 		) AS offline,
 		(
@@ -308,7 +307,7 @@ func (d *Datastore) GenerateHostStatusStatistics(c clock.Clock) (online, offline
 		Offline uint `db:"offline"`
 		Online  uint `db:"online"`
 	}{}
-	if err := d.db.Select(&rows, sqlStatement, c.Now(), c.Now(), c.Now(), c.Now()); err != nil {
+	if err := d.db.Select(&rows, sqlStatement, now, now, now, now); err != nil {
 		e = errors.Wrap(err, "GenerateHostStatusStatistics")
 		return
 	}

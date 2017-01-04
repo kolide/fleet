@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"time"
 
-	"github.com/WatchBeam/clock"
 	"golang.org/x/net/context"
 )
 
@@ -33,7 +32,7 @@ type HostStore interface {
 	EnrollHost(osqueryHostId string, nodeKeySize int) (*Host, error)
 	AuthenticateHost(nodeKey string) (*Host, error)
 	MarkHostSeen(host *Host, t time.Time) error
-	GenerateHostStatusStatistics(c clock.Clock) (online, offline, mia uint, err error)
+	GenerateHostStatusStatistics(now time.Time) (online, offline, mia uint, err error)
 	SearchHosts(query string, omit ...uint) ([]*Host, error)
 	// DistributedQueriesForHost retrieves the distributed queries that the
 	// given host should run. The result map is a mapping from campaign ID
@@ -138,11 +137,11 @@ func RandomText(keySize int) (string, error) {
 	return base64.StdEncoding.EncodeToString(key), nil
 }
 
-func (h *Host) Status(c clock.Clock) string {
+func (h *Host) Status(now time.Time) string {
 	switch {
-	case h.DetailUpdateTime.Add(MIADuration).Before(c.Now()):
+	case h.DetailUpdateTime.Add(MIADuration).Before(now):
 		return StatusMIA
-	case h.DetailUpdateTime.Add(OfflineDuration).Before(c.Now()):
+	case h.DetailUpdateTime.Add(OfflineDuration).Before(now):
 		return StatusOffline
 	default:
 		return StatusOnline

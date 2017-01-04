@@ -533,7 +533,7 @@ func testGenerateHostStatusStatistics(t *testing.T, ds kolide.Datastore) {
 	})
 	assert.Nil(t, err)
 
-	online, offline, mia, err := ds.GenerateHostStatusStatistics(mockClock)
+	online, offline, mia, err := ds.GenerateHostStatusStatistics(mockClock.Now())
 	assert.Nil(t, err)
 	assert.Equal(t, uint(2), online)
 	assert.Equal(t, uint(1), offline)
