@@ -284,18 +284,18 @@ func (d *Datastore) ListHosts(opt kolide.ListOptions) ([]*kolide.Host, error) {
 func (d *Datastore) GenerateHostStatusStatistics(c clock.Clock) (online, offline, mia uint, e error) {
 	sqlStatement := `
 		SELECT (
-			SELECT count(*)
+			SELECT count(id)
 			FROM hosts
-			WHERE DATE_ADD(detail_update_time, INTERVAL 30 DAY) < ?
+			WHERE DATE_ADD(detail_update_time, INTERVAL 30 DAY) <= ?
 		) AS mia,
 		(
-			SELECT count(*)
+			SELECT count(id)
 			FROM hosts
-			WHERE DATE_ADD(detail_update_time, INTERVAL 30 MINUTE) < ?
-			AND DATE_ADD(detail_update_time, INTERVAL 30 DAY) > ?
+			WHERE DATE_ADD(detail_update_time, INTERVAL 30 MINUTE) =< ?
+			AND DATE_ADD(detail_update_time, INTERVAL 30 DAY) >= ?
 		) AS offline,
 		(
-			SELECT count(*)
+			SELECT count(id)
 			FROM hosts
 			WHERE DATE_ADD(detail_update_time, INTERVAL 30 MINUTE) > ?
 		) AS online
