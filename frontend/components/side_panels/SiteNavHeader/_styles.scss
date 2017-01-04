@@ -89,7 +89,6 @@
 }
 
 .user-menu-toggle {
-  @include transition(opacity 150ms ease-in-out);
   height: 0;
   width: 239px;
   position: absolute;

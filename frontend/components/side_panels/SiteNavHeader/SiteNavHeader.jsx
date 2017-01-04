@@ -2,7 +2,6 @@ import React, { Component, PropTypes } from 'react';
 import classnames from 'classnames';
 
 import configInterface from 'interfaces/config';
-import Icon from 'components/icons/Icon';
 import OrgLogoIcon from 'components/icons/OrgLogoIcon';
 import userInterface from 'interfaces/user';
 import UserMenu from 'components/side_panels/SiteNavHeader/UserMenu';
