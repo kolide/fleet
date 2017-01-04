@@ -222,24 +222,6 @@ class QueryForm extends Component {
 
     return (
       <div className={`${baseClass}__button-wrap`}>
-
-        <Button
-          className={`${baseClass}__save-changes-btn`}
-          disabled={!canSaveChanges(formData, query)}
-          onClick={onUpdate}
-          variant="inverse"
-        >
-          Save Changes
-        </Button>
-        <Button
-          className={`${baseClass}__save-as-new-btn`}
-          disabled={!canSaveAsNew(formData, query)}
-          onClick={onSave}
-          variant="success"
-        >
-          Save As New...
-        </Button>
-
         <DropdownButton
           className={`${baseClass}__save`}
           options={[{
@@ -255,6 +237,7 @@ class QueryForm extends Component {
         >
           Save
         </DropdownButton>
+
         {runQueryButton}
       </div>
     );

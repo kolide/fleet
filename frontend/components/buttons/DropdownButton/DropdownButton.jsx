@@ -40,12 +40,18 @@ class DropdownButton extends Component {
     this.setState({ isOpen: !isOpen });
   };
 
+  optionClick = (evt, onClick) => {
+    this.setState({ isOpen: false });
+    onClick(evt);
+  };
+
   renderOptions = (opt, idx) => {
+    const { optionClick } = this;
     const { disabled, label, onClick } = opt;
 
     return (
-      <li className={`${baseClass}__option`} key={idx}>
-        <Button variant="unstyled" onClick={onClick} disabled={disabled}>{label}</Button>
+      <li className={`${baseClass}__option`} key={`dropdown-button-option-${idx}`}>
+        <Button variant="unstyled" onClick={(evt) => optionClick(evt, onClick)} disabled={disabled}>{label}</Button>
       </li>
     );
   };
