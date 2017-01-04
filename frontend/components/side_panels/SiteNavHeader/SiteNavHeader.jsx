@@ -74,8 +74,7 @@ class SiteNavHeader extends Component {
     const headerToggleClass = classnames(
       `${headerBaseClass}__button`,
       'button',
-      'button--unstyled',
-      { [`${headerBaseClass}__button--open`]: userMenuOpened }
+      'button--unstyled'
     );
 
     const userStatusClass = classnames(
@@ -91,7 +90,6 @@ class SiteNavHeader extends Component {
             <h1 className={`${headerBaseClass}__org-name`}>{orgName}</h1>
             <div className={userStatusClass} />
             <h2 className={`${headerBaseClass}__username`}>{username}</h2>
-            <Icon name="chevrondown" className={`${headerBaseClass}__org-chevron`} />
           </div>
 
           <UserMenu
