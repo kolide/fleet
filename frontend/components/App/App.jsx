@@ -45,8 +45,6 @@ export class App extends Component {
     }
   }
 
-
-
   render () {
     const { children, showBackgroundImage } = this.props;
 

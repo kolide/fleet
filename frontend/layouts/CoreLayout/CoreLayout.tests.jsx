@@ -1,9 +1,9 @@
-import expect, { spyOn, restoreSpies } from 'expect';
+import expect from 'expect';
 import { mount } from 'enzyme';
 
-import CoreLayout from './CoreLayout';
-import helpers from '../../test/helpers';
+import helpers from 'test/helpers';
 import { userStub } from 'test/stubs';
+import CoreLayout from './CoreLayout';
 
 const {
   connectedComponent,
@@ -13,9 +13,6 @@ const {
 describe('CoreLayout - layouts', () => {
   const store = { app: { config: {} }, auth: { user: userStub }, notifications: {} };
   const mockStore = reduxMockStore(store);
-  const component = mount(
-    connectedComponent(CoreLayout, { mockStore })
-  );
 
   it('renders the FlashMessage component when notifications are present', () => {
     const storeWithNotifications = {
