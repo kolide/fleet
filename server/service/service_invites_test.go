@@ -21,12 +21,15 @@ func TestInviteNewUser(t *testing.T) {
 	nosuchAdminID := uint(999)
 	adminID := uint(1)
 	mailer := &mockMailService{SendEmailFn: func(e kolide.Email) error { return nil }}
-	svc := validationMiddleware{service{
-		ds:          ds,
-		config:      config.TestConfig(),
-		mailService: mailer,
-		clock:       clock.NewMockClock(),
-	}}
+	svc := validationMiddleware{
+		service{
+			ds:          ds,
+			config:      config.TestConfig(),
+			mailService: mailer,
+			clock:       clock.NewMockClock(),
+		},
+		ds,
+	}
 
 	var inviteTests = []struct {
 		payload kolide.InvitePayload

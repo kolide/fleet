@@ -10,6 +10,7 @@ import (
 
 type validationMiddleware struct {
 	kolide.Service
+	ds kolide.Datastore
 }
 
 func (mw validationMiddleware) NewUser(ctx context.Context, p kolide.UserPayload) (*kolide.User, error) {
