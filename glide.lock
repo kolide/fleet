@@ -95,7 +95,8 @@ imports:
   subpackages:
   - difflib
 - name: github.com/pressly/goose
-  version: d6e8fe0292718c30342b3ed7f324dc21634b3bc6
+  repo: git@github.com:zwass/goose.git
+  version: fix_globals
 - name: github.com/prometheus/client_golang
   version: c5b7fccd204277076155f10851dad72b76a49317
   subpackages:

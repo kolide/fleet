@@ -16,7 +16,10 @@ type Datastore interface {
 	OptionStore
 	Name() string
 	Drop() error
-	Migrate() error
+	// MigrateTables should create and migrate the schema for the tables
+	MigrateTables() error
+	// MigrateData should insert any built-in data
+	MigrateData() error
 }
 
 // NotFoundError is returned when the datastore resource cannot be found.

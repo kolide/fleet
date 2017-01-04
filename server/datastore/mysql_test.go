@@ -9,7 +9,8 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/kolide/kolide-ose/server/config"
 	"github.com/kolide/kolide-ose/server/datastore/mysql"
-	_ "github.com/kolide/kolide-ose/server/datastore/mysql/migrations"
+	_ "github.com/kolide/kolide-ose/server/datastore/mysql/migrations/data"
+	_ "github.com/kolide/kolide-ose/server/datastore/mysql/migrations/tables"
 	"github.com/stretchr/testify/require"
 )
 
@@ -49,7 +50,7 @@ func TestMySQL(t *testing.T) {
 
 		t.Run(functionName(f), func(t *testing.T) {
 			defer func() { require.Nil(t, ds.Drop()) }()
-			require.Nil(t, ds.Migrate())
+			require.Nil(t, ds.MigrateTables())
 
 			f(t, ds)
 		})
