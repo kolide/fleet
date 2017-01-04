@@ -98,7 +98,11 @@ lint-go:
 lint: lint-go lint-js lint-scss lint-ts
 
 test-go:
-	go test -cover $(shell glide nv)
+	go test $(shell glide nv)
+
+test-analyze-go:
+	go test -race -cover $(shell glide nv)
+
 
 test-js: export NODE_PATH = ./frontend
 test-js:
@@ -108,7 +112,7 @@ test-js:
 		--require "frontend/.test.setup.js" \
 		--require "frontend/test/loaderMock.js"
 
-test: lint test-go test-js
+test: lint test-go test-js test-analyze-go
 
 generate: .prefix
 	webpack --progress --colors
