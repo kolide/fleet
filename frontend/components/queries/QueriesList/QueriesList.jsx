@@ -76,7 +76,7 @@ class QueriesList extends Component {
   }
 
   render () {
-    const { checkedQueryIDs, onCheckQuery, onSelectQuery, queries } = this.props;
+    const { checkedQueryIDs, onCheckQuery, onSelectQuery, queries, selectedQuery } = this.props;
     const { allQueriesChecked } = this.state;
     const { renderHelpText, handleCheckAll } = this;
 
