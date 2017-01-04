@@ -61,4 +61,5 @@ var testFunctions = [...]func(*testing.T, kolide.Datastore){
 	testOptionsToConfig,
 	testAddLabelToPackTwice,
 	testGenerateHostStatusStatistics,
+	testMarkHostSeen,
 }

@@ -47,7 +47,7 @@ func (svc service) CountHostsInTargets(ctx context.Context, hostIDs []uint, labe
 	for _, host := range hosts {
 		if !hostLookup[host.ID] {
 			hostLookup[host.ID] = true
-			switch host.Status(svc.clock.Now()) {
+			switch host.Status(svc.clock.Now().UTC()) {
 			case kolide.StatusOnline:
 				result.OnlineHosts++
 			case kolide.StatusOffline:

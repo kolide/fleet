@@ -56,6 +56,7 @@ type Host struct {
 	// a GUID or a Host Name, but in either case, it MUST be unique
 	OsqueryHostID    string        `json:"-" db:"osquery_host_id"`
 	DetailUpdateTime time.Time     `json:"detail_updated_at" db:"detail_update_time"` // Time that the host details were last updated
+	SeenTime         time.Time     `json:"seen_time" db:"seen_time"`                  // Time that the host was last "seen"
 	NodeKey          string        `json:"-" db:"node_key"`
 	HostName         string        `json:"hostname" db:"host_name"` // there is a fulltext index on this field
 	UUID             string        `json:"uuid"`
@@ -139,9 +140,9 @@ func RandomText(keySize int) (string, error) {
 
 func (h *Host) Status(now time.Time) string {
 	switch {
-	case h.DetailUpdateTime.Add(MIADuration).Before(now):
+	case h.SeenTime.Add(MIADuration).Before(now):
 		return StatusMIA
-	case h.DetailUpdateTime.Add(OfflineDuration).Before(now):
+	case h.SeenTime.Add(OfflineDuration).Before(now):
 		return StatusOffline
 	default:
 		return StatusOnline

@@ -42,6 +42,7 @@ var enrollTests = []struct {
 func testSaveHosts(t *testing.T, ds kolide.Datastore) {
 	host, err := ds.NewHost(&kolide.Host{
 		DetailUpdateTime: time.Now(),
+		SeenTime:         time.Now(),
 		NodeKey:          "1",
 		UUID:             "1",
 		HostName:         "foo.local",
@@ -120,6 +121,7 @@ func testSaveHosts(t *testing.T, ds kolide.Datastore) {
 func testDeleteHost(t *testing.T, ds kolide.Datastore) {
 	host, err := ds.NewHost(&kolide.Host{
 		DetailUpdateTime: time.Now(),
+		SeenTime:         time.Now(),
 		NodeKey:          "1",
 		UUID:             "1",
 		HostName:         "foo.local",
@@ -139,6 +141,7 @@ func testListHost(t *testing.T, ds kolide.Datastore) {
 	for i := 0; i < 10; i++ {
 		host, err := ds.NewHost(&kolide.Host{
 			DetailUpdateTime: time.Now(),
+			SeenTime:         time.Now(),
 			OsqueryHostID:    strconv.Itoa(i),
 			NodeKey:          fmt.Sprintf("%d", i),
 			UUID:             fmt.Sprintf("%d", i),
@@ -248,6 +251,7 @@ func testSearchHosts(t *testing.T, ds kolide.Datastore) {
 	_, err := ds.NewHost(&kolide.Host{
 		OsqueryHostID:    "1234",
 		DetailUpdateTime: time.Now(),
+		SeenTime:         time.Now(),
 		NodeKey:          "1",
 		UUID:             "1",
 		HostName:         "foo.local",
@@ -257,6 +261,7 @@ func testSearchHosts(t *testing.T, ds kolide.Datastore) {
 	h2, err := ds.NewHost(&kolide.Host{
 		OsqueryHostID:    "5679",
 		DetailUpdateTime: time.Now(),
+		SeenTime:         time.Now(),
 		NodeKey:          "2",
 		UUID:             "2",
 		HostName:         "bar.local",
@@ -266,6 +271,7 @@ func testSearchHosts(t *testing.T, ds kolide.Datastore) {
 	h3, err := ds.NewHost(&kolide.Host{
 		OsqueryHostID:    "99999",
 		DetailUpdateTime: time.Now(),
+		SeenTime:         time.Now(),
 		NodeKey:          "3",
 		UUID:             "3",
 		HostName:         "foo-bar.local",
@@ -338,6 +344,7 @@ func testSearchHostsLimit(t *testing.T, ds kolide.Datastore) {
 	for i := 0; i < 15; i++ {
 		_, err := ds.NewHost(&kolide.Host{
 			DetailUpdateTime: time.Now(),
+			SeenTime:         time.Now(),
 			OsqueryHostID:    fmt.Sprintf("host%d", i),
 			NodeKey:          fmt.Sprintf("%d", i),
 			UUID:             fmt.Sprintf("%d", i),
@@ -357,6 +364,7 @@ func testDistributedQueriesForHost(t *testing.T, ds kolide.Datastore) {
 	h1, err := ds.NewHost(&kolide.Host{
 		OsqueryHostID:    "1",
 		DetailUpdateTime: time.Now(),
+		SeenTime:         time.Now(),
 		NodeKey:          "1",
 		UUID:             "1",
 		HostName:         "foo.local",
@@ -366,6 +374,7 @@ func testDistributedQueriesForHost(t *testing.T, ds kolide.Datastore) {
 	h2, err := ds.NewHost(&kolide.Host{
 		OsqueryHostID:    "2",
 		DetailUpdateTime: time.Now(),
+		SeenTime:         time.Now(),
 		NodeKey:          "2",
 		UUID:             "2",
 		HostName:         "bar.local",
@@ -500,6 +509,7 @@ func testGenerateHostStatusStatistics(t *testing.T, ds kolide.Datastore) {
 		UUID:             "1",
 		NodeKey:          "1",
 		DetailUpdateTime: mockClock.Now(),
+		SeenTime:         mockClock.Now(),
 	})
 	assert.Nil(t, err)
 
@@ -510,6 +520,7 @@ func testGenerateHostStatusStatistics(t *testing.T, ds kolide.Datastore) {
 		UUID:             "2",
 		NodeKey:          "2",
 		DetailUpdateTime: mockClock.Now().Add(-1 * time.Minute),
+		SeenTime:         mockClock.Now().Add(-1 * time.Minute),
 	})
 	assert.Nil(t, err)
 
@@ -520,6 +531,7 @@ func testGenerateHostStatusStatistics(t *testing.T, ds kolide.Datastore) {
 		UUID:             "3",
 		NodeKey:          "3",
 		DetailUpdateTime: mockClock.Now().Add(-1 * time.Hour),
+		SeenTime:         mockClock.Now().Add(-1 * time.Hour),
 	})
 	assert.Nil(t, err)
 
@@ -530,6 +542,7 @@ func testGenerateHostStatusStatistics(t *testing.T, ds kolide.Datastore) {
 		UUID:             "4",
 		NodeKey:          "4",
 		DetailUpdateTime: mockClock.Now().Add(-35 * (24 * time.Hour)),
+		SeenTime:         mockClock.Now().Add(-35 * (24 * time.Hour)),
 	})
 	assert.Nil(t, err)
 
@@ -538,4 +551,38 @@ func testGenerateHostStatusStatistics(t *testing.T, ds kolide.Datastore) {
 	assert.Equal(t, uint(2), online)
 	assert.Equal(t, uint(1), offline)
 	assert.Equal(t, uint(1), mia)
+}
+
+func testMarkHostSeen(t *testing.T, ds kolide.Datastore) {
+	mockClock := clock.NewMockClock()
+
+	anHourAgo := mockClock.Now().Add(-1 * time.Hour).UTC()
+	aDayAgo := mockClock.Now().Add(-24 * time.Hour).UTC()
+
+	h1, err := ds.NewHost(&kolide.Host{
+		ID:               1,
+		OsqueryHostID:    "1",
+		UUID:             "1",
+		NodeKey:          "1",
+		DetailUpdateTime: aDayAgo,
+		SeenTime:         aDayAgo,
+	})
+	assert.Nil(t, err)
+
+	{
+		h1Verify, err := ds.Host(1)
+		assert.Nil(t, err)
+		require.NotNil(t, h1Verify)
+		assert.WithinDuration(t, aDayAgo, h1Verify.SeenTime, time.Second)
+	}
+
+	err = ds.MarkHostSeen(h1, anHourAgo)
+	assert.Nil(t, err)
+
+	{
+		h1Verify, err := ds.Host(1)
+		assert.Nil(t, err)
+		require.NotNil(t, h1Verify)
+		assert.WithinDuration(t, anHourAgo, h1Verify.SeenTime, time.Second)
+	}
 }

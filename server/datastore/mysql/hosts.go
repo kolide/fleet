@@ -23,13 +23,14 @@ func (d *Datastore) NewHost(host *kolide.Host) (*kolide.Host, error) {
 		osquery_version,
 		os_version,
 		uptime,
-		physical_memory
+		physical_memory,
+		seen_time
 	)
-	VALUES( ?,?,?,?,?,?,?,?,?,? )
+	VALUES( ?,?,?,?,?,?,?,?,?,?,? )
 	`
 	result, err := d.db.Exec(sqlStatement, host.OsqueryHostID, host.DetailUpdateTime,
 		host.NodeKey, host.HostName, host.UUID, host.Platform, host.OsqueryVersion,
-		host.OSVersion, host.Uptime, host.PhysicalMemory)
+		host.OSVersion, host.Uptime, host.PhysicalMemory, host.SeenTime)
 	if err != nil {
 		return nil, errors.Wrap(err, "new host")
 	}
@@ -168,7 +169,8 @@ func (d *Datastore) SaveHost(host *kolide.Host) error {
 			build = ?,
 			platform_like = ?,
 			code_name = ?,
-			cpu_logical_cores = ?
+			cpu_logical_cores = ?,
+			seen_time = ?
 		WHERE id = ?
 	`
 
@@ -201,6 +203,7 @@ func (d *Datastore) SaveHost(host *kolide.Host) error {
 		host.PlatformLike,
 		host.CodeName,
 		host.CPULogicalCores,
+		host.SeenTime,
 		host.ID)
 	if err != nil {
 		tx.Rollback()
@@ -285,18 +288,18 @@ func (d *Datastore) GenerateHostStatusStatistics(now time.Time) (online, offline
 		SELECT (
 			SELECT count(id)
 			FROM hosts
-			WHERE DATE_ADD(updated_at, INTERVAL 30 DAY) <= ?
+			WHERE DATE_ADD(seen_time, INTERVAL 30 DAY) <= ?
 		) AS mia,
 		(
 			SELECT count(id)
 			FROM hosts
-			WHERE DATE_ADD(updated_at, INTERVAL 30 MINUTE) <= ?
-			AND DATE_ADD(updated_at, INTERVAL 30 DAY) >= ?
+			WHERE DATE_ADD(seen_time, INTERVAL 30 MINUTE) <= ?
+			AND DATE_ADD(seen_time, INTERVAL 30 DAY) >= ?
 		) AS offline,
 		(
 			SELECT count(id)
 			FROM hosts
-			WHERE DATE_ADD(updated_at, INTERVAL 30 MINUTE) > ?
+			WHERE DATE_ADD(seen_time, INTERVAL 30 MINUTE) > ?
 		) AS online
 		FROM hosts
 		LIMIT 1;
@@ -406,8 +409,9 @@ func (d *Datastore) EnrollHost(osqueryHostID string, nodeKeySize int) (*kolide.H
 		INSERT INTO hosts (
 			detail_update_time,
 			osquery_host_id,
+			seen_time,
 			node_key
-		) VALUES (?, ?, ?)
+		) VALUES (?, ?, ?, ?)
 		ON DUPLICATE KEY UPDATE
 			node_key = VALUES(node_key),
 			deleted = FALSE
@@ -415,7 +419,7 @@ func (d *Datastore) EnrollHost(osqueryHostID string, nodeKeySize int) (*kolide.H
 
 	var result sql.Result
 
-	result, err = d.db.Exec(sqlInsert, detailUpdateTime, osqueryHostID, nodeKey)
+	result, err = d.db.Exec(sqlInsert, detailUpdateTime, osqueryHostID, time.Now().UTC(), nodeKey)
 
 	if err != nil {
 		return nil, errors.Wrap(err, "inserting")
@@ -457,13 +461,17 @@ func (d *Datastore) AuthenticateHost(nodeKey string) (*kolide.Host, error) {
 		return nil, errors.Wrap(err, "getting interfaces")
 	}
 
+	if err := d.MarkHostSeen(host, time.Now().UTC()); err != nil {
+		return nil, errors.Wrap(err, "marking host seen")
+	}
+
 	return host, nil
 }
 
 func (d *Datastore) MarkHostSeen(host *kolide.Host, t time.Time) error {
 	sqlStatement := `
 		UPDATE hosts SET
-			updated_at = ?
+			seen_time = ?
 		WHERE node_key=?
 	`
 

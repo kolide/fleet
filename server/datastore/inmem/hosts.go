@@ -174,8 +174,12 @@ func (d *Datastore) AuthenticateHost(nodeKey string) (*kolide.Host, error) {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
-	for _, host := range d.hosts {
+	for id, host := range d.hosts {
 		if host.NodeKey == nodeKey {
+			now := time.Now().UTC()
+			host.UpdatedAt = now
+			host.SeenTime = now
+			d.hosts[id] = host
 			return host, nil
 		}
 	}
@@ -187,11 +191,10 @@ func (d *Datastore) MarkHostSeen(host *kolide.Host, t time.Time) error {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
-	host.UpdatedAt = t
-
 	for _, h := range d.hosts {
 		if h.ID == host.ID {
 			h.UpdatedAt = t
+			h.SeenTime = t
 			break
 		}
 	}
