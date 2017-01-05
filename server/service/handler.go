@@ -60,12 +60,10 @@ type KolideEndpoints struct {
 	ListLabels                     endpoint.Endpoint
 	CreateLabel                    endpoint.Endpoint
 	DeleteLabel                    endpoint.Endpoint
-	AddLabelToPack                 endpoint.Endpoint
-	GetLabelsForPack               endpoint.Endpoint
-	DeleteLabelFromPack            endpoint.Endpoint
 	GetHost                        endpoint.Endpoint
 	DeleteHost                     endpoint.Endpoint
 	ListHosts                      endpoint.Endpoint
+	GetHostSummary                 endpoint.Endpoint
 	SearchTargets                  endpoint.Endpoint
 	GetOptions                     endpoint.Endpoint
 	ModifyOptions                  endpoint.Endpoint
@@ -121,14 +119,12 @@ func MakeKolideServerEndpoints(svc kolide.Service, jwtKey string) KolideEndpoint
 		DeleteScheduledQuery:      authenticatedUser(jwtKey, svc, makeDeleteScheduledQueryEndpoint(svc)),
 		GetHost:                   authenticatedUser(jwtKey, svc, makeGetHostEndpoint(svc)),
 		ListHosts:                 authenticatedUser(jwtKey, svc, makeListHostsEndpoint(svc)),
+		GetHostSummary:            authenticatedUser(jwtKey, svc, makeGetHostSummaryEndpoint(svc)),
 		DeleteHost:                authenticatedUser(jwtKey, svc, makeDeleteHostEndpoint(svc)),
 		GetLabel:                  authenticatedUser(jwtKey, svc, makeGetLabelEndpoint(svc)),
 		ListLabels:                authenticatedUser(jwtKey, svc, makeListLabelsEndpoint(svc)),
 		CreateLabel:               authenticatedUser(jwtKey, svc, makeCreateLabelEndpoint(svc)),
 		DeleteLabel:               authenticatedUser(jwtKey, svc, makeDeleteLabelEndpoint(svc)),
-		AddLabelToPack:            authenticatedUser(jwtKey, svc, makeAddLabelToPackEndpoint(svc)),
-		GetLabelsForPack:          authenticatedUser(jwtKey, svc, makeGetLabelsForPackEndpoint(svc)),
-		DeleteLabelFromPack:       authenticatedUser(jwtKey, svc, makeDeleteLabelFromPackEndpoint(svc)),
 		SearchTargets:             authenticatedUser(jwtKey, svc, makeSearchTargetsEndpoint(svc)),
 		GetOptions:                authenticatedUser(jwtKey, svc, mustBeAdmin(makeGetOptionsEndpoint(svc))),
 		ModifyOptions:             authenticatedUser(jwtKey, svc, mustBeAdmin(makeModifyOptionsEndpoint(svc))),
@@ -189,12 +185,10 @@ type kolideHandlers struct {
 	ListLabels                     http.Handler
 	CreateLabel                    http.Handler
 	DeleteLabel                    http.Handler
-	AddLabelToPack                 http.Handler
-	GetLabelsForPack               http.Handler
-	DeleteLabelFromPack            http.Handler
 	GetHost                        http.Handler
 	DeleteHost                     http.Handler
 	ListHosts                      http.Handler
+	GetHostSummary                 http.Handler
 	SearchTargets                  http.Handler
 	GetOptions                     http.Handler
 	ModifyOptions                  http.Handler
@@ -251,12 +245,10 @@ func makeKolideKitHandlers(ctx context.Context, e KolideEndpoints, opts []kithtt
 		ListLabels:                    newServer(e.ListLabels, decodeListLabelsRequest),
 		CreateLabel:                   newServer(e.CreateLabel, decodeCreateLabelRequest),
 		DeleteLabel:                   newServer(e.DeleteLabel, decodeDeleteLabelRequest),
-		AddLabelToPack:                newServer(e.AddLabelToPack, decodeAddLabelToPackRequest),
-		GetLabelsForPack:              newServer(e.GetLabelsForPack, decodeGetLabelsForPackRequest),
-		DeleteLabelFromPack:           newServer(e.DeleteLabelFromPack, decodeDeleteLabelFromPackRequest),
 		GetHost:                       newServer(e.GetHost, decodeGetHostRequest),
 		DeleteHost:                    newServer(e.DeleteHost, decodeDeleteHostRequest),
 		ListHosts:                     newServer(e.ListHosts, decodeListHostsRequest),
+		GetHostSummary:                newServer(e.GetHostSummary, decodeNoParamsRequest),
 		SearchTargets:                 newServer(e.SearchTargets, decodeSearchTargetsRequest),
 		GetOptions:                    newServer(e.GetOptions, decodeNoParamsRequest),
 		ModifyOptions:                 newServer(e.ModifyOptions, decodeModifyOptionsRequest),
@@ -347,11 +339,9 @@ func attachKolideAPIRoutes(r *mux.Router, h *kolideHandlers) {
 	r.Handle("/api/v1/kolide/labels", h.ListLabels).Methods("GET").Name("list_labels")
 	r.Handle("/api/v1/kolide/labels", h.CreateLabel).Methods("POST").Name("create_label")
 	r.Handle("/api/v1/kolide/labels/{id}", h.DeleteLabel).Methods("DELETE").Name("delete_label")
-	r.Handle("/api/v1/kolide/packs/{pid}/labels/{lid}", h.AddLabelToPack).Methods("POST").Name("add_label_to_pack")
-	r.Handle("/api/v1/kolide/packs/{pid}/labels", h.GetLabelsForPack).Methods("GET").Name("get_labels_for_pack")
-	r.Handle("/api/v1/kolide/packs/{pid}/labels/{lid}", h.DeleteLabelFromPack).Methods("DELETE").Name("delete_label_from_pack")
 
 	r.Handle("/api/v1/kolide/hosts", h.ListHosts).Methods("GET").Name("list_hosts")
+	r.Handle("/api/v1/kolide/host_summary", h.GetHostSummary).Methods("GET").Name("get_host_summary")
 	r.Handle("/api/v1/kolide/hosts/{id}", h.GetHost).Methods("GET").Name("get_host")
 	r.Handle("/api/v1/kolide/hosts/{id}", h.DeleteHost).Methods("DELETE").Name("delete_host")
 
