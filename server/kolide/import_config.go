@@ -109,7 +109,7 @@ type QueryDetails struct {
 type PackDetails struct {
 	Queries   []QueryDetails `json:"queries"`
 	Shard     *int           `json:"shard"`
-	Version   *string        `json:"shard"`
+	Version   *string        `json:"version"`
 	Platform  *string        `json:"platform"`
 	Discovery []string       `json:"discovery"`
 }
