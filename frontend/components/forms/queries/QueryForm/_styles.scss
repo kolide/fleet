@@ -1,17 +1,27 @@
 .query-form {
-  margin-top: $pad-base;
-
-  &__query-title,
-  &__query-description {
+  &__query-title {
     width: 50%;
+  }
+
+  &__query-description {
+    width: 75%;
   }
 
   &__button-wrap {
     text-align: right;
+    margin-bottom: 20px;
 
     .query-form__run-query-btn,
     .query-form__stop-query-btn {
       margin-left: $pad-xsmall;
     }
+  }
+
+  .form-field {
+    clear: both;
+  }
+
+  &__text-editor-wrapper {
+    margin: 0 0 $base;
   }
 }

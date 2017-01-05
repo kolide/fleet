@@ -4,22 +4,33 @@
     text-align: right;
   }
 
+  &__run-query-btn {
+    float: right;
+  }
+
   &__save-query-btn {
     margin-right: $xsmall;
   }
 
-  &__text-editor-wrapper {
-    margin: $base 0;
+  &__targets {
+    h2 {
+      float: left;
+      font-size: 16px;
+      font-weight: $bold;
+      letter-spacing: -0.3px;
+      color: $text-dark;
+    }
   }
 
-  &__title {
-    color: $text-medium;
-    display: inline-block;
-    font-size: $large;
+  &__target-select {
+    clear: both;
+    padding-top: 5px;
   }
 
   &__wrapper {
-    padding: $base;
+    .body-wrap {
+      padding: $base;
+    }
 
     h1 {
       font-size: $large;
@@ -27,6 +38,7 @@
       letter-spacing: 1.2px;
       color: $text-medium;
       margin: 0;
+      float: left;
     }
   }
 }
