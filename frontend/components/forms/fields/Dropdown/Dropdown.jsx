@@ -65,7 +65,7 @@ class Dropdown extends Component {
     const formFieldProps = pick(this.props, ['hint', 'label', 'error', 'name']);
     const selectClasses = classnames(className, `${baseClass}__select`, {
       [`${baseClass}__select--error`]: error,
-    })
+    });
 
     return (
       <FormField {...formFieldProps} type="dropdown" className={wrapperClassName}>

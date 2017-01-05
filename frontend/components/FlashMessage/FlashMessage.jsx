@@ -17,12 +17,13 @@ const FlashMessage = ({ fullWidth, notification, onRemoveFlash, onUndoActionClic
     return false;
   }
 
+  const alertIcon = alertType === 'success' ? 'success-check' : 'warning-filled';
+
   return (
     <div className={klass}>
       <div className={`${baseClass}__content`}>
-        {message}
-      </div>
-      <div className={`${baseClass}__action`}>
+        <Icon name={alertIcon} /> <span>{message}</span>
+
         {undoAction &&
           <Button
             className={`${baseClass}__undo`}
@@ -32,7 +33,8 @@ const FlashMessage = ({ fullWidth, notification, onRemoveFlash, onUndoActionClic
             Undo
           </Button>
         }
-
+      </div>
+      <div className={`${baseClass}__action`}>
         <Button
           className={`${baseClass}__remove ${baseClass}__remove--${alertType}`}
           variant="unstyled"
