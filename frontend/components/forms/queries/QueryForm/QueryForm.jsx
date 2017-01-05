@@ -22,6 +22,7 @@ class QueryForm extends Component {
     onSave: PropTypes.func,
     onTextEditorInputChange: PropTypes.func,
     onUpdate: PropTypes.func,
+    onOsqueryTableSelect: PropTypes.func,
     query: queryInterface,
     queryIsRunning: PropTypes.bool,
     queryText: PropTypes.string.isRequired,
@@ -31,23 +32,6 @@ class QueryForm extends Component {
   static defaultProps = {
     query: {},
   };
-
-  onLoad = (editor) => {
-    editor.setOptions({
-      enableLinking: true,
-    });
-
-    editor.on('linkClick', (data) => {
-      const { type, value } = data.token;
-      const { onOsqueryTableSelect } = this.props;
-
-      if (type === 'osquery-token') {
-        return onOsqueryTableSelect(value);
-      }
-
-      return false;
-    });
-  }
 
   constructor (props) {
     super(props);
@@ -105,6 +89,23 @@ class QueryForm extends Component {
     }
 
     return false;
+  }
+
+  onLoad = (editor) => {
+    editor.setOptions({
+      enableLinking: true,
+    });
+
+    editor.on('linkClick', (data) => {
+      const { type, value } = data.token;
+      const { onOsqueryTableSelect } = this.props;
+
+      if (type === 'osquery-token') {
+        return onOsqueryTableSelect(value);
+      }
+
+      return false;
+    });
   }
 
   onCancel = (evt) => {
@@ -190,8 +191,6 @@ class QueryForm extends Component {
     const {
       query,
       queryType,
-      queryIsRunning,
-      onRunQuery,
     } = this.props;
     const { onCancel, onSave, onUpdate } = this;
 
@@ -284,7 +283,7 @@ class QueryForm extends Component {
         />
 
         <div className={`${baseClass}__text-editor-wrapper`}>
-          <label className="form-field__label">SQL</label>
+          <label className="form-field__label" htmlFor="query-editor">SQL</label>
           <AceEditor
             enableBasicAutocompletion
             enableLiveAutocompletion

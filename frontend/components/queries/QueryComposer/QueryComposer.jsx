@@ -39,6 +39,7 @@ class QueryComposer extends Component {
       onSave,
       onStopQuery,
       onTextEditorInputChange,
+      onOsqueryTableSelect,
       onUpdate,
       query,
       queryIsRunning,
@@ -53,6 +54,7 @@ class QueryComposer extends Component {
         onSave={onSave}
         onStopQuery={onStopQuery}
         onTextEditorInputChange={onTextEditorInputChange}
+        onOsqueryTableSelect={onOsqueryTableSelect}
         onUpdate={onUpdate}
         query={query}
         queryIsRunning={queryIsRunning}
@@ -77,7 +79,7 @@ class QueryComposer extends Component {
 
 
     return (
-      <div>
+      <div className={`${baseClass}__target-select`}>
         <SelectTargetsDropdown
           onFetchTargets={onFetchTargets}
           onSelect={onTargetSelect}
@@ -123,7 +125,7 @@ class QueryComposer extends Component {
   };
 
   render () {
-    const { queryIsRunning, queryText, queryType } = this.props;
+    const { queryType } = this.props;
     const { renderForm, renderTargetsInput, renderRunQueryButton } = this;
 
     return (
@@ -134,6 +136,7 @@ class QueryComposer extends Component {
         </div>
 
         <div className={`${baseClass}__targets body-wrap`}>
+          <h2>No Results Until Query Run</h2>
           {renderRunQueryButton()}
           {renderTargetsInput()}
         </div>
