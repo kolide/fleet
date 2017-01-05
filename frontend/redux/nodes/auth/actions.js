@@ -1,7 +1,6 @@
 import { configSuccess } from 'redux/nodes/app/actions';
 import { formatErrorResponse } from 'redux/nodes/entities/base/helpers';
 import Kolide from 'kolide';
-import userActions from 'redux/nodes/entities/users/actions';
 
 export const CLEAR_AUTH_ERRORS = 'CLEAR_AUTH_ERRORS';
 export const LOGIN_REQUEST = 'LOGIN_REQUEST';
@@ -103,7 +102,8 @@ export const updateUser = (targetUser, formData) => {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
       dispatch(updateUserRequest);
-      return dispatch(userActions.update(targetUser, formData))
+
+      return Kolide.updateUser(targetUser, formData)
         .then((user) => {
           dispatch(updateUserSuccess(user));
 
