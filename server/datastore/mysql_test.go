@@ -9,8 +9,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/kolide/kolide-ose/server/config"
 	"github.com/kolide/kolide-ose/server/datastore/mysql"
-	_ "github.com/kolide/kolide-ose/server/datastore/mysql/migrations/data"
-	_ "github.com/kolide/kolide-ose/server/datastore/mysql/migrations/tables"
 	"github.com/stretchr/testify/require"
 )
 

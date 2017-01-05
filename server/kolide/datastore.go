@@ -16,9 +16,9 @@ type Datastore interface {
 	OptionStore
 	Name() string
 	Drop() error
-	// MigrateTables should create and migrate the schema for the tables
+	// MigrateTables creates and migrates the table schemas
 	MigrateTables() error
-	// MigrateData should insert any built-in data
+	// MigrateData populates built-in data
 	MigrateData() error
 }
 
