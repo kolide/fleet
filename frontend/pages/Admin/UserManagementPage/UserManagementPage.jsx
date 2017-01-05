@@ -22,6 +22,11 @@ class UserManagementPage extends Component {
       email: PropTypes.string,
     }),
     invites: PropTypes.arrayOf(inviteInterface),
+    userErrors: PropTypes.shape({
+      base: PropTypes.string,
+      name: PropTypes.string,
+      username: PropTypes.string,
+    }),
     users: PropTypes.arrayOf(userInterface),
   };
 
@@ -105,9 +110,9 @@ class UserManagementPage extends Component {
 
     return dispatch(update(user, updatedUser))
       .then(() => {
-        return dispatch(
-          renderFlash('success', 'User updated', update(user, user))
-        );
+        dispatch(renderFlash('success', 'User updated', update(user, user)));
+
+        return Promise.resolve();
       });
   }
 
@@ -138,7 +143,7 @@ class UserManagementPage extends Component {
   }
 
   renderUserBlock = (user, idx, options = { invite: false }) => {
-    const { currentUser } = this.props;
+    const { currentUser, userErrors } = this.props;
     const { invite } = options;
     const { onEditUser, onUserActionSelect } = this;
 
@@ -150,6 +155,7 @@ class UserManagementPage extends Component {
         onEditUser={onEditUser}
         onSelect={onUserActionSelect}
         user={user}
+        userErrors={userErrors}
       />
     );
   }
@@ -213,8 +219,9 @@ const mapStateToProps = (state) => {
   const { entities: users } = stateEntityGetter.get('users');
   const { entities: invites } = stateEntityGetter.get('invites');
   const { errors: inviteErrors } = state.entities.invites;
+  const { errors: userErrors } = state.entities.users;
 
-  return { currentUser, inviteErrors, invites, users };
+  return { currentUser, inviteErrors, invites, userErrors, users };
 };
 
 export default connect(mapStateToProps)(UserManagementPage);
