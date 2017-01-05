@@ -30,7 +30,7 @@ const HostDetails = ({ host, onQueryClick = noop }) => {
     <div className={`${baseClass} ${baseClass}--${status}`}>
       <span className={`${baseClass}__add-query`}>
         <Button onClick={onQueryClick(host)} variant="unstyled" title="Query this host">
-          <Icon name="query" className={`${baseClass}__add-query-icon`} key="add-query" /> <span>Add</span>
+          <Icon name="query" className={`${baseClass}__add-query-icon`} key="add-query" />
         </Button>
       </span>
 
