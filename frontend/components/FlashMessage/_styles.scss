@@ -55,34 +55,19 @@
   }
 
   &__remove {
-    @include transition(background-color 150ms ease-in-out);
     @include size(30px);
-    border-radius: 50%;
-    color: $white;
     cursor: pointer;
     text-align: center;
     margin-left: 15px;
 
-    &--success {
-      &:hover {
-        .kolidecon {
-          color: $success-light;
-        }
-      }
-    }
-
-    &--error {
-      &:hover {
-        .kolidecon {
-          color: $alert-light;
-        }
-      }
-    }
-
     .kolidecon {
-      @include transition(background-color 150ms ease-in-out, color 150ms ease-in-out);
-      color: $text-dark;
+      @include transition(color 150ms ease-in-out);
+      color: $text-light;
       font-size: 24px;
+
+      &:hover {
+        color: $white;
+      }
     }
   }
 }
