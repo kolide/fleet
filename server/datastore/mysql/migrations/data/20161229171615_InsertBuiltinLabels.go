@@ -1,14 +1,13 @@
-package migration
+package data
 
 import (
 	"database/sql"
 
 	"github.com/kolide/kolide-ose/server/datastore/internal/appstate"
-	"github.com/pressly/goose"
 )
 
 func init() {
-	goose.AddMigration(Up_20161229171615, Down_20161229171615)
+	Client.AddMigration(Up_20161229171615, Down_20161229171615)
 }
 
 func Up_20161229171615(tx *sql.Tx) error {
