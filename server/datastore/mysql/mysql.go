@@ -75,7 +75,7 @@ func (d *Datastore) Name() string {
 }
 
 func (d *Datastore) MigrateTables() error {
-	if err := tables.Client.Up(d.db.DB, ""); err != nil {
+	if err := tables.MigrationClient.Up(d.db.DB, ""); err != nil {
 		return err
 	}
 
@@ -83,7 +83,7 @@ func (d *Datastore) MigrateTables() error {
 }
 
 func (d *Datastore) MigrateData() error {
-	if err := data.Client.Up(d.db.DB, ""); err != nil {
+	if err := data.MigrationClient.Up(d.db.DB, ""); err != nil {
 		return err
 	}
 

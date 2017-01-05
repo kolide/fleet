@@ -3,7 +3,7 @@ package tables
 import "database/sql"
 
 func init() {
-	Client.AddMigration(Up_20170104113816, Down_20170104113816)
+	MigrationClient.AddMigration(Up_20170104113816, Down_20170104113816)
 }
 
 func Up_20170104113816(tx *sql.Tx) error {
