@@ -34,10 +34,11 @@
     width: 40%;
 
     .button {
-      width: 48%;
+      width: 45%;
       float: left;
 
       &:last-child {
+        width: 53%;
         float: right;
       }
     }
