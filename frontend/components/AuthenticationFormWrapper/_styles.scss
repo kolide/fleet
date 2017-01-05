@@ -7,6 +7,5 @@
 
   @include breakpoint(desktop) {
     @include justify-content(center);
-    padding: 0;
   }
 }
