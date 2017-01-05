@@ -1,14 +1,19 @@
 .configure-pack-query-form {
-  .form-field {
-    .input-field,
-    .dropdown__select {
-      width: 166px;
-      float: right;
-    }
 
-    @at-root .configure-pack-query-form__form-field--interval {
+  &__form-field {
+    &--interval {
+      position: relative;
+
       .input-field {
+        width: 100%;
         padding-right: 70px;
+      }
+
+      .form-field__hint {
+        position: absolute;
+        bottom: 5px;
+        right: 10px;
+        text-transform: lowercase;
       }
     }
   }
@@ -24,35 +29,9 @@
   }
 
   &__fields {
-    .form-field {
-      position: relative;
-
-      &__label {
-        font-size: 16px;
-        font-weight: $bold;
-        line-height: 40px;
-        letter-spacing: -0.5px;
-        color: $text-medium;
-        display: inline-block;
-        width: 70px;
-        text-transform: lowercase;
-        padding-left: 12px;
-
-        @include breakpoint(ltdesktop) {
-          padding-left: 6px;
-        }
-      }
-
-      &__hint {
-        position: absolute;
-        bottom: 13px;
-        right: 10px;
-        text-transform: lowercase;
-      }
-    }
-
     .kolidecon {
       margin-right: 6px;
+      margin-left: 6px;
     }
   }
 
