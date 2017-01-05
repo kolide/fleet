@@ -129,21 +129,22 @@ class QueryForm extends Component {
     const {
       fields,
       formData,
+      handleSubmit,
       onRunQuery,
       onStopQuery,
       queryIsRunning,
       queryType,
     } = this.props;
-    const { onCancel, onSave, onUpdate } = this;
+    const { onCancel, onUpdate } = this;
 
     const dropdownBtnOptions = [{
-      disabled: !canSaveChanges(formData, query),
+      disabled: !canSaveChanges(fields, formData),
       label: 'Save Changes',
       onClick: onUpdate,
     }, {
-      disabled: !canSaveAsNew(formData, query),
+      disabled: !canSaveAsNew(fields, formData),
       label: 'Save As New...',
-      onClick: onSave,
+      onClick: handleSubmit,
     }];
 
     let runQueryButton;
