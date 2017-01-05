@@ -96,7 +96,7 @@ func (d *Datastore) MigrateTables() error {
 func (d *Datastore) MigrateData() error {
 	d.mtx.Lock()
 
-	for _, initData := range appstate.Options {
+	for _, initData := range appstate.Options() {
 		opt := kolide.Option{
 			Name:     initData.Name,
 			Value:    kolide.OptionValue{Val: initData.Value},
@@ -261,7 +261,7 @@ func (d *Datastore) createDevPacksAndQueries() error {
 }
 
 func (d *Datastore) createBuiltinLabels() error {
-	for _, label := range appstate.Labels {
+	for _, label := range appstate.Labels() {
 		label := label
 		_, err := d.NewLabel(&label)
 		if err != nil {

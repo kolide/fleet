@@ -21,7 +21,7 @@ func Up_20161229171615(tx *sql.Tx) error {
 		) VALUES (?, ?, ?, ?, ?)
 `
 
-	for _, label := range appstate.Labels {
+	for _, label := range appstate.Labels() {
 		_, err := tx.Exec(sql, label.Name, label.Description, label.Query, label.Platform, label.LabelType)
 		if err != nil {
 			return err
@@ -37,7 +37,7 @@ func Down_20161229171615(tx *sql.Tx) error {
 		WHERE name = ? AND label_type = ?
 `
 
-	for _, label := range appstate.Labels {
+	for _, label := range appstate.Labels() {
 		_, err := tx.Exec(sql, label.Name, label.LabelType)
 		if err != nil {
 			return err
