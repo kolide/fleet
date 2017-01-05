@@ -377,7 +377,8 @@ func TestLabelQueries(t *testing.T) {
 
 func TestGetClientConfig(t *testing.T) {
 	ds, err := inmem.New(config.TestConfig())
-	assert.Nil(t, err)
+	require.Nil(t, err)
+	require.Nil(t, ds.MigrateData())
 
 	mockClock := clock.NewMockClock()
 
@@ -619,6 +620,8 @@ func TestDistributedQueries(t *testing.T) {
 
 	host, err := ds.AuthenticateHost(nodeKey)
 	require.Nil(t, err)
+	err = ds.MarkHostSeen(host, mockClock.Now())
+	require.Nil(t, err)
 
 	ctx = hostctx.NewContext(ctx, *host)
 
@@ -639,6 +642,8 @@ func TestDistributedQueries(t *testing.T) {
 		},
 	})
 	err = ds.RecordLabelQueryExecutions(host, map[string]bool{labelId: true}, mockClock.Now())
+	require.Nil(t, err)
+	err = ds.MarkHostSeen(host, mockClock.Now())
 	require.Nil(t, err)
 
 	q = "select year, month, day, hour, minutes, seconds from time"

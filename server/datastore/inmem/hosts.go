@@ -45,15 +45,15 @@ func (d *Datastore) SaveHost(host *kolide.Host) error {
 	return nil
 }
 
-func (d *Datastore) DeleteHost(host *kolide.Host) error {
+func (d *Datastore) DeleteHost(hid uint) error {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
-	if _, ok := d.hosts[host.ID]; !ok {
-		return notFound("Host").WithID(host.ID)
+	if _, ok := d.hosts[hid]; !ok {
+		return notFound("Host").WithID(hid)
 	}
 
-	delete(d.hosts, host.ID)
+	delete(d.hosts, hid)
 	return nil
 }
 
@@ -114,6 +114,25 @@ func (d *Datastore) ListHosts(opt kolide.ListOptions) ([]*kolide.Host, error) {
 	return hosts, nil
 }
 
+func (d *Datastore) GenerateHostStatusStatistics(now time.Time) (online, offline, mia uint, err error) {
+	d.mtx.Lock()
+	defer d.mtx.Unlock()
+
+	for _, host := range d.hosts {
+		status := host.Status(now)
+		switch status {
+		case kolide.StatusMIA:
+			mia++
+		case kolide.StatusOffline:
+			offline++
+		default:
+			online++
+		}
+	}
+
+	return online, offline, mia, nil
+}
+
 func (d *Datastore) EnrollHost(osQueryHostID string, nodeKeySize int) (*kolide.Host, error) {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
@@ -168,11 +187,10 @@ func (d *Datastore) MarkHostSeen(host *kolide.Host, t time.Time) error {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
-	host.UpdatedAt = t
-
 	for _, h := range d.hosts {
 		if h.ID == host.ID {
 			h.UpdatedAt = t
+			h.SeenTime = t
 			break
 		}
 	}
