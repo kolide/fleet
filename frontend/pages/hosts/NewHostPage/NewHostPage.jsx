@@ -92,9 +92,12 @@ export class NewHostPage extends Component {
             <p>This script does the following:</p>
             <ol className="kolide-ol">
               <li>Detects operating system.</li>
+              <li>Downloads the most recent stable release of osquery.</li>
               <li>Checks for any existing osqueryd installation.</li>
-              <li>Installs osqueryd and ships your config to communicate with Kolide.</li>
+              <li>Installs osqueryd using a config which will communicate with your Kolide instance.</li>
             </ol>
+            <br />
+            <p>This method is a great way to get started with getting hosts enrolled in your Kolide instance. To make sure that you are updating osquery and constantly getting the latest Kolide features, check out the configuration management options below.</p>
           </div>
 
           <p className={`${baseClass}__view-script`}><button className="button button--unstyled">View The Script</button></p>
@@ -103,7 +106,7 @@ export class NewHostPage extends Component {
         <section className={`${baseClass}__section-wrap body-wrap`}>
           <h1 className={`${baseClass}__title`}>Need More Methods?</h1>
 
-          <p className={`${baseClass}__text`}>Many IT automation frameworks offer direct recipes and scripts for deploying osquery. <br />Choose a method below to learn more.</p>
+          <p className={`${baseClass}__text`}>Many infrastructure automation frameworks offer recipes and scripts for deploying osquery and making it talk to your Kolide instance. Choose a method below to learn more.</p>
 
           <ul className={`${baseClass}__more-methods`}>
             <li>
