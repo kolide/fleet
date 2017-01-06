@@ -183,12 +183,11 @@ func TestCreateUser(t *testing.T) {
 	for _, tt := range createUserTests {
 		t.Run("", func(t *testing.T) {
 			payload := kolide.UserPayload{
-				Username:                 tt.Username,
-				Password:                 tt.Password,
-				Email:                    tt.Email,
-				Admin:                    tt.Admin,
-				InviteToken:              tt.InviteToken,
-				AdminForcedPasswordReset: tt.NeedsPasswordReset,
+				Username:    tt.Username,
+				Password:    tt.Password,
+				Email:       tt.Email,
+				Admin:       tt.Admin,
+				InviteToken: tt.InviteToken,
 			}
 			user, err := svc.NewUser(ctx, payload)
 			if tt.wantErr != nil {
@@ -207,7 +206,6 @@ func TestCreateUser(t *testing.T) {
 			err = user.ValidatePassword("different_password")
 			assert.NotNil(t, err)
 
-			assert.Equal(t, user.AdminForcedPasswordReset, *tt.NeedsPasswordReset)
 			assert.Equal(t, user.Admin, *tt.Admin)
 		})
 

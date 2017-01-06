@@ -79,16 +79,15 @@ type User struct {
 
 // UserPayload is used to modify an existing user
 type UserPayload struct {
-	Username                 *string `json:"username"`
-	Name                     *string `json:"name"`
-	Email                    *string `json:"email"`
-	Admin                    *bool   `json:"admin"`
-	Enabled                  *bool   `json:"enabled"`
-	AdminForcedPasswordReset *bool   `json:"force_password_reset"`
-	Password                 *string `json:"password"`
-	GravatarURL              *string `json:"gravatar_url"`
-	Position                 *string `json:"position"`
-	InviteToken              *string `json:"invite_token"`
+	Username    *string `json:"username"`
+	Name        *string `json:"name"`
+	Email       *string `json:"email"`
+	Admin       *bool   `json:"admin"`
+	Enabled     *bool   `json:"enabled"`
+	Password    *string `json:"password"`
+	GravatarURL *string `json:"gravatar_url"`
+	Position    *string `json:"position"`
+	InviteToken *string `json:"invite_token"`
 }
 
 // User creates a user from payload.
@@ -98,8 +97,7 @@ func (p UserPayload) User(keySize, cost int) (*User, error) {
 		Username: *p.Username,
 		Email:    *p.Email,
 		Admin:    falseIfNil(p.Admin),
-		AdminForcedPasswordReset: falseIfNil(p.AdminForcedPasswordReset),
-		Enabled:                  true,
+		Enabled:  true,
 	}
 	if err := user.SetPassword(*p.Password, keySize, cost); err != nil {
 		return nil, err
