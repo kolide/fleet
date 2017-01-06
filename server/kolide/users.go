@@ -19,19 +19,19 @@ type UserStore interface {
 	SaveUser(user *User) error
 }
 
-// UserService contains methods for managing a Kolide User
+// UserService contains methods for managing a Kolide User.
 type UserService interface {
-	// NewUser creates a new User from a request Payload
+	// NewUser creates a new User from a request Payload.
 	NewUser(ctx context.Context, p UserPayload) (user *User, err error)
 
 	// NewAdminCreatedUser allows an admin to create a new user without
 	// first creating and validating invite tokens.
 	NewAdminCreatedUser(ctx context.Context, p UserPayload) (user *User, err error)
 
-	// User returns a valid User given a User ID
+	// User returns a valid User given a User ID.
 	User(ctx context.Context, id uint) (user *User, err error)
 
-	// AuthenticatedUser returns the current user from the viewer context
+	// AuthenticatedUser returns the current user from the viewer context.
 	AuthenticatedUser(ctx context.Context) (user *User, err error)
 
 	// ListUsers returns all users
@@ -53,10 +53,10 @@ type UserService interface {
 	RequirePasswordReset(ctx context.Context, uid uint, require bool) error
 
 	// ResetPassword validates the provided password reset token and
-	// updates the user's password
+	// updates the user's password.
 	ResetPassword(ctx context.Context, token, password string) (err error)
 
-	// ModifyUser updates a user's parameters given a UserPayload
+	// ModifyUser updates a user's parameters given a UserPayload.
 	ModifyUser(ctx context.Context, userID uint, p UserPayload) (user *User, err error)
 }
 

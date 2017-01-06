@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/pkg/errors"
-
 	"golang.org/x/net/context"
 )
 
