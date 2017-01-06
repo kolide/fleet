@@ -56,7 +56,7 @@ describe('Users - actions', () => {
       const errors = [
         {
           name: 'base',
-          reason: 'Unable to require password reset'
+          reason: 'Unable to require password reset',
         },
       ];
       const errorResponse = {

@@ -19,7 +19,7 @@ describe('Users - reducer', () => {
   };
 
   it('updates state when request is dispatched', () => {
-    const newState = reducer(initialState, requirePasswordResetRequest());
+    const newState = reducer(initialState, requirePasswordResetRequest);
 
     expect(newState).toEqual({
       ...initialState,
