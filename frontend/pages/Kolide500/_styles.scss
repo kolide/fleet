@@ -1,4 +1,4 @@
-.kolide-404 {
+.kolide-500 {
   p {
     color: #666;
   }
@@ -27,11 +27,12 @@
   }
 
   .gopher-container {
-    margin: -20px auto 0;
-    max-width: 340px;
+    margin: 40px auto 0;
+    max-width: 800px;
+    text-align: center;
 
     img {
-      height: 470px;
+      height: 340px;
     }
   }
 
@@ -40,7 +41,7 @@
 
     > h1 {
       font-size: 56px;
-      max-width: 479px;
+      min-width: 479px;
       margin: 34px auto 0;
     }
 
@@ -49,5 +50,4 @@
       margin: 13px 0 30px;
     }
   }
-
 }
