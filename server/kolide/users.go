@@ -47,9 +47,10 @@ type UserService interface {
 	RequestPasswordReset(ctx context.Context, email string) (err error)
 
 	// RequirePasswordReset requires a password reset for the user
-	// specified by ID. It deletes all of the user's sessions, and requires
-	// that their password be reset upon the next login.
-	RequirePasswordReset(ctx context.Context, uid uint) error
+	// specified by ID (if require is true). It deletes all of the user's
+	// sessions, and requires that their password be reset upon the next
+	// login. Setting require to false will take a user out of this state.
+	RequirePasswordReset(ctx context.Context, uid uint, require bool) error
 
 	// ResetPassword validates the provided password reset token and
 	// updates the user's password

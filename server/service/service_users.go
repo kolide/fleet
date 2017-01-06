@@ -189,21 +189,23 @@ func (svc service) ResetPassword(ctx context.Context, token, password string) er
 	return nil
 }
 
-func (svc service) RequirePasswordReset(ctx context.Context, uid uint) error {
+func (svc service) RequirePasswordReset(ctx context.Context, uid uint, require bool) error {
 	user, err := svc.ds.UserByID(uid)
 	if err != nil {
 		return errors.Wrap(err, "loading user by ID")
 	}
 
 	// Require reset on next login
-	user.AdminForcedPasswordReset = true
+	user.AdminForcedPasswordReset = require
 	if err := svc.saveUser(user); err != nil {
 		return errors.Wrap(err, "saving user")
 	}
 
-	// Clear all of the existing sessions
-	if err := svc.DeleteSessionsForUser(ctx, user.ID); err != nil {
-		return errors.Wrap(err, "deleting user sessions")
+	if require {
+		// Clear all of the existing sessions
+		if err := svc.DeleteSessionsForUser(ctx, user.ID); err != nil {
+			return errors.Wrap(err, "deleting user sessions")
+		}
 	}
 
 	return nil

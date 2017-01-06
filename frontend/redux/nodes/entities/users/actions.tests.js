@@ -12,41 +12,47 @@ import {
 } from './actions';
 
 const store = { entities: { invites: {}, users: {} } };
-const user = { id: 1, email: 'zwass@kolide.co' };
+const user = { id: 1, email: 'zwass@kolide.co', force_password_reset: false };
 
 describe('Users - actions', () => {
   describe('dispatching the require password reset action', () => {
     describe('successful request', () => {
-      const mockStore = reduxMockStore(store);
-
       beforeEach(() => {
         spyOn(Kolide.default, 'requirePasswordReset').andCall(() => {
-          return Promise.resolve();
+          return Promise.resolve({ ...user, force_password_reset: true });
         });
       });
 
       afterEach(restoreSpies);
 
       it('calls the resetFunc', () => {
-        mockStore.dispatch(requirePasswordReset(user, true));
+        const mockStore = reduxMockStore(store);
 
-        expect(Kolide.default.requirePasswordReset).toHaveBeenCalledWith(user, true);
+        return mockStore.dispatch(requirePasswordReset(user, { require: true }))
+          .then(() => {
+            expect(Kolide.default.requirePasswordReset).toHaveBeenCalledWith(user, { require: true });
+          });
       });
 
       it('dispatches the correct actions', () => {
-        mockStore.dispatch(requirePasswordReset());
+        const mockStore = reduxMockStore(store);
 
-        const dispatchedActions = mockStore.getActions();
-        const dispatchedActionTypes = dispatchedActions.map((action) => { return action.type; });
+        const expectedActions = [
+          { type: REQUIRE_PASSWORD_RESET_REQUEST },
+          {
+            type: REQUIRE_PASSWORD_RESET_SUCCESS,
+            payload: { user: { ...user, force_password_reset: true } },
+          },
+        ];
 
-        expect(dispatchedActionTypes).toInclude(REQUIRE_PASSWORD_RESET_REQUEST);
-        expect(dispatchedActionTypes).toInclude(REQUIRE_PASSWORD_RESET_SUCCESS);
-        expect(dispatchedActionTypes).toNotInclude(REQUIRE_PASSWORD_RESET_FAILURE);
+        return mockStore.dispatch(requirePasswordReset(user, { require: true }))
+          .then(() => {
+            expect(mockStore.getActions()).toEqual(expectedActions);
+          });
       });
     });
 
     describe('unsuccessful request', () => {
-      const mockStore = reduxMockStore(store);
       const errors = { base: 'Unable to require password reset' };
 
       beforeEach(() => {
@@ -58,20 +64,32 @@ describe('Users - actions', () => {
       afterEach(restoreSpies);
 
       it('calls the resetFunc', () => {
-        mockStore.dispatch(requirePasswordReset(user, true));
+        const mockStore = reduxMockStore(store);
 
-        expect(Kolide.default.requirePasswordReset).toHaveBeenCalledWith(user, true);
+        mockStore.dispatch(requirePasswordReset(user, { require: true }))
+          .then(() => {
+            throw new Error('promise should have failed');
+          })
+          .catch(() => {
+            expect(Kolide.default.requirePasswordReset).toHaveBeenCalledWith(user, { require: true });
+          });
       });
 
       it('dispatches the correct actions', () => {
-        mockStore.dispatch(requirePasswordReset());
+        const mockStore = reduxMockStore(store);
 
-        const dispatchedActions = mockStore.getActions();
-        const dispatchedActionTypes = dispatchedActions.map((action) => { return action.type; });
+        const expectedActions = [
+          { type: REQUIRE_PASSWORD_RESET_REQUEST },
+          { type: REQUIRE_PASSWORD_RESET_FAILURE, payload: { errors } },
+        ];
 
-        expect(dispatchedActionTypes).toInclude(REQUIRE_PASSWORD_RESET_REQUEST);
-        expect(dispatchedActionTypes).toNotInclude(REQUIRE_PASSWORD_RESET_SUCCESS);
-        expect(dispatchedActionTypes).toInclude(REQUIRE_PASSWORD_RESET_FAILURE);
+        return mockStore.dispatch(requirePasswordReset(user, { require: true }))
+          .then(() => {
+            throw new Error('promise should have failed');
+          })
+          .catch(() => {
+            expect(mockStore.getActions()).toEqual(expectedActions);
+          });
       });
     });
   });

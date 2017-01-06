@@ -88,9 +88,9 @@ class UserManagementPage extends Component {
               return dispatch(renderFlash('success', 'User promoted to admin', update(user, { admin: false })));
             });
         case 'reset_password':
-          return dispatch(requirePasswordReset(user, true))
+          return dispatch(requirePasswordReset(user, { require: true }))
             .then(() => {
-              return dispatch(renderFlash('success', 'User required to reset password', requirePasswordReset(user, false)));
+              return dispatch(renderFlash('success', 'User required to reset password', requirePasswordReset(user, { require: false })));
             });
         case 'revert_invitation':
           return dispatch(inviteActions.destroy(user))

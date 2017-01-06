@@ -7,35 +7,40 @@ import {
   requirePasswordResetSuccess,
 } from './actions';
 
+const user = { id: 1, email: 'zwass@kolide.co', force_password_reset: false };
+
 describe('Users - reducer', () => {
   const initialState = {
     loading: false,
     errors: {},
-    data: {},
+    data: {
+      [user.id]: user,
+    },
   };
 
   it('updates state when request is dispatched', () => {
-    const newState = reducer(initialState, requirePasswordResetRequest);
+    const newState = reducer(initialState, requirePasswordResetRequest());
 
     expect(newState).toEqual({
+      ...initialState,
       loading: true,
-      errors: {},
-      data: {},
     });
   });
 
   it('updates state when request is successful', () => {
     const initState = {
+      ...initialState,
       loading: true,
-      errors: {},
-      data: {},
     };
-    const newState = reducer(initState, requirePasswordResetSuccess);
+    const newUser = { ...user, force_password_reset: true };
+    const newState = reducer(initState, requirePasswordResetSuccess(newUser));
 
     expect(newState).toEqual({
+      ...initState,
       loading: false,
-      errors: {},
-      data: {},
+      data: {
+        [user.id]: newUser,
+      },
     });
   });
 
@@ -44,9 +49,8 @@ describe('Users - reducer', () => {
     const newState = reducer(initialState, requirePasswordResetFailure(errors));
 
     expect(newState).toEqual({
-      loading: false,
+      ...initialState,
       errors,
-      data: {},
     });
   });
 });

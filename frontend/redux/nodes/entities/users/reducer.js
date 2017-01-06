@@ -10,12 +10,18 @@ export default (state = initialState, { type, payload }) => {
     case REQUIRE_PASSWORD_RESET_REQUEST:
       return {
         ...state,
+        errors: {},
         loading: true,
       };
     case REQUIRE_PASSWORD_RESET_SUCCESS:
       return {
         ...state,
+        errors: {},
         loading: false,
+        data: {
+          ...state.data,
+          [payload.user.id]: payload.user,
+        },
       };
     case REQUIRE_PASSWORD_RESET_FAILURE:
       return {
