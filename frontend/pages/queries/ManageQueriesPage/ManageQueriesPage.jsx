@@ -5,7 +5,6 @@ import { push } from 'react-router-redux';
 
 import Button from 'components/buttons/Button';
 import entityGetter from 'redux/utilities/entityGetter';
-import Icon from 'components/icons/Icon';
 import InputField from 'components/forms/fields/InputField';
 import NumberPill from 'components/NumberPill';
 import PackInfoSidePanel from 'components/side_panels/PackInfoSidePanel';
@@ -164,7 +163,7 @@ export class ManageQueriesPage extends Component {
             onClick={onDeleteQueries}
             variant="alert"
           >
-            <Icon name="offline" /> Disable
+            Delete
           </Button>
         </div>
       );
