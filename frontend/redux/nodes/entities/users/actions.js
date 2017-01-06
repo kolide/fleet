@@ -1,5 +1,7 @@
 import Kolide from 'kolide';
 
+import { formatErrorResponse } from 'redux/nodes/entities/base/helpers';
+
 import config from './config';
 
 export const REQUIRE_PASSWORD_RESET_REQUEST = 'REQUIRE_PASSWORD_RESET_REQUEST';
@@ -35,9 +37,9 @@ export const requirePasswordReset = (user, { require }) => {
         return updatedUser;
       })
       .catch((response) => {
-        const { errors } = response;
+        const errorsObject = formatErrorResponse(response);
+        dispatch(requirePasswordResetFailure(errorsObject));
 
-        dispatch(requirePasswordResetFailure(errors));
         throw response;
       });
   };

@@ -34,7 +34,7 @@ type UserService interface {
 	// AuthenticatedUser returns the current user from the viewer context.
 	AuthenticatedUser(ctx context.Context) (user *User, err error)
 
-	// ListUsers returns all users
+	// ListUsers returns all users.
 	ListUsers(ctx context.Context, opt ListOptions) (users []*User, err error)
 
 	// ChangePassword validates the existing password, and sets the new
@@ -50,7 +50,8 @@ type UserService interface {
 	// specified by ID (if require is true). It deletes all of the user's
 	// sessions, and requires that their password be reset upon the next
 	// login. Setting require to false will take a user out of this state.
-	RequirePasswordReset(ctx context.Context, uid uint, require bool) error
+	// The updated user is returned.
+	RequirePasswordReset(ctx context.Context, uid uint, require bool) (*User, error)
 
 	// ResetPassword validates the provided password reset token and
 	// updates the user's password.

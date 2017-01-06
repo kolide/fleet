@@ -2,7 +2,7 @@ import expect, { restoreSpies, spyOn } from 'expect';
 
 import * as Kolide from 'kolide';
 
-import { reduxMockStore } from '../../../../test/helpers';
+import { reduxMockStore } from 'test/helpers';
 
 import {
   requirePasswordReset,
@@ -53,11 +53,22 @@ describe('Users - actions', () => {
     });
 
     describe('unsuccessful request', () => {
-      const errors = { base: 'Unable to require password reset' };
+      const errors = [
+        {
+          name: 'base',
+          reason: 'Unable to require password reset'
+        },
+      ];
+      const errorResponse = {
+        message: {
+          message: 'Unable to require password reset',
+          errors,
+        },
+      };
 
       beforeEach(() => {
         spyOn(Kolide.default, 'requirePasswordReset').andCall(() => {
-          return Promise.reject({ errors });
+          return Promise.reject(errorResponse);
         });
       });
 
@@ -66,7 +77,7 @@ describe('Users - actions', () => {
       it('calls the resetFunc', () => {
         const mockStore = reduxMockStore(store);
 
-        mockStore.dispatch(requirePasswordReset(user, { require: true }))
+        return mockStore.dispatch(requirePasswordReset(user, { require: true }))
           .then(() => {
             throw new Error('promise should have failed');
           })
@@ -80,7 +91,10 @@ describe('Users - actions', () => {
 
         const expectedActions = [
           { type: REQUIRE_PASSWORD_RESET_REQUEST },
-          { type: REQUIRE_PASSWORD_RESET_FAILURE, payload: { errors } },
+          {
+            type: REQUIRE_PASSWORD_RESET_FAILURE,
+            payload: { errors: { base: 'Unable to require password reset' } },
+          },
         ];
 
         return mockStore.dispatch(requirePasswordReset(user, { require: true }))
