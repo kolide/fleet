@@ -70,9 +70,9 @@ const routes = (
           </Route>
         </Route>
       </Route>
-      <Route path='/500' component={Kolide500} />
-      <Route path='/404' component={Kolide404} />
-      <Redirect from='*' to='/404' />
+      <Route path="/500" component={Kolide500} />
+      <Route path="/404" component={Kolide404} />
+      <Redirect from="*" to="/404" />
     </Router>
   </Provider>
 );

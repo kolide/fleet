@@ -8,12 +8,11 @@ const baseClass = 'kolide-404';
 class Kolide404 extends Component {
 
   render () {
-
     return (
       <div className={baseClass}>
         <header className="primary-header">
           <a href="/">
-            <img className="primary-header__logo" src={kolideLogo} />
+            <img className="primary-header__logo" src={kolideLogo} alt="Kolide" />
           </a>
         </header>
         <main>
@@ -22,7 +21,7 @@ class Kolide404 extends Component {
           <p>You seem to have lost your way.</p>
           <p>Might we recommend going back on your browser or visiting the <a href="/">home page?</a></p>
           <div className="gopher-container">
-            <img src={gopher} />
+            <img src={gopher} role="presentation" />
             <p>Need immediate assistance? <br />Contact <a href="mailto:support@kolide.co">support@kolide.co</a></p>
           </div>
         </main>
