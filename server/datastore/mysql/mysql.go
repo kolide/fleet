@@ -90,11 +90,6 @@ func (d *Datastore) MigrateData() error {
 	return nil
 }
 
-// Initialize preload data needed by the application
-func (d *Datastore) Initialize() error {
-	return nil
-}
-
 // Drop removes database
 func (d *Datastore) Drop() error {
 	tables := []struct {
