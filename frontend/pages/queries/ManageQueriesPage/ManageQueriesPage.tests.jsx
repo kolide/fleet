@@ -82,6 +82,20 @@ describe('ManageQueriesPage - component', () => {
     expect(page.state('checkedQueryIDs')).toEqual([]);
   });
 
+  it('goes to the edit query page when the Edit/Run Query button is the side panel is clicked', () => {
+    const mockStore = reduxMockStore(store);
+    const props = { location: { query: { selectedQuery: queryStub.id } } };
+    const Component = connectedComponent(ConnectedManageQueriesPage, { mockStore, props });
+    const page = mount(Component);
+    const button = page.find('QueryDetailsSidePanel').find('Button');
+
+    button.simulate('click');
+
+    const routerChangeAction = find(mockStore.getActions(), { type: '@@router/CALL_HISTORY_METHOD' });
+
+    expect(routerChangeAction.payload).toEqual({ method: 'push', args: [`/queries/${queryStub.id}`] });
+  });
+
   describe('bulk delete action', () => {
     const queries = [queryStub, { ...queryStub, id: 101, name: 'My unique query name' }];
 

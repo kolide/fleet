@@ -1,6 +1,9 @@
 export default {
   ADMIN_DASHBOARD: '/admin',
   ALL_PACKS: '/packs/all',
+  EDIT_QUERY: (query) => {
+    return `/queries/${query.id}`;
+  },
   FORGOT_PASSWORD: '/login/forgot',
   HOME: '/',
   LOGIN: '/login',

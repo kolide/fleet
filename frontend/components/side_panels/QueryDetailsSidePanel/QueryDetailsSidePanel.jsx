@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 import Button from 'components/buttons/Button';
 import Icon from 'components/icons/Icon';
@@ -8,8 +8,17 @@ import SecondarySidePanelContainer from 'components/side_panels/SecondarySidePan
 
 class QueryDetailsSidePanel extends Component {
   static propTypes = {
+    onEditQuery: PropTypes.func.isRequired,
     query: queryInterface.isRequired,
   };
+
+  handleEditQueryClick = (evt) => {
+    evt.preventDefault();
+
+    const { onEditQuery, query } = this.props;
+
+    return onEditQuery(query);
+  }
 
   renderPacks = () => {
     const { packs } = this.props.query;
@@ -34,13 +43,13 @@ class QueryDetailsSidePanel extends Component {
 
   render () {
     const { query } = this.props;
-    const { renderPacks } = this;
+    const { handleEditQueryClick, renderPacks } = this;
     const { description, name, query: queryText } = query;
 
     return (
       <SecondarySidePanelContainer>
         <h1>{name}</h1>
-        <Button variant="inverse">Edit/Run Query</Button>
+        <Button onClick={handleEditQueryClick} variant="inverse">Edit/Run Query</Button>
         <KolideAce
           fontSize={12}
           name="query-details"

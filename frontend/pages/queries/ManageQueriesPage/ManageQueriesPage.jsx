@@ -139,6 +139,15 @@ export class ManageQueriesPage extends Component {
     return false;
   }
 
+  goToEditQueryPage = (query) => {
+    const { dispatch } = this.props;
+    const { EDIT_QUERY } = paths;
+
+    dispatch(push(EDIT_QUERY(query)));
+
+    return false;
+  }
+
   renderCTAs = () => {
     const { goToNewQueryPage, onDeleteQueries } = this;
     const btnClass = `${baseClass}__delete-queries-btn`;
@@ -167,6 +176,7 @@ export class ManageQueriesPage extends Component {
   }
 
   renderSidePanel = () => {
+    const { goToEditQueryPage } = this;
     const { selectedQuery } = this.props;
 
     if (!selectedQuery) {
@@ -174,7 +184,7 @@ export class ManageQueriesPage extends Component {
       return <PackInfoSidePanel />;
     }
 
-    return <QueryDetailsSidePanel query={selectedQuery} />;
+    return <QueryDetailsSidePanel onEditQuery={goToEditQueryPage} query={selectedQuery} />;
   }
 
   render () {
