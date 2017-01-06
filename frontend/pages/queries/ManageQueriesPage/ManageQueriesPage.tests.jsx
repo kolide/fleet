@@ -109,11 +109,13 @@ describe('ManageQueriesPage - component', () => {
       expect(page.find('.manage-queries-page__delete-queries-btn').length).toEqual(1);
     });
 
-    it('dispatches the query destroy function when the delete button is clicked', () => {
+    it('calls the API to delete once the Modal has been accepted', () => {
       const mockStore = reduxMockStore(store);
       const Component = connectedComponent(ConnectedManageQueriesPage, { mockStore });
       const page = mount(Component).find('ManageQueriesPage');
       const checkAllQueries = page.find({ name: 'check-all-queries' });
+
+      expect(page.find('Modal').length).toEqual(0);
 
       checkAllQueries.simulate('change');
 
@@ -121,9 +123,36 @@ describe('ManageQueriesPage - component', () => {
 
       deleteBtn.simulate('click');
 
-      const dispatchedActions = mockStore.getActions();
+      expect(mockStore.getActions()).toNotInclude({ type: 'queries_DESTROY_REQUEST' });
 
-      expect(dispatchedActions).toInclude({ type: 'queries_DESTROY_REQUEST' });
+      expect(page.find('Modal').length).toEqual(1);
+
+      page.find('Modal').find('Button').last().simulate('click');
+
+      expect(mockStore.getActions()).toInclude({ type: 'queries_DESTROY_REQUEST' });
+    });
+
+    it('does not call the API if the Modal is not accepted', () => {
+      const mockStore = reduxMockStore(store);
+      const Component = connectedComponent(ConnectedManageQueriesPage, { mockStore });
+      const page = mount(Component).find('ManageQueriesPage');
+      const checkAllQueries = page.find({ name: 'check-all-queries' });
+
+      expect(page.find('Modal').length).toEqual(0);
+
+      checkAllQueries.simulate('change');
+
+      const deleteBtn = page.find('.manage-queries-page__delete-queries-btn');
+
+      deleteBtn.simulate('click');
+
+      expect(mockStore.getActions()).toNotInclude({ type: 'queries_DESTROY_REQUEST' });
+
+      expect(page.find('Modal').length).toEqual(1);
+
+      page.find('Modal').find('Button').first().simulate('click');
+
+      expect(mockStore.getActions()).toNotInclude({ type: 'queries_DESTROY_REQUEST' });
     });
   });
 

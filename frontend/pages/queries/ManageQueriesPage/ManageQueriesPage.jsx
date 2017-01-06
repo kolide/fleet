@@ -6,6 +6,7 @@ import { push } from 'react-router-redux';
 import Button from 'components/buttons/Button';
 import entityGetter from 'redux/utilities/entityGetter';
 import InputField from 'components/forms/fields/InputField';
+import Modal from 'components/modals/Modal';
 import NumberPill from 'components/NumberPill';
 import PackInfoSidePanel from 'components/side_panels/PackInfoSidePanel';
 import paths from 'router/paths';
@@ -35,6 +36,7 @@ export class ManageQueriesPage extends Component {
       allQueriesChecked: false,
       checkedQueryIDs: [],
       queriesFilter: '',
+      showModal: false,
     };
   }
 
@@ -61,9 +63,17 @@ export class ManageQueriesPage extends Component {
       .then(() => {
         dispatch(renderFlash('success', 'Queries successfully deleted.'));
 
+        this.setState({ showModal: false });
+
         return false;
       })
-      .catch(() => dispatch(renderFlash('error', 'Something went wrong.')));
+      .catch(() => {
+        dispatch(renderFlash('error', 'Something went wrong.'));
+
+        this.setState({ showModal: false });
+
+        return false;
+      });
   }
 
   onCheckAllQueries = (shouldCheck) => {
@@ -108,6 +118,14 @@ export class ManageQueriesPage extends Component {
     return false;
   }
 
+  onToggleModal = () => {
+    const { showModal } = this.state;
+
+    this.setState({ showModal: !showModal });
+
+    return false;
+  }
+
   getQueries = () => {
     const { queriesFilter } = this.state;
     const { queries } = this.props;
@@ -148,7 +166,7 @@ export class ManageQueriesPage extends Component {
   }
 
   renderCTAs = () => {
-    const { goToNewQueryPage, onDeleteQueries } = this;
+    const { goToNewQueryPage, onToggleModal } = this;
     const btnClass = `${baseClass}__delete-queries-btn`;
     const checkedQueryCount = this.state.checkedQueryIDs.length;
 
@@ -160,7 +178,7 @@ export class ManageQueriesPage extends Component {
           <p className={`${baseClass}__query-count`}>{checkedQueryCount} {queryText} Selected</p>
           <Button
             className={btnClass}
-            onClick={onDeleteQueries}
+            onClick={onToggleModal}
             variant="alert"
           >
             Delete
@@ -171,6 +189,25 @@ export class ManageQueriesPage extends Component {
 
     return (
       <Button variant="brand" onClick={goToNewQueryPage}>CREATE NEW QUERY</Button>
+    );
+  }
+
+  renderModal = () => {
+    const { onDeleteQueries, onToggleModal } = this;
+    const { showModal } = this.state;
+
+    if (!showModal) {
+      return false;
+    }
+
+    return (
+      <Modal onExit={onToggleModal}>
+        <p>Are you sure you want to delete the selected queries?</p>
+        <div>
+          <Button onClick={onToggleModal} variant="inverse">Cancel</Button>
+          <Button onClick={onDeleteQueries} variant="alert">Delete</Button>
+        </div>
+      </Modal>
     );
   }
 
@@ -195,6 +232,7 @@ export class ManageQueriesPage extends Component {
       onSelectQuery,
       onFilterQueries,
       renderCTAs,
+      renderModal,
       renderSidePanel,
     } = this;
     const { queries: allQueries, selectedQuery } = this.props;
@@ -228,6 +266,7 @@ export class ManageQueriesPage extends Component {
           />
         </div>
         {renderSidePanel()}
+        {renderModal()}
       </div>
     );
   }
