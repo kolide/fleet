@@ -86,7 +86,7 @@ func authenticatedUser(jwtKey string, svc kolide.Service, next endpoint.Endpoint
 
 // authViewer creates an authenticated viewer by validating a JWT token.
 func authViewer(ctx context.Context, jwtKey string, bearerToken token.Token, svc kolide.Service) (*viewer.Viewer, error) {
-	jwtToken, err := jwt.Parse(bearerToken.String(), func(token *jwt.Token) (interface{}, error) {
+	jwtToken, err := jwt.Parse(string(bearerToken), func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}

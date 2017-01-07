@@ -16,11 +16,6 @@ const tokenKey key = 0
 // Token is the concrete type which represents kolide session tokens
 type Token string
 
-// String return a string representation of a token
-func (t Token) String() string {
-	return string(t)
-}
-
 // FromHTTPRequest extracts an Authorization
 // from an HTTP header if present.
 func FromHTTPRequest(r *http.Request) Token {
