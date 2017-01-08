@@ -100,6 +100,13 @@ var uintptr = func(n uint) *uint {
 
 func TestPacksImportConfig(t *testing.T) {
 	svc := createServiceMockForImport(t)
+
+	p := &kolide.Pack{
+		Name: "dup",
+	}
+	_, err := svc.ds.NewPack(p)
+	require.Nil(t, err)
+
 	q1 := kolide.QueryDetails{
 		Query:    "select * from foo",
 		Interval: 100,
@@ -135,6 +142,12 @@ func TestPacksImportConfig(t *testing.T) {
 					"select id, xx from yy",
 				},
 			},
+			"dup": kolide.PackDetails{
+				Queries: kolide.QueryNameToQueryDetailsMap{
+					"q1": q1,
+					"q2": q2,
+				},
+			},
 			"*": "/home/usr/packs/*",
 		},
 		ExternalPacks: kolide.PackNameToPackDetails{
@@ -163,12 +176,12 @@ func TestPacksImportConfig(t *testing.T) {
 		Admin:    false,
 		AdminForcedPasswordReset: false,
 	}
-	user, err := svc.ds.NewUser(user)
+	user, err = svc.ds.NewUser(user)
 	require.Nil(t, err)
 
 	packs, err := importConfig.CollectPacks()
 	require.Nil(t, err)
-	assert.Len(t, packs, 3)
+	assert.Len(t, packs, 4)
 	err = svc.importPacks(user.ID, &importConfig, resp)
 	require.Nil(t, err)
 	queries, err := svc.ds.ListQueries(kolide.ListOptions{})
@@ -183,4 +196,7 @@ func TestPacksImportConfig(t *testing.T) {
 	labels, err := svc.ds.ListLabels(kolide.ListOptions{})
 	require.Nil(t, err)
 	assert.Len(t, labels, 3)
+	assert.Equal(t, 3, resp.Status(kolide.PacksSection).ImportCount)
+	assert.Equal(t, 1, resp.Status(kolide.PacksSection).SkipCount)
+	assert.Equal(t, 3, resp.Status(kolide.QueriesSection).ImportCount)
 }
