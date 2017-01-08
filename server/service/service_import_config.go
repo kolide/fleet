@@ -1,16 +1,195 @@
 package service
 
 import (
+	"errors"
+	"strings"
+
+	"github.com/kolide/kolide-ose/server/contexts/viewer"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"golang.org/x/net/context"
 )
 
 func (svc service) ImportConfig(ctx context.Context, cfg *kolide.ImportConfig) (*kolide.ImportConfigResponse, error) {
 	resp := kolide.NewImportConfigResponse()
+	vc, ok := viewer.FromContext(ctx)
+	if !ok {
+		return nil, errors.New("internal error, unable to fetch user")
+	}
 	if err := svc.importOptions(cfg.Options, resp); err != nil {
 		return nil, err
 	}
+	if err := svc.importPacks(vc.UserID(), cfg, resp); err != nil {
+		return nil, err
+	}
+
 	return resp, nil
+}
+
+func (svc service) importPacks(uid uint, cfg *kolide.ImportConfig, resp *kolide.ImportConfigResponse) error {
+	labelCache := map[string]*kolide.Label{}
+	packs, err := cfg.CollectPacks()
+	if err != nil {
+		return err
+	}
+	for packName, packDetails := range packs {
+		_, ok, err := svc.ds.PackByName(packName)
+		if err != nil {
+			return err
+		}
+		if ok {
+			resp.Status(kolide.PacksSection).Warning(
+				kolide.PackDuplicate, "skipped '%s' already exists", packName,
+			)
+			resp.Status(kolide.PacksSection).SkipCount++
+			continue
+		}
+		// import new pack
+		if packDetails.Shard != nil {
+			resp.Status(kolide.PacksSection).Warning(
+				kolide.Unsupported,
+				"shard for pack '%s'",
+				packName,
+			)
+		}
+		if packDetails.Version != nil {
+			resp.Status(kolide.PacksSection).Warning(
+				kolide.Unsupported,
+				"version for pack '%s'",
+				packName,
+			)
+		}
+		pack := &kolide.Pack{
+			Name:        packName,
+			Description: "Imported pack",
+			Platform:    packDetails.Platform,
+		}
+		pack, err = svc.ds.NewPack(pack)
+		if err != nil {
+			return err
+		}
+		err = svc.createLabelsForPack(pack, &packDetails, labelCache, resp)
+		if err != nil {
+			return err
+		}
+		err = svc.createQueriesForPack(uid, pack, &packDetails, resp)
+		if err != nil {
+			return err
+		}
+		resp.Status(kolide.PacksSection).ImportCount++
+		resp.Status(kolide.PacksSection).Message("imported '%s'", packName)
+	}
+	return nil
+}
+
+func hashQuery(platform, query string) string {
+	s := strings.Replace(query, " ", "", -1)
+	s = strings.Replace(s, "\t", "", -1)
+	s = strings.Replace(s, "\n", "", -1)
+	s = strings.Trim(s, ";")
+	s = platform + s
+	return strings.ToLower(s)
+}
+
+func uniqueImportName() (string, error) {
+	random, err := kolide.RandomText(12)
+	if err != nil {
+		return "", err
+	}
+	return "import_" + random, nil
+}
+
+func (svc service) createQueriesForPack(uid uint, pack *kolide.Pack, details *kolide.PackDetails,
+	resp *kolide.ImportConfigResponse) error {
+	for queryName, queryDetails := range details.Queries {
+		query, ok, err := svc.ds.QueryByName(queryName)
+		if err != nil {
+			return err
+		}
+		// if the query isn't already in the database, create it
+		if !ok {
+			query = &kolide.Query{
+				Name:        queryName,
+				Description: "imported",
+				Query:       queryDetails.Query,
+				Saved:       true,
+				AuthorID:    uid,
+			}
+			query, err = svc.ds.NewQuery(query)
+			if err != nil {
+				return err
+			}
+			resp.Status(kolide.QueriesSection).Message(
+				"created '%s' as part of pack '%s'", queryName, pack.Name,
+			)
+			resp.Status(kolide.QueriesSection).ImportCount++
+		}
+		// associate query with pack
+		scheduledQuery := &kolide.ScheduledQuery{
+			PackID:   pack.ID,
+			QueryID:  query.ID,
+			Interval: queryDetails.Interval,
+			Platform: queryDetails.Platform,
+			Snapshot: queryDetails.Snapshot,
+			Removed:  queryDetails.Removed,
+			Version:  queryDetails.Version,
+			Shard:    queryDetails.Shard,
+		}
+		_, err = svc.ds.NewScheduledQuery(scheduledQuery)
+		if err != nil {
+			return nil
+		}
+		resp.Status(kolide.PacksSection).Message("added query '%s'", query.Name)
+
+	}
+	return nil
+}
+
+// createLabelsForPack Iterates through discover queries, creates a label for
+// each query and assigns it to the pack passed as an argument.  Once a Label is created we cache
+// it for reuse.
+func (svc service) createLabelsForPack(pack *kolide.Pack, details *kolide.PackDetails,
+	cache map[string]*kolide.Label, resp *kolide.ImportConfigResponse) error {
+	for _, query := range details.Discovery {
+		hash := hashQuery(details.Platform, query)
+		label, ok := cache[hash]
+		// add existing label to pack
+		if ok {
+			err := svc.ds.AddLabelToPack(label.ID, pack.ID)
+			if err != nil {
+				return err
+			}
+			resp.Status(kolide.PacksSection).Message(
+				"added label '%s' to pack '%s'", label.Name, pack.Name,
+			)
+			continue
+		}
+		// create new label and add it to pack
+		labelName, err := uniqueImportName()
+		if err != nil {
+			return err
+		}
+		label = &kolide.Label{
+			Name:        labelName,
+			Query:       query,
+			Description: "imported",
+			LabelType:   kolide.LabelTypeDefault,
+			Platform:    details.Platform,
+		}
+		label, err = svc.ds.NewLabel(label)
+		if err != nil {
+			return err
+		}
+		// hang on to label so we can reuse it for other packs if needed
+		cache[hash] = label
+		err = svc.ds.AddLabelToPack(label.ID, pack.ID)
+		if err != nil {
+			return err
+		}
+		resp.Status(kolide.PacksSection).Message(
+			"added label '%s' to '%s'", label.Name, pack.Name,
+		)
+	}
+	return nil
 }
 
 func (svc service) importOptions(opts kolide.OptionNameToValueMap, resp *kolide.ImportConfigResponse) error {
@@ -18,17 +197,23 @@ func (svc service) importOptions(opts kolide.OptionNameToValueMap, resp *kolide.
 	for optName, optValue := range opts {
 		opt, err := svc.ds.OptionByName(optName)
 		if err != nil {
-			resp.Status(kolide.OptionsSection).Warning(kolide.OptionUnknown, "skipped '%s' can't find option", optName)
+			resp.Status(kolide.OptionsSection).Warning(
+				kolide.OptionUnknown, "skipped '%s' can't find option", optName,
+			)
 			resp.Status(kolide.OptionsSection).SkipCount++
 			continue
 		}
 		if opt.ReadOnly {
-			resp.Status(kolide.OptionsSection).Warning(kolide.OptionReadonly, "skipped '%s' can't change read only option", optName)
+			resp.Status(kolide.OptionsSection).Warning(
+				kolide.OptionReadonly, "skipped '%s' can't change read only option", optName,
+			)
 			resp.Status(kolide.OptionsSection).SkipCount++
 			continue
 		}
 		if opt.OptionSet() {
-			resp.Status(kolide.OptionsSection).Warning(kolide.OptionAlreadySet, "skipped '%s' can't change option that is already set", optName)
+			resp.Status(kolide.OptionsSection).Warning(
+				kolide.OptionAlreadySet, "skipped '%s' can't change option that is already set", optName,
+			)
 			resp.Status(kolide.OptionsSection).SkipCount++
 			continue
 		}
@@ -42,6 +227,5 @@ func (svc service) importOptions(opts kolide.OptionNameToValueMap, resp *kolide.
 			return err
 		}
 	}
-
 	return nil
 }

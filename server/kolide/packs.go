@@ -11,6 +11,9 @@ type PackStore interface {
 	DeletePack(pid uint) error
 	Pack(pid uint) (*Pack, error)
 	ListPacks(opt ListOptions) ([]*Pack, error)
+	// PackByName fetches pack if it exists, if the pack
+	// exists the bool return value is true
+	PackByName(name string) (*Pack, bool, error)
 
 	// Modifying the labels for packs
 	AddLabelToPack(lid uint, pid uint) error

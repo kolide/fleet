@@ -1,14 +1,33 @@
 package mysql
 
 import (
+	"database/sql"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
 )
 
+func (d *Datastore) QueryByName(name string) (*kolide.Query, bool, error) {
+	sqlStatement := `
+		SELECT *
+			FROM queries
+			WHERE name = ?
+			AND NOT deleted
+	`
+	var query kolide.Query
+	err := d.db.Get(&query, sqlStatement, name)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, false, nil
+		}
+		return nil, false, errors.DatabaseError(err)
+	}
+	return &query, true, nil
+}
+
 // NewQuery creates a Query
 func (d *Datastore) NewQuery(query *kolide.Query) (*kolide.Query, error) {
-
 	sql := `
 		INSERT INTO queries (
 			name,

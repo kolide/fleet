@@ -1,6 +1,7 @@
 package kolide
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -29,6 +30,7 @@ type WarningType string
 
 const (
 	PackDuplicate    WarningType = "duplicate_pack"
+	Unsupported                  = "unsupported"
 	OptionAlreadySet             = "option_already_set"
 	OptionReadonly               = "option_readonly"
 	OptionUnknown                = "option_unknown"
@@ -95,23 +97,23 @@ const (
 // schedule section of an osquery configuration
 type QueryDetails struct {
 	Query    string `json:"query"`
-	Interval int    `json:"interval"`
+	Interval uint   `json:"interval"`
 	// Optional fields
 	Removed  *bool   `json:"removed"`
 	Platform *string `json:"platform"`
 	Version  *string `json:"version"`
-	Shard    *int    `json:"shard"`
+	Shard    *uint   `json:"shard"`
 	Snapshot *bool   `json:"snapshot"`
 }
 
 // PackDetails represents the "packs" section of an osquery configuration
 // file
 type PackDetails struct {
-	Queries   []QueryDetails `json:"queries"`
-	Shard     *int           `json:"shard"`
-	Version   *string        `json:"version"`
-	Platform  *string        `json:"platform"`
-	Discovery []string       `json:"discovery"`
+	Queries   QueryNameToQueryDetailsMap `json:"queries"`
+	Shard     *int                       `json:"shard"`
+	Version   *string                    `json:"version"`
+	Platform  string                     `json:"platform"`
+	Discovery []string                   `json:"discovery"`
 }
 
 // YARAConfig yara configuration maps keys to lists of files
@@ -170,4 +172,43 @@ type ImportConfig struct {
 	ExternalPacks PackNameToPackDetails `json:"-"`
 	// GlobPackNames lists pack names that are globbed
 	GlobPackNames []string
+}
+
+func (ic *ImportConfig) fetchGlobPacks(packs *PackNameToPackDetails) error {
+	for _, packName := range ic.GlobPackNames {
+		pack, ok := ic.ExternalPacks[packName]
+		if !ok {
+			return fmt.Errorf("glob pack '%s' details not found", packName)
+		}
+		(*packs)[packName] = pack
+	}
+	return nil
+}
+
+func (ic *ImportConfig) CollectPacks() (PackNameToPackDetails, error) {
+	result := make(PackNameToPackDetails)
+	for packName, packContent := range ic.Packs {
+		// special case handling for Globbed packs
+		if packName == GlobPacks {
+			if err := ic.fetchGlobPacks(&result); err != nil {
+				return nil, err
+			}
+			continue
+		}
+		// content can either be a file path, in which case we expect to find
+		// pack in ExternalPacks, or pack details
+		switch content := packContent.(type) {
+		case string:
+			pack, ok := ic.ExternalPacks[packName]
+			if !ok {
+				return nil, fmt.Errorf("external pack '%s' details not found", packName)
+			}
+			result[packName] = pack
+		case PackDetails:
+			result[packName] = content
+		default:
+			return nil, errors.New("unexpected pack content")
+		}
+	}
+	return result, nil
 }

@@ -1,9 +1,29 @@
 package mysql
 
 import (
+	"database/sql"
+
 	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
 )
+
+func (d *Datastore) PackByName(name string) (*kolide.Pack, bool, error) {
+	sqlStatement := `
+		SELECT *
+			FROM packs
+			WHERE name = ? AND NOT deleted
+	`
+	var pack kolide.Pack
+	err := d.db.Get(&pack, sqlStatement, name)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, false, nil
+		}
+		return nil, false, errors.DatabaseError(err)
+	}
+
+	return &pack, true, nil
+}
 
 // NewPack creates a new Pack
 func (d *Datastore) NewPack(pack *kolide.Pack) (*kolide.Pack, error) {

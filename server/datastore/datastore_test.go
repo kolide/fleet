@@ -58,4 +58,6 @@ var testFunctions = [...]func(*testing.T, kolide.Datastore){
 	testOptions,
 	testNewScheduledQuery,
 	testOptionsToConfig,
+	testGetPackByName,
+	testGetQueryByName,
 }
