@@ -6,6 +6,11 @@ export const adminUserStub = {
   username: 'gnardog',
 };
 
+export const configOptionStub = {
+  name: 'config_option_name',
+  value: 'config option value',
+};
+
 export const configStub = {
   org_info: {
     org_name: 'Kolide',
