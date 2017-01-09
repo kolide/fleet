@@ -21,8 +21,92 @@ func (svc service) ImportConfig(ctx context.Context, cfg *kolide.ImportConfig) (
 	if err := svc.importPacks(vc.UserID(), cfg, resp); err != nil {
 		return nil, err
 	}
-
+	if err := svc.importScheduledQueries(vc.UserID(), cfg, resp); err != nil {
+		return nil, err
+	}
 	return resp, nil
+}
+
+//func (svc service) importDecorators()
+func (svc service) importScheduledQueries(uid uint, cfg *kolide.ImportConfig, resp *kolide.ImportConfigResponse) error {
+	_, ok, err := svc.ds.PackByName(kolide.ImportPackName)
+	if ok {
+		resp.Status(kolide.PacksSection).Warning(
+			kolide.PackDuplicate, "skipped '%s' already exists", kolide.ImportPackName,
+		)
+		resp.Status(kolide.PacksSection).SkipCount++
+		return nil
+	}
+	// create import pack to hold imported scheduled queries
+	pack := &kolide.Pack{
+		Name:        kolide.ImportPackName,
+		Description: "holds imported scheduled queries",
+		CreatedBy:   uid,
+		Disabled:    false,
+	}
+	pack, err = svc.ds.NewPack(pack)
+	if err != nil {
+		return err
+	}
+	resp.Status(kolide.PacksSection).ImportCount++
+	resp.Status(kolide.PacksSection).Message("created import pack")
+
+	for queryName, queryDetails := range cfg.Schedule {
+		var query *kolide.Query
+		query, ok, err = svc.ds.QueryByName(queryName)
+		// if we find the query check to see if the import query matches the
+		// query we have, if it doesn't skip it
+		if ok {
+			if hashQuery("", query.Query) != hashQuery("", queryDetails.Query) {
+				resp.Status(kolide.PacksSection).Warning(
+					kolide.DifferentQuerySameName,
+					"queries named '%s' have different statements and won't be added to '%s'",
+					queryName,
+					pack.Name,
+				)
+				continue
+			}
+			resp.Status(kolide.QueriesSection).Warning(
+				kolide.QueryDuplicate, "skipped '%s' different query of same name already exists", queryName,
+			)
+			resp.Status(kolide.QueriesSection).SkipCount++
+		} else {
+			// if query doesn't exist, create it
+			query = &kolide.Query{
+				Name:        queryName,
+				Description: "imported",
+				Query:       queryDetails.Query,
+				Saved:       true,
+				AuthorID:    uid,
+			}
+			query, err = svc.ds.NewQuery(query)
+			if err != nil {
+				return err
+			}
+			resp.Status(kolide.QueriesSection).ImportCount++
+			resp.Status(kolide.QueriesSection).Message(
+				"imported scheduled query '%s'", query.Name,
+			)
+		}
+		sq := &kolide.ScheduledQuery{
+			PackID:   pack.ID,
+			QueryID:  query.ID,
+			Interval: queryDetails.Interval,
+			Snapshot: queryDetails.Snapshot,
+			Removed:  queryDetails.Removed,
+			Platform: queryDetails.Platform,
+			Version:  queryDetails.Version,
+			Shard:    queryDetails.Shard,
+		}
+		_, err = svc.ds.NewScheduledQuery(sq)
+		if err != nil {
+			return nil
+		}
+		resp.Status(kolide.PacksSection).Message(
+			"added query '%s' to '%s'", query.Name, pack.Name,
+		)
+	}
+	return nil
 }
 
 func (svc service) importPacks(uid uint, cfg *kolide.ImportConfig, resp *kolide.ImportConfigResponse) error {

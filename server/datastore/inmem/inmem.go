@@ -33,6 +33,7 @@ type Datastore struct {
 	distributedQueryCampaigns       map[uint]kolide.DistributedQueryCampaign
 	distributedQueryCampaignTargets map[uint]kolide.DistributedQueryCampaignTarget
 	options                         map[uint]*kolide.Option
+	decorators                      map[uint]*kolide.Decorator
 	appConfig                       *kolide.AppConfig
 	config                          *config.KolideConfig
 }
@@ -88,6 +89,7 @@ func (d *Datastore) Migrate() error {
 	d.distributedQueryCampaigns = make(map[uint]kolide.DistributedQueryCampaign)
 	d.distributedQueryCampaignTargets = make(map[uint]kolide.DistributedQueryCampaignTarget)
 	d.options = make(map[uint]*kolide.Option)
+	d.decorators = make(map[uint]*kolide.Decorator)
 
 	for _, initData := range appstate.Options {
 		opt := kolide.Option{

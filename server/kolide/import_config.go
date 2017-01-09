@@ -29,11 +29,13 @@ const (
 type WarningType string
 
 const (
-	PackDuplicate    WarningType = "duplicate_pack"
-	Unsupported                  = "unsupported"
-	OptionAlreadySet             = "option_already_set"
-	OptionReadonly               = "option_readonly"
-	OptionUnknown                = "option_unknown"
+	PackDuplicate          WarningType = "duplicate_pack"
+	DifferentQuerySameName             = "different_query_same_name"
+	OptionAlreadySet                   = "option_already_set"
+	OptionReadonly                     = "option_readonly"
+	OptionUnknown                      = "option_unknown"
+	QueryDuplicate                     = "duplicate_query"
+	Unsupported                        = "unsupported"
 )
 
 // ImportStatus contains information pertaining to the import of a section
@@ -91,6 +93,9 @@ func (ic *ImportConfigResponse) Status(section ImportSection) (status *ImportSta
 
 const (
 	GlobPacks = "*"
+	// ImportPackName is a custom pack name used for a pack we create to
+	// hold imported scheduled queries
+	ImportPackName = "imported"
 )
 
 // QueryDetails represents the query objects used in the packs and the
@@ -110,7 +115,7 @@ type QueryDetails struct {
 // file
 type PackDetails struct {
 	Queries   QueryNameToQueryDetailsMap `json:"queries"`
-	Shard     *int                       `json:"shard"`
+	Shard     *uint                      `json:"shard"`
 	Version   *string                    `json:"version"`
 	Platform  string                     `json:"platform"`
 	Discovery []string                   `json:"discovery"`

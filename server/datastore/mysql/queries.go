@@ -12,8 +12,7 @@ func (d *Datastore) QueryByName(name string) (*kolide.Query, bool, error) {
 	sqlStatement := `
 		SELECT *
 			FROM queries
-			WHERE name = ?
-			AND NOT deleted
+			WHERE name = ? AND NOT deleted
 	`
 	var query kolide.Query
 	err := d.db.Get(&query, sqlStatement, name)

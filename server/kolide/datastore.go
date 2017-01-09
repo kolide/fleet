@@ -14,6 +14,7 @@ type Datastore interface {
 	InviteStore
 	ScheduledQueryStore
 	OptionStore
+	DecoratorStore
 	Name() string
 	Drop() error
 	Migrate() error

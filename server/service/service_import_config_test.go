@@ -32,6 +32,71 @@ func TestHashQuery(t *testing.T) {
 
 }
 
+func TestImportScheduledQueries(t *testing.T) {
+	cfg := &kolide.ImportConfig{
+		Schedule: kolide.QueryNameToQueryDetailsMap{
+			"q1": kolide.QueryDetails{
+				Query:    "select pid from processes",
+				Interval: 60,
+				Platform: strPtr("linux"),
+			},
+			"q2": kolide.QueryDetails{
+				Query:    "select uid from users",
+				Interval: 120,
+				Platform: strPtr("linux"),
+				Version:  strPtr("1.0"),
+			},
+			"q3": kolide.QueryDetails{
+				Query:    "select name from os",
+				Interval: 240,
+				Platform: strPtr("linux"),
+				Snapshot: boolPtr(true),
+			},
+		},
+	}
+	resp := kolide.NewImportConfigResponse()
+	svc := createServiceMockForImport(t)
+	user := &kolide.User{
+		Username: "bob",
+		Password: []byte("secret"),
+		Email:    "bob@something.com",
+		Admin:    false,
+		AdminForcedPasswordReset: false,
+	}
+	user, err := svc.ds.NewUser(user)
+	require.Nil(t, err)
+	skipQuery := &kolide.Query{
+		Name:        "q3",
+		Query:       "select version from os",
+		Description: "should be skipped",
+		Saved:       true,
+		AuthorID:    user.ID,
+	}
+	_, err = svc.ds.NewQuery(skipQuery)
+	require.Nil(t, err)
+	noskipQuery := &kolide.Query{
+		Name:     "q2",
+		Query:    "select uid from users",
+		Saved:    true,
+		AuthorID: user.ID,
+	}
+	_, err = svc.ds.NewQuery(noskipQuery)
+	require.Nil(t, err)
+
+	err = svc.importScheduledQueries(user.ID, cfg, resp)
+	require.Nil(t, err)
+	_, ok, err := svc.ds.QueryByName("q1")
+	require.Nil(t, err)
+	require.True(t, ok)
+	_, ok, err = svc.ds.QueryByName("q2")
+	require.Nil(t, err)
+	require.True(t, ok)
+	_, ok, err = svc.ds.QueryByName("q3")
+	require.Nil(t, err)
+	require.True(t, ok)
+
+}
+
 func TestOptionsImportConfig(t *testing.T) {
 	opts := kolide.OptionNameToValueMap{
 		"aws_access_key_id": "foo",
@@ -87,7 +152,7 @@ var boolptr = func(v bool) *bool {
 	*b = v
 	return b
 }
-var stringptr = func(v string) *string {
+var strPtr = func(v string) *string {
 	s := new(string)
 	*s = v
 	return s
@@ -111,22 +176,22 @@ func TestPacksImportConfig(t *testing.T) {
 		Query:    "select * from foo",
 		Interval: 100,
 		Removed:  boolptr(false),
-		Platform: stringptr("linux"),
-		Version:  stringptr("1.0"),
+		Platform: strPtr("linux"),
+		Version:  strPtr("1.0"),
 	}
 	q2 := kolide.QueryDetails{
 		Query:    "select * from bar",
 		Interval: 50,
 		Removed:  boolptr(false),
-		Platform: stringptr("linux"),
-		Version:  stringptr("1.0"),
+		Platform: strPtr("linux"),
+		Version:  strPtr("1.0"),
 	}
 	q3 := kolide.QueryDetails{
 		Query:    "select * from baz",
 		Interval: 500,
 		Removed:  boolptr(false),
-		Platform: stringptr("linux"),
-		Version:  stringptr("1.0"),
+		Platform: strPtr("linux"),
+		Version:  strPtr("1.0"),
 	}
 
 	importConfig := kolide.ImportConfig{

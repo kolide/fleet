@@ -1,10 +1,6 @@
 package kolide
 
-import (
-	"time"
-
-	"golang.org/x/net/context"
-)
+import "golang.org/x/net/context"
 
 type QueryStore interface {
 	// NewQuery creates a new query object in thie datastore. The returned
@@ -65,21 +61,4 @@ type Query struct {
 	// Packs is loaded when retrieving queries, but is stored in a join
 	// table in the MySQL backend.
 	Packs []Pack `json:"packs" db:"-"`
-}
-
-type DecoratorType int
-
-const (
-	DecoratorLoad DecoratorType = iota
-	DecoratorAlways
-	DecoratorInterval
-)
-
-type Decorator struct {
-	ID        uint
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	Type      DecoratorType
-	Interval  int
-	Query     string
 }
