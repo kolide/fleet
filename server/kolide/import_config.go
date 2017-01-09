@@ -19,9 +19,10 @@ type ImportConfigService interface {
 type ImportSection string
 
 const (
-	OptionsSection ImportSection = "options"
-	PacksSection                 = "packs"
-	QueriesSection               = "queries"
+	OptionsSection    ImportSection = "options"
+	PacksSection                    = "packs"
+	QueriesSection                  = "queries"
+	DecoratorsSection               = "decorators"
 )
 
 // WarningType is used to group associated warnings for options, packs etc

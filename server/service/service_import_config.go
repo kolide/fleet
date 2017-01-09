@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"strconv"
 	"strings"
 
 	"github.com/kolide/kolide-ose/server/contexts/viewer"
@@ -24,10 +25,62 @@ func (svc service) ImportConfig(ctx context.Context, cfg *kolide.ImportConfig) (
 	if err := svc.importScheduledQueries(vc.UserID(), cfg, resp); err != nil {
 		return nil, err
 	}
+	if err := svc.importDecorators(cfg, resp); err != nil {
+		return nil, err
+	}
 	return resp, nil
 }
 
-//func (svc service) importDecorators()
+func (svc service) importDecorators(cfg *kolide.ImportConfig, resp *kolide.ImportConfigResponse) error {
+	if cfg.Decorators != nil {
+		for _, query := range cfg.Decorators.Load {
+			decorator := &kolide.Decorator{
+				Query: query,
+				Type:  kolide.DecoratorLoad,
+			}
+			_, err := svc.ds.NewDecorator(decorator)
+			if err != nil {
+				return err
+			}
+			resp.Status(kolide.DecoratorsSection).ImportCount++
+			resp.Status(kolide.DecoratorsSection).Message("imported load '%s'", query)
+		}
+		for _, query := range cfg.Decorators.Always {
+			decorator := &kolide.Decorator{
+				Query: query,
+				Type:  kolide.DecoratorAlways,
+			}
+			_, err := svc.ds.NewDecorator(decorator)
+			if err != nil {
+				return err
+			}
+			resp.Status(kolide.DecoratorsSection).ImportCount++
+			resp.Status(kolide.DecoratorsSection).Message("imported always '%s'", query)
+		}
+		for key, queries := range cfg.Decorators.Interval {
+			for _, query := range queries {
+				interval, err := strconv.ParseInt(key, 10, 32)
+				if err != nil {
+					return err
+				}
+				decorator := &kolide.Decorator{
+					Query:    query,
+					Type:     kolide.DecoratorInterval,
+					Interval: uint(interval),
+				}
+				_, err = svc.ds.NewDecorator(decorator)
+				if err != nil {
+					return err
+				}
+				resp.Status(kolide.DecoratorsSection).ImportCount++
+				resp.Status(kolide.DecoratorsSection).Message("imported interval %d '%s'", interval, query)
+			}
+		}
+
+	}
+	return nil
+}
+
 func (svc service) importScheduledQueries(uid uint, cfg *kolide.ImportConfig, resp *kolide.ImportConfigResponse) error {
 	_, ok, err := svc.ds.PackByName(kolide.ImportPackName)
 	if ok {
