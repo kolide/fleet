@@ -4,17 +4,22 @@
     font-weight: $normal;
   }
 
+  &__ctas {
+    @include flex-grow(1);
+    text-align: right;
+  }
+
   &__query-count {
-    color: #858495;
+    color: $text-dark;
     font-size: 14px;
     font-weight: $bold;
     letter-spacing: -0.5px;
-    margin: 0;
+    margin: 0 12px 0 0;
+    display: inline-block;
   }
 
   &__filter-and-cta {
     @include display(flex);
-    @include justify-content(space-between);
     margin-bottom: $pad-small;
 
     .form-field {
@@ -29,6 +34,7 @@
   }
 
   &__filter-queries {
+    @include flex-grow(1);
     position: relative;
 
     .input-field {

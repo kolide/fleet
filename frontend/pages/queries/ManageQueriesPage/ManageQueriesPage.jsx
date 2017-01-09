@@ -175,7 +175,7 @@ export class ManageQueriesPage extends Component {
       const queryText = checkedQueryCount === 1 ? 'Query' : 'Queries';
 
       return (
-        <div>
+        <div className={`${baseClass}__ctas`}>
           <p className={`${baseClass}__query-count`}>{checkedQueryCount} {queryText} Selected</p>
           <Button
             className={btnClass}
