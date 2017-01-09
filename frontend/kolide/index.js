@@ -32,10 +32,11 @@ class Kolide extends Base {
       });
   }
 
-  createPack = ({ name, description }) => {
+  createPack = ({ name, description, targets }) => {
     const { PACKS } = endpoints;
+    const packTargets = helpers.formatSelectedTargetsForApi(targets, true);
 
-    return this.authenticatedPost(this.endpoint(PACKS), JSON.stringify({ description, name }))
+    return this.authenticatedPost(this.endpoint(PACKS), JSON.stringify({ description, name, ...packTargets }))
       .then((response) => { return response.pack; });
   }
 

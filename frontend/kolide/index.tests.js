@@ -80,7 +80,7 @@ describe('Kolide - API client', () => {
 
     it('#createPack', (done) => {
       const { description, name } = pack;
-      const params = { description, name };
+      const params = { description, name, host_ids: [], label_ids: [] };
       const request = validCreatePackRequest(bearerToken, params);
 
       Kolide.setBearerToken(bearerToken);
