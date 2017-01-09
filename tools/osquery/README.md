@@ -10,7 +10,7 @@ The files in this directory are intended to assist with Kolide development.
 
 * `example_osquery.flags`: An example osquery flagfile setting the config options that must be loaded before the full JSON config.
 
-* `kolide.crt` & `kolide.key`: Self-signed SSL certificate & key useful for testing locally with `osqueryd`. Works with domains `localhost` and `dockerhost`. Should /never/ be used in production.
+* `kolide.crt` & `kolide.key`: Self-signed SSL certificate & key useful for testing locally with `osqueryd`. Works with domains `localhost` and `dockerhost`. Should **never** be used in production.
 
 
 ## Testing with containerized osqueryd
