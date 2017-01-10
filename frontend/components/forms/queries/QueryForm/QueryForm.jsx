@@ -228,7 +228,7 @@ class QueryForm extends Component {
 
     return (
       <div className="form-field form-field--dropdown">
-        <label className="form-field__label" for="platform">Platform</label>
+        <label className="form-field__label" htmlFor="platform">Platform</label>
         <Dropdown
           {...fields.platform}
           options={platformOptions}
