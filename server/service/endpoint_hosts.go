@@ -79,14 +79,14 @@ func makeListHostsEndpoint(svc kolide.Service) endpoint.Endpoint {
 			return listHostsResponse{Err: err}, nil
 		}
 
-		var hostResponses []hostResponse
-		for _, host := range hosts {
+		hostResponses := make([]hostResponse, len(hosts), len(hosts))
+		for i, host := range hosts {
 			h, err := hostResponseForHost(ctx, svc, host)
 			if err != nil {
 				return listHostsResponse{Err: err}, nil
 			}
 
-			hostResponses = append(hostResponses, *h)
+			hostResponses[i] = *h
 		}
 		return listHostsResponse{Hosts: hostResponses}, nil
 	}
