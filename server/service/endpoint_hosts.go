@@ -52,7 +52,6 @@ func makeGetHostEndpoint(svc kolide.Service) endpoint.Endpoint {
 
 		return getHostResponse{
 			Host: resp,
-			Err:  nil,
 		}, nil
 	}
 }
