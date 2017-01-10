@@ -13,6 +13,7 @@ export default {
   PACKS: '/v1/kolide/packs',
   QUERIES: '/v1/kolide/queries',
   RESET_PASSWORD: '/v1/kolide/reset_password',
+  PERFORM_REQUIRED_PASSWORD_RESET: '/v1/kolide/perform_required_password_reset',
   RUN_QUERY: '/v1/kolide/queries/run',
   SCHEDULED_QUERIES: (pack) => {
     return `/v1/kolide/packs/${pack.id}/scheduled`;

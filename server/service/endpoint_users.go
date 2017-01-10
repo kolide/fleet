@@ -185,7 +185,8 @@ type performRequiredPasswordResetRequest struct {
 }
 
 type performRequiredPasswordResetResponse struct {
-	Err error `json:"error,omitempty"`
+	User *kolide.User `json:"user,omitempty"`
+	Err  error        `json:"error,omitempty"`
 }
 
 func (r performRequiredPasswordResetResponse) error() error { return r.Err }
@@ -193,11 +194,11 @@ func (r performRequiredPasswordResetResponse) error() error { return r.Err }
 func makePerformRequiredPasswordResetEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(performRequiredPasswordResetRequest)
-		err := svc.PerformRequiredPasswordReset(ctx, req.Password)
+		user, err := svc.PerformRequiredPasswordReset(ctx, req.Password)
 		if err != nil {
 			return performRequiredPasswordResetResponse{Err: err}, nil
 		}
-		return performRequiredPasswordResetResponse{}, nil
+		return performRequiredPasswordResetResponse{User: user}, nil
 	}
 }
 

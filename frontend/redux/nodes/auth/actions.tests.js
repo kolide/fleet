@@ -5,11 +5,7 @@ import * as Kolide from 'kolide';
 import { reduxMockStore } from 'test/helpers';
 
 import {
-  requirePasswordReset,
   performRequiredPasswordReset,
-  REQUIRE_PASSWORD_RESET_REQUEST,
-  REQUIRE_PASSWORD_RESET_FAILURE,
-  REQUIRE_PASSWORD_RESET_SUCCESS,
   PERFORM_REQUIRED_PASSWORD_RESET_REQUEST,
   PERFORM_REQUIRED_PASSWORD_RESET_FAILURE,
   PERFORM_REQUIRED_PASSWORD_RESET_SUCCESS,
@@ -18,23 +14,25 @@ import {
 const store = { entities: { invites: {}, users: {} } };
 const user = { id: 1, email: 'zwass@kolide.co', force_password_reset: false };
 
-describe('Users - actions', () => {
-  describe('dispatching the require password reset action', () => {
+describe('Auth - actions', () => {
+  describe('dispatching the perform required password reset action', () => {
     describe('successful request', () => {
       beforeEach(() => {
-        spyOn(Kolide.default, 'requirePasswordReset').andCall(() => {
-          return Promise.resolve({ ...user, force_password_reset: true });
+        spyOn(Kolide.default, 'performRequiredPasswordReset').andCall(() => {
+          return Promise.resolve({ ...user, force_password_reset: false });
         });
       });
 
       afterEach(restoreSpies);
 
+      const resetParams = { password: 'foobar' };
+
       it('calls the resetFunc', () => {
         const mockStore = reduxMockStore(store);
 
-        return mockStore.dispatch(requirePasswordReset(user, { require: true }))
+        return mockStore.dispatch(performRequiredPasswordReset(resetParams))
           .then(() => {
-            expect(Kolide.default.requirePasswordReset).toHaveBeenCalledWith(user, { require: true });
+            expect(Kolide.default.performRequiredPasswordReset).toHaveBeenCalledWith(resetParams);
           });
       });
 
@@ -42,14 +40,14 @@ describe('Users - actions', () => {
         const mockStore = reduxMockStore(store);
 
         const expectedActions = [
-          { type: REQUIRE_PASSWORD_RESET_REQUEST },
+          { type: PERFORM_REQUIRED_PASSWORD_RESET_REQUEST },
           {
-            type: REQUIRE_PASSWORD_RESET_SUCCESS,
-            payload: { user: { ...user, force_password_reset: true } },
+            type: PERFORM_REQUIRED_PASSWORD_RESET_SUCCESS,
+            payload: { user: { ...user, force_password_reset: false } },
           },
         ];
 
-        return mockStore.dispatch(requirePasswordReset(user, { require: true }))
+        return mockStore.dispatch(performRequiredPasswordReset(resetParams))
           .then(() => {
             expect(mockStore.getActions()).toEqual(expectedActions);
           });
@@ -60,18 +58,19 @@ describe('Users - actions', () => {
       const errors = [
         {
           name: 'base',
-          reason: 'Unable to require password reset',
+          reason: 'Unable to reset password',
         },
       ];
       const errorResponse = {
         message: {
-          message: 'Unable to require password reset',
+          message: 'Unable to perform reset',
           errors,
         },
       };
+      const resetParams = { password: 'foobar' };
 
       beforeEach(() => {
-        spyOn(Kolide.default, 'requirePasswordReset').andCall(() => {
+        spyOn(Kolide.default, 'performRequiredPasswordReset').andCall(() => {
           return Promise.reject(errorResponse);
         });
       });
@@ -81,12 +80,12 @@ describe('Users - actions', () => {
       it('calls the resetFunc', () => {
         const mockStore = reduxMockStore(store);
 
-        return mockStore.dispatch(requirePasswordReset(user, { require: true }))
+        return mockStore.dispatch(performRequiredPasswordReset(resetParams))
           .then(() => {
             throw new Error('promise should have failed');
           })
           .catch(() => {
-            expect(Kolide.default.requirePasswordReset).toHaveBeenCalledWith(user, { require: true });
+            expect(Kolide.default.performRequiredPasswordReset).toHaveBeenCalledWith(resetParams);
           });
       });
 
@@ -94,14 +93,14 @@ describe('Users - actions', () => {
         const mockStore = reduxMockStore(store);
 
         const expectedActions = [
-          { type: REQUIRE_PASSWORD_RESET_REQUEST },
+          { type: PERFORM_REQUIRED_PASSWORD_RESET_REQUEST },
           {
-            type: REQUIRE_PASSWORD_RESET_FAILURE,
-            payload: { errors: { base: 'Unable to require password reset' } },
+            type: PERFORM_REQUIRED_PASSWORD_RESET_FAILURE,
+            payload: { errors: { base: 'Unable to reset password' } },
           },
         ];
 
-        return mockStore.dispatch(requirePasswordReset(user, { require: true }))
+        return mockStore.dispatch(performRequiredPasswordReset(resetParams))
           .then(() => {
             throw new Error('promise should have failed');
           })
