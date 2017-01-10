@@ -10,11 +10,14 @@ export default (WrappedComponent, { fields, validate = defaultValidate }) => {
       formData: PropTypes.object, // eslint-disable-line react/forbid-prop-types
       handleSubmit: PropTypes.func,
       onChangeFunc: PropTypes.func,
+      onFormUpdate: PropTypes.func,
     };
 
     static defaultProps = {
-      serverErrors: {},
       formData: {},
+      onChangeFunc: noop,
+      onFormUpdate: noop,
+      serverErrors: {},
     };
 
     constructor (props) {
@@ -69,10 +72,16 @@ export default (WrappedComponent, { fields, validate = defaultValidate }) => {
       return false;
     }
 
+    componentDidUpdate () {
+      const { onFormUpdate } = this.props;
+
+      onFormUpdate(this.state);
+    }
+
     onFieldChange = (fieldName) => {
       return (value) => {
         const { errors, formData } = this.state;
-        const { onChangeFunc = noop } = this.props;
+        const { onChangeFunc } = this.props;
 
         onChangeFunc(fieldName, value);
 

@@ -2,16 +2,14 @@ import React from 'react';
 import expect from 'expect';
 import { mount } from 'enzyme';
 
-import ConfigOptionsPage from 'pages/config/ConfigOptionsPage';
-import { configOptionStub } from 'test/stubs';
+import { ConfigOptionsPage } from 'pages/config/ConfigOptionsPage/ConfigOptionsPage';
 
-describe.only('ConfigOptionsPage - component', () => {
-  const props = {};
-  const page = mount(<ConfigOptionsPage props={props} />);
+describe('ConfigOptionsPage - component', () => {
+  const props = { configOptions: [] };
+  const page = mount(<ConfigOptionsPage {...props} />);
 
   it('renders', () => {
     expect(page.length).toEqual(1);
-    expect(page.state('configOptions')).toEqual([]);
   });
 
   it('renders reset and save buttons', () => {
@@ -21,12 +19,5 @@ describe.only('ConfigOptionsPage - component', () => {
 
     expect(resetButton.length).toEqual(1);
     expect(saveButton.length).toEqual(1);
-  });
-
-  it('updates the states configOptions when props change', () => {
-    expect(page.state('configOptions')).toEqual([]);
-
-    page.setProps({ config_options: [configOptionStub] });
-    expect(page.state('configOptions')).toEqual([configOptionStub]);
   });
 });

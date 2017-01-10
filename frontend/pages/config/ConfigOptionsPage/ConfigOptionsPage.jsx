@@ -1,47 +1,38 @@
 import React, { Component, PropTypes } from 'react';
-import { isEqual } from 'lodash';
+import { connect } from 'react-redux';
+import { noop } from 'lodash';
 
 import Button from 'components/buttons/Button';
+import configOptionActions from 'redux/nodes/entities/config_options/actions';
+import ConfigOptionsForm from 'components/forms/ConfigOptionsForm';
 import configOptionInterface from 'interfaces/config_option';
+import entityGetter from 'redux/utilities/entityGetter';
 
-const baseClass= "config-options-page";
+const baseClass = 'config-options-page';
 
-class ConfigOptionsPage extends Component {
+export class ConfigOptionsPage extends Component {
   static propTypes = {
-    config_options: PropTypes.arrayOf(configOptionInterface),
+    configOptions: PropTypes.arrayOf(configOptionInterface),
+    dispatch: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
     configOptions: [],
+    dispatch: noop,
   };
 
-  constructor (props) {
-    const { config_options: configOptions } = props;
+  componentWillMount () {
+    const { configOptions, dispatch } = this.props;
 
-    super(props);
-
-    this.state = {
-      configOptions: configOptions || [],
-    };
-  }
-
-  componentWillReceiveProps ({ config_options: configOptions }) {
-    if (!isEqual(configOptions, this.state.configOptions)) {
-      this.setState({ configOptions });
+    if (!configOptions.length) {
+      dispatch(configOptionActions.loadAll());
     }
 
     return false;
   }
 
-  renderOptions = () => {
-    return (
-      <div className={`${baseClass}__options-wrapper`}>
-      </div>
-    );
-  }
-
   render () {
-    const { renderOptions } = this;
+    const { configOptions } = this.props;
 
     return (
       <div className={`body-wrap ${baseClass} ${baseClass}__wrapper`}>
@@ -61,10 +52,16 @@ class ConfigOptionsPage extends Component {
             SAVE OPTIONS
           </Button>
         </div>
-        {renderOptions()}
+        <ConfigOptionsForm configOptions={configOptions} />
       </div>
     );
   }
 }
 
-export default ConfigOptionsPage;
+const mapStateToProps = (state) => {
+  const { entities: configOptions } = entityGetter(state).get('config_options');
+
+  return { configOptions };
+};
+
+export default connect(mapStateToProps)(ConfigOptionsPage);
