@@ -7,8 +7,10 @@ export const adminUserStub = {
 };
 
 export const configOptionStub = {
+  id: 1,
   name: 'config_option_name',
   value: 'config option value',
+  read_only: false,
 };
 
 export const configStub = {
