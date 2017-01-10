@@ -185,9 +185,6 @@ func (svc service) PerformRequiredPasswordReset(ctx context.Context, password st
 	if !ok {
 		return nil, errNoContext
 	}
-	if !vc.IsLoggedIn() {
-		return nil, permissionError{message: "must be logged in"}
-	}
 	user := vc.User
 
 	if !user.AdminForcedPasswordReset {
