@@ -15,6 +15,8 @@ type Datastore interface {
 	ScheduledQueryStore
 	OptionStore
 	DecoratorStore
+	FileIntegrityMonitoringStore
+	YARAStore
 	Name() string
 	Drop() error
 	Migrate() error
