@@ -110,6 +110,36 @@ func (svc service) GetClientConfig(ctx context.Context) (*kolide.OsqueryConfig, 
 	return config, nil
 }
 
+type annotatedLog struct {
+	Log  interface{} `json:"log"`
+	Host struct {
+		Hostname  string `json:"hostname"`
+		PrimaryIP string `json:"primary_ip"`
+		UUID      string `json:"uuid"`
+	} `json:"host"`
+}
+
+func (svc service) annotateLog(ctx context.Context, host kolide.Host, log interface{}) annotatedLog {
+	ip := ""
+	primaryInterface := host.PrimaryNetworkInterface()
+	if primaryInterface != nil {
+		ip = primaryInterface.IPAddress
+	}
+
+	return annotatedLog{
+		Log: log,
+		Host: struct {
+			Hostname  string `json:"hostname"`
+			PrimaryIP string `json:"primary_ip"`
+			UUID      string `json:"uuid"`
+		}{
+			Hostname:  host.HostName,
+			PrimaryIP: ip,
+			UUID:      host.UUID,
+		},
+	}
+}
+
 func (svc service) SubmitStatusLogs(ctx context.Context, logs []kolide.OsqueryStatusLog) error {
 	host, ok := hostctx.FromContext(ctx)
 	if !ok {
@@ -117,7 +147,8 @@ func (svc service) SubmitStatusLogs(ctx context.Context, logs []kolide.OsquerySt
 	}
 
 	for _, log := range logs {
-		err := json.NewEncoder(svc.osqueryStatusLogWriter).Encode(log)
+		annotated := svc.annotateLog(ctx, host, log)
+		err := json.NewEncoder(svc.osqueryStatusLogWriter).Encode(annotated)
 		if err != nil {
 			return errors.NewFromError(err, http.StatusInternalServerError, "error writing status log")
 		}
@@ -138,7 +169,8 @@ func (svc service) SubmitResultLogs(ctx context.Context, logs []kolide.OsqueryRe
 	}
 
 	for _, log := range logs {
-		err := json.NewEncoder(svc.osqueryResultLogWriter).Encode(log)
+		annotated := svc.annotateLog(ctx, host, log)
+		err := json.NewEncoder(svc.osqueryResultLogWriter).Encode(annotated)
 		if err != nil {
 			return errors.NewFromError(err, http.StatusInternalServerError, "error writing result log")
 		}
