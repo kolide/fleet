@@ -122,7 +122,7 @@ class Kolide extends Base {
     const { HOSTS } = endpoints;
 
     return this.authenticatedGet(this.endpoint(HOSTS))
-      .then((response) => { return response.hosts; });
+      .then(response => response.hosts);
   }
 
   getLabelHosts = (labelID) => {

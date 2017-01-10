@@ -30,6 +30,7 @@ class EditPackFormWrapper extends Component {
       onEditPack,
       onFetchTargets,
       pack,
+      packTargets,
       targetsCount,
     } = this.props;
 
@@ -63,6 +64,7 @@ class EditPackFormWrapper extends Component {
           name="selected-pack-targets"
           onFetchTargets={onFetchTargets}
           onSelect={noop}
+          selectedTargets={packTargets}
           targetsCount={targetsCount}
           disabled
           className={`${baseClass}__select-targets`}
