@@ -6,6 +6,7 @@ import EditPackForm from 'components/forms/packs/EditPackForm';
 import Icon from 'components/icons/Icon';
 import packInterface from 'interfaces/pack';
 import SelectTargetsDropdown from 'components/forms/fields/SelectTargetsDropdown';
+import targetInterface from 'interfaces/target';
 
 const baseClass = 'edit-pack-form';
 
@@ -18,6 +19,7 @@ class EditPackFormWrapper extends Component {
     onEditPack: PropTypes.func.isRequired,
     onFetchTargets: PropTypes.func,
     pack: packInterface.isRequired,
+    packTargets: PropTypes.arrayOf(targetInterface),
     targetsCount: PropTypes.number,
   };
 
@@ -38,9 +40,11 @@ class EditPackFormWrapper extends Component {
       return (
         <EditPackForm
           className={className}
-          formData={pack}
+          formData={{ ...pack, targets: packTargets }}
           handleSubmit={handleSubmit}
           onCancel={onCancelEditPack}
+          onFetchTargets={onFetchTargets}
+          targetsCount={targetsCount}
         />
       );
     }
