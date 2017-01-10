@@ -30,16 +30,16 @@ class QueryDetailsSidePanel extends Component {
     }
 
     return (
-      <div>
+      <ul className={`${baseClass}__packs`}>
         {packs.map((pack) => {
           return (
-            <div key={`query-side-panel-pack-${pack.id}`}>
+            <li className={`${baseClass}__pack-item`} key={`query-side-panel-pack-${pack.id}`}>
               <Icon name="packs" />
               <span>{pack.name}</span>
-            </div>
+            </li>
           );
         })}
-      </div>
+      </ul>
     );
   }
 
