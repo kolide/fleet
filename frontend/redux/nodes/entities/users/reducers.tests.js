@@ -5,9 +5,6 @@ import {
   requirePasswordResetRequest,
   requirePasswordResetFailure,
   requirePasswordResetSuccess,
-  performRequiredPasswordResetRequest,
-  performRequiredPasswordResetFailure,
-  performRequiredPasswordResetSuccess,
 } from './actions';
 
 const user = { id: 1, email: 'zwass@kolide.co', force_password_reset: false };

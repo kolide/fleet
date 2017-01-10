@@ -6,13 +6,9 @@ import { reduxMockStore } from 'test/helpers';
 
 import {
   requirePasswordReset,
-  performRequiredPasswordReset,
   REQUIRE_PASSWORD_RESET_REQUEST,
   REQUIRE_PASSWORD_RESET_FAILURE,
   REQUIRE_PASSWORD_RESET_SUCCESS,
-  PERFORM_REQUIRED_PASSWORD_RESET_REQUEST,
-  PERFORM_REQUIRED_PASSWORD_RESET_FAILURE,
-  PERFORM_REQUIRED_PASSWORD_RESET_SUCCESS,
 } from './actions';
 
 const store = { entities: { invites: {}, users: {} } };

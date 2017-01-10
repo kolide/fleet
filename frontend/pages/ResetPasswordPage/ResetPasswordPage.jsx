@@ -7,7 +7,7 @@ import debounce from '../../utilities/debounce';
 import { resetPassword } from '../../redux/nodes/components/ResetPasswordPage/actions';
 import ResetPasswordForm from '../../components/forms/ResetPasswordForm';
 import StackedWhiteBoxes from '../../components/StackedWhiteBoxes';
-import { updateUser, performRequiredPasswordReset } from '../../redux/nodes/auth/actions';
+import { performRequiredPasswordReset } from '../../redux/nodes/auth/actions';
 import userInterface from '../../interfaces/user';
 
 export class ResetPasswordPage extends Component {
@@ -56,7 +56,7 @@ export class ResetPasswordPage extends Component {
   }
 
   loggedInUser = (formData) => {
-    const { dispatch, user } = this.props;
+    const { dispatch } = this.props;
     const { new_password: password } = formData;
     const passwordUpdateParams = { password };
 
