@@ -48,5 +48,13 @@
       margin-right: 12px;
       color: $text-medium;
     }
+
+    a {
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
   }
 }

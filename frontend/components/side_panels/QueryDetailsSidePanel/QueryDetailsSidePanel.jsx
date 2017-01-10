@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 
+import { Link } from 'react-router';
 import Button from 'components/buttons/Button';
 import Icon from 'components/icons/Icon';
 import KolideAce from 'components/KolideAce';
@@ -34,8 +35,10 @@ class QueryDetailsSidePanel extends Component {
         {packs.map((pack) => {
           return (
             <li className={`${baseClass}__pack-item`} key={`query-side-panel-pack-${pack.id}`}>
-              <Icon name="packs" />
-              <span>{pack.name}</span>
+              <Link to={`/packs/${pack.id}`}>
+                <Icon name="packs" />
+                <span>{pack.name}</span>
+              </Link>
             </li>
           );
         })}
