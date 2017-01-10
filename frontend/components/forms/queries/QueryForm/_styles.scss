@@ -30,7 +30,8 @@
     text-align: right;
   }
 
-  &__save-query-btn {
+  &__save-query-btn,
+  &__cancel-btn {
     margin-right: $xsmall;
   }
 
