@@ -25,7 +25,7 @@ class OrgDetails extends Component {
     const tabIndex = currentPage ? 1 : -1;
 
     return (
-      <div className={className}>
+      <form onSubmit={handleSubmit} className={className}>
         <div className="registration-fields">
           <InputFieldWithIcon
             {...fields.org_name}
@@ -39,10 +39,10 @@ class OrgDetails extends Component {
             hint="must start with https://"
           />
         </div>
-        <Button onClick={handleSubmit} variant="gradient" tabIndex={tabIndex}>
+        <Button type="submit" variant="gradient" tabIndex={tabIndex}>
           Submit
         </Button>
-      </div>
+      </form>
     );
   }
 }

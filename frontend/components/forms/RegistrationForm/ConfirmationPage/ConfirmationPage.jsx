@@ -15,17 +15,10 @@ class ConfirmationPage extends Component {
     handleSubmit: PropTypes.func,
   };
 
-  onSubmit = (evt) => {
-    evt.preventDefault();
-
-    const { handleSubmit } = this.props;
-
-    return handleSubmit();
-  }
-
   render () {
     const {
       className,
+      handleSubmit,
       formData: {
         email,
         kolide_server_url: kolideWebAddress,
@@ -38,7 +31,7 @@ class ConfirmationPage extends Component {
     const confirmRegClasses = classnames(className, baseClass);
 
     return (
-      <div className={confirmRegClasses}>
+      <form onSubmit={handleSubmit} className={confirmRegClasses}>
         <div className={`${baseClass}__wrapper`}>
           <Icon name="success-check" className={`${baseClass}__icon`} />
           <table className={`${baseClass}__table`}>
@@ -71,10 +64,10 @@ class ConfirmationPage extends Component {
           </div>
         </div>
 
-        <Button onClick={onSubmit} variant="gradient" className={`${baseClass}__submit`}>
+        <Button type="submit" variant="gradient" className={`${baseClass}__submit`}>
           Finish
         </Button>
-      </div>
+      </form>
     );
   }
 }

@@ -178,13 +178,13 @@ class RegistrationForm extends Component {
         <div className={containerClass}>
           {renderContent()}
 
-          <form onSubmit={onSubmit} className={formSectionClasses}>
+          <div className={formSectionClasses}>
             <AdminDetails formData={formData} handleSubmit={onPageFormSubmit} className={adminDetailsClass} currentPage={isCurrentPage(1)} />
 
             <OrgDetails formData={formData} handleSubmit={onPageFormSubmit} className={orgDetailsClass} currentPage={isCurrentPage(2)} />
 
             <KolideDetails formData={formData} handleSubmit={onPageFormSubmit} className={kolideDetailsClass} currentPage={isCurrentPage(3)} />
-          </form>
+          </div>
         </div>
       </div>
     );
