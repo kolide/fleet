@@ -34,7 +34,7 @@ class UserMenu extends Component {
       <div className={userMenuClass}>
         <Avatar className={`${toggleBaseClass}__avatar`} user={user} />
         <p className={`${toggleBaseClass}__name`}>{ name || username }</p>
-        <p className={`${toggleBaseClass}__position`}>{ position }</p>
+        <p className={`${toggleBaseClass}__position`}>{ position || <em>No job title specified</em> }</p>
 
         <nav className={`${toggleBaseClass}__nav`}>
           <ul className={`${toggleBaseClass}__nav-list`}>
