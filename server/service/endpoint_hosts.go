@@ -18,7 +18,7 @@ func hostResponseForHost(ctx context.Context, svc kolide.Service, host *kolide.H
 	return &hostResponse{
 		Host:        *host,
 		Status:      host.Status(time.Now()),
-		DisplayText: "TODO",
+		DisplayText: host.HostName,
 	}, nil
 }
 
