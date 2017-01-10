@@ -108,7 +108,7 @@ describe('Kolide - API client', () => {
       const targets = [hostStub];
       const packTargets = helpers.formatSelectedTargetsForApi(targets, true);
       const updatePackParams = { name: 'New Pack Name', ...packTargets };
-      const request = validUpdatePackRequest(bearerToken, { ...pack, updatePackParams });
+      const request = validUpdatePackRequest(bearerToken, pack, updatePackParams);
 
       Kolide.setBearerToken(bearerToken);
       Kolide.updatePack(pack, updatePackParams)
