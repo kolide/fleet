@@ -6,6 +6,7 @@ services:
     volumes:
       - ./kolide.crt:/etc/osquery/kolide.crt
       - ./example_osquery.flags:/etc/osquery/osquery.flags
+      - ./product_uuid:/sys/class/dmi/id/product_uuid
     extra_hosts:
       - "dockerhost:${LOCALHOST}"
     environment:
@@ -17,6 +18,7 @@ services:
     volumes:
       - ./kolide.crt:/etc/osquery/kolide.crt
       - ./example_osquery.flags:/etc/osquery/osquery.flags
+      - ./product_uuid:/sys/class/dmi/id/product_uuid
     extra_hosts:
       - "dockerhost:${LOCALHOST}"
     environment:
