@@ -30,8 +30,32 @@ export class NewHostPage extends Component {
     super(props);
 
     this.state = {
-      method1Text: 'curl https://kolide.acme.com/install/osquery.sh | sudo sh',
-      method1TextCopied: false,
+      osqueryCommandText: `
+osqueryd
+ --enroll_secret_env=OSQUERY_ENROLL_SECRET
+ --tls_server_certs=/etc/osquery/kolide.crt
+
+ --tls_hostname=acme.kolide.co
+
+ --host_identifier=hostname
+ --enroll_tls_endpoint=/api/v1/osquery/enroll
+
+ --config_plugin=tls
+ --config_tls_endpoint=/api/v1/osquery/config
+ --config_tls_refresh=10
+
+ --disable_distributed=false
+ --distributed_plugin=tls
+ --distributed_interval=10
+ --distributed_tls_max_attempts=3
+ --distributed_tls_read_endpoint=/api/v1/osquery/distributed/read
+ --distributed_tls_write_endpoint=/api/v1/osquery/distributed/write
+
+ --logger_plugin=tls
+ --logger_tls_endpoint=/api/v1/osquery/log
+ --logger_tls_period=10
+      `,
+      osqueryCommandTextCopied: false,
       selectedTab: HOST_TABS.FIRST,
     };
   }
@@ -41,7 +65,7 @@ export class NewHostPage extends Component {
       evt.preventDefault();
 
       const { dispatch } = this.props;
-      const { method1Text } = this.state;
+      const { osqueryCommandText } = this.state;
 
       if (copyText(elementId)) {
         dispatch(renderFlash('success', 'Text copied to clipboard'));
@@ -49,15 +73,15 @@ export class NewHostPage extends Component {
         dispatch(renderFlash('error', 'Text not copied. Use CMD + C to copy text'));
       }
 
-      if (text === method1Text) {
+      if (text === osqueryCommandText) {
         this.setState({
-          method1TextCopied: true,
+          osqueryCommandTextCopied: true,
         });
       }
 
       setTimeout(() => {
         this.setState({
-          method1TextCopied: false,
+          osqueryCommandTextCopied: false,
         });
 
         return false;
@@ -68,13 +92,13 @@ export class NewHostPage extends Component {
   }
 
   render () {
-    const { method1Text, method1TextCopied } = this.state;
+    const { osqueryCommandText, osqueryCommandTextCopied } = this.state;
     const { onCopyText } = this;
 
-    const method1IconClasses = classnames(
+    const osqueryCommandIconClasses = classnames(
       `${baseClass}__clipboard-icon`,
       {
-        [`${baseClass}__clipboard-icon--copied`]: method1TextCopied,
+        [`${baseClass}__clipboard-icon--copied`]: osqueryCommandTextCopied,
       }
     );
 
@@ -82,49 +106,29 @@ export class NewHostPage extends Component {
       <div className={baseClass}>
         <section className={`${baseClass}__section-wrap body-wrap`}>
           <h1 className={`${baseClass}__title`}>Kolide Installation Instructions</h1>
-          <div className={`${baseClass}__input-wrap`}>
-            <input id="method1" className={`${baseClass}__input`} value={method1Text} readOnly />
-            {method1TextCopied && <span className={`${baseClass}__clipboard-text`}>copied!</span>}
-            <a href="#copyMethod1" onClick={onCopyText(method1Text, '#method1')}><Icon name="clipboard" className={method1IconClasses} /></a>
-          </div>
 
           <div className={`${baseClass}__text`}>
-            <p>This script does the following:</p>
+            <p>To use Kolide, you must install the open source osquery tool on the hosts which you wish to monitor. You can find various ways to install osquery on a variety of platforms at <a href="https://osquery.io/downloads">https://osquery.io/downloads</a>.</p>
+            <br />
+            <p>Once you have installed osquery, you need to do two things:</p>
             <ol className="kolide-ol">
-              <li>Detects operating system.</li>
-              <li>Downloads the most recent stable release of osquery.</li>
-              <li>Checks for any existing osqueryd installation.</li>
-              <li>Installs osqueryd using a config which will communicate with your Kolide instance.</li>
+              <li>Set an environment variable with an agent enrollment secret</li>
+              <li>Deploy the TLS certificate that osquery will use to communicate with Kolide</li>
             </ol>
             <br />
-            <p>This method is a great way to get started with getting hosts enrolled in your Kolide instance. To make sure that you are updating osquery and constantly getting the latest Kolide features, check out the configuration management options below.</p>
+            <p>The enrollment secret is a value that osquery uses to ensure a level of confidence that the host running osquery is actually a host that you would like to hear from. Morbi id varius velit. Phasellus risus arcu, lacinia non cursus a, tempor quis dolor. Nam tempor quam orci, eget semper augue rutrum quis. Fusce eget volutpat ipsum, et rhoncus sapien. Aenean luctus, nulla sit amet facilisis dictum, lacus lorem rutrum tellus, et ultricies nisl nunc vitae ligula. Duis a arcu efficitur, porta nisi sed, placerat justo. Nulla volutpat mollis purus, vel ultricies odio molestie at. Integer vitae mollis nulla, at pellentesque urna. For more information on configuring and deploying enrollment secrets, see the <a href="https://osquery.readthedocs.io/en/stable/deployment/remote/#simple-shared-secret-enrollment">osquery documentation</a></p>
+            <br />
+            <p>The TLS certificate that osquery will use to communicate with Kolide is the same certificate that your browser is using to communicate with Kolide right now. Nullam sollicitudin odio vitae ipsum consequat commodo. Etiam sodales tempus erat, ut faucibus lorem aliquam et. Nam ac ligula venenatis, ultrices orci vel, suscipit odio. Nam ullamcorper euismod pellentesque. Aenean dapibus risus nec mollis imperdiet. Aenean ac faucibus elit. Nam fringilla vel eros ac pellentesque. Curabitur vulputate sollicitudin posuere. Mauris aliquet non ante eu commodo. For more information on configuring the TLS settings in osquery, see the <a href="https://osquery.readthedocs.io/en/stable/deployment/remote/#remote-authentication">osquery documentation</a></p>
+            <br />
+            <p>Assuming that you're deploying your enrollment secret as the environment variable OSQUERY_ENROLL_SECRET and your osquery server certificate is at /etc/osquery/kolide.crt, you could copy and paste the following command with the following flags:</p>
+            <br />
           </div>
 
-          <p className={`${baseClass}__view-script`}><button className="button button--unstyled">View The Script</button></p>
-        </section>
-
-        <section className={`${baseClass}__section-wrap body-wrap`}>
-          <h1 className={`${baseClass}__title`}>Need More Methods?</h1>
-
-          <p className={`${baseClass}__text`}>Many infrastructure automation frameworks offer recipes and scripts for deploying osquery and making it talk to your Kolide instance. Choose a method below to learn more.</p>
-
-          <ul className={`${baseClass}__more-methods`}>
-            <li>
-              <button className="button button--unstyled" title="Chef">
-                <img src={ChefImage} alt="Chef" />
-              </button>
-            </li>
-            <li>
-              <button className="button button--unstyled" title="Ansible">
-                <img src={AnsibleImage} alt="Ansible" />
-              </button>
-            </li>
-            <li>
-              <button className="button button--unstyled" title="Puppet">
-                <img src={PuppetImage} alt="Puppet" />
-              </button>
-            </li>
-          </ul>
+          <div className={`${baseClass}__input-wrap`}>
+            <input id="osqueryCommand" className={`${baseClass}__input`} value={osqueryCommandText} readOnly />
+            {osqueryCommandTextCopied && <span className={`${baseClass}__clipboard-text`}>copied!</span>}
+            <a href="#copyosqueryCommand" onClick={onCopyText(osqueryCommandText, '#osqueryCommand')}><Icon name="clipboard" className={osqueryCommandIconClasses} /></a>
+          </div>
         </section>
       </div>
     );
