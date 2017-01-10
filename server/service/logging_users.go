@@ -40,6 +40,7 @@ func (mw loggingMiddleware) NewAdminCreatedUser(ctx context.Context, p kolide.Us
 
 func (mw loggingMiddleware) ListUsers(ctx context.Context, opt kolide.ListOptions) ([]*kolide.User, error) {
 	var (
+		users    []*kolide.User
 		err      error
 		username = "none"
 	)
@@ -58,11 +59,13 @@ func (mw loggingMiddleware) ListUsers(ctx context.Context, opt kolide.ListOption
 		)
 	}(time.Now())
 
-	return mw.Service.ListUsers(ctx, opt)
+	users, err = mw.Service.ListUsers(ctx, opt)
+	return users, err
 }
 
 func (mw loggingMiddleware) RequirePasswordReset(ctx context.Context, uid uint, require bool) (*kolide.User, error) {
 	var (
+		user     *kolide.User
 		err      error
 		username = "none"
 	)
@@ -81,7 +84,8 @@ func (mw loggingMiddleware) RequirePasswordReset(ctx context.Context, uid uint, 
 		)
 	}(time.Now())
 
-	return mw.Service.RequirePasswordReset(ctx, uid, require)
+	user, err = mw.Service.RequirePasswordReset(ctx, uid, require)
+	return user, err
 
 }
 
