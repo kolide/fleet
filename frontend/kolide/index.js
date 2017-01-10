@@ -358,11 +358,12 @@ class Kolide extends Base {
     return this.authenticatedPatch(this.endpoint(CONFIG), JSON.stringify(configData));
   }
 
-  updatePack = ({ id: packID }, updateParams) => {
+  updatePack = (pack, { description, name, targets }) => {
     const { PACKS } = endpoints;
-    const updatePackEndpoint = `${this.baseURL}${PACKS}/${packID}`;
+    const updatePackEndpoint = `${this.baseURL}${PACKS}/${pack.id}`;
+    const packTargets = helpers.formatSelectedTargetsForApi(targets, true);
 
-    return this.authenticatedPatch(updatePackEndpoint, JSON.stringify(updateParams))
+    return this.authenticatedPatch(updatePackEndpoint, JSON.stringify({ description, name, ...packTargets }))
       .then((response) => { return response.pack; });
   }
 

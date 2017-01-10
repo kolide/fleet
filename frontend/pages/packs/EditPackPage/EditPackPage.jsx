@@ -136,10 +136,10 @@ export class EditPackPage extends Component {
   }
 
   handlePackFormSubmit = (formData) => {
-    const { dispatch } = this.props;
+    const { dispatch, pack } = this.props;
     const { update } = packActions;
 
-    return dispatch(update(formData));
+    return dispatch(update(pack, formData));
   }
 
   handleRemoveScheduledQueries = (scheduledQueryIDs) => {
