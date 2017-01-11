@@ -92,6 +92,10 @@ var testFunctions = [...]func(*testing.T, *testResource){
 	testGetOptions,
 	testModifyOptions,
 	testModifyOptionsValidationFail,
+	testImportConfig,
+	testImportConfigMissingExternal,
+	testImportConfigWithMissingGlob,
+	testImportConfigWithGlob,
 }
 
 func TestEndpoints(t *testing.T) {

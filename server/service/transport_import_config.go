@@ -30,7 +30,10 @@ func decodeImportConfigRequest(ctx context.Context, r *http.Request) (interface{
 		return nil, err
 	}
 	// Unmarshal main config
-	var conf kolide.ImportConfig
+	conf := kolide.ImportConfig{
+		Packs:         make(kolide.PackNameMap),
+		ExternalPacks: make(kolide.PackNameToPackDetails),
+	}
 	if err := json.Unmarshal([]byte(req.Config), &conf); err != nil {
 		return nil, err
 	}

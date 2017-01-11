@@ -23,6 +23,9 @@ const (
 	PacksSection                    = "packs"
 	QueriesSection                  = "queries"
 	DecoratorsSection               = "decorators"
+	FilePathsSection                = "file_paths"
+	YARASigSection                  = "yara_signature_group"
+	YARAFileSection                 = "yara_file_group"
 )
 
 // WarningType is used to group associated warnings for options, packs etc
@@ -177,7 +180,7 @@ type ImportConfig struct {
 	// an external file.  The PackName here must match the PackName in the Packs map
 	ExternalPacks PackNameToPackDetails `json:"-"`
 	// GlobPackNames lists pack names that are globbed
-	GlobPackNames []string
+	GlobPackNames []string `json:"glob"`
 }
 
 func (ic *ImportConfig) fetchGlobPacks(packs *PackNameToPackDetails) error {

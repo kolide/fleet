@@ -4,7 +4,7 @@ import (
 	"github.com/kolide/kolide-ose/server/kolide"
 )
 
-func (d *Datastore) NewFilePath(fp *kolide.FilePath) (*kolide.FilePath, error) {
+func (d *Datastore) NewFIMSection(fp *kolide.FIMSection) (*kolide.FIMSection, error) {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 	fp.ID = d.nextID(fp)
@@ -12,10 +12,10 @@ func (d *Datastore) NewFilePath(fp *kolide.FilePath) (*kolide.FilePath, error) {
 	return fp, nil
 }
 
-func (d *Datastore) FilePaths() (kolide.FilePaths, error) {
+func (d *Datastore) FIMSections() (kolide.FIMSections, error) {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
-	result := make(kolide.FilePaths)
+	result := make(kolide.FIMSections)
 	for _, filePath := range d.filePaths {
 		result[filePath.SectionName] = append(result[filePath.SectionName], filePath.Paths...)
 	}

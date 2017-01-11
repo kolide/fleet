@@ -19,7 +19,7 @@ func testYARAStore(t *testing.T, ds kolide.Datastore) {
 	ysg, err := ds.NewYARASignatureGroup(ysg)
 	require.Nil(t, err)
 	require.True(t, ysg.ID > 0)
-	fp := &kolide.FilePath{
+	fp := &kolide.FIMSection{
 		SectionName: "fp1",
 		Paths: []string{
 			"path1",
@@ -27,7 +27,7 @@ func testYARAStore(t *testing.T, ds kolide.Datastore) {
 			"path3",
 		},
 	}
-	fp, err = ds.NewFilePath(fp)
+	fp, err = ds.NewFIMSection(fp)
 	require.Nil(t, err)
 	assert.True(t, fp.ID > 0)
 

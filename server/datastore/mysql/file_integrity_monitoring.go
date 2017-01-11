@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (d *Datastore) NewFilePath(fp *kolide.FilePath) (result *kolide.FilePath, err error) {
+func (d *Datastore) NewFIMSection(fp *kolide.FIMSection) (result *kolide.FIMSection, err error) {
 	txn, err := d.db.Begin()
 	if err != nil {
 		return nil, errors.Wrap(err, "update options begin transaction")
@@ -51,7 +51,7 @@ func (d *Datastore) NewFilePath(fp *kolide.FilePath) (result *kolide.FilePath, e
 	return fp, nil
 }
 
-func (d *Datastore) FilePaths() (kolide.FilePaths, error) {
+func (d *Datastore) FIMSections() (kolide.FIMSections, error) {
 	sqlStatement := `
     SELECT fim.section_name, mf.file FROM
      file_integrity_monitorings AS fim
@@ -65,7 +65,7 @@ func (d *Datastore) FilePaths() (kolide.FilePaths, error) {
 		}
 		return nil, errors.Wrap(err, sqlStatement)
 	}
-	result := make(kolide.FilePaths)
+	result := make(kolide.FIMSections)
 	for rows.Next() {
 		var sectionName, fileName string
 		err = rows.Scan(&sectionName, &fileName)

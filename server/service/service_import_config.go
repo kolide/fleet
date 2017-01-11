@@ -28,7 +28,58 @@ func (svc service) ImportConfig(ctx context.Context, cfg *kolide.ImportConfig) (
 	if err := svc.importDecorators(cfg, resp); err != nil {
 		return nil, err
 	}
+	if err := svc.importFIMSections(cfg, resp); err != nil {
+		return nil, err
+	}
 	return resp, nil
+}
+
+func (svc service) importYARA(cfg *kolide.ImportConfig, resp *kolide.ImportConfigResponse) error {
+	if cfg.YARA != nil {
+		for sig, paths := range cfg.YARA.Signatures {
+			ysg := &kolide.YARASignatureGroup{
+				SignatureName: sig,
+				Paths:         paths,
+			}
+			_, err := svc.ds.NewYARASignatureGroup(ysg)
+			if err != nil {
+				return err
+			}
+			resp.Status(kolide.YARASigSection).ImportCount++
+			resp.Status(kolide.YARASigSection).Message("imported '%s'", sig)
+		}
+		for section, sigs := range cfg.YARA.FilePaths {
+			for _, sig := range sigs {
+				err := svc.ds.NewYARAFilePath(section, sig)
+				if err != nil {
+					return err
+				}
+			}
+			resp.Status(kolide.YARAFileSection).ImportCount++
+			resp.Status(kolide.YARAFileSection).Message("imported '%s'", section)
+		}
+	}
+	return nil
+}
+
+func (svc service) importFIMSections(cfg *kolide.ImportConfig, resp *kolide.ImportConfigResponse) error {
+	if cfg.FileIntegrityMonitoring != nil {
+		for sectionName, paths := range cfg.FileIntegrityMonitoring {
+			fp := &kolide.FIMSection{
+				SectionName: sectionName,
+				Description: "imported",
+				Paths:       paths,
+			}
+			_, err := svc.ds.NewFIMSection(fp)
+			if err != nil {
+				return err
+			}
+			resp.Status(kolide.FilePathsSection).ImportCount++
+			resp.Status(kolide.FilePathsSection).Message("imported '%s'", sectionName)
+		}
+	}
+	// this has to happen AFTER fim section, because it requires file paths
+	return svc.importYARA(cfg, resp)
 }
 
 func (svc service) importDecorators(cfg *kolide.ImportConfig, resp *kolide.ImportConfigResponse) error {

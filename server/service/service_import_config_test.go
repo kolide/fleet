@@ -31,6 +31,81 @@ func TestHashQuery(t *testing.T) {
 	assert.NotEqual(t, h1, h2)
 
 }
+func TestImportFilePaths(t *testing.T) {
+	cfg := &kolide.ImportConfig{
+		FileIntegrityMonitoring: kolide.FIMCategoryToPaths{
+			"files1": []string{
+				"path1",
+				"path2",
+			},
+			"files2": []string{
+				"path3",
+			},
+		},
+		YARA: &kolide.YARAConfig{
+			Signatures: map[string][]string{
+				"sig1": []string{
+					"path4",
+					"path5",
+				},
+				"sig2": []string{
+					"path6",
+				},
+			},
+			FilePaths: map[string][]string{
+				"files1": []string{
+					"sig1",
+					"sig2",
+				},
+				"files2": []string{
+					"sig1",
+				},
+			},
+		},
+	}
+	resp := kolide.NewImportConfigResponse()
+	svc := createServiceMockForImport(t)
+	err := svc.importFIMSections(cfg, resp)
+	require.Nil(t, err)
+	assert.Equal(t, 2, resp.Status(kolide.FilePathsSection).ImportCount)
+	sections, err := svc.ds.FIMSections()
+	require.Nil(t, err)
+	assert.Len(t, sections, 2)
+	yara, err := svc.ds.YARASection()
+	require.Nil(t, err)
+	assert.Len(t, yara.Signatures, 2)
+	assert.Len(t, yara.FilePaths, 2)
+}
+
+func TestImportDecorators(t *testing.T) {
+	cfg := &kolide.ImportConfig{
+		Decorators: &kolide.DecoratorConfig{
+			Load: []string{
+				"select from foo",
+				"select from bar",
+			},
+			Always: []string{
+				"select from always",
+			},
+			Interval: map[string][]string{
+				"100": []string{
+					"select from 100",
+				},
+				"200": []string{
+					"select from 200",
+				},
+			},
+		},
+	}
+	resp := kolide.NewImportConfigResponse()
+	svc := createServiceMockForImport(t)
+	err := svc.importDecorators(cfg, resp)
+	require.Nil(t, err)
+	assert.Equal(t, 5, resp.Status(kolide.DecoratorsSection).ImportCount)
+	dec, err := svc.ds.ListDecorators()
+	require.Nil(t, err)
+	assert.Len(t, dec, 5)
+}
 
 func TestImportScheduledQueries(t *testing.T) {
 	cfg := &kolide.ImportConfig{

@@ -138,6 +138,12 @@ func (e *invalidArgumentError) Append(name, reason string) {
 		reason: reason,
 	})
 }
+func (e *invalidArgumentError) Appendf(name, reasonFmt string, args ...interface{}) {
+	*e = append(*e, invalidArgument{
+		name:   name,
+		reason: fmt.Sprintf(reasonFmt, args...),
+	})
+}
 
 func (e *invalidArgumentError) HasErrors() bool {
 	return len(*e) != 0
