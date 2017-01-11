@@ -6,9 +6,9 @@ import ConfigOptionsForm from 'components/forms/ConfigOptionsForm';
 import { configOptionStub } from 'test/stubs';
 
 describe('ConfigOptionsForm - form', () => {
-  it('renders a ConfigOptionForm for each config option', () => {
-    const formWithOneOption = mount(<ConfigOptionsForm configOptions={[configOptionStub]} />);
-    const formWithTwoOptions = mount(<ConfigOptionsForm configOptions={[configOptionStub, configOptionStub]} />);
+  it('renders a ConfigOptionForm for each completed config option', () => {
+    const formWithOneOption = mount(<ConfigOptionsForm completedOptions={[configOptionStub]} />);
+    const formWithTwoOptions = mount(<ConfigOptionsForm completedOptions={[configOptionStub, configOptionStub]} />);
 
     expect(formWithOneOption.find('ConfigOptionForm').length).toEqual(1);
     expect(formWithTwoOptions.find('ConfigOptionForm').length).toEqual(2);

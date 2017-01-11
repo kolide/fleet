@@ -7,6 +7,7 @@ import configOptionActions from 'redux/nodes/entities/config_options/actions';
 import ConfigOptionsForm from 'components/forms/ConfigOptionsForm';
 import configOptionInterface from 'interfaces/config_option';
 import entityGetter from 'redux/utilities/entityGetter';
+import helpers from 'pages/config/ConfigOptionsPage/helpers';
 
 const baseClass = 'config-options-page';
 
@@ -33,7 +34,7 @@ export class ConfigOptionsPage extends Component {
 
   render () {
     const { configOptions } = this.props;
-    const completedOptions = filter(configOptions, (o) => o.value);
+    const completedOptions = filter(configOptions, option => option.value);
 
     return (
       <div className={`body-wrap ${baseClass} ${baseClass}__wrapper`}>
@@ -53,7 +54,10 @@ export class ConfigOptionsPage extends Component {
             SAVE OPTIONS
           </Button>
         </div>
-        <ConfigOptionsForm configOptions={completedOptions} />
+        <ConfigOptionsForm
+          configNameOptions={helpers.configOptionDropdownOptions(configOptions)}
+          completedOptions={completedOptions}
+        />
       </div>
     );
   }

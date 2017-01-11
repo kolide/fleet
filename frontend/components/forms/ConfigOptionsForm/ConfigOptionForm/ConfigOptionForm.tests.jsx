@@ -4,27 +4,40 @@ import { mount } from 'enzyme';
 import { noop } from 'lodash';
 
 import ConfigOptionForm from 'components/forms/ConfigOptionsForm/ConfigOptionForm';
-import { itBehavesLikeAFormInputElement } from 'test/helpers';
+import {
+  itBehavesLikeAFormInputElement,
+  itBehavesLikeAFormDropdownElement,
+} from 'test/helpers';
 
 describe('ConfigOptionForm - form', () => {
   afterEach(restoreSpies);
 
   it('renders form fields for the config option name and value', () => {
-    const form = mount(<ConfigOptionForm handleSubmit={noop} />);
+    const configNameOptions = [{ label: 'My option', value: 'my_option' }];
+    const form = mount(
+      <ConfigOptionForm configNameOptions={configNameOptions} handleSubmit={noop} />
+    );
 
-    itBehavesLikeAFormInputElement(form, 'name');
+    itBehavesLikeAFormDropdownElement(form, 'name');
     itBehavesLikeAFormInputElement(form, 'value');
   });
 
   it('calls the onFormUpdate prop when the form updates', () => {
     const spy = createSpy();
-    const form = mount(<ConfigOptionForm handleSubmit={noop} onFormUpdate={spy} />);
+    const configNameOptions = [{ label: 'My option', value: 'my_option' }];
+    const form = mount(
+      <ConfigOptionForm configNameOptions={configNameOptions} handleSubmit={noop} onFormUpdate={spy} />
+    );
 
-    itBehavesLikeAFormInputElement(form, 'name', 'InputField', 'new config option name');
+    itBehavesLikeAFormInputElement(form, 'value', 'InputField', 'new config option value');
+    itBehavesLikeAFormDropdownElement(form, 'name');
 
     expect(spy).toHaveBeenCalledWith({
-      errors: { base: null, name: null },
-      formData: { name: 'new config option name' },
+      errors: { base: null, name: null, value: null },
+      formData: {
+        name: 'my_option',
+        value: 'new config option value',
+      },
     });
   });
 });

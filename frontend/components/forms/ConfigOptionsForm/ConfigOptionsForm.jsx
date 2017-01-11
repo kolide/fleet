@@ -2,23 +2,33 @@ import React, { Component, PropTypes } from 'react';
 
 import ConfigOptionForm from 'components/forms/ConfigOptionsForm/ConfigOptionForm';
 import configOptionInterface from 'interfaces/config_option';
+import dropdownOptionInterface from 'interfaces/dropdownOption';
 
 class ConfigOptionsForm extends Component {
   static propTypes = {
-    configOptions: PropTypes.arrayOf(configOptionInterface),
+    completedOptions: PropTypes.arrayOf(configOptionInterface),
+    configNameOptions: PropTypes.arrayOf(dropdownOptionInterface),
   };
 
   renderConfigOptionForm = (option, idx) => {
-    return <ConfigOptionForm key={`config-option-form-${option.id}-${idx}`} formData={option} />;
+    const { configNameOptions } = this.props;
+
+    return (
+      <ConfigOptionForm
+        configNameOptions={configNameOptions}
+        formData={option}
+        key={`config-option-form-${option.id}-${idx}`}
+      />
+    );
   }
 
   render () {
-    const { configOptions } = this.props;
+    const { completedOptions } = this.props;
     const { renderConfigOptionForm } = this;
 
     return (
       <div>
-        {configOptions.map((option, idx) => {
+        {completedOptions.map((option, idx) => {
           return renderConfigOptionForm(option, idx);
         })}
       </div>
