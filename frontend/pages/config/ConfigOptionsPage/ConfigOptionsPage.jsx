@@ -11,6 +11,7 @@ import helpers from 'pages/config/ConfigOptionsPage/helpers';
 import replaceArrayItem from 'utilities/replace_array_item';
 
 const baseClass = 'config-options-page';
+const DEFAULT_CONFIG_OPTION = { name: '', value: '', read_only: false };
 
 export class ConfigOptionsPage extends Component {
   static propTypes = {
@@ -69,20 +70,15 @@ export class ConfigOptionsPage extends Component {
     evt.preventDefault();
 
     const { configOptions } = this.state;
-    const newConfigOption = {
-      name: '',
-      value: '',
-      read_only: false,
-    };
 
-    if (find(configOptions, newConfigOption)) {
+    if (find(configOptions, DEFAULT_CONFIG_OPTION)) {
       return false;
     }
 
     this.setState({
       configOptions: [
         ...configOptions,
-        newConfigOption,
+        DEFAULT_CONFIG_OPTION,
       ],
     });
 
@@ -104,19 +100,39 @@ export class ConfigOptionsPage extends Component {
     const { configOptions } = this.state;
     const configOptionsWithoutRemovedOption = filter(configOptions, (o) => !isEqual(o, option));
 
-    this.setState({
-      configOptions: [
-        ...configOptionsWithoutRemovedOption,
-        { ...option, value: null },
-      ],
-    });
+    if (isEqual(option, DEFAULT_CONFIG_OPTION)) {
+      this.setState({ configOptions: configOptionsWithoutRemovedOption });
+    } else {
+      this.setState({
+        configOptions: [
+          ...configOptionsWithoutRemovedOption,
+          { ...option, value: null },
+        ],
+      });
+    }
+
+    return false;
+  }
+
+  onResetConfigOptions = () => {
+    const { configOptions } = this.props;
+
+    this.setState({ configOptions });
+
+    return false;
+  }
+
+  onSave = () => {
+    const changedOptions = this.calculateChangedOptions();
+
+    console.log('changedOptions', changedOptions);
 
     return false;
   }
 
   render () {
     const { configOptions } = this.state;
-    const { onAddNewOption, onOptionUpdate, onRemoveOption } = this;
+    const { onAddNewOption, onOptionUpdate, onRemoveOption, onResetConfigOptions, onSave } = this;
     const availableOptions = filter(configOptions, option => option.value !== null);
 
     return (
@@ -131,10 +147,10 @@ export class ConfigOptionsPage extends Component {
             </p>
           </div>
           <div className={`${baseClass}__btn-wrapper`}>
-            <Button block className={`${baseClass}__reset-btn`} variant="inverse">
+            <Button block className={`${baseClass}__reset-btn`} onClick={onResetConfigOptions} variant="inverse">
               RESET TO DEFAULT
             </Button>
-            <Button block className={`${baseClass}__save-btn`} variant="brand">
+            <Button block className={`${baseClass}__save-btn`} onClick={onSave} variant="brand">
               SAVE OPTIONS
             </Button>
           </div>
