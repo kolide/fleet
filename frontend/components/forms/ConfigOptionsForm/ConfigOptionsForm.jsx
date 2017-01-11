@@ -8,16 +8,18 @@ class ConfigOptionsForm extends Component {
   static propTypes = {
     completedOptions: PropTypes.arrayOf(configOptionInterface),
     configNameOptions: PropTypes.arrayOf(dropdownOptionInterface),
+    onRemoveOption: PropTypes.func.isRequired,
   };
 
   renderConfigOptionForm = (option, idx) => {
-    const { configNameOptions } = this.props;
+    const { configNameOptions, onRemoveOption } = this.props;
 
     return (
       <ConfigOptionForm
         configNameOptions={configNameOptions}
         formData={option}
         key={`config-option-form-${option.id}-${idx}`}
+        onRemove={onRemoveOption}
       />
     );
   }

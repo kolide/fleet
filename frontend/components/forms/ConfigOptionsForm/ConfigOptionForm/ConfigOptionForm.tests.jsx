@@ -15,7 +15,11 @@ describe('ConfigOptionForm - form', () => {
   it('renders form fields for the config option name and value', () => {
     const configNameOptions = [{ label: 'My option', value: 'my_option' }];
     const form = mount(
-      <ConfigOptionForm configNameOptions={configNameOptions} handleSubmit={noop} />
+      <ConfigOptionForm
+        configNameOptions={configNameOptions}
+        handleSubmit={noop}
+        onRemove={noop}
+      />
     );
 
     itBehavesLikeAFormDropdownElement(form, 'name');
@@ -26,7 +30,12 @@ describe('ConfigOptionForm - form', () => {
     const spy = createSpy();
     const configNameOptions = [{ label: 'My option', value: 'my_option' }];
     const form = mount(
-      <ConfigOptionForm configNameOptions={configNameOptions} handleSubmit={noop} onFormUpdate={spy} />
+      <ConfigOptionForm
+        configNameOptions={configNameOptions}
+        handleSubmit={noop}
+        onFormUpdate={spy}
+        onRemove={noop}
+      />
     );
 
     itBehavesLikeAFormInputElement(form, 'value', 'InputField', 'new config option value');
@@ -45,13 +54,19 @@ describe('ConfigOptionForm - form', () => {
     const formData = { name: 'My option', value: 'my_option', read_only: false };
     const configNameOptions = [formData];
     const form = mount(
-      <ConfigOptionForm configNameOptions={configNameOptions} formData={formData} handleSubmit={noop} />
+      <ConfigOptionForm
+        configNameOptions={configNameOptions}
+        formData={formData}
+        handleSubmit={noop}
+        onRemove={noop}
+      />
     );
     const readOnlyForm = mount(
       <ConfigOptionForm
         configNameOptions={configNameOptions}
         formData={{ ...formData, read_only: true }}
         handleSubmit={noop}
+        onRemove={noop}
       />
     );
 
@@ -64,6 +79,25 @@ describe('ConfigOptionForm - form', () => {
     expect(disabledValueField.prop('disabled')).toEqual(true);
     expect(enabledNameField.prop('disabled')).toEqual(false);
     expect(enabledValueField.prop('disabled')).toEqual(false);
+  });
+
+  it.only('calls onRemove with the formdata when the ex icon is clicked', () => {
+    const formData = { name: 'My option', value: 'my_option', read_only: false };
+    const configNameOptions = [formData];
+    const spy = createSpy();
+    const form = mount(
+      <ConfigOptionForm
+        configNameOptions={configNameOptions}
+        formData={formData}
+        handleSubmit={noop}
+        onRemove={spy}
+      />
+    );
+    const exIcon = form.find('Button');
+
+    exIcon.simulate('click');
+
+    expect(spy).toHaveBeenCalledWith(formData);
   });
 });
 

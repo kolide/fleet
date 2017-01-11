@@ -32,8 +32,15 @@ export class ConfigOptionsPage extends Component {
     return false;
   }
 
+  onRemoveOption = (option) => {
+    console.log('option removed', option);
+
+    return false;
+  }
+
   render () {
     const { configOptions } = this.props;
+    const { onRemoveOption } = this;
     const completedOptions = filter(configOptions, option => option.value);
 
     return (
@@ -59,6 +66,7 @@ export class ConfigOptionsPage extends Component {
         <ConfigOptionsForm
           configNameOptions={helpers.configOptionDropdownOptions(configOptions)}
           completedOptions={completedOptions}
+          onRemoveOption={onRemoveOption}
         />
       </div>
     );

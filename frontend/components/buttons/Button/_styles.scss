@@ -130,7 +130,7 @@ $base-class: 'button';
   }
 
   &--unstyled {
-    background-color: transparent;
+    @include button-variant(transparent);
     border: 0;
     box-shadow: none;
     color: $text-dark;
