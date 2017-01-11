@@ -37,22 +37,24 @@ export class ConfigOptionsPage extends Component {
     const completedOptions = filter(configOptions, option => option.value);
 
     return (
-      <div className={`body-wrap ${baseClass} ${baseClass}__wrapper`}>
-        <div>
-          <h1>Manage Additional Osquery Options</h1>
-          <p>
-            Osquery allows you to set a number of configuration options (Osquery Documentation).
-            Since Kolide manages your Osquery configuration, you can set these additional desired
-            options on this screen. Some options that Kolide needs to function correctly will be ignored.
-          </p>
-        </div>
-        <div className={`${baseClass}__btn-wrapper`}>
-          <Button block className={`${baseClass}__reset-btn`} variant="inverse">
-            RESET TO DEFAULT
-          </Button>
-          <Button block className={`${baseClass}__save-btn`} variant="brand">
-            SAVE OPTIONS
-          </Button>
+      <div className={`body-wrap ${baseClass}`}>
+        <div className={`${baseClass}__header-wrapper`}>
+          <div>
+            <h1>Manage Additional Osquery Options</h1>
+            <p>
+              Osquery allows you to set a number of configuration options (Osquery Documentation).
+              Since Kolide manages your Osquery configuration, you can set these additional desired
+              options on this screen. Some options that Kolide needs to function correctly will be ignored.
+            </p>
+          </div>
+          <div className={`${baseClass}__btn-wrapper`}>
+            <Button block className={`${baseClass}__reset-btn`} variant="inverse">
+              RESET TO DEFAULT
+            </Button>
+            <Button block className={`${baseClass}__save-btn`} variant="brand">
+              SAVE OPTIONS
+            </Button>
+          </div>
         </div>
         <ConfigOptionsForm
           configNameOptions={helpers.configOptionDropdownOptions(configOptions)}

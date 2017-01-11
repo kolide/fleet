@@ -6,6 +6,7 @@ import Form from 'components/forms/Form';
 import formFieldInterface from 'interfaces/form_field';
 import InputField from 'components/forms/fields/InputField';
 
+const baseClass = 'config-option-form';
 const fieldNames = ['name', 'value'];
 
 class ConfigOptionForm extends Component {
@@ -21,12 +22,13 @@ class ConfigOptionForm extends Component {
     const { configNameOptions, fields } = this.props;
 
     return (
-      <form>
+      <form className={baseClass}>
         <Dropdown
           {...fields.name}
+          className={`${baseClass}__field`}
           options={configNameOptions}
         />
-        <InputField {...fields.value} />
+        <InputField {...fields.value} inputClassName={`${baseClass}__field`} />
       </form>
     );
   }

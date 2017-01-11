@@ -3,7 +3,7 @@
     min-width: 214px;
   }
 
-  &__wrapper {
+  &__header-wrapper {
     @include display(flex);
     @include justify-content(space-around);
 
