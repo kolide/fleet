@@ -4,6 +4,7 @@ import { mount } from 'enzyme';
 
 import { ConfigOptionsPage } from 'pages/config/ConfigOptionsPage/ConfigOptionsPage';
 import { configOptionStub } from 'test/stubs';
+import { fillInFormInput } from 'test/helpers';
 
 describe('ConfigOptionsPage - component', () => {
   const props = { configOptions: [] };
@@ -25,7 +26,7 @@ describe('ConfigOptionsPage - component', () => {
   describe('removing a config option', () => {
     it('sets the option value to null in state', () => {
       const page = mount(<ConfigOptionsPage configOptions={[configOptionStub]} />);
-      const removeBtn = page.find('ConfigOptionForm').find('Button');
+      const removeBtn = page.find('ConfigOptionForm').find('Button').first();
 
       expect(page.state('configOptions')).toEqual([configOptionStub]);
 
@@ -35,6 +36,52 @@ describe('ConfigOptionsPage - component', () => {
         ...configOptionStub,
         value: null,
       }]);
+    });
+  });
+
+  describe('adding a config option', () => {
+    it('adds a blank option to state', () => {
+      const blankConfigOption = { name: '', value: '', read_only: false };
+      const page = mount(<ConfigOptionsPage configOptions={[configOptionStub]} />);
+      const addBtn = page.find('Button').last();
+
+      expect(page.state('configOptions')).toEqual([configOptionStub]);
+
+      addBtn.simulate('click');
+
+      expect(page.state('configOptions')).toEqual([
+        configOptionStub,
+        blankConfigOption,
+      ]);
+    });
+
+    it('only allows one blank config option', () => {
+      const blankConfigOption = { name: '', value: '', read_only: false };
+      const page = mount(<ConfigOptionsPage configOptions={[configOptionStub]} />);
+      const addBtn = page.find('Button').last();
+
+      expect(page.state('configOptions')).toEqual([configOptionStub]);
+
+      addBtn.simulate('click');
+      addBtn.simulate('click');
+
+      expect(page.state('configOptions')).toEqual([
+        configOptionStub,
+        blankConfigOption,
+      ]);
+    });
+  });
+
+  describe('updating a config option', () => {
+    it('updates the config option in state', () => {
+      const page = mount(<ConfigOptionsPage configOptions={[configOptionStub]} />);
+      const configOptionInput = page.find('ConfigOptionForm').find('InputField');
+
+      fillInFormInput(configOptionInput.find('input'), 'updated value');
+
+      expect(page.state('configOptions')).toEqual([
+        { ...configOptionStub, value: 'updated value' },
+      ]);
     });
   });
 });

@@ -26,14 +26,14 @@ describe('ConfigOptionForm - form', () => {
     itBehavesLikeAFormInputElement(form, 'value');
   });
 
-  it('calls the onFormUpdate prop when the form updates', () => {
+  it('calls the onChangeFunc prop when the form updates', () => {
     const spy = createSpy();
     const configNameOptions = [{ label: 'My option', value: 'my_option' }];
     const form = mount(
       <ConfigOptionForm
         configNameOptions={configNameOptions}
         handleSubmit={noop}
-        onFormUpdate={spy}
+        onChangeFunc={spy}
         onRemove={noop}
       />
     );
@@ -41,13 +41,8 @@ describe('ConfigOptionForm - form', () => {
     itBehavesLikeAFormInputElement(form, 'value', 'InputField', 'new config option value');
     itBehavesLikeAFormDropdownElement(form, 'name');
 
-    expect(spy).toHaveBeenCalledWith({
-      errors: { base: null, name: null, value: null },
-      formData: {
-        name: 'my_option',
-        value: 'new config option value',
-      },
-    });
+    expect(spy).toHaveBeenCalledWith('value', 'new config option value');
+    expect(spy).toHaveBeenCalledWith('name', 'my_option');
   });
 
   it('renders the input fields as disabled when the option is read_only', () => {

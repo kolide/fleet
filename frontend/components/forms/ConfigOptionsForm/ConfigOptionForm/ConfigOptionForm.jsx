@@ -34,6 +34,7 @@ class ConfigOptionForm extends Component {
     const { configNameOptions, fields, formData } = this.props;
     const { handleRemove } = this;
     const { read_only: readOnly } = formData;
+    const inputType = formData.type === 'int' ? 'number' : 'input';
 
     return (
       <form className={baseClass}>
@@ -50,6 +51,7 @@ class ConfigOptionForm extends Component {
           {...fields.value}
           disabled={readOnly}
           inputClassName={`${baseClass}__field`}
+          type={inputType}
         />
       </form>
     );

@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { difference, filter, isEqual, noop, remove } from 'lodash';
+import { difference, find, filter, isEqual, noop, remove } from 'lodash';
 
 import Button from 'components/buttons/Button';
 import configOptionActions from 'redux/nodes/entities/config_options/actions';
@@ -8,6 +8,7 @@ import ConfigOptionsForm from 'components/forms/ConfigOptionsForm';
 import configOptionInterface from 'interfaces/config_option';
 import entityGetter from 'redux/utilities/entityGetter';
 import helpers from 'pages/config/ConfigOptionsPage/helpers';
+import replaceArrayItem from 'utilities/replace_array_item';
 
 const baseClass = 'config-options-page';
 
@@ -64,6 +65,41 @@ export class ConfigOptionsPage extends Component {
     return difference(stateConfigOptions, propConfigOptions);
   }
 
+  onAddNewOption = (evt) => {
+    evt.preventDefault();
+
+    const { configOptions } = this.state;
+    const newConfigOption = {
+      name: '',
+      value: '',
+      read_only: false,
+    };
+
+    if (find(configOptions, newConfigOption)) {
+      return false;
+    }
+
+    this.setState({
+      configOptions: [
+        ...configOptions,
+        newConfigOption,
+      ],
+    });
+
+    return false;
+  }
+
+  onOptionUpdate = (option, newOption) => {
+    const { configOptions } = this.state;
+    const newConfigOptions = replaceArrayItem(configOptions, option, newOption);
+
+    this.setState({
+      configOptions: newConfigOptions,
+    });
+
+    return false;
+  }
+
   onRemoveOption = (option) => {
     const { configOptions } = this.state;
     const configOptionsWithoutRemovedOption = filter(configOptions, (o) => !isEqual(o, option));
@@ -80,7 +116,7 @@ export class ConfigOptionsPage extends Component {
 
   render () {
     const { configOptions } = this.state;
-    const { onRemoveOption } = this;
+    const { onAddNewOption, onOptionUpdate, onRemoveOption } = this;
     const availableOptions = filter(configOptions, option => option.value !== null);
 
     return (
@@ -106,8 +142,10 @@ export class ConfigOptionsPage extends Component {
         <ConfigOptionsForm
           configNameOptions={helpers.configOptionDropdownOptions(configOptions)}
           completedOptions={availableOptions}
+          onFormUpdate={onOptionUpdate}
           onRemoveOption={onRemoveOption}
         />
+        <Button onClick={onAddNewOption} variant="unstyled">Add New Option</Button>
       </div>
     );
   }
