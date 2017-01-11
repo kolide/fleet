@@ -188,6 +188,7 @@ class AppConfigForm extends Component {
             <InputField
               {...fields.port}
               label="&nbsp;"
+              type="number"
             />
             <Checkbox
               {...fields.enable_ssl_tls}
