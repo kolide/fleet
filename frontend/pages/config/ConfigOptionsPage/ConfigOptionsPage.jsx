@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { difference, find, filter, isEqual, noop, remove } from 'lodash';
+import { difference, find, filter, isEqual, noop } from 'lodash';
 
 import Button from 'components/buttons/Button';
 import configOptionActions from 'redux/nodes/entities/config_options/actions';
@@ -59,13 +59,6 @@ export class ConfigOptionsPage extends Component {
     return false;
   }
 
-  calculateChangedOptions = () => {
-    const { configOptions: stateConfigOptions } = this.state;
-    const { configOptions: propConfigOptions } = this.props;
-
-    return difference(stateConfigOptions, propConfigOptions);
-  }
-
   onAddNewOption = (evt) => {
     evt.preventDefault();
 
@@ -98,7 +91,7 @@ export class ConfigOptionsPage extends Component {
 
   onRemoveOption = (option) => {
     const { configOptions } = this.state;
-    const configOptionsWithoutRemovedOption = filter(configOptions, (o) => !isEqual(o, option));
+    const configOptionsWithoutRemovedOption = filter(configOptions, o => !isEqual(o, option));
 
     if (isEqual(option, DEFAULT_CONFIG_OPTION)) {
       this.setState({ configOptions: configOptionsWithoutRemovedOption });
@@ -128,6 +121,13 @@ export class ConfigOptionsPage extends Component {
     console.log('changedOptions', changedOptions);
 
     return false;
+  }
+
+  calculateChangedOptions = () => {
+    const { configOptions: stateConfigOptions } = this.state;
+    const { configOptions: propConfigOptions } = this.props;
+
+    return difference(stateConfigOptions, propConfigOptions);
   }
 
   render () {

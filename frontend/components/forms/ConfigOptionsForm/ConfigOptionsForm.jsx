@@ -18,7 +18,7 @@ class ConfigOptionsForm extends Component {
       const newOption = { ...option, [fieldName]: value };
 
       return onFormUpdate(option, newOption);
-    }
+    };
   }
 
   renderConfigOptionForm = (option, idx) => {

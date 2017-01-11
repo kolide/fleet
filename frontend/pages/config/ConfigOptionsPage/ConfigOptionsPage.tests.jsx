@@ -8,13 +8,15 @@ import { fillInFormInput } from 'test/helpers';
 
 describe('ConfigOptionsPage - component', () => {
   const props = { configOptions: [] };
-  const page = mount(<ConfigOptionsPage {...props} />);
 
   it('renders', () => {
+    const page = mount(<ConfigOptionsPage {...props} />);
+
     expect(page.length).toEqual(1);
   });
 
   it('renders reset and save buttons', () => {
+    const page = mount(<ConfigOptionsPage {...props} />);
     const buttons = page.find('Button');
     const resetButton = buttons.find('.config-options-page__reset-btn');
     const saveButton = buttons.find('.config-options-page__save-btn');
