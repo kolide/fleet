@@ -23,13 +23,13 @@ interface Inputs {
 }
 
 class Button extends React.Component<IButtonProps, IButtonState> {
-  inputs: Inputs = {};
-
   static defaultProps = {
     size: '',
     type: 'button',
     variant: 'default',
   };
+
+  inputs: Inputs = {};
 
   componentDidMount () {
     const { autofocus } = this.props;
@@ -56,8 +56,14 @@ class Button extends React.Component<IButtonProps, IButtonState> {
     return false;
   }
 
+  setRef = (button: HTMLButtonElement) => {
+    this.inputs.button = button;
+
+    return false;
+  }
+
   render () {
-    const { handleClick } = this;
+    const { handleClick, setRef } = this;
     const { children, className, disabled, size, tabIndex, type, title, variant } = this.props;
     const fullClassName = classnames(baseClass, `${baseClass}--${variant}`, className, {
       [`${baseClass}--disabled`]: disabled,
@@ -72,7 +78,7 @@ class Button extends React.Component<IButtonProps, IButtonState> {
         tabIndex={tabIndex}
         type={type}
         title={title}
-        ref={(b) => this.inputs.button = b}
+        ref={setRef}
       >
         {children}
       </button>
