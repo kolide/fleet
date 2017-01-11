@@ -19,7 +19,9 @@ class InputField extends Component {
     onFocus: PropTypes.func,
     placeholder: PropTypes.string,
     type: PropTypes.string,
-    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    value: PropTypes.oneOfType(
+      [PropTypes.bool, PropTypes.string, PropTypes.number]
+    ).isRequired,
   };
 
   static defaultProps = {

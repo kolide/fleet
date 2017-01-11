@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { filter, noop } from 'lodash';
+import { difference, filter, isEqual, noop, remove } from 'lodash';
 
 import Button from 'components/buttons/Button';
 import configOptionActions from 'redux/nodes/entities/config_options/actions';
@@ -22,26 +22,66 @@ export class ConfigOptionsPage extends Component {
     dispatch: noop,
   };
 
+  constructor (props) {
+    super(props);
+
+    this.state = {
+      configOptions: [],
+    };
+  }
+
   componentWillMount () {
     const { configOptions, dispatch } = this.props;
 
     if (!configOptions.length) {
       dispatch(configOptionActions.loadAll());
+
+      return false;
+    }
+
+    this.setState({ configOptions });
+
+    return false;
+  }
+
+  componentWillReceiveProps ({ configOptions }) {
+    if (!isEqual(configOptions, this.state.configOptions)) {
+      this.setState({
+        configOptions: [
+          ...this.state.configOptions,
+          ...configOptions,
+        ],
+      });
     }
 
     return false;
   }
 
+  calculateChangedOptions = () => {
+    const { configOptions: stateConfigOptions } = this.state;
+    const { configOptions: propConfigOptions } = this.props;
+
+    return difference(stateConfigOptions, propConfigOptions);
+  }
+
   onRemoveOption = (option) => {
-    console.log('option removed', option);
+    const { configOptions } = this.state;
+    const configOptionsWithoutRemovedOption = filter(configOptions, (o) => !isEqual(o, option));
+
+    this.setState({
+      configOptions: [
+        ...configOptionsWithoutRemovedOption,
+        { ...option, value: null },
+      ],
+    });
 
     return false;
   }
 
   render () {
-    const { configOptions } = this.props;
+    const { configOptions } = this.state;
     const { onRemoveOption } = this;
-    const completedOptions = filter(configOptions, option => option.value);
+    const availableOptions = filter(configOptions, option => option.value !== null);
 
     return (
       <div className={`body-wrap ${baseClass}`}>
@@ -65,7 +105,7 @@ export class ConfigOptionsPage extends Component {
         </div>
         <ConfigOptionsForm
           configNameOptions={helpers.configOptionDropdownOptions(configOptions)}
-          completedOptions={completedOptions}
+          completedOptions={availableOptions}
           onRemoveOption={onRemoveOption}
         />
       </div>

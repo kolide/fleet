@@ -3,6 +3,7 @@ import expect from 'expect';
 import { mount } from 'enzyme';
 
 import { ConfigOptionsPage } from 'pages/config/ConfigOptionsPage/ConfigOptionsPage';
+import { configOptionStub } from 'test/stubs';
 
 describe('ConfigOptionsPage - component', () => {
   const props = { configOptions: [] };
@@ -19,5 +20,21 @@ describe('ConfigOptionsPage - component', () => {
 
     expect(resetButton.length).toEqual(1);
     expect(saveButton.length).toEqual(1);
+  });
+
+  describe('removing a config option', () => {
+    it('sets the option value to null in state', () => {
+      const page = mount(<ConfigOptionsPage configOptions={[configOptionStub]} />);
+      const removeBtn = page.find('ConfigOptionForm').find('Button');
+
+      expect(page.state('configOptions')).toEqual([configOptionStub]);
+
+      removeBtn.simulate('click');
+
+      expect(page.state('configOptions')).toEqual([{
+        ...configOptionStub,
+        value: null,
+      }]);
+    });
   });
 });

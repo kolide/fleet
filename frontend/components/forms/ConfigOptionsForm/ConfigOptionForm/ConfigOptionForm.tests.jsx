@@ -81,7 +81,7 @@ describe('ConfigOptionForm - form', () => {
     expect(enabledValueField.prop('disabled')).toEqual(false);
   });
 
-  it.only('calls onRemove with the formdata when the ex icon is clicked', () => {
+  it('calls onRemove with the formdata when the ex icon is clicked', () => {
     const formData = { name: 'My option', value: 'my_option', read_only: false };
     const configNameOptions = [formData];
     const spy = createSpy();
