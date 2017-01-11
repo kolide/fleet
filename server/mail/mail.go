@@ -117,9 +117,6 @@ func (m mailService) sendMail(e kolide.Email, msg []byte) error {
 		return errors.Wrap(err, "could not dial smtp host")
 	}
 	defer client.Close()
-	if err = client.Hello(""); err != nil {
-		return errors.Wrap(err, "failed client hello")
-	}
 	if e.Config.SMTPEnableStartTLS {
 		if ok, _ := client.Extension("STARTTLS"); ok {
 			config := &tls.Config{
