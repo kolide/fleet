@@ -13,6 +13,8 @@ import (
 func createServiceMockForImport(t *testing.T) *service {
 	ds, err := inmem.New(config.TestConfig())
 	require.Nil(t, err)
+	err = ds.MigrateData()
+	require.Nil(t, err)
 	return &service{
 		ds: ds,
 	}
@@ -63,7 +65,9 @@ func TestImportFilePaths(t *testing.T) {
 			},
 		},
 	}
-	resp := kolide.NewImportConfigResponse()
+	resp := &kolide.ImportConfigResponse{
+		ImportStatusBySection: make(map[kolide.ImportSection]*kolide.ImportStatus),
+	}
 	svc := createServiceMockForImport(t)
 	err := svc.importFIMSections(cfg, resp)
 	require.Nil(t, err)
@@ -97,7 +101,9 @@ func TestImportDecorators(t *testing.T) {
 			},
 		},
 	}
-	resp := kolide.NewImportConfigResponse()
+	resp := &kolide.ImportConfigResponse{
+		ImportStatusBySection: make(map[kolide.ImportSection]*kolide.ImportStatus),
+	}
 	svc := createServiceMockForImport(t)
 	err := svc.importDecorators(cfg, resp)
 	require.Nil(t, err)
@@ -129,7 +135,9 @@ func TestImportScheduledQueries(t *testing.T) {
 			},
 		},
 	}
-	resp := kolide.NewImportConfigResponse()
+	resp := &kolide.ImportConfigResponse{
+		ImportStatusBySection: make(map[kolide.ImportSection]*kolide.ImportStatus),
+	}
 	svc := createServiceMockForImport(t)
 	user := &kolide.User{
 		Username: "bob",
@@ -176,7 +184,9 @@ func TestOptionsImportConfig(t *testing.T) {
 	opts := kolide.OptionNameToValueMap{
 		"aws_access_key_id": "foo",
 	}
-	resp := kolide.NewImportConfigResponse()
+	resp := &kolide.ImportConfigResponse{
+		ImportStatusBySection: make(map[kolide.ImportSection]*kolide.ImportStatus),
+	}
 	svc := createServiceMockForImport(t)
 	err := svc.importOptions(opts, resp)
 	require.Nil(t, err)
@@ -202,7 +212,9 @@ func TestOptionsImportConfigWithSkips(t *testing.T) {
 		// this should be skipped because it's not an option we know about
 		"wombat": "not venomous",
 	}
-	resp := kolide.NewImportConfigResponse()
+	resp := &kolide.ImportConfigResponse{
+		ImportStatusBySection: make(map[kolide.ImportSection]*kolide.ImportStatus),
+	}
 	svc := createServiceMockForImport(t)
 	// set option val, it should be skipped
 	opt, err := svc.ds.OptionByName("aws_firehose_period")
@@ -308,7 +320,9 @@ func TestPacksImportConfig(t *testing.T) {
 		},
 		GlobPackNames: []string{"ext2"},
 	}
-	resp := kolide.NewImportConfigResponse()
+	resp := &kolide.ImportConfigResponse{
+		ImportStatusBySection: make(map[kolide.ImportSection]*kolide.ImportStatus),
+	}
 	user := &kolide.User{
 		Username: "bob",
 		Password: []byte("secret"),
@@ -335,7 +349,7 @@ func TestPacksImportConfig(t *testing.T) {
 	assert.Len(t, sqs, 2)
 	labels, err := svc.ds.ListLabels(kolide.ListOptions{})
 	require.Nil(t, err)
-	assert.Len(t, labels, 3)
+	assert.Len(t, labels, 8)
 	assert.Equal(t, 3, resp.Status(kolide.PacksSection).ImportCount)
 	assert.Equal(t, 1, resp.Status(kolide.PacksSection).SkipCount)
 	assert.Equal(t, 3, resp.Status(kolide.QueriesSection).ImportCount)

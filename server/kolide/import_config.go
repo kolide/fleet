@@ -9,13 +9,13 @@ import (
 )
 
 type ImportConfigService interface {
-	// ImportOsqueryConfiguration create packs, queries, options etc based on imported
-	// osquery configuration
+	// ImportConfig create packs, queries, options etc based on imported
+	// osquery configuration.
 	ImportConfig(ctx context.Context, cfg *ImportConfig) (*ImportConfigResponse, error)
 }
 
 // ImportSection is used to categorize information associated with the import
-// of a particular section of an imported osquery configuration file
+// of a particular section of an imported osquery configuration file.
 type ImportSection string
 
 const (
@@ -29,7 +29,7 @@ const (
 )
 
 // WarningType is used to group associated warnings for options, packs etc
-// when importing on osquery configuration file
+// when importing on osquery configuration file.
 type WarningType string
 
 const (
@@ -43,43 +43,37 @@ const (
 )
 
 // ImportStatus contains information pertaining to the import of a section
-// of an osquery configuration file
+// of an osquery configuration file.
 type ImportStatus struct {
 	// Title human readable name of the section of the import file that this
 	// status pertains to.
 	Title string `json:"title"`
-	// ImportCount count of items successfully imported
+	// ImportCount count of items successfully imported.
 	ImportCount int `json:"import_count"`
 	// SkipCount count of items that are skipped.  The reasons for the omissions
-	// can be found in Warnings
+	// can be found in Warnings.
 	SkipCount int `json:"skip_count"`
-	// Warnings groups catagories of warnings with one or more detail messages
+	// Warnings groups catagories of warnings with one or more detail messages.
 	Warnings map[WarningType][]string `json:"warnings"`
-	// Messages contains an entry for each import attempt
+	// Messages contains an entry for each import attempt.
 	Messages []string `json:"messages"`
 }
 
-// Warning is used to add a warning message to ImportStatus
+// Warning is used to add a warning message to ImportStatus.
 func (is *ImportStatus) Warning(warnType WarningType, fmtMsg string, fmtArgs ...interface{}) {
 	is.Warnings[warnType] = append(is.Warnings[warnType], fmt.Sprintf(fmtMsg, fmtArgs...))
 }
 
 // Message is used to add a general message to ImportStatus, usually indicating
-// what was changed in a successful import
+// what was changed in a successful import.
 func (is *ImportStatus) Message(fmtMsg string, args ...interface{}) {
 	is.Messages = append(is.Messages, fmt.Sprintf(fmtMsg, args...))
 }
 
 // ImportConfigResponse contains information about the import of an osquery
-// configuration file
+// configuration file.
 type ImportConfigResponse struct {
 	ImportStatusBySection map[ImportSection]*ImportStatus `json:"import_status"`
-}
-
-func NewImportConfigResponse() *ImportConfigResponse {
-	return &ImportConfigResponse{
-		ImportStatusBySection: make(map[ImportSection]*ImportStatus),
-	}
 }
 
 // Status returns a structure that contains information about the import
@@ -98,12 +92,12 @@ func (ic *ImportConfigResponse) Status(section ImportSection) (status *ImportSta
 const (
 	GlobPacks = "*"
 	// ImportPackName is a custom pack name used for a pack we create to
-	// hold imported scheduled queries
+	// hold imported scheduled queries.
 	ImportPackName = "imported"
 )
 
 // QueryDetails represents the query objects used in the packs and the
-// schedule section of an osquery configuration
+// schedule section of an osquery configuration.
 type QueryDetails struct {
 	Query    string `json:"query"`
 	Interval uint   `json:"interval"`
@@ -116,7 +110,7 @@ type QueryDetails struct {
 }
 
 // PackDetails represents the "packs" section of an osquery configuration
-// file
+// file.
 type PackDetails struct {
 	Queries   QueryNameToQueryDetailsMap `json:"queries"`
 	Shard     *uint                      `json:"shard"`
@@ -125,7 +119,7 @@ type PackDetails struct {
 	Discovery []string                   `json:"discovery"`
 }
 
-// YARAConfig yara configuration maps keys to lists of files
+// YARAConfig yara configuration maps keys to lists of files.
 // See https://osquery.readthedocs.io/en/stable/deployment/yara/
 type YARAConfig struct {
 	Signatures map[string][]string `json:"signatures"`
@@ -133,7 +127,7 @@ type YARAConfig struct {
 }
 
 // Decorator section of osquery config each section contains rows of decorator
-// queries
+// queries.
 type DecoratorConfig struct {
 	Load   []string `json:"load"`
 	Always []string `json:"always"`
@@ -162,24 +156,24 @@ type PackNameToPackDetails map[string]PackDetails
 // See https://osquery.readthedocs.io/en/stable/deployment/configuration/
 type ImportConfig struct {
 	// Options is a map of option name to a value which can be an int,
-	// bool, or string
+	// bool, or string.
 	Options OptionNameToValueMap `json:"options"`
 	// Schedule is a map of query names to details
 	Schedule QueryNameToQueryDetailsMap `json:"schedule"`
 	// Packs is a map of pack names to either PackDetails, or a string
 	// containing a file path with a pack config. If a string, we expect
-	// PackDetails to be stored in ExternalPacks
+	// PackDetails to be stored in ExternalPacks.
 	Packs PackNameMap `json:"packs"`
-	// FileIntegrityMonitoring file integrity monitoring information
+	// FileIntegrityMonitoring file integrity monitoring information.
 	// See https://osquery.readthedocs.io/en/stable/deployment/file-integrity-monitoring/
 	FileIntegrityMonitoring FIMCategoryToPaths `json:"file_paths"`
 	// YARA configuration
 	YARA       *YARAConfig      `json:"yara"`
 	Decorators *DecoratorConfig `json:"decorators"`
 	// ExternalPacks are packs referenced when an item in the Packs map references
-	// an external file.  The PackName here must match the PackName in the Packs map
+	// an external file.  The PackName here must match the PackName in the Packs map.
 	ExternalPacks PackNameToPackDetails `json:"-"`
-	// GlobPackNames lists pack names that are globbed
+	// GlobPackNames lists pack names that are globbed.
 	GlobPackNames []string `json:"glob"`
 }
 
@@ -194,6 +188,7 @@ func (ic *ImportConfig) fetchGlobPacks(packs *PackNameToPackDetails) error {
 	return nil
 }
 
+// CollectPacks consolidates packs, globbed packs and external packs.
 func (ic *ImportConfig) CollectPacks() (PackNameToPackDetails, error) {
 	result := make(PackNameToPackDetails)
 	for packName, packContent := range ic.Packs {

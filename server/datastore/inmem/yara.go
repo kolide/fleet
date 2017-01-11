@@ -1,8 +1,6 @@
 package inmem
 
-import (
-	"github.com/kolide/kolide-ose/server/kolide"
-)
+import "github.com/kolide/kolide-ose/server/kolide"
 
 func (d *Datastore) NewYARASignatureGroup(ysg *kolide.YARASignatureGroup) (*kolide.YARASignatureGroup, error) {
 	d.mtx.Lock()

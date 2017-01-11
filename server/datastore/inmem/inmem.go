@@ -102,8 +102,6 @@ func (d *Datastore) MigrateTables() error {
 }
 
 func (d *Datastore) MigrateData() error {
-	d.mtx.Lock()
-
 	for _, initData := range appstate.Options() {
 		opt := kolide.Option{
 			Name:     initData.Name,
@@ -122,8 +120,6 @@ func (d *Datastore) MigrateData() error {
 		SMTPEnableStartTLS: true,
 		SMTPVerifySSLCerts: true,
 	}
-
-	d.mtx.Unlock()
 
 	if err := d.createBuiltinLabels(); err != nil {
 		return err

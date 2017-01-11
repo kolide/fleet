@@ -3,7 +3,8 @@ package mysql
 import (
 	"database/sql"
 
-	"github.com/kolide/kolide-ose/server/errors"
+	"github.com/pkg/errors"
+
 	"github.com/kolide/kolide-ose/server/kolide"
 )
 
@@ -16,7 +17,7 @@ func (ds *Datastore) NewDecorator(decorator *kolide.Decorator) (*kolide.Decorato
 			"VALUES (?, ?, ?)"
 	result, err := ds.db.Exec(sqlStatement, decorator.Query, decorator.Type, decorator.Interval)
 	if err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, sqlStatement)
 	}
 	id, _ := result.LastInsertId()
 	decorator.ID = uint(id)
@@ -30,7 +31,7 @@ func (ds *Datastore) DeleteDecorator(id uint) error {
   `
 	res, err := ds.db.Exec(sqlStatement, id)
 	if err != nil {
-		return errors.DatabaseError(err)
+		return errors.Wrap(err, sqlStatement)
 	}
 	deleted, _ := res.RowsAffected()
 	if deleted < 1 {
@@ -51,7 +52,7 @@ func (ds *Datastore) Decorator(id uint) (*kolide.Decorator, error) {
 		if err == sql.ErrNoRows {
 			return nil, notFound("Decorator").WithID(id)
 		}
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, sqlStatement)
 	}
 	return &result, nil
 }
@@ -64,7 +65,7 @@ func (ds *Datastore) ListDecorators() ([]*kolide.Decorator, error) {
 	var results []*kolide.Decorator
 	err := ds.db.Select(&results, sqlStatement)
 	if err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, sqlStatement)
 	}
 	return results, nil
 }

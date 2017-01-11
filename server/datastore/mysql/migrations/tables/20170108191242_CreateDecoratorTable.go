@@ -1,13 +1,9 @@
-package migration
+package tables
 
-import (
-	"database/sql"
-
-	"github.com/pressly/goose"
-)
+import "database/sql"
 
 func init() {
-	goose.AddMigration(Up_20170108191242, Down_20170108191242)
+	MigrationClient.AddMigration(Up_20170108191242, Down_20170108191242)
 }
 
 func Up_20170108191242(tx *sql.Tx) error {

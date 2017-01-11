@@ -29,7 +29,7 @@ func (d *Datastore) NewYARASignatureGroup(ysg *kolide.YARASignatureGroup) (sg *k
 	var result sql.Result
 	result, err = txn.Exec(sqlStatement, ysg.SignatureName)
 	if err != nil {
-		return nil, errors.Wrap(err, sqlStatement)
+		return nil, errors.Wrap(err, "error creating new yara signature group")
 	}
 	id, _ := result.LastInsertId()
 	ysg.ID = uint(id)
@@ -43,7 +43,7 @@ func (d *Datastore) NewYARASignatureGroup(ysg *kolide.YARASignatureGroup) (sg *k
 	for _, path := range ysg.Paths {
 		_, err = txn.Exec(sqlStatement, path, ysg.ID)
 		if err != nil {
-			return nil, errors.Wrap(err, sqlStatement)
+			return nil, errors.Wrap(err, "error creating new signature path")
 		}
 	}
 	success = true

@@ -11,7 +11,9 @@ import (
 )
 
 func (svc service) ImportConfig(ctx context.Context, cfg *kolide.ImportConfig) (*kolide.ImportConfigResponse, error) {
-	resp := kolide.NewImportConfigResponse()
+	resp := &kolide.ImportConfigResponse{
+		ImportStatusBySection: make(map[kolide.ImportSection]*kolide.ImportStatus),
+	}
 	vc, ok := viewer.FromContext(ctx)
 	if !ok {
 		return nil, errors.New("internal error, unable to fetch user")
@@ -360,7 +362,7 @@ func (svc service) createLabelsForPack(pack *kolide.Pack, details *kolide.PackDe
 			Name:        labelName,
 			Query:       query,
 			Description: "imported",
-			LabelType:   kolide.LabelTypeDefault,
+			LabelType:   kolide.LabelTypeRegular,
 			Platform:    details.Platform,
 		}
 		label, err = svc.ds.NewLabel(label)
