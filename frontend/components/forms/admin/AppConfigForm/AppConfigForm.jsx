@@ -165,12 +165,7 @@ class AppConfigForm extends Component {
           </div>
         </div>
         <div className={`${baseClass}__section`}>
-          <h2>SMTP Options <small className={`smtp-options smtp-options--${smtpConfigured ? 'configured' : 'notconfigured'}`}>STATUS: <em>{smtpConfigured ? 'CONFIGURED' : 'NOT CONFIGURED'}</em></small>
-            <div className={`${baseClass}__smtp-buttons`}>
-              <Button variant="inverse">Send Test</Button>
-              <Button variant="inverse-alert">Disable Email</Button>
-            </div>
-          </h2>
+          <h2>SMTP Options <small className={`smtp-options smtp-options--${smtpConfigured ? 'configured' : 'notconfigured'}`}>STATUS: <em>{smtpConfigured ? 'CONFIGURED' : 'NOT CONFIGURED'}</em></small></h2>
           <div className={`${baseClass}__inputs`}>
             <InputField
               {...fields.sender_address}
@@ -188,6 +183,7 @@ class AppConfigForm extends Component {
             <InputField
               {...fields.port}
               label="&nbsp;"
+              type="number"
             />
             <Checkbox
               {...fields.enable_ssl_tls}
