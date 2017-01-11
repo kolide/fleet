@@ -180,3 +180,23 @@ func (d *Datastore) ListHostsInPack(pid uint, opt kolide.ListOptions) ([]*kolide
 	}
 	return hosts, nil
 }
+
+func (d *Datastore) ListExplicitHostsInPack(pid uint, opt kolide.ListOptions) ([]*kolide.Host, error) {
+	sql := `
+		SELECT DISTINCT h.*
+		FROM hosts h
+		JOIN pack_targets pt
+		ON (
+		  pt.target_id = h.id
+		  AND pt.type = ?
+		)
+		WHERE pt.pack_id = ?
+	`
+	sql = appendListOptionsToSQL(sql, opt)
+	hosts := []*kolide.Host{}
+	if err := d.db.Select(&hosts, sql, kolide.TargetHost, pid); err != nil {
+		return nil, errors.DatabaseError(err)
+	}
+	return hosts, nil
+
+}

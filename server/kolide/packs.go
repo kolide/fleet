@@ -21,6 +21,7 @@ type PackStore interface {
 	AddHostToPack(hid uint, pid uint) error
 	RemoveHostFromPack(hid uint, pid uint) error
 	ListHostsInPack(pid uint, opt ListOptions) ([]*Host, error)
+	ListExplicitHostsInPack(pid uint, opt ListOptions) ([]*Host, error)
 }
 
 type PackService interface {
@@ -41,6 +42,7 @@ type PackService interface {
 	RemoveHostFromPack(ctx context.Context, hid, pid uint) (err error)
 	ListPacksForHost(ctx context.Context, hid uint) (packs []*Pack, err error)
 	ListHostsInPack(ctx context.Context, pid uint, opt ListOptions) (hosts []*Host, err error)
+	ListExplicitHostsInPack(ctx context.Context, pid uint, opt ListOptions) (hosts []*Host, err error)
 }
 
 type Pack struct {
