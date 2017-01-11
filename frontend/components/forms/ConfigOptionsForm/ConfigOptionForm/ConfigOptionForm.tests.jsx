@@ -40,5 +40,30 @@ describe('ConfigOptionForm - form', () => {
       },
     });
   });
+
+  it('renders the input fields as disabled when the option is read_only', () => {
+    const formData = { name: 'My option', value: 'my_option', read_only: false };
+    const configNameOptions = [formData];
+    const form = mount(
+      <ConfigOptionForm configNameOptions={configNameOptions} formData={formData} handleSubmit={noop} />
+    );
+    const readOnlyForm = mount(
+      <ConfigOptionForm
+        configNameOptions={configNameOptions}
+        formData={{ ...formData, read_only: true }}
+        handleSubmit={noop}
+      />
+    );
+
+    const disabledNameField = readOnlyForm.find('Select').findWhere(s => s.prop('name') === 'name-select');
+    const disabledValueField = readOnlyForm.find({ name: 'value' });
+    const enabledNameField = form.find('Select').findWhere(s => s.prop('name') === 'name-select');
+    const enabledValueField = form.find({ name: 'value' });
+
+    expect(disabledNameField.prop('disabled')).toEqual(true);
+    expect(disabledValueField.prop('disabled')).toEqual(true);
+    expect(enabledNameField.prop('disabled')).toEqual(false);
+    expect(enabledValueField.prop('disabled')).toEqual(false);
+  });
 });
 

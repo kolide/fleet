@@ -16,19 +16,28 @@ class ConfigOptionForm extends Component {
       name: formFieldInterface,
       value: formFieldInterface,
     }),
+    formData: PropTypes.shape({
+      read_only: PropTypes.bool,
+    }).isRequired,
   };
 
   render () {
-    const { configNameOptions, fields } = this.props;
+    const { configNameOptions, fields, formData } = this.props;
+    const { read_only: readOnly } = formData;
 
     return (
       <form className={baseClass}>
         <Dropdown
           {...fields.name}
           className={`${baseClass}__field`}
+          disabled={readOnly}
           options={configNameOptions}
         />
-        <InputField {...fields.value} inputClassName={`${baseClass}__field`} />
+        <InputField
+          {...fields.value}
+          disabled={readOnly}
+          inputClassName={`${baseClass}__field`}
+        />
       </form>
     );
   }
