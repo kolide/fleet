@@ -54,7 +54,6 @@ func testModifyAppConfig(t *testing.T, r *testResource) {
 		SMTPEnableTLS:          true,
 		SMTPVerifySSLCerts:     true,
 		SMTPEnableStartTLS:     true,
-		SMTPEnabled:            true,
 	}
 	payload := appConfigPayloadFromAppConfig(config)
 	payload.SMTPTest = new(bool)
@@ -90,7 +89,6 @@ func testModifyAppConfigWithValidationFail(t *testing.T, r *testResource) {
 		SMTPEnableTLS:          true,
 		SMTPVerifySSLCerts:     true,
 		SMTPEnableStartTLS:     true,
-		SMTPEnabled:            true,
 	}
 	payload := appConfigPayloadFromAppConfig(config)
 	payload.SMTPTest = new(bool)
@@ -109,11 +107,9 @@ func testModifyAppConfigWithValidationFail(t *testing.T, r *testResource) {
 	err = json.NewDecoder(resp.Body).Decode(&validationErrors)
 	require.Nil(t, err)
 	assert.Equal(t, "Validation Failed", validationErrors.Message)
-	require.Equal(t, 2, len(validationErrors.Errors))
+	require.Equal(t, 1, len(validationErrors.Errors))
 	assert.Equal(t, "kolide_server_url", validationErrors.Errors[0].Name)
 	assert.Equal(t, "missing", validationErrors.Errors[0].Reason)
-	assert.Equal(t, "smtp_server", validationErrors.Errors[1].Name)
-	assert.Equal(t, "required argument", validationErrors.Errors[1].Reason)
 	// verify no changes are not saved if validation fails
 	existing, _ := r.ds.AppConfig()
 	assert.NotEqual(t, config.OrgName, existing.OrgName)

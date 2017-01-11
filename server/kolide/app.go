@@ -98,8 +98,6 @@ type AppConfig struct {
 	SMTPVerifySSLCerts bool `db:"smtp_verify_ssl_certs"`
 	// SMTPEnableStartTLS detects of TLS is enabled on mail server and starts to use it (default true)
 	SMTPEnableStartTLS bool `db:"smtp_enable_start_tls"`
-	// SMTPDisabled if user sets this to TRUE emails will not be sent from the application
-	SMTPEnabled bool `db:"smtp_enabled"`
 }
 
 // ModifyAppConfigRequest contains application configuration information
@@ -143,8 +141,6 @@ type SMTPSettings struct {
 	SMTPVerifySSLCerts bool `json:"verify_ssl_certs"`
 	// SMTPEnableStartTLS detects of TLS is enabled on mail server and starts to use it (default true)
 	SMTPEnableStartTLS bool `json:"enable_start_tls"`
-	// SMTPDisabled if user sets this to TRUE emails will not be sent from the application
-	SMTPEnabled bool `json:"email_enabled"`
 }
 
 // AppConfigPayload contains request/response format of
