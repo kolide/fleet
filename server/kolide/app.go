@@ -132,7 +132,7 @@ type SMTPSettings struct {
 	// SMTPUserName must be provided if SMTPAuthenticationType is UserNamePassword
 	SMTPUserName string `json:"user_name"`
 	// SMTPPassword must be provided if SMTPAuthenticationType is UserNamePassword
-	SMTPPassword string `json:"password"`
+	SMTPPassword string `json:"-"`
 	// SMTPEnableSSLTLS whether to use SSL/TLS for SMTP
 	SMTPEnableTLS bool `json:"enable_ssl_tls"`
 	// SMTPAuthenticationMethod authentication method smtp server will use
