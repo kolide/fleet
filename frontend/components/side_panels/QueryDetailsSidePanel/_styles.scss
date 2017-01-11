@@ -53,13 +53,16 @@
       margin-right: 12px;
       color: $text-medium;
     }
+  }
 
-    a {
-      text-decoration: none;
+  &__pack-name {
+    @include ellipsis(240px);
+    text-decoration: none;
+    font-size: 14px;
+    vertical-align: bottom;
 
-      &:hover {
-        text-decoration: underline;
-      }
+    &:hover {
+      text-decoration: underline;
     }
   }
 }
