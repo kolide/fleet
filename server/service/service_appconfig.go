@@ -66,24 +66,24 @@ func (svc service) SendTestEmail(ctx context.Context, config *kolide.AppConfig) 
 
 }
 
-func (svc service) ModifyAppConfig(ctx context.Context, p kolide.AppConfigPayload) (config *kolide.AppConfig, err error) {
-	oldAppConfig, appConfigErr := svc.AppConfig(ctx)
+func (svc service) ModifyAppConfig(ctx context.Context, p kolide.AppConfigPayload) (*kolide.AppConfig, error) {
+	oldAppConfig, err := svc.AppConfig(ctx)
 	if err != nil {
-		return nil, errors.Wrap(appConfigErr, "failed retrieving existing app config")
+		return nil, errors.Wrap(err, "failed retrieving existing app config")
 	}
-	config = appConfigFromAppConfigPayload(p, *oldAppConfig)
+	config := appConfigFromAppConfigPayload(p, *oldAppConfig)
 
 	if p.SMTPSettings != nil {
-		if testEmailErr := svc.SendTestEmail(ctx, config); testEmailErr != nil {
-			err = errors.Wrap(testEmailErr, "test email failed")
+		if err = svc.SendTestEmail(ctx, config); err != nil {
+			err = errors.Wrap(err, "test email failed")
 			config.SMTPConfigured = false
 		} else {
 			config.SMTPConfigured = true
 		}
 	}
 
-	if saveConfigErr := svc.ds.SaveAppConfig(config); saveConfigErr != nil {
-		err = errors.Wrap(saveConfigErr, "could not save config")
+	if err := svc.ds.SaveAppConfig(config); err != nil {
+		err = errors.Wrap(err, "could not save config")
 	}
 	return config, err
 }
