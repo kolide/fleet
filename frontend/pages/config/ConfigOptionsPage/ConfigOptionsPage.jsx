@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { noop } from 'lodash';
+import { filter, noop } from 'lodash';
 
 import Button from 'components/buttons/Button';
 import configOptionActions from 'redux/nodes/entities/config_options/actions';
@@ -33,6 +33,7 @@ export class ConfigOptionsPage extends Component {
 
   render () {
     const { configOptions } = this.props;
+    const completedOptions = filter(configOptions, (o) => o.value);
 
     return (
       <div className={`body-wrap ${baseClass} ${baseClass}__wrapper`}>
@@ -52,7 +53,7 @@ export class ConfigOptionsPage extends Component {
             SAVE OPTIONS
           </Button>
         </div>
-        <ConfigOptionsForm configOptions={configOptions} />
+        <ConfigOptionsForm configOptions={completedOptions} />
       </div>
     );
   }
