@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { filter, includes, noop, size, find } from 'lodash';
+import { filter, includes, isEqual, noop, size, find } from 'lodash';
 import { push } from 'react-router-redux';
 
 import EditPackFormWrapper from 'components/packs/EditPackFormWrapper';
@@ -86,7 +86,7 @@ export class EditPackPage extends Component {
   }
 
   componentWillReceiveProps ({ dispatch, pack, packHosts, packLabels }) {
-    if (pack && !this.props.pack) {
+    if (!isEqual(pack, this.props.pack)) {
       if (!packHosts || packHosts.length !== pack.host_ids.length) {
         dispatch(hostActions.loadAll());
       }
