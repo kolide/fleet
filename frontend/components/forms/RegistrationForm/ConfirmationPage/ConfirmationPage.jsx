@@ -26,7 +26,6 @@ class ConfirmationPage extends Component {
         username,
       },
     } = this.props;
-    const { onSubmit } = this;
 
     const confirmRegClasses = classnames(className, baseClass);
 
@@ -64,7 +63,7 @@ class ConfirmationPage extends Component {
           </div>
         </div>
 
-        <Button type="submit" variant="gradient" className={`${baseClass}__submit`}>
+        <Button type="submit" variant="gradient" className={`${baseClass}__submit`} autofocus>
           Finish
         </Button>
       </form>

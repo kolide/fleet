@@ -34,12 +34,12 @@ class OrgDetails extends Component {
           />
           <InputFieldWithIcon
             {...fields.org_logo_url}
-            placeholder="Organization Logo URL"
+            placeholder="Organization Logo URL (optional)"
             tabIndex={tabIndex}
             hint="must start with https://"
           />
         </div>
-        <Button type="submit" variant="gradient" tabIndex={tabIndex}>
+        <Button type="submit" variant="gradient" tabIndex={tabIndex} disabled={!currentPage}>
           Submit
         </Button>
       </form>

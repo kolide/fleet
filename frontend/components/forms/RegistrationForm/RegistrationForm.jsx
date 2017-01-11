@@ -48,7 +48,9 @@ class RegistrationForm extends Component {
     return onNextPage();
   }
 
-  onSubmitConfirmation = () => {
+  onSubmitConfirmation = (evt) => {
+    evt.preventDefault();
+
     const { formData } = this.state;
     const { onSubmit: handleSubmit } = this.props;
 
@@ -138,7 +140,7 @@ class RegistrationForm extends Component {
   }
 
   render () {
-    const { onSubmit, page } = this.props;
+    const { page } = this.props;
     const { formData } = this.state;
     const { isCurrentPage, onPageFormSubmit, renderContent } = this;
 

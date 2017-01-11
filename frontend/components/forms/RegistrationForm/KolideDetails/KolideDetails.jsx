@@ -33,7 +33,7 @@ class KolideDetails extends Component {
             hint={['Don’t include ', <code key="hint">/v1</code>, ' or any other path']}
           />
         </div>
-        <Button type="submit" variant="gradient" tabIndex={tabIndex}>
+        <Button type="submit" variant="gradient" tabIndex={tabIndex} disabled={!currentPage}>
           Submit
         </Button>
       </form>

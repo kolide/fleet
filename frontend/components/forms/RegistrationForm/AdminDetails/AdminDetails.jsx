@@ -34,6 +34,7 @@ class AdminDetails extends Component {
             iconName="username"
             placeholder="Username"
             tabIndex={tabIndex}
+            autofocus={currentPage}
           />
           <InputFieldWithIcon
             {...fields.password}
@@ -56,7 +57,7 @@ class AdminDetails extends Component {
             tabIndex={tabIndex}
           />
         </div>
-        <Button type="submit" variant="gradient" tabIndex={tabIndex}>
+        <Button type="submit" variant="gradient" tabIndex={tabIndex} disabled={!currentPage}>
           Submit
         </Button>
       </form>

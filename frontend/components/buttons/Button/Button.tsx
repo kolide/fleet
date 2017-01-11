@@ -4,6 +4,7 @@ const classnames = require('classnames');
 const baseClass = 'button';
 
 interface IButtonProps {
+  autofocus: boolean;
   children: React.ReactChild;
   className: string;
   disabled: boolean;
@@ -17,12 +18,29 @@ interface IButtonProps {
 
 interface IButtonState {}
 
+interface Inputs {
+  button?: HTMLButtonElement;
+}
+
 class Button extends React.Component<IButtonProps, IButtonState> {
+  inputs: Inputs = {};
+
   static defaultProps = {
     size: '',
     type: 'button',
     variant: 'default',
   };
+
+  componentDidMount () {
+    const { autofocus } = this.props;
+    const { inputs: { button } } = this;
+
+    if (autofocus && button) {
+      button.focus();
+    }
+
+    return false;
+  }
 
   handleClick = (evt: React.MouseEvent<HTMLButtonElement>) => {
     const { disabled, onClick } = this.props;
@@ -54,6 +72,7 @@ class Button extends React.Component<IButtonProps, IButtonState> {
         tabIndex={tabIndex}
         type={type}
         title={title}
+        ref={(b) => this.inputs.button = b}
       >
         {children}
       </button>
