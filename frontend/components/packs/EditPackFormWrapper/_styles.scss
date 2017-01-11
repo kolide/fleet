@@ -4,6 +4,7 @@
   }
 
   &__title {
+    @include ellipsis(80%);
     font-size: 24px;
     font-weight: $light;
     letter-spacing: -0.5px;
@@ -22,5 +23,6 @@
     line-height: 2;
     color: $text-medium;
     max-width: 800px;
+    word-wrap: break-word;
   }
 }
