@@ -353,6 +353,7 @@ class Kolide extends Base {
   updateConfig = (formData) => {
     const { CONFIG } = endpoints;
     const configData = helpers.formatConfigDataForServer(formData);
+    configData.smtp_settings.port = parseInt(configData.smtp_settings.port);
 
     return this.authenticatedPatch(this.endpoint(CONFIG), JSON.stringify(configData));
   }
