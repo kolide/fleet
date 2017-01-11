@@ -78,12 +78,8 @@ func (svc service) ModifyAppConfig(ctx context.Context, p kolide.AppConfigPayloa
 			if err != nil {
 				// if there is an error, set configured to false
 				newConfig.SMTPConfigured = false
-
-				if smtpTest {
-					// if we're sending a test email, return: the test failed
-					return nil, mailError{
-						message: err.Error(),
-					}
+				return nil, mailError{
+					message: err.Error(),
 				}
 			} else {
 				// if there was not an error sending the test email, set
