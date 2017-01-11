@@ -2,7 +2,6 @@ import React, { Component, PropTypes } from 'react';
 import AceEditor from 'react-ace';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
-import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 import entityGetter from 'redux/utilities/entityGetter';
 import hostActions from 'redux/nodes/entities/hosts/actions';
@@ -15,13 +14,11 @@ import HostsTable from 'components/hosts/HostsTable';
 import Icon from 'components/icons/Icon';
 import osqueryTableInterface from 'interfaces/osquery_table';
 import paths from 'router/paths';
-import QueryComposer from 'components/queries/QueryComposer';
+import QueryForm from 'components/forms/queries/QueryForm';
 import QuerySidePanel from 'components/side_panels/QuerySidePanel';
-import { renderFlash } from 'redux/nodes/notifications/actions';
 import Rocker from 'components/buttons/Rocker';
 import { selectOsqueryTable } from 'redux/nodes/components/QueryPages/actions';
 import { setDisplay } from 'redux/nodes/components/ManageHostsPage/actions';
-import validateQuery from 'components/forms/validators/validate_query';
 import iconClassForLabel from 'utilities/icon_class_for_label';
 
 const NEW_LABEL_HASH = '#new_label';
@@ -33,6 +30,9 @@ export class ManageHostsPage extends Component {
     display: PropTypes.oneOf(['Grid', 'List']),
     hosts: PropTypes.arrayOf(hostInterface),
     isAddLabel: PropTypes.bool,
+    labelErrors: PropTypes.shape({
+      base: PropTypes.string,
+    }),
     labels: PropTypes.arrayOf(labelInterface),
     selectedLabel: labelInterface,
     selectedOsqueryTable: osqueryTableInterface,
@@ -122,29 +122,13 @@ export class ManageHostsPage extends Component {
 
   onSaveAddLabel = (formData) => {
     const { dispatch } = this.props;
-    const { labelQueryText } = this.state;
-
-    const { error } = validateQuery(labelQueryText);
-
-    if (error) {
-      dispatch(renderFlash('error', error));
-
-      return false;
-    }
 
     return dispatch(labelActions.create(formData))
       .then(() => {
-        this.setState({ labelQueryText: '' });
         dispatch(push('/hosts/manage'));
 
         return false;
       });
-  }
-
-  onTextEditorInputChange = (labelQueryText) => {
-    this.setState({ labelQueryText });
-
-    return false;
   }
 
   onToggleDisplay = (val) => {
@@ -239,24 +223,27 @@ export class ManageHostsPage extends Component {
 
 
   renderForm = () => {
-    const { isAddLabel } = this.props;
-    const { labelQueryText } = this.state;
+    const { isAddLabel, labelErrors } = this.props;
     const {
       onCancelAddLabel,
+      onOsqueryTableSelect,
       onSaveAddLabel,
-      onTextEditorInputChange,
     } = this;
+    const queryStub = { description: '', name: '', query: '' };
 
     if (isAddLabel) {
       return (
-        <QueryComposer
-          key="query-composer"
-          onFormCancel={onCancelAddLabel}
-          onSave={onSaveAddLabel}
-          onTextEditorInputChange={onTextEditorInputChange}
-          queryType="label"
-          queryText={labelQueryText}
-        />
+        <div className="body-wrap">
+          <QueryForm
+            key="query-composer"
+            onCancel={onCancelAddLabel}
+            onOsqueryTableSelect={onOsqueryTableSelect}
+            handleSubmit={onSaveAddLabel}
+            queryType="label"
+            query={queryStub}
+            serverErrors={labelErrors}
+          />
+        </div>
       );
     }
 
@@ -293,15 +280,7 @@ export class ManageHostsPage extends Component {
       );
     }
 
-    return (
-      <ReactCSSTransitionGroup
-        transitionName="hosts-page-side-panel"
-        transitionEnterTimeout={500}
-        transitionLeaveTimeout={0}
-      >
-        {SidePanel}
-      </ReactCSSTransitionGroup>
-    );
+    return SidePanel;
   }
 
   render () {
@@ -338,11 +317,13 @@ const mapStateToProps = (state, { location, params }) => {
     { ignoreCase: true },
   );
   const { selectedOsqueryTable } = state.components.QueryPages;
+  const labelErrors = state.entities.labels.errors;
 
   return {
     display,
     hosts,
     isAddLabel,
+    labelErrors,
     labels,
     selectedLabel,
     selectedOsqueryTable,

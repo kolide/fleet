@@ -1,6 +1,8 @@
 package kolide
 
-import "golang.org/x/net/context"
+import (
+	"golang.org/x/net/context"
+)
 
 // AppConfigStore contains method for saving and retrieving
 // application configuration
@@ -16,6 +18,7 @@ type AppConfigService interface {
 	NewAppConfig(ctx context.Context, p AppConfigPayload) (info *AppConfig, err error)
 	AppConfig(ctx context.Context) (info *AppConfig, err error)
 	ModifyAppConfig(ctx context.Context, p AppConfigPayload) (info *AppConfig, err error)
+	SendTestEmail(ctx context.Context, config *AppConfig) error
 }
 
 // SMTP settings names returned from API, these map to SMTPAuthType and
@@ -98,10 +101,6 @@ type AppConfig struct {
 	SMTPVerifySSLCerts bool `db:"smtp_verify_ssl_certs"`
 	// SMTPEnableStartTLS detects of TLS is enabled on mail server and starts to use it (default true)
 	SMTPEnableStartTLS bool `db:"smtp_enable_start_tls"`
-	// SMTPDisabled if user sets this to TRUE emails will not be sent from the application
-	SMTPEnabled bool `db:"smtp_enabled"`
-	// SMTPLastError contains error information if email test fails, it's not persisted
-	SMTPLastError string
 }
 
 // ModifyAppConfigRequest contains application configuration information
@@ -145,8 +144,6 @@ type SMTPSettings struct {
 	SMTPVerifySSLCerts bool `json:"verify_ssl_certs"`
 	// SMTPEnableStartTLS detects of TLS is enabled on mail server and starts to use it (default true)
 	SMTPEnableStartTLS bool `json:"enable_start_tls"`
-	// SMTPDisabled if user sets this to TRUE emails will not be sent from the application
-	SMTPEnabled bool `json:"email_enabled"`
 }
 
 // AppConfigPayload contains request/response format of

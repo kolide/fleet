@@ -64,6 +64,26 @@ export const validCreateScheduledQueryRequest = (bearerToken, formData) => {
     .reply(201, { scheduled_query: scheduledQueryStub });
 };
 
+export const validDestroyQueryRequest = (bearerToken, query) => {
+  return nock('http://localhost:8080', {
+    reqHeaders: {
+      Authorization: `Bearer ${bearerToken}`,
+    },
+  })
+    .delete(`/api/v1/kolide/queries/${query.id}`)
+    .reply(200, {});
+};
+
+export const validDestroyPackRequest = (bearerToken, pack) => {
+  return nock('http://localhost:8080', {
+    reqHeaders: {
+      Authorization: `Bearer ${bearerToken}`,
+    },
+  })
+    .delete(`/api/v1/kolide/packs/${pack.id}`)
+    .reply(200, {});
+};
+
 export const validDestroyScheduledQueryRequest = (bearerToken, scheduledQuery) => {
   return nock('http://localhost:8080', {
     reqHeaders: {
@@ -81,7 +101,15 @@ export const invalidGetQueryRequest = (bearerToken, queryID) => {
     },
   })
     .get(`/api/v1/kolide/queries/${queryID}`)
-    .reply(404, { error: 'resource not found' });
+    .reply(404, {
+      message: 'Resource not found',
+      errors: [
+        {
+          name: 'base',
+          reason: 'Resource not found',
+        },
+      ],
+    });
 };
 
 export const validGetQueriesRequest = (bearerToken) => {
@@ -246,7 +274,7 @@ export const validForgotPasswordRequest = () => {
 export const invalidForgotPasswordRequest = (error) => {
   return nock('http://localhost:8080')
   .post('/api/v1/kolide/forgot_password')
-  .reply(422, { error });
+  .reply(422, error);
 };
 
 export const validResetPasswordRequest = (password, token) => {
@@ -258,14 +286,14 @@ export const validResetPasswordRequest = (password, token) => {
   .reply(200, validUser);
 };
 
-export const validRevokeInviteRequest = (bearerToken, inviteID) => {
+export const validRevokeInviteRequest = (bearerToken, invite) => {
   return nock('http://localhost:8080', {
     reqheaders: {
       Authorization: `Bearer ${bearerToken}`,
     },
   })
-  .delete(`/api/v1/kolide/invites/${inviteID}`)
-  .reply(200);
+  .delete(`/api/v1/kolide/invites/${invite.id}`)
+  .reply(200, {});
 };
 
 export const invalidResetPasswordRequest = (password, token, error) => {
@@ -305,6 +333,16 @@ export const validUpdateConfigRequest = (bearerToken, configData) => {
   .reply(200, {});
 };
 
+export const validUpdatePackRequest = (bearerToken, pack, formData) => {
+  return nock('http://localhost:8080', {
+    reqHeaders: {
+      Authorization: `Bearer ${bearerToken}`,
+    },
+  })
+  .patch(`/api/v1/kolide/packs/${pack.id}`, JSON.stringify(formData))
+  .reply(200, { pack: { ...pack, ...formData } });
+};
+
 export const validUpdateQueryRequest = (bearerToken, query, formData) => {
   return nock('http://localhost:8080', {
     reqHeaders: {
@@ -330,6 +368,8 @@ export default {
   validCreatePackRequest,
   validCreateQueryRequest,
   validCreateScheduledQueryRequest,
+  validDestroyQueryRequest,
+  validDestroyPackRequest,
   validDestroyScheduledQueryRequest,
   validForgotPasswordRequest,
   validGetConfigRequest,
@@ -349,6 +389,7 @@ export default {
   validRunQueryRequest,
   validSetupRequest,
   validUpdateConfigRequest,
+  validUpdatePackRequest,
   validUpdateQueryRequest,
   validUpdateUserRequest,
   validUser,

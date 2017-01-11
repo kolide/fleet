@@ -1,17 +1,15 @@
 package kolide
 
-import (
-	"golang.org/x/net/context"
-)
+import "golang.org/x/net/context"
 
 type OsqueryService interface {
-	EnrollAgent(ctx context.Context, enrollSecret, hostIdentifier string) (string, error)
-	AuthenticateHost(ctx context.Context, nodeKey string) (*Host, error)
-	GetClientConfig(ctx context.Context) (*OsqueryConfig, error)
-	GetDistributedQueries(ctx context.Context) (map[string]string, error)
-	SubmitDistributedQueryResults(ctx context.Context, results OsqueryDistributedQueryResults) error
-	SubmitStatusLogs(ctx context.Context, logs []OsqueryStatusLog) error
-	SubmitResultLogs(ctx context.Context, logs []OsqueryResultLog) error
+	EnrollAgent(ctx context.Context, enrollSecret, hostIdentifier string) (nodeKey string, err error)
+	AuthenticateHost(ctx context.Context, nodeKey string) (host *Host, err error)
+	GetClientConfig(ctx context.Context) (config *OsqueryConfig, err error)
+	GetDistributedQueries(ctx context.Context) (queries map[string]string, err error)
+	SubmitDistributedQueryResults(ctx context.Context, results OsqueryDistributedQueryResults, statuses map[string]string) (err error)
+	SubmitStatusLogs(ctx context.Context, logs []OsqueryStatusLog) (err error)
+	SubmitResultLogs(ctx context.Context, logs []OsqueryResultLog) (err error)
 }
 
 type OsqueryDistributedQueryResults map[string][]map[string]string
@@ -52,13 +50,16 @@ type OsqueryConfig struct {
 }
 
 type OsqueryResultLog struct {
-	Name           string            `json:"name"`
-	HostIdentifier string            `json:"hostIdentifier"`
-	UnixTime       string            `json:"unixTime"`
-	CalendarTime   string            `json:"calendarTime"`
-	Columns        map[string]string `json:"columns"`
-	Action         string            `json:"action"`
-	Decorations    map[string]string `json:"decorations"`
+	Name           string `json:"name"`
+	HostIdentifier string `json:"hostIdentifier"`
+	UnixTime       string `json:"unixTime"`
+	CalendarTime   string `json:"calendarTime"`
+	// Columns stores the columns of differential queries
+	Columns map[string]string `json:"columns,omitempty"`
+	// Snapshot stores the rows and columns of snapshot queries
+	Snapshot    []map[string]string `json:"snapshot,omitempty"`
+	Action      string              `json:"action"`
+	Decorations map[string]string   `json:"decorations"`
 }
 
 type OsqueryStatusLog struct {

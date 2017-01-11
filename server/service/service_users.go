@@ -13,11 +13,7 @@ import (
 )
 
 func (svc service) NewUser(ctx context.Context, p kolide.UserPayload) (*kolide.User, error) {
-	err := svc.VerifyInvite(ctx, *p.Email, *p.InviteToken)
-	if err != nil {
-		return nil, err
-	}
-	invite, err := svc.ds.InviteByEmail(*p.Email)
+	invite, err := svc.VerifyInvite(ctx, *p.InviteToken)
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +25,8 @@ func (svc service) NewUser(ctx context.Context, p kolide.UserPayload) (*kolide.U
 	if err != nil {
 		return nil, err
 	}
-	err = svc.ds.DeleteInvite(invite)
+
+	err = svc.ds.DeleteInvite(invite.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -88,33 +85,12 @@ func (svc service) ModifyUser(ctx context.Context, userID uint, p kolide.UserPay
 		user.GravatarURL = *p.GravatarURL
 	}
 
-	if p.Password != nil {
-		err := user.SetPassword(
-			*p.Password,
-			svc.config.Auth.SaltKeySize,
-			svc.config.Auth.BcryptCost,
-		)
-		if err != nil {
-			return nil, err
-		}
-		user.AdminForcedPasswordReset = false
-	}
-
 	err = svc.saveUser(user)
 	if err != nil {
 		return nil, err
 	}
 
-	// https://github.com/kolide/kolide-ose/issues/351
-	// Calling this action last, because svc.RequestPasswordReset saves the
-	// user separately and we don't want to override the value set there
-	if p.AdminForcedPasswordReset != nil && *p.AdminForcedPasswordReset {
-		err = svc.RequestPasswordReset(ctx, user.Email)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return svc.User(ctx, userID)
+	return user, nil
 }
 
 func (svc service) User(ctx context.Context, id uint) (*kolide.User, error) {
@@ -204,29 +180,60 @@ func (svc service) ResetPassword(ctx context.Context, token, password string) er
 	return nil
 }
 
+func (svc service) PerformRequiredPasswordReset(ctx context.Context, password string) (*kolide.User, error) {
+	vc, ok := viewer.FromContext(ctx)
+	if !ok {
+		return nil, errNoContext
+	}
+	user := vc.User
+
+	if !user.AdminForcedPasswordReset {
+		return nil, errors.New("user does not require password reset")
+	}
+
+	// prevent setting the same password
+	if err := user.ValidatePassword(password); err == nil {
+		return nil, newInvalidArgumentError("new_password", "cannot reuse old password")
+	}
+
+	user.AdminForcedPasswordReset = false
+	err := svc.setNewPassword(ctx, user, password)
+	if err != nil {
+		return nil, errors.Wrap(err, "setting new password")
+	}
+
+	// Sessions should already have been cleared when the reset was
+	// required
+
+	return user, nil
+}
+
+func (svc service) RequirePasswordReset(ctx context.Context, uid uint, require bool) (*kolide.User, error) {
+	user, err := svc.ds.UserByID(uid)
+	if err != nil {
+		return nil, errors.Wrap(err, "loading user by ID")
+	}
+
+	// Require reset on next login
+	user.AdminForcedPasswordReset = require
+	if err := svc.saveUser(user); err != nil {
+		return nil, errors.Wrap(err, "saving user")
+	}
+
+	if require {
+		// Clear all of the existing sessions
+		if err := svc.DeleteSessionsForUser(ctx, user.ID); err != nil {
+			return nil, errors.Wrap(err, "deleting user sessions")
+		}
+	}
+
+	return user, nil
+}
+
 func (svc service) RequestPasswordReset(ctx context.Context, email string) error {
-	// the password reset is different depending on whether performed by an
-	// admin or a user
-	// if an admin requests a password reset, then no token is
-	// generated, instead the AdminForcedPasswordReset flag is set
 	user, err := svc.ds.UserByEmail(email)
 	if err != nil {
 		return err
-	}
-	vc, ok := viewer.FromContext(ctx)
-	if ok {
-		if vc.IsAdmin() {
-			user.AdminForcedPasswordReset = true
-			if err := svc.saveUser(user); err != nil {
-				return err
-			}
-			// Sessions should only be cleared if this is an admin
-			// forced password reset
-			if err := svc.DeleteSessionsForUser(ctx, user.ID); err != nil {
-				return err
-			}
-			return nil
-		}
 	}
 
 	random, err := kolide.RandomText(svc.config.App.TokenKeySize)

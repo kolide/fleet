@@ -20,6 +20,7 @@ func (d *Datastore) NewQuery(query *kolide.Query) (*kolide.Query, error) {
 	}
 
 	newQuery.ID = d.nextID(newQuery)
+	newQuery.Packs = []kolide.Pack{}
 	d.queries[newQuery.ID] = &newQuery
 
 	return &newQuery, nil
@@ -48,15 +49,15 @@ func (d *Datastore) SaveQuery(query *kolide.Query) error {
 	return nil
 }
 
-func (d *Datastore) DeleteQuery(query *kolide.Query) error {
+func (d *Datastore) DeleteQuery(qid uint) error {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
-	if _, ok := d.queries[query.ID]; !ok {
-		return notFound("Query").WithID(query.ID)
+	if _, ok := d.queries[qid]; !ok {
+		return notFound("Query").WithID(qid)
 	}
 
-	delete(d.queries, query.ID)
+	delete(d.queries, qid)
 	return nil
 }
 

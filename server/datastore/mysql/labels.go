@@ -34,13 +34,7 @@ func (d *Datastore) NewLabel(label *kolide.Label) (*kolide.Label, error) {
 
 // DeleteLabel soft deletes a kolide.Label
 func (d *Datastore) DeleteLabel(lid uint) error {
-	sql := `
-		UPDATE labels
-		SET deleted_at = ?, deleted = TRUE
-		WHERE id = ?
-	`
-	_, err := d.db.Exec(sql, d.clock.Now(), lid)
-	return errors.DatabaseError(err)
+	return d.deleteEntity("labels", lid)
 }
 
 // Label returns a kolide.Label identified by  lid if one exists
@@ -77,7 +71,7 @@ func (d *Datastore) LabelQueriesForHost(host *kolide.Host, cutoff time.Time) (ma
 	sqlStatment := `
 			SELECT l.id, l.query
 			FROM labels l
-			WHERE l.platform = ?
+			WHERE (l.platform = ? OR l.platform = '')
 			AND NOT l.deleted
 			AND l.id NOT IN /* subtract the set of executions that are recent enough */
 			(
@@ -139,7 +133,6 @@ func (d *Datastore) RecordLabelQueryExecutions(host *kolide.Host, results map[st
 	}
 
 	return nil
-
 }
 
 // ListLabelsForHost returns a list of kolide.Label for a given host id.

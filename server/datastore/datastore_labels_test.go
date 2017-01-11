@@ -7,8 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kolide/kolide-ose/server/datastore/inmem"
-	"github.com/kolide/kolide-ose/server/datastore/mysql"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -49,9 +47,8 @@ func testLabels(t *testing.T, db kolide.Datastore) {
 			Platform: "darwin",
 		},
 		kolide.Label{
-			Name:     "label1",
-			Query:    "query1",
-			Platform: "darwin",
+			Name:  "label1",
+			Query: "query1",
 		},
 		kolide.Label{
 			Name:     "label2",
@@ -243,6 +240,7 @@ func testSearchLabelsLimit(t *testing.T, db kolide.Datastore) {
 func testListHostsInLabel(t *testing.T, db kolide.Datastore) {
 	h1, err := db.NewHost(&kolide.Host{
 		DetailUpdateTime: time.Now(),
+		SeenTime:         time.Now(),
 		OsqueryHostID:    "1",
 		NodeKey:          "1",
 		UUID:             "1",
@@ -252,6 +250,7 @@ func testListHostsInLabel(t *testing.T, db kolide.Datastore) {
 
 	h2, err := db.NewHost(&kolide.Host{
 		DetailUpdateTime: time.Now(),
+		SeenTime:         time.Now(),
 		OsqueryHostID:    "2",
 		NodeKey:          "2",
 		UUID:             "2",
@@ -261,6 +260,7 @@ func testListHostsInLabel(t *testing.T, db kolide.Datastore) {
 
 	h3, err := db.NewHost(&kolide.Host{
 		DetailUpdateTime: time.Now(),
+		SeenTime:         time.Now(),
 		OsqueryHostID:    "3",
 		NodeKey:          "3",
 		UUID:             "3",
@@ -296,14 +296,7 @@ func testListHostsInLabel(t *testing.T, db kolide.Datastore) {
 }
 
 func testBuiltInLabels(t *testing.T, db kolide.Datastore) {
-	if i, ok := db.(*mysql.Datastore); ok {
-		err := i.Initialize()
-		require.Nil(t, err)
-	}
-	if i, ok := db.(*inmem.Datastore); ok {
-		err := i.Initialize()
-		require.Nil(t, err)
-	}
+	require.Nil(t, db.MigrateData())
 
 	hits, err := db.SearchLabels("Mac OS X")
 	require.Nil(t, err)
@@ -318,6 +311,7 @@ func testListUniqueHostsInLabels(t *testing.T, db kolide.Datastore) {
 	for i := 0; i < 4; i++ {
 		h, err := db.NewHost(&kolide.Host{
 			DetailUpdateTime: time.Now(),
+			SeenTime:         time.Now(),
 			OsqueryHostID:    strconv.Itoa(i),
 			NodeKey:          strconv.Itoa(i),
 			UUID:             strconv.Itoa(i),

@@ -43,6 +43,7 @@ func (d *Datastore) NewQuery(query *kolide.Query) (*kolide.Query, error) {
 
 	id, _ := result.LastInsertId()
 	query.ID = uint(id)
+	query.Packs = []kolide.Pack{}
 	return query, nil
 }
 
@@ -62,19 +63,8 @@ func (d *Datastore) SaveQuery(q *kolide.Query) error {
 }
 
 // DeleteQuery soft deletes Query identified by Query.ID
-func (d *Datastore) DeleteQuery(query *kolide.Query) error {
-	query.MarkDeleted(d.clock.Now())
-	sql := `
-		UPDATE queries
-			SET deleted_at = ?, deleted = true
-			WHERE id = ?
-	`
-	_, err := d.db.Exec(sql, query.DeletedAt, query.ID)
-	if err != nil {
-		return errors.DatabaseError(err)
-	}
-
-	return nil
+func (d *Datastore) DeleteQuery(qid uint) error {
+	return d.deleteEntity("queries", qid)
 }
 
 // DeleteQueries (soft) deletes the existing query objects with the provided

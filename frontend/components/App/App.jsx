@@ -3,10 +3,10 @@ import { connect } from 'react-redux';
 import { noop } from 'lodash';
 import classnames from 'classnames';
 
-import { fetchCurrentUser } from '../../redux/nodes/auth/actions';
-import { getConfig } from '../../redux/nodes/app/actions';
-import { authToken } from '../../utilities/local';
-import userInterface from '../../interfaces/user';
+import { authToken } from 'utilities/local';
+import { fetchCurrentUser } from 'redux/nodes/auth/actions';
+import { getConfig } from 'redux/nodes/app/actions';
+import userInterface from 'interfaces/user';
 
 export class App extends Component {
   static propTypes = {
@@ -62,8 +62,9 @@ export class App extends Component {
 }
 
 const mapStateToProps = (state) => {
-  const { showBackgroundImage } = state.app;
-  const { user } = state.auth;
+  const { app, auth } = state;
+  const { showBackgroundImage } = app;
+  const { user } = auth;
 
   return {
     showBackgroundImage,

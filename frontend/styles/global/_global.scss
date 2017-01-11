@@ -34,6 +34,18 @@ h3 {
   line-height: 1.2;
 }
 
+h1 {
+  font-size: 24px;
+  font-weight: $light;
+  letter-spacing: -0.5px;
+  color: $text-dark;
+  margin: 0;
+}
+
+a {
+  color: $link;
+}
+
 .wrapper {
   background: $bg-medium;
   margin: 0;
@@ -50,12 +62,22 @@ h3 {
   box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.1);
   border: solid 1px $silver;
   min-width: 610px;
+  max-width: calc(100vw - #{$nav-width} - #{$pad-base});
   box-sizing: border-box;
   margin-top: $pad-base;
   margin-right: $pad-base;
 
+  @include breakpoint(smalldesk) {
+    max-width: calc(100vw - #{$nav-tablet-width} - #{$pad-base});
+  }
+
   @at-root .has-sidebar & {
     margin-right: 0;
+    max-width: calc(100vw - #{$nav-width} - #{$pad-base} - #{$pad-base} - #{$sidepanel-width});
+
+    @include breakpoint(smalldesk) {
+      max-width: calc(100vw - #{$nav-tablet-width} - #{$pad-base} - #{$pad-base} - #{$sidepanel-width});
+    }
   }
 }
 

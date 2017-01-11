@@ -5,14 +5,20 @@ export default (formData) => {
   const {
     authentication_type: authType,
     kolide_server_url: kolideServerUrl,
+    org_name: orgName,
+    password: smtpPassword,
     sender_address: smtpSenderAddress,
     server: smtpServer,
+    port: smtpServerPort,
     user_name: smtpUserName,
-    password: smtpPassword,
   } = formData;
 
   if (!kolideServerUrl) {
     errors.kolide_server_url = 'Kolide Server URL must be present';
+  }
+
+  if (!orgName) {
+    errors.org_name = 'Organization Name must be present';
   }
 
   if (some([smtpSenderAddress, smtpPassword, smtpServer, smtpUserName])) {
@@ -22,6 +28,10 @@ export default (formData) => {
 
     if (!smtpServer) {
       errors.server = 'SMTP Server must be present';
+    }
+
+    if (!smtpServerPort) {
+      errors.server = 'SMTP Server Port must be present';
     }
 
     if (authType !== 'authtype_none') {

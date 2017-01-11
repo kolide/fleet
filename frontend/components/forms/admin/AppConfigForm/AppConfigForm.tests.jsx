@@ -7,7 +7,7 @@ import AppConfigForm from 'components/forms/admin/AppConfigForm';
 import { itBehavesLikeAFormInputElement } from 'test/helpers';
 
 describe('AppConfigForm - form', () => {
-  const form = mount(<AppConfigForm handleSubmit={noop} />);
+  const form = mount(<AppConfigForm handleSubmit={noop} smtpConfigured={false} />);
 
   describe('Organization Name input', () => {
     it('renders an input field', () => {
@@ -58,6 +58,12 @@ describe('AppConfigForm - form', () => {
   });
 
   describe('SMTP user password input', () => {
+    it('renders an HTML password input', () => {
+      const passwordField = form.find({ name: 'password' });
+
+      expect(passwordField.prop('type')).toEqual('password');
+    });
+
     it('renders an input field', () => {
       itBehavesLikeAFormInputElement(form, 'password');
     });

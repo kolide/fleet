@@ -12,7 +12,7 @@ const {
 } = helpers;
 
 describe('App - component', () => {
-  const store = { app: {}, auth: {} };
+  const store = { app: {}, auth: {}, notifications: {} };
   const mockStore = reduxMockStore(store);
   const component = mount(
     connectedComponent(ConnectedApp, { mockStore })
@@ -56,6 +56,7 @@ describe('App - component', () => {
           email: 'hi@thegnar.co',
         },
       },
+      notifications: {},
     };
     const mockStoreWithUser = reduxMockStore(storeWithUser);
     const application = connectedComponent(ConnectedApp, { mockStore: mockStoreWithUser });

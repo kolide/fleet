@@ -6,10 +6,14 @@
   box-shadow: -2px 0 8px 0 rgba($black, 0.1);
   box-sizing: border-box;
   overflow: scroll;
-  width: 320px;
+  width: $sidepanel-width;
   margin-top: $pad-base;
   margin-left: $pad-base;
   min-height: 100%;
   border-top-left-radius: 3px;
   padding-top: $pad-base;
+
+  @include breakpoint(smalldesk) {
+    width: 300px;
+  }
 }

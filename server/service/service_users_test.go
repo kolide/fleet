@@ -19,15 +19,20 @@ import (
 
 func TestAuthenticatedUser(t *testing.T) {
 	ds, err := inmem.New(config.TestConfig())
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	createTestUsers(t, ds)
 	svc, err := newTestService(ds, nil)
 	assert.Nil(t, err)
 	admin1, err := ds.User("admin1")
 	assert.Nil(t, err)
+	admin1Session, err := ds.NewSession(&kolide.Session{
+		UserID: admin1.ID,
+		Key:    "admin1",
+	})
+	assert.Nil(t, err)
 
 	ctx := context.Background()
-	ctx = viewer.NewContext(ctx, viewer.Viewer{User: admin1})
+	ctx = viewer.NewContext(ctx, viewer.Viewer{User: admin1, Session: admin1Session})
 	user, err := svc.AuthenticatedUser(ctx)
 	assert.Nil(t, err)
 	assert.Equal(t, user, admin1)
@@ -90,8 +95,6 @@ func TestRequestPasswordReset(t *testing.T) {
 
 	for _, tt := range requestPasswordResetTests {
 		t.Run("", func(t *testing.T) {
-			t.Parallel()
-			tt := tt
 			ctx := context.Background()
 			if tt.vc != nil {
 				ctx = viewer.NewContext(ctx, *tt.vc)
@@ -100,16 +103,11 @@ func TestRequestPasswordReset(t *testing.T) {
 			svc.mailService = mailer
 			serviceErr := svc.RequestPasswordReset(ctx, tt.email)
 			assert.Equal(t, tt.wantErr, serviceErr)
-			if tt.vc != nil && tt.vc.IsAdmin() {
-				assert.False(t, mailer.Invoked, "email should not be sent if reset requested by admin")
-				assert.True(t, tt.user.AdminForcedPasswordReset, "AdminForcedPasswordReset should be true if reset requested by admin")
-			} else {
-				assert.True(t, mailer.Invoked, "email should be sent if vc is not admin")
-				if serviceErr == nil {
-					req, err := ds.FindPassswordResetsByUserID(tt.user.ID)
-					assert.Nil(t, err)
-					assert.NotEmpty(t, req, "user should have at least one password reset request")
-				}
+			assert.True(t, mailer.Invoked, "email should be sent if vc is not admin")
+			if serviceErr == nil {
+				req, err := ds.FindPassswordResetsByUserID(tt.user.ID)
+				assert.Nil(t, err)
+				assert.NotEmpty(t, req, "user should have at least one password reset request")
 			}
 		})
 	}
@@ -158,7 +156,7 @@ func TestCreateUser(t *testing.T) {
 			NeedsPasswordReset: boolPtr(true),
 			Admin:              boolPtr(false),
 			InviteToken:        &invites["admin2@example.com"].Token,
-			wantErr:            errors.New("Invite with email admin2@example.com was not found in the datastore"),
+			wantErr:            errors.New("Invite with token admin2@example.com was not found in the datastore"),
 		},
 		{
 			Username:           stringPtr("admin3"),
@@ -183,12 +181,11 @@ func TestCreateUser(t *testing.T) {
 	for _, tt := range createUserTests {
 		t.Run("", func(t *testing.T) {
 			payload := kolide.UserPayload{
-				Username:                 tt.Username,
-				Password:                 tt.Password,
-				Email:                    tt.Email,
-				Admin:                    tt.Admin,
-				InviteToken:              tt.InviteToken,
-				AdminForcedPasswordReset: tt.NeedsPasswordReset,
+				Username:    tt.Username,
+				Password:    tt.Password,
+				Email:       tt.Email,
+				Admin:       tt.Admin,
+				InviteToken: tt.InviteToken,
 			}
 			user, err := svc.NewUser(ctx, payload)
 			if tt.wantErr != nil {
@@ -207,7 +204,6 @@ func TestCreateUser(t *testing.T) {
 			err = user.ValidatePassword("different_password")
 			assert.NotNil(t, err)
 
-			assert.Equal(t, user.AdminForcedPasswordReset, *tt.NeedsPasswordReset)
 			assert.Equal(t, user.Admin, *tt.Admin)
 		})
 
@@ -372,6 +368,113 @@ func TestResetPassword(t *testing.T) {
 			} else {
 				assert.Nil(t, serr)
 			}
+		})
+	}
+}
+
+func TestRequirePasswordReset(t *testing.T) {
+	ds, err := inmem.New(config.TestConfig())
+	require.Nil(t, err)
+	svc, err := newTestService(ds, nil)
+	require.Nil(t, err)
+
+	createTestUsers(t, ds)
+
+	for _, tt := range testUsers {
+		t.Run(tt.Username, func(t *testing.T) {
+			user, err := ds.User(tt.Username)
+			require.Nil(t, err)
+
+			var sessions []*kolide.Session
+			ctx := context.Background()
+
+			// Log user in
+			if tt.Enabled {
+				_, _, err = svc.Login(ctx, tt.Username, tt.PlaintextPassword)
+				require.Nil(t, err, "login unsuccesful")
+				sessions, err = svc.GetInfoAboutSessionsForUser(ctx, user.ID)
+				require.Nil(t, err)
+				require.Len(t, sessions, 1, "user should have one session")
+			}
+
+			// Reset and verify sessions destroyed
+			retUser, err := svc.RequirePasswordReset(ctx, user.ID, true)
+			require.Nil(t, err)
+			assert.True(t, retUser.AdminForcedPasswordReset)
+			checkUser, err := ds.User(tt.Username)
+			require.Nil(t, err)
+			assert.True(t, checkUser.AdminForcedPasswordReset)
+			sessions, err = svc.GetInfoAboutSessionsForUser(ctx, user.ID)
+			require.Nil(t, err)
+			require.Len(t, sessions, 0, "sessions should be destroyed")
+
+			// try undo
+			retUser, err = svc.RequirePasswordReset(ctx, user.ID, false)
+			require.Nil(t, err)
+			assert.False(t, retUser.AdminForcedPasswordReset)
+			checkUser, err = ds.User(tt.Username)
+			require.Nil(t, err)
+			assert.False(t, checkUser.AdminForcedPasswordReset)
+
+		})
+	}
+}
+
+func TestPerformRequiredPasswordReset(t *testing.T) {
+	ds, err := inmem.New(config.TestConfig())
+	require.Nil(t, err)
+	svc, err := newTestService(ds, nil)
+	require.Nil(t, err)
+
+	createTestUsers(t, ds)
+
+	for _, tt := range testUsers {
+		t.Run(tt.Username, func(t *testing.T) {
+			if !tt.Enabled {
+				return
+			}
+
+			user, err := ds.User(tt.Username)
+			require.Nil(t, err)
+
+			ctx := context.Background()
+
+			_, err = svc.RequirePasswordReset(ctx, user.ID, true)
+			require.Nil(t, err)
+
+			// should error when not logged in
+			_, err = svc.PerformRequiredPasswordReset(ctx, "new_pass")
+			require.NotNil(t, err)
+
+			session, err := ds.NewSession(&kolide.Session{
+				UserID: user.ID,
+			})
+			ctx = viewer.NewContext(ctx, viewer.Viewer{User: user, Session: session})
+
+			// should error when reset not required
+			_, err = svc.RequirePasswordReset(ctx, user.ID, false)
+			require.Nil(t, err)
+			_, err = svc.PerformRequiredPasswordReset(ctx, "new_pass")
+			require.NotNil(t, err)
+
+			_, err = svc.RequirePasswordReset(ctx, user.ID, true)
+			require.Nil(t, err)
+
+			// should error when using same password
+			_, err = svc.PerformRequiredPasswordReset(ctx, tt.PlaintextPassword)
+			require.NotNil(t, err)
+
+			// should succeed with good new password
+			u, err := svc.PerformRequiredPasswordReset(ctx, "new_pass")
+			require.Nil(t, err)
+			assert.False(t, u.AdminForcedPasswordReset)
+
+			ctx = context.Background()
+
+			// Now user should be able to login with new password
+			u, _, err = svc.Login(ctx, tt.Username, "new_pass")
+			require.Nil(t, err)
+			assert.False(t, u.AdminForcedPasswordReset)
 		})
 	}
 }

@@ -5,19 +5,20 @@ import { push } from 'react-router-redux';
 
 import configInterface from 'interfaces/config';
 import FlashMessage from 'components/FlashMessage';
-import { hideFlash } from 'redux/nodes/notifications/actions';
 import SiteNavHeader from 'components/side_panels/SiteNavHeader';
 import SiteNavSidePanel from 'components/side_panels/SiteNavSidePanel';
-import notificationInterface from 'interfaces/notification';
 import userInterface from 'interfaces/user';
+import notificationInterface from 'interfaces/notification';
+import { hideFlash } from 'redux/nodes/notifications/actions';
 
 export class CoreLayout extends Component {
   static propTypes = {
     children: PropTypes.node,
     config: configInterface,
     dispatch: PropTypes.func,
-    notifications: notificationInterface,
     user: userInterface,
+    fullWidthFlash: PropTypes.bool,
+    notifications: notificationInterface,
   };
 
   onLogoutUser = () => {
@@ -28,7 +29,7 @@ export class CoreLayout extends Component {
     return false;
   }
 
-  onRedirectTo = (path) => {
+  onNavItemClick = (path) => {
     return (evt) => {
       evt.preventDefault();
 
@@ -62,11 +63,12 @@ export class CoreLayout extends Component {
   }
 
   render () {
-    const { children, config, notifications, user } = this.props;
+    const { fullWidthFlash, notifications, children, config, user } = this.props;
+    const { onRemoveFlash, onUndoActionClick } = this;
 
     if (!user) return false;
 
-    const { onLogoutUser, onRedirectTo, onRemoveFlash, onUndoActionClick } = this;
+    const { onLogoutUser, onNavItemClick } = this;
     const { pathname } = global.window.location;
 
     return (
@@ -75,18 +77,19 @@ export class CoreLayout extends Component {
           <SiteNavHeader
             config={config}
             onLogoutUser={onLogoutUser}
-            onRedirectTo={onRedirectTo}
+            onNavItemClick={onNavItemClick}
             user={user}
           />
           <SiteNavSidePanel
             config={config}
-            onRedirectTo={onRedirectTo}
+            onNavItemClick={onNavItemClick}
             pathname={pathname}
             user={user}
           />
         </nav>
         <div className="core-wrapper">
           <FlashMessage
+            fullWidth={fullWidthFlash}
             notification={notifications}
             onRemoveFlash={onRemoveFlash}
             onUndoActionClick={onUndoActionClick}
@@ -105,9 +108,12 @@ const mapStateToProps = (state) => {
     notifications,
   } = state;
 
+  const fullWidthFlash = !user;
+
   return {
-    config,
     notifications,
+    fullWidthFlash,
+    config,
     user,
   };
 };

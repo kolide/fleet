@@ -7,18 +7,21 @@ import Avatar from 'components/Avatar';
 import Button from 'components/buttons/Button';
 import ChangePasswordForm from 'components/forms/ChangePasswordForm';
 import Icon from 'components/icons/Icon';
-import { logoutUser } from 'redux/nodes/auth/actions';
+import { logoutUser, updateUser } from 'redux/nodes/auth/actions';
 import Modal from 'components/modals/Modal';
 import { renderFlash } from 'redux/nodes/notifications/actions';
-import userActions from 'redux/nodes/entities/users/actions';
 import userInterface from 'interfaces/user';
 import UserSettingsForm from 'components/forms/UserSettingsForm';
 
 const baseClass = 'user-settings';
 
-class UserSettingsPage extends Component {
+export class UserSettingsPage extends Component {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
+    errors: PropTypes.shape({
+      username: PropTypes.string,
+      base: PropTypes.string,
+    }),
     user: userInterface,
   };
 
@@ -68,12 +71,12 @@ class UserSettingsPage extends Component {
 
   handleSubmit = (formData) => {
     const { dispatch, user } = this.props;
-    const { update } = userActions;
 
-    return dispatch(update(user, formData))
+    return dispatch(updateUser(user, formData))
       .then(() => {
         return dispatch(renderFlash('success', 'Account updated!'));
-      });
+      })
+      .catch(() => false);
   }
 
   handleSubmitPasswordForm = (formData) => {
@@ -107,20 +110,26 @@ class UserSettingsPage extends Component {
 
   render () {
     const { handleSubmit, onCancel, onLogout, onShowModal, renderModal } = this;
-    const { user } = this.props;
+    const { errors, user } = this.props;
 
     if (!user) {
       return false;
     }
 
-    const { updated_at: updatedAt } = user;
+    const { admin, updated_at: updatedAt } = user;
+    const roleText = admin ? 'ADMIN' : 'USER';
     const lastUpdatedAt = moment(updatedAt).fromNow();
 
     return (
       <div className={baseClass}>
         <div className={`${baseClass}__manage body-wrap`}>
           <h1>Manage User Settings</h1>
-          <UserSettingsForm formData={user} handleSubmit={handleSubmit} onCancel={onCancel} />
+          <UserSettingsForm
+            formData={user}
+            handleSubmit={handleSubmit}
+            onCancel={onCancel}
+            serverErrors={errors}
+          />
         </div>
         <div className={`${baseClass}__additional body-wrap`}>
           <h1>Additional Info</h1>
@@ -132,7 +141,7 @@ class UserSettingsPage extends Component {
 
           <div className={`${baseClass}__more-info-detail`}>
             <Icon name="username" />
-            <strong>Role</strong> - USER
+            <strong>Role</strong> - {roleText}
           </div>
           <div className={`${baseClass}__more-info-detail`}>
             <Icon name="lock-big" />
@@ -153,9 +162,9 @@ class UserSettingsPage extends Component {
 }
 
 const mapStateToProps = (state) => {
-  const { user } = state.auth;
+  const { errors, user } = state.auth;
 
-  return { user };
+  return { errors, user };
 };
 
 export default connect(mapStateToProps)(UserSettingsPage);

@@ -19,6 +19,7 @@ var testFunctions = [...]func(*testing.T, kolide.Datastore){
 	testOrgInfo,
 	testCreateInvite,
 	testInviteByEmail,
+	testInviteByToken,
 	testListInvites,
 	testDeleteInvite,
 	testSaveInvite,
@@ -63,4 +64,7 @@ var testFunctions = [...]func(*testing.T, kolide.Datastore){
 	testDecorators,
 	testFileIntegrityMonitoring,
 	testYARAStore,
+	testAddLabelToPackTwice,
+	testGenerateHostStatusStatistics,
+	testMarkHostSeen,
 }

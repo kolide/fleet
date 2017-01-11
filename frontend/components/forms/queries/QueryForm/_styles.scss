@@ -1,5 +1,7 @@
 .query-form {
-  margin-top: $pad-base;
+  &__wrapper {
+    padding: $base;
+  }
 
   &__query-title,
   &__query-description {
@@ -9,8 +11,29 @@
   &__button-wrap {
     text-align: right;
 
-    .button {
+    .query-form__run-query-btn,
+    .query-form__stop-query-btn {
       margin-left: $pad-xsmall;
     }
+  }
+
+  &__btn-wrapper {
+    margin-top: $base;
+    text-align: right;
+  }
+
+  &__save-query-btn,
+  &__cancel-btn {
+    margin-right: $xsmall;
+  }
+
+  &__text-editor-wrapper {
+    margin: $base 0;
+  }
+
+  &__title {
+    color: $text-medium;
+    display: inline-block;
+    font-size: $large;
   }
 }

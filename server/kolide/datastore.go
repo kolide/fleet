@@ -19,7 +19,10 @@ type Datastore interface {
 	YARAStore
 	Name() string
 	Drop() error
-	Migrate() error
+	// MigrateTables creates and migrates the table schemas
+	MigrateTables() error
+	// MigrateData populates built-in data
+	MigrateData() error
 }
 
 // NotFoundError is returned when the datastore resource cannot be found.

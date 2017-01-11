@@ -1,0 +1,61 @@
+.manage-queries-page {
+  &__delete-queries-btn {
+    font-size: 15px;
+    font-weight: $normal;
+  }
+
+  &__ctas {
+    @include flex-grow(1);
+    text-align: right;
+  }
+
+  &__query-count {
+    color: $text-dark;
+    font-size: 14px;
+    font-weight: $bold;
+    letter-spacing: -0.5px;
+    margin: 0 12px 0 0;
+    display: inline-block;
+  }
+
+  &__filter-and-cta {
+    @include display(flex);
+    margin-bottom: $pad-small;
+
+    .form-field {
+      margin: 0;
+    }
+
+    input {
+      &[name='query-filter'] {
+        width: 240px;
+      }
+    }
+  }
+
+  &__filter-queries {
+    @include flex-grow(1);
+    position: relative;
+
+    .input-field {
+      padding-left: 42px;
+    }
+
+    .kolidecon {
+      position: absolute;
+      top: 12px;
+      left: 9px;
+      font-size: 18px;
+      color: $accent-medium;
+    }
+  }
+
+  &__title {
+    margin: 0 0 12px;
+  }
+
+  &__wrapper {
+    padding: $base;
+  }
+}
+

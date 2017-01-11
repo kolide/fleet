@@ -1,5 +1,5 @@
 import React from 'react';
-import { browserHistory, IndexRedirect, IndexRoute, Route, Router } from 'react-router';
+import { browserHistory, IndexRedirect, IndexRoute, Redirect, Route, Router } from 'react-router';
 import { Provider } from 'react-redux';
 import { syncHistoryWithStore } from 'react-router-redux';
 
@@ -9,17 +9,21 @@ import AllPacksPage from 'pages/packs/AllPacksPage';
 import App from 'components/App';
 import AuthenticatedAdminRoutes from 'components/AuthenticatedAdminRoutes';
 import AuthenticatedRoutes from 'components/AuthenticatedRoutes';
+import ConfirmInvitePage from 'pages/ConfirmInvitePage';
 import CoreLayout from 'layouts/CoreLayout';
 import EditPackPage from 'pages/packs/EditPackPage';
 import LoginRoutes from 'components/LoginRoutes';
 import LogoutPage from 'pages/LogoutPage';
 import ManageHostsPage from 'pages/hosts/ManageHostsPage';
+import ManageQueriesPage from 'pages/queries/ManageQueriesPage';
 import NewHostPage from 'pages/hosts/NewHostPage';
 import PackPageWrapper from 'components/packs/PackPageWrapper';
 import PackComposerPage from 'pages/packs/PackComposerPage';
 import QueryPage from 'pages/queries/QueryPage';
 import QueryPageWrapper from 'components/queries/QueryPageWrapper';
 import RegistrationPage from 'pages/RegistrationPage';
+import Kolide404 from 'pages/Kolide404';
+import Kolide500 from 'pages/Kolide500';
 import store from 'redux/store';
 import UserSettingsPage from 'pages/UserSettingsPage';
 
@@ -31,6 +35,7 @@ const routes = (
       <Route path="/" component={App}>
         <Route path="setup" component={RegistrationPage} />
         <Route path="login" component={LoginRoutes}>
+          <Route path="invites/:invite_token" component={ConfirmInvitePage} />
           <Route path="forgot" />
           <Route path="reset" />
         </Route>
@@ -47,7 +52,7 @@ const routes = (
               <Route path="manage" component={ManageHostsPage} />
             </Route>
             <Route path="packs" component={PackPageWrapper}>
-              <Route path="all" component={AllPacksPage} />
+              <Route path="manage" component={AllPacksPage} />
               <Route path="new" component={PackComposerPage} />
               <Route path=":id">
                 <IndexRoute component={EditPackPage} />
@@ -59,6 +64,7 @@ const routes = (
               <Route path="manage(/:active_label)" component={ManageHostsPage} />
             </Route>
             <Route path="queries" component={QueryPageWrapper}>
+              <Route path="manage" component={ManageQueriesPage} />
               <Route path="new" component={QueryPage} />
               <Route path=":id" component={QueryPage} />
             </Route>
@@ -66,6 +72,9 @@ const routes = (
           </Route>
         </Route>
       </Route>
+      <Route path="/500" component={Kolide500} />
+      <Route path="/404" component={Kolide404} />
+      <Redirect from="*" to="/404" />
     </Router>
   </Provider>
 );

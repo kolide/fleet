@@ -114,6 +114,7 @@ class AppConfigForm extends Component {
         <InputField
           {...fields.password}
           label="SMTP Password"
+          type="password"
         />
         <Dropdown
           {...fields.authentication_method}
@@ -160,8 +161,7 @@ class AppConfigForm extends Component {
           </div>
           <div className={`${baseClass}__details`}>
             <p>What base URL should <strong>osqueryd</strong> clients user to connect and register with <strong>Kolide</strong>?</p>
-            <p className={`${baseClass}__note`}><strong>Note:</strong>Please ensure the URL you choose is accessible to all endpoints that need to communicate with Kolide, otherwise they will not be able to correctly register.</p>
-            <Button variant="inverse">SEND TEST</Button>
+            <p className={`${baseClass}__note`}><strong>Note:</strong> Please ensure the URL you choose is accessible to all endpoints that need to communicate with Kolide, otherwise they will not be able to correctly register.</p>
           </div>
         </div>
         <div className={`${baseClass}__section`}>
@@ -183,6 +183,7 @@ class AppConfigForm extends Component {
             <InputField
               {...fields.port}
               label="&nbsp;"
+              type="number"
             />
             <Checkbox
               {...fields.enable_ssl_tls}

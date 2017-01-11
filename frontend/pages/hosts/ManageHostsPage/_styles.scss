@@ -1,5 +1,6 @@
 .manage-hosts {
   padding: $pad-base;
+  min-height: 90vh;
 
   &__header {
     .ace-kolide {
@@ -8,12 +9,6 @@
   }
 
   &__title {
-    margin: 0;
-    font-weight: $light;
-    font-size: 20px;
-    letter-spacing: 1px;
-    color: $text-medium;
-
     .kolidecon {
       color: $text-light;
       margin-right: 15px;
@@ -59,32 +54,10 @@
   &__list {
     &--grid {
       @include display(flex);
-      @include justify-content(center);
+      @include justify-content(space-around);
       @include flex-wrap(wrap);
-      max-width: $medium-width;
+      @include align-content(center);
       margin: 0 auto;
-    }
-  }
-}
-
-.hosts-page-side-panel {
-  &-enter {
-    @include transition(margin 300ms ease-in);
-    margin-right: -250px;
-
-    &.hosts-page-side-panel-enter-active {
-      @include transition(margin 300ms ease-in);
-      margin-right: 0;
-    }
-  }
-
-  &-leave {
-    @include transition(margin 300ms ease-in);
-    margin-right: 0;
-
-    &.hosts-page-side-panel-leave-active {
-      @include transition(margin 300ms ease-in);
-      margin-right: -250px;
     }
   }
 }

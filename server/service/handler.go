@@ -1,7 +1,6 @@
 package service
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/go-kit/kit/endpoint"
@@ -25,6 +24,8 @@ type KolideEndpoints struct {
 	GetUser                        endpoint.Endpoint
 	ListUsers                      endpoint.Endpoint
 	ModifyUser                     endpoint.Endpoint
+	RequirePasswordReset           endpoint.Endpoint
+	PerformRequiredPasswordReset   endpoint.Endpoint
 	GetSessionsForUserInfo         endpoint.Endpoint
 	DeleteSessionsForUser          endpoint.Endpoint
 	GetSessionInfo                 endpoint.Endpoint
@@ -34,6 +35,7 @@ type KolideEndpoints struct {
 	CreateInvite                   endpoint.Endpoint
 	ListInvites                    endpoint.Endpoint
 	DeleteInvite                   endpoint.Endpoint
+	VerifyInvite                   endpoint.Endpoint
 	GetQuery                       endpoint.Endpoint
 	ListQueries                    endpoint.Endpoint
 	CreateQuery                    endpoint.Endpoint
@@ -60,12 +62,10 @@ type KolideEndpoints struct {
 	ListLabels                     endpoint.Endpoint
 	CreateLabel                    endpoint.Endpoint
 	DeleteLabel                    endpoint.Endpoint
-	AddLabelToPack                 endpoint.Endpoint
-	GetLabelsForPack               endpoint.Endpoint
-	DeleteLabelFromPack            endpoint.Endpoint
 	GetHost                        endpoint.Endpoint
 	DeleteHost                     endpoint.Endpoint
 	ListHosts                      endpoint.Endpoint
+	GetHostSummary                 endpoint.Endpoint
 	SearchTargets                  endpoint.Endpoint
 	GetOptions                     endpoint.Endpoint
 	ModifyOptions                  endpoint.Endpoint
@@ -80,6 +80,7 @@ func MakeKolideServerEndpoints(svc kolide.Service, jwtKey string) KolideEndpoint
 		ForgotPassword: makeForgotPasswordEndpoint(svc),
 		ResetPassword:  makeResetPasswordEndpoint(svc),
 		CreateUser:     makeCreateUserEndpoint(svc),
+		VerifyInvite:   makeVerifyInviteEndpoint(svc),
 
 		// Authenticated user endpoints
 		// Each of these endpoints should have exactly one
@@ -88,11 +89,15 @@ func MakeKolideServerEndpoints(svc kolide.Service, jwtKey string) KolideEndpoint
 		// stricter/different checks and should NOT also use
 		// canPerformActions (these other checks should also call
 		// canPerformActions if that is appropriate).
-		Me:                             authenticatedUser(jwtKey, svc, canPerformActions(makeGetSessionUserEndpoint(svc))),
-		ChangePassword:                 authenticatedUser(jwtKey, svc, canPerformActions(makeChangePasswordEndpoint(svc))),
-		GetUser:                        authenticatedUser(jwtKey, svc, canReadUser(makeGetUserEndpoint(svc))),
-		ListUsers:                      authenticatedUser(jwtKey, svc, canPerformActions(makeListUsersEndpoint(svc))),
-		ModifyUser:                     authenticatedUser(jwtKey, svc, validateModifyUserRequest(makeModifyUserEndpoint(svc))),
+		Me:                   authenticatedUser(jwtKey, svc, canPerformActions(makeGetSessionUserEndpoint(svc))),
+		ChangePassword:       authenticatedUser(jwtKey, svc, canPerformActions(makeChangePasswordEndpoint(svc))),
+		GetUser:              authenticatedUser(jwtKey, svc, canReadUser(makeGetUserEndpoint(svc))),
+		ListUsers:            authenticatedUser(jwtKey, svc, canPerformActions(makeListUsersEndpoint(svc))),
+		ModifyUser:           authenticatedUser(jwtKey, svc, validateModifyUserRequest(makeModifyUserEndpoint(svc))),
+		RequirePasswordReset: authenticatedUser(jwtKey, svc, mustBeAdmin(makeRequirePasswordResetEndpoint(svc))),
+		// PerformRequiredPasswordReset needs only to authenticate the
+		// logged in user
+		PerformRequiredPasswordReset:   authenticatedUser(jwtKey, svc, makePerformRequiredPasswordResetEndpoint(svc)),
 		GetSessionsForUserInfo:         authenticatedUser(jwtKey, svc, canReadUser(makeGetInfoAboutSessionsForUserEndpoint(svc))),
 		DeleteSessionsForUser:          authenticatedUser(jwtKey, svc, canModifyUser(makeDeleteSessionsForUserEndpoint(svc))),
 		GetSessionInfo:                 authenticatedUser(jwtKey, svc, mustBeAdmin(makeGetInfoAboutSessionEndpoint(svc))),
@@ -121,14 +126,12 @@ func MakeKolideServerEndpoints(svc kolide.Service, jwtKey string) KolideEndpoint
 		DeleteScheduledQuery:      authenticatedUser(jwtKey, svc, makeDeleteScheduledQueryEndpoint(svc)),
 		GetHost:                   authenticatedUser(jwtKey, svc, makeGetHostEndpoint(svc)),
 		ListHosts:                 authenticatedUser(jwtKey, svc, makeListHostsEndpoint(svc)),
+		GetHostSummary:            authenticatedUser(jwtKey, svc, makeGetHostSummaryEndpoint(svc)),
 		DeleteHost:                authenticatedUser(jwtKey, svc, makeDeleteHostEndpoint(svc)),
 		GetLabel:                  authenticatedUser(jwtKey, svc, makeGetLabelEndpoint(svc)),
 		ListLabels:                authenticatedUser(jwtKey, svc, makeListLabelsEndpoint(svc)),
 		CreateLabel:               authenticatedUser(jwtKey, svc, makeCreateLabelEndpoint(svc)),
 		DeleteLabel:               authenticatedUser(jwtKey, svc, makeDeleteLabelEndpoint(svc)),
-		AddLabelToPack:            authenticatedUser(jwtKey, svc, makeAddLabelToPackEndpoint(svc)),
-		GetLabelsForPack:          authenticatedUser(jwtKey, svc, makeGetLabelsForPackEndpoint(svc)),
-		DeleteLabelFromPack:       authenticatedUser(jwtKey, svc, makeDeleteLabelFromPackEndpoint(svc)),
 		SearchTargets:             authenticatedUser(jwtKey, svc, makeSearchTargetsEndpoint(svc)),
 		GetOptions:                authenticatedUser(jwtKey, svc, mustBeAdmin(makeGetOptionsEndpoint(svc))),
 		ModifyOptions:             authenticatedUser(jwtKey, svc, mustBeAdmin(makeModifyOptionsEndpoint(svc))),
@@ -154,6 +157,8 @@ type kolideHandlers struct {
 	GetUser                        http.Handler
 	ListUsers                      http.Handler
 	ModifyUser                     http.Handler
+	RequirePasswordReset           http.Handler
+	PerformRequiredPasswordReset   http.Handler
 	GetSessionsForUserInfo         http.Handler
 	DeleteSessionsForUser          http.Handler
 	GetSessionInfo                 http.Handler
@@ -163,6 +168,7 @@ type kolideHandlers struct {
 	CreateInvite                   http.Handler
 	ListInvites                    http.Handler
 	DeleteInvite                   http.Handler
+	VerifyInvite                   http.Handler
 	GetQuery                       http.Handler
 	ListQueries                    http.Handler
 	CreateQuery                    http.Handler
@@ -189,12 +195,10 @@ type kolideHandlers struct {
 	ListLabels                     http.Handler
 	CreateLabel                    http.Handler
 	DeleteLabel                    http.Handler
-	AddLabelToPack                 http.Handler
-	GetLabelsForPack               http.Handler
-	DeleteLabelFromPack            http.Handler
 	GetHost                        http.Handler
 	DeleteHost                     http.Handler
 	ListHosts                      http.Handler
+	GetHostSummary                 http.Handler
 	SearchTargets                  http.Handler
 	GetOptions                     http.Handler
 	ModifyOptions                  http.Handler
@@ -216,6 +220,8 @@ func makeKolideKitHandlers(ctx context.Context, e KolideEndpoints, opts []kithtt
 		GetUser:                        newServer(e.GetUser, decodeGetUserRequest),
 		ListUsers:                      newServer(e.ListUsers, decodeListUsersRequest),
 		ModifyUser:                     newServer(e.ModifyUser, decodeModifyUserRequest),
+		RequirePasswordReset:           newServer(e.RequirePasswordReset, decodeRequirePasswordResetRequest),
+		PerformRequiredPasswordReset:   newServer(e.PerformRequiredPasswordReset, decodePerformRequiredPasswordResetRequest),
 		GetSessionsForUserInfo:         newServer(e.GetSessionsForUserInfo, decodeGetInfoAboutSessionsForUserRequest),
 		DeleteSessionsForUser:          newServer(e.DeleteSessionsForUser, decodeDeleteSessionsForUserRequest),
 		GetSessionInfo:                 newServer(e.GetSessionInfo, decodeGetInfoAboutSessionRequest),
@@ -225,6 +231,7 @@ func makeKolideKitHandlers(ctx context.Context, e KolideEndpoints, opts []kithtt
 		CreateInvite:                   newServer(e.CreateInvite, decodeCreateInviteRequest),
 		ListInvites:                    newServer(e.ListInvites, decodeListInvitesRequest),
 		DeleteInvite:                   newServer(e.DeleteInvite, decodeDeleteInviteRequest),
+		VerifyInvite:                   newServer(e.VerifyInvite, decodeVerifyInviteRequest),
 		GetQuery:                       newServer(e.GetQuery, decodeGetQueryRequest),
 		ListQueries:                    newServer(e.ListQueries, decodeListQueriesRequest),
 		CreateQuery:                    newServer(e.CreateQuery, decodeCreateQueryRequest),
@@ -251,12 +258,10 @@ func makeKolideKitHandlers(ctx context.Context, e KolideEndpoints, opts []kithtt
 		ListLabels:                    newServer(e.ListLabels, decodeListLabelsRequest),
 		CreateLabel:                   newServer(e.CreateLabel, decodeCreateLabelRequest),
 		DeleteLabel:                   newServer(e.DeleteLabel, decodeDeleteLabelRequest),
-		AddLabelToPack:                newServer(e.AddLabelToPack, decodeAddLabelToPackRequest),
-		GetLabelsForPack:              newServer(e.GetLabelsForPack, decodeGetLabelsForPackRequest),
-		DeleteLabelFromPack:           newServer(e.DeleteLabelFromPack, decodeDeleteLabelFromPackRequest),
 		GetHost:                       newServer(e.GetHost, decodeGetHostRequest),
 		DeleteHost:                    newServer(e.DeleteHost, decodeDeleteHostRequest),
 		ListHosts:                     newServer(e.ListHosts, decodeListHostsRequest),
+		GetHostSummary:                newServer(e.GetHostSummary, decodeNoParamsRequest),
 		SearchTargets:                 newServer(e.SearchTargets, decodeSearchTargetsRequest),
 		GetOptions:                    newServer(e.GetOptions, decodeNoParamsRequest),
 		ModifyOptions:                 newServer(e.ModifyOptions, decodeModifyOptionsRequest),
@@ -308,11 +313,13 @@ func attachKolideAPIRoutes(r *mux.Router, h *kolideHandlers) {
 	r.Handle("/api/v1/kolide/reset_password", h.ResetPassword).Methods("POST").Name("reset_password")
 	r.Handle("/api/v1/kolide/me", h.Me).Methods("GET").Name("me")
 	r.Handle("/api/v1/kolide/change_password", h.ChangePassword).Methods("POST").Name("change_password")
+	r.Handle("/api/v1/kolide/perform_required_password_reset", h.PerformRequiredPasswordReset).Methods("POST").Name("perform_required_password_reset")
 
 	r.Handle("/api/v1/kolide/users", h.ListUsers).Methods("GET").Name("list_users")
 	r.Handle("/api/v1/kolide/users", h.CreateUser).Methods("POST").Name("create_user")
 	r.Handle("/api/v1/kolide/users/{id}", h.GetUser).Methods("GET").Name("get_user")
 	r.Handle("/api/v1/kolide/users/{id}", h.ModifyUser).Methods("PATCH").Name("modify_user")
+	r.Handle("/api/v1/kolide/users/{id}/require_password_reset", h.RequirePasswordReset).Methods("POST").Name("require_password_reset")
 	r.Handle("/api/v1/kolide/users/{id}/sessions", h.GetSessionsForUserInfo).Methods("GET").Name("get_session_for_user")
 	r.Handle("/api/v1/kolide/users/{id}/sessions", h.DeleteSessionsForUser).Methods("DELETE").Name("delete_session_for_user")
 
@@ -324,6 +331,7 @@ func attachKolideAPIRoutes(r *mux.Router, h *kolideHandlers) {
 	r.Handle("/api/v1/kolide/invites", h.CreateInvite).Methods("POST").Name("create_invite")
 	r.Handle("/api/v1/kolide/invites", h.ListInvites).Methods("GET").Name("list_invites")
 	r.Handle("/api/v1/kolide/invites/{id}", h.DeleteInvite).Methods("DELETE").Name("delete_invite")
+	r.Handle("/api/v1/kolide/invites/{token}", h.VerifyInvite).Methods("GET").Name("verify_invite")
 
 	r.Handle("/api/v1/kolide/queries/{id}", h.GetQuery).Methods("GET").Name("get_query")
 	r.Handle("/api/v1/kolide/queries", h.ListQueries).Methods("GET").Name("list_queries")
@@ -347,11 +355,9 @@ func attachKolideAPIRoutes(r *mux.Router, h *kolideHandlers) {
 	r.Handle("/api/v1/kolide/labels", h.ListLabels).Methods("GET").Name("list_labels")
 	r.Handle("/api/v1/kolide/labels", h.CreateLabel).Methods("POST").Name("create_label")
 	r.Handle("/api/v1/kolide/labels/{id}", h.DeleteLabel).Methods("DELETE").Name("delete_label")
-	r.Handle("/api/v1/kolide/packs/{pid}/labels/{lid}", h.AddLabelToPack).Methods("POST").Name("add_label_to_pack")
-	r.Handle("/api/v1/kolide/packs/{pid}/labels", h.GetLabelsForPack).Methods("GET").Name("get_labels_for_pack")
-	r.Handle("/api/v1/kolide/packs/{pid}/labels/{lid}", h.DeleteLabelFromPack).Methods("DELETE").Name("delete_label_from_pack")
 
 	r.Handle("/api/v1/kolide/hosts", h.ListHosts).Methods("GET").Name("list_hosts")
+	r.Handle("/api/v1/kolide/host_summary", h.GetHostSummary).Methods("GET").Name("get_host_summary")
 	r.Handle("/api/v1/kolide/hosts/{id}", h.GetHost).Methods("GET").Name("get_host")
 	r.Handle("/api/v1/kolide/hosts/{id}", h.DeleteHost).Methods("DELETE").Name("delete_host")
 
@@ -375,7 +381,6 @@ func attachKolideAPIRoutes(r *mux.Router, h *kolideHandlers) {
 func WithSetup(svc kolide.Service, logger kitlog.Logger, next http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		configRouter := http.NewServeMux()
-		configRouter.Handle("/api/v1/kolide/config", http.HandlerFunc(forceSetup))
 		configRouter.Handle("/api/v1/setup", kithttp.NewServer(
 			context.Background(),
 			makeSetupEndpoint(svc),
@@ -390,12 +395,24 @@ func WithSetup(svc kolide.Service, logger kitlog.Logger, next http.Handler) http
 	}
 }
 
-func forceSetup(w http.ResponseWriter, r *http.Request) {
-	response := map[string]bool{
-		"require_setup": true,
-	}
-	if err := json.NewEncoder(w).Encode(&response); err != nil {
-		encodeError(context.Background(), err, w)
+// RedirectLoginToSetup detects if the setup endpoint should be used. If setup is required it redirect all
+// frontend urls to /setup, otherwise the frontend router is used.
+func RedirectLoginToSetup(svc kolide.Service, logger kitlog.Logger, next http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		redirect := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.Path == "/setup" {
+				next.ServeHTTP(w, r)
+				return
+			}
+			newURL := r.URL
+			newURL.Path = "/setup"
+			http.Redirect(w, r, newURL.String(), http.StatusTemporaryRedirect)
+		})
+		if RequireSetup(svc, logger) {
+			redirect.ServeHTTP(w, r)
+		} else {
+			next.ServeHTTP(w, r)
+		}
 	}
 }
 

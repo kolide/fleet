@@ -36,10 +36,10 @@ type LabelStore interface {
 }
 
 type LabelService interface {
-	ListLabels(ctx context.Context, opt ListOptions) ([]*Label, error)
-	GetLabel(ctx context.Context, id uint) (*Label, error)
-	NewLabel(ctx context.Context, p LabelPayload) (*Label, error)
-	DeleteLabel(ctx context.Context, id uint) error
+	ListLabels(ctx context.Context, opt ListOptions) (labels []*Label, err error)
+	GetLabel(ctx context.Context, id uint) (label *Label, err error)
+	NewLabel(ctx context.Context, p LabelPayload) (label *Label, err error)
+	DeleteLabel(ctx context.Context, id uint) (err error)
 }
 
 type LabelPayload struct {
@@ -53,10 +53,10 @@ type LabelPayload struct {
 type LabelType uint
 
 const (
-	// LabelTypeDefault - the label can change, this is the default
-	LabelTypeDefault LabelType = iota
-	// LabelTypeBuiltIn - this type of label is created by Kolide on start up
-	// and can't be removed by end user.
+	// LabelTypeRegular is for user created labels that can be modified.
+	LabelTypeRegular LabelType = iota
+	// LabelTypeBuiltIn is for labels built into Kolide that cannot be
+	// modified by users.
 	LabelTypeBuiltIn
 )
 

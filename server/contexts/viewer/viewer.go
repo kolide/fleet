@@ -56,6 +56,15 @@ func (v Viewer) Username() string {
 	return "none"
 }
 
+// FullName is a helper that enables quick access to the full name of the
+// current user.
+func (v Viewer) FullName() string {
+	if v.User != nil {
+		return v.User.Name
+	}
+	return "none"
+}
+
 // SessionID returns the current user's session ID
 func (v Viewer) SessionID() uint {
 	if v.Session != nil {
@@ -68,7 +77,16 @@ func (v Viewer) SessionID() uint {
 // account
 func (v Viewer) IsLoggedIn() bool {
 	if v.User != nil {
-		return v.User.Enabled
+		if !v.User.Enabled {
+			return false
+		}
+	}
+	if v.Session != nil {
+		// Without having access to a service to call GetInfoAboutSession(id),
+		// we can't synchronously check the database here.
+		if v.Session.ID != 0 {
+			return true
+		}
 	}
 	return false
 }

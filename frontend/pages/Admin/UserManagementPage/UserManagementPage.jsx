@@ -17,7 +17,16 @@ class UserManagementPage extends Component {
   static propTypes = {
     currentUser: userInterface,
     dispatch: PropTypes.func,
+    inviteErrors: PropTypes.shape({
+      base: PropTypes.string,
+      email: PropTypes.string,
+    }),
     invites: PropTypes.arrayOf(inviteInterface),
+    userErrors: PropTypes.shape({
+      base: PropTypes.string,
+      name: PropTypes.string,
+      username: PropTypes.string,
+    }),
     users: PropTypes.arrayOf(userInterface),
   };
 
@@ -46,7 +55,7 @@ class UserManagementPage extends Component {
 
   onUserActionSelect = (user, action) => {
     const { currentUser, dispatch } = this.props;
-    const { update } = userActions;
+    const { update, requirePasswordReset } = userActions;
 
     if (action) {
       switch (action) {
@@ -79,15 +88,14 @@ class UserManagementPage extends Component {
               return dispatch(renderFlash('success', 'User promoted to admin', update(user, { admin: false })));
             });
         case 'reset_password':
-          return dispatch(update(user, { force_password_reset: true }))
+          return dispatch(requirePasswordReset(user, { require: true }))
             .then(() => {
-              return dispatch(renderFlash('success', 'User forced to reset password', update(user, { force_password_reset: false })));
+              return dispatch(renderFlash('success', 'User required to reset password', requirePasswordReset(user, { require: false })));
             });
         case 'revert_invitation':
           return dispatch(inviteActions.destroy(user))
-            .then(() => {
-              return dispatch(renderFlash('success', 'Invite revoked'));
-            });
+            .then(() => dispatch(renderFlash('success', 'Invite revoked')))
+            .catch(() => dispatch(renderFlash('error', 'Invite could not be revoked')));
         default:
           return false;
       }
@@ -102,9 +110,9 @@ class UserManagementPage extends Component {
 
     return dispatch(update(user, updatedUser))
       .then(() => {
-        return dispatch(
-          renderFlash('success', 'User updated', update(user, user))
-        );
+        dispatch(renderFlash('success', 'User updated', update(user, user)));
+
+        return Promise.resolve();
       });
   }
 
@@ -115,12 +123,6 @@ class UserManagementPage extends Component {
       .then(() => {
         dispatch(renderFlash('success', 'User invited'));
         return this.toggleInviteUserModal();
-      })
-      .catch((error) => {
-        const inviteError = error === 'resource already created'
-          ? 'User has already been invited'
-          : error;
-        this.setState({ inviteError });
       });
   }
 
@@ -140,8 +142,8 @@ class UserManagementPage extends Component {
     return false;
   }
 
-  renderUserBlock = (user, options = { invite: false }) => {
-    const { currentUser } = this.props;
+  renderUserBlock = (user, idx, options = { invite: false }) => {
+    const { currentUser, userErrors } = this.props;
     const { invite } = options;
     const { onEditUser, onUserActionSelect } = this;
 
@@ -149,17 +151,18 @@ class UserManagementPage extends Component {
       <UserBlock
         currentUser={currentUser}
         invite={invite}
-        key={user.email}
+        key={`${user.email}-${idx}-${invite ? 'invite' : 'user'}`}
         onEditUser={onEditUser}
         onSelect={onUserActionSelect}
         user={user}
+        userErrors={userErrors}
       />
     );
   }
 
   renderModal = () => {
-    const { currentUser } = this.props;
-    const { inviteError, showInviteUserModal } = this.state;
+    const { currentUser, inviteErrors } = this.props;
+    const { showInviteUserModal } = this.state;
     const { onInviteCancel, onInviteUserSubmit, toggleInviteUserModal } = this;
 
     if (!showInviteUserModal) {
@@ -172,7 +175,7 @@ class UserManagementPage extends Component {
         onExit={toggleInviteUserModal}
       >
         <InviteUserForm
-          error={inviteError}
+          serverErrors={inviteErrors}
           invitedBy={currentUser}
           onCancel={onInviteCancel}
           onSubmit={onInviteUserSubmit}
@@ -197,11 +200,11 @@ class UserManagementPage extends Component {
           </Button>
         </div>
         <div className={`${baseClass}__users`}>
-          {users.map((user) => {
-            return this.renderUserBlock(user);
+          {users.map((user, idx) => {
+            return this.renderUserBlock(user, idx);
           })}
-          {invites.map((user) => {
-            return this.renderUserBlock(user, { invite: true });
+          {invites.map((user, idx) => {
+            return this.renderUserBlock(user, idx, { invite: true });
           })}
         </div>
         {this.renderModal()}
@@ -215,9 +218,10 @@ const mapStateToProps = (state) => {
   const { user: currentUser } = state.auth;
   const { entities: users } = stateEntityGetter.get('users');
   const { entities: invites } = stateEntityGetter.get('invites');
+  const { errors: inviteErrors } = state.entities.invites;
+  const { errors: userErrors } = state.entities.users;
 
-  return { currentUser, invites, users };
+  return { currentUser, inviteErrors, invites, userErrors, users };
 };
 
 export default connect(mapStateToProps)(UserManagementPage);
-

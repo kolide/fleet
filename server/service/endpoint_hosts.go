@@ -8,24 +8,18 @@ import (
 	"golang.org/x/net/context"
 )
 
-const (
-	// StatusOnline host is active
-	StatusOnline string = "online"
-	// StatusOffline no communication with host for OfflineDuration
-	StatusOffline string = "offline"
-	// StatusMIA no communition with host for MIADuration
-	StatusMIA string = "mia"
-	// OfflineDuration if a host hasn't been in communition for this
-	// period it is considered offline
-	OfflineDuration time.Duration = 30 * time.Minute
-	// OfflineDuration if a host hasn't been in communition for this
-	// period it is considered MIA
-	MIADuration time.Duration = 30 * 24 * time.Hour
-)
-
 type hostResponse struct {
 	kolide.Host
-	Status string `json:"status"`
+	Status      string `json:"status"`
+	DisplayText string `json:"display_text"`
+}
+
+func hostResponseForHost(ctx context.Context, svc kolide.Service, host *kolide.Host) (*hostResponse, error) {
+	return &hostResponse{
+		Host:        *host,
+		Status:      host.Status(time.Now()),
+		DisplayText: host.HostName,
+	}, nil
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -50,7 +44,15 @@ func makeGetHostEndpoint(svc kolide.Service) endpoint.Endpoint {
 		if err != nil {
 			return getHostResponse{Err: err}, nil
 		}
-		return getHostResponse{&hostResponse{*host, svc.HostStatus(ctx, *host)}, nil}, nil
+
+		resp, err := hostResponseForHost(ctx, svc, host)
+		if err != nil {
+			return getHostResponse{Err: err}, nil
+		}
+
+		return getHostResponse{
+			Host: resp,
+		}, nil
 	}
 }
 
@@ -77,9 +79,39 @@ func makeListHostsEndpoint(svc kolide.Service) endpoint.Endpoint {
 			return listHostsResponse{Err: err}, nil
 		}
 
-		resp := listHostsResponse{Hosts: []hostResponse{}}
-		for _, host := range hosts {
-			resp.Hosts = append(resp.Hosts, hostResponse{*host, svc.HostStatus(ctx, *host)})
+		hostResponses := make([]hostResponse, len(hosts), len(hosts))
+		for i, host := range hosts {
+			h, err := hostResponseForHost(ctx, svc, host)
+			if err != nil {
+				return listHostsResponse{Err: err}, nil
+			}
+
+			hostResponses[i] = *h
+		}
+		return listHostsResponse{Hosts: hostResponses}, nil
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get Host Summary
+////////////////////////////////////////////////////////////////////////////////
+
+type getHostSummaryResponse struct {
+	kolide.HostSummary
+	Err error `json:"error,omitempty"`
+}
+
+func (r getHostSummaryResponse) error() error { return r.Err }
+
+func makeGetHostSummaryEndpoint(svc kolide.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		summary, err := svc.GetHostSummary(ctx)
+		if err != nil {
+			return getHostSummaryResponse{Err: err}, nil
+		}
+
+		resp := getHostSummaryResponse{
+			HostSummary: *summary,
 		}
 		return resp, nil
 	}

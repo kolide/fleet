@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 )
 
@@ -49,6 +50,29 @@ func decodeChangePasswordRequest(ctx context.Context, r *http.Request) (interfac
 	var req changePasswordRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, err
+	}
+	return req, nil
+}
+
+func decodeRequirePasswordResetRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	id, err := idFromRequest(r, "id")
+	if err != nil {
+		return nil, errors.Wrap(err, "getting ID from request")
+	}
+
+	var req requirePasswordResetRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, errors.Wrap(err, "decoding JSON")
+	}
+	req.ID = id
+
+	return req, nil
+}
+
+func decodePerformRequiredPasswordResetRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	var req performRequiredPasswordResetRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, errors.Wrap(err, "decoding JSON")
 	}
 	return req, nil
 }

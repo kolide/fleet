@@ -19,9 +19,20 @@ describe('ChangePasswordForm - component', () => {
     itBehavesLikeAFormInputElement(form, 'new_password_confirmation');
   });
 
+  it('renders the password fields as HTML password fields', () => {
+    const form = mount(<ChangePasswordForm handleSubmit={noop} onCancel={noop} />);
+    const passwordField = form.find({ name: 'password' });
+    const newPasswordField = form.find({ name: 'new_password' });
+    const newPasswordConfirmationField = form.find({ name: 'new_password_confirmation' });
+
+    expect(passwordField.prop('type')).toEqual('password');
+    expect(newPasswordField.prop('type')).toEqual('password');
+    expect(newPasswordConfirmationField.prop('type')).toEqual('password');
+  });
+
   it('calls the handleSubmit props with form data', () => {
     const handleSubmitSpy = createSpy();
-    const form = mount(<ChangePasswordForm handleSubmit={handleSubmitSpy} onCancel={noop} />);
+    const form = mount(<ChangePasswordForm handleSubmit={handleSubmitSpy} onCancel={noop} />).find('form');
     const expectedFormData = { password: 'password', new_password: 'new_password', new_password_confirmation: 'new_password' };
     const passwordInput = form.find({ name: 'password' }).find('input');
     const newPasswordInput = form.find({ name: 'new_password' }).find('input');
@@ -38,7 +49,7 @@ describe('ChangePasswordForm - component', () => {
 
   it('calls the onCancel prop when CANCEL is clicked', () => {
     const onCancelSpy = createSpy();
-    const form = mount(<ChangePasswordForm handleSubmit={noop} onCancel={onCancelSpy} />);
+    const form = mount(<ChangePasswordForm handleSubmit={noop} onCancel={onCancelSpy} />).find('form');
     const cancelBtn = form.find('Button').findWhere(n => n.prop('children') === 'CANCEL').find('button');
 
     cancelBtn.simulate('click');

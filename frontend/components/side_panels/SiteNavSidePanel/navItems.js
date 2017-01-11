@@ -60,15 +60,15 @@ export default (admin) => {
       name: 'Query',
       location: {
         regex: /^\/queries/,
-        pathname: '/queries',
+        pathname: '/queries/manage',
       },
       subItems: [
         {
           icon: 'query',
           name: 'Manage Queries',
           location: {
-            regex: /\/queries$/,
-            pathname: '/queries',
+            regex: /\/queries\/manage/,
+            pathname: '/queries/manage',
           },
         },
         {
@@ -86,15 +86,15 @@ export default (admin) => {
       name: 'Packs',
       location: {
         regex: /^\/packs/,
-        pathname: '/packs/all',
+        pathname: '/packs/manage',
       },
       subItems: [
         {
           icon: 'packs',
           name: 'Manage Packs',
           location: {
-            regex: /\/packs\/all/,
-            pathname: '/packs/all',
+            regex: /\/packs\/manage/,
+            pathname: '/packs/manage',
           },
         },
         {

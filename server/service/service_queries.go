@@ -32,12 +32,14 @@ func (svc service) NewQuery(ctx context.Context, p kolide.QueryPayload) (*kolide
 	vc, ok := viewer.FromContext(ctx)
 	if ok {
 		query.AuthorID = vc.UserID()
+		query.AuthorName = vc.FullName()
 	}
 
 	query, err := svc.ds.NewQuery(query)
 	if err != nil {
 		return nil, err
 	}
+
 	return query, nil
 }
 
@@ -68,17 +70,7 @@ func (svc service) ModifyQuery(ctx context.Context, id uint, p kolide.QueryPaylo
 }
 
 func (svc service) DeleteQuery(ctx context.Context, id uint) error {
-	query, err := svc.ds.Query(id)
-	if err != nil {
-		return err
-	}
-
-	err = svc.ds.DeleteQuery(query)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return svc.ds.DeleteQuery(id)
 }
 
 func (svc service) DeleteQueries(ctx context.Context, ids []uint) (uint, error) {

@@ -1,0 +1,30 @@
+.scheduled-queries-list-wrapper {
+  padding: $pad-small $pad-base;
+
+  &__query-count {
+    font-size: 20px;
+    font-weight: $light;
+    letter-spacing: -0.5px;
+    text-align: left;
+    color: $text-dark;
+  }
+
+  &__queries-list-wrapper {
+    margin-top: $pad-base;
+    clear: both;
+  }
+
+  &__search-queries-input {
+    float: left;
+    display: inline-block;
+    width: '400px';
+  }
+
+  &__query-btn {
+    float: right;
+  }
+
+  &__search-queries {
+    float: left;
+  }
+}

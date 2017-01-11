@@ -64,10 +64,31 @@ class Kolide extends Base {
       .then(response => response.scheduled);
   }
 
+  destroyQuery = ({ id }) => {
+    const { QUERIES } = endpoints;
+    const endpoint = `${this.endpoint(QUERIES)}/${id}`;
+
+    return this.authenticatedDelete(endpoint);
+  }
+
+  destroyPack = ({ id }) => {
+    const { PACKS } = endpoints;
+    const endpoint = `${this.endpoint(PACKS)}/${id}`;
+
+    return this.authenticatedDelete(endpoint);
+  }
+
   destroyScheduledQuery = ({ id }) => {
     const endpoint = `${this.endpoint('/v1/kolide/schedule')}/${id}`;
 
     return this.authenticatedDelete(endpoint);
+  }
+
+  createUser = (formData) => {
+    const { USERS } = endpoints;
+
+    return this.authenticatedPost(this.endpoint(USERS), JSON.stringify(formData))
+      .then((response) => { return response.user; });
   }
 
   forgotPassword ({ email }) {
@@ -296,9 +317,9 @@ class Kolide extends Base {
     return Base.post(resetPasswordEndpoint, JSON.stringify(formData));
   }
 
-  revokeInvite = ({ entityID }) => {
+  revokeInvite = ({ id }) => {
     const { INVITES } = endpoints;
-    const endpoint = `${this.endpoint(INVITES)}/${entityID}`;
+    const endpoint = `${this.endpoint(INVITES)}/${id}`;
 
     return this.authenticatedDelete(endpoint);
   }
@@ -332,8 +353,17 @@ class Kolide extends Base {
   updateConfig = (formData) => {
     const { CONFIG } = endpoints;
     const configData = helpers.formatConfigDataForServer(formData);
+    configData.smtp_settings.port = parseInt(configData.smtp_settings.port, 10);
 
     return this.authenticatedPatch(this.endpoint(CONFIG), JSON.stringify(configData));
+  }
+
+  updatePack = ({ id: packID }, updateParams) => {
+    const { PACKS } = endpoints;
+    const updatePackEndpoint = `${this.baseURL}${PACKS}/${packID}`;
+
+    return this.authenticatedPatch(updatePackEndpoint, JSON.stringify(updateParams))
+      .then((response) => { return response.pack; });
   }
 
   updateQuery = ({ id: queryID }, updateParams) => {
@@ -352,6 +382,30 @@ class Kolide extends Base {
       .then((response) => {
         const { user: updatedUser } = response;
 
+        return helpers.addGravatarUrlToResource(updatedUser);
+      });
+  }
+
+  requirePasswordReset = (user, { require }) => {
+    const { USERS } = endpoints;
+    const requirePasswordResetEndpoint = this.endpoint(`${USERS}/${user.id}/require_password_reset`);
+
+    return this.authenticatedPost(requirePasswordResetEndpoint, JSON.stringify({ require }))
+      .then((response) => {
+        const { user: updatedUser } = response;
+        return helpers.addGravatarUrlToResource(updatedUser);
+      });
+  }
+
+  // Perform a password reset for the currently logged in user that has had a
+  // reset required
+  performRequiredPasswordReset = ({ password }) => {
+    const { PERFORM_REQUIRED_PASSWORD_RESET } = endpoints;
+    const performRequiredPasswordResetEndpoint = this.baseURL + PERFORM_REQUIRED_PASSWORD_RESET;
+
+    return this.authenticatedPost(performRequiredPasswordResetEndpoint, JSON.stringify({ new_password: password }))
+      .then((response) => {
+        const { user: updatedUser } = response;
         return helpers.addGravatarUrlToResource(updatedUser);
       });
   }

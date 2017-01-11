@@ -2,7 +2,6 @@ package cli
 
 import (
 	"encoding/json"
-	"flag"
 	"fmt"
 	"net/http"
 	"os"
@@ -49,11 +48,9 @@ the way that the kolide server works.
 `,
 		Run: func(cmd *cobra.Command, args []string) {
 			var (
-				httpAddr = flag.String("http.addr", ":8080", "HTTP listen address")
-				ctx      = context.Background()
-				logger   kitlog.Logger
+				ctx    = context.Background()
+				logger kitlog.Logger
 			)
-			flag.Parse()
 
 			config := configManager.LoadConfig()
 
@@ -82,10 +79,7 @@ the way that the kolide server works.
 				mailService = mail.NewDevService()
 			} else {
 				const defaultMaxAttempts = 15
-
-				connString := mysql.GetMysqlConnectionString(config.Mysql)
-				ds, err = mysql.New(connString, clock.C, mysql.Logger(logger))
-
+				ds, err = mysql.New(config.Mysql, clock.C, mysql.Logger(logger))
 				if err != nil {
 					initFatal(err, "initializing datastore")
 				}
@@ -139,14 +133,16 @@ the way that the kolide server works.
 
 			httpLogger := kitlog.NewContext(logger).With("component", "http")
 
-			var apiHandler http.Handler
+			var apiHandler, frontendHandler http.Handler
 			{
+				frontendHandler = prometheus.InstrumentHandler("get_frontend", service.ServeFrontend())
 				apiHandler = service.MakeHandler(ctx, svc, config.Auth.JwtKey, httpLogger)
 				// WithSetup will check if first time setup is required
 				// By performing the same check inside main, we can make server startups
 				// more efficient after the first startup.
 				if service.RequireSetup(svc, logger) {
 					apiHandler = service.WithSetup(svc, logger, apiHandler)
+					frontendHandler = service.RedirectLoginToSetup(svc, logger, frontendHandler)
 				}
 			}
 
@@ -161,17 +157,17 @@ the way that the kolide server works.
 			http.Handle("/assets/", prometheus.InstrumentHandler("static_assets", service.ServeStaticAssets("/assets/")))
 			http.Handle("/metrics", prometheus.InstrumentHandler("metrics", promhttp.Handler()))
 			http.Handle("/api/", apiHandler)
-			http.Handle("/", prometheus.InstrumentHandler("get_frontend", service.ServeFrontend()))
+			http.Handle("/", frontendHandler)
 
 			errs := make(chan error, 2)
 			go func() {
 				if !config.Server.TLS || (devMode && !configManager.IsSet("server.tls")) {
-					logger.Log("transport", "http", "address", *httpAddr, "msg", "listening")
-					errs <- http.ListenAndServe(*httpAddr, nil)
+					logger.Log("transport", "http", "address", config.Server.Address, "msg", "listening")
+					errs <- http.ListenAndServe(config.Server.Address, nil)
 				} else {
-					logger.Log("transport", "https", "address", *httpAddr, "msg", "listening")
+					logger.Log("transport", "https", "address", config.Server.Address, "msg", "listening")
 					errs <- http.ListenAndServeTLS(
-						*httpAddr,
+						config.Server.Address,
 						config.Server.Cert,
 						config.Server.Key,
 						nil,
