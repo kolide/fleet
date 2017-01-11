@@ -4,7 +4,7 @@ const baseClass = 'kolide-spinner';
 
 const Spinner = () => {
   return (
-    <div className={baseClass}></div>
+    <div className={baseClass} />
   );
 };
 

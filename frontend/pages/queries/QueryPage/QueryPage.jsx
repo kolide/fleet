@@ -218,7 +218,7 @@ class QueryPage extends Component {
       <div className={`${baseClass}__results body-wrap`}>
         {resultBody}
       </div>
-    )
+    );
   }
 
   render () {
