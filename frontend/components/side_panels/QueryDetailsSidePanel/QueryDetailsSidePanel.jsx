@@ -63,7 +63,7 @@ class QueryDetailsSidePanel extends Component {
           wrapEnabled
         />
         <h2>Description</h2>
-        <p className={`${baseClass}__description`}>{description}</p>
+        <p className={`${baseClass}__description`}>{description || <em>No description available</em>}</p>
         <h2>Packs</h2>
         {renderPacks()}
       </SecondarySidePanelContainer>
