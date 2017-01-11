@@ -105,6 +105,10 @@ class AppConfigForm extends Component {
       return false;
     }
 
+    if (fields.user_name) {
+      fields.password.value = '************';
+    }
+
     return (
       <div className={`${baseClass}__smtp-section`}>
         <InputField
