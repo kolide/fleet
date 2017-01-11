@@ -14,7 +14,7 @@ func (svc service) NewAppConfig(ctx context.Context, p kolide.AppConfigPayload) 
 	if err != nil {
 		return nil, err
 	}
-	newConfig, err := svc.ds.NewAppConfig(fromPayload(p, *config))
+	newConfig, err := svc.ds.NewAppConfig(appConfigFromAppConfigPayload(p, *config))
 	if err != nil {
 		return nil, err
 	}
@@ -30,8 +30,8 @@ func (svc service) ModifyAppConfig(ctx context.Context, p kolide.AppConfigPayloa
 	if err != nil {
 		return nil, err
 	}
-	newConfig := fromPayload(p, *oldConfig)
-	if p.SMTPSettings != nil && p.SMTPSettings.SMTPEnabled {
+	newConfig := appConfigFromAppConfigPayload(p, *oldConfig)
+	if p.SMTPSettings != nil {
 		oldSettings := smtpSettingsFromAppConfig(oldConfig)
 		// anything changed?
 		if !reflect.DeepEqual(oldSettings, p.SMTPSettings) {
@@ -71,7 +71,7 @@ func (svc service) ModifyAppConfig(ctx context.Context, p kolide.AppConfigPayloa
 	return newConfig, nil
 }
 
-func fromPayload(p kolide.AppConfigPayload, config kolide.AppConfig) *kolide.AppConfig {
+func appConfigFromAppConfigPayload(p kolide.AppConfigPayload, config kolide.AppConfig) *kolide.AppConfig {
 	if p.OrgInfo != nil && p.OrgInfo.OrgLogoURL != nil {
 		config.OrgLogoURL = *p.OrgInfo.OrgLogoURL
 	}
@@ -125,7 +125,7 @@ func smtpSettingsFromAppConfig(config *kolide.AppConfig) *kolide.SMTPSettings {
 	}
 }
 
-func fromAppConfig(config *kolide.AppConfig) *kolide.AppConfigPayload {
+func appConfigPayloadFromAppConfig(config *kolide.AppConfig) *kolide.AppConfigPayload {
 	return &kolide.AppConfigPayload{
 		OrgInfo: &kolide.OrgInfo{
 			OrgLogoURL: &config.OrgLogoURL,
