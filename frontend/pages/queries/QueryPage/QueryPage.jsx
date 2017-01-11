@@ -19,6 +19,7 @@ import { renderFlash } from 'redux/nodes/notifications/actions';
 import { selectOsqueryTable, setSelectedTargets, setSelectedTargetsQuery } from 'redux/nodes/components/QueryPages/actions';
 import targetInterface from 'interfaces/target';
 import validateQuery from 'components/forms/validators/validate_query';
+import Spinner from 'components/loaders/Spinner';
 
 const baseClass = 'query-page';
 
@@ -199,6 +200,27 @@ class QueryPage extends Component {
     return false;
   }
 
+  renderResultsTable = () => {
+    const { campaign } = this.props;
+    let resultBody = '';
+
+    if (!campaign) {
+      return false;
+    }
+
+    if (!campaign.query_results || campaign.query_results.length < 1) {
+      resultBody = <Spinner />;
+    } else {
+      resultBody = <QueryResultsTable campaign={campaign} />;
+    }
+
+    return (
+      <div className={`${baseClass}__results body-wrap`}>
+        {resultBody}
+      </div>
+    )
+  }
+
   render () {
     const {
       onFetchTargets,
@@ -209,10 +231,10 @@ class QueryPage extends Component {
       onTargetSelect,
       onTextEditorInputChange,
       onUpdateQuery,
+      renderResultsTable,
     } = this;
     const { queryIsRunning, targetsCount } = this.state;
     const {
-      campaign,
       errors,
       query,
       selectedOsqueryTable,
@@ -239,7 +261,7 @@ class QueryPage extends Component {
               selectedOsqueryTable={selectedOsqueryTable}
             />
           </div>
-          {campaign && <div className={`${baseClass}__results body-wrap`}><QueryResultsTable campaign={campaign} /></div>}
+          {renderResultsTable()}
         </div>
         <QuerySidePanel
           onOsqueryTableSelect={onOsqueryTableSelect}
