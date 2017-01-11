@@ -17,11 +17,11 @@ func setupMySQL(t *testing.T) (ds *mysql.Datastore, teardown func()) {
 		Username: "kolide",
 		Password: "kolide",
 		Database: "kolide",
-		Address:  "127.0.0.1:3306",
+		Address:  "127.0.0.1:3307",
 	}
 
 	if h, ok := os.LookupEnv("MYSQL_PORT_3306_TCP_ADDR"); ok {
-		config.Address = h + ":3306"
+		config.Address = h + ":3307"
 	}
 
 	ds, err := mysql.New(config, clock.NewMockClock(), mysql.Logger(log.NewNopLogger()), mysql.LimitAttempts(1))
