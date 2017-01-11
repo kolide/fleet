@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"reflect"
 
 	"github.com/kolide/kolide-ose/server/contexts/viewer"
@@ -8,6 +9,24 @@ import (
 	"github.com/kolide/kolide-ose/server/mail"
 	"golang.org/x/net/context"
 )
+
+// mailError is set when an error performing mail operations
+type mailError struct {
+	message string
+}
+
+func (e mailError) Error() string {
+	return fmt.Sprintf("a mail error occurred: %s", e.message)
+}
+
+func (e mailError) MailError() []map[string]string {
+	return []map[string]string{
+		map[string]string{
+			"name":   "base",
+			"reason": e.message,
+		},
+	}
+}
 
 func (svc service) NewAppConfig(ctx context.Context, p kolide.AppConfigPayload) (*kolide.AppConfig, error) {
 	config, err := svc.ds.AppConfig()
@@ -51,10 +70,9 @@ func (svc service) ModifyAppConfig(ctx context.Context, p kolide.AppConfigPayloa
 
 			err = mail.Test(svc.mailService, testMail)
 			if err != nil {
-				// if the provided SMTP parameters don't work with the targeted SMTP server
-				// capture the error and return it to the front end so that GUI can
-				// display the problem to the end user to aid in diagnosis
-				newConfig.SMTPLastError = err.Error()
+				return nil, mailError{
+					message: err.Error(),
+				}
 			}
 			newConfig.SMTPConfigured = (err == nil)
 

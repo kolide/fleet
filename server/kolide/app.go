@@ -100,8 +100,6 @@ type AppConfig struct {
 	SMTPEnableStartTLS bool `db:"smtp_enable_start_tls"`
 	// SMTPDisabled if user sets this to TRUE emails will not be sent from the application
 	SMTPEnabled bool `db:"smtp_enabled"`
-	// SMTPLastError contains error information if email test fails, it's not persisted
-	SMTPLastError string
 }
 
 // ModifyAppConfigRequest contains application configuration information
