@@ -91,6 +91,8 @@ class ScheduledQueriesList extends Component {
       [`${baseClass}__table--query-selected`]: size(selectedScheduledQueryIDs),
     });
 
+    console.log(scheduledQueries);
+
     return (
       <div className={baseClass}>
         <table className={wrapperClassName}>
