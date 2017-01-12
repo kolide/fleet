@@ -17,7 +17,7 @@ export const normalizeTables = (tablesJSON) => {
 
   const flattenedTables = flatten(tablesWithPlatformKey);
 
-  return sortBy(flattenedTables, (table) => { return table.name });
+  return sortBy(flattenedTables, (table) => { return table.name; });
 };
 
 export const osqueryTables = normalizeTables(osqueryTablesJSON);
