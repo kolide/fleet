@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
 import { first, isEqual, values } from 'lodash';
+import classnames from 'classnames';
 
 import Kolide from 'kolide';
 import campaignActions from 'redux/nodes/entities/campaigns/actions';
@@ -202,6 +203,9 @@ class QueryPage extends Component {
 
   renderResultsTable = () => {
     const { campaign } = this.props;
+    const resultsClasses = classnames(`${baseClass}__results`, 'body-wrap', {
+      [`${baseClass}__results--loading`]: this.socket && !campaign.query_results,
+    });
     let resultBody = '';
 
     if (!campaign || !this.socket) {
@@ -215,7 +219,7 @@ class QueryPage extends Component {
     }
 
     return (
-      <div className={`${baseClass}__results body-wrap`}>
+      <div className={resultsClasses}>
         {resultBody}
       </div>
     );
