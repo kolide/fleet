@@ -208,9 +208,11 @@ class QueryPage extends Component {
     });
     let resultBody = '';
 
-    if (!campaign) {
+    if (!campaign || (!this.socket && !campaign.query_results)) {
       return false;
     }
+
+    console.log(campaign);
 
     if ((!campaign.query_results || campaign.query_results.length < 1) && this.socket) {
       resultBody = <Spinner />;
