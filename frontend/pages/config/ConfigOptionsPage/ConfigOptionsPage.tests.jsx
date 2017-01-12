@@ -84,29 +84,5 @@ describe('ConfigOptionsPage - component', () => {
         { ...configOptionStub, value: 'updated value' },
       ]);
     });
-
-    it('updates the correct config option when the config option name is changed', () => {
-      const configOptions = [configOptionStub, { id: 99, name: 'test', value: null }];
-      const page = mount(<ConfigOptionsPage configOptions={configOptions} />);
-      const form = page.find('ConfigOptionForm');
-      const dropdownField = form.find('Select');
-      const dropdownFieldInput = form.find('.Select-input').find('input');
-
-      fillInFormInput(dropdownFieldInput, 'test');
-      dropdownField.find('.Select-option').first().simulate('mousedown');
-
-      expect(page.state('configOptions')).toEqual([
-        configOptionStub,
-        { id: 99, name: 'test', value: configOptionStub.value },
-      ]);
-
-      const configOptionInput = page.find('ConfigOptionForm').find('InputField').last();
-      fillInFormInput(configOptionInput.find('input'), 'updated value');
-
-      expect(page.state('configOptions')).toEqual([
-        configOptionStub,
-        { id: 99, name: 'test', value: 'updated value' },
-      ]);
-    });
   });
 });

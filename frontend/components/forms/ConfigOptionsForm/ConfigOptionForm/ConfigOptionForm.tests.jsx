@@ -45,13 +45,21 @@ describe('ConfigOptionForm - form', () => {
     expect(spy).toHaveBeenCalledWith('name', 'my_option');
   });
 
-  it('renders the input fields as disabled when the option is read_only', () => {
-    const formData = { name: 'My option', value: 'my_option', read_only: false };
+  it('renders the input fields as disabled when the option is read_only or name and value are present', () => {
+    const formData = { name: 'My option', value: 'My value', read_only: false };
     const configNameOptions = [formData];
-    const form = mount(
+    const disabledForm = mount(
       <ConfigOptionForm
         configNameOptions={configNameOptions}
         formData={formData}
+        handleSubmit={noop}
+        onRemove={noop}
+      />
+    );
+    const enabledForm = mount(
+      <ConfigOptionForm
+        configNameOptions={configNameOptions}
+        formData={{ ...formData, value: null }}
         handleSubmit={noop}
         onRemove={noop}
       />
@@ -65,15 +73,19 @@ describe('ConfigOptionForm - form', () => {
       />
     );
 
-    const disabledNameField = readOnlyForm.find('Select').findWhere(s => s.prop('name') === 'name-select');
-    const disabledValueField = readOnlyForm.find({ name: 'value' });
-    const enabledNameField = form.find('Select').findWhere(s => s.prop('name') === 'name-select');
-    const enabledValueField = form.find({ name: 'value' });
+    const disabledNameField = disabledForm.find('Dropdown');
+    const disabledValueField = disabledForm.find({ name: 'value' });
+    const enabledNameField = enabledForm.find('Dropdown');
+    const enabledValueField = enabledForm.find({ name: 'value' });
+    const readOnlyNameField = readOnlyForm.find('Dropdown');
+    const readOnlyValueField = readOnlyForm.find({ name: 'value' });
 
     expect(disabledNameField.prop('disabled')).toEqual(true);
-    expect(disabledValueField.prop('disabled')).toEqual(true);
+    expect(disabledValueField.prop('disabled')).toEqual(false);
     expect(enabledNameField.prop('disabled')).toEqual(false);
     expect(enabledValueField.prop('disabled')).toEqual(false);
+    expect(readOnlyNameField.prop('disabled')).toEqual(true);
+    expect(readOnlyValueField.prop('disabled')).toEqual(true);
   });
 
   it('calls onRemove with the formdata when the ex icon is clicked', () => {

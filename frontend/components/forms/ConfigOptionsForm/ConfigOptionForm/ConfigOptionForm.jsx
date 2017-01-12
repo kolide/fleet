@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import { uniq } from 'lodash';
 
 import Button from 'components/buttons/Button';
 import Dropdown from 'components/forms/fields/Dropdown';
@@ -33,8 +34,10 @@ class ConfigOptionForm extends Component {
   render () {
     const { configNameOptions, fields, formData } = this.props;
     const { handleRemove } = this;
-    const { read_only: readOnly } = formData;
+    const { name, read_only: readOnly, value } = formData;
     const inputType = formData.type === 'int' ? 'number' : 'input';
+    const options = uniq(configNameOptions.concat({ label: name, value: name, disabled: readOnly || false }));
+    const disabled = readOnly || !!(name && value);
 
     return (
       <form className={baseClass}>
@@ -44,8 +47,8 @@ class ConfigOptionForm extends Component {
         <Dropdown
           {...fields.name}
           className={`${baseClass}__field`}
-          disabled={readOnly}
-          options={configNameOptions}
+          disabled={disabled}
+          options={options}
         />
         <InputField
           {...fields.value}
