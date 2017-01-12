@@ -208,7 +208,7 @@ class QueryPage extends Component {
     });
     let resultBody = '';
 
-    if (!campaign || !this.socket) {
+    if (!campaign) {
       return false;
     }
 
