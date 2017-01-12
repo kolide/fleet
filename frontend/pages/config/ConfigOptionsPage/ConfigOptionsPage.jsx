@@ -11,7 +11,7 @@ import helpers from 'pages/config/ConfigOptionsPage/helpers';
 import replaceArrayItem from 'utilities/replace_array_item';
 
 const baseClass = 'config-options-page';
-const DEFAULT_CONFIG_OPTION = { name: '', value: '', read_only: false };
+const DEFAULT_CONFIG_OPTION = { name: '', value: '' };
 
 export class ConfigOptionsPage extends Component {
   static propTypes = {
@@ -29,6 +29,7 @@ export class ConfigOptionsPage extends Component {
 
     this.state = {
       configOptions: [],
+      configOptionErrors: [],
     };
   }
 
@@ -80,11 +81,13 @@ export class ConfigOptionsPage extends Component {
 
   onOptionUpdate = (option, newOption) => {
     const { configOptions } = this.state;
-    const newConfigOptions = replaceArrayItem(configOptions, option, newOption);
+    const { configOptions: propConfigOptions } = this.props;
+    const persistedConfigOption = find(propConfigOptions, { name: newOption.name });
+    const updatedConfigOption = { ...persistedConfigOption, name: newOption.name, value: newOption.value };
 
-    this.setState({
-      configOptions: newConfigOptions,
-    });
+    const newConfigOptions = replaceArrayItem(configOptions, persistedConfigOption, updatedConfigOption);
+
+    this.setState({ configOptions: newConfigOptions });
 
     return false;
   }
@@ -128,6 +131,11 @@ export class ConfigOptionsPage extends Component {
     const { configOptions: propConfigOptions } = this.props;
 
     return difference(stateConfigOptions, propConfigOptions);
+  }
+
+  validate = () => {
+    const changedConfigOptions = this.calculateChangedOptions();
+    const configErrors = helpers.configErrorsFor(changedConfigOptions);
   }
 
   render () {

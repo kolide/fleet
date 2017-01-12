@@ -4,9 +4,10 @@ import { mount } from 'enzyme';
 
 import { ConfigOptionsPage } from 'pages/config/ConfigOptionsPage/ConfigOptionsPage';
 import { configOptionStub } from 'test/stubs';
-import { fillInFormInput } from 'test/helpers';
+import { fillInFormInput, itBehavesLikeAFormDropdownElement } from 'test/helpers';
 
 describe('ConfigOptionsPage - component', () => {
+  const blankConfigOption = { name: '', value: '' };
   const props = { configOptions: [] };
 
   it('renders', () => {
@@ -43,7 +44,6 @@ describe('ConfigOptionsPage - component', () => {
 
   describe('adding a config option', () => {
     it('adds a blank option to state', () => {
-      const blankConfigOption = { name: '', value: '', read_only: false };
       const page = mount(<ConfigOptionsPage configOptions={[configOptionStub]} />);
       const addBtn = page.find('Button').last();
 
@@ -58,7 +58,6 @@ describe('ConfigOptionsPage - component', () => {
     });
 
     it('only allows one blank config option', () => {
-      const blankConfigOption = { name: '', value: '', read_only: false };
       const page = mount(<ConfigOptionsPage configOptions={[configOptionStub]} />);
       const addBtn = page.find('Button').last();
 
@@ -83,6 +82,30 @@ describe('ConfigOptionsPage - component', () => {
 
       expect(page.state('configOptions')).toEqual([
         { ...configOptionStub, value: 'updated value' },
+      ]);
+    });
+
+    it('updates the correct config option when the config option name is changed', () => {
+      const configOptions = [configOptionStub, { id: 99, name: 'test', value: null }];
+      const page = mount(<ConfigOptionsPage configOptions={configOptions} />);
+      const form = page.find('ConfigOptionForm');
+      const dropdownField = form.find('Select');
+      const dropdownFieldInput = form.find('.Select-input').find('input');
+
+      fillInFormInput(dropdownFieldInput, 'test');
+      dropdownField.find('.Select-option').first().simulate('mousedown');
+
+      expect(page.state('configOptions')).toEqual([
+        configOptionStub,
+        { id: 99, name: 'test', value: configOptionStub.value },
+      ]);
+
+      const configOptionInput = page.find('ConfigOptionForm').find('InputField').last();
+      fillInFormInput(configOptionInput.find('input'), 'updated value');
+
+      expect(page.state('configOptions')).toEqual([
+        configOptionStub,
+        { id: 99, name: 'test', value: 'updated value' },
       ]);
     });
   });
