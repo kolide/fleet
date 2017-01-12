@@ -13,6 +13,7 @@ import queryInterface from 'interfaces/query';
 import SelectTargetsDropdown from 'components/forms/fields/SelectTargetsDropdown';
 import targetInterface from 'interfaces/target';
 import validateQuery from 'components/forms/validators/validate_query';
+import Timer from 'components/loaders/Timer';
 
 const baseClass = 'query-form';
 
@@ -212,6 +213,7 @@ class QueryForm extends Component {
           Save
         </DropdownButton>
 
+        <Timer running={queryIsRunning} />
         {runQueryButton}
       </div>
     );
