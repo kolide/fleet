@@ -242,7 +242,7 @@ export class ManageHostsPage extends Component {
       });
     }
 
-    return <HostsTable hosts={hosts} />;
+    return <HostsTable hosts={sortedHosts} />;
   }
 
 
