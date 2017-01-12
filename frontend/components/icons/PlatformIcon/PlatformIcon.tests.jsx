@@ -13,7 +13,7 @@ describe('PlatformIcon - component', () => {
     const component = mount(<PlatformIcon name="blah" />);
 
     expect(component.find('span').length).toEqual(1);
-    expect(component.text()).toInclude('blah');
+    expect(component.text()).toInclude('All');
     expect(component.find('Icon').length).toEqual(0);
   });
 });
