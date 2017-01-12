@@ -1,11 +1,65 @@
+import { filter, find, flatMap, size } from 'lodash';
+import replaceArrayItem from 'utilities/replace_array_item';
+
 const configOptionDropdownOptions = (configOptions) => {
-  return configOptions.map((option) => {
+  return flatMap(configOptions, (option) => {
+    if (option.value !== null) {
+      return [];
+    }
+
     return {
-      disabled: option.read_only,
+      disabled: option.read_only || false,
       label: option.name,
       value: option.name,
     };
   });
 };
 
-export default { configOptionDropdownOptions };
+const configErrorsFor = (changedOptions, allOptions) => {
+  const errors = {};
+
+  changedOptions.forEach((option) => {
+    const { id, name } = option;
+    const optionErrors = {};
+
+    if (!name) {
+      optionErrors.name = 'Must be present';
+    }
+
+    if (name) {
+      const configOptionsWithName = filter(allOptions, { name });
+
+      if (configOptionsWithName.length > 1) {
+        optionErrors.name = 'Must be unique';
+      }
+    }
+
+    if (size(optionErrors)) {
+      errors[id] = optionErrors;
+    }
+  });
+
+  const valid = !size(errors);
+
+  return { errors, valid };
+};
+
+const updatedConfigOptions = ({ oldOption, newOption, configOptions }) => {
+  const existingConfigOption = find(configOptions, { name: newOption.name });
+  const newValue = newOption.value || oldOption.value;
+  const updatedConfigOption = { ...existingConfigOption, name: newOption.name, value: newValue };
+
+  // we are making an update to the same option so only need to replace it
+  if (updatedConfigOption.id === oldOption.id) {
+    return replaceArrayItem(configOptions, oldOption, updatedConfigOption);
+  }
+
+  // we are changing the option name so we need to remove the other
+  // option with the same name before replacing the current option
+  const filteredConfigOptions = filter(configOptions, o => o.id !== updatedConfigOption.id);
+  const option = { ...oldOption, value: null };
+
+  return replaceArrayItem(filteredConfigOptions, oldOption, updatedConfigOption).concat(option);
+};
+
+export default { configErrorsFor, configOptionDropdownOptions, updatedConfigOptions };

@@ -8,7 +8,6 @@ import ConfigOptionsForm from 'components/forms/ConfigOptionsForm';
 import configOptionInterface from 'interfaces/config_option';
 import entityGetter from 'redux/utilities/entityGetter';
 import helpers from 'pages/config/ConfigOptionsPage/helpers';
-import replaceArrayItem from 'utilities/replace_array_item';
 
 const baseClass = 'config-options-page';
 const DEFAULT_CONFIG_OPTION = { name: '', value: '' };
@@ -29,32 +28,23 @@ export class ConfigOptionsPage extends Component {
 
     this.state = {
       configOptions: [],
-      configOptionErrors: [],
+      configOptionErrors: {},
     };
   }
 
   componentWillMount () {
     const { configOptions, dispatch } = this.props;
 
-    if (!configOptions.length) {
-      dispatch(configOptionActions.loadAll());
-
-      return false;
-    }
-
     this.setState({ configOptions });
+
+    dispatch(configOptionActions.loadAll());
 
     return false;
   }
 
   componentWillReceiveProps ({ configOptions }) {
     if (!isEqual(configOptions, this.state.configOptions)) {
-      this.setState({
-        configOptions: [
-          ...this.state.configOptions,
-          ...configOptions,
-        ],
-      });
+      this.setState({ configOptions });
     }
 
     return false;
@@ -79,13 +69,9 @@ export class ConfigOptionsPage extends Component {
     return false;
   }
 
-  onOptionUpdate = (option, newOption) => {
+  onOptionUpdate = (oldOption, newOption) => {
     const { configOptions } = this.state;
-    const { configOptions: propConfigOptions } = this.props;
-    const persistedConfigOption = find(propConfigOptions, { name: newOption.name });
-    const updatedConfigOption = { ...persistedConfigOption, name: newOption.name, value: newOption.value };
-
-    const newConfigOptions = replaceArrayItem(configOptions, persistedConfigOption, updatedConfigOption);
+    const newConfigOptions = helpers.updatedConfigOptions({ oldOption, newOption, configOptions });
 
     this.setState({ configOptions: newConfigOptions });
 
@@ -120,8 +106,16 @@ export class ConfigOptionsPage extends Component {
 
   onSave = () => {
     const changedOptions = this.calculateChangedOptions();
+    const { errors, valid } = this.validate();
 
-    console.log('changedOptions', changedOptions);
+    if (!valid) {
+      this.setState({ configOptionErrors: errors });
+      console.log('invalid', errors);
+
+      return false;
+    }
+
+    console.log('valid', changedOptions);
 
     return false;
   }
@@ -129,13 +123,16 @@ export class ConfigOptionsPage extends Component {
   calculateChangedOptions = () => {
     const { configOptions: stateConfigOptions } = this.state;
     const { configOptions: propConfigOptions } = this.props;
+    const presentStateConfigOptions = filter(stateConfigOptions, o => o.name);
 
-    return difference(stateConfigOptions, propConfigOptions);
+    return difference(presentStateConfigOptions, propConfigOptions);
   }
 
   validate = () => {
+    const { configOptions: allConfigOptions } = this.state;
     const changedConfigOptions = this.calculateChangedOptions();
-    const configErrors = helpers.configErrorsFor(changedConfigOptions);
+
+    return helpers.configErrorsFor(changedConfigOptions, allConfigOptions);
   }
 
   render () {

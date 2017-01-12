@@ -4,7 +4,7 @@ import { mount } from 'enzyme';
 
 import { ConfigOptionsPage } from 'pages/config/ConfigOptionsPage/ConfigOptionsPage';
 import { configOptionStub } from 'test/stubs';
-import { fillInFormInput, itBehavesLikeAFormDropdownElement } from 'test/helpers';
+import { fillInFormInput } from 'test/helpers';
 
 describe('ConfigOptionsPage - component', () => {
   const blankConfigOption = { name: '', value: '' };
