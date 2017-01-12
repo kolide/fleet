@@ -6,9 +6,6 @@ import classnames from 'classnames';
 import { renderFlash } from 'redux/nodes/notifications/actions';
 import Icon from 'components/icons/Icon';
 import { copyText } from './helpers';
-import AnsibleImage from '../../../../assets/images/Ansible.png';
-import ChefImage from '../../../../assets/images/Chef.png';
-import PuppetImage from '../../../../assets/images/Puppet.png';
 
 const HOST_TABS = {
   FIRST: 'What Does This Script Do?',
@@ -120,7 +117,7 @@ osqueryd
             <br />
             <p>The TLS certificate that osquery will use to communicate with Kolide is the same certificate that your browser is using to communicate with Kolide right now. Nullam sollicitudin odio vitae ipsum consequat commodo. Etiam sodales tempus erat, ut faucibus lorem aliquam et. Nam ac ligula venenatis, ultrices orci vel, suscipit odio. Nam ullamcorper euismod pellentesque. Aenean dapibus risus nec mollis imperdiet. Aenean ac faucibus elit. Nam fringilla vel eros ac pellentesque. Curabitur vulputate sollicitudin posuere. Mauris aliquet non ante eu commodo. For more information on configuring the TLS settings in osquery, see the <a href="https://osquery.readthedocs.io/en/stable/deployment/remote/#remote-authentication">osquery documentation</a></p>
             <br />
-            <p>Assuming that you're deploying your enrollment secret as the environment variable OSQUERY_ENROLL_SECRET and your osquery server certificate is at /etc/osquery/kolide.crt, you could copy and paste the following command with the following flags:</p>
+            <p>Assuming that you arere deploying your enrollment secret as the environment variable OSQUERY_ENROLL_SECRET and your osquery server certificate is at /etc/osquery/kolide.crt, you could copy and paste the following command with the following flags:</p>
             <br />
           </div>
 
