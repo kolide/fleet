@@ -204,11 +204,11 @@ class QueryPage extends Component {
     const { campaign } = this.props;
     let resultBody = '';
 
-    if (!campaign) {
+    if (!campaign || !this.socket) {
       return false;
     }
 
-    if (!campaign.query_results || campaign.query_results.length < 1) {
+    if ((!campaign.query_results || campaign.query_results.length < 1) && this.socket) {
       resultBody = <Spinner />;
     } else {
       resultBody = <QueryResultsTable campaign={campaign} />;
