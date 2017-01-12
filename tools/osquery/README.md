@@ -72,3 +72,20 @@ docker-compose rm
 ```
 
 We have had no trouble running up to 100 containerized osqueryd instances on a single processor core and about 1GB of RAM.
+
+### Generating a osqueryd core file
+
+1. Open a shell session on a container
+```
+docker exec -t -i <container id> /bin/bash
+```
+2. Find the process ID of osqueryd
+```
+ps aux
+```
+There will be two osqueryd processes, you'll probably be interested in the child process (the one with the higher pid)
+3. Send a signal to the process to core dump
+```
+kill -3 <pid>
+```
+The core file should be in your pwd
