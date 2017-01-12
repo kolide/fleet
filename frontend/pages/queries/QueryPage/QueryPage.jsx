@@ -212,8 +212,6 @@ class QueryPage extends Component {
       return false;
     }
 
-    console.log(campaign);
-
     if ((!campaign.query_results || campaign.query_results.length < 1) && this.socket) {
       resultBody = <Spinner />;
     } else {
