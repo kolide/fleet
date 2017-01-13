@@ -29,7 +29,7 @@ func (d *Datastore) NewYARASignatureGroup(ysg *kolide.YARASignatureGroup) (sg *k
 	var result sql.Result
 	result, err = txn.Exec(sqlStatement, ysg.SignatureName)
 	if err != nil {
-		return nil, errors.Wrap(err, "error creating new yara signature group")
+		return nil, errors.Wrap(err, "error inserting new yara signature group")
 	}
 	id, _ := result.LastInsertId()
 	ysg.ID = uint(id)
@@ -43,7 +43,7 @@ func (d *Datastore) NewYARASignatureGroup(ysg *kolide.YARASignatureGroup) (sg *k
 	for _, path := range ysg.Paths {
 		_, err = txn.Exec(sqlStatement, path, ysg.ID)
 		if err != nil {
-			return nil, errors.Wrap(err, "error creating new signature path")
+			return nil, errors.Wrap(err, "error inserting new signature path")
 		}
 	}
 	success = true
@@ -72,7 +72,7 @@ func (d *Datastore) NewYARAFilePath(fileSectionName, sigGroupName string) error 
   `
 	_, err := d.db.Exec(sqlStatement, fileSectionName, sigGroupName)
 	if err != nil {
-		return errors.Wrap(err, sqlStatement)
+		return errors.Wrap(err, "error inserting yara file path")
 	}
 	return nil
 }
@@ -90,13 +90,13 @@ func (d *Datastore) YARASection() (*kolide.YARASection, error) {
   `
 	rows, err := d.db.Query(sqlStatement)
 	if err != nil {
-		return nil, errors.Wrap(err, sqlStatement)
+		return nil, errors.Wrap(err, "error selecting yara information")
 	}
 	for rows.Next() {
 		var sigName, sigPath string
 		err = rows.Scan(&sigName, &sigPath)
 		if err != nil {
-			return nil, errors.Wrap(err, sqlStatement)
+			return nil, errors.Wrap(err, "error scanning yara information")
 		}
 		result.Signatures[sigName] = append(result.Signatures[sigName], sigPath)
 	}
@@ -111,13 +111,13 @@ func (d *Datastore) YARASection() (*kolide.YARASection, error) {
   `
 	rows, err = d.db.Query(sqlStatement)
 	if err != nil {
-		return nil, errors.Wrap(err, sqlStatement)
+		return nil, errors.Wrap(err, "error selecting yara signatures")
 	}
 	for rows.Next() {
 		var sectionName, signatureName string
 		err = rows.Scan(&sectionName, &signatureName)
 		if err != nil {
-			return nil, errors.Wrap(err, sqlStatement)
+			return nil, errors.Wrap(err, "error scanning yara signature values")
 		}
 		result.FilePaths[sectionName] = append(result.FilePaths[sectionName], signatureName)
 	}

@@ -4,8 +4,8 @@ import (
 	"database/sql"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
+	"github.com/pkg/errors"
 )
 
 func (d *Datastore) QueryByName(name string) (*kolide.Query, bool, error) {
@@ -20,7 +20,7 @@ func (d *Datastore) QueryByName(name string) (*kolide.Query, bool, error) {
 		if err == sql.ErrNoRows {
 			return nil, false, nil
 		}
-		return nil, false, errors.DatabaseError(err)
+		return nil, false, errors.Wrap(err, "error selecting query by name")
 	}
 	return &query, true, nil
 }
@@ -38,7 +38,7 @@ func (d *Datastore) NewQuery(query *kolide.Query) (*kolide.Query, error) {
 	`
 	result, err := d.db.Exec(sql, query.Name, query.Description, query.Query, query.Saved, query.AuthorID)
 	if err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, "error inserting new query")
 	}
 
 	id, _ := result.LastInsertId()
@@ -56,7 +56,7 @@ func (d *Datastore) SaveQuery(q *kolide.Query) error {
 	`
 	_, err := d.db.Exec(sql, q.Name, q.Description, q.Query, q.AuthorID, q.Saved, q.ID)
 	if err != nil {
-		return errors.DatabaseError(err)
+		return errors.Wrap(err, "error updating query")
 	}
 
 	return nil
@@ -77,17 +77,17 @@ func (d *Datastore) DeleteQueries(ids []uint) (uint, error) {
 	`
 	query, args, err := sqlx.In(sql, ids)
 	if err != nil {
-		return 0, errors.DatabaseError(err)
+		return 0, errors.Wrap(err, "error building delete query query")
 	}
 
 	result, err := d.db.Exec(query, args...)
 	if err != nil {
-		return 0, errors.DatabaseError(err)
+		return 0, errors.Wrap(err, "error updating delete query")
 	}
 
 	deleted, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.DatabaseError(err)
+		return 0, errors.Wrap(err, "error fetching delete query rows effected")
 	}
 
 	return uint(deleted), nil
@@ -106,11 +106,11 @@ func (d *Datastore) Query(id uint) (*kolide.Query, error) {
 	`
 	query := &kolide.Query{}
 	if err := d.db.Get(query, sql, id); err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, "error selecting query")
 	}
 
 	if err := d.loadPacksForQueries([]*kolide.Query{query}); err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, "error loading packs for queries")
 	}
 
 	return query, nil
@@ -131,11 +131,11 @@ func (d *Datastore) ListQueries(opt kolide.ListOptions) ([]*kolide.Query, error)
 	results := []*kolide.Query{}
 
 	if err := d.db.Select(&results, sql); err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, "error listing queries")
 	}
 
 	if err := d.loadPacksForQueries(results); err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, "error loading packs for queries")
 	}
 
 	return results, nil
@@ -168,7 +168,7 @@ func (d *Datastore) loadPacksForQueries(queries []*kolide.Query) error {
 
 	query, args, err := sqlx.In(sql, ids)
 	if err != nil {
-		return errors.DatabaseError(err)
+		return errors.Wrap(err, "error building query in load packs for queries")
 	}
 
 	rows := []struct {
@@ -178,7 +178,7 @@ func (d *Datastore) loadPacksForQueries(queries []*kolide.Query) error {
 
 	err = d.db.Select(&rows, query, args...)
 	if err != nil {
-		return errors.DatabaseError(err)
+		return errors.Wrap(err, "error selecting load packs for queries")
 	}
 
 	for _, row := range rows {

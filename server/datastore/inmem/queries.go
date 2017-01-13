@@ -3,8 +3,8 @@ package inmem
 import (
 	"sort"
 
-	"github.com/kolide/kolide-ose/server/errors"
 	"github.com/kolide/kolide-ose/server/kolide"
+	"github.com/pkg/errors"
 )
 
 func (d *Datastore) NewQuery(query *kolide.Query) (*kolide.Query, error) {
@@ -97,7 +97,7 @@ func (d *Datastore) Query(id uint) (*kolide.Query, error) {
 	query.AuthorName = d.getUserNameByID(query.AuthorID)
 
 	if err := d.loadPacksForQueries([]*kolide.Query{query}); err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, "error fetching query by id")
 	}
 
 	return query, nil
@@ -147,7 +147,7 @@ func (d *Datastore) ListQueries(opt kolide.ListOptions) ([]*kolide.Query, error)
 	queries = queries[low:high]
 
 	if err := d.loadPacksForQueries(queries); err != nil {
-		return nil, errors.DatabaseError(err)
+		return nil, errors.Wrap(err, "error listing queries")
 	}
 
 	return queries, nil
