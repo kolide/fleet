@@ -44,6 +44,26 @@ const configErrorsFor = (changedOptions, allOptions) => {
   return { errors, valid };
 };
 
+const formatOptionsForServer = (options) => {
+  return options.map((option) => {
+    const { type, value } = option;
+
+    switch (type) {
+      case 'int':
+        return { ...option, value: Number(value) };
+      case 'bool':
+        return {
+          ...option,
+          value: (value === 'true') || (value === true),
+        };
+      case 'string':
+        return { ...option, value: String(value) };
+      default:
+        return option;
+    }
+  });
+};
+
 const updatedConfigOptions = ({ oldOption, newOption, configOptions }) => {
   const existingConfigOption = find(configOptions, { name: newOption.name });
   const newValue = newOption.value || oldOption.value;
@@ -62,4 +82,4 @@ const updatedConfigOptions = ({ oldOption, newOption, configOptions }) => {
   return replaceArrayItem(filteredConfigOptions, oldOption, updatedConfigOption).concat(option);
 };
 
-export default { configErrorsFor, configOptionDropdownOptions, updatedConfigOptions };
+export default { configErrorsFor, configOptionDropdownOptions, formatOptionsForServer, updatedConfigOptions };

@@ -26,4 +26,39 @@ describe('ConfigOptionsForm - form', () => {
 
     expect(spy).toHaveBeenCalledWith(configOptionStub, { ...configOptionStub, value: 'updated value' });
   });
+
+  describe('error rendering', () => {
+    it('sets errors on the ConfigOptionForm correctly when there are errors', () => {
+      const errors = {
+        [configOptionStub.id]: { name: 'Must be unique' },
+        10101: { name: 'Something went wrong' },
+      };
+
+      const form = mount(<ConfigOptionsForm configNameOptions={[]} completedOptions={[configOptionStub]} errors={errors} />);
+      const configOptionForm = form.find('ConfigOptionForm');
+
+      expect(configOptionForm.prop('serverErrors')).toEqual({
+        name: 'Must be unique',
+      });
+    });
+
+    it('sets errors on the ConfigOptionForm correctly when there are errors on a different object', () => {
+      const errors = {
+        10101: { name: 'Something went wrong' },
+      };
+
+      const form = mount(<ConfigOptionsForm configNameOptions={[]} completedOptions={[configOptionStub]} errors={errors} />);
+      const configOptionForm = form.find('ConfigOptionForm');
+
+      expect(configOptionForm.prop('serverErrors')).toEqual({});
+    });
+
+    it('sets errors on the ConfigOptionForm correctly when there are no errors', () => {
+      const errors = {};
+      const form = mount(<ConfigOptionsForm configNameOptions={[]} completedOptions={[configOptionStub]} errors={errors} />);
+      const configOptionForm = form.find('ConfigOptionForm');
+
+      expect(configOptionForm.prop('serverErrors')).toEqual({});
+    });
+  });
 });

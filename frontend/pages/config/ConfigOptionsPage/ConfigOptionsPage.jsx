@@ -105,17 +105,19 @@ export class ConfigOptionsPage extends Component {
   }
 
   onSave = () => {
+    const { dispatch } = this.props;
     const changedOptions = this.calculateChangedOptions();
     const { errors, valid } = this.validate();
 
     if (!valid) {
       this.setState({ configOptionErrors: errors });
-      console.log('invalid', errors);
 
       return false;
     }
 
-    console.log('valid', changedOptions);
+    const formattedChangedOptions = helpers.formatOptionsForServer(changedOptions);
+
+    dispatch(configOptionActions.update(formattedChangedOptions));
 
     return false;
   }
@@ -136,7 +138,7 @@ export class ConfigOptionsPage extends Component {
   }
 
   render () {
-    const { configOptions } = this.state;
+    const { configOptionErrors, configOptions } = this.state;
     const { onAddNewOption, onOptionUpdate, onRemoveOption, onResetConfigOptions, onSave } = this;
     const availableOptions = filter(configOptions, option => option.value !== null);
 
@@ -163,6 +165,7 @@ export class ConfigOptionsPage extends Component {
         <ConfigOptionsForm
           configNameOptions={helpers.configOptionDropdownOptions(configOptions)}
           completedOptions={availableOptions}
+          errors={configOptionErrors}
           onFormUpdate={onOptionUpdate}
           onRemoveOption={onRemoveOption}
         />

@@ -8,8 +8,13 @@ class ConfigOptionsForm extends Component {
   static propTypes = {
     completedOptions: PropTypes.arrayOf(configOptionInterface),
     configNameOptions: PropTypes.arrayOf(dropdownOptionInterface),
+    errors: PropTypes.object, // eslint-disable-line react/forbid-prop-types
     onRemoveOption: PropTypes.func.isRequired,
     onFormUpdate: PropTypes.func.isRequired,
+  };
+
+  static defaultProps = {
+    errors: {},
   };
 
   handleFormUpdate = (option) => {
@@ -22,8 +27,9 @@ class ConfigOptionsForm extends Component {
   }
 
   renderConfigOptionForm = (option, idx) => {
-    const { configNameOptions, onRemoveOption } = this.props;
+    const { configNameOptions, errors, onRemoveOption } = this.props;
     const { handleFormUpdate } = this;
+    const configErrors = errors[option.id] || {};
 
     return (
       <ConfigOptionForm
@@ -32,6 +38,7 @@ class ConfigOptionsForm extends Component {
         key={`config-option-form-${option.id}-${idx}`}
         onChangeFunc={handleFormUpdate(option)}
         onRemove={onRemoveOption}
+        serverErrors={configErrors}
       />
     );
   }
