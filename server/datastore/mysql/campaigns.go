@@ -20,7 +20,7 @@ func (d *Datastore) NewDistributedQueryCampaign(camp *kolide.DistributedQueryCam
 	`
 	result, err := d.db.Exec(sqlStatement, camp.QueryID, camp.Status, camp.UserID)
 	if err != nil {
-		return nil, errors.Wrap(err, "error inserting distributed query campaign")
+		return nil, errors.Wrap(err, "inserting distributed query campaign")
 	}
 
 	id, _ := result.LastInsertId()
@@ -34,7 +34,7 @@ func (d *Datastore) DistributedQueryCampaign(id uint) (*kolide.DistributedQueryC
 	`
 	campaign := &kolide.DistributedQueryCampaign{}
 	if err := d.db.Get(campaign, sql, id); err != nil {
-		return nil, errors.Wrap(err, "error selecting distributed query campaign")
+		return nil, errors.Wrap(err, "selecting distributed query campaign")
 	}
 
 	return campaign, nil
@@ -51,7 +51,7 @@ func (d *Datastore) SaveDistributedQueryCampaign(camp *kolide.DistributedQueryCa
 	`
 	_, err := d.db.Exec(sqlStatement, camp.QueryID, camp.Status, camp.UserID, camp.ID)
 	if err != nil {
-		return errors.Wrap(err, "error updating distributed query campaign")
+		return errors.Wrap(err, "updating distributed query campaign")
 	}
 
 	return nil
@@ -64,7 +64,7 @@ func (d *Datastore) DistributedQueryCampaignTargetIDs(id uint) (hostIDs []uint, 
 	targets := []kolide.DistributedQueryCampaignTarget{}
 
 	if err = d.db.Select(&targets, sqlStatement, id); err != nil {
-		return nil, nil, errors.Wrap(err, "error selecting distributed campaign target")
+		return nil, nil, errors.Wrap(err, "selecting distributed campaign target")
 	}
 
 	hostIDs = []uint{}
@@ -140,7 +140,7 @@ func (d *Datastore) CleanupDistributedQueryCampaigns(now time.Time) (expired uin
 
 	exp, err := result.RowsAffected()
 	if err != nil {
-		return expired, deleted, errors.Wrap(err, "error rows effected updating distributed query campaign")
+		return expired, deleted, errors.Wrap(err, "rows effected updating distributed query campaign")
 	}
 	expired = uint(exp)
 
@@ -154,12 +154,12 @@ func (d *Datastore) CleanupDistributedQueryCampaigns(now time.Time) (expired uin
 	`
 	result, err = d.db.Exec(sqlStatement, kolide.QueryComplete)
 	if err != nil {
-		return expired, deleted, errors.Wrap(err, "error deleting distributed campaign executions")
+		return expired, deleted, errors.Wrap(err, "deleting distributed campaign executions")
 	}
 
 	del, err := result.RowsAffected()
 	if err != nil {
-		return expired, deleted, errors.Wrap(err, "error rows effected deleting distributed campaign")
+		return expired, deleted, errors.Wrap(err, "rows effected deleting distributed campaign")
 	}
 	deleted = uint(del)
 

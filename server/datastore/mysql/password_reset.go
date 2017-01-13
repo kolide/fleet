@@ -13,7 +13,7 @@ func (d *Datastore) NewPasswordResetRequest(req *kolide.PasswordResetRequest) (*
 	`
 	response, err := d.db.Exec(sqlStatement, req.UserID, req.Token)
 	if err != nil {
-		return nil, errors.Wrap(err, "error inserting password reset requests")
+		return nil, errors.Wrap(err, "inserting password reset requests")
 	}
 
 	id, _ := response.LastInsertId()
@@ -32,7 +32,7 @@ func (d *Datastore) SavePasswordResetRequest(req *kolide.PasswordResetRequest) e
 	`
 	_, err := d.db.Exec(sqlStatement, req.ExpiresAt, req.UserID, req.Token, req.ID)
 	if err != nil {
-		return errors.Wrap(err, "error updating password reset requests")
+		return errors.Wrap(err, "updating password reset requests")
 	}
 
 	return nil
@@ -45,7 +45,7 @@ func (d *Datastore) DeletePasswordResetRequest(req *kolide.PasswordResetRequest)
 	`
 	_, err := d.db.Exec(sqlStatement, req.ID)
 	if err != nil {
-		return errors.Wrap(err, "error deleting from password reset request")
+		return errors.Wrap(err, "deleting from password reset request")
 	}
 
 	return nil
@@ -57,7 +57,7 @@ func (d *Datastore) DeletePasswordResetRequestsForUser(userID uint) error {
 	`
 	_, err := d.db.Exec(sqlStatement, userID)
 	if err != nil {
-		return errors.Wrap(err, "error deleting password reset request by user")
+		return errors.Wrap(err, "deleting password reset request by user")
 	}
 
 	return nil
@@ -71,7 +71,7 @@ func (d *Datastore) FindPassswordResetByID(id uint) (*kolide.PasswordResetReques
 	passwordResetRequest := &kolide.PasswordResetRequest{}
 	err := d.db.Get(&passwordResetRequest, sqlStatement, id)
 	if err != nil {
-		return nil, errors.Wrap(err, "error selecting password reset by id")
+		return nil, errors.Wrap(err, "selecting password reset by id")
 	}
 
 	return passwordResetRequest, nil
@@ -86,7 +86,7 @@ func (d *Datastore) FindPassswordResetsByUserID(id uint) ([]*kolide.PasswordRese
 	passwordResetRequests := []*kolide.PasswordResetRequest{}
 	err := d.db.Select(&passwordResetRequests, sqlStatement, id)
 	if err != nil {
-		return nil, errors.Wrap(err, "error finding password resets by user id")
+		return nil, errors.Wrap(err, "finding password resets by user id")
 	}
 
 	return passwordResetRequests, nil
@@ -101,7 +101,7 @@ func (d *Datastore) FindPassswordResetByToken(token string) (*kolide.PasswordRes
 	passwordResetRequest := &kolide.PasswordResetRequest{}
 	err := d.db.Get(passwordResetRequest, sqlStatement, token)
 	if err != nil {
-		return nil, errors.Wrap(err, "error selecting password reset requests")
+		return nil, errors.Wrap(err, "selecting password reset requests")
 	}
 
 	return passwordResetRequest, nil
@@ -117,7 +117,7 @@ func (d *Datastore) FindPassswordResetByTokenAndUserID(token string, id uint) (*
 	passwordResetRequest := &kolide.PasswordResetRequest{}
 	err := d.db.Get(passwordResetRequest, sqlStatement, id, token)
 	if err != nil {
-		return nil, errors.Wrap(err, "error selecting password reset by token and user id")
+		return nil, errors.Wrap(err, "selecting password reset by token and user id")
 	}
 
 	return passwordResetRequest, nil

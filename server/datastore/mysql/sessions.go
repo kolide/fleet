@@ -13,7 +13,7 @@ func (d *Datastore) SessionByKey(key string) (*kolide.Session, error) {
 	session := &kolide.Session{}
 	err := d.db.Get(session, sqlStatement, key)
 	if err != nil {
-		return nil, errors.Wrap(err, "error selecting sessions")
+		return nil, errors.Wrap(err, "selecting sessions")
 	}
 
 	return session, nil
@@ -28,7 +28,7 @@ func (d *Datastore) SessionByID(id uint) (*kolide.Session, error) {
 	session := &kolide.Session{}
 	err := d.db.Get(session, sqlStatement, id)
 	if err != nil {
-		return nil, errors.Wrap(err, "error selecting session by id")
+		return nil, errors.Wrap(err, "selecting session by id")
 	}
 
 	return session, nil
@@ -42,7 +42,7 @@ func (d *Datastore) ListSessionsForUser(id uint) ([]*kolide.Session, error) {
 	sessions := []*kolide.Session{}
 	err := d.db.Select(&sessions, sqlStatement, id)
 	if err != nil {
-		return nil, errors.Wrap(err, "error selecting sessions for user")
+		return nil, errors.Wrap(err, "selecting sessions for user")
 	}
 
 	return sessions, nil
@@ -59,7 +59,7 @@ func (d *Datastore) NewSession(session *kolide.Session) (*kolide.Session, error)
 	`
 	result, err := d.db.Exec(sqlStatement, session.UserID, session.Key)
 	if err != nil {
-		return nil, errors.Wrap(err, "error inserting session")
+		return nil, errors.Wrap(err, "inserting session")
 	}
 
 	id, _ := result.LastInsertId()
@@ -73,7 +73,7 @@ func (d *Datastore) DestroySession(session *kolide.Session) error {
 	`
 	_, err := d.db.Exec(sqlStatement, session.ID)
 	if err != nil {
-		return errors.Wrap(err, "error deleting session")
+		return errors.Wrap(err, "deleting session")
 	}
 
 	return nil
@@ -85,7 +85,7 @@ func (d *Datastore) DestroyAllSessionsForUser(id uint) error {
 	`
 	_, err := d.db.Exec(sqlStatement, id)
 	if err != nil {
-		return errors.Wrap(err, "error deleting sessions for user")
+		return errors.Wrap(err, "deleting sessions for user")
 	}
 
 	return nil
@@ -99,7 +99,7 @@ func (d *Datastore) MarkSessionAccessed(session *kolide.Session) error {
 	`
 	_, err := d.db.Exec(sqlStatement, d.clock.Now(), session.ID)
 	if err != nil {
-		return errors.Wrap(err, "error updating mark session as accessed")
+		return errors.Wrap(err, "updating mark session as accessed")
 	}
 
 	return nil

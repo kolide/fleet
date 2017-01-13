@@ -366,7 +366,7 @@ func attachKolideAPIRoutes(r *mux.Router, h *kolideHandlers) {
 
 	r.Handle("/api/v1/kolide/targets", h.SearchTargets).Methods("POST").Name("search_targets")
 
-	r.Handle("/api/v1/kolide/import", h.ImportConfig).Methods("POST").Name("import_config")
+	r.Handle("/api/v1/kolide/osquery/config/import", h.ImportConfig).Methods("POST").Name("import_config")
 
 	r.Handle("/api/v1/osquery/enroll", h.EnrollAgent).Methods("POST").Name("enroll_agent")
 	r.Handle("/api/v1/osquery/config", h.GetClientConfig).Methods("POST").Name("get_client_config")

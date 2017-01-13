@@ -31,7 +31,7 @@ func (d *Datastore) NewFIMSection(fp *kolide.FIMSection) (result *kolide.FIMSect
 	var resp sql.Result
 	resp, err = txn.Exec(sqlStatement, fp.SectionName, fp.Description)
 	if err != nil {
-		return nil, errors.Wrap(err, "error creating fim section")
+		return nil, errors.Wrap(err, "creating fim section")
 	}
 	id, _ := resp.LastInsertId()
 	fp.ID = uint(id)
@@ -44,7 +44,7 @@ func (d *Datastore) NewFIMSection(fp *kolide.FIMSection) (result *kolide.FIMSect
 	for _, fileName := range fp.Paths {
 		_, err = txn.Exec(sqlStatement, fileName, fp.ID)
 		if err != nil {
-			return nil, errors.Wrap(err, "error adding path to fim section")
+			return nil, errors.Wrap(err, "adding path to fim section")
 		}
 	}
 	success = true
@@ -63,14 +63,14 @@ func (d *Datastore) FIMSections() (kolide.FIMSections, error) {
 		if err == sql.ErrNoRows {
 			return nil, notFound("FilePath")
 		}
-		return nil, errors.Wrap(err, "error retrieving fim sections")
+		return nil, errors.Wrap(err, "retrieving fim sections")
 	}
 	result := make(kolide.FIMSections)
 	for rows.Next() {
 		var sectionName, fileName string
 		err = rows.Scan(&sectionName, &fileName)
 		if err != nil {
-			return nil, errors.Wrap(err, "error retrieving path for fim section")
+			return nil, errors.Wrap(err, "retrieving path for fim section")
 		}
 		result[sectionName] = append(result[sectionName], fileName)
 	}
