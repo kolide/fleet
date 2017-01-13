@@ -135,8 +135,8 @@ export class UserSettingsPage extends Component {
           <h1>Additional Info</h1>
 
           <div className={`${baseClass}__change-avatar`}>
-            <a href="http://en.gravatar.com/emails/">Change Photo at Gravatar</a>
             <Avatar user={user} className={`${baseClass}__avatar`} />
+            <a href="http://en.gravatar.com/emails/">Change Photo at Gravatar</a>
           </div>
 
           <div className={`${baseClass}__more-info-detail`}>
