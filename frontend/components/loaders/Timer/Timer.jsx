@@ -9,6 +9,7 @@ let interval = null;
 class Timer extends Component {
   static propTypes = {
     running: PropTypes.bool,
+    reset: PropTypes.bool,
   }
 
   constructor (props) {
@@ -20,7 +21,11 @@ class Timer extends Component {
     };
   }
 
-  componentWillReceiveProps ({ running }) {
+  componentWillReceiveProps ({ running, reset }) {
+    if (reset) {
+      this.reset();
+    }
+
     if (running) {
       this.play();
     } else {
@@ -40,6 +45,13 @@ class Timer extends Component {
       clearInterval(interval);
       interval = null;
     }
+  }
+
+  reset = () => {
+    this.setState({
+      totalSeconds: 0,
+      currrentTimer: convertSeconds(0),
+    });
   }
 
   update = () => {
