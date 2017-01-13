@@ -30,7 +30,6 @@
       line-height: 40px;
       color: #fff;
       text-align: center;
-      margin-top: -10px;
       position: relative;
       z-index: 1;
       text-decoration: none;
@@ -40,7 +39,7 @@
   &__avatar {
     @include size(200px);
     border: solid 1px $brand-dark;
-    margin: 0 auto;
+    margin: -10px auto 0;
     display: block;
   }
 
