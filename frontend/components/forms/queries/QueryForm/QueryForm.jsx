@@ -205,6 +205,8 @@ class QueryForm extends Component {
 
     return (
       <div className={`${baseClass}__button-wrap`}>
+        {queryIsRunning && <Timer running={queryIsRunning} />}
+
         <DropdownButton
           className={`${baseClass}__save`}
           options={dropdownBtnOptions}
@@ -213,7 +215,6 @@ class QueryForm extends Component {
           Save
         </DropdownButton>
 
-        <Timer running={queryIsRunning} />
         {runQueryButton}
       </div>
     );

@@ -1,32 +1,28 @@
 import React, { Component, PropTypes } from 'react';
 
-import convertSeconds from './convertSeconds';
+import { convertSeconds } from './helpers';
 
 const baseClass = 'kolide-timer';
-let offset = null;
-let interval = null;
 
 class Timer extends Component {
   static propTypes = {
     running: PropTypes.bool,
-    reset: PropTypes.bool,
   }
 
   constructor (props) {
     super(props);
 
-    this.state = {
-      totalSeconds: 0,
-      currrentTimer: '',
-    };
+    this.state = { totalMilliseconds: 0 };
   }
 
-  componentWillReceiveProps ({ running, reset }) {
-    if (reset) {
-      this.reset();
-    }
+  componentWillReceiveProps ({ running }) {
+    const { running: currentRunning } = this.props;
 
     if (running) {
+      if (!currentRunning) {
+        this.reset();
+      }
+
       this.play();
     } else {
       this.pause();
@@ -34,50 +30,37 @@ class Timer extends Component {
   }
 
   play = () => {
+    const { interval, update } = this;
+
     if (!interval) {
-      offset = Date.now();
-      interval = setInterval(this.update, 1000);
+      this.interval = setInterval(update, 1000);
     }
   }
 
   pause = () => {
+    const { interval } = this;
+
     if (interval) {
       clearInterval(interval);
-      interval = null;
+      this.interval = null;
     }
   }
 
   reset = () => {
-    this.setState({
-      totalSeconds: 0,
-      currrentTimer: convertSeconds(0),
-    });
+    this.setState({ totalMilliseconds: 0 });
   }
 
   update = () => {
-    let { totalSeconds } = this.state;
+    const { totalMilliseconds } = this.state;
 
-    totalSeconds += this.calculateOffset();
-
-    this.setState({
-      currrentTimer: convertSeconds(totalSeconds),
-      totalSeconds,
-    });
-  }
-
-  calculateOffset = () => {
-    const now = Date.now();
-    const newOffset = now - offset;
-    offset = now;
-
-    return newOffset;
+    this.setState({ totalMilliseconds: totalMilliseconds + 1000 });
   }
 
   render () {
-    const { currrentTimer } = this.state;
+    const { totalMilliseconds } = this.state;
 
     return (
-      <span className={baseClass}>{currrentTimer}</span>
+      <span className={baseClass}>{convertSeconds(totalMilliseconds)}</span>
     );
   }
 }
