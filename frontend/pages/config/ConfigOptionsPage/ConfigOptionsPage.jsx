@@ -7,6 +7,7 @@ import configOptionActions from 'redux/nodes/entities/config_options/actions';
 import ConfigOptionsForm from 'components/forms/ConfigOptionsForm';
 import configOptionInterface from 'interfaces/config_option';
 import debounce from 'utilities/debounce';
+import defaultConfigOptions from 'pages/config/ConfigOptionsPage/default_config_options';
 import entityGetter from 'redux/utilities/entityGetter';
 import helpers from 'pages/config/ConfigOptionsPage/helpers';
 import { renderFlash } from 'redux/nodes/notifications/actions';
@@ -99,9 +100,7 @@ export class ConfigOptionsPage extends Component {
   }
 
   onResetConfigOptions = () => {
-    const { configOptions } = this.props;
-
-    this.setState({ configOptions });
+    this.setState({ configOptions: defaultConfigOptions });
 
     return false;
   }

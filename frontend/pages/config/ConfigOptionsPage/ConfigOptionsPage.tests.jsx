@@ -4,6 +4,7 @@ import { mount } from 'enzyme';
 
 import { ConfigOptionsPage } from 'pages/config/ConfigOptionsPage/ConfigOptionsPage';
 import { configOptionStub } from 'test/stubs';
+import defaultConfigOptions from 'pages/config/ConfigOptionsPage/default_config_options';
 import { fillInFormInput } from 'test/helpers';
 
 describe('ConfigOptionsPage - component', () => {
@@ -24,6 +25,18 @@ describe('ConfigOptionsPage - component', () => {
 
     expect(resetButton.length).toEqual(1);
     expect(saveButton.length).toEqual(1);
+  });
+
+  it('resets config option defaults', () => {
+    const page = mount(<ConfigOptionsPage {...props} />);
+    const buttons = page.find('Button');
+    const resetButton = buttons.find('.config-options-page__reset-btn');
+
+    expect(page.state('configOptions')).toEqual([]);
+
+    resetButton.simulate('click');
+
+    expect(page.state('configOptions')).toEqual(defaultConfigOptions);
   });
 
   describe('removing a config option', () => {
