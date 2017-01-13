@@ -8,6 +8,7 @@ import ConfigOptionsForm from 'components/forms/ConfigOptionsForm';
 import configOptionInterface from 'interfaces/config_option';
 import entityGetter from 'redux/utilities/entityGetter';
 import helpers from 'pages/config/ConfigOptionsPage/helpers';
+import { renderFlash } from 'redux/nodes/notifications/actions';
 
 const baseClass = 'config-options-page';
 const DEFAULT_CONFIG_OPTION = { name: '', value: '' };
@@ -117,7 +118,16 @@ export class ConfigOptionsPage extends Component {
 
     const formattedChangedOptions = helpers.formatOptionsForServer(changedOptions);
 
-    dispatch(configOptionActions.update(formattedChangedOptions));
+    dispatch(configOptionActions.update(formattedChangedOptions))
+      .then(() => {
+        dispatch(renderFlash('success', 'Options updated!'));
+
+        return false;
+      })
+      .catch(() => {
+        dispatch(renderFlash('error', 'We were unable to update your config options'));
+        return false;
+      });
 
     return false;
   }
