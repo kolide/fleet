@@ -27,7 +27,7 @@ describe('Timer - component', () => {
   });
 
   it('should not reset when stopped', () => {
-    const timer = mount(<Timer running={true} />);
+    const timer = mount(<Timer running />);
     const spy = spyOn(timer.node, 'reset').andCallThrough();
 
     timer.setProps({ running: false });
@@ -36,7 +36,7 @@ describe('Timer - component', () => {
   });
 
   it('should not reset when it continues', () => {
-    const timer = mount(<Timer running={true} />);
+    const timer = mount(<Timer running />);
     const spy = spyOn(timer.node, 'reset').andCallThrough();
 
     timer.setProps({ running: true });
