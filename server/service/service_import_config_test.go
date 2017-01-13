@@ -119,18 +119,18 @@ func TestImportScheduledQueries(t *testing.T) {
 			"q1": kolide.QueryDetails{
 				Query:    "select pid from processes",
 				Interval: 60,
-				Platform: strPtr("linux"),
+				Platform: stringPtr("linux"),
 			},
 			"q2": kolide.QueryDetails{
 				Query:    "select uid from users",
 				Interval: 120,
-				Platform: strPtr("linux"),
-				Version:  strPtr("1.0"),
+				Platform: stringPtr("linux"),
+				Version:  stringPtr("1.0"),
 			},
 			"q3": kolide.QueryDetails{
 				Query:    "select name from os",
 				Interval: 240,
-				Platform: strPtr("linux"),
+				Platform: stringPtr("linux"),
 				Snapshot: boolPtr(true),
 			},
 		},
@@ -234,22 +234,6 @@ func TestOptionsImportConfigWithSkips(t *testing.T) {
 	assert.Len(t, status.Messages, 2)
 }
 
-var boolptr = func(v bool) *bool {
-	b := new(bool)
-	*b = v
-	return b
-}
-var strPtr = func(v string) *string {
-	s := new(string)
-	*s = v
-	return s
-}
-var uintptr = func(n uint) *uint {
-	i := new(uint)
-	*i = n
-	return i
-}
-
 func TestPacksImportConfig(t *testing.T) {
 	svc := createServiceMockForImport(t)
 
@@ -262,23 +246,23 @@ func TestPacksImportConfig(t *testing.T) {
 	q1 := kolide.QueryDetails{
 		Query:    "select * from foo",
 		Interval: 100,
-		Removed:  boolptr(false),
-		Platform: strPtr("linux"),
-		Version:  strPtr("1.0"),
+		Removed:  boolPtr(false),
+		Platform: stringPtr("linux"),
+		Version:  stringPtr("1.0"),
 	}
 	q2 := kolide.QueryDetails{
 		Query:    "select * from bar",
 		Interval: 50,
-		Removed:  boolptr(false),
-		Platform: strPtr("linux"),
-		Version:  strPtr("1.0"),
+		Removed:  boolPtr(false),
+		Platform: stringPtr("linux"),
+		Version:  stringPtr("1.0"),
 	}
 	q3 := kolide.QueryDetails{
 		Query:    "select * from baz",
 		Interval: 500,
-		Removed:  boolptr(false),
-		Platform: strPtr("linux"),
-		Version:  strPtr("1.0"),
+		Removed:  boolPtr(false),
+		Platform: stringPtr("linux"),
+		Version:  stringPtr("1.0"),
 	}
 
 	importConfig := kolide.ImportConfig{
