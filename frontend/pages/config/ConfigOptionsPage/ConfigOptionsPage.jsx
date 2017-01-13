@@ -6,6 +6,7 @@ import Button from 'components/buttons/Button';
 import configOptionActions from 'redux/nodes/entities/config_options/actions';
 import ConfigOptionsForm from 'components/forms/ConfigOptionsForm';
 import configOptionInterface from 'interfaces/config_option';
+import debounce from 'utilities/debounce';
 import entityGetter from 'redux/utilities/entityGetter';
 import helpers from 'pages/config/ConfigOptionsPage/helpers';
 import { renderFlash } from 'redux/nodes/notifications/actions';
@@ -105,10 +106,14 @@ export class ConfigOptionsPage extends Component {
     return false;
   }
 
-  onSave = () => {
+  onSave = debounce(() => {
     const { dispatch } = this.props;
     const changedOptions = this.calculateChangedOptions();
     const { errors, valid } = this.validate();
+
+    if (!changedOptions.length) {
+      return false;
+    }
 
     if (!valid) {
       this.setState({ configOptionErrors: errors });
@@ -130,7 +135,7 @@ export class ConfigOptionsPage extends Component {
       });
 
     return false;
-  }
+  })
 
   calculateChangedOptions = () => {
     const { configOptions: stateConfigOptions } = this.state;

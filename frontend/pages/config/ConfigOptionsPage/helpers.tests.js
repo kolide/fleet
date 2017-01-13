@@ -65,36 +65,38 @@ describe('ConfigOptionsPage - helpers', () => {
     it('sets boolean type options correctly', () => {
       const stringOption = { id: 1, type: 'bool', name: 'utc', value: 'true' };
       const boolOption = { id: 1, type: 'bool', name: 'utc', value: true };
+      const nullOption = { id: 1, type: 'bool', name: 'utc', value: null };
 
       expect(helpers.formatOptionsForServer([stringOption])).toEqual([
         { ...stringOption, value: true },
       ]);
-
       expect(helpers.formatOptionsForServer([boolOption])).toEqual([boolOption]);
+      expect(helpers.formatOptionsForServer([nullOption])).toEqual([nullOption]);
     });
 
     it('sets int type options correctly', () => {
       const stringOption = { id: 1, type: 'int', name: 'utc', value: '100' };
       const intOption = { id: 1, type: 'int', name: 'utc', value: 100 };
+      const nullOption = { id: 1, type: 'bool', name: 'utc', value: null };
 
       expect(helpers.formatOptionsForServer([stringOption])).toEqual([
         { ...stringOption, value: 100 },
       ]);
-
       expect(helpers.formatOptionsForServer([intOption])).toEqual([intOption]);
+      expect(helpers.formatOptionsForServer([nullOption])).toEqual([nullOption]);
     });
 
     it('sets string type options correctly', () => {
       const stringOption = { id: 1, type: 'string', name: 'utc', value: 'something' };
       const intOption = { id: 1, type: 'string', name: 'utc', value: 100 };
       const boolOption = { id: 1, type: 'string', name: 'utc', value: false };
+      const nullOption = { id: 1, type: 'bool', name: 'utc', value: null };
 
       expect(helpers.formatOptionsForServer([stringOption])).toEqual([stringOption]);
-
+      expect(helpers.formatOptionsForServer([nullOption])).toEqual([nullOption]);
       expect(helpers.formatOptionsForServer([intOption])).toEqual([
         { ...intOption, value: '100' },
       ]);
-
       expect(helpers.formatOptionsForServer([boolOption])).toEqual([
         { ...boolOption, value: 'false' },
       ]);

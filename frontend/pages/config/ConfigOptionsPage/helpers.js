@@ -48,6 +48,10 @@ const formatOptionsForServer = (options) => {
   return options.map((option) => {
     const { type, value } = option;
 
+    if (value === null) {
+      return option;
+    }
+
     switch (type) {
       case 'int':
         return { ...option, value: Number(value) };
