@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { difference, find, filter, isEqual, noop } from 'lodash';
+import { differenceWith, find, filter, isEqual, noop } from 'lodash';
 
 import Button from 'components/buttons/Button';
 import configOptionActions from 'redux/nodes/entities/config_options/actions';
@@ -125,7 +125,7 @@ export class ConfigOptionsPage extends Component {
     const { configOptions: propConfigOptions } = this.props;
     const presentStateConfigOptions = filter(stateConfigOptions, o => o.name);
 
-    return difference(presentStateConfigOptions, propConfigOptions);
+    return differenceWith(presentStateConfigOptions, propConfigOptions, isEqual);
   }
 
   validate = () => {
