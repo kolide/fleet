@@ -1,5 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 
+import convertSeconds from './convertSeconds';
+
 const baseClass = 'kolide-timer';
 let offset = null;
 let interval = null;
@@ -15,13 +17,10 @@ class Timer extends Component {
     this.state = {
       totalSeconds: 0,
       currrentTimer: '',
-      running: props.running,
     };
   }
 
   componentWillReceiveProps ({ running }) {
-    this.setState({ running });
-
     if (running) {
       this.play();
     } else {
@@ -47,27 +46,11 @@ class Timer extends Component {
     let { totalSeconds } = this.state;
 
     totalSeconds += this.calculateOffset();
-    this.convertSeconds();
 
     this.setState({
+      currrentTimer: convertSeconds(totalSeconds),
       totalSeconds,
     });
-  }
-
-  convertSeconds = () => {
-    const { totalSeconds } = this.state;
-    const currentSeconds = totalSeconds / 1000;
-
-    const hours = Math.floor(currentSeconds / 3600);
-    const minutes = Math.floor((currentSeconds - (hours * 3600)) / 60);
-    let seconds = currentSeconds - (hours * 3600) - (minutes * 60);
-    seconds = Math.round((seconds * 100) / 100);
-
-    const resultHrs = hours < 10 ? `0${hours}` : hours;
-    const resultMins = minutes < 10 ? `0${minutes}` : minutes;
-    const resultSecs = seconds < 10 ? `0${seconds}` : seconds;
-
-    this.setState({ currrentTimer: `${resultHrs}:${resultMins}:${resultSecs}` });
   }
 
   calculateOffset = () => {
