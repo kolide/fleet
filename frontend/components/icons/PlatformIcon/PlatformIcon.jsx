@@ -41,7 +41,7 @@ export class PlatformIcon extends Component {
     const iconName = findIcon();
 
     if (!iconName) {
-      return <span className={iconClasses}>All</span>;
+      return <span className={iconClasses}>{name || 'All'}</span>;
     }
 
     return (
