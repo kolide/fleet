@@ -141,10 +141,11 @@ func (d *Datastore) Label(lid uint) (*kolide.Label, error) {
 }
 
 func (d *Datastore) ListLabels(opt kolide.ListOptions) ([]*kolide.Label, error) {
+	d.mtx.Lock()
+	defer d.mtx.Unlock()
 	// We need to sort by keys to provide reliable ordering
 	keys := []int{}
 
-	d.mtx.Lock()
 	for k, _ := range d.labels {
 		keys = append(keys, int(k))
 	}
@@ -154,7 +155,6 @@ func (d *Datastore) ListLabels(opt kolide.ListOptions) ([]*kolide.Label, error) 
 	for _, k := range keys {
 		labels = append(labels, d.labels[uint(k)])
 	}
-	d.mtx.Unlock()
 
 	// Apply ordering
 	if opt.OrderKey != "" {
@@ -172,6 +172,14 @@ func (d *Datastore) ListLabels(opt kolide.ListOptions) ([]*kolide.Label, error) 
 	// Apply limit/offset
 	low, high := d.getLimitOffsetSliceBounds(opt, len(labels))
 	labels = labels[low:high]
+
+	labelToHosts := make(map[uint][]uint)
+	for _, lqe := range d.labelQueryExecutions {
+		labelToHosts[lqe.LabelID] = append(labelToHosts[lqe.LabelID], lqe.HostID)
+	}
+	for _, label := range labels {
+		label.HostIDs = labelToHosts[label.ID]
+	}
 
 	return labels, nil
 }

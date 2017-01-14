@@ -54,14 +54,54 @@ func (d *Datastore) Label(lid uint) (*kolide.Label, error) {
 
 // ListLabels returns all labels limited or sorted  by kolide.ListOptions
 func (d *Datastore) ListLabels(opt kolide.ListOptions) ([]*kolide.Label, error) {
-	sql := `
+	query := `
 		SELECT * FROM labels WHERE NOT deleted
 	`
-	sql = appendListOptionsToSQL(sql, opt)
+	query = appendListOptionsToSQL(query, opt)
 	labels := []*kolide.Label{}
 
-	if err := d.db.Select(&labels, sql); err != nil {
+	if err := d.db.Select(&labels, query); err != nil {
+		// it's ok if no labels exist
+		if err == sql.ErrNoRows {
+			return labels, nil
+		}
 		return nil, errors.Wrap(err, "selecting labels")
+	}
+
+	query = `
+		SELECT
+			label_id,
+			host_id
+		FROM label_query_executions
+		WHERE label_id IN (?)
+	`
+
+	labelCache := make(map[uint]*kolide.Label)
+	var selectList []uint
+	for _, label := range labels {
+		selectList = append(selectList, label.ID)
+		labelCache[label.ID] = label
+	}
+
+	query, args, err := sqlx.In(query, selectList)
+	if err != nil {
+		return nil, errors.Wrap(err, "building in query for list labels")
+	}
+	query = d.db.Rebind(query)
+	rows, err := d.db.Query(query, args...)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return labels, nil
+		}
+		return nil, errors.Wrap(err, "fetching hosts for label")
+	}
+	for rows.Next() {
+		var labelID, hostID uint
+		err = rows.Scan(&labelID, &hostID)
+		if err != nil {
+			return nil, errors.Wrap(err, "scanning columns to get host ids for label")
+		}
+		labelCache[labelID].HostIDs = append(labelCache[labelID].HostIDs, hostID)
 	}
 
 	return labels, nil

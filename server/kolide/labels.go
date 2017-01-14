@@ -69,6 +69,7 @@ type Label struct {
 	Query       string    `json:"query"`
 	Platform    string    `json:"platform"`
 	LabelType   LabelType `json:"label_type" db:"label_type"`
+	HostIDs     []uint    `json:"host_ids" db:"-"`
 }
 
 type LabelQueryExecution struct {
