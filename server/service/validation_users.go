@@ -1,7 +1,9 @@
 package service
 
 import (
+	"errors"
 	"strings"
+	"unicode"
 
 	"github.com/kolide/kolide-ose/server/kolide"
 	"golang.org/x/net/context"
@@ -31,6 +33,9 @@ func (mw validationMiddleware) NewUser(ctx context.Context, p kolide.UserPayload
 	} else {
 		if *p.Password == "" {
 			invalid.Append("password", "cannot be empty")
+		}
+		if err := validatePasswordRequirements(*p.Password); err != nil {
+			invalid.Append("password", err.Error())
 		}
 	}
 
@@ -94,6 +99,11 @@ func (mw validationMiddleware) ChangePassword(ctx context.Context, oldPass, newP
 	if newPass == "" {
 		invalid.Append("new_password", "cannot be empty")
 	}
+
+	if err := validatePasswordRequirements(newPass); err != nil {
+		invalid.Append("new_password", err.Error())
+	}
+
 	if invalid.HasErrors() {
 		return invalid
 	}
@@ -108,8 +118,39 @@ func (mw validationMiddleware) ResetPassword(ctx context.Context, token, passwor
 	if password == "" {
 		invalid.Append("new_password", "cannot be empty field")
 	}
+	if err := validatePasswordRequirements(password); err != nil {
+		invalid.Append("new_password", err.Error())
+	}
 	if invalid.HasErrors() {
 		return invalid
 	}
 	return mw.Service.ResetPassword(ctx, token, password)
+}
+
+// Requirements for user password:
+// at least 7 character length
+// at least 1 symbol
+// at least 1 number
+func validatePasswordRequirements(password string) error {
+	var (
+		number bool
+		symbol bool
+	)
+
+	for _, s := range password {
+		switch {
+		case unicode.IsNumber(s):
+			number = true
+		case unicode.IsPunct(s) || unicode.IsSymbol(s):
+			symbol = true
+		}
+	}
+
+	if len(password) >= 7 &&
+		number &&
+		symbol {
+		return nil
+	}
+
+	return errors.New("password does not meet validation requirements")
 }
