@@ -356,6 +356,5 @@ func testListUniqueHostsInLabels(t *testing.T, db kolide.Datastore) {
 	labels, err := db.ListLabels(kolide.ListOptions{})
 	require.Nil(t, err)
 	require.Len(t, labels, 2)
-	assert.Len(t, labels[0].HostIDs, 3)
 
 }

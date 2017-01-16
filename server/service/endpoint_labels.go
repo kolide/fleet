@@ -21,6 +21,7 @@ type labelResponse struct {
 	Online          uint   `json:"online"`
 	Offline         uint   `json:"offline"`
 	MissingInAction uint   `json:"missing_in_action"`
+	HostIDs         []uint `json:"host_ids,omitempty"`
 }
 
 type getLabelResponse struct {
@@ -41,6 +42,11 @@ func makeGetLabelEndpoint(svc kolide.Service) endpoint.Endpoint {
 		if err != nil {
 			return getLabelResponse{Err: err}, nil
 		}
+		hosts, err := svc.HostIDsForLabel(label.ID)
+		if err != nil {
+			return getLabelResponse{Err: err}, nil
+		}
+
 		return getLabelResponse{
 			Label: labelResponse{
 				*label,
@@ -49,6 +55,7 @@ func makeGetLabelEndpoint(svc kolide.Service) endpoint.Endpoint {
 				metrics.OnlineHosts,
 				metrics.OfflineHosts,
 				metrics.MissingInActionHosts,
+				hosts,
 			},
 		}, nil
 	}
@@ -83,6 +90,10 @@ func makeListLabelsEndpoint(svc kolide.Service) endpoint.Endpoint {
 			if err != nil {
 				return listLabelsResponse{Err: err}, nil
 			}
+			hosts, err := svc.HostIDsForLabel(label.ID)
+			if err != nil {
+				return listLabelsResponse{Err: err}, nil
+			}
 			resp.Labels = append(resp.Labels,
 				labelResponse{
 					*label,
@@ -91,6 +102,7 @@ func makeListLabelsEndpoint(svc kolide.Service) endpoint.Endpoint {
 					metrics.OnlineHosts,
 					metrics.OfflineHosts,
 					metrics.MissingInActionHosts,
+					hosts,
 				},
 			)
 		}
@@ -132,6 +144,7 @@ func makeCreateLabelEndpoint(svc kolide.Service) endpoint.Endpoint {
 				metrics.OnlineHosts,
 				metrics.OfflineHosts,
 				metrics.MissingInActionHosts,
+				nil,
 			},
 		}, nil
 	}

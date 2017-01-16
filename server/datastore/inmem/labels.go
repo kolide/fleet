@@ -33,7 +33,6 @@ func (d *Datastore) ListLabelsForHost(hid uint) ([]kolide.Label, error) {
 	defer d.mtx.Unlock()
 	// First get IDs of label executions for the host
 	resLabels := []kolide.Label{}
-	hostIdsByLabels := make(map[uint][]uint)
 
 	for _, lqe := range d.labelQueryExecutions {
 		if lqe.HostID == hid && lqe.Matches {
@@ -41,11 +40,6 @@ func (d *Datastore) ListLabelsForHost(hid uint) ([]kolide.Label, error) {
 				resLabels = append(resLabels, *label)
 			}
 		}
-		hostIdsByLabels[lqe.LabelID] = append(hostIdsByLabels[lqe.LabelID], lqe.HostID)
-	}
-
-	for _, l := range resLabels {
-		l.HostIDs = hostIdsByLabels[l.ID]
 	}
 
 	return resLabels, nil
@@ -143,12 +137,6 @@ func (d *Datastore) Label(lid uint) (*kolide.Label, error) {
 	if !ok {
 		return nil, errors.New("Label not found")
 	}
-
-	for _, lqe := range d.labelQueryExecutions {
-		if label.ID == lqe.LabelID {
-			label.HostIDs = append(label.HostIDs, lqe.HostID)
-		}
-	}
 	return label, nil
 }
 
@@ -185,14 +173,6 @@ func (d *Datastore) ListLabels(opt kolide.ListOptions) ([]*kolide.Label, error) 
 	low, high := d.getLimitOffsetSliceBounds(opt, len(labels))
 	labels = labels[low:high]
 
-	labelToHosts := make(map[uint][]uint)
-	for _, lqe := range d.labelQueryExecutions {
-		labelToHosts[lqe.LabelID] = append(labelToHosts[lqe.LabelID], lqe.HostID)
-	}
-	for _, label := range labels {
-		label.HostIDs = labelToHosts[label.ID]
-	}
-
 	return labels, nil
 }
 
@@ -219,15 +199,6 @@ func (d *Datastore) SearchLabels(query string, omit ...uint) ([]kolide.Label, er
 	}
 
 	sortutil.AscByField(results, "ID")
-
-	labelToHosts := make(map[uint][]uint)
-	for _, lqe := range d.labelQueryExecutions {
-		labelToHosts[lqe.LabelID] = append(labelToHosts[lqe.LabelID], lqe.HostID)
-	}
-	for i := range results {
-		results[i].HostIDs = labelToHosts[results[i].ID]
-	}
-
 	return results, nil
 }
 
