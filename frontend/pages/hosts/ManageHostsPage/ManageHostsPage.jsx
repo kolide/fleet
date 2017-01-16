@@ -2,10 +2,11 @@ import React, { Component, PropTypes } from 'react';
 import AceEditor from 'react-ace';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
-import { filter, orderBy, sortBy } from 'lodash';
+import { orderBy, sortBy } from 'lodash';
 
 import entityGetter from 'redux/utilities/entityGetter';
 import { getStatusLabelCounts, setDisplay } from 'redux/nodes/components/ManageHostsPage/actions';
+import helpers from 'pages/hosts/ManageHostsPage/helpers';
 import hostActions from 'redux/nodes/entities/hosts/actions';
 import labelActions from 'redux/nodes/entities/labels/actions';
 import labelInterface from 'interfaces/label';
@@ -137,17 +138,9 @@ export class ManageHostsPage extends Component {
   }
 
   filterHosts = () => {
-    const { hosts: allHosts, selectedLabel } = this.props;
+    const { hosts, selectedLabel } = this.props;
 
-    // TODO: Filter custom labels by their host_ids attribute
-    if (!selectedLabel || selectedLabel.type === 'custom' || selectedLabel.type === 'all') {
-      return allHosts;
-    }
-
-    const { type } = selectedLabel;
-    const filterObject = type === 'status' ? { status: selectedLabel.slug } : { [type]: selectedLabel[type] };
-
-    return filter(allHosts, filterObject);
+    return helpers.filterHosts(hosts, selectedLabel);
   }
 
   sortHosts = (hosts) => {
