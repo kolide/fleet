@@ -128,6 +128,10 @@ func (d *Datastore) MigrateData() error {
 	return nil
 }
 
+func (d *Datastore) MigrateDemoData() error {
+	return errors.New("inmem dataastore does not support demo data")
+}
+
 func (d *Datastore) Drop() error {
 	return d.MigrateTables()
 }
