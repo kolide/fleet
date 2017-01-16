@@ -66,7 +66,8 @@ type adminUserRequest struct {
 }
 
 type adminUserResponse struct {
-	Err error `json:"error,omitempty"`
+	Err      error            `json:"error,omitempty"`
+	Response adminUserRequest `json:"response,omitempty"`
 }
 
 func (r adminUserResponse) error() error { return r.Err }
@@ -77,7 +78,7 @@ func makeAdminUserEndpoint(svc kolide.Service) endpoint.Endpoint {
 		if err := svc.ChangeUserAdmin(req.ID, req.Admin); err != nil {
 			return adminUserResponse{Err: err}, nil
 		}
-		return adminUserResponse{}, nil
+		return adminUserResponse{Response: req}, nil
 	}
 }
 
@@ -87,7 +88,8 @@ type enableUserRequest struct {
 }
 
 type enableUserResponse struct {
-	Err error `json:"error,omitempty"`
+	Err      error             `json:"error,omitempty"`
+	Response enableUserRequest `json:"response,omitempty"`
 }
 
 func (r enableUserResponse) error() error { return r.Err }
@@ -98,7 +100,7 @@ func makeEnableUserEndpoint(svc kolide.Service) endpoint.Endpoint {
 		if err := svc.ChangeUserEnabled(req.ID, req.Enabled); err != nil {
 			return enableUserResponse{Err: err}, nil
 		}
-		return enableUserResponse{}, nil
+		return enableUserResponse{Response: req}, nil
 	}
 }
 

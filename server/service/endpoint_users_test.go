@@ -18,7 +18,7 @@ func testAdminUserSetAdmin(t *testing.T, r *testResource) {
 	inJson := `{"admin":true}`
 	buff := bytes.NewBufferString(inJson)
 	path := fmt.Sprintf("/api/v1/kolide/users/%d/admin", user.ID)
-	req, err := http.NewRequest("PATCH", r.server.URL+path, buff)
+	req, err := http.NewRequest("POST", r.server.URL+path, buff)
 	require.Nil(t, err)
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", r.adminToken))
 	client := &http.Client{}
@@ -40,7 +40,7 @@ func testNonAdminUserSetAdmin(t *testing.T, r *testResource) {
 	inJson := `{"admin":true}`
 	buff := bytes.NewBufferString(inJson)
 	path := fmt.Sprintf("/api/v1/kolide/users/%d/admin", user.ID)
-	req, err := http.NewRequest("PATCH", r.server.URL+path, buff)
+	req, err := http.NewRequest("POST", r.server.URL+path, buff)
 	require.Nil(t, err)
 	// user NOT admin
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", r.userToken))
@@ -62,7 +62,7 @@ func testAdminUserSetEnabled(t *testing.T, r *testResource) {
 	inJson := `{"enabled":false}`
 	buff := bytes.NewBufferString(inJson)
 	path := fmt.Sprintf("/api/v1/kolide/users/%d/enable", user.ID)
-	req, err := http.NewRequest("PATCH", r.server.URL+path, buff)
+	req, err := http.NewRequest("POST", r.server.URL+path, buff)
 	require.Nil(t, err)
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", r.adminToken))
 	client := &http.Client{}
@@ -84,7 +84,7 @@ func testNonAdminUserSetEnabled(t *testing.T, r *testResource) {
 	inJson := `{"enabled":false}`
 	buff := bytes.NewBufferString(inJson)
 	path := fmt.Sprintf("/api/v1/kolide/users/%d/enable", user.ID)
-	req, err := http.NewRequest("PATCH", r.server.URL+path, buff)
+	req, err := http.NewRequest("POST", r.server.URL+path, buff)
 	require.Nil(t, err)
 	// user NOT admin
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", r.userToken))
