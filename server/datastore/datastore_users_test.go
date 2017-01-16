@@ -6,32 +6,7 @@ import (
 
 	"github.com/kolide/kolide-ose/server/kolide"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
-
-func testUserAdmin(t *testing.T, ds kolide.Datastore) {
-	users := createTestUsers(t, ds)
-	require.True(t, len(users) > 0)
-	user := users[0]
-	change := !user.Admin
-	err := ds.SaveUserAdmin(user.ID, change)
-	require.Nil(t, err)
-	user, err = ds.UserByID(user.ID)
-	require.Nil(t, err)
-	assert.Equal(t, change, user.Admin)
-}
-
-func testUserEnable(t *testing.T, ds kolide.Datastore) {
-	users := createTestUsers(t, ds)
-	require.True(t, len(users) > 0)
-	user := users[0]
-	change := !user.Enabled
-	err := ds.SaveUserEnabled(user.ID, change)
-	require.Nil(t, err)
-	user, err = ds.UserByID(user.ID)
-	require.Nil(t, err)
-	assert.Equal(t, change, user.Enabled)
-}
 
 func testCreateUser(t *testing.T, ds kolide.Datastore) {
 	var createTests = []struct {

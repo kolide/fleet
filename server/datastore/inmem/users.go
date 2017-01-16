@@ -7,30 +7,6 @@ import (
 	"github.com/kolide/kolide-ose/server/kolide"
 )
 
-func (d *Datastore) SaveUserAdmin(id uint, isAdmin bool) error {
-	d.mtx.Lock()
-	defer d.mtx.Unlock()
-	for _, user := range d.users {
-		if user.ID == id {
-			user.Admin = isAdmin
-			return nil
-		}
-	}
-	return notFound("User")
-}
-
-func (d *Datastore) SaveUserEnabled(id uint, isEnabled bool) error {
-	d.mtx.Lock()
-	defer d.mtx.Unlock()
-	for _, user := range d.users {
-		if user.ID == id {
-			user.Enabled = isEnabled
-			return nil
-		}
-	}
-	return notFound("User")
-}
-
 func (d *Datastore) NewUser(user *kolide.User) (*kolide.User, error) {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()

@@ -66,8 +66,8 @@ type adminUserRequest struct {
 }
 
 type adminUserResponse struct {
-	Err      error            `json:"error,omitempty"`
-	Response adminUserRequest `json:"response,omitempty"`
+	User *kolide.User `json:"user,omitempty"`
+	Err  error        `json:"error,omitempty"`
 }
 
 func (r adminUserResponse) error() error { return r.Err }
@@ -75,10 +75,14 @@ func (r adminUserResponse) error() error { return r.Err }
 func makeAdminUserEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(adminUserRequest)
-		if err := svc.ChangeUserAdmin(req.ID, req.Admin); err != nil {
+		payload := kolide.UserPayload{
+			Admin: &req.Admin,
+		}
+		user, err := svc.ModifyUser(ctx, req.ID, payload)
+		if err != nil {
 			return adminUserResponse{Err: err}, nil
 		}
-		return adminUserResponse{Response: req}, nil
+		return adminUserResponse{User: user}, nil
 	}
 }
 
@@ -88,8 +92,8 @@ type enableUserRequest struct {
 }
 
 type enableUserResponse struct {
-	Err      error             `json:"error,omitempty"`
-	Response enableUserRequest `json:"response,omitempty"`
+	User *kolide.User `json:"user,omitempty"`
+	Err  error        `json:"error,omitempty"`
 }
 
 func (r enableUserResponse) error() error { return r.Err }
@@ -97,10 +101,14 @@ func (r enableUserResponse) error() error { return r.Err }
 func makeEnableUserEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(enableUserRequest)
-		if err := svc.ChangeUserEnabled(req.ID, req.Enabled); err != nil {
+		payload := kolide.UserPayload{
+			Enabled: &req.Enabled,
+		}
+		user, err := svc.ModifyUser(ctx, req.ID, payload)
+		if err != nil {
 			return enableUserResponse{Err: err}, nil
 		}
-		return enableUserResponse{Response: req}, nil
+		return enableUserResponse{User: user}, nil
 	}
 }
 

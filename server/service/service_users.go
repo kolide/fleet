@@ -33,20 +33,6 @@ func (svc service) NewUser(ctx context.Context, p kolide.UserPayload) (*kolide.U
 	return user, nil
 }
 
-func (svc service) ChangeUserAdmin(id uint, isAdmin bool) error {
-	if err := svc.ds.SaveUserAdmin(id, isAdmin); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (svc service) ChangeUserEnabled(id uint, isEnabled bool) error {
-	if err := svc.ds.SaveUserEnabled(id, isEnabled); err != nil {
-		return err
-	}
-	return nil
-}
-
 func (svc service) NewAdminCreatedUser(ctx context.Context, p kolide.UserPayload) (*kolide.User, error) {
 	return svc.newUser(p)
 }
@@ -71,6 +57,14 @@ func (svc service) ModifyUser(ctx context.Context, userID uint, p kolide.UserPay
 
 	// the method assumes that the correct authorization
 	// has been validated higher up the stack
+	if p.Admin != nil {
+		user.Admin = *p.Admin
+	}
+
+	if p.Enabled != nil {
+		user.Enabled = *p.Enabled
+	}
+
 	if p.Username != nil {
 		user.Username = *p.Username
 	}
