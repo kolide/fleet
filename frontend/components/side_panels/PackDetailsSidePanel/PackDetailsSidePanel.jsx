@@ -11,10 +11,6 @@ import Slider from 'components/forms/fields/Slider';
 const baseClass = 'pack-details-side-panel';
 
 const Description = ({ pack }) => {
-  if (!pack.description) {
-    return false;
-  }
-
   return (
     <div>
       <p className={`${baseClass}__section-label`}>Description</p>

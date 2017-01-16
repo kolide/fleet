@@ -200,12 +200,10 @@ export class ManageHostsPage extends Component {
 
         { renderQuery() }
 
-        {description &&
-          <div className={`${baseClass}__description`}>
-            <h2>Description</h2>
-            <p>{description}</p>
-          </div>
-        }
+        <div className={`${baseClass}__description`}>
+          <h2>Description</h2>
+          <p>{description || <em>No description available.</em>}</p>
+        </div>
 
         <div className={`${baseClass}__topper`}>
           <p className={`${baseClass}__host-count`}>{count} Hosts Total</p>

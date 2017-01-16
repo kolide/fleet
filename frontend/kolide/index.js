@@ -243,9 +243,9 @@ class Kolide extends Base {
           };
         });
         const stubbedLabels = [
-          { id: 40, display_text: 'ONLINE', type: 'status', count: 20 },
-          { id: 50, display_text: 'OFFLINE', type: 'status', count: 2 },
-          { id: 55, display_text: 'MIA', description: '(offline > 30 days)', type: 'status', count: 3 },
+          { id: 40, display_text: 'ONLINE', description: 'Hosts that have recently checked-in to Kolide and are ready to run queries.', type: 'status', count: 20 },
+          { id: 50, display_text: 'OFFLINE', description: 'Hosts that have not checked-in to Kolide recently', type: 'status', count: 2 },
+          { id: 55, display_text: 'MIA', description: 'Hosts that have not been seen by Kolide in more than 30 days.', type: 'status', count: 3 },
         ];
 
         return labels.concat(stubbedLabels);
