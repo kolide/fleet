@@ -15,9 +15,9 @@ func decodeEnableUserRequest(ctx context.Context, r *http.Request) (interface{},
 	}
 	var req enableUserRequest
 	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
-		req.ID = id
 		return nil, err
 	}
+	req.ID = id
 	return req, nil
 }
 
@@ -28,9 +28,9 @@ func decodeAdminUserRequest(ctx context.Context, r *http.Request) (interface{}, 
 	}
 	var req adminUserRequest
 	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
-		req.ID = id
 		return nil, err
 	}
+	req.ID = id
 	return req, nil
 }
 

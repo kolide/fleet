@@ -79,16 +79,8 @@ func (svc service) ModifyUser(ctx context.Context, userID uint, p kolide.UserPay
 		user.Name = *p.Name
 	}
 
-	if p.Admin != nil {
-		user.Admin = *p.Admin
-	}
-
 	if p.Email != nil {
 		user.Email = *p.Email
-	}
-
-	if p.Enabled != nil {
-		user.Enabled = *p.Enabled
 	}
 
 	if p.Position != nil {
