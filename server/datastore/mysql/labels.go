@@ -49,6 +49,10 @@ func (d *Datastore) Label(lid uint) (*kolide.Label, error) {
 		return nil, errors.Wrap(err, "selecting label")
 	}
 
+	if err := d.hostIDsForLabels([]*kolide.Label{label}); err != nil {
+		return nil, err
+	}
+
 	return label, nil
 }
 
@@ -68,40 +72,8 @@ func (d *Datastore) ListLabels(opt kolide.ListOptions) ([]*kolide.Label, error) 
 		return nil, errors.Wrap(err, "selecting labels")
 	}
 
-	query = `
-		SELECT
-			label_id,
-			host_id
-		FROM label_query_executions
-		WHERE label_id IN (?)
-	`
-
-	labelCache := make(map[uint]*kolide.Label)
-	var selectList []uint
-	for _, label := range labels {
-		selectList = append(selectList, label.ID)
-		labelCache[label.ID] = label
-	}
-
-	query, args, err := sqlx.In(query, selectList)
-	if err != nil {
-		return nil, errors.Wrap(err, "building in query for list labels")
-	}
-	query = d.db.Rebind(query)
-	rows, err := d.db.Query(query, args...)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return labels, nil
-		}
-		return nil, errors.Wrap(err, "fetching hosts for label")
-	}
-	for rows.Next() {
-		var labelID, hostID uint
-		err = rows.Scan(&labelID, &hostID)
-		if err != nil {
-			return nil, errors.Wrap(err, "scanning columns to get host ids for label")
-		}
-		labelCache[labelID].HostIDs = append(labelCache[labelID].HostIDs, hostID)
+	if err := d.hostIDsForLabels(labels); err != nil {
+		return nil, err
 	}
 
 	return labels, nil
@@ -189,6 +161,13 @@ func (d *Datastore) ListLabelsForHost(hid uint) ([]kolide.Label, error) {
 	err := d.db.Select(&labels, sqlStatement, hid)
 	if err != nil {
 		return nil, errors.Wrap(err, "selecting host labels")
+	}
+	var labelsWithHostIds []*kolide.Label
+	for i := range labels {
+		labelsWithHostIds = append(labelsWithHostIds, &labels[i])
+	}
+	if err = d.hostIDsForLabels(labelsWithHostIds); err != nil {
+		return nil, err
 	}
 	return labels, nil
 
@@ -314,6 +293,56 @@ func (d *Datastore) SearchLabels(query string, omit ...uint) ([]kolide.Label, er
 	if err != nil {
 		return nil, errors.Wrap(err, "selecting labels for search")
 	}
+	var matchesWithHostIDs []*kolide.Label
+	for i := range matches {
+		matchesWithHostIDs = append(matchesWithHostIDs, &matches[i])
+	}
+	if err = d.hostIDsForLabels(matchesWithHostIDs); err != nil {
+		return nil, err
+	}
 
 	return matches, nil
+}
+
+func (d *Datastore) hostIDsForLabels(labels []*kolide.Label) error {
+	if len(labels) == 0 {
+		return nil
+	}
+	query := `
+		SELECT
+			lqe.label_id,
+			lqe.host_id
+		FROM label_query_executions AS lqe
+		INNER JOIN hosts AS h
+		ON ( h.id = lqe.host_id)
+		WHERE NOT h.deleted AND lqe.label_id IN (?)
+	`
+
+	labelCache := make(map[uint]*kolide.Label)
+	var selectList []uint
+	for _, label := range labels {
+		selectList = append(selectList, label.ID)
+		labelCache[label.ID] = label
+	}
+
+	query, args, err := sqlx.In(query, selectList)
+	if err != nil {
+		return errors.Wrap(err, "building in query for list labels")
+	}
+	query = d.db.Rebind(query)
+	rows, err := d.db.Query(query, args...)
+	if err == sql.ErrNoRows {
+		return nil
+	} else if err != nil {
+		return errors.Wrap(err, "fetching hosts for label")
+	}
+	for rows.Next() {
+		var labelID, hostID uint
+		err = rows.Scan(&labelID, &hostID)
+		if err != nil {
+			return errors.Wrap(err, "scanning columns to get host ids for label")
+		}
+		labelCache[labelID].HostIDs = append(labelCache[labelID].HostIDs, hostID)
+	}
+	return nil
 }
