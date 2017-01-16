@@ -1,13 +1,14 @@
 .config-options-page {
+  padding: 30px;
+
   &__btn-wrapper {
     min-width: 214px;
+    float: right;
   }
 
-  &__header-wrapper {
-    @include display(flex);
-    @include justify-content(space-around);
-
-    padding: 31px 35px;
+  &__header-content {
+    max-width: 75%;
+    float: left;
   }
 
   &__options-wrapper {
@@ -17,6 +18,16 @@
 
   &__reset-btn {
     margin-bottom: 32px;
+  }
+
+  &__add-new {
+    color: $success;
+
+    .kolidecon {
+      font-size: 24px;
+      vertical-align: text-bottom;
+      margin-right: 15px;
+    }
   }
 
   h1 {
