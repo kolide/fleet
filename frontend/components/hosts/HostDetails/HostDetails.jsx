@@ -20,6 +20,7 @@ const HostDetails = ({ host, onDestroyHost }) => {
     mac,
     memory,
     os_version: osVersion,
+    osquery_version: osqueryVersion,
     platform,
     status,
     uptime,
@@ -50,7 +51,7 @@ const HostDetails = ({ host, onDestroyHost }) => {
 
         <li className={` ${baseClass}__detail ${baseClass}__detail--osquery`}>
           <Icon name="osquery" className={`${baseClass}__icon`} />
-          <span className={`${baseClass}__host-content`}>2.0.1</span>
+          <span className={`${baseClass}__host-content`}>{osqueryVersion}</span>
         </li>
 
         <li className={` ${baseClass}__detail ${baseClass}__detail--memory`}>
