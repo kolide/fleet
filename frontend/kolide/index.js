@@ -32,6 +32,15 @@ class Kolide extends Base {
     },
   }
 
+  statusLabels = {
+    getCounts: () => {
+      const { STATUS_LABEL_COUNTS } = endpoints;
+
+      return this.authenticatedGet(this.endpoint(STATUS_LABEL_COUNTS))
+        .then(response => response.host_summary);
+    },
+  }
+
   createLabel = ({ description, name, query }) => {
     const { LABELS } = endpoints;
 
