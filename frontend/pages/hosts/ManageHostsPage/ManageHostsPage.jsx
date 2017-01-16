@@ -54,20 +54,10 @@ export class ManageHostsPage extends Component {
   }
 
   componentWillMount () {
-    const {
-      dispatch,
-      hosts,
-      labels,
-    } = this.props;
+    const { dispatch } = this.props;
 
-    if (!hosts.length) {
-      dispatch(hostActions.loadAll());
-    }
-
-    if (!labels.length) {
-      dispatch(labelActions.loadAll());
-    }
-
+    dispatch(hostActions.loadAll());
+    dispatch(labelActions.loadAll());
     dispatch(getStatusLabelCounts);
 
     return false;

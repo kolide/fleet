@@ -36,8 +36,7 @@ class Kolide extends Base {
     getCounts: () => {
       const { STATUS_LABEL_COUNTS } = endpoints;
 
-      return this.authenticatedGet(this.endpoint(STATUS_LABEL_COUNTS))
-        .then(response => response.host_summary);
+      return this.authenticatedGet(this.endpoint(STATUS_LABEL_COUNTS));
     },
   }
 
@@ -252,9 +251,9 @@ class Kolide extends Base {
           };
         });
         const stubbedLabels = [
-          { id: 'online', display_text: 'ONLINE', type: 'status', count: 0 },
-          { id: 'offline', display_text: 'OFFLINE', type: 'status', count: 0 },
-          { id: 'mia', display_text: 'MIA', description: '(offline > 30 days)', type: 'status', count: 0 },
+          { id: 'online', display_text: 'ONLINE', slug: 'online', type: 'status', count: 0 },
+          { id: 'offline', display_text: 'OFFLINE', slug: 'offline', type: 'status', count: 0 },
+          { id: 'mia', display_text: 'MIA', description: '(offline > 30 days)', slug: 'mia', type: 'status', count: 0 },
         ];
 
         return labels.concat(stubbedLabels);

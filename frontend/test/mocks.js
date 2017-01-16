@@ -340,13 +340,7 @@ export const validStatusLabelsGetCountsRequest = (bearerToken) => {
     },
   })
     .get('/api/v1/kolide/host_summary')
-    .reply(200, {
-      host_summary: {
-        online_count: 100,
-        offline_count: 23,
-        mia_count: 2,
-      },
-    });
+    .reply(200, { online_count: 100, offline_count: 23, mia_count: 2 });
 };
 
 export const validUpdateConfigRequest = (bearerToken, configData) => {
