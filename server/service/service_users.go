@@ -33,6 +33,20 @@ func (svc service) NewUser(ctx context.Context, p kolide.UserPayload) (*kolide.U
 	return user, nil
 }
 
+func (svc service) ChangeUserAdmin(id uint, isAdmin bool) error {
+	if err := svc.ds.SaveUserAdmin(id, isAdmin); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (svc service) ChangeUserEnabled(id uint, isEnabled bool) error {
+	if err := svc.ds.SaveUserEnabled(id, isEnabled); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (svc service) NewAdminCreatedUser(ctx context.Context, p kolide.UserPayload) (*kolide.User, error) {
 	return svc.newUser(p)
 }

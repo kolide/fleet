@@ -8,6 +8,46 @@ import (
 	"github.com/pkg/errors"
 )
 
+func (d *Datastore) SaveUserAdmin(id uint, isAdmin bool) error {
+	sqlStatement := `
+		UPDATE users SET
+			admin = ?
+		WHERE id = ?
+	`
+	result, err := d.db.Exec(sqlStatement, isAdmin, id)
+	if err != nil {
+		return errors.Wrap(err, "updating user admin value")
+	}
+	count, err := result.RowsAffected()
+	if err != nil {
+		return errors.Wrap(err, "fetching rows effected updating user admin")
+	}
+	if count == 0 {
+		return notFound("User")
+	}
+	return nil
+}
+
+func (d *Datastore) SaveUserEnabled(id uint, isEnabled bool) error {
+	sqlStatement := `
+			UPDATE users SET
+				enabled = ?
+			WHERE id = ?
+		`
+	result, err := d.db.Exec(sqlStatement, isEnabled, id)
+	if err != nil {
+		return errors.Wrap(err, "updating user enabled value")
+	}
+	count, err := result.RowsAffected()
+	if err != nil {
+		return errors.Wrap(err, "fetching rows effected updating user enabled")
+	}
+	if count == 0 {
+		return notFound("User")
+	}
+	return nil
+}
+
 // NewUser creates a new user
 func (d *Datastore) NewUser(user *kolide.User) (*kolide.User, error) {
 	sqlStatement := `

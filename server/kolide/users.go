@@ -17,6 +17,12 @@ type UserStore interface {
 	UserByEmail(email string) (*User, error)
 	UserByID(id uint) (*User, error)
 	SaveUser(user *User) error
+	// SaveUserAdmin sets the value of the user admin field for user identified
+	// by id.
+	SaveUserAdmin(id uint, isAdmin bool) error
+	// SaveUserEnabled sets the value of the enabled field of the user identified
+	// by id.
+	SaveUserEnabled(id uint, isEnabled bool) error
 }
 
 // UserService contains methods for managing a Kolide User.
@@ -64,6 +70,13 @@ type UserService interface {
 
 	// ModifyUser updates a user's parameters given a UserPayload.
 	ModifyUser(ctx context.Context, userID uint, p UserPayload) (user *User, err error)
+
+	// ChangeUserAdmin updates user's admin state, true sets user to be an admin
+	ChangeUserAdmin(id uint, isAdmin bool) error
+
+	// ChangeUserEnabled updates a user's enabled state, true sets a user to be
+	// enabled
+	ChangeUserEnabled(id uint, isAdmin bool) error
 }
 
 // User is the model struct which represents a kolide user
