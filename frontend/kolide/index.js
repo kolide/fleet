@@ -252,9 +252,9 @@ class Kolide extends Base {
           };
         });
         const stubbedLabels = [
-          { id: 40, display_text: 'ONLINE', type: 'status', count: 20 },
-          { id: 50, display_text: 'OFFLINE', type: 'status', count: 2 },
-          { id: 55, display_text: 'MIA', description: '(offline > 30 days)', type: 'status', count: 3 },
+          { id: 'online', display_text: 'ONLINE', type: 'status', count: 0 },
+          { id: 'offline', display_text: 'OFFLINE', type: 'status', count: 0 },
+          { id: 'mia', display_text: 'MIA', description: '(offline > 30 days)', type: 'status', count: 0 },
         ];
 
         return labels.concat(stubbedLabels);

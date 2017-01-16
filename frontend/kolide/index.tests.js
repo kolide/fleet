@@ -64,7 +64,7 @@ describe('Kolide - API client', () => {
       Kolide.statusLabels.getCounts()
         .then(() => {
           expect(request.isDone()).toEqual(true);
-          done()
+          done();
         })
         .catch(() => {
           throw new Error('Endpoint not reached');

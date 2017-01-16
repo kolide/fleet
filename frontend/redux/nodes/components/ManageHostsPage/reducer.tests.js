@@ -1,5 +1,7 @@
 import expect, { spyOn, restoreSpies } from 'expect';
 
+import Kolide from 'kolide';
+import { reduxMockStore } from 'test/helpers';
 import {
   getStatusLabelCounts,
   getStatusLabelCountsFailure,
@@ -7,9 +9,7 @@ import {
   loadStatusLabelCounts,
   setDisplay,
 } from './actions';
-import Kolide from 'kolide';
 import reducer, { initialState } from './reducer';
-import { reduxMockStore } from 'test/helpers';
 
 describe('ManageHostsPage - reducer', () => {
   afterEach(restoreSpies);
@@ -27,7 +27,7 @@ describe('ManageHostsPage - reducer', () => {
     });
   });
 
-  describe.only('#getStatusLabelCounts', () => {
+  describe('#getStatusLabelCounts', () => {
     it('sets the loading boolean', () => {
       expect(reducer(initialState, loadStatusLabelCounts)).toEqual({
         ...initialState,
@@ -57,11 +57,10 @@ describe('ManageHostsPage - reducer', () => {
           expect(mockStore.getActions()).toEqual(expectedActions);
 
           done();
-        })
+        });
     });
 
     it('dispatches the correct actions when unsuccessful', (done) => {
-      const statusLabelCounts = { online_count: 23, offline_count: 100, mia_count: 2 };
       const store = { components: { ManageHostsPage: initialState } };
       const mockStore = reduxMockStore(store);
       const errors = [{ name: 'error_name', reason: 'error reason' }];
