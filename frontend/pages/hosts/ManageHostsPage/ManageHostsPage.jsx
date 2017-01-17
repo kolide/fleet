@@ -210,6 +210,7 @@ export class ManageHostsPage extends Component {
       leftIcon: 'list-select',
       leftText: 'List',
     };
+    const hostsTotalDisplay = count === 1 ? '1 Host Total' : `${count} Hosts Total`;
 
     return (
       <div className={`${baseClass}__header`}>
@@ -228,7 +229,7 @@ export class ManageHostsPage extends Component {
         }
 
         <div className={`${baseClass}__topper`}>
-          <p className={`${baseClass}__host-count`}>{count} Hosts Total</p>
+          <p className={`${baseClass}__host-count`}>{hostsTotalDisplay}</p>
           <Rocker
             onChange={onToggleDisplay}
             options={buttonOptions}

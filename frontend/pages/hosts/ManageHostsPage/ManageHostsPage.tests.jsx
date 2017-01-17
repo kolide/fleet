@@ -70,6 +70,22 @@ describe('ManageHostsPage - component', () => {
     });
   });
 
+  describe('header', () => {
+    it('displays "1 Host Total" when there is 1 host', () => {
+      const oneHostLabel = { ...allHostsLabel, count: 1 };
+      const page = mount(<ManageHostsPage {...props} selectedLabel={oneHostLabel} />);
+
+      expect(page.text()).toInclude('1 Host Total');
+    });
+
+    it('displays "#{count} Hosts Total" when there are more than 1 host', () => {
+      const oneHostLabel = { ...allHostsLabel, count: 2 };
+      const page = mount(<ManageHostsPage {...props} selectedLabel={oneHostLabel} />);
+
+      expect(page.text()).toInclude('2 Hosts Total');
+    });
+  });
+
   describe('host rendering', () => {
     it('renders hosts as HostDetails by default', () => {
       const page = mount(<ManageHostsPage {...props} hosts={[hostStub]} />);
