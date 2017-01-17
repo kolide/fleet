@@ -55,6 +55,11 @@ class ConfigOptionsForm extends Component {
     return (
       <div className={baseClass}>
         <ul className={`${baseClass}__options`}>
+          <li className={`${baseClass}__option-header`}>
+            <span className={`${baseClass}__option-header-name`}>Option Name</span>
+            <span className={`${baseClass}__option-header-value`}>Value</span>
+          </li>
+
           {completedOptions.map((option, idx) => {
             return renderConfigOptionForm(option, idx);
           })}

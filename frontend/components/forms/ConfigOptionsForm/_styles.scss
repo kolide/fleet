@@ -15,6 +15,23 @@
     margin: 0 0 $pad-small;
   }
 
+  &__option-header {
+    span {
+      font-size: 15px;
+      font-weight: $normal;
+      line-height: 2.5;
+      letter-spacing: 0.6px;
+      color: $text-medium;
+      text-transform: uppercase;
+      display: inline-block;
+    }
+
+    &-name {
+      padding: 0 50px 0 40px;
+      width: 300px;
+    }
+  }
+
   &__form {
     @include display(flex);
 
