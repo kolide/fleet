@@ -49,6 +49,30 @@ func (svc service) newUser(p kolide.UserPayload) (*kolide.User, error) {
 	return user, nil
 }
 
+func (svc service) ChangeUserAdmin(id uint, isAdmin bool) (*kolide.User, error) {
+	user, err := svc.ds.UserByID(id)
+	if err != nil {
+		return nil, err
+	}
+	user.Admin = isAdmin
+	if err = svc.saveUser(user); err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
+func (svc service) ChangeUserEnabled(id uint, isEnabled bool) (*kolide.User, error) {
+	user, err := svc.ds.UserByID(id)
+	if err != nil {
+		return nil, err
+	}
+	user.Enabled = isEnabled
+	if err = svc.saveUser(user); err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
 func (svc service) ModifyUser(ctx context.Context, userID uint, p kolide.UserPayload) (*kolide.User, error) {
 	user, err := svc.User(ctx, userID)
 	if err != nil {

@@ -18,10 +18,6 @@ type UserByIDFunc func(id uint) (*kolide.User, error)
 
 type SaveUserFunc func(user *kolide.User) error
 
-type SaveUserAdminFunc func(id uint, isAdmin bool) error
-
-type SaveUserEnabledFunc func(id uint, isEnabled bool) error
-
 type UserStore struct {
 	NewUserFunc        NewUserFunc
 	NewUserFuncInvoked bool
@@ -40,12 +36,6 @@ type UserStore struct {
 
 	SaveUserFunc        SaveUserFunc
 	SaveUserFuncInvoked bool
-
-	SaveUserAdminFunc        SaveUserAdminFunc
-	SaveUserAdminFuncInvoked bool
-
-	SaveUserEnabledFunc        SaveUserEnabledFunc
-	SaveUserEnabledFuncInvoked bool
 }
 
 func (s *UserStore) NewUser(user *kolide.User) (*kolide.User, error) {
@@ -76,14 +66,4 @@ func (s *UserStore) UserByID(id uint) (*kolide.User, error) {
 func (s *UserStore) SaveUser(user *kolide.User) error {
 	s.SaveUserFuncInvoked = true
 	return s.SaveUserFunc(user)
-}
-
-func (s *UserStore) SaveUserAdmin(id uint, isAdmin bool) error {
-	s.SaveUserAdminFuncInvoked = true
-	return s.SaveUserAdminFunc(id, isAdmin)
-}
-
-func (s *UserStore) SaveUserEnabled(id uint, isEnabled bool) error {
-	s.SaveUserEnabledFuncInvoked = true
-	return s.SaveUserEnabledFunc(id, isEnabled)
 }

@@ -75,10 +75,7 @@ func (r adminUserResponse) error() error { return r.Err }
 func makeAdminUserEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(adminUserRequest)
-		payload := kolide.UserPayload{
-			Admin: &req.Admin,
-		}
-		user, err := svc.ModifyUser(ctx, req.ID, payload)
+		user, err := svc.ChangeUserAdmin(req.ID, req.Admin)
 		if err != nil {
 			return adminUserResponse{Err: err}, nil
 		}
@@ -101,10 +98,7 @@ func (r enableUserResponse) error() error { return r.Err }
 func makeEnableUserEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(enableUserRequest)
-		payload := kolide.UserPayload{
-			Enabled: &req.Enabled,
-		}
-		user, err := svc.ModifyUser(ctx, req.ID, payload)
+		user, err := svc.ChangeUserEnabled(req.ID, req.Enabled)
 		if err != nil {
 			return enableUserResponse{Err: err}, nil
 		}

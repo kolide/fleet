@@ -64,6 +64,10 @@ type UserService interface {
 
 	// ModifyUser updates a user's parameters given a UserPayload.
 	ModifyUser(ctx context.Context, userID uint, p UserPayload) (user *User, err error)
+	// ChangeUserAdmin is used to modify the admin state of the user identified by id.
+	ChangeUserAdmin(id uint, isAdmin bool) (*User, error)
+	// ChangeUserEnabled is used to enable/disable the user identified by id.
+	ChangeUserEnabled(id uint, isEnabled bool) (*User, error)
 }
 
 // User is the model struct which represents a kolide user
