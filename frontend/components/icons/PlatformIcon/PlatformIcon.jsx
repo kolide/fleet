@@ -16,7 +16,6 @@ export class PlatformIcon extends Component {
   };
 
   render () {
-    const { findIcon } = this;
     const { className, name, fw, size, title } = this.props;
     const iconClasses = classnames(baseClass, className);
     const iconName = platformIconClass(name);
