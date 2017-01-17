@@ -250,14 +250,9 @@ func (d *Datastore) searchLabelsWithOmits(query string, omit ...uint) ([]kolide.
 
 func (d *Datastore) searchLabelsDefault(omit ...uint) ([]kolide.Label, error) {
 	sqlStatement := `
-	SELECT DISTINCT *
+	SELECT *
 	FROM labels
-	WHERE (
-		id in ( 
-			SELECT id FROM labels
-		)
-	)
-	AND NOT deleted
+	WHERE NOT deleted
 	AND id NOT IN (?)
 	LIMIT 5
 	`

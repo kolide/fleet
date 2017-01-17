@@ -528,14 +528,8 @@ func (d *Datastore) searchHostsWithOmits(query string, omit ...uint) ([]*kolide.
 
 func (d *Datastore) searchHostsDefault(omit ...uint) ([]*kolide.Host, error) {
 	sqlStatement := `
-	SELECT DISTINCT *
-	FROM hosts
-	WHERE (
-		id in ( 
-			SELECT id FROM hosts
-		)
-	)
-	AND NOT deleted
+	SELECT * FROM hosts
+	WHERE NOT deleted
 	AND id NOT IN (?)
 	ORDER BY seen_time DESC
 	LIMIT 5
