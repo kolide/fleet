@@ -17,6 +17,7 @@ type setupResponse struct {
 	Admin           *kolide.User    `json:"admin,omitempty"`
 	OrgInfo         *kolide.OrgInfo `json:"org_info,omitempty"`
 	KolideServerURL *string         `json:"kolide_server_url"`
+	Token           *string         `json:"token,omitempty"`
 	Err             error           `json:"error,omitempty"`
 }
 
@@ -28,6 +29,7 @@ func makeSetupEndpoint(svc kolide.Service) endpoint.Endpoint {
 			admin         *kolide.User
 			config        *kolide.AppConfig
 			configPayload kolide.AppConfigPayload
+			token         string
 			err           error
 		)
 		req := request.(setupRequest)
@@ -37,7 +39,6 @@ func makeSetupEndpoint(svc kolide.Service) endpoint.Endpoint {
 				return setupResponse{Err: err}, nil
 			}
 		}
-
 		if req.OrgInfo != nil {
 			configPayload.OrgInfo = req.OrgInfo
 		}
@@ -48,6 +49,11 @@ func makeSetupEndpoint(svc kolide.Service) endpoint.Endpoint {
 		if err != nil {
 			return setupResponse{Err: err}, nil
 		}
+		// If everything works to this point, log the user in and return token
+		_, token, err = svc.Login(ctx, *req.Admin.Username, *req.Admin.Password)
+		if err != nil {
+			return setupResponse{Err: err}, nil
+		}
 		return setupResponse{
 			Admin: admin,
 			OrgInfo: &kolide.OrgInfo{
@@ -55,6 +61,7 @@ func makeSetupEndpoint(svc kolide.Service) endpoint.Endpoint {
 				OrgLogoURL: &config.OrgLogoURL,
 			},
 			KolideServerURL: &config.KolideServerURL,
+			Token:           &token,
 		}, nil
 	}
 }
