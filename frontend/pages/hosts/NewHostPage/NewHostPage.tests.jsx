@@ -20,10 +20,10 @@ describe('New Host Page - component', () => {
 
   it('saves the copied text in state', () => {
     const page = mount(<NewHostPage />);
-    const method1Icon = page.find('.kolidecon-clipboard').first();
+    const osqueryCommandIcon = page.find('.kolidecon-clipboard').first();
 
-    method1Icon.simulate('click');
+    osqueryCommandIcon.simulate('click');
 
-    expect(page.state().method1TextCopied).toEqual(true);
+    expect(page.state().osqueryCommandTextCopied).toEqual(true);
   });
 });
