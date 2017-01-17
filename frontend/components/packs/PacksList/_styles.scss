@@ -34,4 +34,10 @@
   &__select-all {
     margin-bottom: 0;
   }
+
+  &__empty-table {
+    text-align: center;
+    font-size: 18px;
+    color: $text-ultradark;
+  }
 }
