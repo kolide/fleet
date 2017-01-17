@@ -538,7 +538,7 @@ func (d *Datastore) searchHostsDefault(omit ...uint) ([]*kolide.Host, error) {
 	AND NOT deleted
 	AND id NOT IN (?)
 	ORDER BY seen_time DESC
-	LIMIT 10
+	LIMIT 5
 	`
 
 	var in interface{}
