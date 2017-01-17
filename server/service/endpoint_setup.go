@@ -29,7 +29,6 @@ func makeSetupEndpoint(svc kolide.Service) endpoint.Endpoint {
 			admin         *kolide.User
 			config        *kolide.AppConfig
 			configPayload kolide.AppConfigPayload
-			token         string
 			err           error
 		)
 		req := request.(setupRequest)
@@ -49,10 +48,13 @@ func makeSetupEndpoint(svc kolide.Service) endpoint.Endpoint {
 		if err != nil {
 			return setupResponse{Err: err}, nil
 		}
-		// If everything works to this point, log the user in and return token
-		_, token, err = svc.Login(ctx, *req.Admin.Username, *req.Admin.Password)
+		// If everything works to this point, log the user in and return token.  If
+		// the login fails for some reason, ignore the error and don't return
+		// a token, forcing the user to log in manually
+		token := new(string)
+		_, *token, err = svc.Login(ctx, *req.Admin.Username, *req.Admin.Password)
 		if err != nil {
-			return setupResponse{Err: err}, nil
+			token = nil
 		}
 		return setupResponse{
 			Admin: admin,
@@ -61,7 +63,7 @@ func makeSetupEndpoint(svc kolide.Service) endpoint.Endpoint {
 				OrgLogoURL: &config.OrgLogoURL,
 			},
 			KolideServerURL: &config.KolideServerURL,
-			Token:           &token,
+			Token:           token,
 		}, nil
 	}
 }
