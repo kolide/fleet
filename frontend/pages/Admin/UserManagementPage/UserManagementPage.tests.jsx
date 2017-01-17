@@ -14,6 +14,11 @@ const currentUser = {
 };
 const loadUsersAction = { type: 'users_LOAD_REQUEST' };
 const store = {
+  app: {
+    config: {
+      configured: true,
+    },
+  },
   auth: {
     user: {
       ...currentUser,
@@ -42,6 +47,57 @@ const store = {
 };
 
 describe('UserManagementPage - component', () => {
+  it('displays a disabled "Add User" button if email is not configured', () => {
+    const notConfiguredStore = { ...store, app: { config: { configured: false } } };
+    const notConfiguredMockStore = reduxMockStore(notConfiguredStore);
+    const notConfiguredPage = mount(connectedComponent(UserManagementPage, {
+      mockStore: notConfiguredMockStore,
+    }));
+
+    const configuredStore = store;
+    const configuredMockStore = reduxMockStore(configuredStore);
+    const configuredPage = mount(connectedComponent(UserManagementPage, {
+      mockStore: configuredMockStore,
+    }));
+
+    expect(notConfiguredPage.find('Button').first().prop('disabled')).toEqual(true);
+    expect(configuredPage.find('Button').first().prop('disabled')).toEqual(false);
+  });
+
+  it('displays a SmtpWarning if email is not configured', () => {
+    const notConfiguredStore = { ...store, app: { config: { configured: false } } };
+    const notConfiguredMockStore = reduxMockStore(notConfiguredStore);
+    const notConfiguredPage = mount(connectedComponent(UserManagementPage, {
+      mockStore: notConfiguredMockStore,
+    }));
+
+    const configuredStore = store;
+    const configuredMockStore = reduxMockStore(configuredStore);
+    const configuredPage = mount(connectedComponent(UserManagementPage, {
+      mockStore: configuredMockStore,
+    }));
+
+    expect(notConfiguredPage.find('SmtpWarning').html()).toExist();
+    expect(configuredPage.find('SmtpWarning').html()).toNotExist();
+  });
+
+  it('goes to the app settings page for the user to resolve their smtp settings', () => {
+    const notConfiguredStore = { ...store, app: { config: { configured: false } } };
+    const mockStore = reduxMockStore(notConfiguredStore);
+    const page = mount(connectedComponent(UserManagementPage, { mockStore }));
+
+    const smtpWarning = page.find('SmtpWarning');
+
+    smtpWarning.find('Button').simulate('click');
+
+    const goToAppSettingsAction = {
+      type: '@@router/CALL_HISTORY_METHOD',
+      payload: { method: 'push', args: ['/admin/settings'] },
+    };
+
+    expect(mockStore.getActions()).toInclude(goToAppSettingsAction);
+  });
+
   it('renders user blocks for users and invites', () => {
     const mockStore = reduxMockStore(store);
     const page = mount(connectedComponent(UserManagementPage, { mockStore }));

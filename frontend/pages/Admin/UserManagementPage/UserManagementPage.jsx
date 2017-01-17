@@ -1,13 +1,17 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
+import { push } from 'react-router-redux';
 import { first, isEqual, size } from 'lodash';
 
-import entityGetter from 'redux/utilities/entityGetter';
 import Button from 'components/buttons/Button';
+import configInterface from 'interfaces/config';
+import entityGetter from 'redux/utilities/entityGetter';
 import inviteActions from 'redux/nodes/entities/invites/actions';
 import inviteInterface from 'interfaces/invite';
 import InviteUserForm from 'components/forms/InviteUserForm';
 import Modal from 'components/modals/Modal';
+import paths from 'router/paths';
+import SmtpWarning from 'components/SmtpWarning';
 import userActions from 'redux/nodes/entities/users/actions';
 import userInterface from 'interfaces/user';
 import { renderFlash } from 'redux/nodes/notifications/actions';
@@ -15,6 +19,7 @@ import UserBlock from './UserBlock';
 
 class UserManagementPage extends Component {
   static propTypes = {
+    config: configInterface,
     currentUser: userInterface,
     dispatch: PropTypes.func,
     inviteErrors: PropTypes.shape({
@@ -122,14 +127,25 @@ class UserManagementPage extends Component {
     dispatch(inviteActions.create(formData))
       .then(() => {
         dispatch(renderFlash('success', 'User invited'));
+
         return this.toggleInviteUserModal();
-      });
+      })
+      .catch(() => false);
   }
 
   onInviteCancel = (evt) => {
     evt.preventDefault();
 
     return this.toggleInviteUserModal();
+  }
+
+  goToAppConfigPage = (evt) => {
+    evt.preventDefault();
+
+    const { ADMIN_SETTINGS } = paths;
+    const { dispatch } = this.props;
+
+    dispatch(push(ADMIN_SETTINGS));
   }
 
   toggleInviteUserModal = () => {
@@ -185,19 +201,31 @@ class UserManagementPage extends Component {
   };
 
   render () {
-    const { toggleInviteUserModal } = this;
-    const { invites, users } = this.props;
+    const { goToAppConfigPage, toggleInviteUserModal } = this;
+    const { config, invites, users } = this.props;
     const resourcesCount = users.length + invites.length;
 
     const baseClass = 'user-management';
 
     return (
       <div className={`${baseClass} body-wrap`}>
-        <h1 className={`${baseClass}__user-count`}>Listing {resourcesCount} users</h1>
-        <div className={`${baseClass}__add-user-wrap`}>
-          <Button onClick={toggleInviteUserModal} className={`${baseClass}__add-user-btn`}>
-            Add User
-          </Button>
+        <div className={`${baseClass}__heading-wrapper`}>
+          <h1 className={`${baseClass}__user-count`}>Listing {resourcesCount} users</h1>
+          <div className={`${baseClass}__add-user-wrap`}>
+            <Button
+              className={`${baseClass}__add-user-btn`}
+              disabled={!config.configured}
+              onClick={toggleInviteUserModal}
+            >
+              Add User
+            </Button>
+          </div>
+        </div>
+        <div className={`${baseClass}__smtp-warning-wrapper`}>
+          <SmtpWarning
+            onResolve={goToAppConfigPage}
+            shouldShowWarning={!config.configured}
+          />
         </div>
         <div className={`${baseClass}__users`}>
           {users.map((user, idx) => {
@@ -215,13 +243,14 @@ class UserManagementPage extends Component {
 
 const mapStateToProps = (state) => {
   const stateEntityGetter = entityGetter(state);
+  const { config } = state.app;
   const { user: currentUser } = state.auth;
   const { entities: users } = stateEntityGetter.get('users');
   const { entities: invites } = stateEntityGetter.get('invites');
   const { errors: inviteErrors } = state.entities.invites;
   const { errors: userErrors } = state.entities.users;
 
-  return { currentUser, inviteErrors, invites, userErrors, users };
+  return { config, currentUser, inviteErrors, invites, userErrors, users };
 };
 
 export default connect(mapStateToProps)(UserManagementPage);
