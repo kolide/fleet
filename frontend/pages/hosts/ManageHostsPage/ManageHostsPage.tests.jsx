@@ -47,6 +47,7 @@ describe('ManageHostsPage - component', () => {
     hosts: [],
     labels: [],
     selectedOsqueryTable: stubbedOsqueryTable,
+    statusLabels: {},
   };
 
   beforeEach(() => {

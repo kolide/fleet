@@ -189,13 +189,13 @@ export class ManageHostsPage extends Component {
 
   renderHeader = () => {
     const { renderIcon, renderQuery } = this;
-    const { display, isAddLabel, selectedLabel } = this.props;
+    const { display, isAddLabel, selectedLabel, statusLabels } = this.props;
 
     if (!selectedLabel || isAddLabel) {
       return false;
     }
 
-    const { count, description, display_text: displayText } = selectedLabel;
+    const { count, description, display_text: displayText, slug, type } = selectedLabel;
     const { onToggleDisplay } = this;
     const buttonOptions = {
       rightIcon: 'grid-select',
@@ -203,7 +203,9 @@ export class ManageHostsPage extends Component {
       leftIcon: 'list-select',
       leftText: 'List',
     };
-    const hostsTotalDisplay = count === 1 ? '1 Host Total' : `${count} Hosts Total`;
+
+    const hostCount = type === 'status' ? statusLabels[`${slug}_count`] : count;
+    const hostsTotalDisplay = hostCount === 1 ? '1 Host Total' : `${hostCount} Hosts Total`;
 
     return (
       <div className={`${baseClass}__header`}>
