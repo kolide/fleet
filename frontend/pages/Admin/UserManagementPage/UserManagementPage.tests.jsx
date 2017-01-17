@@ -13,6 +13,7 @@ const currentUser = {
   username: 'gnardog',
 };
 const loadUsersAction = { type: 'users_LOAD_REQUEST' };
+const loadInvitesAction = { type: 'invites_LOAD_REQUEST' };
 const store = {
   app: {
     config: {
@@ -112,24 +113,7 @@ describe('UserManagementPage - component', () => {
     expect(page.text()).toInclude('Listing 2 users');
   });
 
-  it('gets all users if there are no users in state', () => {
-    const mockStore = reduxMockStore({
-      ...store,
-      entities: {
-        ...store.entities,
-        users: {
-          ...store.entities.users,
-          data: {},
-        },
-      },
-    });
-
-    mount(connectedComponent(UserManagementPage, { mockStore }));
-
-    expect(mockStore.getActions()).toInclude(loadUsersAction);
-  });
-
-  it('gets all users if the only user in state is the current user', () => {
+  it('gets users on mount', () => {
     const mockStore = reduxMockStore(store);
 
     mount(connectedComponent(UserManagementPage, { mockStore }));
@@ -137,23 +121,11 @@ describe('UserManagementPage - component', () => {
     expect(mockStore.getActions()).toInclude(loadUsersAction);
   });
 
-  it('does not get users if users are already loaded', () => {
-    const mockStore = reduxMockStore({
-      ...store,
-      entities: {
-        ...store.entities,
-        users: {
-          ...store.entities.users,
-          data: {
-            1: { ...currentUser },
-            2: { id: 2, email: 'another@gnar.dog', full_name: 'GnarDog' },
-          },
-        },
-      },
-    });
+  it('gets invites on mount', () => {
+    const mockStore = reduxMockStore(store);
 
     mount(connectedComponent(UserManagementPage, { mockStore }));
 
-    expect(mockStore.getActions()).toNotInclude(loadUsersAction);
+    expect(mockStore.getActions()).toInclude(loadInvitesAction);
   });
 });

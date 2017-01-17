@@ -1,7 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
-import { first, isEqual, size } from 'lodash';
 
 import Button from 'components/buttons/Button';
 import configInterface from 'interfaces/config';
@@ -12,13 +11,17 @@ import InviteUserForm from 'components/forms/InviteUserForm';
 import Modal from 'components/modals/Modal';
 import paths from 'router/paths';
 import SmtpWarning from 'components/SmtpWarning';
+import Spinner from 'components/loaders/Spinner';
 import userActions from 'redux/nodes/entities/users/actions';
 import userInterface from 'interfaces/user';
 import { renderFlash } from 'redux/nodes/notifications/actions';
 import UserBlock from './UserBlock';
 
+const baseClass = 'user-management';
+
 class UserManagementPage extends Component {
   static propTypes = {
+    appConfigLoading: PropTypes.bool,
     config: configInterface,
     currentUser: userInterface,
     dispatch: PropTypes.func,
@@ -27,6 +30,8 @@ class UserManagementPage extends Component {
       email: PropTypes.string,
     }),
     invites: PropTypes.arrayOf(inviteInterface),
+    loadingInvites: PropTypes.bool,
+    loadingUsers: PropTypes.bool,
     userErrors: PropTypes.shape({
       base: PropTypes.string,
       name: PropTypes.string,
@@ -44,16 +49,10 @@ class UserManagementPage extends Component {
   }
 
   componentWillMount () {
-    const { currentUser, dispatch, invites, users } = this.props;
+    const { dispatch } = this.props;
 
-    if (!size(users) ||
-      (size(users) === 1 && isEqual(first(users), currentUser))) {
-      dispatch(userActions.loadAll());
-    }
-
-    if (!invites.length) {
-      dispatch(inviteActions.loadAll());
-    }
+    dispatch(userActions.loadAll());
+    dispatch(inviteActions.loadAll());
 
     return false;
   }
@@ -200,12 +199,48 @@ class UserManagementPage extends Component {
     );
   };
 
+  renderSmtpWarning = () => {
+    const { appConfigLoading, config } = this.props;
+    const { goToAppConfigPage } = this;
+
+    if (appConfigLoading) {
+      return false;
+    }
+
+    return (
+      <div className={`${baseClass}__smtp-warning-wrapper`}>
+        <SmtpWarning
+          onResolve={goToAppConfigPage}
+          shouldShowWarning={!config.configured}
+        />
+      </div>
+    );
+  }
+
+  renderUsersAndInvites = () => {
+    const { invites, loadingInvites, loadingUsers, users } = this.props;
+    const { renderUserBlock } = this;
+
+    if (loadingInvites || loadingUsers) {
+      return <div className={`${baseClass}__users`}><Spinner /></div>;
+    }
+
+    return (
+      <div className={`${baseClass}__users`}>
+        {users.map((user, idx) => {
+          return renderUserBlock(user, idx);
+        })}
+        {invites.map((user, idx) => {
+          return renderUserBlock(user, idx, { invite: true });
+        })}
+      </div>
+    );
+  }
+
   render () {
-    const { goToAppConfigPage, toggleInviteUserModal } = this;
+    const { renderModal, renderSmtpWarning, renderUsersAndInvites, toggleInviteUserModal } = this;
     const { config, invites, users } = this.props;
     const resourcesCount = users.length + invites.length;
-
-    const baseClass = 'user-management';
 
     return (
       <div className={`${baseClass} body-wrap`}>
@@ -221,21 +256,9 @@ class UserManagementPage extends Component {
             </Button>
           </div>
         </div>
-        <div className={`${baseClass}__smtp-warning-wrapper`}>
-          <SmtpWarning
-            onResolve={goToAppConfigPage}
-            shouldShowWarning={!config.configured}
-          />
-        </div>
-        <div className={`${baseClass}__users`}>
-          {users.map((user, idx) => {
-            return this.renderUserBlock(user, idx);
-          })}
-          {invites.map((user, idx) => {
-            return this.renderUserBlock(user, idx, { invite: true });
-          })}
-        </div>
-        {this.renderModal()}
+        {renderSmtpWarning()}
+        {renderUsersAndInvites()}
+        {renderModal()}
       </div>
     );
   }
@@ -244,13 +267,24 @@ class UserManagementPage extends Component {
 const mapStateToProps = (state) => {
   const stateEntityGetter = entityGetter(state);
   const { config } = state.app;
+  const { loading: appConfigLoading } = state.app;
   const { user: currentUser } = state.auth;
   const { entities: users } = stateEntityGetter.get('users');
   const { entities: invites } = stateEntityGetter.get('invites');
-  const { errors: inviteErrors } = state.entities.invites;
-  const { errors: userErrors } = state.entities.users;
+  const { errors: inviteErrors, loading: loadingInvites } = state.entities.invites;
+  const { errors: userErrors, loading: loadingUsers } = state.entities.users;
 
-  return { config, currentUser, inviteErrors, invites, userErrors, users };
+  return {
+    appConfigLoading,
+    config,
+    currentUser,
+    inviteErrors,
+    invites,
+    loadingInvites,
+    loadingUsers,
+    userErrors,
+    users,
+  };
 };
 
 export default connect(mapStateToProps)(UserManagementPage);
