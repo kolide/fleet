@@ -6,11 +6,17 @@ var autoprefixer = require('autoprefixer');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 var bourbon = require('node-bourbon').includePaths;
 var WebpackBuildNotifierPlugin = require('webpack-build-notifier');
+var HtmlWebpackPlugin = require('html-webpack-plugin');
+
 
 var plugins = [
   new webpack.NoErrorsPlugin(),
   new webpack.optimize.DedupePlugin(),
-  new ExtractTextPlugin("bundle.css", {allChunks: false})
+  new ExtractTextPlugin("bundle-[contenthash].css", {allChunks: false}),
+  new HtmlWebpackPlugin({
+    filename: '../frontend/templates/react.tmpl',
+    template: 'frontend/templates/react.ejs'
+  })
 ];
 
 if (process.env.NODE_ENV === 'production') {
@@ -46,7 +52,7 @@ var config  = {
   output: {
     path: path.join(repo, 'assets/'),
     publicPath: "/assets/",
-    filename: '[name].js'
+    filename: '[name]-[hash].js'
   },
   plugins: plugins,
   module: {
