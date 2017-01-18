@@ -53,6 +53,12 @@ class Kolide extends Base {
   }
 
   users = {
+    enable: (user, { enabled }) => {
+      const { ENABLE_USER } = endpoints;
+
+      return this.authenticatedPost(this.endpoint(ENABLE_USER(user.id)), JSON.stringify({ enabled }))
+        .then(response => response.user);
+    },
     updateAdmin: (user, { admin }) => {
       const { UPDATE_USER_ADMIN } = endpoints;
 

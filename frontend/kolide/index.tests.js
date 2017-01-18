@@ -17,6 +17,7 @@ const {
   validDestroyQueryRequest,
   validDestroyPackRequest,
   validDestroyScheduledQueryRequest,
+  validEnableUserRequest,
   validForgotPasswordRequest,
   validGetConfigOptionsRequest,
   validGetConfigRequest,
@@ -283,6 +284,21 @@ describe('Kolide - API client', () => {
 
       Kolide.setBearerToken(bearerToken);
       Kolide.users.updateAdmin(userStub, adminParams)
+        .then(() => {
+          expect(request.isDone()).toEqual(true);
+          done();
+        })
+        .catch(() => {
+          throw new Error('Request should have been stubbed');
+        });
+    });
+
+    it('#enable', (done) => {
+      const enableParams = { enabled: true };
+      const request = validEnableUserRequest(bearerToken, userStub, enableParams);
+
+      Kolide.setBearerToken(bearerToken);
+      Kolide.users.enable(userStub, enableParams)
         .then(() => {
           expect(request.isDone()).toEqual(true);
           done();

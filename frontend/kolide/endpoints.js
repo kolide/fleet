@@ -1,6 +1,9 @@
 export default {
   CONFIG: '/v1/kolide/config',
   CONFIG_OPTIONS: '/v1/kolide/options',
+  ENABLE_USER: (id) => {
+    return `/v1/kolide/users/${id}/enable`;
+  },
   FORGOT_PASSWORD: '/v1/kolide/forgot_password',
   HOSTS: '/v1/kolide/hosts',
   INVITES: '/v1/kolide/invites',

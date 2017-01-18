@@ -84,6 +84,16 @@ export const validDestroyQueryRequest = (bearerToken, query) => {
     .reply(200, {});
 };
 
+export const validEnableUserRequest = (bearerToken, user, params) => {
+  return nock('http://localhost:8080', {
+    reqHeaders: {
+      Authorization: `Bearer ${bearerToken}`,
+    },
+  })
+    .post(`/api/v1/kolide/users/${user.id}/enable`, JSON.stringify(params))
+    .reply(200, { user: { ...user, ...params } });
+};
+
 export const validDestroyPackRequest = (bearerToken, pack) => {
   return nock('http://localhost:8080', {
     reqHeaders: {
@@ -422,6 +432,7 @@ export default {
   validDestroyQueryRequest,
   validDestroyPackRequest,
   validDestroyScheduledQueryRequest,
+  validEnableUserRequest,
   validForgotPasswordRequest,
   validGetConfigOptionsRequest,
   validGetConfigRequest,
