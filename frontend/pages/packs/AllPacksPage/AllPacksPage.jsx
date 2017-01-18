@@ -43,11 +43,9 @@ export class AllPacksPage extends Component {
   }
 
   componentWillMount() {
-    const { dispatch, packs, selectedPack } = this.props;
+    const { dispatch, selectedPack } = this.props;
 
-    if (!packs.length) {
-      dispatch(packActions.loadAll());
-    }
+    dispatch(packActions.loadAll());
 
     if (selectedPack) {
       this.getScheduledQueriesForPack(selectedPack);
