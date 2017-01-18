@@ -7,6 +7,7 @@ import InputField from 'components/forms/fields/InputField';
 import SelectTargetsDropdown from 'components/forms/fields/SelectTargetsDropdown';
 
 const fieldNames = ['description', 'name', 'targets'];
+const baseClass = 'edit-pack-form';
 
 class EditPackForm extends Component {
   static propTypes = {
@@ -36,9 +37,16 @@ class EditPackForm extends Component {
       <form className={className} onSubmit={handleSubmit}>
         <InputField
           {...fields.name}
+          placeholder="Query Pack Title"
+          label="Query Pack Title"
+          inputWrapperClass={`${baseClass}__pack-title`}
         />
         <InputField
           {...fields.description}
+          inputWrapperClass={`${baseClass}__pack-description`}
+          label="Query Pack Description"
+          placeholder="Add a description of your query"
+          type="textarea"
         />
         <SelectTargetsDropdown
           {...fields.targets}
