@@ -141,18 +141,22 @@ export class ManageHostsPage extends Component {
   }
 
   onDeleteLabel = () => {
-    const { toggleRemoveLabel } = this;
+    const { toggleModal } = this;
+    const { dispatch, selectedLabel } = this.props;
 
-    console.log('Delete the Label');
-    toggleRemoveLabel();
-    return true;
+    return dispatch(labelActions.destroy(selectedLabel))
+      .then(() => {
+        toggleModal();
+        dispatch(push('/hosts/manage'));
+        return false;
+      });
   }
 
-  toggleRemoveLabel = () => {
+  toggleModal = () => {
     const { showDeleteModal } = this.state;
 
     this.setState({ showDeleteModal: !showDeleteModal });
-    return true;
+    return false;
   }
 
   filterHosts = () => {
@@ -170,7 +174,7 @@ export class ManageHostsPage extends Component {
 
   renderModal = () => {
     const { showDeleteModal } = this.state;
-    const { toggleRemoveLabel, onDeleteLabel } = this;
+    const { toggleModal, onDeleteLabel } = this;
 
     if (!showDeleteModal) {
       return false;
@@ -179,12 +183,12 @@ export class ManageHostsPage extends Component {
     return (
       <Modal
         title="Delete Label"
-        onExit={toggleRemoveLabel}
+        onExit={toggleModal}
         className={`${baseClass}__modal`}
       >
         <p>Are you sure you wish to delete this label?</p>
         <div>
-          <Button onClick={toggleRemoveLabel} variant="inverse">Cancel</Button>
+          <Button onClick={toggleModal} variant="inverse">Cancel</Button>
           <Button onClick={onDeleteLabel} variant="alert">Delete</Button>
         </div>
       </Modal>
@@ -192,7 +196,7 @@ export class ManageHostsPage extends Component {
   }
 
   renderDeleteButton = () => {
-    const { toggleRemoveLabel, renderModal } = this;
+    const { toggleModal } = this;
     const { selectedLabel: { type } } = this.props;
 
     if (type !== 'custom') {
@@ -201,8 +205,7 @@ export class ManageHostsPage extends Component {
 
     return (
       <div className={`${baseClass}__delete-label`}>
-        <Button onClick={toggleRemoveLabel} variant="alert">Delete</Button>
-        {renderModal()}
+        <Button onClick={toggleModal} variant="alert">Delete</Button>
       </div>
     );
   }
@@ -386,7 +389,7 @@ export class ManageHostsPage extends Component {
   }
 
   render () {
-    const { renderForm, renderHeader, renderHosts, renderSidePanel } = this;
+    const { renderForm, renderHeader, renderHosts, renderSidePanel, renderModal } = this;
     const { display, isAddLabel } = this.props;
 
     return (
@@ -402,6 +405,7 @@ export class ManageHostsPage extends Component {
         }
 
         {renderSidePanel()}
+        {renderModal()}
       </div>
     );
   }
