@@ -2,6 +2,7 @@ import { get, omit } from 'lodash';
 
 import { appendTargetTypeToTargets } from 'redux/nodes/entities/targets/helpers';
 import Base from 'kolide/base';
+import deepDifference from 'utilities/deep_difference';
 import endpoints from 'kolide/endpoints';
 import helpers from 'kolide/helpers';
 import local from 'utilities/local';
@@ -392,9 +393,10 @@ class Kolide extends Base {
     const { targets } = updatedPack;
     const updatePackEndpoint = `${this.baseURL}${PACKS}/${pack.id}`;
     const packTargets = helpers.formatSelectedTargetsForApi(targets, true);
-    const packParams = omit(updatedPack, 'targets');
+    const packWithoutTargets = omit(updatedPack, 'targets');
+    const packParams = deepDifference({ ...packWithoutTargets, ...packTargets }, pack);
 
-    return this.authenticatedPatch(updatePackEndpoint, JSON.stringify({ ...packParams, ...packTargets }))
+    return this.authenticatedPatch(updatePackEndpoint, JSON.stringify(packParams))
       .then((response) => { return response.pack; });
   }
 
