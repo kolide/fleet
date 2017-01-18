@@ -21,6 +21,8 @@ import paths from 'router/paths';
 import QueryForm from 'components/forms/queries/QueryForm';
 import QuerySidePanel from 'components/side_panels/QuerySidePanel';
 import Rocker from 'components/buttons/Rocker';
+import Button from 'components/buttons/Button';
+import Modal from 'components/modals/Modal';
 import { selectOsqueryTable } from 'redux/nodes/components/QueryPages/actions';
 import statusLabelsInterface from 'interfaces/status_labels';
 import iconClassForLabel from 'utilities/icon_class_for_label';
@@ -53,6 +55,7 @@ export class ManageHostsPage extends Component {
 
     this.state = {
       labelQueryText: '',
+      showDeleteModal: false,
     };
   }
 
@@ -150,6 +153,60 @@ export class ManageHostsPage extends Component {
     return orderedHosts;
   }
 
+  onDeleteLabel = () => {
+    const { toggleRemoveLabel } = this;
+
+    console.log('Delete the Label');
+    toggleRemoveLabel();
+    return true;
+  }
+
+  toggleRemoveLabel = () => {
+    const { showDeleteModal } = this.state;
+
+    this.setState({ showDeleteModal: !showDeleteModal });
+    return true;
+  }
+
+  renderModal = () => {
+    const { showDeleteModal } = this.state;
+    const { toggleRemoveLabel, onDeleteLabel } = this;
+
+    if (!showDeleteModal) {
+      return false;
+    }
+
+    return (
+      <Modal
+        title="Delete Label"
+        onExit={toggleRemoveLabel}
+        className={`${baseClass}__modal`}
+      >
+        <p>Are you sure you wish to delete this label?</p>
+        <div>
+          <Button onClick={toggleRemoveLabel} variant="inverse">Cancel</Button>
+          <Button onClick={onDeleteLabel} variant="alert">Delete</Button>
+        </div>
+      </Modal>
+    );
+  }
+
+  renderDeleteButton = () => {
+    const { toggleRemoveLabel, renderModal } = this;
+    const { selectedLabel: { type } } = this.props;
+
+    if (type !== 'custom') {
+      return false;
+    }
+
+    return (
+      <div className={`${baseClass}__delete-label`}>
+        <Button onClick={toggleRemoveLabel} variant="alert">Delete</Button>
+        {renderModal()}
+      </div>
+    );
+  }
+
   renderIcon = () => {
     const { selectedLabel } = this.props;
 
@@ -188,7 +245,7 @@ export class ManageHostsPage extends Component {
   }
 
   renderHeader = () => {
-    const { renderIcon, renderQuery } = this;
+    const { renderIcon, renderQuery, renderDeleteButton } = this;
     const { display, isAddLabel, selectedLabel, statusLabels } = this.props;
 
     if (!selectedLabel || isAddLabel) {
@@ -209,6 +266,8 @@ export class ManageHostsPage extends Component {
 
     return (
       <div className={`${baseClass}__header`}>
+        {renderDeleteButton()}
+
         <h1 className={`${baseClass}__title`}>
           {renderIcon()}
           <span>{displayText}</span>
