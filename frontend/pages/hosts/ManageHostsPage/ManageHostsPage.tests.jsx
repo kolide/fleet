@@ -36,6 +36,7 @@ const mockStore = reduxMockStore({
         3: { id: 3, display_text: 'Ubuntu', slug: 'ubuntu', type: 'platform', count: 22 },
         4: { id: 4, display_text: 'ONLINE', slug: 'online', type: 'status', count: 22 },
         5: offlineHostsLabel,
+        6: { id: 6, display_text: 'Custom Label', slug: 'custom-label', type: 'custom', count: 3 },
       },
     },
   },
@@ -180,6 +181,26 @@ describe('ManageHostsPage - component', () => {
       expect(page.find('HostSidePanel').props()).toInclude({
         selectedLabel: windowsLabel,
       });
+    });
+  });
+
+  describe.only('Delete a label', () => {
+    it('Presents a Modal confirmation', () => {
+      const ownProps = { location: {}, params: { active_label: 'custom-label' } };
+      const component = connectedComponent(ConnectedManageHostsPage, { props: ownProps, mockStore });
+      const page = mount(component);
+      const deleteBtn = page.find('.manage-hosts__delete-label').find('button');
+
+      expect(page.find('Modal').length).toEqual(0);
+
+      deleteBtn.simulate('click');
+
+      const confirmModal = page.find('Modal');
+
+      expect(confirmModal.length).toEqual(1);
+
+      // const confirmBtn = confirmModal.find('.button--alert');
+      // confirmBtn.simulate('click');
     });
   });
 });

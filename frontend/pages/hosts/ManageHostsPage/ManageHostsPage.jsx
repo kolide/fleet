@@ -140,19 +140,6 @@ export class ManageHostsPage extends Component {
     return false;
   }
 
-  filterHosts = () => {
-    const { hosts, selectedLabel } = this.props;
-
-    return helpers.filterHosts(hosts, selectedLabel);
-  }
-
-  sortHosts = (hosts) => {
-    const alphaHosts = sortBy(hosts, (h) => { return h.hostname; });
-    const orderedHosts = orderBy(alphaHosts, 'status', 'desc');
-
-    return orderedHosts;
-  }
-
   onDeleteLabel = () => {
     const { toggleRemoveLabel } = this;
 
@@ -166,6 +153,19 @@ export class ManageHostsPage extends Component {
 
     this.setState({ showDeleteModal: !showDeleteModal });
     return true;
+  }
+
+  filterHosts = () => {
+    const { hosts, selectedLabel } = this.props;
+
+    return helpers.filterHosts(hosts, selectedLabel);
+  }
+
+  sortHosts = (hosts) => {
+    const alphaHosts = sortBy(hosts, (h) => { return h.hostname; });
+    const orderedHosts = orderBy(alphaHosts, 'status', 'desc');
+
+    return orderedHosts;
   }
 
   renderModal = () => {
