@@ -16,7 +16,11 @@ class ConfirmationPage extends Component {
   };
 
   importOsqueryConfig = () => {
-    return false;
+    const disableImport = true;
+
+    if (disableImport) {
+      return false;
+    }
 
     return (
       <div className={`${baseClass}__import`}>
