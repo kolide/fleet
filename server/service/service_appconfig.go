@@ -6,6 +6,7 @@ import (
 	"github.com/kolide/kolide-ose/server/contexts/viewer"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"github.com/kolide/kolide-ose/server/mail"
+	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 )
 
@@ -32,7 +33,17 @@ func (svc service) NewAppConfig(ctx context.Context, p kolide.AppConfigPayload) 
 	if err != nil {
 		return nil, err
 	}
-	newConfig, err := svc.ds.NewAppConfig(appConfigFromAppConfigPayload(p, *config))
+	fromPayload := appConfigFromAppConfigPayload(p, *config)
+	if fromPayload.EnrollSecret == "" {
+		// generate a default enroll secret for the user if they don't provide
+		// one in the form.
+		rand, err := generateRandomText(24)
+		if err != nil {
+			return nil, errors.Wrap(err, "generating enroll secret")
+		}
+		fromPayload.EnrollSecret = rand
+	}
+	newConfig, err := svc.ds.NewAppConfig(fromPayload)
 	if err != nil {
 		return nil, err
 	}
@@ -94,6 +105,9 @@ func appConfigFromAppConfigPayload(p kolide.AppConfigPayload, config kolide.AppC
 	}
 	if p.ServerSettings != nil && p.ServerSettings.KolideServerURL != nil {
 		config.KolideServerURL = *p.ServerSettings.KolideServerURL
+	}
+	if p.ServerSettings != nil && p.ServerSettings.EnrollSecret != nil {
+		config.EnrollSecret = *p.ServerSettings.EnrollSecret
 	}
 
 	populateSMTP := func(p *kolide.SMTPSettingsPayload) {

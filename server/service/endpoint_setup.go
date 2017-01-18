@@ -34,12 +34,6 @@ func makeSetupEndpoint(svc kolide.Service) endpoint.Endpoint {
 			err           error
 		)
 		req := request.(setupRequest)
-		if req.Admin != nil {
-			admin, err = svc.NewAdminCreatedUser(ctx, *req.Admin)
-			if err != nil {
-				return setupResponse{Err: err}, nil
-			}
-		}
 		if req.OrgInfo != nil {
 			configPayload.OrgInfo = req.OrgInfo
 		}
@@ -54,6 +48,15 @@ func makeSetupEndpoint(svc kolide.Service) endpoint.Endpoint {
 		if err != nil {
 			return setupResponse{Err: err}, nil
 		}
+		// creating the user should be the last action. If there's a user
+		// present and other errors occur, the setup endpoint closes.
+		if req.Admin != nil {
+			admin, err = svc.NewAdminCreatedUser(ctx, *req.Admin)
+			if err != nil {
+				return setupResponse{Err: err}, nil
+			}
+		}
+
 		// If everything works to this point, log the user in and return token.  If
 		// the login fails for some reason, ignore the error and don't return
 		// a token, forcing the user to log in manually
