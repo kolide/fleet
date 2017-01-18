@@ -163,8 +163,11 @@ func (m mailService) sendMail(e kolide.Email, msg []byte) error {
 func dialTimeout(addr string) (*smtp.Client, error) {
 	conn, err := net.DialTimeout("tcp", addr, 15*time.Second)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "dialing with timeout")
 	}
-	host, _, _ := net.SplitHostPort(addr)
+	host, _, err := net.SplitHostPort(addr)
+	if err != nil {
+		return nil, errors.Wrap(err, "split host port")
+	}
 	return smtp.NewClient(conn, host)
 }
