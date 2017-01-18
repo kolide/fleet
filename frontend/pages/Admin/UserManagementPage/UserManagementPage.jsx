@@ -60,7 +60,7 @@ export class UserManagementPage extends Component {
 
   onUserActionSelect = (user, action) => {
     const { currentUser, dispatch } = this.props;
-    const { update, requirePasswordReset } = userActions;
+    const { update, updateAdmin, requirePasswordReset } = userActions;
 
     if (action) {
       switch (action) {
@@ -68,9 +68,9 @@ export class UserManagementPage extends Component {
           if (currentUser.id === user.id) {
             return dispatch(renderFlash('error', 'You cannot demote yourself'));
           }
-          return dispatch(update(user, { admin: false }))
+          return dispatch(updateAdmin(user, { admin: false }))
             .then(() => {
-              return dispatch(renderFlash('success', 'User demoted', update(user, { admin: true })));
+              return dispatch(renderFlash('success', 'User demoted', updateAdmin(user, { admin: true })));
             });
         }
         case 'disable_account': {
@@ -88,9 +88,9 @@ export class UserManagementPage extends Component {
               return dispatch(renderFlash('success', 'User account enabled', update(user, { enabled: false })));
             });
         case 'promote_user':
-          return dispatch(update(user, { admin: true }))
+          return dispatch(updateAdmin(user, { admin: true }))
             .then(() => {
-              return dispatch(renderFlash('success', 'User promoted to admin', update(user, { admin: false })));
+              return dispatch(renderFlash('success', 'User promoted to admin', updateAdmin(user, { admin: false })));
             });
         case 'reset_password':
           return dispatch(requirePasswordReset(user, { require: true }))
