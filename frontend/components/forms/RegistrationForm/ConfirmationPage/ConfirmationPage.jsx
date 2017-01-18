@@ -15,7 +15,21 @@ class ConfirmationPage extends Component {
     handleSubmit: PropTypes.func,
   };
 
+  importOsqueryConfig = () => {
+    return false;
+
+    return (
+      <div className={`${baseClass}__import`}>
+        <Checkbox name="import-install">
+          <p>I am migrating an existing <strong>osquery</strong> installation.</p>
+          <p>Take me to the <strong>Import Configuration</strong> page.</p>
+        </Checkbox>
+      </div>
+    );
+  }
+
   render () {
+    const { importOsqueryConfig } = this;
     const {
       className,
       handleSubmit,
@@ -55,12 +69,7 @@ class ConfirmationPage extends Component {
             </tbody>
           </table>
 
-          <div className={`${baseClass}__import`}>
-            <Checkbox name="import-install">
-              <p>I am migrating an existing <strong>osquery</strong> installation.</p>
-              <p>Take me to the <strong>Import Configuration</strong> page.</p>
-            </Checkbox>
-          </div>
+          {importOsqueryConfig()}
         </div>
 
         <Button type="submit" variant="gradient" className={`${baseClass}__submit`} autofocus>
