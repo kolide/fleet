@@ -60,7 +60,7 @@ export class UserManagementPage extends Component {
 
   onUserActionSelect = (user, action) => {
     const { currentUser, dispatch } = this.props;
-    const { update, updateAdmin, requirePasswordReset } = userActions;
+    const { enableUser, updateAdmin, requirePasswordReset } = userActions;
 
     if (action) {
       switch (action) {
@@ -77,15 +77,15 @@ export class UserManagementPage extends Component {
           if (currentUser.id === user.id) {
             return dispatch(renderFlash('error', 'You cannot disable your own account'));
           }
-          return dispatch(userActions.update(user, { enabled: false }))
+          return dispatch(userActions.enableUser(user, { enabled: false }))
             .then(() => {
-              return dispatch(renderFlash('success', 'User account disabled', update(user, { enabled: true })));
+              return dispatch(renderFlash('success', 'User account disabled', enableUser(user, { enabled: true })));
             });
         }
         case 'enable_account':
-          return dispatch(update(user, { enabled: true }))
+          return dispatch(enableUser(user, { enabled: true }))
             .then(() => {
-              return dispatch(renderFlash('success', 'User account enabled', update(user, { enabled: false })));
+              return dispatch(renderFlash('success', 'User account enabled', enableUser(user, { enabled: false })));
             });
         case 'promote_user':
           return dispatch(updateAdmin(user, { admin: true }))
