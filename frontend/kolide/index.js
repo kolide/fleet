@@ -1,4 +1,4 @@
-import { get } from 'lodash';
+import { get, omit } from 'lodash';
 
 import { appendTargetTypeToTargets } from 'redux/nodes/entities/targets/helpers';
 import Base from 'kolide/base';
@@ -387,12 +387,14 @@ class Kolide extends Base {
     return this.authenticatedPatch(this.endpoint(CONFIG), JSON.stringify(configData));
   }
 
-  updatePack = (pack, { description, name, targets }) => {
+  updatePack = (pack, updatedPack) => {
     const { PACKS } = endpoints;
+    const { targets } = updatedPack;
     const updatePackEndpoint = `${this.baseURL}${PACKS}/${pack.id}`;
     const packTargets = helpers.formatSelectedTargetsForApi(targets, true);
+    const packParams = omit(updatedPack, 'targets');
 
-    return this.authenticatedPatch(updatePackEndpoint, JSON.stringify({ description, name, ...packTargets }))
+    return this.authenticatedPatch(updatePackEndpoint, JSON.stringify({ ...packParams, ...packTargets }))
       .then((response) => { return response.pack; });
   }
 
