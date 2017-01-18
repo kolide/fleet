@@ -5,6 +5,7 @@ import * as Kolide from 'kolide';
 import { reduxMockStore } from 'test/helpers';
 
 import {
+  enableUser,
   requirePasswordReset,
   REQUIRE_PASSWORD_RESET_REQUEST,
   REQUIRE_PASSWORD_RESET_FAILURE,
@@ -17,6 +18,97 @@ const store = { entities: { invites: {}, users: {} } };
 const user = { id: 1, email: 'zwass@kolide.co', force_password_reset: false };
 
 describe('Users - actions', () => {
+  describe('enableUser', () => {
+    describe('successful request', () => {
+      beforeEach(() => {
+        spyOn(Kolide.default.users, 'enable').andCall(() => {
+          return Promise.resolve({ ...user, enabled: true });
+        });
+      });
+
+      afterEach(restoreSpies);
+
+      it('calls the API', (done) => {
+        const mockStore = reduxMockStore(store);
+
+        mockStore.dispatch(enableUser(user, { enabled: true }))
+          .then(() => {
+            expect(Kolide.default.users.enable).toHaveBeenCalledWith(user, { enabled: true });
+            done();
+          })
+          .catch(done);
+      });
+
+      it('dispatches the correct actions', (done) => {
+        const mockStore = reduxMockStore(store);
+
+        mockStore.dispatch(enableUser(user, { enabled: true }))
+          .then(() => {
+            const dispatchedActions = mockStore.getActions();
+
+            expect(dispatchedActions).toEqual([
+              config.extendedActions.updateRequest,
+              config.extendedActions.updateSuccess({ ...user, enabled: true }),
+            ]);
+
+            done();
+          })
+          .catch(done);
+      });
+    });
+
+    describe('unsuccessful request', () => {
+      const errors = [
+        {
+          name: 'base',
+          reason: 'Unable to enable the user',
+        },
+      ];
+      const errorResponse = {
+        message: {
+          message: 'Unable to enable the user',
+          errors,
+        },
+      };
+      beforeEach(() => {
+        spyOn(Kolide.default.users, 'enable').andCall(() => {
+          return Promise.reject(errorResponse);
+        });
+      });
+
+      afterEach(restoreSpies);
+
+      it('calls the API', (done) => {
+        const mockStore = reduxMockStore(store);
+
+        mockStore.dispatch(enableUser(user, { enabled: true }))
+          .then(done)
+          .catch(() => {
+            expect(Kolide.default.users.enable).toHaveBeenCalledWith(user, { enabled: true });
+
+            done();
+          });
+      });
+
+      it('dispatches the correct actions', (done) => {
+        const mockStore = reduxMockStore(store);
+
+        mockStore.dispatch(enableUser(user, { enabled: true }))
+          .then(done)
+          .catch(() => {
+            const dispatchedActions = mockStore.getActions();
+
+            expect(dispatchedActions).toEqual([
+              config.extendedActions.updateRequest,
+              config.extendedActions.updateFailure({ base: 'Unable to enable the user' }),
+            ]);
+
+            done();
+          });
+      });
+    });
+  });
+
   describe('updateAdmin', () => {
     describe('successful request', () => {
       beforeEach(() => {

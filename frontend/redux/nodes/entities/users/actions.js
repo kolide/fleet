@@ -25,6 +25,26 @@ export const requirePasswordResetFailure = (errors) => {
   };
 };
 
+export const enableUser = (user, { enabled }) => {
+  const { extendedActions } = config;
+
+  return (dispatch) => {
+    dispatch(extendedActions.updateRequest);
+
+    return Kolide.users.enable(user, { enabled })
+      .then((userResponse) => {
+        return dispatch(extendedActions.updateSuccess(userResponse));
+      })
+      .catch((response) => {
+        const errorsObject = formatErrorResponse(response);
+
+        dispatch(extendedActions.updateFailure(errorsObject));
+
+        throw errorsObject;
+      });
+  };
+};
+
 export const requirePasswordReset = (user, { require }) => {
   return (dispatch) => {
     dispatch(requirePasswordResetRequest);
@@ -64,4 +84,4 @@ export const updateAdmin = (user, { admin }) => {
   };
 };
 
-export default { ...config.actions, requirePasswordReset, updateAdmin };
+export default { ...config.actions, enableUser, requirePasswordReset, updateAdmin };
