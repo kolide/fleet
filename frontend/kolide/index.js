@@ -50,7 +50,16 @@ class Kolide extends Base {
 
       return this.authenticatedDelete(endpoint);
     },
-  };
+  }
+
+  users = {
+    updateAdmin: (user, { admin }) => {
+      const { UPDATE_USER_ADMIN } = endpoints;
+
+      return this.authenticatedPost(this.endpoint(UPDATE_USER_ADMIN(user.id)), JSON.stringify({ admin }))
+        .then(response => response.user);
+    },
+  }
 
   createLabel = ({ description, name, query }) => {
     const { LABELS } = endpoints;

@@ -353,6 +353,16 @@ export const validStatusLabelsGetCountsRequest = (bearerToken) => {
     .reply(200, { online_count: 100, offline_count: 23, mia_count: 2 });
 };
 
+export const validUpdateAdminRequest = (bearerToken, user, params) => {
+  return nock('http://localhost:8080', {
+    reqHeaders: {
+      Authorization: `Bearer ${bearerToken}`,
+    },
+  })
+  .post(`/api/v1/kolide/users/${user.id}/admin`, JSON.stringify(params))
+  .reply(200, { user: { ...user, ...params } });
+};
+
 export const validUpdateConfigRequest = (bearerToken, configData) => {
   return nock('http://localhost:8080', {
     reqHeaders: {
@@ -431,6 +441,7 @@ export default {
   validRunQueryRequest,
   validSetupRequest,
   validStatusLabelsGetCountsRequest,
+  validUpdateAdminRequest,
   validUpdateConfigOptionsRequest,
   validUpdateConfigRequest,
   validUpdatePackRequest,
