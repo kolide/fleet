@@ -283,6 +283,21 @@ const reduxConfig = ({
 
   return {
     actions,
+    extendedActions: {
+      clearErrors,
+      createFailure,
+      createRequest,
+      createSuccess,
+      destroyFailure,
+      destroyRequest,
+      destroySuccess,
+      loadFailure,
+      loadRequest,
+      loadSuccess,
+      updateFailure,
+      updateRequest,
+      updateSuccess,
+    },
     reducer,
   };
 };

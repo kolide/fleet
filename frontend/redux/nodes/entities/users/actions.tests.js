@@ -9,12 +9,105 @@ import {
   REQUIRE_PASSWORD_RESET_REQUEST,
   REQUIRE_PASSWORD_RESET_FAILURE,
   REQUIRE_PASSWORD_RESET_SUCCESS,
+  updateAdmin,
 } from './actions';
+import config from './config';
 
 const store = { entities: { invites: {}, users: {} } };
 const user = { id: 1, email: 'zwass@kolide.co', force_password_reset: false };
 
 describe('Users - actions', () => {
+  describe('updateAdmin', () => {
+    describe('successful request', () => {
+      beforeEach(() => {
+        spyOn(Kolide.default.users, 'updateAdmin').andCall(() => {
+          return Promise.resolve({ ...user, admin: true });
+        });
+      });
+
+      afterEach(restoreSpies);
+
+      it('calls the API', (done) => {
+        const mockStore = reduxMockStore(store);
+
+        mockStore.dispatch(updateAdmin(user, { admin: true }))
+          .then(() => {
+            expect(Kolide.default.users.updateAdmin).toHaveBeenCalledWith(user, { admin: true });
+            done();
+          })
+          .catch(done);
+      });
+
+      it('dispatches the correct actions', (done) => {
+        const mockStore = reduxMockStore(store);
+
+        mockStore.dispatch(updateAdmin(user, { admin: true }))
+          .then(() => {
+            const dispatchedActions = mockStore.getActions();
+
+            expect(dispatchedActions).toEqual([
+              config.extendedActions.updateRequest,
+              config.extendedActions.updateSuccess({ ...user, admin: true }),
+            ]);
+
+            done();
+          })
+          .catch(done);
+      });
+    });
+
+    describe('unsuccessful request', () => {
+      const errors = [
+        {
+          name: 'base',
+          reason: 'Unable to make the user an admin',
+        },
+      ];
+      const errorResponse = {
+        message: {
+          message: 'Unable to make the user an admin',
+          errors,
+        },
+      };
+      beforeEach(() => {
+        spyOn(Kolide.default.users, 'updateAdmin').andCall(() => {
+          return Promise.reject(errorResponse);
+        });
+      });
+
+      afterEach(restoreSpies);
+
+      it('calls the API', (done) => {
+        const mockStore = reduxMockStore(store);
+
+        mockStore.dispatch(updateAdmin(user, { admin: true }))
+          .then(done)
+          .catch(() => {
+            expect(Kolide.default.users.updateAdmin).toHaveBeenCalledWith(user, { admin: true });
+
+            done();
+          });
+      });
+
+      it('dispatches the correct actions', (done) => {
+        const mockStore = reduxMockStore(store);
+
+        mockStore.dispatch(updateAdmin(user, { admin: true }))
+          .then(done)
+          .catch(() => {
+            const dispatchedActions = mockStore.getActions();
+
+            expect(dispatchedActions).toEqual([
+              config.extendedActions.updateRequest,
+              config.extendedActions.updateFailure({ base: 'Unable to make the user an admin' }),
+            ]);
+
+            done();
+          });
+      });
+    });
+  });
+
   describe('dispatching the require password reset action', () => {
     describe('successful request', () => {
       beforeEach(() => {

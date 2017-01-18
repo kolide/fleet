@@ -44,4 +44,24 @@ export const requirePasswordReset = (user, { require }) => {
   };
 };
 
-export default { ...config.actions, requirePasswordReset };
+export const updateAdmin = (user, { admin }) => {
+  const { extendedActions } = config;
+
+  return (dispatch) => {
+    dispatch(extendedActions.updateRequest);
+
+    return Kolide.users.updateAdmin(user, { admin })
+      .then((userResponse) => {
+        return dispatch(extendedActions.updateSuccess(userResponse));
+      })
+      .catch((response) => {
+        const errorsObject = formatErrorResponse(response);
+
+        dispatch(extendedActions.updateFailure(errorsObject));
+
+        throw errorsObject;
+      });
+  };
+};
+
+export default { ...config.actions, requirePasswordReset, updateAdmin };
