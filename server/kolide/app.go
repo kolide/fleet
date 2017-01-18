@@ -73,6 +73,9 @@ type AppConfig struct {
 	OrgName         string `db:"org_name"`
 	OrgLogoURL      string `db:"org_logo_url"`
 	KolideServerURL string `db:"kolide_server_url"`
+
+	EnrollSecret string `db:"osquery_enroll_secret"`
+
 	// SMTPConfigured is a flag that indicates if smtp has been successfully
 	// tested with the settings provided by an admin user.
 	SMTPConfigured bool `db:"smtp_configured"`
@@ -165,6 +168,7 @@ type OrgInfo struct {
 // ServerSettings contains general settings about the kolide App.
 type ServerSettings struct {
 	KolideServerURL *string `json:"kolide_server_url"`
+	EnrollSecret    *string `json:"osquery_enroll_secret"`
 }
 
 type OrderDirection int

@@ -11,12 +11,14 @@ type setupRequest struct {
 	Admin           *kolide.UserPayload `json:"admin"`
 	OrgInfo         *kolide.OrgInfo     `json:"org_info"`
 	KolideServerURL *string             `json:"kolide_server_url"`
+	EnrollSecret    *string             `json:"osquery_enroll_secret"`
 }
 
 type setupResponse struct {
 	Admin           *kolide.User    `json:"admin,omitempty"`
 	OrgInfo         *kolide.OrgInfo `json:"org_info,omitempty"`
 	KolideServerURL *string         `json:"kolide_server_url"`
+	EnrollSecret    *string         `json:"osquery_enroll_secret"`
 	Token           *string         `json:"token,omitempty"`
 	Err             error           `json:"error,omitempty"`
 }
@@ -41,8 +43,12 @@ func makeSetupEndpoint(svc kolide.Service) endpoint.Endpoint {
 		if req.OrgInfo != nil {
 			configPayload.OrgInfo = req.OrgInfo
 		}
+		configPayload.ServerSettings = &kolide.ServerSettings{}
 		if req.KolideServerURL != nil {
-			configPayload.ServerSettings = &kolide.ServerSettings{KolideServerURL: req.KolideServerURL}
+			configPayload.ServerSettings.KolideServerURL = req.KolideServerURL
+		}
+		if req.EnrollSecret != nil {
+			configPayload.ServerSettings.EnrollSecret = req.EnrollSecret
 		}
 		config, err = svc.NewAppConfig(ctx, configPayload)
 		if err != nil {
@@ -63,6 +69,7 @@ func makeSetupEndpoint(svc kolide.Service) endpoint.Endpoint {
 				OrgLogoURL: &config.OrgLogoURL,
 			},
 			KolideServerURL: &config.KolideServerURL,
+			EnrollSecret:    &config.EnrollSecret,
 			Token:           token,
 		}, nil
 	}
