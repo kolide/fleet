@@ -90,7 +90,7 @@ describe('ManageHostsPage - component', () => {
     });
   });
 
-  describe.only('host rendering', () => {
+  describe('host rendering', () => {
     it('render LonelyHost if no hosts available', () => {
       const page = mount(<ManageHostsPage {...props} hosts={[]} selectedLabel={allHostsLabel} />);
 
