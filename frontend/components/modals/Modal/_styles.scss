@@ -10,43 +10,38 @@
   }
 
   &__content {
-    padding: $base;
-    padding-top: 0;
-
     .input-field {
       width: 100%;
-    }
-
-    button {
-      width: calc(50% - 25px);
-      margin-top: 25px;
-
-      &:last-child {
-        margin-left: 50px;
-      }
     }
   }
 
   &__ex {
+    @include size(30px);
+    line-height: 30px;
     position: absolute;
-    top: 6px;
-    right: $base;
+    top: 15px;
+    right: 15px;
     text-decoration: none;
 
     .button {
+      @include size(30px);
+      line-height: 30px;
       color: $text-medium;
       font-size: $larger;
+
+      &:hover {
+        color: $alert-light;
+      }
     }
   }
 
   &__header {
-    padding: $base $base 0;
     font-size: 24px;
-    font-weight: $light;
-    line-height: 1.33;
-    letter-spacing: 1px;
-    color: $text-dark;
-    margin: 0 0 30px;
+    font-weight: $normal;
+    line-height: normal;
+    letter-spacing: -0.5px;
+    text-align: left;
+    color: $text-ultradark;
   }
 
   &__modal_container {
@@ -56,5 +51,6 @@
     top: 25%;
     width: 600px;
     z-index: 3;
+    padding: 30px;
   }
 }
