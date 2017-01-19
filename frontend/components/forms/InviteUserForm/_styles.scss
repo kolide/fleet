@@ -2,11 +2,16 @@
   &__radio {
     margin-top: 22px;
 
-    .kolide-checkbox__label {
-      font-size: 20px;
-      font-weight: $light;
-      letter-spacing: 1px;
-      color: $text-dark;
+    .kolide-checkbox {
+      margin-top: 5px;
+
+      &__label {
+        font-size: 16px;
+        font-weight: $normal;
+        letter-spacing: 1px;
+        color: $text-dark;
+        padding-left: 32px;
+      }
     }
   }
 
