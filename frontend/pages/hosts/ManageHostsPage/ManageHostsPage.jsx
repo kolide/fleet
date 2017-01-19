@@ -24,6 +24,7 @@ import Rocker from 'components/buttons/Rocker';
 import Button from 'components/buttons/Button';
 import Modal from 'components/modals/Modal';
 import { selectOsqueryTable } from 'redux/nodes/components/QueryPages/actions';
+import { renderFlash } from 'redux/nodes/notifications/actions';
 import statusLabelsInterface from 'interfaces/status_labels';
 import iconClassForLabel from 'utilities/icon_class_for_label';
 import platformIconClass from 'utilities/platform_icon_class';
@@ -148,6 +149,7 @@ export class ManageHostsPage extends Component {
       .then(() => {
         toggleModal();
         dispatch(push('/hosts/manage'));
+        dispatch(renderFlash('success', 'Label successfully deleted'));
         return false;
       });
   }
