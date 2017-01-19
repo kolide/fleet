@@ -15,9 +15,10 @@ export const STATUSES = {
 
 const HostDetails = ({ host, onDestroyHost }) => {
   const {
+    host_cpu: hostCpu,
+    host_mac: hostMac,
+    host_ip_address: hostIpAddress,
     hostname,
-    ip,
-    mac,
     memory,
     os_version: osVersion,
     osquery_version: osqueryVersion,
@@ -46,7 +47,7 @@ const HostDetails = ({ host, onDestroyHost }) => {
 
         <li className={` ${baseClass}__detail ${baseClass}__detail--cpu`}>
           <Icon name="cpu" className={`${baseClass}__icon`} />
-          <span className={`${baseClass}__host-content`}> 1 x 2.4Ghz</span>
+          <span className={`${baseClass}__host-content`}>{hostCpu}</span>
         </li>
 
         <li className={` ${baseClass}__detail ${baseClass}__detail--osquery`}>
@@ -66,12 +67,12 @@ const HostDetails = ({ host, onDestroyHost }) => {
 
         <li className={` ${baseClass}__detail ${baseClass}__detail--mac`}>
           <Icon name="mac" className={`${baseClass}__icon`} />
-          <span className={`${baseClass}__host-content ${baseClass}__host-content--mono`}>{mac || '04:01:34:EA:54:01'}</span>
+          <span className={`${baseClass}__host-content ${baseClass}__host-content--mono`}>{hostMac}</span>
         </li>
 
         <li className={` ${baseClass}__detail ${baseClass}__detail--ip`}>
           <Icon name="world" className={`${baseClass}__icon`} />
-          <span className={`${baseClass}__host-content ${baseClass}__host-content--mono`}>{ip || '104.236.116.77'}</span>
+          <span className={`${baseClass}__host-content ${baseClass}__host-content--mono`}>{hostIpAddress}</span>
         </li>
       </ul>
     </div>
