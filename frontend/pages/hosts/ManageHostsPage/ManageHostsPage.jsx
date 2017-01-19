@@ -301,12 +301,16 @@ export class ManageHostsPage extends Component {
   }
 
   renderNoHosts = () => {
+    const { selectedLabel } = this.props;
+    const { type } = selectedLabel || '';
+    const isCustom = type === 'custom';
+
     return (
       <div className={`${baseClass}__no-hosts`}>
         <h1>No matching hosts found.</h1>
         <h2>Where are the missing hosts?</h2>
         <ul>
-          <li>Check your SQL query above to confirm there are no mistakes.</li>
+          {isCustom && <li>Check your SQL query above to confirm there are no mistakes.</li>}
           <li>Check to confirm that your hosts are online.</li>
           <li>Confirm that your expected hosts have osqueryd installed and configured.</li>
         </ul>
@@ -321,7 +325,7 @@ export class ManageHostsPage extends Component {
   }
 
   renderHosts = () => {
-    const { display, isAddLabel, selectedLabel: { type } } = this.props;
+    const { display, isAddLabel } = this.props;
     const { onHostDetailActionClick, filterHosts, sortHosts, renderNoHosts } = this;
 
     if (isAddLabel) {
@@ -331,7 +335,7 @@ export class ManageHostsPage extends Component {
     const filteredHosts = filterHosts();
     const sortedHosts = sortHosts(filteredHosts);
 
-    if (sortedHosts.length === 0 && type === 'custom') {
+    if (sortedHosts.length === 0) {
       return renderNoHosts();
     }
 
