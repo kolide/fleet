@@ -321,7 +321,7 @@ export class ManageHostsPage extends Component {
   }
 
   renderHosts = () => {
-    const { display, isAddLabel } = this.props;
+    const { display, isAddLabel, selectedLabel: { type } } = this.props;
     const { onHostDetailActionClick, filterHosts, sortHosts, renderNoHosts } = this;
 
     if (isAddLabel) {
@@ -331,7 +331,7 @@ export class ManageHostsPage extends Component {
     const filteredHosts = filterHosts();
     const sortedHosts = sortHosts(filteredHosts);
 
-    if (sortedHosts.length === 0) {
+    if (sortedHosts.length === 0 && type === 'custom') {
       return renderNoHosts();
     }
 
