@@ -6,7 +6,6 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"io"
-	"io/ioutil"
 	"net"
 	"net/url"
 
@@ -16,13 +15,15 @@ import (
 
 // Certificate returns the PEM encoded certificate chain for osqueryd TLS termination.
 func (svc service) CertificateChain(ctx context.Context, insecure bool) ([]byte, error) {
-	if svc.config.Server.TLS {
-		cert, err := ioutil.ReadFile(svc.config.Server.Cert)
-		if err != nil {
-			return nil, errors.Wrap(err, "reading certificate file")
+	/*
+		if svc.config.Server.TLS {
+			cert, err := ioutil.ReadFile(svc.config.Server.Cert)
+			if err != nil {
+				return nil, errors.Wrap(err, "reading certificate file")
+			}
+			return cert, nil
 		}
-		return cert, nil
-	}
+	*/
 
 	// if kolide is not using a TLS listener itself, it must be terminated upstream.
 	// we can still retrieve the certificate chain if we can establish a
@@ -32,24 +33,25 @@ func (svc service) CertificateChain(ctx context.Context, insecure bool) ([]byte,
 		return nil, err
 	}
 
-	conn, err := connectTLS(config.KolideServerURL, insecure)
+	u, err := url.Parse(config.KolideServerURL)
+	if err != nil {
+		return nil, errors.Wrap(err, "parsing serverURL")
+	}
+
+	conn, err := connectTLS(u, insecure)
 	if err != nil {
 		return nil, err
 	}
 
-	return chain(conn.ConnectionState())
+	return chain(conn.ConnectionState(), u.Hostname())
 }
 
-func connectTLS(serverURL string, insecure bool) (*tls.Conn, error) {
-	u, err := url.Parse(serverURL)
-	if err != nil {
-		return nil, errors.Wrap(err, "parsing serverURL")
-	}
+func connectTLS(serverURL *url.URL, insecure bool) (*tls.Conn, error) {
 	var hostport string
-	if u.Port() == "" {
-		hostport = net.JoinHostPort(u.Host, "443")
+	if serverURL.Port() == "" {
+		hostport = net.JoinHostPort(serverURL.Host, "443")
 	} else {
-		hostport = u.Host
+		hostport = serverURL.Host
 	}
 
 	conn, err := tls.Dial("tcp", hostport, &tls.Config{InsecureSkipVerify: insecure})
@@ -60,21 +62,31 @@ func connectTLS(serverURL string, insecure bool) (*tls.Conn, error) {
 	return conn, nil
 }
 
-func chain(cs tls.ConnectionState) ([]byte, error) {
+func chain(cs tls.ConnectionState, hostname string) ([]byte, error) {
 	buf := bytes.NewBuffer([]byte(""))
+
+	verifyEncode := func(chain []*x509.Certificate) error {
+		for _, cert := range chain {
+			if len(chain) > 1 {
+				if err := cert.VerifyHostname(hostname); err == nil {
+					continue
+				}
+			}
+			if err := encodePEM(buf, cert); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
 	if len(cs.VerifiedChains) != 0 {
 		for _, chain := range cs.VerifiedChains {
-			for _, cert := range chain {
-				if err := encodePEM(buf, cert); err != nil {
-					return nil, errors.Wrap(err, "encode verified chains pem")
-				}
+			if err := verifyEncode(chain); err != nil {
+				return nil, errors.Wrap(err, "encode verified chains pem")
 			}
 		}
 	} else {
-		for _, cert := range cs.PeerCertificates {
-			if err := encodePEM(buf, cert); err != nil {
-				return nil, errors.Wrap(err, "encode peer certificates pem")
-			}
+		if err := verifyEncode(cs.PeerCertificates); err != nil {
+			return nil, errors.Wrap(err, "encode peer certificates pem")
 		}
 	}
 	return buf.Bytes(), nil
