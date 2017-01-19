@@ -1,5 +1,4 @@
 import React, { Component, PropTypes } from 'react';
-import { noop } from 'lodash';
 
 import Button from 'components/buttons/Button';
 import InputFieldWithIcon from 'components/forms/fields/InputFieldWithIcon';
