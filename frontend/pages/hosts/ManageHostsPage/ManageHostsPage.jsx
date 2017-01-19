@@ -98,6 +98,7 @@ export class ManageHostsPage extends Component {
 
       dispatch(hostActions.destroy(host))
         .then(() => {
+          dispatch(getStatusLabelCounts);
           dispatch(renderFlash('success', `Host "${host.hostname}" was successfully deleted`));
         });
 
