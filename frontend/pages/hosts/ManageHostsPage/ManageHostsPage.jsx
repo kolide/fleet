@@ -338,7 +338,7 @@ export class ManageHostsPage extends Component {
     const sortedHosts = sortHosts(filteredHosts);
 
     if (sortedHosts.length === 0) {
-      if (selectedLabel && selectedLabel.type && selectedLabel.type === 'all') {
+      if (selectedLabel && selectedLabel.type === 'all') {
         return <LonelyHost />;
       }
 
