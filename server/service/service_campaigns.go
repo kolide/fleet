@@ -72,7 +72,6 @@ type targetTotals struct {
 
 const (
 	campaignStatusPending  = "pending"
-	campaignStatusMore     = "more"
 	campaignStatusFinished = "finished"
 )
 
@@ -124,9 +123,6 @@ func (svc service) StreamCampaignResults(ctx context.Context, conn *websocket.Co
 	}
 
 	lastStatus := status.Status
-	if err = conn.WriteJSONMessage("status", status); err != nil {
-		return
-	}
 
 	// Loop, pushing updates to results and expected totals
 	for {
@@ -140,8 +136,6 @@ func (svc service) StreamCampaignResults(ctx context.Context, conn *websocket.Co
 					fmt.Println("error writing to channel")
 				}
 				status.ActualResults++
-				status.Status = campaignStatusMore
-
 			}
 
 		case <-time.After(1 * time.Second):
@@ -171,7 +165,7 @@ func (svc service) StreamCampaignResults(ctx context.Context, conn *websocket.Co
 			}
 
 			status.ExpectedResults = totals.Online
-			if status.ActualResults == status.ExpectedResults {
+			if status.ActualResults >= status.ExpectedResults {
 				status.Status = campaignStatusFinished
 			}
 			// only write status message if status has changed
