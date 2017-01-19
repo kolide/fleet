@@ -23,6 +23,8 @@ type Datastore interface {
 	MigrateTables() error
 	// MigrateData populates built-in data
 	MigrateData() error
+	// MigrateDemoData populates data for a demo environment
+	MigrateDemoData() error
 }
 
 // NotFoundError is returned when the datastore resource cannot be found.

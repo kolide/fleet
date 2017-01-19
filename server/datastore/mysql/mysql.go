@@ -9,6 +9,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/kolide/kolide-ose/server/config"
 	"github.com/kolide/kolide-ose/server/datastore/mysql/migrations/data"
+	"github.com/kolide/kolide-ose/server/datastore/mysql/migrations/demo"
 	"github.com/kolide/kolide-ose/server/datastore/mysql/migrations/tables"
 	"github.com/kolide/kolide-ose/server/kolide"
 )
@@ -84,6 +85,14 @@ func (d *Datastore) MigrateTables() error {
 
 func (d *Datastore) MigrateData() error {
 	if err := data.MigrationClient.Up(d.db.DB, ""); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (d *Datastore) MigrateDemoData() error {
+	if err := demo.MigrationClient.Up(d.db.DB, ""); err != nil {
 		return err
 	}
 

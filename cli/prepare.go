@@ -50,6 +50,25 @@ To setup kolide infrastructure, use one of the available commands.
 
 	prepareCmd.AddCommand(dbCmd)
 
+	var demoCmd = &cobra.Command{
+		Use:   "demo",
+		Short: "Populate the database with demo data",
+		Long:  ``,
+		Run: func(cmd *cobra.Command, args []string) {
+			config := configManager.LoadConfig()
+			ds, err := mysql.New(config.Mysql, clock.C)
+			if err != nil {
+				initFatal(err, "creating db connection")
+			}
+
+			if err := ds.MigrateDemoData(); err != nil {
+				initFatal(err, "migrating demo data")
+			}
+		},
+	}
+
+	prepareCmd.AddCommand(demoCmd)
+
 	var testDataCmd = &cobra.Command{
 		Use:   "test-data",
 		Short: "Generate test data",
