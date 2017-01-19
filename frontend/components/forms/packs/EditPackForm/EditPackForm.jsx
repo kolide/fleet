@@ -34,7 +34,8 @@ class EditPackForm extends Component {
     } = this.props;
 
     return (
-      <form className={className} onSubmit={handleSubmit}>
+      <form className={`${baseClass} ${className}`} onSubmit={handleSubmit}>
+        <h1>Edit Pack</h1>
         <InputField
           {...fields.name}
           placeholder="Query Pack Title"
@@ -57,8 +58,10 @@ class EditPackForm extends Component {
           selectedTargets={fields.targets.value}
           targetsCount={targetsCount}
         />
-        <Button onClick={onCancel} type="button" variant="inverse">CANCEL</Button>
-        <Button type="submit" variant="brand">SAVE</Button>
+        <div className={`${baseClass}__pack-buttons`}>
+          <Button onClick={onCancel} type="button" variant="inverse">Cancel</Button>
+          <Button type="submit" variant="brand">Save</Button>
+        </div>
       </form>
     );
   }
