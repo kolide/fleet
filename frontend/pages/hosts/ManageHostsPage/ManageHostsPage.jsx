@@ -144,11 +144,12 @@ export class ManageHostsPage extends Component {
   onDeleteLabel = () => {
     const { toggleModal } = this;
     const { dispatch, selectedLabel } = this.props;
+    const { MANAGE_HOSTS } = paths;
 
     return dispatch(labelActions.destroy(selectedLabel))
       .then(() => {
         toggleModal();
-        dispatch(push('/hosts/manage'));
+        dispatch(push(MANAGE_HOSTS));
         dispatch(renderFlash('success', 'Label successfully deleted'));
         return false;
       });

@@ -102,7 +102,7 @@ describe('Kolide - API client', () => {
       const request = validDestroyLabelRequest(bearerToken, labelStub);
 
       Kolide.setBearerToken(bearerToken);
-      Kolide.label.destroy(labelStub)
+      Kolide.labels.destroy(labelStub)
         .then(() => {
           expect(request.isDone()).toEqual(true);
           done();
