@@ -19,6 +19,9 @@ type AppConfigService interface {
 	AppConfig(ctx context.Context) (info *AppConfig, err error)
 	ModifyAppConfig(ctx context.Context, p AppConfigPayload) (info *AppConfig, err error)
 	SendTestEmail(ctx context.Context, config *AppConfig) error
+
+	// Certificate returns the PEM encoded certificate chain for osqueryd TLS termination.
+	CertificateChain(ctx context.Context, insecure bool) (cert []byte, err error)
 }
 
 // SMTP settings names returned from API, these map to SMTPAuthType and

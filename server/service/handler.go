@@ -73,6 +73,7 @@ type KolideEndpoints struct {
 	GetOptions                     endpoint.Endpoint
 	ModifyOptions                  endpoint.Endpoint
 	ImportConfig                   endpoint.Endpoint
+	GetCertificate                 endpoint.Endpoint
 }
 
 // MakeKolideServerEndpoints creates the Kolide API endpoints.
@@ -84,6 +85,7 @@ func MakeKolideServerEndpoints(svc kolide.Service, jwtKey string) KolideEndpoint
 		ResetPassword:  makeResetPasswordEndpoint(svc),
 		CreateUser:     makeCreateUserEndpoint(svc),
 		VerifyInvite:   makeVerifyInviteEndpoint(svc),
+		GetCertificate: makeCertificateEndpoint(svc),
 
 		// Authenticated user endpoints
 		// Each of these endpoints should have exactly one
@@ -210,6 +212,7 @@ type kolideHandlers struct {
 	GetOptions                     http.Handler
 	ModifyOptions                  http.Handler
 	ImportConfig                   http.Handler
+	GetCertificate                 http.Handler
 }
 
 func makeKolideKitHandlers(ctx context.Context, e KolideEndpoints, opts []kithttp.ServerOption) *kolideHandlers {
@@ -275,6 +278,7 @@ func makeKolideKitHandlers(ctx context.Context, e KolideEndpoints, opts []kithtt
 		GetOptions:                    newServer(e.GetOptions, decodeNoParamsRequest),
 		ModifyOptions:                 newServer(e.ModifyOptions, decodeModifyOptionsRequest),
 		ImportConfig:                  newServer(e.ImportConfig, decodeImportConfigRequest),
+		GetCertificate:                newServer(e.GetCertificate, decodeCertificateRequest),
 	}
 }
 
@@ -337,6 +341,7 @@ func attachKolideAPIRoutes(r *mux.Router, h *kolideHandlers) {
 	r.Handle("/api/v1/kolide/sessions/{id}", h.GetSessionInfo).Methods("GET").Name("get_session_info")
 	r.Handle("/api/v1/kolide/sessions/{id}", h.DeleteSession).Methods("DELETE").Name("delete_session")
 
+	r.Handle("/api/v1/kolide/config/certificate", h.GetCertificate).Methods("GET").Name("get_certificate")
 	r.Handle("/api/v1/kolide/config", h.GetAppConfig).Methods("GET").Name("get_app_config")
 	r.Handle("/api/v1/kolide/config", h.ModifyAppConfig).Methods("PATCH").Name("modify_app_config")
 	r.Handle("/api/v1/kolide/invites", h.CreateInvite).Methods("POST").Name("create_invite")
