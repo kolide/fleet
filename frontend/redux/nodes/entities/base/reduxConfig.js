@@ -260,7 +260,7 @@ const reduxConfig = ({
           data: {
             ...payload.data[entityName],
           },
-        }
+        };
       case actionTypes.CREATE_SUCCESS:
       case actionTypes.UPDATE_SUCCESS:
       case actionTypes.LOAD_SUCCESS:

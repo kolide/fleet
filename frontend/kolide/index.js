@@ -53,6 +53,11 @@ class Kolide extends Base {
   }
 
   users = {
+    changePassword: (passwordParams) => {
+      const { CHANGE_PASSWORD } = endpoints;
+
+      return this.authenticatedPost(this.endpoint(CHANGE_PASSWORD), JSON.stringify(passwordParams));
+    },
     enable: (user, { enabled }) => {
       const { ENABLE_USER } = endpoints;
 

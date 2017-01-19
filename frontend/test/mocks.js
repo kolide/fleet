@@ -14,6 +14,16 @@ export const validUser = {
   gravatarURL: 'https://www.gravatar.com/avatar/7157f4758f8423b59aaee869d919f6b9?d=blank&size=200',
 };
 
+export const validChangePasswordRequest = (bearerToken, params) => {
+  return nock('http://localhost:8080', {
+    reqHeaders: {
+      Authorization: `Bearer ${bearerToken}`,
+    },
+  })
+    .post('/api/v1/kolide/change_password', JSON.stringify(params))
+    .reply(200, {});
+};
+
 export const validCreateLabelRequest = (bearerToken, labelParams) => {
   return nock('http://localhost:8080', {
     reqHeaders: {
@@ -424,6 +434,7 @@ export default {
   invalidForgotPasswordRequest,
   invalidGetQueryRequest,
   invalidResetPasswordRequest,
+  validChangePasswordRequest,
   validCreateLabelRequest,
   validCreatePackRequest,
   validCreateQueryRequest,

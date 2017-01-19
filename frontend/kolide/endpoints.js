@@ -1,4 +1,5 @@
 export default {
+  CHANGE_PASSWORD: '/v1/kolide/change_password',
   CONFIG: '/v1/kolide/config',
   CONFIG_OPTIONS: '/v1/kolide/options',
   ENABLE_USER: (id) => {

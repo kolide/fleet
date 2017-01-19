@@ -9,6 +9,7 @@ import { configOptionStub, hostStub, packStub, queryStub, userStub, labelStub } 
 const {
   invalidForgotPasswordRequest,
   invalidResetPasswordRequest,
+  validChangePasswordRequest,
   validCreateLabelRequest,
   validCreatePackRequest,
   validCreateQueryRequest,
@@ -77,8 +78,6 @@ describe('Kolide - API client', () => {
   });
 
   describe('labels', () => {
-    const bearerToken = 'valid-bearer-token';
-
     describe('#createLabel', () => {
       it('calls the appropriate endpoint with the correct parameters', (done) => {
         const description = 'label description';
@@ -101,6 +100,7 @@ describe('Kolide - API client', () => {
           })
           .catch(done);
       });
+    });
 
     describe('#destroyLabel', () => {
       it('calls the appropriate endpoint with the correct parameters', (done) => {
@@ -278,34 +278,55 @@ describe('Kolide - API client', () => {
   });
 
   describe('users', () => {
-    it('#updateAdmin', (done) => {
-      const adminParams = { admin: true };
-      const request = validUpdateAdminRequest(bearerToken, userStub, adminParams);
+    describe('#changePassword', () => {
+      it('calls the appropriate endpoint with the correct parameters', (done) => {
+        const passwordParams = { old_password: 'password', new_password: 'p@ssw0rd' };
+        const request = validChangePasswordRequest(bearerToken, passwordParams);
 
-      Kolide.setBearerToken(bearerToken);
-      Kolide.users.updateAdmin(userStub, adminParams)
-        .then(() => {
-          expect(request.isDone()).toEqual(true);
-          done();
-        })
-        .catch(() => {
-          throw new Error('Request should have been stubbed');
-        });
+        Kolide.setBearerToken(bearerToken);
+        Kolide.users.changePassword(passwordParams)
+          .then(() => {
+            expect(request.isDone()).toEqual(true);
+            done();
+          })
+          .catch(() => {
+            throw new Error('Expected request to have been stubbed');
+          });
+      });
     });
 
-    it('#enable', (done) => {
-      const enableParams = { enabled: true };
-      const request = validEnableUserRequest(bearerToken, userStub, enableParams);
+    describe('#enable', () => {
+      it('calls the appropriate endpoint with the correct parameters', (done) => {
+        const enableParams = { enabled: true };
+        const request = validEnableUserRequest(bearerToken, userStub, enableParams);
 
-      Kolide.setBearerToken(bearerToken);
-      Kolide.users.enable(userStub, enableParams)
-        .then(() => {
-          expect(request.isDone()).toEqual(true);
-          done();
-        })
-        .catch(() => {
-          throw new Error('Request should have been stubbed');
-        });
+        Kolide.setBearerToken(bearerToken);
+        Kolide.users.enable(userStub, enableParams)
+          .then(() => {
+            expect(request.isDone()).toEqual(true);
+            done();
+          })
+          .catch(() => {
+            throw new Error('Request should have been stubbed');
+          });
+      });
+    });
+
+    describe('#updateAdmin', () => {
+      it('calls the appropriate endpoint with the correct parameters', (done) => {
+        const adminParams = { admin: true };
+        const request = validUpdateAdminRequest(bearerToken, userStub, adminParams);
+
+        Kolide.setBearerToken(bearerToken);
+        Kolide.users.updateAdmin(userStub, adminParams)
+          .then(() => {
+            expect(request.isDone()).toEqual(true);
+            done();
+          })
+          .catch(() => {
+            throw new Error('Request should have been stubbed');
+          });
+      });
     });
   });
 

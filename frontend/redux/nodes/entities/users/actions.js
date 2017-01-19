@@ -1,8 +1,8 @@
 import Kolide from 'kolide';
 
+import config from 'redux/nodes/entities/users/config';
 import { formatErrorResponse } from 'redux/nodes/entities/base/helpers';
 
-import config from './config';
 const { extendedActions } = config;
 
 // Actions for admin to require password reset for a user
@@ -23,6 +23,26 @@ export const requirePasswordResetFailure = (errors) => {
   return {
     type: REQUIRE_PASSWORD_RESET_FAILURE,
     payload: { errors },
+  };
+};
+
+export const changePassword = (user, { new_password: newPassword, old_password: oldPassword }) => {
+  const { successAction, updateFailure, updateRequest, updateSuccess } = extendedActions;
+
+  return (dispatch) => {
+    dispatch(updateRequest);
+
+    return Kolide.users.changePassword({ new_password: newPassword, old_password: oldPassword })
+      .then(() => {
+        return dispatch(successAction(user, updateSuccess));
+      })
+      .catch((response) => {
+        const errorsObject = formatErrorResponse(response);
+
+        dispatch(updateFailure(errorsObject));
+
+        throw errorsObject;
+      });
   };
 };
 
@@ -85,4 +105,4 @@ export const updateAdmin = (user, { admin }) => {
   };
 };
 
-export default { ...config.actions, enableUser, requirePasswordReset, updateAdmin };
+export default { ...config.actions, changePassword, enableUser, requirePasswordReset, updateAdmin };

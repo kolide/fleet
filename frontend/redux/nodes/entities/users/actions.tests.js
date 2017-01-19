@@ -5,6 +5,7 @@ import * as Kolide from 'kolide';
 import { reduxMockStore } from 'test/helpers';
 
 import {
+  changePassword,
   enableUser,
   requirePasswordReset,
   REQUIRE_PASSWORD_RESET_REQUEST,
@@ -105,6 +106,104 @@ describe('Users - actions', () => {
             expect(dispatchedActions).toEqual([
               config.extendedActions.updateRequest,
               config.extendedActions.updateFailure({ base: 'Unable to enable the user' }),
+            ]);
+
+            done();
+          });
+      });
+    });
+  });
+
+  describe('changePassword', () => {
+    const passwordParams = { old_password: 'p@ssword', new_password: 'password' };
+    const changePasswordAction = changePassword(user, passwordParams);
+
+    describe('successful request', () => {
+      beforeEach(() => {
+        spyOn(Kolide.default.users, 'changePassword').andCall(() => {
+          return Promise.resolve({});
+        });
+      });
+
+      afterEach(restoreSpies);
+
+      it('calls the API', (done) => {
+        const mockStore = reduxMockStore(store);
+
+        mockStore.dispatch(changePasswordAction)
+          .then(() => {
+            expect(Kolide.default.users.changePassword).toHaveBeenCalledWith(passwordParams);
+            done();
+          })
+          .catch(done);
+      });
+
+      it('dispatches the correct actions', (done) => {
+        const mockStore = reduxMockStore(store);
+
+        mockStore.dispatch(changePasswordAction)
+          .then(() => {
+            const dispatchedActions = mockStore.getActions();
+
+            expect(dispatchedActions).toEqual([
+              config.extendedActions.updateRequest,
+              config.extendedActions.updateSuccess({
+                users: {
+                  [user.id]: user,
+                },
+              }),
+            ]);
+
+            done();
+          })
+          .catch(done);
+      });
+    });
+
+    describe('unsuccessful request', () => {
+      const errors = [
+        {
+          name: 'base',
+          reason: 'Unable to change password',
+        },
+      ];
+      const errorResponse = {
+        message: {
+          message: 'Unable to change password',
+          errors,
+        },
+      };
+      beforeEach(() => {
+        spyOn(Kolide.default.users, 'changePassword').andCall(() => {
+          return Promise.reject(errorResponse);
+        });
+      });
+
+      afterEach(restoreSpies);
+
+      it('calls the API', (done) => {
+        const mockStore = reduxMockStore(store);
+
+        mockStore.dispatch(changePasswordAction)
+          .then(done)
+          .catch(() => {
+            expect(Kolide.default.users.changePassword).toHaveBeenCalledWith(passwordParams);
+
+            done();
+          });
+      });
+
+      it('dispatches the correct actions', (done) => {
+        const mockStore = reduxMockStore(store);
+
+        mockStore.dispatch(changePasswordAction)
+          .then(done)
+          .catch(() => {
+            const dispatchedActions = mockStore.getActions();
+
+            expect(dispatchedActions).toEqual([
+              config.extendedActions.updateRequest,
+              config.extendedActions.updateFailure({ base: 'Unable to change password' }),
             ]);
 
             done();
