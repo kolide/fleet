@@ -3,6 +3,7 @@ import Kolide from 'kolide';
 import { formatErrorResponse } from 'redux/nodes/entities/base/helpers';
 
 import config from './config';
+const { extendedActions } = config;
 
 // Actions for admin to require password reset for a user
 export const REQUIRE_PASSWORD_RESET_REQUEST = 'REQUIRE_PASSWORD_RESET_REQUEST';
@@ -26,19 +27,19 @@ export const requirePasswordResetFailure = (errors) => {
 };
 
 export const enableUser = (user, { enabled }) => {
-  const { extendedActions } = config;
+  const { successAction, updateFailure, updateRequest, updateSuccess } = extendedActions;
 
   return (dispatch) => {
-    dispatch(extendedActions.updateRequest);
+    dispatch(updateRequest);
 
     return Kolide.users.enable(user, { enabled })
       .then((userResponse) => {
-        return dispatch(extendedActions.updateSuccess(userResponse));
+        return dispatch(successAction(userResponse, updateSuccess));
       })
       .catch((response) => {
         const errorsObject = formatErrorResponse(response);
 
-        dispatch(extendedActions.updateFailure(errorsObject));
+        dispatch(updateFailure(errorsObject));
 
         throw errorsObject;
       });
@@ -65,19 +66,19 @@ export const requirePasswordReset = (user, { require }) => {
 };
 
 export const updateAdmin = (user, { admin }) => {
-  const { extendedActions } = config;
+  const { successAction, updateFailure, updateRequest, updateSuccess } = extendedActions;
 
   return (dispatch) => {
-    dispatch(extendedActions.updateRequest);
+    dispatch(updateRequest);
 
     return Kolide.users.updateAdmin(user, { admin })
       .then((userResponse) => {
-        return dispatch(extendedActions.updateSuccess(userResponse));
+        return dispatch(successAction(userResponse, updateSuccess));
       })
       .catch((response) => {
         const errorsObject = formatErrorResponse(response);
 
-        dispatch(extendedActions.updateFailure(errorsObject));
+        dispatch(updateFailure(errorsObject));
 
         throw errorsObject;
       });

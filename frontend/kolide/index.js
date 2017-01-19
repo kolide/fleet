@@ -57,13 +57,21 @@ class Kolide extends Base {
       const { ENABLE_USER } = endpoints;
 
       return this.authenticatedPost(this.endpoint(ENABLE_USER(user.id)), JSON.stringify({ enabled }))
-        .then(response => response.user);
+        .then((response) => {
+          const { user: updatedUser } = response;
+
+          return helpers.addGravatarUrlToResource(updatedUser);
+        });
     },
     updateAdmin: (user, { admin }) => {
       const { UPDATE_USER_ADMIN } = endpoints;
 
       return this.authenticatedPost(this.endpoint(UPDATE_USER_ADMIN(user.id)), JSON.stringify({ admin }))
-        .then(response => response.user);
+        .then((response) => {
+          const { user: updatedUser } = response;
+
+          return helpers.addGravatarUrlToResource(updatedUser);
+        });
     },
   }
 

@@ -48,7 +48,11 @@ describe('Users - actions', () => {
 
             expect(dispatchedActions).toEqual([
               config.extendedActions.updateRequest,
-              config.extendedActions.updateSuccess({ ...user, enabled: true }),
+              config.extendedActions.updateSuccess({
+                users: {
+                  [user.id]: { ...user, enabled: true },
+                },
+              }),
             ]);
 
             done();
@@ -139,7 +143,11 @@ describe('Users - actions', () => {
 
             expect(dispatchedActions).toEqual([
               config.extendedActions.updateRequest,
-              config.extendedActions.updateSuccess({ ...user, admin: true }),
+              config.extendedActions.updateSuccess({
+                users: {
+                  [user.id]: { ...user, admin: true },
+                },
+              }),
             ]);
 
             done();
