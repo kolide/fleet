@@ -22,11 +22,11 @@ import osqueryTableInterface from 'interfaces/osquery_table';
 import paths from 'router/paths';
 import QueryForm from 'components/forms/queries/QueryForm';
 import QuerySidePanel from 'components/side_panels/QuerySidePanel';
+import { renderFlash } from 'redux/nodes/notifications/actions';
 import Rocker from 'components/buttons/Rocker';
 import Button from 'components/buttons/Button';
 import Modal from 'components/modals/Modal';
 import { selectOsqueryTable } from 'redux/nodes/components/QueryPages/actions';
-import { renderFlash } from 'redux/nodes/notifications/actions';
 import statusLabelsInterface from 'interfaces/status_labels';
 import iconClassForLabel from 'utilities/icon_class_for_label';
 import platformIconClass from 'utilities/platform_icon_class';
@@ -72,14 +72,6 @@ export class ManageHostsPage extends Component {
     return false;
   }
 
-  onCancelAddLabel = () => {
-    const { dispatch } = this.props;
-
-    dispatch(push('/hosts/manage'));
-
-    return false;
-  }
-
   onAddLabelClick = (evt) => {
     evt.preventDefault();
 
@@ -90,14 +82,26 @@ export class ManageHostsPage extends Component {
     return false;
   }
 
-  onHostDetailActionClick = (type) => {
-    return (host) => {
-      return (evt) => {
-        evt.preventDefault();
+  onCancelAddLabel = () => {
+    const { dispatch } = this.props;
 
-        console.log(type, host);
-        return false;
-      };
+    dispatch(push('/hosts/manage'));
+
+    return false;
+  }
+
+  onDestroyHost = (host) => {
+    return (evt) => {
+      evt.preventDefault();
+
+      const { dispatch } = this.props;
+
+      dispatch(hostActions.destroy(host))
+        .then(() => {
+          dispatch(renderFlash('success', `Host "${host.hostname}" was successfully deleted`));
+        });
+
+      return false;
     };
   }
 
@@ -328,7 +332,7 @@ export class ManageHostsPage extends Component {
 
   renderHosts = () => {
     const { display, isAddLabel, selectedLabel } = this.props;
-    const { onHostDetailActionClick, filterHosts, sortHosts, renderNoHosts } = this;
+    const { onDestroyHost, filterHosts, sortHosts, renderNoHosts } = this;
 
     if (isAddLabel) {
       return false;
@@ -351,14 +355,13 @@ export class ManageHostsPage extends Component {
           <HostDetails
             host={host}
             key={`host-${host.id}-details`}
-            onDisableClick={onHostDetailActionClick('disable')}
-            onQueryClick={onHostDetailActionClick('query')}
+            onDestroyHost={onDestroyHost}
           />
         );
       });
     }
 
-    return <HostsTable hosts={sortedHosts} />;
+    return <HostsTable hosts={sortedHosts} onDestroyHost={onDestroyHost} />;
   }
 
 
