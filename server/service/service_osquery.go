@@ -178,15 +178,15 @@ const hostDistributedQueryPrefix = "kolide_distributed_query_"
 // kolide.Host data model. This map should not be modified at runtime.
 var detailQueries = map[string]struct {
 	Query      string
-	IngestFunc func(host *kolide.Host, rows []map[string]string) error
+	IngestFunc func(svc *service, host *kolide.Host, rows []map[string]string) error
 }{
 	"osquery_info": {
 		Query: "select * from osquery_info limit 1",
-		IngestFunc: func(host *kolide.Host, rows []map[string]string) error {
+		IngestFunc: func(svc *service, host *kolide.Host, rows []map[string]string) error {
 			if len(rows) != 1 {
-				return osqueryError{
-					message: fmt.Sprintf("expected 1 row but got %d", len(rows)),
-				}
+				svc.logger.Log("component", "service", "method", "IngestFunc", "err",
+					fmt.Sprintf("detail_query_osquery_info expected single result got %d", len(rows)))
+				return nil
 			}
 
 			host.Platform = rows[0]["build_platform"]
@@ -197,11 +197,11 @@ var detailQueries = map[string]struct {
 	},
 	"system_info": {
 		Query: "select * from system_info limit 1",
-		IngestFunc: func(host *kolide.Host, rows []map[string]string) error {
+		IngestFunc: func(svc *service, host *kolide.Host, rows []map[string]string) error {
 			if len(rows) != 1 {
-				return osqueryError{
-					message: fmt.Sprintf("expected 1 row but got %d", len(rows)),
-				}
+				svc.logger.Log("component", "service", "method", "IngestFunc", "err",
+					fmt.Sprintf("detail_query_system_info expected single result got %d", len(rows)))
+				return nil
 			}
 
 			var err error
@@ -232,11 +232,11 @@ var detailQueries = map[string]struct {
 	},
 	"os_version": {
 		Query: "select * from os_version limit 1",
-		IngestFunc: func(host *kolide.Host, rows []map[string]string) error {
+		IngestFunc: func(svc *service, host *kolide.Host, rows []map[string]string) error {
 			if len(rows) != 1 {
-				return osqueryError{
-					message: fmt.Sprintf("expected 1 row but got %d", len(rows)),
-				}
+				svc.logger.Log("component", "service", "method", "IngestFunc", "err",
+					fmt.Sprintf("detail_query_os_version expected single result got %d", len(rows)))
+				return nil
 			}
 
 			host.OSVersion = fmt.Sprintf(
@@ -258,11 +258,11 @@ var detailQueries = map[string]struct {
 	},
 	"uptime": {
 		Query: "select * from uptime limit 1",
-		IngestFunc: func(host *kolide.Host, rows []map[string]string) error {
+		IngestFunc: func(svc *service, host *kolide.Host, rows []map[string]string) error {
 			if len(rows) != 1 {
-				return osqueryError{
-					message: fmt.Sprintf("expected 1 row but got %d", len(rows)),
-				}
+				svc.logger.Log("component", "service", "method", "IngestFunc", "err",
+					fmt.Sprintf("detail_query_uptime expected single result got %d", len(rows)))
+				return nil
 			}
 
 			uptimeSeconds, err := strconv.Atoi(rows[0]["total_seconds"])
@@ -278,8 +278,12 @@ var detailQueries = map[string]struct {
 		Query: `select * from interface_details id join interface_addresses ia
                         on ia.interface = id.interface where broadcast != ""
                         order by (ibytes + obytes) desc`,
-		IngestFunc: func(host *kolide.Host, rows []map[string]string) (err error) {
-
+		IngestFunc: func(svc *service, host *kolide.Host, rows []map[string]string) (err error) {
+			if len(rows) == 0 {
+				svc.logger.Log("component", "service", "method", "IngestFunc", "err",
+					"detail_query_network_interface expected 1 or more results")
+				return nil
+			}
 			networkInterfaces := []*kolide.NetworkInterface{}
 
 			for _, row := range rows {
@@ -393,7 +397,7 @@ func (svc service) ingestDetailQuery(host *kolide.Host, name string, rows []map[
 		return osqueryError{message: "unknown detail query " + trimmedQuery}
 	}
 
-	err := query.IngestFunc(host, rows)
+	err := query.IngestFunc(&svc, host, rows)
 	if err != nil {
 		return osqueryError{
 			message: fmt.Sprintf("ingesting query %s: %s", name, err.Error()),
