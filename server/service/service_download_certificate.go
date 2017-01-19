@@ -6,6 +6,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"io"
+	"io/ioutil"
 	"net"
 	"net/url"
 
@@ -15,15 +16,13 @@ import (
 
 // Certificate returns the PEM encoded certificate chain for osqueryd TLS termination.
 func (svc service) CertificateChain(ctx context.Context, insecure bool) ([]byte, error) {
-	/*
-		if svc.config.Server.TLS {
-			cert, err := ioutil.ReadFile(svc.config.Server.Cert)
-			if err != nil {
-				return nil, errors.Wrap(err, "reading certificate file")
-			}
-			return cert, nil
+	if svc.config.Server.TLS {
+		cert, err := ioutil.ReadFile(svc.config.Server.Cert)
+		if err != nil {
+			return nil, errors.Wrap(err, "reading certificate file")
 		}
-	*/
+		return cert, nil
+	}
 
 	// if kolide is not using a TLS listener itself, it must be terminated upstream.
 	// we can still retrieve the certificate chain if we can establish a
@@ -62,22 +61,31 @@ func connectTLS(serverURL *url.URL, insecure bool) (*tls.Conn, error) {
 	return conn, nil
 }
 
+// chain builds a PEM encoded certificate chain using the PeerCertificates
+// in tls.ConnectionState. chain uses the hostname to omit the Leaf certificate
+// from the chain.
 func chain(cs tls.ConnectionState, hostname string) ([]byte, error) {
 	buf := bytes.NewBuffer([]byte(""))
 
 	verifyEncode := func(chain []*x509.Certificate) error {
 		for _, cert := range chain {
 			if len(chain) > 1 {
+				// drop the leaf certificate from the chain. osqueryd does not
+				// need it to establish a secure connection
 				if err := cert.VerifyHostname(hostname); err == nil {
 					continue
 				}
 			}
-			if err := encodePEM(buf, cert); err != nil {
+			if err := encodePEMCertificate(buf, cert); err != nil {
 				return err
 			}
 		}
 		return nil
 	}
+
+	// use verified chains if available(which adds the root CA), otherwise
+	// use the certificate chain offered by the server (if terminated with
+	// self-signed certs)
 	if len(cs.VerifiedChains) != 0 {
 		for _, chain := range cs.VerifiedChains {
 			if err := verifyEncode(chain); err != nil {
@@ -92,7 +100,7 @@ func chain(cs tls.ConnectionState, hostname string) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func encodePEM(buf io.Writer, cert *x509.Certificate) error {
+func encodePEMCertificate(buf io.Writer, cert *x509.Certificate) error {
 	block := &pem.Block{
 		Type:  "CERTIFICATE",
 		Bytes: cert.Raw,

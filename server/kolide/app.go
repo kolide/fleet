@@ -21,6 +21,8 @@ type AppConfigService interface {
 	SendTestEmail(ctx context.Context, config *AppConfig) error
 
 	// Certificate returns the PEM encoded certificate chain for osqueryd TLS termination.
+	// For cases where the connection is self-signed, the user can opt in to
+	// establish an insecure connection to get the certificate.
 	CertificateChain(ctx context.Context, insecure bool) (cert []byte, err error)
 }
 
