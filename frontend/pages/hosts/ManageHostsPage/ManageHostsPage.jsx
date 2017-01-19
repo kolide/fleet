@@ -80,6 +80,14 @@ export class ManageHostsPage extends Component {
     return false;
   }
 
+  onAddHostClick = (evt) => {
+    evt.preventDefault();
+
+    console.log('open add host modal');
+
+    return false;
+  }
+
   onAddLabelClick = (evt) => {
     evt.preventDefault();
 
@@ -399,7 +407,7 @@ export class ManageHostsPage extends Component {
       selectedOsqueryTable,
       statusLabels,
     } = this.props;
-    const { onAddLabelClick, onLabelClick, onOsqueryTableSelect } = this;
+    const { onAddHostClick, onAddLabelClick, onLabelClick, onOsqueryTableSelect } = this;
 
     if (isAddLabel) {
       SidePanel = (
@@ -414,6 +422,7 @@ export class ManageHostsPage extends Component {
         <HostSidePanel
           key="hosts-side-panel"
           labels={labels}
+          onAddHostClick={onAddHostClick}
           onAddLabelClick={onAddLabelClick}
           onLabelClick={onLabelClick}
           selectedLabel={selectedLabel}
