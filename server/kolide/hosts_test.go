@@ -49,6 +49,9 @@ func TestHostStatus(t *testing.T) {
 
 	host := Host{}
 
+	host.CreatedAt = mockClock.Now().AddDate(0, 0, -1)
+	assert.Equal(t, StatusNew, host.IsNew(mockClock.Now()))
+
 	host.SeenTime = mockClock.Now()
 	assert.Equal(t, StatusOnline, host.Status(mockClock.Now()))
 
@@ -60,4 +63,16 @@ func TestHostStatus(t *testing.T) {
 
 	host.SeenTime = mockClock.Now().Add(-35 * (24 * time.Hour)) // 35 days
 	assert.Equal(t, StatusMIA, host.Status(mockClock.Now()))
+}
+
+func TestHostIsNew(t *testing.T) {
+	mockClock := clock.NewMockClock()
+
+	host := Host{}
+
+	host.CreatedAt = mockClock.Now().AddDate(0, 0, -1)
+	assert.True(t, host.IsNew(mockClock.Now()))
+
+	host.CreatedAt = mockClock.Now().AddDate(0, 0, -2)
+	assert.False(t, host.IsNew(mockClock.Now()))
 }
