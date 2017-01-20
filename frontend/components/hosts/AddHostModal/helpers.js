@@ -8,7 +8,7 @@ export const copyText = (elementSelector) => {
   const { document } = global;
 
   const element = document.querySelector(elementSelector);
-  element.type = 'text';
+  element.querySelector('input').type = 'text';
 
   select(element);
 
@@ -19,7 +19,7 @@ export const copyText = (elementSelector) => {
   }
 
   document.execCommand('copy');
-  element.type = 'password';
+  element.querySelector('input').type = 'password';
   removeSelectedText();
   return true;
 };
