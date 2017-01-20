@@ -15,7 +15,7 @@ const (
 	// StatusOffline no communication with host for OfflineDuration.
 	StatusOffline = "offline"
 
-	// StatusMIA no communition with host for MIADuration.
+	// StatusMIA no communication with host for MIADuration.
 	StatusMIA = "mia"
 
 	// NewDuration if a host has been created within this time period it's
