@@ -25,7 +25,7 @@ You can specify the path to this certificate with the `--tls_server_certs` flag 
 
 ## Launching osqueryd
 
-Assuming that you arere deploying your enrollment secret as the environment variable `OSQUERY_ENROLL_SECRET` and your osquery server certificate is at `/etc/osquery/kolide.crt`, you could copy and paste the following command with the following flags:
+Assuming that you arere deploying your enrollment secret as the environment variable `OSQUERY_ENROLL_SECRET` and your osquery server certificate is at `/etc/osquery/kolide.crt`, you could copy and paste the following command with the following flags (be sure to replace acme.kolide.co with the hostname for your Kolide installation):
 
 ```
 osqueryd
