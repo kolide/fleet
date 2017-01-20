@@ -503,7 +503,7 @@ CREATE TABLE `pack_targets` (
   `target_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `constraint_pack_target_unique` (`pack_id`,`target_id`,`type`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -512,7 +512,7 @@ CREATE TABLE `pack_targets` (
 
 LOCK TABLES `pack_targets` WRITE;
 /*!40000 ALTER TABLE `pack_targets` DISABLE KEYS */;
-INSERT INTO `pack_targets` VALUES (1,1,0,1),(2,2,0,1),(3,3,0,1),(4,4,0,1),(5,5,0,1),(6,6,0,1),(7,7,0,1);
+INSERT INTO `pack_targets` VALUES (1,1,0,1),(2,2,0,1),(3,3,0,1),(4,4,0,1),(5,5,0,1),(6,6,0,1),(7,7,0,1),(8,8,0,3),(9,8,0,4);
 /*!40000 ALTER TABLE `pack_targets` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -536,7 +536,7 @@ CREATE TABLE `packs` (
   `created_by` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_pack_unique_name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -545,7 +545,7 @@ CREATE TABLE `packs` (
 
 LOCK TABLES `packs` WRITE;
 /*!40000 ALTER TABLE `packs` DISABLE KEYS */;
-INSERT INTO `packs` VALUES (1,'2017-01-19 01:07:01','2017-01-19 01:09:03',NULL,0,0,'Intrusion Detection','A collection of queries that detect indicators of initial compromise via various tactics, techniques, and procedures.','',1),(2,'2017-01-19 01:08:08','2017-01-19 01:08:08',NULL,0,0,'Osquery Monitoring','Osquery exposes several tables which allow you to query the internal operations of the osqueryd process itself. This pack contains queries that allow us to maintain insight into the health and performance of the osquery fleet.','',1),(3,'2017-01-19 01:10:38','2017-01-19 01:10:38',NULL,0,0,'Asset Management','A collection of queries that tracks the company\'s assets, installed applications, etc.','',1),(4,'2017-01-19 01:12:28','2017-01-19 01:12:28',NULL,0,0,'Hardware Monitoring','A collection of queries which monitor the changes that occur in the lower-level, hardware configurations of assets. ','',1),(5,'2017-01-19 01:13:51','2017-01-19 01:13:51',NULL,0,0,'Incident Response','While responding to an incident, it\'s often useful to have a collection of certain historical data to be able to piece together the incident timeline. This pack is a collection of queries which are useful to have during the incident response process.','',1),(6,'2017-01-19 01:14:56','2017-01-19 01:14:56',NULL,0,0,'Compliance','In order to maintain compliance, we have to ensure that we are tracking certain events and operations that occur throughout our fleet.','',1),(7,'2017-01-19 01:16:51','2017-01-19 01:16:51',NULL,0,0,'Vulnerability Management','In order to ensure that our assets are not running vulnerable versions of key software, we deploy queries within this pack to track important application values and versions.','',1);
+INSERT INTO `packs` VALUES (1,'2017-01-19 01:07:01','2017-01-19 01:09:03',NULL,0,0,'Intrusion Detection','A collection of queries that detect indicators of initial compromise via various tactics, techniques, and procedures.','',1),(2,'2017-01-19 01:08:08','2017-01-19 01:08:08',NULL,0,0,'Osquery Monitoring','Osquery exposes several tables which allow you to query the internal operations of the osqueryd process itself. This pack contains queries that allow us to maintain insight into the health and performance of the osquery fleet.','',1),(3,'2017-01-19 01:10:38','2017-01-19 01:10:38',NULL,0,0,'Asset Management','A collection of queries that tracks the company\'s assets, installed applications, etc.','',1),(4,'2017-01-19 01:12:28','2017-01-19 01:12:28',NULL,0,0,'Hardware Monitoring','A collection of queries which monitor the changes that occur in the lower-level, hardware configurations of assets. ','',1),(5,'2017-01-19 01:13:51','2017-01-19 01:13:51',NULL,0,0,'Incident Response','While responding to an incident, it\'s often useful to have a collection of certain historical data to be able to piece together the incident timeline. This pack is a collection of queries which are useful to have during the incident response process.','',1),(6,'2017-01-19 01:14:56','2017-01-19 01:14:56',NULL,0,0,'Compliance','In order to maintain compliance, we have to ensure that we are tracking certain events and operations that occur throughout our fleet.','',1),(7,'2017-01-19 01:16:51','2017-01-19 01:16:51',NULL,0,0,'Vulnerability Management','In order to ensure that our assets are not running vulnerable versions of key software, we deploy queries within this pack to track important application values and versions.','',1),(8,'2017-01-20 08:16:52','2017-01-20 08:16:52',NULL,0,0,'Systems Monitoring','Queries which track the health, stability, and performance of a system from an operations perspective.','',1);
 /*!40000 ALTER TABLE `packs` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -671,7 +671,7 @@ CREATE TABLE `sessions` (
 
 LOCK TABLES `sessions` WRITE;
 /*!40000 ALTER TABLE `sessions` DISABLE KEYS */;
-INSERT INTO `sessions` VALUES (1,'2017-01-20 08:09:01','2017-01-20 08:09:09',1,'qRDbkVCGURs3Auh+3RN5SZF1umFouMQIU7LXT6mzLge04jMRT8Z+FcIfrKYyU28X7G5RkhJH3T9ee9Uby2TFQQ==');
+INSERT INTO `sessions` VALUES (1,'2017-01-20 08:09:01','2017-01-20 08:17:09',1,'qRDbkVCGURs3Auh+3RN5SZF1umFouMQIU7LXT6mzLge04jMRT8Z+FcIfrKYyU28X7G5RkhJH3T9ee9Uby2TFQQ==');
 /*!40000 ALTER TABLE `sessions` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -799,4 +799,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-01-20  1:09:38
+-- Dump completed on 2017-01-20  1:17:26
