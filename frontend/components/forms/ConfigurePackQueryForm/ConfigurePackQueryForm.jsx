@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import Select from 'react-select';
 
 import Icon from 'components/icons/Icon';
 import Button from 'components/buttons/Button';
@@ -73,6 +74,7 @@ class ConfigurePackQueryForm extends Component {
             options={platformOptions}
             placeholder="- - -"
             label="Platform"
+            multi
             wrapperClassName={`${baseClass}__form-field ${baseClass}__form-field--platform`}
           />
           <Dropdown

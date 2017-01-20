@@ -16,6 +16,7 @@ class Dropdown extends Component {
     error: PropTypes.string,
     label: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
     labelClassName: PropTypes.string,
+    multi: PropTypes.bool,
     name: PropTypes.string,
     onChange: PropTypes.func,
     options: PropTypes.arrayOf(dropdownOptionInterface).isRequired,
@@ -28,14 +29,16 @@ class Dropdown extends Component {
     onChange: noop,
     clearable: false,
     disabled: false,
+    multi: false,
     name: 'targets',
     placeholder: 'Select One...',
   };
 
-  handleChange = ({ value }) => {
+  handleChange = (stuff) => {
+    console.log('handleChange', stuff);
     const { onChange } = this.props;
 
-    return onChange(value);
+    return onChange(stuff.value);
   };
 
   renderLabel = () => {
@@ -62,7 +65,7 @@ class Dropdown extends Component {
 
   render () {
     const { handleChange } = this;
-    const { error, className, clearable, disabled, name, options, placeholder, value, wrapperClassName } = this.props;
+    const { error, className, clearable, disabled, multi, name, options, placeholder, value, wrapperClassName } = this.props;
 
     const formFieldProps = pick(this.props, ['hint', 'label', 'error', 'name']);
     const selectClasses = classnames(className, `${baseClass}__select`, {
@@ -75,6 +78,7 @@ class Dropdown extends Component {
           className={selectClasses}
           clearable={clearable}
           disabled={disabled}
+          multi={multi}
           name={`${name}-select`}
           onChange={handleChange}
           options={options}
