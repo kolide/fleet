@@ -85,7 +85,6 @@ func MakeKolideServerEndpoints(svc kolide.Service, jwtKey string) KolideEndpoint
 		ResetPassword:  makeResetPasswordEndpoint(svc),
 		CreateUser:     makeCreateUserEndpoint(svc),
 		VerifyInvite:   makeVerifyInviteEndpoint(svc),
-		GetCertificate: makeCertificateEndpoint(svc),
 
 		// Authenticated user endpoints
 		// Each of these endpoints should have exactly one
@@ -143,6 +142,7 @@ func MakeKolideServerEndpoints(svc kolide.Service, jwtKey string) KolideEndpoint
 		GetOptions:                authenticatedUser(jwtKey, svc, mustBeAdmin(makeGetOptionsEndpoint(svc))),
 		ModifyOptions:             authenticatedUser(jwtKey, svc, mustBeAdmin(makeModifyOptionsEndpoint(svc))),
 		ImportConfig:              authenticatedUser(jwtKey, svc, makeImportConfigEndpoint(svc)),
+		GetCertificate:            authenticatedUser(jwtKey, svc, makeCertificateEndpoint(svc)),
 
 		// Osquery endpoints
 		EnrollAgent:                   makeEnrollAgentEndpoint(svc),
