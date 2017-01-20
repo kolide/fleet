@@ -12,6 +12,7 @@ const baseClass = 'add-host-modal';
 class AddHostModal extends Component {
   static propTypes = {
     dispatch: PropTypes.func,
+    onFetchCertificate: PropTypes.func,
     onReturnToApp: PropTypes.func,
     osqueryEnrollSecret: PropTypes.string,
   };
@@ -37,14 +38,6 @@ class AddHostModal extends Component {
     };
   }
 
-  onDownloadCertificate = (evt) => {
-    evt.preventDefault();
-
-    console.log('Download the Certificate');
-
-    return false;
-  }
-
   toggleSecret = (evt) => {
     const { revealSecret } = this.state;
     evt.preventDefault();
@@ -54,9 +47,9 @@ class AddHostModal extends Component {
   }
 
   render () {
-    const { onCopySecret, onDownloadCertificate, toggleSecret } = this;
+    const { onCopySecret, toggleSecret } = this;
     const { revealSecret } = this.state;
-    const { onReturnToApp, osqueryEnrollSecret } = this.props;
+    const { onFetchCertificate, onReturnToApp, osqueryEnrollSecret } = this.props;
 
     return (
       <div className={baseClass}>
@@ -78,10 +71,10 @@ class AddHostModal extends Component {
               <h4>Download Osquery Package and Certificate</h4>
               <p>Osquery requires the same TLS certificate that Kolide is using in order to authenticate. You can fetch the certificate below:</p>
               <p className={`${baseClass}__download-cert`}>
-                <a href="#downloadCertificate" onClick={onDownloadCertificate}>
+                <Button variant="unstyled" onClick={onFetchCertificate}>
                   <img src={certificate} role="presentation" />
                   <span>Fetch Kolide Certificate</span>
-                </a>
+                </Button>
               </p>
             </li>
             <li>
