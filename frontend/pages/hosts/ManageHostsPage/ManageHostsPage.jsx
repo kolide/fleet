@@ -1,8 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import AceEditor from 'react-ace';
 import { connect } from 'react-redux';
-import { filter, orderBy, sortBy } from 'lodash';
-import moment from 'moment';
+import { orderBy, sortBy } from 'lodash';
 import { push } from 'react-router-redux';
 
 import entityGetter from 'redux/utilities/entityGetter';
@@ -23,11 +22,11 @@ import osqueryTableInterface from 'interfaces/osquery_table';
 import paths from 'router/paths';
 import QueryForm from 'components/forms/queries/QueryForm';
 import QuerySidePanel from 'components/side_panels/QuerySidePanel';
+import { renderFlash } from 'redux/nodes/notifications/actions';
 import Rocker from 'components/buttons/Rocker';
 import Button from 'components/buttons/Button';
 import Modal from 'components/modals/Modal';
 import { selectOsqueryTable } from 'redux/nodes/components/QueryPages/actions';
-import { renderFlash } from 'redux/nodes/notifications/actions';
 import statusLabelsInterface from 'interfaces/status_labels';
 import iconClassForLabel from 'utilities/icon_class_for_label';
 import platformIconClass from 'utilities/platform_icon_class';
@@ -59,8 +58,10 @@ export class ManageHostsPage extends Component {
 
     this.state = {
       labelQueryText: '',
-      showDeleteModal: false,
+      showDeleteHostModal: false,
       showAddHostModal: false,
+      selectedHost: null,
+      showDeleteLabelModal: false,
     };
   }
 
@@ -70,6 +71,16 @@ export class ManageHostsPage extends Component {
     dispatch(hostActions.loadAll());
     dispatch(labelActions.loadAll());
     dispatch(getStatusLabelCounts);
+
+    return false;
+  }
+
+  onAddLabelClick = (evt) => {
+    evt.preventDefault();
+
+    const { dispatch } = this.props;
+
+    dispatch(push(`/hosts/manage${NEW_LABEL_HASH}`));
 
     return false;
   }
@@ -100,25 +111,21 @@ export class ManageHostsPage extends Component {
     return false;
   }
 
-  onAddLabelClick = (evt) => {
+  onDestroyHost = (evt) => {
     evt.preventDefault();
 
     const { dispatch } = this.props;
+    const { selectedHost } = this.state;
 
-    dispatch(push(`/hosts/manage${NEW_LABEL_HASH}`));
+    dispatch(hostActions.destroy(selectedHost))
+      .then(() => {
+        this.toggleDeleteHostModal(null)();
+
+        dispatch(getStatusLabelCounts);
+        dispatch(renderFlash('success', `Host "${selectedHost.hostname}" was successfully deleted`));
+      });
 
     return false;
-  }
-
-  onHostDetailActionClick = (type) => {
-    return (host) => {
-      return (evt) => {
-        evt.preventDefault();
-
-        console.log(type, host);
-        return false;
-      };
-    };
   }
 
   onLabelClick = (selectedLabel) => {
@@ -164,13 +171,13 @@ export class ManageHostsPage extends Component {
   }
 
   onDeleteLabel = () => {
-    const { toggleModal } = this;
+    const { toggleDeleteLabelModal } = this;
     const { dispatch, selectedLabel } = this.props;
     const { MANAGE_HOSTS } = paths;
 
     return dispatch(labelActions.destroy(selectedLabel))
       .then(() => {
-        toggleModal();
+        toggleDeleteLabelModal();
         dispatch(push(MANAGE_HOSTS));
         dispatch(renderFlash('success', 'Label successfully deleted'));
         return false;
@@ -183,10 +190,23 @@ export class ManageHostsPage extends Component {
     return false;
   }
 
-  toggleModal = () => {
-    const { showDeleteModal } = this.state;
+  toggleDeleteHostModal = (selectedHost) => {
+    return () => {
+      const { showDeleteHostModal } = this.state;
 
-    this.setState({ showDeleteModal: !showDeleteModal });
+      this.setState({
+        selectedHost,
+        showDeleteHostModal: !showDeleteHostModal,
+      });
+
+      return false;
+    };
+  }
+
+  toggleDeleteLabelModal = () => {
+    const { showDeleteLabelModal } = this.state;
+
+    this.setState({ showDeleteLabelModal: !showDeleteLabelModal });
     return false;
   }
 
@@ -226,23 +246,46 @@ export class ManageHostsPage extends Component {
     );
   }
 
-  renderModal = () => {
-    const { showDeleteModal } = this.state;
-    const { toggleModal, onDeleteLabel } = this;
+  renderDeleteHostModal = () => {
+    const { showDeleteHostModal } = this.state;
+    const { toggleDeleteHostModal, onDestroyHost } = this;
 
-    if (!showDeleteModal) {
+    if (!showDeleteHostModal) {
+      return false;
+    }
+
+    return (
+      <Modal
+        title="Delete Host"
+        onExit={toggleDeleteHostModal(null)}
+        className={`${baseClass}__modal`}
+      >
+        <p>Are you sure you wish to delete this host?</p>
+        <div>
+          <Button onClick={toggleDeleteHostModal(null)} variant="inverse">Cancel</Button>
+          <Button onClick={onDestroyHost} variant="alert">Delete</Button>
+        </div>
+      </Modal>
+    );
+  }
+
+  renderDeleteLabelModal = () => {
+    const { showDeleteLabelModal } = this.state;
+    const { toggleDeleteLabelModal, onDeleteLabel } = this;
+
+    if (!showDeleteLabelModal) {
       return false;
     }
 
     return (
       <Modal
         title="Delete Label"
-        onExit={toggleModal}
+        onExit={toggleDeleteLabelModal}
         className={`${baseClass}__modal`}
       >
         <p>Are you sure you wish to delete this label?</p>
         <div>
-          <Button onClick={toggleModal} variant="inverse">Cancel</Button>
+          <Button onClick={toggleDeleteLabelModal} variant="inverse">Cancel</Button>
           <Button onClick={onDeleteLabel} variant="alert">Delete</Button>
         </div>
       </Modal>
@@ -250,7 +293,7 @@ export class ManageHostsPage extends Component {
   }
 
   renderDeleteButton = () => {
-    const { toggleModal } = this;
+    const { toggleDeleteLabelModal } = this;
     const { selectedLabel: { type } } = this.props;
 
     if (type !== 'custom') {
@@ -259,7 +302,7 @@ export class ManageHostsPage extends Component {
 
     return (
       <div className={`${baseClass}__delete-label`}>
-        <Button onClick={toggleModal} variant="alert">Delete</Button>
+        <Button onClick={toggleDeleteLabelModal} variant="alert">Delete</Button>
       </div>
     );
   }
@@ -377,7 +420,7 @@ export class ManageHostsPage extends Component {
 
   renderHosts = () => {
     const { display, isAddLabel, selectedLabel } = this.props;
-    const { onHostDetailActionClick, filterHosts, sortHosts, renderNoHosts, toggleAddHostModal } = this;
+    const { toggleDeleteHostModal, filterHosts, sortHosts, renderNoHosts, toggleAddHostModal } = this;
 
     if (isAddLabel) {
       return false;
@@ -400,14 +443,13 @@ export class ManageHostsPage extends Component {
           <HostDetails
             host={host}
             key={`host-${host.id}-details`}
-            onDisableClick={onHostDetailActionClick('disable')}
-            onQueryClick={onHostDetailActionClick('query')}
+            onDestroyHost={toggleDeleteHostModal}
           />
         );
       });
     }
 
-    return <HostsTable hosts={sortedHosts} />;
+    return <HostsTable hosts={sortedHosts} onDestroyHost={toggleDeleteHostModal} />;
   }
 
 
@@ -476,7 +518,7 @@ export class ManageHostsPage extends Component {
   }
 
   render () {
-    const { renderAddHostModal, renderForm, renderHeader, renderHosts, renderSidePanel, renderModal } = this;
+    const { renderForm, renderHeader, renderHosts, renderSidePanel, renderAddHostModal, renderDeleteHostModal, renderDeleteLabelModal } = this;
     const { display, isAddLabel } = this.props;
 
     return (
@@ -492,8 +534,9 @@ export class ManageHostsPage extends Component {
         }
 
         {renderSidePanel()}
-        {renderModal()}
         {renderAddHostModal()}
+        {renderDeleteHostModal()}
+        {renderDeleteLabelModal()}
       </div>
     );
   }
@@ -512,11 +555,6 @@ const mapStateToProps = (state, { location, params }) => {
   );
   const { selectedOsqueryTable } = state.components.QueryPages;
   const labelErrors = state.entities.labels.errors;
-
-  // TODO: remove this once the API is updated to return new_count
-  statusLabels.new_count = filter(hosts, (h) => {
-    return moment().diff(h.created_at, 'hours') <= 24;
-  }).length;
 
   return {
     display,
