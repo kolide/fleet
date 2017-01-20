@@ -16,6 +16,7 @@ import hostInterface from 'interfaces/host';
 import HostSidePanel from 'components/side_panels/HostSidePanel';
 import HostsTable from 'components/hosts/HostsTable';
 import LonelyHost from 'components/hosts/LonelyHost';
+import AddHostModal from 'components/hosts/AddHostModal';
 import Icon from 'components/icons/Icon';
 import PlatformIcon from 'components/icons/PlatformIcon';
 import osqueryTableInterface from 'interfaces/osquery_table';
@@ -59,6 +60,7 @@ export class ManageHostsPage extends Component {
     this.state = {
       labelQueryText: '',
       showDeleteModal: false,
+      showAddHostModal: false,
     };
   }
 
@@ -80,10 +82,47 @@ export class ManageHostsPage extends Component {
     return false;
   }
 
+  toggleAddHostModal = () => {
+    const { showAddHostModal } = this.state;
+    this.setState({ showAddHostModal: !showAddHostModal });
+    return false;
+  }
+
+  onAddHostSubmit = () => {
+    const { toggleAddHostModal } = this;
+    toggleAddHostModal();
+
+    console.log('Submitted the Add Host Modal');
+
+    return false;
+  }
+
+  renderAddHostModal = () => {
+    const { toggleAddHostModal } = this;
+    const { showAddHostModal } = this.state;
+
+    if (!showAddHostModal) {
+      return false;
+    }
+
+    return (
+      <Modal
+        title="Add New Host"
+        onExit={toggleAddHostModal}
+        className={`${baseClass}__invite-modal`}
+      >
+        <AddHostModal
+          onReturnToApp={toggleAddHostModal}
+        />
+      </Modal>
+    );
+  }
+
   onAddHostClick = (evt) => {
     evt.preventDefault();
 
-    console.log('open add host modal');
+    const { toggleAddHostModal } = this;
+    toggleAddHostModal();
 
     return false;
   }
@@ -336,7 +375,7 @@ export class ManageHostsPage extends Component {
 
   renderHosts = () => {
     const { display, isAddLabel, selectedLabel } = this.props;
-    const { onHostDetailActionClick, filterHosts, sortHosts, renderNoHosts } = this;
+    const { onHostDetailActionClick, filterHosts, sortHosts, renderNoHosts, toggleAddHostModal } = this;
 
     if (isAddLabel) {
       return false;
@@ -347,7 +386,7 @@ export class ManageHostsPage extends Component {
 
     if (sortedHosts.length === 0) {
       if (selectedLabel && selectedLabel.type === 'all') {
-        return <LonelyHost />;
+        return <LonelyHost onClick={toggleAddHostModal} />;
       }
 
       return renderNoHosts();
@@ -435,7 +474,7 @@ export class ManageHostsPage extends Component {
   }
 
   render () {
-    const { renderForm, renderHeader, renderHosts, renderSidePanel, renderModal } = this;
+    const { renderAddHostModal, renderForm, renderHeader, renderHosts, renderSidePanel, renderModal } = this;
     const { display, isAddLabel } = this.props;
 
     return (
@@ -452,6 +491,7 @@ export class ManageHostsPage extends Component {
 
         {renderSidePanel()}
         {renderModal()}
+        {renderAddHostModal()}
       </div>
     );
   }
