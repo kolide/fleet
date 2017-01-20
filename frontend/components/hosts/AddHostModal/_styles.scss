@@ -7,7 +7,7 @@
     border: solid 1px $accent-light;
     position: relative;
     z-index: 2;
-    padding: 25px;
+    padding: 15px 25px;
     box-sizing: border-box;
 
     h2 {
@@ -26,6 +26,13 @@
       letter-spacing: normal;
       color: rgba(32, 37, 50, 0.48);
       margin: 0;
+    }
+
+    .kolidecon {
+      float: left;
+      font-size: 44px;
+      color: #48c586;
+      margin-right: 15px;
     }
   }
 
@@ -47,6 +54,11 @@
       letter-spacing: -0.5px;
       color: rgba(32, 37, 50, 0.66);
       margin: 40px 0 0;
+
+      .kolidecon {
+        margin-left: 5px;
+        font-size: 18px;
+      }
     }
 
     p {
@@ -57,12 +69,24 @@
       color: rgba(32, 37, 50, 0.66);
       margin: 0;
     }
+
+    a {
+      text-decoration: none;
+    }
   }
 
   &__install-steps {
     margin: 0;
     padding: 0;
     list-style: none;
+
+    li {
+      &:first-child {
+        h4 {
+          margin-top: 10px;
+        }
+      }
+    }
   }
 
   &__button-wrap {
@@ -70,5 +94,40 @@
     text-align: right;
     margin: 15px 0 0;
     padding: 15px 0 0;
+  }
+
+  &__download-cert {
+    text-align: center;
+    padding-top: 15px;
+
+    span {
+      display: block;
+    }
+  }
+
+  &__reveal-secret {
+    float: right;
+    text-decoration: none;
+  }
+
+  &__secret-wrapper {
+    position: relative;
+  }
+
+  &__secret-copy-icon {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    font-size: 18px;
+    color: $link;
+  }
+
+  &__secret-input {
+    input {
+      border-radius: 2px;
+      background-color: $bg-medium;
+      border-color: $bg-medium;
+      color: $link;
+    }
   }
 }

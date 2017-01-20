@@ -82,12 +82,6 @@ export class ManageHostsPage extends Component {
     return false;
   }
 
-  toggleAddHostModal = () => {
-    const { showAddHostModal } = this.state;
-    this.setState({ showAddHostModal: !showAddHostModal });
-    return false;
-  }
-
   onAddHostSubmit = () => {
     const { toggleAddHostModal } = this;
     toggleAddHostModal();
@@ -95,27 +89,6 @@ export class ManageHostsPage extends Component {
     console.log('Submitted the Add Host Modal');
 
     return false;
-  }
-
-  renderAddHostModal = () => {
-    const { toggleAddHostModal } = this;
-    const { showAddHostModal } = this.state;
-
-    if (!showAddHostModal) {
-      return false;
-    }
-
-    return (
-      <Modal
-        title="Add New Host"
-        onExit={toggleAddHostModal}
-        className={`${baseClass}__invite-modal`}
-      >
-        <AddHostModal
-          onReturnToApp={toggleAddHostModal}
-        />
-      </Modal>
-    );
   }
 
   onAddHostClick = (evt) => {
@@ -204,6 +177,12 @@ export class ManageHostsPage extends Component {
       });
   }
 
+  toggleAddHostModal = () => {
+    const { showAddHostModal } = this.state;
+    this.setState({ showAddHostModal: !showAddHostModal });
+    return false;
+  }
+
   toggleModal = () => {
     const { showDeleteModal } = this.state;
 
@@ -222,6 +201,29 @@ export class ManageHostsPage extends Component {
     const orderedHosts = orderBy(alphaHosts, 'status', 'desc');
 
     return orderedHosts;
+  }
+
+  renderAddHostModal = () => {
+    const { toggleAddHostModal } = this;
+    const { showAddHostModal } = this.state;
+    const { dispatch } = this.props;
+
+    if (!showAddHostModal) {
+      return false;
+    }
+
+    return (
+      <Modal
+        title="Add New Host"
+        onExit={toggleAddHostModal}
+        className={`${baseClass}__invite-modal`}
+      >
+        <AddHostModal
+          onReturnToApp={toggleAddHostModal}
+          dispatch={dispatch}
+        />
+      </Modal>
+    );
   }
 
   renderModal = () => {
