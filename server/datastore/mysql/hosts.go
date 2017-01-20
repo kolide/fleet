@@ -244,7 +244,7 @@ func (d *Datastore) SaveHost(host *kolide.Host) error {
 func (d *Datastore) DeleteHost(hid uint) error {
 	_, err := d.db.Exec("DELETE FROM hosts WHERE id = ?", hid)
 	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("deleting host with id %d", hid))
+		return errors.Wrapf(err, "deleting host with id %d", hid)
 	}
 	return nil
 }
