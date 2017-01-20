@@ -27,7 +27,7 @@ func TestCertificateChain(t *testing.T) {
 	u, err := url.Parse(server.URL)
 	require.Nil(t, err)
 
-	conn, err := connectTLS(u, true)
+	conn, err := connectTLS(u)
 	require.Nil(t, err)
 
 	have, want := len(conn.ConnectionState().PeerCertificates), len(cert.Certificate)

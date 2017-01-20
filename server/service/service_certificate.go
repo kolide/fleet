@@ -14,7 +14,7 @@ import (
 )
 
 // Certificate returns the PEM encoded certificate chain for osqueryd TLS termination.
-func (svc service) CertificateChain(ctx context.Context, insecure bool) ([]byte, error) {
+func (svc service) CertificateChain(ctx context.Context) ([]byte, error) {
 	config, err := svc.AppConfig(ctx)
 	if err != nil {
 		return nil, err
@@ -25,7 +25,7 @@ func (svc service) CertificateChain(ctx context.Context, insecure bool) ([]byte,
 		return nil, errors.Wrap(err, "parsing serverURL")
 	}
 
-	conn, err := connectTLS(u, insecure)
+	conn, err := connectTLS(u)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +33,7 @@ func (svc service) CertificateChain(ctx context.Context, insecure bool) ([]byte,
 	return chain(conn.ConnectionState(), u.Hostname())
 }
 
-func connectTLS(serverURL *url.URL, insecure bool) (*tls.Conn, error) {
+func connectTLS(serverURL *url.URL) (*tls.Conn, error) {
 	var hostport string
 	if serverURL.Port() == "" {
 		hostport = net.JoinHostPort(serverURL.Host, "443")
@@ -41,12 +41,29 @@ func connectTLS(serverURL *url.URL, insecure bool) (*tls.Conn, error) {
 		hostport = serverURL.Host
 	}
 
-	conn, err := tls.Dial("tcp", hostport, &tls.Config{InsecureSkipVerify: insecure})
-	if err != nil {
-		return nil, errors.Wrap(err, "dial tls")
+	// attempt dialing twice, first with a secure conn, and then
+	// if that fails, use insecure
+	dial := func(insecure bool) (*tls.Conn, error) {
+		conn, err := tls.Dial("tcp", hostport, &tls.Config{
+			InsecureSkipVerify: insecure})
+		if err != nil {
+			return nil, errors.Wrap(err, "dial tls")
+		}
+		defer conn.Close()
+		return conn, nil
 	}
-	defer conn.Close()
-	return conn, nil
+
+	var (
+		conn *tls.Conn
+		err  error
+	)
+
+	conn, err = dial(false)
+	if err == nil {
+		return conn, nil
+	}
+	conn, err = dial(true)
+	return conn, err
 }
 
 // chain builds a PEM encoded certificate chain using the PeerCertificates

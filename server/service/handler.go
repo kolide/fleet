@@ -278,7 +278,7 @@ func makeKolideKitHandlers(ctx context.Context, e KolideEndpoints, opts []kithtt
 		GetOptions:                    newServer(e.GetOptions, decodeNoParamsRequest),
 		ModifyOptions:                 newServer(e.ModifyOptions, decodeModifyOptionsRequest),
 		ImportConfig:                  newServer(e.ImportConfig, decodeImportConfigRequest),
-		GetCertificate:                newServer(e.GetCertificate, decodeCertificateRequest),
+		GetCertificate:                newServer(e.GetCertificate, decodeNoParamsRequest),
 	}
 }
 
