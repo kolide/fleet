@@ -6,7 +6,6 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"io"
-	"io/ioutil"
 	"net"
 	"net/url"
 
@@ -16,17 +15,6 @@ import (
 
 // Certificate returns the PEM encoded certificate chain for osqueryd TLS termination.
 func (svc service) CertificateChain(ctx context.Context, insecure bool) ([]byte, error) {
-	if svc.config.Server.TLS {
-		cert, err := ioutil.ReadFile(svc.config.Server.Cert)
-		if err != nil {
-			return nil, errors.Wrap(err, "reading certificate file")
-		}
-		return cert, nil
-	}
-
-	// if kolide is not using a TLS listener itself, it must be terminated upstream.
-	// we can still retrieve the certificate chain if we can establish a
-	// connection to the KolideServerURL and get the cert from the connection info.
 	config, err := svc.AppConfig(ctx)
 	if err != nil {
 		return nil, err
