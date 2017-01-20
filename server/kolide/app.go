@@ -74,6 +74,9 @@ type AppConfig struct {
 	OrgLogoURL      string `db:"org_logo_url"`
 	KolideServerURL string `db:"kolide_server_url"`
 
+	// EnrollSecret is the config value that must be given by osqueryd hosts
+	// on enrollment.
+	// See https://osquery.readthedocs.io/en/stable/deployment/remote/#remote-authentication
 	EnrollSecret string `db:"osquery_enroll_secret"`
 
 	// SMTPConfigured is a flag that indicates if smtp has been successfully
