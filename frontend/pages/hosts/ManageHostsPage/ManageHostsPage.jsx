@@ -175,6 +175,22 @@ export class ManageHostsPage extends Component {
       });
   }
 
+  onQueryHost = (host) => {
+    return (evt) => {
+      evt.preventDefault();
+
+      const { dispatch } = this.props;
+      const { NEW_QUERY } = paths;
+
+      dispatch(push({
+        pathname: NEW_QUERY,
+        query: { host_ids: [host.id] },
+      }));
+
+      return false;
+    };
+  }
+
   toggleAddHostModal = () => {
     const { showAddHostModal } = this.state;
     this.setState({ showAddHostModal: !showAddHostModal });
@@ -411,7 +427,7 @@ export class ManageHostsPage extends Component {
 
   renderHosts = () => {
     const { display, isAddLabel, selectedLabel } = this.props;
-    const { toggleDeleteHostModal, filterHosts, sortHosts, renderNoHosts, toggleAddHostModal } = this;
+    const { toggleDeleteHostModal, filterHosts, onQueryHost, sortHosts, renderNoHosts, toggleAddHostModal } = this;
 
     if (isAddLabel) {
       return false;
@@ -435,12 +451,19 @@ export class ManageHostsPage extends Component {
             host={host}
             key={`host-${host.id}-details`}
             onDestroyHost={toggleDeleteHostModal}
+            onQueryHost={onQueryHost}
           />
         );
       });
     }
 
-    return <HostsTable hosts={sortedHosts} onDestroyHost={toggleDeleteHostModal} />;
+    return (
+      <HostsTable
+        hosts={sortedHosts}
+        onDestroyHost={toggleDeleteHostModal}
+        onQueryHost={onQueryHost}
+      />
+    );
   }
 
 

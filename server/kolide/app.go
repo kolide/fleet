@@ -19,6 +19,11 @@ type AppConfigService interface {
 	AppConfig(ctx context.Context) (info *AppConfig, err error)
 	ModifyAppConfig(ctx context.Context, p AppConfigPayload) (info *AppConfig, err error)
 	SendTestEmail(ctx context.Context, config *AppConfig) error
+
+	// Certificate returns the PEM encoded certificate chain for osqueryd TLS termination.
+	// For cases where the connection is self-signed, the server will attempt to
+	// connect using the InsecureSkipVerify option in tls.Config.
+	CertificateChain(ctx context.Context) (cert []byte, err error)
 }
 
 // SMTP settings names returned from API, these map to SMTPAuthType and
@@ -73,6 +78,12 @@ type AppConfig struct {
 	OrgName         string `db:"org_name"`
 	OrgLogoURL      string `db:"org_logo_url"`
 	KolideServerURL string `db:"kolide_server_url"`
+
+	// EnrollSecret is the config value that must be given by osqueryd hosts
+	// on enrollment.
+	// See https://osquery.readthedocs.io/en/stable/deployment/remote/#remote-authentication
+	EnrollSecret string `db:"osquery_enroll_secret"`
+
 	// SMTPConfigured is a flag that indicates if smtp has been successfully
 	// tested with the settings provided by an admin user.
 	SMTPConfigured bool `db:"smtp_configured"`
@@ -165,6 +176,7 @@ type OrgInfo struct {
 // ServerSettings contains general settings about the kolide App.
 type ServerSettings struct {
 	KolideServerURL *string `json:"kolide_server_url"`
+	EnrollSecret    *string `json:"osquery_enroll_secret"`
 }
 
 type OrderDirection int
