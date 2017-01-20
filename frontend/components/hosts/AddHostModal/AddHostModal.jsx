@@ -13,15 +13,13 @@ class AddHostModal extends Component {
   static propTypes = {
     dispatch: PropTypes.func,
     onReturnToApp: PropTypes.func,
+    osqueryEnrollSecret: PropTypes.string,
   };
 
   constructor (props) {
     super(props);
 
-    this.state = {
-      revealSecret: false,
-      secretText: '1234567890',
-    };
+    this.state = { revealSecret: false };
   }
 
   onCopySecret = (elementClass) => {
@@ -58,7 +56,7 @@ class AddHostModal extends Component {
   render () {
     const { onCopySecret, onDownloadCertificate, toggleSecret } = this;
     const { revealSecret } = this.state;
-    const { onReturnToApp } = this.props;
+    const { onReturnToApp, osqueryEnrollSecret } = this.props;
 
     return (
       <div className={baseClass}>
@@ -98,7 +96,7 @@ class AddHostModal extends Component {
                   inputWrapperClass={`${baseClass}__secret-input`}
                   name="osqueryd-secret"
                   type={revealSecret ? 'text' : 'password'}
-                  value={this.state.secretText}
+                  value={osqueryEnrollSecret}
                 />
                 <Button variant="unstyled" className={`${baseClass}__secret-copy-icon`} onClick={onCopySecret(`.${baseClass}__secret-input`)}>
                   <Icon name="clipboard" />

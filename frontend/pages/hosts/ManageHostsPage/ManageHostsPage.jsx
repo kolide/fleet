@@ -44,6 +44,7 @@ export class ManageHostsPage extends Component {
       base: PropTypes.string,
     }),
     labels: PropTypes.arrayOf(labelInterface),
+    osqueryEnrollSecret: PropTypes.string,
     selectedLabel: labelInterface,
     selectedOsqueryTable: osqueryTableInterface,
     statusLabels: statusLabelsInterface,
@@ -233,7 +234,7 @@ export class ManageHostsPage extends Component {
   renderAddHostModal = () => {
     const { toggleAddHostModal } = this;
     const { showAddHostModal } = this.state;
-    const { dispatch } = this.props;
+    const { dispatch, osqueryEnrollSecret } = this.props;
 
     if (!showAddHostModal) {
       return false;
@@ -246,8 +247,9 @@ export class ManageHostsPage extends Component {
         className={`${baseClass}__invite-modal`}
       >
         <AddHostModal
-          onReturnToApp={toggleAddHostModal}
           dispatch={dispatch}
+          onReturnToApp={toggleAddHostModal}
+          osqueryEnrollSecret={osqueryEnrollSecret}
         />
       </Modal>
     );
@@ -569,6 +571,7 @@ const mapStateToProps = (state, { location, params }) => {
   );
   const { selectedOsqueryTable } = state.components.QueryPages;
   const labelErrors = state.entities.labels.errors;
+  const { osquery_enroll_secret: osqueryEnrollSecret } = state.app.config;
 
   return {
     display,
@@ -576,6 +579,7 @@ const mapStateToProps = (state, { location, params }) => {
     isAddLabel,
     labelErrors,
     labels,
+    osqueryEnrollSecret,
     selectedLabel,
     selectedOsqueryTable,
     statusLabels,
