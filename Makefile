@@ -155,8 +155,12 @@ docker-build-circle:
 	docker build -t "${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}" .
 	docker push "${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
 
-demodump:
+demo-dump:
 	mysqldump -u kolide -p \
 		-h ${MYSQL_PORT_3306_TCP_ADDR} kolide \
-		--ignore-table=kolide.users --ignore-table=kolide.sessions \
 		> ./tools/app/demo.sql
+
+demo-restore:
+	mysql --binary-mode -u kolide -p \
+		-h ${MYSQL_PORT_3306_TCP_ADDR} kolide \
+		< ./tools/app/demo.sql
