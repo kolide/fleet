@@ -114,7 +114,7 @@ export const labelStub = {
   missing_in_action: 0,
   host_ids: [],
   type: 'all',
-  target_type: 'hosts',
+  target_type: 'labels',
 };
 
 export const packStub = {
