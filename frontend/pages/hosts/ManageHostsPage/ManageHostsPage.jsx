@@ -93,15 +93,6 @@ export class ManageHostsPage extends Component {
     return false;
   }
 
-  onAddHostSubmit = () => {
-    const { toggleAddHostModal } = this;
-    toggleAddHostModal();
-
-    console.log('Submitted the Add Host Modal');
-
-    return false;
-  }
-
   onAddHostClick = (evt) => {
     evt.preventDefault();
 
