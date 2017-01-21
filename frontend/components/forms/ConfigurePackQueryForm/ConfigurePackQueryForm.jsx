@@ -1,5 +1,4 @@
 import React, { Component, PropTypes } from 'react';
-import Select from 'react-select';
 
 import Icon from 'components/icons/Icon';
 import Button from 'components/buttons/Button';
@@ -12,7 +11,7 @@ import validate from 'components/forms/ConfigurePackQueryForm/validate';
 const baseClass = 'configure-pack-query-form';
 const fieldNames = ['query_id', 'interval', 'logging_type', 'platform', 'version'];
 const platformOptions = [
-  { label: 'All', value: '' },
+  { label: 'All', value: 'all' },
   { label: 'Windows', value: 'windows' },
   { label: 'Linux', value: 'linux' },
   { label: 'macOS', value: 'darwin' },

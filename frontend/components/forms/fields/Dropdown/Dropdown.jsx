@@ -21,7 +21,7 @@ class Dropdown extends Component {
     onChange: PropTypes.func,
     options: PropTypes.arrayOf(dropdownOptionInterface).isRequired,
     placeholder: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
-    value: PropTypes.string,
+    value: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
     wrapperClassName: PropTypes.string,
   };
 
@@ -34,11 +34,15 @@ class Dropdown extends Component {
     placeholder: 'Select One...',
   };
 
-  handleChange = (stuff) => {
-    console.log('handleChange', stuff);
-    const { onChange } = this.props;
+  handleChange = (selected) => {
+    console.log('handleChange', selected);
+    const { multi, onChange } = this.props;
 
-    return onChange(stuff.value);
+    if (multi) {
+      return onChange(selected.map(obj => obj.value).join(','));
+    }
+
+    return onChange(selected.value);
   };
 
   renderLabel = () => {
