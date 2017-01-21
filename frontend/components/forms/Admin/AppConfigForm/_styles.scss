@@ -1,4 +1,20 @@
 .app-config-form {
+  &__enroll-secret-label {
+    font-size: 15px;
+
+    button {
+      color: $link;
+      font-size: 15px;
+      font-weight: $normal;
+      float: right;
+      text-transform: none;
+    }
+
+    input {
+      color: $link;
+    }
+  }
+
   &__section {
     @include clearfix;
     margin: 0 0 30px;
