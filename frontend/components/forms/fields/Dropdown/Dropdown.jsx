@@ -35,7 +35,6 @@ class Dropdown extends Component {
   };
 
   handleChange = (selected) => {
-    console.log('handleChange', selected);
     const { multi, onChange } = this.props;
 
     if (multi) {
