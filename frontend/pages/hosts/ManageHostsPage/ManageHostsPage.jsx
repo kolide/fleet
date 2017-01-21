@@ -126,7 +126,7 @@ export class ManageHostsPage extends Component {
     return Kolide.config.getCertificate()
       .then((certificate) => {
         const filename = `${global.window.location.host}.pem`;
-        const file = new global.window.File([certificate], filename, { type: 'text/plain;charset=utf-8' });
+        const file = new global.window.File([certificate], filename, { type: 'application/x-pem-file' });
 
         FileSaver.saveAs(file);
 
