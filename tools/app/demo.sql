@@ -360,7 +360,13 @@ CREATE TABLE `labels` (
 
 LOCK TABLES `labels` WRITE;
 /*!40000 ALTER TABLE `labels` DISABLE KEYS */;
-INSERT INTO `labels` VALUES (1,'2017-01-18 21:41:16','2017-01-18 21:41:16',NULL,0,'All Hosts','','select 1;','',1),(2,'2017-01-18 21:41:16','2017-01-18 21:41:16',NULL,0,'Mac OS X','','select 1 from osquery_info where build_platform = \'darwin\';','darwin',1),(3,'2017-01-18 21:41:16','2017-01-18 21:41:16',NULL,0,'Ubuntu Linux','','select 1 from osquery_info where build_platform = \'ubuntu\';','ubuntu',1),(4,'2017-01-18 21:41:16','2017-01-18 21:41:16',NULL,0,'CentOS Linux','','select 1 from osquery_info where build_platform = \'centos\';','centos',1),(5,'2017-01-18 21:41:16','2017-01-18 21:41:16',NULL,0,'MS Windows','','select 1 from osquery_info where build_platform = \'windows\';','windows',1),(6,'2017-01-19 01:22:08','2017-01-19 01:23:40',NULL,0,'macOS - update needed','The macOS hosts which have not yet updated to macOS Sierra.','select * from os_version where version != \'10.12\';','',0),(7,'2017-01-19 01:25:13','2017-01-19 01:25:13',NULL,0,'Windows- update needed','Windows hosts which have not installed Windows 10.','select * from os_version where major != \'10\';','',0);
+INSERT INTO `labels` VALUES (1,'2017-01-18 21:41:16','2017-01-18 21:41:16',NULL,0,'All Hosts','','select 1;','',1);
+INSERT INTO `labels` VALUES (2,'2017-01-18 21:41:16','2017-01-18 21:41:16',NULL,0,'Mac OS X','','select 1 from osquery_info where build_platform = \'darwin\';','darwin',1);
+INSERT INTO `labels` VALUES (3,'2017-01-18 21:41:16','2017-01-18 21:41:16',NULL,0,'Ubuntu Linux','','select 1 from osquery_info where build_platform = \'ubuntu\';','ubuntu',1);
+INSERT INTO `labels` VALUES (4,'2017-01-18 21:41:16','2017-01-18 21:41:16',NULL,0,'CentOS Linux','','select 1 from osquery_info where build_platform = \'centos\';','centos',1);
+INSERT INTO `labels` VALUES (5,'2017-01-18 21:41:16','2017-01-18 21:41:16',NULL,0,'MS Windows','','select 1 from osquery_info where build_platform = \'windows\';','windows',1);
+INSERT INTO `labels` VALUES (6,'2017-01-19 01:22:08','2017-01-19 01:23:40',NULL,0,'macOS - update needed','The macOS hosts which have not yet updated to macOS Sierra.','select * from os_version where version != \'10.12\';','',0);
+INSERT INTO `labels` VALUES (7,'2017-01-19 01:25:13','2017-01-19 01:25:13',NULL,0,'Windows- update needed','Windows hosts which have not installed Windows 10.','select * from os_version where major != \'10\';','',0);
 /*!40000 ALTER TABLE `labels` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -387,7 +393,9 @@ CREATE TABLE `migration_status_data` (
 
 LOCK TABLES `migration_status_data` WRITE;
 /*!40000 ALTER TABLE `migration_status_data` DISABLE KEYS */;
-INSERT INTO `migration_status_data` VALUES (1,0,1,'2017-01-18 21:41:16'),(2,20161223115449,1,'2017-01-18 21:41:16'),(3,20161229171615,1,'2017-01-18 21:41:16');
+INSERT INTO `migration_status_data` VALUES (1,0,1,'2017-01-18 21:41:16');
+INSERT INTO `migration_status_data` VALUES (2,20161223115449,1,'2017-01-18 21:41:16');
+INSERT INTO `migration_status_data` VALUES (3,20161229171615,1,'2017-01-18 21:41:16');
 /*!40000 ALTER TABLE `migration_status_data` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -414,7 +422,33 @@ CREATE TABLE `migration_status_tables` (
 
 LOCK TABLES `migration_status_tables` WRITE;
 /*!40000 ALTER TABLE `migration_status_tables` DISABLE KEYS */;
-INSERT INTO `migration_status_tables` VALUES (1,0,1,'2017-01-20 08:04:28'),(2,20161118193812,1,'2017-01-20 08:04:28'),(3,20161118211713,1,'2017-01-20 08:04:28'),(4,20161118212436,1,'2017-01-20 08:04:28'),(5,20161118212515,1,'2017-01-20 08:04:28'),(6,20161118212528,1,'2017-01-20 08:04:28'),(7,20161118212538,1,'2017-01-20 08:04:28'),(8,20161118212549,1,'2017-01-20 08:04:28'),(9,20161118212557,1,'2017-01-20 08:04:28'),(10,20161118212604,1,'2017-01-20 08:04:28'),(11,20161118212613,1,'2017-01-20 08:04:28'),(12,20161118212621,1,'2017-01-20 08:04:28'),(13,20161118212630,1,'2017-01-20 08:04:28'),(14,20161118212641,1,'2017-01-20 08:04:28'),(15,20161118212649,1,'2017-01-20 08:04:28'),(16,20161118212656,1,'2017-01-20 08:04:28'),(17,20161118212758,1,'2017-01-20 08:04:28'),(18,20161128234849,1,'2017-01-20 08:04:28'),(19,20161230162221,1,'2017-01-20 08:04:28'),(20,20170104113816,1,'2017-01-20 08:04:28'),(21,20170105151732,1,'2017-01-20 08:04:28'),(22,20170108191242,1,'2017-01-20 08:04:28'),(23,20170109094020,1,'2017-01-20 08:04:28'),(24,20170109130438,1,'2017-01-20 08:04:28'),(25,20170110202752,1,'2017-01-20 08:04:28'),(26,20170111133013,1,'2017-01-20 08:04:28'),(27,20170117025759,1,'2017-01-20 08:04:28');
+INSERT INTO `migration_status_tables` VALUES (1,0,1,'2017-01-20 08:04:28');
+INSERT INTO `migration_status_tables` VALUES (2,20161118193812,1,'2017-01-20 08:04:28');
+INSERT INTO `migration_status_tables` VALUES (3,20161118211713,1,'2017-01-20 08:04:28');
+INSERT INTO `migration_status_tables` VALUES (4,20161118212436,1,'2017-01-20 08:04:28');
+INSERT INTO `migration_status_tables` VALUES (5,20161118212515,1,'2017-01-20 08:04:28');
+INSERT INTO `migration_status_tables` VALUES (6,20161118212528,1,'2017-01-20 08:04:28');
+INSERT INTO `migration_status_tables` VALUES (7,20161118212538,1,'2017-01-20 08:04:28');
+INSERT INTO `migration_status_tables` VALUES (8,20161118212549,1,'2017-01-20 08:04:28');
+INSERT INTO `migration_status_tables` VALUES (9,20161118212557,1,'2017-01-20 08:04:28');
+INSERT INTO `migration_status_tables` VALUES (10,20161118212604,1,'2017-01-20 08:04:28');
+INSERT INTO `migration_status_tables` VALUES (11,20161118212613,1,'2017-01-20 08:04:28');
+INSERT INTO `migration_status_tables` VALUES (12,20161118212621,1,'2017-01-20 08:04:28');
+INSERT INTO `migration_status_tables` VALUES (13,20161118212630,1,'2017-01-20 08:04:28');
+INSERT INTO `migration_status_tables` VALUES (14,20161118212641,1,'2017-01-20 08:04:28');
+INSERT INTO `migration_status_tables` VALUES (15,20161118212649,1,'2017-01-20 08:04:28');
+INSERT INTO `migration_status_tables` VALUES (16,20161118212656,1,'2017-01-20 08:04:28');
+INSERT INTO `migration_status_tables` VALUES (17,20161118212758,1,'2017-01-20 08:04:28');
+INSERT INTO `migration_status_tables` VALUES (18,20161128234849,1,'2017-01-20 08:04:28');
+INSERT INTO `migration_status_tables` VALUES (19,20161230162221,1,'2017-01-20 08:04:28');
+INSERT INTO `migration_status_tables` VALUES (20,20170104113816,1,'2017-01-20 08:04:28');
+INSERT INTO `migration_status_tables` VALUES (21,20170105151732,1,'2017-01-20 08:04:28');
+INSERT INTO `migration_status_tables` VALUES (22,20170108191242,1,'2017-01-20 08:04:28');
+INSERT INTO `migration_status_tables` VALUES (23,20170109094020,1,'2017-01-20 08:04:28');
+INSERT INTO `migration_status_tables` VALUES (24,20170109130438,1,'2017-01-20 08:04:28');
+INSERT INTO `migration_status_tables` VALUES (25,20170110202752,1,'2017-01-20 08:04:28');
+INSERT INTO `migration_status_tables` VALUES (26,20170111133013,1,'2017-01-20 08:04:28');
+INSERT INTO `migration_status_tables` VALUES (27,20170117025759,1,'2017-01-20 08:04:28');
 /*!40000 ALTER TABLE `migration_status_tables` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -485,7 +519,62 @@ CREATE TABLE `options` (
 
 LOCK TABLES `options` WRITE;
 /*!40000 ALTER TABLE `options` DISABLE KEYS */;
-INSERT INTO `options` VALUES (1,'disable_distributed',2,'false',1),(2,'distributed_plugin',0,'\"tls\"',1),(3,'distributed_tls_read_endpoint',0,'\"/api/v1/osquery/distributed/read\"',1),(4,'distributed_tls_write_endpoint',0,'\"/api/v1/osquery/distributed/write\"',1),(5,'pack_delimiter',0,'\"/\"',1),(6,'aws_access_key_id',0,'null',0),(7,'aws_firehose_period',1,'null',0),(8,'aws_firehose_stream',0,'null',0),(9,'aws_kinesis_period',1,'null',0),(10,'aws_kinesis_random_partition_key',2,'null',0),(11,'aws_kinesis_stream',0,'null',0),(12,'aws_profile_name',0,'null',0),(13,'aws_region',0,'null',0),(14,'aws_secret_access_key',0,'null',0),(15,'aws_sts_arn_role',0,'null',0),(16,'aws_sts_region',0,'null',0),(17,'aws_sts_session_name',0,'null',0),(18,'aws_sts_timeout',1,'null',0),(19,'buffered_log_max',1,'null',0),(20,'decorations_top_level',2,'null',0),(21,'disable_caching',2,'null',0),(22,'disable_database',2,'null',0),(23,'disable_decorators',2,'null',0),(24,'disable_events',2,'null',0),(25,'disable_kernel',2,'null',0),(26,'disable_logging',2,'null',0),(27,'disable_tables',0,'null',0),(28,'distributed_interval',1,'10',0),(29,'distributed_tls_max_attempts',1,'3',0),(30,'enable_foreign',2,'null',0),(31,'enable_monitor',2,'null',0),(32,'ephemeral',2,'null',0),(33,'events_expiry',1,'null',0),(34,'events_max',1,'null',0),(35,'events_optimize',2,'null',0),(36,'host_identifier',0,'null',0),(37,'logger_event_type',2,'null',0),(38,'logger_mode',0,'null',0),(39,'logger_path',0,'null',0),(40,'logger_plugin',0,'\"tls\"',0),(41,'logger_secondary_status_only',2,'null',0),(42,'logger_syslog_facility',1,'null',0),(43,'logger_tls_compress',2,'null',0),(44,'logger_tls_endpoint',0,'\"/api/v1/osquery/log\"',0),(45,'logger_tls_max',1,'null',0),(46,'logger_tls_period',1,'10',0),(47,'pack_refresh_interval',1,'null',0),(48,'read_max',1,'null',0),(49,'read_user_max',1,'null',0),(50,'schedule_default_interval',1,'null',0),(51,'schedule_splay_percent',1,'null',0),(52,'schedule_timeout',1,'null',0),(53,'utc',2,'null',0),(54,'value_max',1,'null',0),(55,'verbose',2,'null',0),(56,'worker_threads',1,'null',0);
+INSERT INTO `options` VALUES (1,'disable_distributed',2,'false',1);
+INSERT INTO `options` VALUES (2,'distributed_plugin',0,'\"tls\"',1);
+INSERT INTO `options` VALUES (3,'distributed_tls_read_endpoint',0,'\"/api/v1/osquery/distributed/read\"',1);
+INSERT INTO `options` VALUES (4,'distributed_tls_write_endpoint',0,'\"/api/v1/osquery/distributed/write\"',1);
+INSERT INTO `options` VALUES (5,'pack_delimiter',0,'\"/\"',1);
+INSERT INTO `options` VALUES (6,'aws_access_key_id',0,'null',0);
+INSERT INTO `options` VALUES (7,'aws_firehose_period',1,'null',0);
+INSERT INTO `options` VALUES (8,'aws_firehose_stream',0,'null',0);
+INSERT INTO `options` VALUES (9,'aws_kinesis_period',1,'null',0);
+INSERT INTO `options` VALUES (10,'aws_kinesis_random_partition_key',2,'null',0);
+INSERT INTO `options` VALUES (11,'aws_kinesis_stream',0,'null',0);
+INSERT INTO `options` VALUES (12,'aws_profile_name',0,'null',0);
+INSERT INTO `options` VALUES (13,'aws_region',0,'null',0);
+INSERT INTO `options` VALUES (14,'aws_secret_access_key',0,'null',0);
+INSERT INTO `options` VALUES (15,'aws_sts_arn_role',0,'null',0);
+INSERT INTO `options` VALUES (16,'aws_sts_region',0,'null',0);
+INSERT INTO `options` VALUES (17,'aws_sts_session_name',0,'null',0);
+INSERT INTO `options` VALUES (18,'aws_sts_timeout',1,'null',0);
+INSERT INTO `options` VALUES (19,'buffered_log_max',1,'null',0);
+INSERT INTO `options` VALUES (20,'decorations_top_level',2,'null',0);
+INSERT INTO `options` VALUES (21,'disable_caching',2,'null',0);
+INSERT INTO `options` VALUES (22,'disable_database',2,'null',0);
+INSERT INTO `options` VALUES (23,'disable_decorators',2,'null',0);
+INSERT INTO `options` VALUES (24,'disable_events',2,'null',0);
+INSERT INTO `options` VALUES (25,'disable_kernel',2,'null',0);
+INSERT INTO `options` VALUES (26,'disable_logging',2,'null',0);
+INSERT INTO `options` VALUES (27,'disable_tables',0,'null',0);
+INSERT INTO `options` VALUES (28,'distributed_interval',1,'10',0);
+INSERT INTO `options` VALUES (29,'distributed_tls_max_attempts',1,'3',0);
+INSERT INTO `options` VALUES (30,'enable_foreign',2,'null',0);
+INSERT INTO `options` VALUES (31,'enable_monitor',2,'null',0);
+INSERT INTO `options` VALUES (32,'ephemeral',2,'null',0);
+INSERT INTO `options` VALUES (33,'events_expiry',1,'null',0);
+INSERT INTO `options` VALUES (34,'events_max',1,'null',0);
+INSERT INTO `options` VALUES (35,'events_optimize',2,'null',0);
+INSERT INTO `options` VALUES (36,'host_identifier',0,'null',0);
+INSERT INTO `options` VALUES (37,'logger_event_type',2,'null',0);
+INSERT INTO `options` VALUES (38,'logger_mode',0,'null',0);
+INSERT INTO `options` VALUES (39,'logger_path',0,'null',0);
+INSERT INTO `options` VALUES (40,'logger_plugin',0,'\"tls\"',0);
+INSERT INTO `options` VALUES (41,'logger_secondary_status_only',2,'null',0);
+INSERT INTO `options` VALUES (42,'logger_syslog_facility',1,'null',0);
+INSERT INTO `options` VALUES (43,'logger_tls_compress',2,'null',0);
+INSERT INTO `options` VALUES (44,'logger_tls_endpoint',0,'\"/api/v1/osquery/log\"',0);
+INSERT INTO `options` VALUES (45,'logger_tls_max',1,'null',0);
+INSERT INTO `options` VALUES (46,'logger_tls_period',1,'10',0);
+INSERT INTO `options` VALUES (47,'pack_refresh_interval',1,'null',0);
+INSERT INTO `options` VALUES (48,'read_max',1,'null',0);
+INSERT INTO `options` VALUES (49,'read_user_max',1,'null',0);
+INSERT INTO `options` VALUES (50,'schedule_default_interval',1,'null',0);
+INSERT INTO `options` VALUES (51,'schedule_splay_percent',1,'null',0);
+INSERT INTO `options` VALUES (52,'schedule_timeout',1,'null',0);
+INSERT INTO `options` VALUES (53,'utc',2,'null',0);
+INSERT INTO `options` VALUES (54,'value_max',1,'null',0);
+INSERT INTO `options` VALUES (55,'verbose',2,'null',0);
+INSERT INTO `options` VALUES (56,'worker_threads',1,'null',0);
 /*!40000 ALTER TABLE `options` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -512,7 +601,15 @@ CREATE TABLE `pack_targets` (
 
 LOCK TABLES `pack_targets` WRITE;
 /*!40000 ALTER TABLE `pack_targets` DISABLE KEYS */;
-INSERT INTO `pack_targets` VALUES (1,1,0,1),(2,2,0,1),(3,3,0,1),(4,4,0,1),(5,5,0,1),(6,6,0,1),(7,7,0,1),(8,8,0,3),(9,8,0,4);
+INSERT INTO `pack_targets` VALUES (1,1,0,1);
+INSERT INTO `pack_targets` VALUES (2,2,0,1);
+INSERT INTO `pack_targets` VALUES (3,3,0,1);
+INSERT INTO `pack_targets` VALUES (4,4,0,1);
+INSERT INTO `pack_targets` VALUES (5,5,0,1);
+INSERT INTO `pack_targets` VALUES (6,6,0,1);
+INSERT INTO `pack_targets` VALUES (7,7,0,1);
+INSERT INTO `pack_targets` VALUES (8,8,0,3);
+INSERT INTO `pack_targets` VALUES (9,8,0,4);
 /*!40000 ALTER TABLE `pack_targets` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -545,7 +642,14 @@ CREATE TABLE `packs` (
 
 LOCK TABLES `packs` WRITE;
 /*!40000 ALTER TABLE `packs` DISABLE KEYS */;
-INSERT INTO `packs` VALUES (1,'2017-01-19 01:07:01','2017-01-19 01:09:03',NULL,0,0,'Intrusion Detection','A collection of queries that detect indicators of initial compromise via various tactics, techniques, and procedures.','',1),(2,'2017-01-19 01:08:08','2017-01-19 01:08:08',NULL,0,0,'Osquery Monitoring','Osquery exposes several tables which allow you to query the internal operations of the osqueryd process itself. This pack contains queries that allow us to maintain insight into the health and performance of the osquery fleet.','',1),(3,'2017-01-19 01:10:38','2017-01-19 01:10:38',NULL,0,0,'Asset Management','A collection of queries that tracks the company\'s assets, installed applications, etc.','',1),(4,'2017-01-19 01:12:28','2017-01-19 01:12:28',NULL,0,0,'Hardware Monitoring','A collection of queries which monitor the changes that occur in the lower-level, hardware configurations of assets. ','',1),(5,'2017-01-19 01:13:51','2017-01-19 01:13:51',NULL,0,0,'Incident Response','While responding to an incident, it\'s often useful to have a collection of certain historical data to be able to piece together the incident timeline. This pack is a collection of queries which are useful to have during the incident response process.','',1),(6,'2017-01-19 01:14:56','2017-01-19 01:14:56',NULL,0,0,'Compliance','In order to maintain compliance, we have to ensure that we are tracking certain events and operations that occur throughout our fleet.','',1),(7,'2017-01-19 01:16:51','2017-01-19 01:16:51',NULL,0,0,'Vulnerability Management','In order to ensure that our assets are not running vulnerable versions of key software, we deploy queries within this pack to track important application values and versions.','',1),(8,'2017-01-20 08:16:52','2017-01-20 08:16:52',NULL,0,0,'Systems Monitoring','Queries which track the health, stability, and performance of a system from an operations perspective.','',1);
+INSERT INTO `packs` VALUES (1,'2017-01-19 01:07:01','2017-01-19 01:09:03',NULL,0,0,'Intrusion Detection','A collection of queries that detect indicators of initial compromise via various tactics, techniques, and procedures.','',1);
+INSERT INTO `packs` VALUES (2,'2017-01-19 01:08:08','2017-01-19 01:08:08',NULL,0,0,'Osquery Monitoring','Osquery exposes several tables which allow you to query the internal operations of the osqueryd process itself. This pack contains queries that allow us to maintain insight into the health and performance of the osquery fleet.','',1);
+INSERT INTO `packs` VALUES (3,'2017-01-19 01:10:38','2017-01-19 01:10:38',NULL,0,0,'Asset Management','A collection of queries that tracks the company\'s assets, installed applications, etc.','',1);
+INSERT INTO `packs` VALUES (4,'2017-01-19 01:12:28','2017-01-19 01:12:28',NULL,0,0,'Hardware Monitoring','A collection of queries which monitor the changes that occur in the lower-level, hardware configurations of assets. ','',1);
+INSERT INTO `packs` VALUES (5,'2017-01-19 01:13:51','2017-01-19 01:13:51',NULL,0,0,'Incident Response','While responding to an incident, it\'s often useful to have a collection of certain historical data to be able to piece together the incident timeline. This pack is a collection of queries which are useful to have during the incident response process.','',1);
+INSERT INTO `packs` VALUES (6,'2017-01-19 01:14:56','2017-01-19 01:14:56',NULL,0,0,'Compliance','In order to maintain compliance, we have to ensure that we are tracking certain events and operations that occur throughout our fleet.','',1);
+INSERT INTO `packs` VALUES (7,'2017-01-19 01:16:51','2017-01-19 01:16:51',NULL,0,0,'Vulnerability Management','In order to ensure that our assets are not running vulnerable versions of key software, we deploy queries within this pack to track important application values and versions.','',1);
+INSERT INTO `packs` VALUES (8,'2017-01-20 08:16:52','2017-01-20 08:16:52',NULL,0,0,'Systems Monitoring','Queries which track the health, stability, and performance of a system from an operations perspective.','',1);
 /*!40000 ALTER TABLE `packs` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -599,7 +703,7 @@ CREATE TABLE `queries` (
   UNIQUE KEY `constraint_query_name_unique` (`name`),
   KEY `author_id` (`author_id`),
   CONSTRAINT `queries_ibfk_1` FOREIGN KEY (`author_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -608,7 +712,40 @@ CREATE TABLE `queries` (
 
 LOCK TABLES `queries` WRITE;
 /*!40000 ALTER TABLE `queries` DISABLE KEYS */;
-INSERT INTO `queries` VALUES (1,'2017-01-20 00:53:10','2017-01-20 00:53:10',NULL,0,1,'Osquery Events','Information about osquery\'s event publishers and subscribers, which are the implementation components of event-based tables.','select * from osquery_events;',1),(2,'2017-01-20 00:53:46','2017-01-20 00:53:46',NULL,0,1,'Osquery Extensions','A list of active osquery extensions.','select * from osquery_extensions;',1),(3,'2017-01-20 00:54:27','2017-01-20 00:54:27',NULL,0,1,'Osquery Flags','The values of configurable flags which modify osquery\'s behavior. ','select * from osquery_flags;',1),(4,'2017-01-20 00:55:04','2017-01-20 00:55:04',NULL,0,1,'Osquery General Info','Top-level information about the running osquery instance.','select * from osquery_info;',1),(5,'2017-01-20 00:55:43','2017-01-20 00:55:43',NULL,0,1,'Osquery Packs','Information about the current query packs that are loaded in osquery.','select * from osquery_packs;',1),(6,'2017-01-20 00:56:18','2017-01-20 00:56:18',NULL,0,1,'Osquery Registry','Information about the active items/plugins in the osquery application registry.','select * from osquery_registry;',1),(7,'2017-01-20 00:56:42','2017-01-20 00:56:42',NULL,0,1,'Osquery Schedule','Information about the current queries that are scheduled in osquery.','select * from osquery_schedule;',1),(8,'2017-01-20 00:59:50','2017-01-20 00:59:50',NULL,0,1,'Hosts File','A line-parsed readout of the /etc/hosts file.','select * from etc_hosts;',1),(9,'2017-01-20 01:00:12','2017-01-20 01:00:12',NULL,0,1,'Protocols File','A line-parsed readout of the /etc/protocols file.','select * from etc_protocols;',1),(10,'2017-01-20 01:00:30','2017-01-20 01:00:30',NULL,0,1,'Services File','A line-parsed readout of the /etc/services file.','select * from etc_services;',1),(11,'2017-01-20 01:01:14','2017-01-20 01:01:14',NULL,0,1,'OS Version Info','Information about the operating system name and version.','select * from os_version;',1),(12,'2017-01-20 01:01:50','2017-01-20 01:01:50',NULL,0,1,'System Info','Interesting system information about a host.','select * from system_info;',1),(13,'2017-01-20 01:03:42','2017-01-20 01:03:42',NULL,0,1,'Users','Information about the users on a system and their groups.','SELECT * FROM users u JOIN groups g WHERE u.gid = g.gid;',1),(14,'2017-01-20 01:04:23','2017-01-20 01:04:23',NULL,0,1,'Windows Services','All installed Windows services and relevant data.','select * from services;',1),(15,'2017-01-20 01:04:59','2017-01-20 01:04:59',NULL,0,1,'Windows Registry','All of the Windows registry hives.','select * from registry;',1),(16,'2017-01-20 01:05:32','2017-01-20 01:05:32',NULL,0,1,'Windows Drivers','Lists all installed and loaded Windows Drivers and their relevant data.','select * from drivers;',1),(17,'2017-01-20 01:05:56','2017-01-20 01:05:56',NULL,0,1,'Windows Patches','Lists all the patches applied. Note: This does not include patches applied via MSI or downloaded from Windows Update (e.g. Service Packs).','select * from patches;',1),(18,'2017-01-20 01:12:11','2017-01-20 01:12:11',NULL,0,1,'Windows Application Compatibility Shims','Application Compatibility shims are a way to persist malware. This table presents information about the Application Compatibility Shims from the registry in a nice format.','select * from appcompat_shims;',1),(19,'2017-01-20 01:13:34','2017-01-20 01:13:34',NULL,0,1,'Kernel Info','Basic information about the active kernel.','select * from kernel_info;',1);
+INSERT INTO `queries` VALUES (1,'2017-01-20 00:53:10','2017-01-20 00:53:10',NULL,0,1,'Osquery Events','Information about osquery\'s event publishers and subscribers, which are the implementation components of event-based tables.','select * from osquery_events;',1);
+INSERT INTO `queries` VALUES (2,'2017-01-20 00:53:46','2017-01-20 00:53:46',NULL,0,1,'Osquery Extensions','A list of active osquery extensions.','select * from osquery_extensions;',1);
+INSERT INTO `queries` VALUES (3,'2017-01-20 00:54:27','2017-01-20 00:54:27',NULL,0,1,'Osquery Flags','The values of configurable flags which modify osquery\'s behavior. ','select * from osquery_flags;',1);
+INSERT INTO `queries` VALUES (4,'2017-01-20 00:55:04','2017-01-20 00:55:04',NULL,0,1,'Osquery General Info','Top-level information about the running osquery instance.','select * from osquery_info;',1);
+INSERT INTO `queries` VALUES (5,'2017-01-20 00:55:43','2017-01-20 00:55:43',NULL,0,1,'Osquery Packs','Information about the current query packs that are loaded in osquery.','select * from osquery_packs;',1);
+INSERT INTO `queries` VALUES (6,'2017-01-20 00:56:18','2017-01-20 00:56:18',NULL,0,1,'Osquery Registry','Information about the active items/plugins in the osquery application registry.','select * from osquery_registry;',1);
+INSERT INTO `queries` VALUES (7,'2017-01-20 00:56:42','2017-01-20 00:56:42',NULL,0,1,'Osquery Schedule','Information about the current queries that are scheduled in osquery.','select * from osquery_schedule;',1);
+INSERT INTO `queries` VALUES (8,'2017-01-20 00:59:50','2017-01-20 00:59:50',NULL,0,1,'Hosts File','A line-parsed readout of the /etc/hosts file.','select * from etc_hosts;',1);
+INSERT INTO `queries` VALUES (9,'2017-01-20 01:00:12','2017-01-20 01:00:12',NULL,0,1,'Protocols File','A line-parsed readout of the /etc/protocols file.','select * from etc_protocols;',1);
+INSERT INTO `queries` VALUES (10,'2017-01-20 01:00:30','2017-01-20 01:00:30',NULL,0,1,'Services File','A line-parsed readout of the /etc/services file.','select * from etc_services;',1);
+INSERT INTO `queries` VALUES (11,'2017-01-20 01:01:14','2017-01-20 01:01:14',NULL,0,1,'OS Version Info','Information about the operating system name and version.','select * from os_version;',1);
+INSERT INTO `queries` VALUES (12,'2017-01-20 01:01:50','2017-01-20 01:01:50',NULL,0,1,'System Info','Interesting system information about a host.','select * from system_info;',1);
+INSERT INTO `queries` VALUES (13,'2017-01-20 01:03:42','2017-01-20 01:03:42',NULL,0,1,'Users','Information about the users on a system and their groups.','SELECT * FROM users u JOIN groups g WHERE u.gid = g.gid;',1);
+INSERT INTO `queries` VALUES (14,'2017-01-20 01:04:23','2017-01-20 01:04:23',NULL,0,1,'Windows Services','All installed Windows services and relevant data.','select * from services;',1);
+INSERT INTO `queries` VALUES (15,'2017-01-20 01:04:59','2017-01-20 01:04:59',NULL,0,1,'Windows Registry','All of the Windows registry hives.','select * from registry;',1);
+INSERT INTO `queries` VALUES (16,'2017-01-20 01:05:32','2017-01-20 01:05:32',NULL,0,1,'Windows Drivers','Lists all installed and loaded Windows Drivers and their relevant data.','select * from drivers;',1);
+INSERT INTO `queries` VALUES (17,'2017-01-20 01:05:56','2017-01-20 01:05:56',NULL,0,1,'Windows Patches','Lists all the patches applied. Note: This does not include patches applied via MSI or downloaded from Windows Update (e.g. Service Packs).','select * from patches;',1);
+INSERT INTO `queries` VALUES (18,'2017-01-20 01:12:11','2017-01-20 01:12:11',NULL,0,1,'Windows Application Compatibility Shims','Application Compatibility shims are a way to persist malware. This table presents information about the Application Compatibility Shims from the registry in a nice format.','select * from appcompat_shims;',1);
+INSERT INTO `queries` VALUES (19,'2017-01-20 01:13:34','2017-01-22 20:23:15',NULL,0,1,'Kernel Info','Basic information about the active kernel.','select * from kernel_info join hash using (path);',1);
+INSERT INTO `queries` VALUES (20,'2017-01-22 20:12:09','2017-01-22 20:12:09',NULL,0,1,'Mac Applications','The applications that are installed on a user\'s Apple laptop.','select * from apps;',1);
+INSERT INTO `queries` VALUES (21,'2017-01-22 20:14:04','2017-01-22 20:14:04',NULL,0,1,'Chrome Extensions','The Google Chrome Extensions that a user has installed in their browser.','select * from chrome_extensions;',1);
+INSERT INTO `queries` VALUES (22,'2017-01-22 20:16:16','2017-01-22 20:16:16',NULL,0,1,'ACPI Tables','Firmware ACPI functional table common metadata and content.','select * from acpi_tables;',1);
+INSERT INTO `queries` VALUES (23,'2017-01-22 20:17:18','2017-01-22 20:17:18',NULL,0,1,'CPU features','Useful CPU features from the cpuid ASM call.','select feature, value, output_register, output_bit, input_eax from cpuid;',1);
+INSERT INTO `queries` VALUES (24,'2017-01-22 20:20:34','2017-01-22 20:20:34',NULL,0,1,'SMBIOS Tables','BIOS (DMI) structure common details and content.','select * from smbios_tables;',1);
+INSERT INTO `queries` VALUES (25,'2017-01-22 20:22:18','2017-01-22 20:22:18',NULL,0,1,'NVRAM','NVRAM content.','select * from nvram where name not in (\'backlight-level\', \'SystemAudioVolumeDB\', \'SystemAudioVolume\');',1);
+INSERT INTO `queries` VALUES (26,'2017-01-22 20:24:38','2017-01-22 20:24:38',NULL,0,1,'PCI Devices','An inventory of PCI devices.','select * from pci_devices;',1);
+INSERT INTO `queries` VALUES (27,'2017-01-22 20:25:00','2017-01-22 20:25:00',NULL,0,1,'USB Devices','An inventory of USB devices.','select * from usb_devices;',1);
+INSERT INTO `queries` VALUES (28,'2017-01-22 20:25:46','2017-01-22 20:25:46',NULL,0,1,'Hardware Events','Attaches and detaches of hardware inputs on a host.','select * from hardware_events;',1);
+INSERT INTO `queries` VALUES (29,'2017-01-22 20:26:59','2017-01-22 20:26:59',NULL,0,1,'Kernel System Controls','Kernel system controls on macOS.','select * from system_controls where subsystem = \'kern\' and (name like \'%boot%\' or name like \'%secure%\' or name like \'%single%\');',1);
+INSERT INTO `queries` VALUES (30,'2017-01-22 20:30:00','2017-01-22 20:30:00',NULL,0,1,'IOKit Device Tree','General inventory of IOKit\'s devices on macOS.','select * from iokit_devicetree;',1);
+INSERT INTO `queries` VALUES (31,'2017-01-22 20:31:52','2017-01-22 20:31:52',NULL,0,1,'Kernel Extensions','A list of the kernel extensions on a macOS host.','select * from kernel_extensions;',1);
+INSERT INTO `queries` VALUES (32,'2017-01-22 20:32:11','2017-01-22 20:32:11',NULL,0,1,'Kernel Modules','A list of the kernel modules on a Linux host.','select * from kernel_modules;',1);
+INSERT INTO `queries` VALUES (33,'2017-01-22 20:34:29','2017-01-22 20:34:29',NULL,0,1,'Device Nodes','All devices nodes in /dev.','select file.path, uid, gid, mode, 0 as atime, mtime, ctime, block_size, mode, type from file where directory = \'/dev/\';',1);
+INSERT INTO `queries` VALUES (34,'2017-01-22 20:42:19','2017-01-22 20:42:43',NULL,0,1,'Active Directory Configuration','Retrieves the Active Directory configuration for the target machine.','select * from ad_config;',1);
 /*!40000 ALTER TABLE `queries` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -634,7 +771,7 @@ CREATE TABLE `scheduled_queries` (
   `version` varchar(255) DEFAULT NULL,
   `shard` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=69 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -643,7 +780,74 @@ CREATE TABLE `scheduled_queries` (
 
 LOCK TABLES `scheduled_queries` WRITE;
 /*!40000 ALTER TABLE `scheduled_queries` DISABLE KEYS */;
-INSERT INTO `scheduled_queries` VALUES (1,'2017-01-20 00:57:12','2017-01-20 00:57:12',NULL,0,2,1,3600,1,0,'','',NULL),(2,'2017-01-20 00:57:27','2017-01-20 00:57:27',NULL,0,2,2,3600,1,0,'','',NULL),(3,'2017-01-20 00:57:40','2017-01-20 00:57:40',NULL,0,2,3,3600,1,0,NULL,NULL,NULL),(4,'2017-01-20 00:57:48','2017-01-20 00:57:48',NULL,0,2,4,3600,1,0,NULL,NULL,NULL),(5,'2017-01-20 00:57:56','2017-01-20 00:57:56',NULL,0,2,5,3600,1,0,NULL,NULL,NULL),(6,'2017-01-20 00:58:05','2017-01-20 00:58:05',NULL,0,2,6,3600,1,0,NULL,NULL,NULL),(7,'2017-01-20 00:58:12','2017-01-20 00:58:12',NULL,0,2,7,3600,1,0,NULL,NULL,NULL);
+INSERT INTO `scheduled_queries` VALUES (1,'2017-01-20 00:57:12','2017-01-20 00:57:12',NULL,0,2,1,3600,1,0,'','',NULL);
+INSERT INTO `scheduled_queries` VALUES (2,'2017-01-20 00:57:27','2017-01-20 00:57:27',NULL,0,2,2,3600,1,0,'','',NULL);
+INSERT INTO `scheduled_queries` VALUES (3,'2017-01-20 00:57:40','2017-01-20 00:57:40',NULL,0,2,3,3600,1,0,NULL,NULL,NULL);
+INSERT INTO `scheduled_queries` VALUES (4,'2017-01-20 00:57:48','2017-01-20 00:57:48',NULL,0,2,4,3600,1,0,NULL,NULL,NULL);
+INSERT INTO `scheduled_queries` VALUES (5,'2017-01-20 00:57:56','2017-01-20 00:57:56',NULL,0,2,5,3600,1,0,NULL,NULL,NULL);
+INSERT INTO `scheduled_queries` VALUES (6,'2017-01-20 00:58:05','2017-01-20 00:58:05',NULL,0,2,6,3600,1,0,NULL,NULL,NULL);
+INSERT INTO `scheduled_queries` VALUES (7,'2017-01-20 00:58:12','2017-01-20 00:58:12',NULL,0,2,7,3600,1,0,NULL,NULL,NULL);
+INSERT INTO `scheduled_queries` VALUES (8,'2017-01-22 20:03:09','2017-01-22 20:03:09',NULL,0,1,17,3600,0,1,'windows','2.2.1',NULL);
+INSERT INTO `scheduled_queries` VALUES (9,'2017-01-22 20:04:14','2017-01-22 20:04:14',NULL,0,1,18,3600,0,1,'windows','2.2.1',NULL);
+INSERT INTO `scheduled_queries` VALUES (10,'2017-01-22 20:04:55','2017-01-22 20:04:55',NULL,0,1,19,3600,0,1,'','',NULL);
+INSERT INTO `scheduled_queries` VALUES (11,'2017-01-22 20:05:55','2017-01-22 20:05:55',NULL,0,1,16,1800,0,1,'windows','2.1.1',NULL);
+INSERT INTO `scheduled_queries` VALUES (12,'2017-01-22 20:06:20','2017-01-22 20:06:20',NULL,0,1,15,1800,0,1,'windows','2.2.1',NULL);
+INSERT INTO `scheduled_queries` VALUES (13,'2017-01-22 20:06:40','2017-01-22 20:06:40',NULL,0,1,14,3600,0,1,'windows','2.2.1',NULL);
+INSERT INTO `scheduled_queries` VALUES (14,'2017-01-22 20:07:07','2017-01-22 20:07:07',NULL,0,1,13,1800,0,1,'','',NULL);
+INSERT INTO `scheduled_queries` VALUES (15,'2017-01-22 20:07:32','2017-01-22 20:07:32',NULL,0,1,8,3600,0,1,'linux','',NULL);
+INSERT INTO `scheduled_queries` VALUES (16,'2017-01-22 20:08:01','2017-01-22 20:08:01',NULL,0,1,9,3600,0,1,'linux','',NULL);
+INSERT INTO `scheduled_queries` VALUES (17,'2017-01-22 20:08:19','2017-01-22 20:08:19',NULL,0,1,10,3600,0,1,'linux',NULL,NULL);
+INSERT INTO `scheduled_queries` VALUES (18,'2017-01-22 20:10:33','2017-01-22 20:10:33',NULL,0,3,12,1800,1,0,'','',NULL);
+INSERT INTO `scheduled_queries` VALUES (19,'2017-01-22 20:10:58','2017-01-22 20:10:58',NULL,0,3,13,1800,1,0,'','',NULL);
+INSERT INTO `scheduled_queries` VALUES (20,'2017-01-22 20:12:31','2017-01-22 20:12:31',NULL,0,3,20,3600,0,1,'darwin','',NULL);
+INSERT INTO `scheduled_queries` VALUES (21,'2017-01-22 20:14:30','2017-01-22 20:14:30',NULL,0,1,21,3600,0,1,'','2.2.1',NULL);
+INSERT INTO `scheduled_queries` VALUES (22,'2017-01-22 20:15:03','2017-01-22 20:15:03',NULL,0,3,21,3600,0,1,'','2.2.1',NULL);
+INSERT INTO `scheduled_queries` VALUES (23,'2017-01-22 20:19:18','2017-01-22 20:19:18',NULL,0,4,23,28800,0,1,'','',NULL);
+INSERT INTO `scheduled_queries` VALUES (24,'2017-01-22 20:19:42','2017-01-22 20:19:42',NULL,0,4,22,28800,0,1,'linux','',NULL);
+INSERT INTO `scheduled_queries` VALUES (25,'2017-01-22 20:21:09','2017-01-22 20:21:09',NULL,0,4,24,28800,0,1,'linux','',NULL);
+INSERT INTO `scheduled_queries` VALUES (26,'2017-01-22 20:22:36','2017-01-22 20:22:36',NULL,0,4,25,3600,0,1,'darwin','',NULL);
+INSERT INTO `scheduled_queries` VALUES (27,'2017-01-22 20:27:27','2017-01-22 20:27:27',NULL,0,4,29,28800,0,1,'darwin','',NULL);
+INSERT INTO `scheduled_queries` VALUES (28,'2017-01-22 20:28:21','2017-01-22 20:28:21',NULL,0,4,28,300,0,1,'linux','',NULL);
+INSERT INTO `scheduled_queries` VALUES (29,'2017-01-22 20:28:41','2017-01-22 20:28:41',NULL,0,4,26,3600,0,1,'linux',NULL,NULL);
+INSERT INTO `scheduled_queries` VALUES (30,'2017-01-22 20:28:54','2017-01-22 20:28:54',NULL,0,4,27,3600,0,1,'linux',NULL,NULL);
+INSERT INTO `scheduled_queries` VALUES (31,'2017-01-22 20:30:27','2017-01-22 20:30:27',NULL,0,4,30,28800,0,1,'darwin',NULL,NULL);
+INSERT INTO `scheduled_queries` VALUES (32,'2017-01-22 20:32:30','2017-01-22 20:32:30',NULL,0,4,31,300,0,1,'darwin',NULL,NULL);
+INSERT INTO `scheduled_queries` VALUES (33,'2017-01-22 20:32:45','2017-01-22 20:32:45',NULL,0,4,32,300,0,1,'linux',NULL,NULL);
+INSERT INTO `scheduled_queries` VALUES (34,'2017-01-22 20:33:12','2017-01-22 20:33:12',NULL,0,1,31,300,0,1,'darwin',NULL,NULL);
+INSERT INTO `scheduled_queries` VALUES (35,'2017-01-22 20:33:32','2017-01-22 20:33:32',NULL,0,1,32,300,0,1,'linux','',NULL);
+INSERT INTO `scheduled_queries` VALUES (36,'2017-01-22 20:34:59','2017-01-22 20:34:59',NULL,0,4,33,3600,0,1,'linux',NULL,NULL);
+INSERT INTO `scheduled_queries` VALUES (37,'2017-01-22 20:35:40','2017-01-22 20:35:40',NULL,0,7,10,3600,0,1,'linux',NULL,NULL);
+INSERT INTO `scheduled_queries` VALUES (38,'2017-01-22 20:36:02','2017-01-22 20:36:02',NULL,0,7,11,300,0,1,'',NULL,NULL);
+INSERT INTO `scheduled_queries` VALUES (39,'2017-01-22 20:36:35','2017-01-22 20:36:35',NULL,0,7,14,3600,0,1,'windows',NULL,NULL);
+INSERT INTO `scheduled_queries` VALUES (40,'2017-01-22 20:36:58','2017-01-22 20:36:58',NULL,0,7,17,3600,1,0,'windows','2.2.1',NULL);
+INSERT INTO `scheduled_queries` VALUES (41,'2017-01-22 20:37:23','2017-01-22 20:37:23',NULL,0,7,20,3600,1,0,'darwin',NULL,NULL);
+INSERT INTO `scheduled_queries` VALUES (42,'2017-01-22 20:37:46','2017-01-22 20:37:46',NULL,0,7,21,3600,0,1,'','2.2.1',NULL);
+INSERT INTO `scheduled_queries` VALUES (43,'2017-01-22 20:38:32','2017-01-22 20:38:32',NULL,0,6,11,3600,1,0,'',NULL,NULL);
+INSERT INTO `scheduled_queries` VALUES (44,'2017-01-22 20:38:53','2017-01-22 20:38:53',NULL,0,6,31,300,0,1,'darwin',NULL,NULL);
+INSERT INTO `scheduled_queries` VALUES (45,'2017-01-22 20:39:10','2017-01-22 20:39:10',NULL,0,6,32,300,0,1,'linux',NULL,NULL);
+INSERT INTO `scheduled_queries` VALUES (46,'2017-01-22 20:39:51','2017-01-22 20:39:51',NULL,0,6,15,3600,0,1,'windows','2.2.1',NULL);
+INSERT INTO `scheduled_queries` VALUES (47,'2017-01-22 20:40:08','2017-01-22 20:40:08',NULL,0,6,19,3600,1,0,'',NULL,NULL);
+INSERT INTO `scheduled_queries` VALUES (48,'2017-01-22 20:40:31','2017-01-22 20:40:31',NULL,0,6,20,3600,0,1,'darwin',NULL,NULL);
+INSERT INTO `scheduled_queries` VALUES (49,'2017-01-22 20:40:53','2017-01-22 20:40:53',NULL,0,6,14,3600,0,1,'windows','2.2.1',NULL);
+INSERT INTO `scheduled_queries` VALUES (50,'2017-01-22 20:41:14','2017-01-22 20:41:14',NULL,0,6,21,3600,0,1,NULL,'2.2.1',NULL);
+INSERT INTO `scheduled_queries` VALUES (51,'2017-01-22 20:44:12','2017-01-22 20:44:12',NULL,0,5,16,86400,1,0,'windows','2.2.1',NULL);
+INSERT INTO `scheduled_queries` VALUES (52,'2017-01-22 20:44:36','2017-01-22 20:44:36',NULL,0,5,16,60,0,1,'windows','2.2.1',NULL);
+INSERT INTO `scheduled_queries` VALUES (53,'2017-01-22 20:45:13','2017-01-22 20:45:13',NULL,0,5,15,86400,1,0,'windows','2.2.1',NULL);
+INSERT INTO `scheduled_queries` VALUES (54,'2017-01-22 20:45:30','2017-01-22 20:45:30',NULL,0,5,15,60,0,1,'windows','2.2.1',NULL);
+INSERT INTO `scheduled_queries` VALUES (55,'2017-01-22 20:46:01','2017-01-22 20:46:01',NULL,0,5,32,86400,1,0,'linux',NULL,NULL);
+INSERT INTO `scheduled_queries` VALUES (56,'2017-01-22 20:46:08','2017-01-22 20:46:08',NULL,0,5,32,60,0,1,'linux',NULL,NULL);
+INSERT INTO `scheduled_queries` VALUES (57,'2017-01-22 20:46:28','2017-01-22 20:46:28',NULL,0,5,31,86400,1,0,'darwin',NULL,NULL);
+INSERT INTO `scheduled_queries` VALUES (58,'2017-01-22 20:46:40','2017-01-22 20:46:40',NULL,0,5,31,60,0,1,'darwin',NULL,NULL);
+INSERT INTO `scheduled_queries` VALUES (59,'2017-01-22 20:47:13','2017-01-22 20:47:13',NULL,0,8,4,3600,0,1,'',NULL,NULL);
+INSERT INTO `scheduled_queries` VALUES (60,'2017-01-22 20:47:28','2017-01-22 20:47:28',NULL,0,8,8,300,0,1,'linux','',NULL);
+INSERT INTO `scheduled_queries` VALUES (61,'2017-01-22 20:47:47','2017-01-22 20:47:47',NULL,0,8,9,300,0,1,'linux',NULL,NULL);
+INSERT INTO `scheduled_queries` VALUES (62,'2017-01-22 20:48:09','2017-01-22 20:48:09',NULL,0,8,10,300,0,1,'linux',NULL,NULL);
+INSERT INTO `scheduled_queries` VALUES (63,'2017-01-22 20:48:27','2017-01-22 20:48:27',NULL,0,8,11,300,0,1,'',NULL,NULL);
+INSERT INTO `scheduled_queries` VALUES (64,'2017-01-22 20:48:42','2017-01-22 20:48:42',NULL,0,8,12,300,0,1,'',NULL,NULL);
+INSERT INTO `scheduled_queries` VALUES (65,'2017-01-22 20:49:07','2017-01-22 20:49:07',NULL,0,8,19,3600,0,1,'linux',NULL,NULL);
+INSERT INTO `scheduled_queries` VALUES (66,'2017-01-22 20:49:32','2017-01-22 20:49:32',NULL,0,8,23,3600,0,1,'linux',NULL,NULL);
+INSERT INTO `scheduled_queries` VALUES (67,'2017-01-22 20:50:00','2017-01-22 20:50:00',NULL,0,8,28,60,0,1,'linux',NULL,NULL);
+INSERT INTO `scheduled_queries` VALUES (68,'2017-01-22 20:50:19','2017-01-22 20:50:19',NULL,0,8,34,3600,0,1,'darwin',NULL,NULL);
 /*!40000 ALTER TABLE `scheduled_queries` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -671,7 +875,7 @@ CREATE TABLE `sessions` (
 
 LOCK TABLES `sessions` WRITE;
 /*!40000 ALTER TABLE `sessions` DISABLE KEYS */;
-INSERT INTO `sessions` VALUES (1,'2017-01-20 08:09:01','2017-01-20 08:17:09',1,'qRDbkVCGURs3Auh+3RN5SZF1umFouMQIU7LXT6mzLge04jMRT8Z+FcIfrKYyU28X7G5RkhJH3T9ee9Uby2TFQQ==');
+INSERT INTO `sessions` VALUES (1,'2017-01-20 08:09:01','2017-01-22 20:51:16',1,'qRDbkVCGURs3Auh+3RN5SZF1umFouMQIU7LXT6mzLge04jMRT8Z+FcIfrKYyU28X7G5RkhJH3T9ee9Uby2TFQQ==');
 /*!40000 ALTER TABLE `sessions` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -799,4 +1003,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-01-20  1:17:26
+-- Dump completed

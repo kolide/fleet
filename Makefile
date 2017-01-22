@@ -156,7 +156,8 @@ docker-build-circle:
 	docker push "${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
 
 demo-dump:
-	mysqldump -u kolide -p \
+	mysqldump --extended-insert=FALSE --skip-dump-date \
+		-u kolide -p \
 		-h ${MYSQL_PORT_3306_TCP_ADDR} kolide \
 		> ./tools/app/demo.sql
 
