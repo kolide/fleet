@@ -1,12 +1,11 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
-import { first, filter, includes, isArray, isEqual, values } from 'lodash';
+import { filter, includes, isArray, isEqual, size } from 'lodash';
 import classnames from 'classnames';
 
 import Kolide from 'kolide';
-import campaignActions from 'redux/nodes/entities/campaigns/actions';
-import campaignInterface from 'interfaces/campaign';
+import campaignHelpers from 'redux/nodes/entities/campaigns/helpers';
 import debounce from 'utilities/debounce';
 import deepDifference from 'utilities/deep_difference';
 import entityGetter from 'redux/utilities/entityGetter';
@@ -28,7 +27,6 @@ const baseClass = 'query-page';
 
 class QueryPage extends Component {
   static propTypes = {
-    campaign: campaignInterface,
     dispatch: PropTypes.func,
     errors: PropTypes.shape({
       base: PropTypes.string,
@@ -43,6 +41,7 @@ class QueryPage extends Component {
     super(props);
 
     this.state = {
+      campaign: {},
       queryIsRunning: false,
       targetsCount: 0,
       targetsError: null,
@@ -64,6 +63,18 @@ class QueryPage extends Component {
 
     removeSocket();
     destroyCampaign();
+
+    return false;
+  }
+
+  onExportQueryResults = (evt) => {
+    evt.preventDefault();
+
+    const { campaign } = this.state;
+
+    if (campaign) {
+      console.log('stateCampaign', campaign);
+    }
 
     return false;
   }
@@ -104,18 +115,17 @@ class QueryPage extends Component {
       return false;
     }
 
-    const { create, update } = campaignActions;
     const { destroyCampaign, removeSocket } = this;
     const selected = formatSelectedTargetsForApi(selectedTargets);
 
     removeSocket();
     destroyCampaign();
 
-    dispatch(create({ query: queryText, selected }))
+    Kolide.queries.run({ query: queryText, selected })
       .then((campaignResponse) => {
-        return Kolide.runQueryWebsocket(campaignResponse.id)
+        return Kolide.websockets.queries.run(campaignResponse.id)
           .then((socket) => {
-            this.campaign = campaignResponse;
+            this.setState({ campaign: campaignResponse });
             this.socket = socket;
             this.setState({ queryIsRunning: true });
 
@@ -129,10 +139,10 @@ class QueryPage extends Component {
                 return false;
               }
 
-              return dispatch(update(this.campaign, socketData))
+              return campaignHelpers.update(this.state.campaign, socketData)
                 .then((updatedCampaign) => {
                   this.previousSocketData = socketData;
-                  this.campaign = updatedCampaign;
+                  this.setState({ campaign: updatedCampaign });
                 });
             };
           });
@@ -203,12 +213,11 @@ class QueryPage extends Component {
   };
 
   destroyCampaign = () => {
-    const { campaign, dispatch } = this.props;
-    const { destroy } = campaignActions;
+    const { campaign } = this.state;
 
-    if (campaign) {
+    if (this.campaign || campaign) {
       this.campaign = null;
-      dispatch(destroy(campaign));
+      this.setState({ campaign: {} });
     }
 
     return false;
@@ -225,20 +234,21 @@ class QueryPage extends Component {
   }
 
   renderResultsTable = () => {
-    const { campaign } = this.props;
+    const { campaign } = this.state;
+    const { onExportQueryResults } = this;
     const resultsClasses = classnames(`${baseClass}__results`, 'body-wrap', {
       [`${baseClass}__results--loading`]: this.socket && !campaign.query_results,
     });
     let resultBody = '';
 
-    if (!campaign || (!this.socket && !campaign.query_results)) {
+    if (!size(campaign) || (!this.socket && !campaign.query_results)) {
       return false;
     }
 
     if ((!campaign.query_results || campaign.query_results.length < 1) && this.socket) {
       resultBody = <Spinner />;
     } else {
-      resultBody = <QueryResultsTable campaign={campaign} />;
+      resultBody = <QueryResultsTable campaign={campaign} onExportQueryResults={onExportQueryResults} />;
     }
 
     return (
@@ -304,10 +314,8 @@ class QueryPage extends Component {
 const mapStateToProps = (state, ownProps) => {
   const stateEntities = entityGetter(state);
   const { id: queryID } = ownProps.params;
-  const { entities: campaigns } = stateEntities.get('campaigns');
   const reduxQuery = entityGetter(state).get('queries').findBy({ id: queryID });
   const { queryText, selectedOsqueryTable } = state.components.QueryPages;
-  const campaign = first(values(campaigns));
   const { errors } = state.entities.queries;
   const queryStub = { description: '', name: '', query: queryText };
   const query = reduxQuery || queryStub;
@@ -329,7 +337,6 @@ const mapStateToProps = (state, ownProps) => {
   }
 
   return {
-    campaign,
     errors,
     hostIDs,
     query,

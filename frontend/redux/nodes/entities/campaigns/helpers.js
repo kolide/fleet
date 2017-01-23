@@ -2,7 +2,7 @@ export const destroyFunc = (campaign) => {
   return Promise.resolve(campaign);
 };
 
-export const updateFunc = (campaign, socketData) => {
+export const update = (campaign, socketData) => {
   return new Promise((resolve, reject) => {
     const { type, data } = socketData;
 
@@ -38,4 +38,4 @@ export const updateFunc = (campaign, socketData) => {
   });
 };
 
-export default { destroyFunc, updateFunc };
+export default { destroyFunc, update };
