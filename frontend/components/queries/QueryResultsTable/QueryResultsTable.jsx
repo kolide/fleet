@@ -1,7 +1,8 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import classnames from 'classnames';
 import { get, keys, omit } from 'lodash';
 
+import Button from 'components/buttons/Button';
 import campaignInterface from 'interfaces/campaign';
 import filterArrayByHash from 'utilities/filter_array_by_hash';
 import Icon from 'components/icons/Icon';
@@ -14,6 +15,7 @@ const baseClass = 'query-results-table';
 class QueryResultsTable extends Component {
   static propTypes = {
     campaign: campaignInterface.isRequired,
+    onExportQueryResults: PropTypes.func,
   };
 
   constructor (props) {
@@ -44,7 +46,7 @@ class QueryResultsTable extends Component {
   }
 
   renderProgressDetails = () => {
-    const { campaign } = this.props;
+    const { campaign, onExportQueryResults } = this.props;
     const totalHostsCount = get(campaign, 'totals.count', 0);
     const totalHostsReturned = get(campaign, 'hosts.length', 0);
     const totalRowsCount = get(campaign, 'query_results.length', 0);
@@ -57,6 +59,9 @@ class QueryResultsTable extends Component {
           <b>{totalRowsCount} Records</b>
         </span>
         <ProgressBar max={totalHostsCount} value={totalHostsReturned} />
+        <Button variant="brand" onClick={onExportQueryResults}>
+          Export
+        </Button>
       </div>
     );
   }

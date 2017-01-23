@@ -1,11 +1,13 @@
 import React, { Component, PropTypes } from 'react';
-import { connect } from 'react-redux';
-import { push } from 'react-router-redux';
-import { filter, includes, isArray, isEqual, size } from 'lodash';
 import classnames from 'classnames';
+import { connect } from 'react-redux';
+import FileSaver from 'file-saver';
+import { filter, includes, isArray, isEqual, size } from 'lodash';
+import { push } from 'react-router-redux';
 
 import Kolide from 'kolide';
 import campaignHelpers from 'redux/nodes/entities/campaigns/helpers';
+import convertToCSV from 'utilities/convert_to_csv';
 import debounce from 'utilities/debounce';
 import deepDifference from 'utilities/deep_difference';
 import entityGetter from 'redux/utilities/entityGetter';
@@ -25,7 +27,7 @@ import Spinner from 'components/loaders/Spinner';
 
 const baseClass = 'query-page';
 
-class QueryPage extends Component {
+export class QueryPage extends Component {
   static propTypes = {
     dispatch: PropTypes.func,
     errors: PropTypes.shape({
@@ -71,9 +73,14 @@ class QueryPage extends Component {
     evt.preventDefault();
 
     const { campaign } = this.state;
+    const { query_results: queryResults } = campaign;
 
-    if (campaign) {
-      console.log('stateCampaign', campaign);
+    if (queryResults) {
+      const results = convertToCSV(queryResults);
+      const filename = 'query_results.csv';
+      const file = new global.window.File([results], filename, { type: 'text/csv' });
+
+      FileSaver.saveAs(file);
     }
 
     return false;
