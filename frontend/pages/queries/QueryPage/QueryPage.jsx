@@ -141,6 +141,15 @@ class QueryPage extends Component {
 
               return campaignHelpers.update(this.state.campaign, socketData)
                 .then((updatedCampaign) => {
+                  const { status } = updatedCampaign;
+
+                  if (status === 'finished') {
+                    this.setState({ queryIsRunning: false });
+                    removeSocket();
+
+                    return false;
+                  }
+
                   this.previousSocketData = socketData;
                   this.setState({ campaign: updatedCampaign });
                 });

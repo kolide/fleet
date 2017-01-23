@@ -34,7 +34,13 @@ export const update = (campaign, socketData) => {
       });
     }
 
-    return reject();
+    if (type === 'status') {
+      const { status } = data;
+
+      return resolve({ ...campaign, status });
+    }
+
+    return resolve(campaign);
   });
 };
 
