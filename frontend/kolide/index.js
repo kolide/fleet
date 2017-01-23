@@ -76,6 +76,15 @@ class Kolide extends Base {
     },
   }
 
+  queries = {
+    run: ({ query, selected }) => {
+      const { RUN_QUERY } = endpoints;
+
+      return this.authenticatedPost(this.endpoint(RUN_QUERY), JSON.stringify({ query, selected }))
+        .then(response => response.campaign);
+    },
+  }
+
   users = {
     changePassword: (passwordParams) => {
       const { CHANGE_PASSWORD } = endpoints;
@@ -101,6 +110,22 @@ class Kolide extends Base {
 
           return helpers.addGravatarUrlToResource(updatedUser);
         });
+    },
+  }
+
+  websockets = {
+    queries: {
+      run: (campaignID) => {
+        return new Promise((resolve) => {
+          const socket = new global.WebSocket(`${this.websocketBaseURL}/v1/kolide/results/${campaignID}`);
+
+          socket.onopen = () => {
+            socket.send(JSON.stringify({ type: 'auth', data: { token: local.getItem('auth_token') } }));
+          };
+
+          return resolve(socket);
+        });
+      },
     },
   }
 
@@ -403,25 +428,6 @@ class Kolide extends Base {
     const endpoint = `${this.endpoint(INVITES)}/${id}`;
 
     return this.authenticatedDelete(endpoint);
-  }
-
-  runQuery = ({ query, selected }) => {
-    const { RUN_QUERY } = endpoints;
-
-    return this.authenticatedPost(this.endpoint(RUN_QUERY), JSON.stringify({ query, selected }))
-      .then(response => response.campaign);
-  }
-
-  runQueryWebsocket = (campaignID) => {
-    return new Promise((resolve) => {
-      const socket = new global.WebSocket(`${this.websocketBaseURL}/v1/kolide/results/${campaignID}`);
-
-      socket.onopen = () => {
-        socket.send(JSON.stringify({ type: 'auth', data: { token: local.getItem('auth_token') } }));
-      };
-
-      return resolve(socket);
-    });
   }
 
   setup = (formData) => {
