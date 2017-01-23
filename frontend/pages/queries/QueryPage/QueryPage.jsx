@@ -159,6 +159,8 @@ export class QueryPage extends Component {
 
                   this.previousSocketData = socketData;
                   this.setState({ campaign: updatedCampaign });
+
+                  return false;
                 });
             };
           });

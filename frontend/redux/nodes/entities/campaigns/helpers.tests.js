@@ -23,7 +23,7 @@ const campaignWithResults = {
     online: 2,
   },
 };
-const { destroyFunc, updateFunc } = helpers;
+const { destroyFunc, update } = helpers;
 const resultSocketData = {
   type: 'result',
   data: {
@@ -55,9 +55,9 @@ describe('campaign entity - helpers', () => {
     });
   });
 
-  describe('#updateFunc', () => {
+  describe('#update', () => {
     it('appends query results to the campaign when the campaign has query results', (done) => {
-      updateFunc(campaignWithResults, resultSocketData)
+      update(campaignWithResults, resultSocketData)
         .then((response) => {
           expect(response.query_results).toEqual([
             ...campaignWithResults.query_results,
@@ -71,7 +71,7 @@ describe('campaign entity - helpers', () => {
     });
 
     it('adds query results to the campaign when the campaign does not have query results', (done) => {
-      updateFunc(campaign, resultSocketData)
+      update(campaign, resultSocketData)
         .then((response) => {
           expect(response.query_results).toEqual([
             { hostname: host.hostname, feature: 'product_name', value: 'Intel Core' },
@@ -84,7 +84,7 @@ describe('campaign entity - helpers', () => {
     });
 
     it('updates totals on the campaign when the campaign has totals', (done) => {
-      updateFunc(campaignWithResults, totalsSocketData)
+      update(campaignWithResults, totalsSocketData)
         .then((response) => {
           expect(response.totals).toEqual(totalsSocketData.data);
           done();
@@ -93,7 +93,7 @@ describe('campaign entity - helpers', () => {
     });
 
     it('adds totals to the campaign when the campaign does not have totals', (done) => {
-      updateFunc(campaign, totalsSocketData)
+      update(campaign, totalsSocketData)
         .then((response) => {
           expect(response.totals).toEqual(totalsSocketData.data);
           done();

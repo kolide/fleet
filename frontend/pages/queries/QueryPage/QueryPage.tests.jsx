@@ -129,11 +129,11 @@ describe('QueryPage - component', () => {
       const Page = mount(<QueryPage dispatch={noop} selectedOsqueryTable={defaultSelectedOsqueryTable} />);
       const filename = 'query_results.csv';
       const fileStub = new global.window.File([queryResultsCSV], filename, { type: 'text/csv' });
+
+      Page.setState({ campaign });
+      Page.node.socket = {};
+
       const QueryResultsTable = Page.find('QueryResultsTable');
-
-      page.setState({ campaign });
-      page.node.socket = {};
-
 
       QueryResultsTable.find('Button').simulate('click');
 

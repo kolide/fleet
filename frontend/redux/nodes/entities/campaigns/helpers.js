@@ -3,7 +3,7 @@ export const destroyFunc = (campaign) => {
 };
 
 export const update = (campaign, socketData) => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const { type, data } = socketData;
 
     if (type === 'totals') {
