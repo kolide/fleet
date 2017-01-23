@@ -39,6 +39,7 @@ CREATE TABLE `app_configs` (
   `smtp_password` varchar(255) NOT NULL DEFAULT '',
   `smtp_verify_ssl_certs` tinyint(1) NOT NULL DEFAULT '1',
   `smtp_enable_start_tls` tinyint(1) NOT NULL DEFAULT '1',
+  `osquery_enroll_secret` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -49,7 +50,7 @@ CREATE TABLE `app_configs` (
 
 LOCK TABLES `app_configs` WRITE;
 /*!40000 ALTER TABLE `app_configs` DISABLE KEYS */;
-INSERT INTO `app_configs` VALUES (1,'Kolide','https://www.kolide.co/assets/kolide-nav-logo.svg','https://demo.kolide.kolide.net',0,'','',587,0,1,0,'','','',1,1);
+INSERT INTO `app_configs` VALUES (1,'Kolide','https://www.kolide.co/assets/kolide-nav-logo.svg','https://demo.kolide.kolide.net',0,'','',587,0,1,0,'','','',1,1,'');
 /*!40000 ALTER TABLE `app_configs` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -413,7 +414,7 @@ CREATE TABLE `migration_status_tables` (
   `tstamp` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -449,6 +450,8 @@ INSERT INTO `migration_status_tables` VALUES (24,20170109130438,1,'2017-01-20 08
 INSERT INTO `migration_status_tables` VALUES (25,20170110202752,1,'2017-01-20 08:04:28');
 INSERT INTO `migration_status_tables` VALUES (26,20170111133013,1,'2017-01-20 08:04:28');
 INSERT INTO `migration_status_tables` VALUES (27,20170117025759,1,'2017-01-20 08:04:28');
+INSERT INTO `migration_status_tables` VALUES (28,20170118191001,1,'2017-01-23 17:11:38');
+INSERT INTO `migration_status_tables` VALUES (29,20170119234632,1,'2017-01-23 17:11:38');
 /*!40000 ALTER TABLE `migration_status_tables` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -695,7 +698,7 @@ CREATE TABLE `queries` (
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
   `saved` tinyint(1) NOT NULL DEFAULT '0',
   `name` varchar(255) NOT NULL,
-  `description` varchar(255) DEFAULT NULL,
+  `description` text NOT NULL,
   `query` text NOT NULL,
   `author_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
