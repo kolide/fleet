@@ -125,10 +125,10 @@ func (svc service) StreamCampaignResults(ctx context.Context, conn *websocket.Co
 	lastStatus := status.Status
 
 	// to improve performance of the frontend rendering the results table, we
-	// add the "hostname" field to every row.
+	// add the "host_hostname" field to every row.
 	mapHostnameRows := func(hostname string, rows []map[string]string) {
 		for _, row := range rows {
-			row["hostname"] = hostname
+			row["host_hostname"] = hostname
 		}
 	}
 
