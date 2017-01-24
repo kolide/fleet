@@ -3,6 +3,7 @@ import classnames from 'classnames';
 import { connect } from 'react-redux';
 import FileSaver from 'file-saver';
 import { filter, includes, isArray, isEqual, size } from 'lodash';
+import moment from 'moment';
 import { push } from 'react-router-redux';
 
 import Kolide from 'kolide';
@@ -69,6 +70,14 @@ export class QueryPage extends Component {
     return false;
   }
 
+  onChangeQueryFormField = (fieldName, value) => {
+    if (fieldName === 'name') {
+      this.queryName = value;
+    }
+
+    return false;
+  }
+
   onExportQueryResults = (evt) => {
     evt.preventDefault();
 
@@ -77,7 +86,8 @@ export class QueryPage extends Component {
 
     if (queryResults) {
       const results = convertToCSV(queryResults);
-      const filename = 'query_results.csv';
+      const formattedTime = moment(new Date()).format('mm-DD-YY hh:mm:ss');
+      const filename = this.queryName ?  `${this.queryName} ${formattedTime}.csv` : `Query Results ${formattedTime}.csv`;
       const file = new global.window.File([results], filename, { type: 'text/csv' });
 
       FileSaver.saveAs(file);
@@ -278,6 +288,7 @@ export class QueryPage extends Component {
 
   render () {
     const {
+      onChangeQueryFormField,
       onFetchTargets,
       onOsqueryTableSelect,
       onRunQuery,
@@ -303,6 +314,7 @@ export class QueryPage extends Component {
             <QueryForm
               formData={query}
               handleSubmit={onSaveQueryFormSubmit}
+              onChangeFunc={onChangeQueryFormField}
               onFetchTargets={onFetchTargets}
               onOsqueryTableSelect={onOsqueryTableSelect}
               onRunQuery={onRunQuery}
