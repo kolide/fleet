@@ -49,6 +49,8 @@ export class QueryPage extends Component {
       targetsCount: 0,
       targetsError: null,
     };
+
+    this.csvQueryName = 'Query Results';
   }
 
   componentWillMount () {
@@ -72,7 +74,7 @@ export class QueryPage extends Component {
 
   onChangeQueryFormField = (fieldName, value) => {
     if (fieldName === 'name') {
-      this.queryName = value;
+      this.csvQueryName = value;
     }
 
     return false;
@@ -85,10 +87,16 @@ export class QueryPage extends Component {
     const { query_results: queryResults } = campaign;
 
     if (queryResults) {
-      const results = convertToCSV(queryResults);
-      const formattedTime = moment(new Date()).format('mm-DD-YY hh:mm:ss');
-      const filename = this.queryName ?  `${this.queryName} ${formattedTime}.csv` : `Query Results ${formattedTime}.csv`;
-      const file = new global.window.File([results], filename, { type: 'text/csv' });
+      const csv = convertToCSV(queryResults, (fields) => {
+        const result = filter(fields, f => f !== 'host_hostname');
+
+        result.unshift('host_hostname');
+
+        return result;
+      });
+      const formattedTime = moment(new Date()).format('MM-DD-YY hh-mm-ss');
+      const filename = `${this.csvQueryName} (${formattedTime}).csv`;
+      const file = new global.window.File([csv], filename, { type: 'text/csv' });
 
       FileSaver.saveAs(file);
     }
