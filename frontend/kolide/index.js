@@ -63,7 +63,8 @@ class Kolide extends Base {
     getCounts: () => {
       const { STATUS_LABEL_COUNTS } = endpoints;
 
-      return this.authenticatedGet(this.endpoint(STATUS_LABEL_COUNTS));
+      return this.authenticatedGet(this.endpoint(STATUS_LABEL_COUNTS))
+        .catch(() => false);
     },
   }
 
