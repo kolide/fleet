@@ -46,7 +46,7 @@ class QueryResultsTable extends Component {
   }
 
   renderProgressDetails = () => {
-    const { campaign, onExportQueryResults } = this.props;
+    const { campaign } = this.props;
     const totalHostsCount = get(campaign, 'totals.count', 0);
     const totalHostsReturned = get(campaign, 'hosts.length', 0);
     const totalRowsCount = get(campaign, 'query_results.length', 0);
@@ -59,9 +59,6 @@ class QueryResultsTable extends Component {
           <b>{totalRowsCount} Records</b>
         </span>
         <ProgressBar max={totalHostsCount} value={totalHostsReturned} />
-        <Button variant="brand" onClick={onExportQueryResults}>
-          Export
-        </Button>
       </div>
     );
   }
@@ -122,7 +119,7 @@ class QueryResultsTable extends Component {
   }
 
   render () {
-    const { campaign } = this.props;
+    const { campaign, onExportQueryResults } = this.props;
     const {
       renderProgressDetails,
       renderTableHeaderRow,
@@ -136,6 +133,13 @@ class QueryResultsTable extends Component {
 
     return (
       <div className={baseClass}>
+        <Button
+          className={`${baseClass}__export-btn`}
+          onClick={onExportQueryResults}
+          variant="brand"
+        >
+          Export
+        </Button>
         {renderProgressDetails()}
         <div className={`${baseClass}__table-wrapper`}>
           <table className={`${baseClass}__table`}>
