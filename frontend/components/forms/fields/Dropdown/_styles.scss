@@ -165,6 +165,21 @@
   }
 
   &.Select--multi {
+    .Select-control {
+      @include display(flex);
+      @include align-items(center);
+      height: auto;
+      min-height: 40px;
+    }
+
+    .Select-multi-value-wrapper {
+      @include flex-grow(1);
+    }
+
+    .Select-arrow-zone {
+      display: block;
+    }
+
     .Select-option {
       &.is-disabled {
         color: $text-dark;
@@ -183,6 +198,12 @@
 
     .Select-value-label {
       padding: 0 0 0 1rem;
+    }
+
+    &.has-value {
+      .Select-multi-value-wrapper {
+        padding: 5px 0;
+      }
     }
   }
 }
