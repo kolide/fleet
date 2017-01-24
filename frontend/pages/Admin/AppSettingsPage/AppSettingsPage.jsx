@@ -11,8 +11,6 @@ import { updateConfig } from 'redux/nodes/app/actions';
 
 export const baseClass = 'app-settings';
 
-const FAKE_PASSWORD = '********';
-
 class AppSettingsPage extends Component {
   static propTypes = {
     appConfig: configInterface,
@@ -84,13 +82,6 @@ class AppSettingsPage extends Component {
 
 const mapStateToProps = ({ app }) => {
   const { config: appConfig, error } = app;
-
-  if (appConfig.password === FAKE_PASSWORD) {
-    return {
-      appConfig: { ...appConfig, password: '' },
-      error,
-    };
-  }
 
   return { appConfig, error };
 };
