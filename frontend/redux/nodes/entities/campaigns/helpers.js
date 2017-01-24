@@ -17,9 +17,6 @@ export const update = (campaign, socketData) => {
       const queryResults = campaign.query_results || [];
       const hosts = campaign.hosts || [];
       const { host, rows } = data;
-      const newQueryResults = rows.map((row) => {
-        return { ...row, hostname: host.hostname };
-      });
 
       return resolve({
         ...campaign,
@@ -29,7 +26,7 @@ export const update = (campaign, socketData) => {
         ],
         query_results: [
           ...queryResults,
-          ...newQueryResults,
+          ...rows,
         ],
       });
     }

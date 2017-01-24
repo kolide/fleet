@@ -61,8 +61,8 @@ describe('campaign entity - helpers', () => {
         .then((response) => {
           expect(response.query_results).toEqual([
             ...campaignWithResults.query_results,
-            { hostname: host.hostname, feature: 'product_name', value: 'Intel Core' },
-            { hostname: host.hostname, feature: 'family', value: '0600' },
+            { feature: 'product_name', value: 'Intel Core' },
+            { feature: 'family', value: '0600' },
           ]);
           expect(response.hosts).toInclude(host);
           done();
@@ -74,8 +74,8 @@ describe('campaign entity - helpers', () => {
       update(campaign, resultSocketData)
         .then((response) => {
           expect(response.query_results).toEqual([
-            { hostname: host.hostname, feature: 'product_name', value: 'Intel Core' },
-            { hostname: host.hostname, feature: 'family', value: '0600' },
+            { feature: 'product_name', value: 'Intel Core' },
+            { feature: 'family', value: '0600' },
           ]);
           expect(response.hosts).toInclude(host);
           done();
