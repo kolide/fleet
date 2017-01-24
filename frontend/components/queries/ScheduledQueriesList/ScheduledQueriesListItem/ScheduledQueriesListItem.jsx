@@ -46,7 +46,7 @@ class ScheduledQueriesListItem extends Component {
     const { scheduledQuery: { platform } } = this.props;
     const platformArr = platform.split(',');
 
-    if (platformArr.includes('') || platformArr.includes('all')) {
+    if (platformArr.includes('all')) {
       return <PlatformIcon name="" />;
     }
 
