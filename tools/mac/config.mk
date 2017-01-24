@@ -9,7 +9,7 @@ define KOLIDE_TLS_CERTIFICATE
 CHANGEME
 endef
 
-# Osquery flag file. No need to modify
+# Osquery flag file. No need to modify.
 define KOLIDE_FLAGS
 --force=true
 --host_identifier=hostname
