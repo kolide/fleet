@@ -80,7 +80,10 @@ export class ManageHostsPage extends Component {
 
   componentDidMount () {
     const { dispatch } = this.props;
-    const getLabels = () => dispatch(labelActions.loadAll());
+    const getLabels = () => {
+      dispatch(labelActions.loadAll());
+      dispatch(getStatusLabelCounts);
+    };
 
     this.interval = global.window.setInterval(getLabels, 5000);
 
