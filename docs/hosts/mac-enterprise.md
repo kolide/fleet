@@ -14,15 +14,14 @@ Next, you'll have to edit the `config.mk` file. You'll find all the necessary in
 
  - Set the `KOLIDE_HOSTNAME` variable to the FQDN of your kolide server.
  - Set the `ENROLL_SECRET` variable to the enroll secret you got from kolide.
- - Paste the contents of the kolide TLS certificate after the 
+ - Paste the contents of the kolide TLS certificate after the following line:
       ```
       define KOLIDE_TLS_CERTIFICATE
       ``` 
-      line.
 
 Note that osqueryd requires a full certificate chain, even for certificates which might be trusted by your keychain. The "Fetch Kolide Certificate" button in the Add New Host screen will attempt to fetch the full chain for you. 
 
 Once you've configured the `config.mk` file with the corect variables, you can run `make` in the `tools/mac` directory. Running `make` will create a new `kolide-enroll.pkg` file which you can import into your software repository and deploy to your macs. 
 
-The enrollment package must installed after the osqueryd package, and will require a restart -- it will install a LaunchDaemon to keep osqueryd running.  
+The enrollment package must installed after the osqueryd package, and will install a LaunchDaemon to keep the osqueryd process running.
 
