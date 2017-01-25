@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import classnames from 'classnames';
-import { includes, orderBy, size } from 'lodash';
+import { includes, sortBy, size } from 'lodash';
 
 import queryInterface from 'interfaces/query';
 import Checkbox from 'components/forms/fields/Checkbox';
@@ -101,7 +101,7 @@ class QueriesList extends Component {
           </thead>
           <tbody>
             {renderHelpText()}
-            {!!queries.length && orderBy(queries, ['name']).map((query) => {
+            {!!queries.length && sortBy(queries, ['name']).map((query) => {
               return (
                 <QueriesListRow
                   checked={this.isChecked(query)}
