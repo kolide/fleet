@@ -8,18 +8,25 @@ export const copyText = (elementSelector) => {
   const { document } = global;
 
   const element = document.querySelector(elementSelector);
-  element.querySelector('input').type = 'text';
+  const input = element.querySelector('input');
+  input.type = 'text';
+  input.disabled = false;
 
-  select(element);
+  console.log(input);
+
+  select(input);
 
   const canCopy = document.queryCommandEnabled('copy');
+
+  console.log(canCopy);
 
   if (!canCopy) {
     return false;
   }
 
   document.execCommand('copy');
-  element.querySelector('input').type = 'password';
+  input.type = 'password';
+  input.disabled = true;
   removeSelectedText();
   return true;
 };
