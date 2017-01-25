@@ -25,7 +25,7 @@ You can specify the path to this certificate with the `--tls_server_certs` flag 
 
 ## Launching osqueryd
 
-Assuming that you arere deploying your enrollment secret as the environment variable `OSQUERY_ENROLL_SECRET` and your osquery server certificate is at `/etc/osquery/kolide.crt`, you could copy and paste the following command with the following flags (be sure to replace acme.kolide.co with the hostname for your Kolide installation):
+Assuming that you are deploying your enrollment secret as the environment variable `OSQUERY_ENROLL_SECRET` and your osquery server certificate is at `/etc/osquery/kolide.crt`, you could copy and paste the following command with the following flags (be sure to replace acme.kolide.co with the hostname for your Kolide installation):
 
 ```
 osqueryd
@@ -52,10 +52,10 @@ If your osquery server certificate is deployed to a path that is not `/etc/osque
 
 ### Using a flag file to manage flags
 
-For your convenience, osqueryd supports putting all of your flags into a single file. This file is commonly deployed to `/etc/osquery/osquery.flags`. If you've deployed the appropriate osquery flags to that path, you could simply launch osquery via:
+For your convenience, osqueryd supports putting all of your flags into a single file. We suggest deploying this file to `/etc/osquery/kolide.flags`. If you've deployed the appropriate osquery flags to that path, you could simply launch osquery via:
 
 ```
-osqueryd --flagfile=/etc/osquery/osquery.flags
+osqueryd --flagfile=/etc/osquery/kolide.flags
 ```
 
 ## Configuration Management
