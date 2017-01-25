@@ -12,13 +12,9 @@ export const copyText = (elementSelector) => {
   input.type = 'text';
   input.disabled = false;
 
-  console.log(input);
-
   select(input);
 
   const canCopy = document.queryCommandEnabled('copy');
-
-  console.log(canCopy);
 
   if (!canCopy) {
     return false;
