@@ -88,7 +88,7 @@ class AddHostModal extends Component {
                   inputWrapperClass={`${baseClass}__secret-input`}
                   name="osqueryd-secret"
                   type={revealSecret ? 'text' : 'password'}
-                  value={osqueryEnrollSecret || "something temporary"}
+                  value={osqueryEnrollSecret}
                 />
                 <Button variant="unstyled" className={`${baseClass}__secret-copy-icon`} onClick={onCopySecret(`.${baseClass}__secret-input`)}>
                   <Icon name="clipboard" />
