@@ -17,6 +17,7 @@ type Datastore interface {
 	DecoratorStore
 	FileIntegrityMonitoringStore
 	YARAStore
+	EmailChangesStore
 	Name() string
 	Drop() error
 	// MigrateTables creates and migrates the table schemas

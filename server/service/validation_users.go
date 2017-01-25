@@ -83,6 +83,9 @@ func (mw validationMiddleware) ModifyUser(ctx context.Context, userID uint, p ko
 		if *p.Email == "" {
 			invalid.Append("email", "cannot be empty")
 		}
+		if p.Password == nil {
+			invalid.Append("password", "cannot be empty if email is changed")
+		}
 	}
 
 	if invalid.HasErrors() {
