@@ -1,0 +1,37 @@
+{
+    "dependencies": {
+        "github.com/dgrijalva/jwt-go": {
+            "branch": "master"
+        },
+        "github.com/go-kit/kit": {
+            "branch": "master"
+        },
+        "github.com/go-sql-driver/mysql": {
+            "branch": "master"
+        },
+        "github.com/gorilla/mux": {
+            "branch": "master"
+        },
+        "github.com/gorilla/websocket": {
+            "branch": "master"
+        },
+        "github.com/jmoiron/sqlx": {
+            "branch": "master"
+        },
+        "github.com/pkg/errors": {
+            "branch": "master"
+        },
+        "github.com/spf13/cobra": {
+            "branch": "master"
+        },
+        "github.com/stretchr/testify": {
+            "branch": "master"
+        },
+        "golang.org/x/net": {
+            "branch": "master"
+        },
+        "gopkg.in/yaml.v2": {
+            "branch": "v2"
+        }
+    }
+}

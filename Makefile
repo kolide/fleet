@@ -92,15 +92,15 @@ lint-scss:
 	sass-lint --verbose
 
 lint-go:
-	go vet $(shell glide nv)
+	go vet ./server/... ./cli
 
 lint: lint-go lint-js lint-scss lint-ts
 
 test-go:
-	go test $(shell glide nv)
+	go test ./server/... ./cli
 
 analyze-go:
-	go test -race -cover $(shell glide nv)
+	go test -race -cover ./server/... ./cli
 
 
 test-js: export NODE_PATH = ./frontend
@@ -135,9 +135,9 @@ generate-dev: .prefix
 deps:
 	npm install
 	go get github.com/jteeuwen/go-bindata/...
-	go get github.com/Masterminds/glide
+	go get github.com/golang/dep
 	go get github.com/groob/mockimpl
-	glide install
+	dep ensure
 
 distclean:
 ifeq ($(OS), Windows_NT)
