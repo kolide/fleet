@@ -1,4 +1,5 @@
-# Kolide Documentation
+Kolide Documentation
+====================
 
 Welcome to the Kolide documentation.
 
