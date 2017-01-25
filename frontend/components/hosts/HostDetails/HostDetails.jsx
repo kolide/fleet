@@ -54,37 +54,37 @@ const HostDetails = ({ host, onDestroyHost, onQueryHost }) => {
       <p className={`${baseClass}__hostname`}>{hostname}</p>
 
       <ul className={`${baseClass}__details-list`}>
-        {osVersion && <li className={` ${baseClass}__detail ${baseClass}__detail--os`}>
+        {!!osVersion && <li className={` ${baseClass}__detail ${baseClass}__detail--os`}>
           <PlatformIcon name={platform} className={`${baseClass}__icon`} />
           <span className={`${baseClass}__host-content`}>{osVersion}</span>
         </li>}
 
-        {hostCpu && <li className={` ${baseClass}__detail ${baseClass}__detail--cpu`}>
+        {!!hostCpu && <li className={` ${baseClass}__detail ${baseClass}__detail--cpu`}>
           <Icon name="cpu" className={`${baseClass}__icon`} />
           <span className={`${baseClass}__host-content`}>{hostCpu}</span>
         </li>}
 
-        {osqueryVersion && <li className={` ${baseClass}__detail ${baseClass}__detail--osquery`}>
+        {!!osqueryVersion && <li className={` ${baseClass}__detail ${baseClass}__detail--osquery`}>
           <Icon name="osquery" className={`${baseClass}__icon`} />
           <span className={`${baseClass}__host-content`}>{osqueryVersion}</span>
         </li>}
 
-        {memory && <li className={` ${baseClass}__detail ${baseClass}__detail--memory`}>
+        {!!memory && <li className={` ${baseClass}__detail ${baseClass}__detail--memory`}>
           <Icon name="memory" className={`${baseClass}__icon`} />
           <span className={`${baseClass}__host-content`}>{humanMemory(memory)}</span>
         </li>}
 
-        {uptime && <li className={` ${baseClass}__detail ${baseClass}__detail--uptime`}>
+        {!!uptime && <li className={` ${baseClass}__detail ${baseClass}__detail--uptime`}>
           <Icon name="uptime" className={`${baseClass}__icon`} />
           <span className={`${baseClass}__host-content`}>{humanUptime(uptime)}</span>
         </li>}
 
-        {hostMac && <li className={` ${baseClass}__detail ${baseClass}__detail--mac`}>
+        {!!hostMac && <li className={` ${baseClass}__detail ${baseClass}__detail--mac`}>
           <Icon name="mac" className={`${baseClass}__icon`} />
           <span className={`${baseClass}__host-content ${baseClass}__host-content--mono`}>{hostMac}</span>
         </li>}
 
-        {hostIpAddress && <li className={` ${baseClass}__detail ${baseClass}__detail--ip`}>
+        {!!hostIpAddress && <li className={` ${baseClass}__detail ${baseClass}__detail--ip`}>
           <Icon name="world" className={`${baseClass}__icon`} />
           <span className={`${baseClass}__host-content ${baseClass}__host-content--mono`}>{hostIpAddress}</span>
         </li>}
