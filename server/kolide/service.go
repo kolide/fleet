@@ -16,5 +16,4 @@ type Service interface {
 	ScheduledQueryService
 	OptionService
 	ImportConfigService
-	EmailChangeService
 }

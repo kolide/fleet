@@ -23,9 +23,9 @@ func (ds *Datastore) PendingEmailChange(uid uint, newEmail, token string) error 
 	return nil
 }
 
-// CommitEmailChange finds email change record, updates user with new email,
+// ChangeUserEmail finds email change record, updates user with new email,
 // then deletes change record if everything succeeds.
-func (ds *Datastore) CommitEmailChange(token string) (newEmail string, err error) {
+func (ds *Datastore) ChangeUserEmail(token string) (newEmail string, err error) {
 	var (
 		tx      *sqlx.Tx
 		success bool // indicates all db operations success if true

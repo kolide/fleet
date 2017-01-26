@@ -39,17 +39,19 @@ func TestAuthenticatedUser(t *testing.T) {
 }
 
 func TestModifyUserEmail(t *testing.T) {
+	user := &kolide.User{
+		ID:      3,
+		Admin:   false,
+		Email:   "foo@bar.com",
+		Enabled: true,
+	}
+	user.SetPassword("password", 10, 10)
 	ms := new(mock.Store)
 	ms.PendingEmailChangeFunc = func(id uint, em, tk string) error {
 		return nil
 	}
 	ms.UserByIDFunc = func(id uint) (*kolide.User, error) {
-		u := &kolide.User{
-			ID:    id,
-			Email: "foo@bar.com",
-		}
-		u.SetPassword("password", 10, 10)
-		return u, nil
+		return user, nil
 	}
 	ms.AppConfigFunc = func() (*kolide.AppConfig, error) {
 		config := &kolide.AppConfig{
@@ -63,6 +65,7 @@ func TestModifyUserEmail(t *testing.T) {
 	}
 	svc, err := newTestService(ms, nil)
 	ctx := context.Background()
+	ctx = viewer.NewContext(ctx, viewer.Viewer{User: user})
 	payload := kolide.UserPayload{
 		Email:    stringPtr("zip@zap.com"),
 		Password: stringPtr("password"),

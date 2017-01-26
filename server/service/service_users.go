@@ -97,8 +97,8 @@ func (svc service) ModifyUser(ctx context.Context, userID uint, p kolide.UserPay
 		user.Name = *p.Name
 	}
 
-	if p.Email != nil && p.Password != nil {
-		err = svc.modifyEmailAddress(ctx, user, *p.Email, *p.Password)
+	if p.Email != nil {
+		err = svc.modifyEmailAddress(ctx, user, *p.Email, p.Password)
 		if err != nil {
 			return nil, err
 		}
@@ -121,10 +121,13 @@ func (svc service) ModifyUser(ctx context.Context, userID uint, p kolide.UserPay
 	return user, nil
 }
 
-func (svc service) modifyEmailAddress(ctx context.Context, user *kolide.User, email, password string) error {
-	err := user.ValidatePassword(password)
-	if err != nil {
-		return permissionError{}
+func (svc service) modifyEmailAddress(ctx context.Context, user *kolide.User, email string, password *string) error {
+	// password requirement handled in validation middleware
+	if password != nil {
+		err := user.ValidatePassword(*password)
+		if err != nil {
+			return permissionError{message: "incorrect password"}
+		}
 	}
 	random, err := kolide.RandomText(svc.config.App.TokenKeySize)
 	if err != nil {
@@ -153,6 +156,10 @@ func (svc service) modifyEmailAddress(ctx context.Context, user *kolide.User, em
 		return err
 	}
 	return nil
+}
+
+func (svc service) CommitEmailChange(ctx context.Context, token string) (string, error) {
+	return svc.ds.ChangeUserEmail(token)
 }
 
 func (svc service) User(ctx context.Context, id uint) (*kolide.User, error) {

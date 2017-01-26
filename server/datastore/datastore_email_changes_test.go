@@ -1,7 +1,6 @@
 package datastore
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/kolide/kolide-ose/server/kolide"
@@ -11,8 +10,7 @@ import (
 
 func testChangeEmail(t *testing.T, ds kolide.Datastore) {
 	if ds.Name() == "inmem" {
-		fmt.Println("inmem is being deprecated, test skipped")
-		return
+		t.Skip("inmem is being deprecated, test skipped")
 	}
 	user := &kolide.User{
 		Username: "bob",
@@ -23,13 +21,13 @@ func testChangeEmail(t *testing.T, ds kolide.Datastore) {
 	require.Nil(t, err)
 	err = ds.PendingEmailChange(user.ID, "xxxx@yyy.com", "abcd12345")
 	require.Nil(t, err)
-	newMail, err := ds.CommitEmailChange("abcd12345")
+	newMail, err := ds.ChangeUserEmail("abcd12345")
 	require.Nil(t, err)
 	assert.Equal(t, "xxxx@yyy.com", newMail)
 	user, err = ds.UserByID(user.ID)
 	require.Nil(t, err)
 	assert.Equal(t, "xxxx@yyy.com", user.Email)
 	// this should fail because it doesn't exist
-	newMail, err = ds.CommitEmailChange("abcd12345")
+	newMail, err = ds.ChangeUserEmail("abcd12345")
 	assert.NotNil(t, err)
 }
