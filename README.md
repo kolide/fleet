@@ -2,4 +2,4 @@
 
 Documentation can be found in the [docs](./docs/README.md) subdirectory of this repository.
 
-![Kolide](./assets/images/rube.png)
+[![Kolide](./assets/images/rube.png)](https://kolide.co)
