@@ -6,7 +6,7 @@ import { orderBy, sortBy } from 'lodash';
 import { push } from 'react-router-redux';
 
 import entityGetter from 'redux/utilities/entityGetter';
-import { getStatusLabelCounts, setDisplay } from 'redux/nodes/components/ManageHostsPage/actions';
+import { getStatusLabelCounts, setDisplay, silentGetStatusLabelCounts } from 'redux/nodes/components/ManageHostsPage/actions';
 import helpers from 'pages/hosts/ManageHostsPage/helpers';
 import hostActions from 'redux/nodes/entities/hosts/actions';
 import labelActions from 'redux/nodes/entities/labels/actions';
@@ -81,8 +81,8 @@ export class ManageHostsPage extends Component {
   componentDidMount () {
     const { dispatch } = this.props;
     const getLabels = () => {
-      dispatch(labelActions.loadAll());
-      dispatch(getStatusLabelCounts);
+      dispatch(labelActions.silentLoadAll());
+      dispatch(silentGetStatusLabelCounts);
     };
 
     this.interval = global.window.setInterval(getLabels, 5000);
