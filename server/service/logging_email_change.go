@@ -6,7 +6,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-func (mw loggingMiddleware) CommitEmailChange(ctx context.Context, token string) (string, error) {
+func (mw loggingMiddleware) ChangeUserEmail(ctx context.Context, token string) (string, error) {
 	var (
 		err     error
 		newMail string
@@ -19,6 +19,6 @@ func (mw loggingMiddleware) CommitEmailChange(ctx context.Context, token string)
 			"took", time.Since(begin),
 		)
 	}(time.Now())
-	newMail, err = mw.Service.CommitEmailChange(ctx, token)
+	newMail, err = mw.Service.ChangeUserEmail(ctx, token)
 	return newMail, err
 }

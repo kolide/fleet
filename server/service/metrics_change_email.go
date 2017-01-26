@@ -7,7 +7,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-func (mw metricsMiddleware) CommitEmailChange(ctx context.Context, token string) (string, error) {
+func (mw metricsMiddleware) ChangeUserEmail(ctx context.Context, token string) (string, error) {
 	var (
 		err      error
 		newEmail string
@@ -17,6 +17,6 @@ func (mw metricsMiddleware) CommitEmailChange(ctx context.Context, token string)
 		mw.requestCount.With(lvs...).Add(1)
 		mw.requestLatency.With(lvs...).Observe(time.Since(begin).Seconds())
 	}(time.Now())
-	newEmail, err = mw.Service.CommitEmailChange(ctx, token)
+	newEmail, err = mw.Service.ChangeUserEmail(ctx, token)
 	return newEmail, err
 }

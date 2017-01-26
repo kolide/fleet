@@ -20,7 +20,7 @@ func (r changeEmailResponse) error() error { return r.Err }
 func makeChangeEmailEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(changeEmailRequest)
-		newEmailAddress, err := svc.CommitEmailChange(ctx, req.Token)
+		newEmailAddress, err := svc.ChangeUserEmail(ctx, req.Token)
 		if err != nil {
 			return changeEmailResponse{Err: err}, nil
 		}

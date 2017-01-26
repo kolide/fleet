@@ -158,7 +158,7 @@ func (svc service) modifyEmailAddress(ctx context.Context, user *kolide.User, em
 	return nil
 }
 
-func (svc service) CommitEmailChange(ctx context.Context, token string) (string, error) {
+func (svc service) ChangeUserEmail(ctx context.Context, token string) (string, error) {
 	return svc.ds.ChangeUserEmail(token)
 }
 

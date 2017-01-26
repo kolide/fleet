@@ -80,9 +80,9 @@ type UserService interface {
 	// ChangeUserEnabled is used to enable/disable the user identified by id.
 	ChangeUserEnabled(ctx context.Context, id uint, isEnabled bool) (*User, error)
 
-	// CommitEmailChange is used to confirm new email address and if confirmed,
+	// ChangeUserEmail is used to confirm new email address and if confirmed,
 	// write the new email address to user.
-	CommitEmailChange(ctx context.Context, token string) (string, error)
+	ChangeUserEmail(ctx context.Context, token string) (string, error)
 }
 
 // User is the model struct which represents a kolide user
