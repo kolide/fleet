@@ -46,6 +46,8 @@ export class ManageHostsPage extends Component {
       base: PropTypes.string,
     }),
     labels: PropTypes.arrayOf(labelInterface),
+    loadingHosts: PropTypes.bool.isRequired,
+    loadingLabels: PropTypes.bool.isRequired,
     osqueryEnrollSecret: PropTypes.string,
     selectedLabel: labelInterface,
     selectedOsqueryTable: osqueryTableInterface,
@@ -573,7 +575,11 @@ export class ManageHostsPage extends Component {
 
   render () {
     const { renderForm, renderHeader, renderHosts, renderSidePanel, renderAddHostModal, renderDeleteHostModal, renderDeleteLabelModal } = this;
-    const { display, isAddLabel } = this.props;
+    const { display, isAddLabel, loadingHosts, loadingLabels } = this.props;
+
+    if (loadingHosts || loadingLabels) {
+      return false;
+    }
 
     return (
       <div className="has-sidebar">
@@ -608,7 +614,8 @@ const mapStateToProps = (state, { location, params }) => {
     { ignoreCase: true },
   );
   const { selectedOsqueryTable } = state.components.QueryPages;
-  const labelErrors = state.entities.labels.errors;
+  const { errors: labelErrors, loading: loadingLabels } = state.entities.labels;
+  const { loading: loadingHosts } = state.entities.hosts;
   const { osquery_enroll_secret: osqueryEnrollSecret } = state.app.config;
 
   return {
@@ -617,6 +624,8 @@ const mapStateToProps = (state, { location, params }) => {
     isAddLabel,
     labelErrors,
     labels,
+    loadingHosts,
+    loadingLabels,
     osqueryEnrollSecret,
     selectedLabel,
     selectedOsqueryTable,
