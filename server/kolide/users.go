@@ -22,10 +22,10 @@ type UserStore interface {
 	// PendingEmailChange creates a record with a pending email change for a user identified
 	// by uid. The change record is keyed by a unique token. The token is emailed to the user
 	// with a link that they can use to confirm the change.
-	PendingEmailChange(uid uint, newEmail, token string) error
-	// ChangeUserEmail will confirm new email address identified by token is valid.
+	PendingEmailChange(userID uint, newEmail, token string) error
+	// ConfirmPendingEmailChange will confirm new email address identified by token is valid.
 	// The new email will be written to user record.
-	ChangeUserEmail(token string) (string, error)
+	ConfirmPendingEmailChange(token string) (string, error)
 }
 
 // UserService contains methods for managing a Kolide User.

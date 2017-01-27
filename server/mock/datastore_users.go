@@ -83,7 +83,7 @@ func (s *UserStore) PendingEmailChange(uid uint, newEmail string, token string) 
 	return s.PendingEmailChangeFunc(uid, newEmail, token)
 }
 
-func (s *UserStore) ChangeUserEmail(token string) (string, error) {
+func (s *UserStore) ConfirmPendingEmailChange(token string) (string, error) {
 	s.ChangeUserEmailFuncInvoked = true
 	return s.ChangeUserEmailFunc(token)
 }
