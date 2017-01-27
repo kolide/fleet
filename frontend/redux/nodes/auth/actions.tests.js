@@ -62,6 +62,7 @@ describe('Auth - actions', () => {
         },
       ];
       const errorResponse = {
+        status: 422,
         message: {
           message: 'Unable to perform reset',
           errors,
@@ -96,7 +97,7 @@ describe('Auth - actions', () => {
           { type: PERFORM_REQUIRED_PASSWORD_RESET_REQUEST },
           {
             type: PERFORM_REQUIRED_PASSWORD_RESET_FAILURE,
-            payload: { errors: { base: 'Unable to reset password' } },
+            payload: { errors: { base: 'Unable to reset password', http_status: 422 } },
           },
         ];
 
