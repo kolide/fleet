@@ -120,6 +120,20 @@ class Kolide extends Base {
     },
   }
 
+  license = {
+    create: (jwtToken) => {
+      const { LICENSE } = endpoints;
+
+      return this.authenticatedPost(this.endpoint(LICENSE), JSON.stringify({ license: jwtToken }));
+    },
+
+    load: () => {
+      const { LICENSE } = endpoints;
+
+      return this.authenticatedGet(this.endpoint(LICENSE));
+    },
+  }
+
   queries = {
     run: ({ query, selected }) => {
       const { RUN_QUERY } = endpoints;

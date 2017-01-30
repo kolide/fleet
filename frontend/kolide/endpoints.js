@@ -12,6 +12,7 @@ export default {
   LABEL_HOSTS: (id) => {
     return `/v1/kolide/labels/${id}/hosts`;
   },
+  LICENSE: '/v1/kolide/license',
   LOGIN: '/v1/kolide/login',
   LOGOUT: '/v1/kolide/logout',
   ME: '/v1/kolide/me',
