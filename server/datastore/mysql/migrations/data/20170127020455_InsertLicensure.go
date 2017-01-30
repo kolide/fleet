@@ -11,7 +11,7 @@ func init() {
 }
 
 func Up_20170127020455(tx *sql.Tx) error {
-	_, err := tx.Exec(`INSERT INTO licensure (id, public_key) VALUES(1, ?);`, appstate.PublicKey)
+	_, err := tx.Exec(`INSERT INTO licensure (id, public_key) VALUES(1, ?);`, appstate.LicensingPublicKey)
 	if err != nil {
 		return err
 	}

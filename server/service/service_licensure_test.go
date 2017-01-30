@@ -8,6 +8,7 @@ import (
 	"github.com/kolide/kolide-ose/server/mock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/net/context"
 )
 
 func TestLicenseService(t *testing.T) {
@@ -42,7 +43,8 @@ func TestLicenseService(t *testing.T) {
 
 	svc, err := newTestService(ds, nil)
 	require.Nil(t, err)
-	claims, err := svc.LicenseClaims()
+	ctx := context.Background()
+	claims, err := svc.LicenseClaims(ctx)
 	require.Nil(t, err)
 	require.NotNil(t, claims)
 	assert.True(t, claims.Licensed)

@@ -1,6 +1,6 @@
 package appstate
 
-var PublicKey = "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AM" +
+var LicensingPublicKey = "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AM" +
 	"IIBCgKCAQEA0ZhY7r6HmifXPtServt4\nD3MSi8Awe9u132vLf8yzlknvnq+8CSnOPSSbC" +
 	"D+HajvZ6dnNJXjdcAhuZ32ShrH8\nrEQACEUS8Mh4z8Mo5Nlq1ou0s2JzWCx049kA34jP" +
 	"3u6AiPgpWUf8JRGstTlisxMn\nH6B7miDs1038gVbN5rk+j+3ALYzllaTnCX3Y0C7f6IW7B" +
