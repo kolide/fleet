@@ -122,15 +122,36 @@ class Kolide extends Base {
 
   license = {
     create: (jwtToken) => {
-      const { LICENSE } = endpoints;
+      // const { LICENSE } = endpoints;
+      const fakeExpiryDate = new Date();
 
-      return this.authenticatedPost(this.endpoint(LICENSE), JSON.stringify({ license: jwtToken }));
+      const fakeLicense = {
+        license: jwtToken,
+        expiry: fakeExpiryDate.toISOString(),
+        allowed_hosts: 100,
+        hosts: 70,
+        evaluation: true,
+      };
+
+      return Promise.resolve(fakeLicense);
+      // return this.authenticatedPost(this.endpoint(LICENSE), JSON.stringify({ license: jwtToken }));
     },
 
     load: () => {
-      const { LICENSE } = endpoints;
+      // const { LICENSE } = endpoints;
+      const fakeExpiryDate = new Date();
+      const fakeJwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ';
 
-      return this.authenticatedGet(this.endpoint(LICENSE));
+      const fakeLicense = {
+        license: fakeJwtToken,
+        expiry: fakeExpiryDate.toISOString(),
+        allowed_hosts: 100,
+        hosts: 70,
+        evaluation: true,
+      };
+
+      return Promise.resolve(fakeLicense);
+      // return this.authenticatedGet(this.endpoint(LICENSE));
     },
   }
 

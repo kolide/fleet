@@ -44,11 +44,13 @@ export const validCreateLicenseRequest = (bearerToken, jwtToken) => {
   })
     .post('/api/v1/kolide/license', JSON.stringify({ license: jwtToken }))
     .reply(201, {
-      license: jwtToken,
-      expiry: expiryDate.toISOString(),
-      allowed_hosts: 100,
-      hosts: 70,
-      evaluation: true,
+      license: {
+        license: jwtToken,
+        expiry: expiryDate.toISOString(),
+        allowed_hosts: 100,
+        hosts: 70,
+        evaluation: true,
+      },
     });
 };
 
@@ -63,11 +65,13 @@ export const validGetLicenseRequest = (bearerToken) => {
   })
     .get('/api/v1/kolide/license')
     .reply(200, {
-      license: jwtToken,
-      expiry: expiryDate.toISOString(),
-      allowed_hosts: 100,
-      hosts: 70,
-      evaluation: true,
+      license: {
+        license: jwtToken,
+        expiry: expiryDate.toISOString(),
+        allowed_hosts: 100,
+        hosts: 70,
+        evaluation: true,
+      },
     });
 };
 
