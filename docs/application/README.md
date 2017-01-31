@@ -5,7 +5,7 @@ Kolide is an application that allows you to take advantage of the power of osque
 
 ## Using The Kolide application
 
-- For information on running osquery queries on hosts in your infrastructure, you can refer to the [Running Queries](.running-queries.md) page.
+- For information on running osquery queries on hosts in your infrastructure, you can refer to the [Running Queries](./running-queries.md) page.
 - To learn more about scheduling queries for periodic execution on select hosts, managing query packs, etc, you can refer to the [Scheduling Queries](./scheduling-queries.md) page.
 - Kolide also allows you to configure osquery options so that you can endlessly customize your osquery usage. For information on how to customize osquery using Kolide as well as thoughts on what customization you might consider performing, see the [Configuring Osquery Options](./configuring-osquery-options.md) documentation.
 
