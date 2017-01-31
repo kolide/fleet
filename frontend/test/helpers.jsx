@@ -45,7 +45,8 @@ export const itBehavesLikeAFormDropdownElement = (form, inputName) => {
 };
 
 export const itBehavesLikeAFormInputElement = (form, inputName, inputType = 'InputField', inputText = 'some text') => {
-  const inputField = form.find({ name: inputName }).find('input');
+  const Input = form.find({ name: inputName });
+  const inputField = inputType === 'textarea' ? Input.find('textarea') : Input.find('input');
 
   expect(inputField.length).toEqual(1);
 
