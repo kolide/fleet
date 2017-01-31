@@ -51,6 +51,24 @@ export const createLicense = ({ license }) => {
       });
   };
 };
+export const getLicense = () => {
+  return (dispatch) => {
+    dispatch(licenseRequest);
+
+    return Kolide.license.load()
+      .then((license) => {
+        dispatch(licenseSuccess(license));
+
+        return license;
+      })
+      .catch((response) => {
+        const errorsObject = formatErrorResponse(response);
+        dispatch(licenseFailure(errorsObject));
+
+        throw response;
+      });
+  };
+};
 
 export const clearAuthErrors = { type: CLEAR_AUTH_ERRORS };
 export const loginRequest = { type: LOGIN_REQUEST };

@@ -8,6 +8,7 @@ import { userStub } from 'test/stubs';
 
 import {
   createLicense,
+  getLicense,
   LICENSE_FAILURE,
   LICENSE_REQUEST,
   LICENSE_SUCCESS,
@@ -105,6 +106,99 @@ describe('Auth - actions', () => {
         ];
 
         return mockStore.dispatch(createLicense({ license }))
+          .then(() => {
+            expect(mockStore.getActions()).toEqual(expectedActions);
+          })
+          .catch(() => {
+            expect(mockStore.getActions()).toEqual(expectedActions);
+          });
+      });
+    });
+  });
+
+  describe('#getLicense', () => {
+    const license = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ';
+    afterEach(restoreSpies);
+
+    describe('successful request', () => {
+      beforeEach(() => {
+        spyOn(Kolide.default.license, 'load').andReturn(Promise.resolve({ license }));
+      });
+
+      it('calls the API', () => {
+        const mockStore = reduxMockStore(store);
+
+        mockStore.dispatch(getLicense())
+          .then(() => {
+            expect(Kolide.default.license.load).toHaveBeenCalled();
+          })
+          .catch(() => {
+            expect(Kolide.default.license.load).toHaveBeenCalled();
+          });
+      });
+
+      it('dispatches the correct actions', () => {
+        const mockStore = reduxMockStore(store);
+        const expectedActions = [
+          { type: LICENSE_REQUEST },
+          {
+            type: LICENSE_SUCCESS,
+            payload: { license: { license } },
+          },
+        ];
+
+        return mockStore.dispatch(getLicense())
+          .then(() => {
+            expect(mockStore.getActions()).toEqual(expectedActions);
+          })
+          .catch(() => {
+            expect(mockStore.getActions()).toEqual(expectedActions);
+          });
+      });
+    });
+
+    describe('unsuccessful request', () => {
+      const errors = [
+        {
+          name: 'base',
+          reason: 'Unable to get license',
+        },
+      ];
+      const errorResponse = {
+        status: 500,
+        message: {
+          message: 'Unable to get license',
+          errors,
+        },
+      };
+
+      beforeEach(() => {
+        spyOn(Kolide.default.license, 'load').andReturn(Promise.reject(errorResponse));
+      });
+
+      it('calls the API', () => {
+        const mockStore = reduxMockStore(store);
+
+        mockStore.dispatch(getLicense())
+          .then(() => {
+            expect(Kolide.default.license.load).toHaveBeenCalled();
+          })
+          .catch(() => {
+            expect(Kolide.default.license.load).toHaveBeenCalled();
+          });
+      });
+
+      it('dispatches the correct actions', () => {
+        const mockStore = reduxMockStore(store);
+        const expectedActions = [
+          { type: LICENSE_REQUEST },
+          {
+            type: LICENSE_FAILURE,
+            payload: { errors: { base: 'Unable to get license', http_status: 500 } },
+          },
+        ];
+
+        return mockStore.dispatch(getLicense())
           .then(() => {
             expect(mockStore.getActions()).toEqual(expectedActions);
           })
