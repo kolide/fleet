@@ -1,6 +1,7 @@
 package kolide
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -8,11 +9,14 @@ import (
 	"golang.org/x/net/context"
 )
 
-const LicenseTimeLayout = "2006-01-02 15:04:05 MST"
+const (
+	LicenseTimeLayout  = "2006-01-02 15:04:05 MST"
+	LicenseGracePeriod = time.Hour * 24 * 60 // 60 days
+)
 
 type LicenseStore interface {
 	// SaveLicense saves jwt formatted customer license information
-	SaveLicense(tokenString string) error
+	SaveLicense(tokenString string) (*License, error)
 	// License returns a structure with the jwt customer license if it exists.
 	License() (*License, error)
 }
@@ -20,24 +24,27 @@ type LicenseStore interface {
 type LicenseService interface {
 	// LicenseClaims returns details of a customer license that determine authorization
 	// to use the Kolide product.
-	LicenseClaims(ctx context.Context) (*Claims, error)
+	License(ctx context.Context) (*License, error)
+
+	// SaveLicense writes jwt token string to database after performing
+	// validation
+	SaveLicense(ctx context.Context, jwtToken string) (*License, error)
 }
 
 // Contains information needed to extract customer license particulars.
 type License struct {
 	UpdateTimestamp
-	ID          uint
-	TokenString *string `db:"license"`
-	PublicKey   string  `db:"public_key"`
-	Revoked     bool
+	ID        uint
+	Token     *string `db:"license"`
+	PublicKey string  `db:"public_key"`
+	// Revoked if true overrides a license that might otherwise be valid
+	Revoked   bool
+	HostCount uint `db:"-"`
 }
 
 // LicenseClaims contains information about the rights of a customer to
 // use the Kolide product
 type Claims struct {
-	// Licensed indicates whether the application license has been installed. It does
-	// not indicate whether or not the license is valid.
-	Licensed         bool
 	LicenseUUID      string
 	OrganizationName string
 	OrganizationUUID string
@@ -52,11 +59,11 @@ type Claims struct {
 }
 
 // Claims returns information contained in the jwt license token
-func (l License) Claims() (*Claims, error) {
-	if l.TokenString == nil {
-		return &Claims{Licensed: false}, nil
+func (l *License) Claims() (*Claims, error) {
+	if l.Token == nil {
+		return nil, errors.New("license missing")
 	}
-	token, err := jwt.Parse(*l.TokenString, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.Parse(*l.Token, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
@@ -69,19 +76,18 @@ func (l License) Claims() (*Claims, error) {
 	if err != nil {
 		return nil, err
 	}
-	result := &Claims{Licensed: true}
+	var result Claims
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		result.LicenseUUID = claims["license_uuid"].(string)
 		result.OrganizationName = claims["organization_name"].(string)
 		result.OrganizationUUID = claims["organization_uuid"].(string)
 		result.HostLimit = int(claims["host_limit"].(float64))
 		result.Evaluation = claims["evaluation"].(bool)
-		result.Revoked = l.Revoked
 		expiry, err := time.Parse(LicenseTimeLayout, claims["expires_at"].(string))
 		if err != nil {
 			return nil, err
 		}
 		result.ExpiresAt = expiry
 	}
-	return result, nil
+	return &result, nil
 }

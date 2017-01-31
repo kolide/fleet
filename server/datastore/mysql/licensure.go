@@ -5,7 +5,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (ds *Datastore) SaveLicense(jwt string) error {
+func (ds *Datastore) SaveLicense(jwt string) (*kolide.License, error) {
 	sqlStatement := `
     UPDATE licensure SET
       license = ?
@@ -13,9 +13,13 @@ func (ds *Datastore) SaveLicense(jwt string) error {
     `
 	_, err := ds.db.Exec(sqlStatement, jwt)
 	if err != nil {
-		return errors.Wrap(err, "saving license")
+		return nil, errors.Wrap(err, "saving license")
 	}
-	return nil
+	result, err := ds.License()
+	if err != nil {
+		return nil, errors.Wrap(err, "fetching license")
+	}
+	return result, nil
 }
 
 func (ds *Datastore) License() (*kolide.License, error) {
@@ -27,6 +31,15 @@ func (ds *Datastore) License() (*kolide.License, error) {
 	err := ds.db.Get(&license, query)
 	if err != nil {
 		return nil, errors.Wrap(err, "fetching license information")
+	}
+	query = `
+    SELECT count(*)
+      FROM hosts
+      WHERE NOT deleted
+  `
+	err = ds.db.Get(&license.HostCount, query)
+	if err != nil {
+		return nil, errors.Wrap(err, "fetching host count for license")
 	}
 	return &license, nil
 }

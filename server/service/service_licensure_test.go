@@ -27,7 +27,7 @@ func TestLicenseService(t *testing.T) {
 			UpdateTimestamp: kolide.UpdateTimestamp{
 				UpdatedAt: time.Now().Add(-5 * time.Minute),
 			},
-			TokenString: &tokenString,
+			Token: &tokenString,
 			PublicKey: "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AM" +
 				"IIBCgKCAQEA0ZhY7r6HmifXPtServt4\nD3MSi8Awe9u132vLf8yzlknvnq+8CSnOPSSbC" +
 				"D+HajvZ6dnNJXjdcAhuZ32ShrH8\nrEQACEUS8Mh4z8Mo5Nlq1ou0s2JzWCx049kA34jP" +
@@ -44,10 +44,12 @@ func TestLicenseService(t *testing.T) {
 	svc, err := newTestService(ds, nil)
 	require.Nil(t, err)
 	ctx := context.Background()
-	claims, err := svc.LicenseClaims(ctx)
+	lic, err := svc.License(ctx)
+	require.Nil(t, err)
+	claims, err := lic.Claims()
 	require.Nil(t, err)
 	require.NotNil(t, claims)
-	assert.True(t, claims.Licensed)
+
 	assert.False(t, claims.Revoked)
 	assert.Equal(t, "700488b7-799b-4e46-934c-e9f15c061e0d", claims.LicenseUUID)
 	assert.Equal(t, "Phantasm, Inc.", claims.OrganizationName)

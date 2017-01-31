@@ -5,14 +5,28 @@ import (
 	"golang.org/x/net/context"
 )
 
-func (svc service) LicenseClaims(ctx context.Context) (*kolide.Claims, error) {
+func (svc service) License(ctx context.Context) (*kolide.License, error) {
 	license, err := svc.ds.License()
 	if err != nil {
 		return nil, err
 	}
-	claims, err := license.Claims()
+	return license, nil
+}
+
+func (svc service) SaveLicense(ctx context.Context, jwtToken string) (*kolide.License, error) {
+	license, err := svc.ds.License()
 	if err != nil {
 		return nil, err
 	}
-	return claims, nil
+	// check license validity
+	license.Token = &jwtToken
+	_, err = license.Claims()
+	if err != nil {
+		return nil, err
+	}
+	updated, err := svc.ds.SaveLicense(jwtToken)
+	if err != nil {
+		return nil, err
+	}
+	return updated, nil
 }

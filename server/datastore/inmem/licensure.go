@@ -2,7 +2,7 @@ package inmem
 
 import "github.com/kolide/kolide-ose/server/kolide"
 
-func (ds *Datastore) SaveLicense(string) error {
+func (ds *Datastore) SaveLicense(string) (*kolide.License, error) {
 	panic("inmem is being deprecated")
 }
 

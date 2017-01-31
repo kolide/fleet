@@ -16,13 +16,13 @@ func testLicensure(t *testing.T, ds kolide.Datastore) {
 	require.Nil(t, err)
 	license, err := ds.License()
 	require.Nil(t, err)
-	assert.Nil(t, license.TokenString)
+	assert.Nil(t, license.Token)
 
-	err = ds.SaveLicense("fake license")
+	_, err = ds.SaveLicense("fake license")
 	require.Nil(t, err)
 	license, err = ds.License()
 	require.Nil(t, err)
-	require.NotNil(t, license.TokenString)
-	assert.Equal(t, "fake license", *license.TokenString)
+	require.NotNil(t, license.Token)
+	assert.Equal(t, "fake license", *license.Token)
 
 }

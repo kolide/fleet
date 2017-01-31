@@ -6,7 +6,7 @@ import "github.com/kolide/kolide-ose/server/kolide"
 
 var _ kolide.LicenseStore = (*LicenseStore)(nil)
 
-type SaveLicenseFunc func(jwt string) error
+type SaveLicenseFunc func(tokenString string) (*kolide.License, error)
 
 type LicenseFunc func() (*kolide.License, error)
 
@@ -18,9 +18,9 @@ type LicenseStore struct {
 	LicenseFuncInvoked bool
 }
 
-func (s *LicenseStore) SaveLicense(jwt string) error {
+func (s *LicenseStore) SaveLicense(tokenString string) (*kolide.License, error) {
 	s.SaveLicenseFuncInvoked = true
-	return s.SaveLicenseFunc(jwt)
+	return s.SaveLicenseFunc(tokenString)
 }
 
 func (s *LicenseStore) License() (*kolide.License, error) {
