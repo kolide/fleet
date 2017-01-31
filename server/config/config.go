@@ -90,45 +90,70 @@ type KolideConfig struct {
 // filled into the KolideConfig struct
 func (man Manager) addConfigs() {
 	// MySQL
-	man.addConfigString("mysql.address", "localhost:3306", "MySQL server address (host:port)")
-	man.addConfigString("mysql.username", "kolide", "MySQL server username")
-	man.addConfigString("mysql.password", "kolide", "MySQL server password (prefer env variable for security)")
-	man.addConfigString("mysql.database", "kolide", "MySQL database name")
+	man.addConfigString("mysql.address", "localhost:3306",
+		"MySQL server address (host:port)")
+	man.addConfigString("mysql.username", "kolide",
+		"MySQL server username")
+	man.addConfigString("mysql.password", "kolide",
+		"MySQL server password (prefer env variable for security)")
+	man.addConfigString("mysql.database", "kolide",
+		"MySQL database name")
 
 	// Redis
-	man.addConfigString("redis.address", "localhost:6379", "Redis server address (host:port)")
-	man.addConfigString("redis.password", "", "Redis server password (prefer env variable for security)")
+	man.addConfigString("redis.address", "localhost:6379",
+		"Redis server address (host:port)")
+	man.addConfigString("redis.password", "",
+		"Redis server password (prefer env variable for security)")
 
 	// Server
-	man.addConfigString("server.address", "0.0.0.0:8080", "Kolide server address (host:port)")
-	man.addConfigString("server.cert", "./tools/osquery/kolide.crt", "Kolide TLS certificate path")
-	man.addConfigString("server.key", "./tools/osquery/kolide.key", "Kolide TLS key path")
-	man.addConfigBool("server.tls", true, "Enable TLS (required for osqueryd communication)")
+	man.addConfigString("server.address", "0.0.0.0:8080",
+		"Kolide server address (host:port)")
+	man.addConfigString("server.cert", "./tools/osquery/kolide.crt",
+		"Kolide TLS certificate path")
+	man.addConfigString("server.key", "./tools/osquery/kolide.key",
+		"Kolide TLS key path")
+	man.addConfigBool("server.tls", true,
+		"Enable TLS (required for osqueryd communication)")
 
 	// Auth
-	man.addConfigString("auth.jwt_key", "CHANGEME", "JWT session token key")
-	man.addConfigInt("auth.bcrypt_cost", 12, "Bcrypt iterations")
-	man.addConfigInt("auth.salt_key_size", 24, "Size of salt for passwords")
+	man.addConfigString(
+		"auth.jwt_key", "CHANGEME", "JWT session token key")
+	man.addConfigInt("auth.bcrypt_cost", 12,
+		"Bcrypt iterations")
+	man.addConfigInt("auth.salt_key_size", 24,
+		"Size of salt for passwords")
 
 	// App
-	man.addConfigString("app.token_key", "CHANGEME", "Secret key for generating invite and reset tokens")
-	man.addConfigDuration("app.invite_token_validity_period", 5*24*time.Hour, "Duration invite tokens remain valid (i.e. 1h)")
-	man.addConfigInt("app.token_key_size", 24, "Size of generated tokens")
+	man.addConfigString("app.token_key", "CHANGEME",
+		"Secret key for generating invite and reset tokens")
+	man.addConfigDuration("app.invite_token_validity_period", 5*24*time.Hour,
+		"Duration invite tokens remain valid (i.e. 1h)")
+	man.addConfigInt("app.token_key_size", 24,
+		"Size of generated tokens")
 
 	// Session
-	man.addConfigInt("session.key_size", 64, "Size of generated session keys")
-	man.addConfigDuration("session.duration", 24*90*time.Hour, "Duration session keys remain valid (i.e. 24h)")
+	man.addConfigInt("session.key_size", 64,
+		"Size of generated session keys")
+	man.addConfigDuration("session.duration", 24*90*time.Hour,
+		"Duration session keys remain valid (i.e. 24h)")
 
 	// Osquery
-	man.addConfigInt("osquery.node_key_size", 24, "Size of generated osqueryd node keys")
-	man.addConfigString("osquery.status_log_file", "/tmp/osquery_status", "Path for osqueryd status logs")
-	man.addConfigString("osquery.result_log_file", "/tmp/osquery_result", "Path for osqueryd result logs")
-	man.addConfigDuration("osquery.label_update_interval", 1*time.Hour, "Interval to update host label membership (i.e. 1h)")
+	man.addConfigInt("osquery.node_key_size", 24,
+		"Size of generated osqueryd node keys")
+	man.addConfigString("osquery.status_log_file", "/tmp/osquery_status",
+		"Path for osqueryd status logs")
+	man.addConfigString("osquery.result_log_file", "/tmp/osquery_result",
+		"Path for osqueryd result logs")
+	man.addConfigDuration("osquery.label_update_interval", 1*time.Hour,
+		"Interval to update host label membership (i.e. 1h)")
 
 	// Logging
-	man.addConfigBool("logging.debug", false, "Enable debug logging")
-	man.addConfigBool("logging.json", false, "Log in JSON format")
-	man.addConfigBool("logging.disable_banner", false, "Disable startup banner")
+	man.addConfigBool("logging.debug", false,
+		"Enable debug logging")
+	man.addConfigBool("logging.json", false,
+		"Log in JSON format")
+	man.addConfigBool("logging.disable_banner", false,
+		"Disable startup banner")
 }
 
 // LoadConfig will load the config variables into a fully initialized
