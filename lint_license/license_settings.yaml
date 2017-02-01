@@ -1,0 +1,14 @@
+# License names that are allowable for use in Kolide
+allowed_licenses:
+  ? MIT
+  ? BSD
+  ? Apache?1.0
+  ? Apache?2.0
+  ? JSON
+  ? Postgres
+  ? ISC
+
+# Packages for which licensing has been manually reviewed and determined to be
+# acceptable
+exceptions:
+  ? Kolide@0.1.0
