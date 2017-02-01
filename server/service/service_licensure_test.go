@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/WatchBeam/clock"
 	"github.com/kolide/kolide-ose/server/kolide"
 	"github.com/kolide/kolide-ose/server/mock"
 	"github.com/stretchr/testify/assert"
@@ -50,11 +51,27 @@ func TestLicenseService(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, claims)
 
-	assert.False(t, claims.Revoked)
 	assert.Equal(t, "700488b7-799b-4e46-934c-e9f15c061e0d", claims.LicenseUUID)
 	assert.Equal(t, "Phantasm, Inc.", claims.OrganizationName)
 	assert.Equal(t, "ae5a4548-652a-48b9-a15c-544e5f2faecb", claims.OrganizationUUID)
 	assert.Equal(t, 0, claims.HostLimit)
 	assert.Equal(t, "2017-02-26 15:48:07 UTC", claims.ExpiresAt.Format(kolide.LicenseTimeLayout))
+	assert.True(t, claims.Evaluation)
+
+	// Eval license expires without grace period
+	tm, err := time.Parse(kolide.LicenseTimeLayout, "2017-02-26 15:48:06 UTC")
+	require.Nil(t, err)
+	c := clock.NewMockClock(tm)
+	assert.False(t, claims.Expired(c.Now()))
+	c.AddTime(time.Second)
+	assert.True(t, claims.Expired(c.Now()))
+	// Non eval gets a sixty day grace period
+	claims.Evaluation = false
+	tm, err = time.Parse(kolide.LicenseTimeLayout, "2017-02-26 15:48:06 UTC")
+	tm = tm.Add(kolide.LicenseGracePeriod)
+	c = clock.NewMockClock(tm)
+	assert.False(t, claims.Expired(c.Now()))
+	c.AddTime(time.Second)
+	assert.True(t, claims.Expired(c.Now()))
 
 }

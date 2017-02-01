@@ -80,14 +80,8 @@ func licensedUser(svc kolide.Service, next endpoint.Endpoint) endpoint.Endpoint 
 		if err != nil {
 			return nil, err
 		}
-		if claims.Evaluation {
-			if time.Since(claims.ExpiresAt) > 0 {
-				return nil, licensingError{reason: "license expired"}
-			}
-		} else {
-			if time.Since(claims.ExpiresAt.Add(kolide.LicenseGracePeriod)) > 0 {
-				return nil, licensingError{reason: "license expired"}
-			}
+		if claims.Expired(time.Now()) {
+			return nil, licensingError{reason: "license expired"}
 		}
 		return next(ctx, request)
 	}

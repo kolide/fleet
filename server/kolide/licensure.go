@@ -34,11 +34,14 @@ type LicenseService interface {
 // Contains information needed to extract customer license particulars.
 type License struct {
 	UpdateTimestamp
-	ID        uint
-	Token     *string `db:"license"`
-	PublicKey string  `db:"public_key"`
+	ID uint
+	// Token is a jwt token
+	Token *string `db:"token"`
+	// PublicKey is used to validate the Token and extract claims
+	PublicKey string `db:"key"`
 	// Revoked if true overrides a license that might otherwise be valid
-	Revoked   bool
+	Revoked bool
+	// HostCount is the count of enrolled hosts
 	HostCount uint `db:"-"`
 }
 
@@ -54,8 +57,20 @@ type Claims struct {
 	Evaluation bool
 	// ExpiresAt time when license expires
 	ExpiresAt time.Time
-	// Revoked if true overrides a license that might otherwise be valid
-	Revoked bool
+}
+
+// Expired returns true if the license is expired
+func (c *Claims) Expired(current time.Time) bool {
+	if c.Evaluation {
+		if current.Sub(c.ExpiresAt) >= 0 {
+			return true
+		}
+		return false
+	}
+	if current.Sub(c.ExpiresAt.Add(LicenseGracePeriod)) >= 0 {
+		return true
+	}
+	return false
 }
 
 // Claims returns information contained in the jwt license token
