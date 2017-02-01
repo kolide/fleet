@@ -14,8 +14,8 @@ dependencies:
   pre:
     - docker info
     - docker login -e $DOCKER_HUB_EMAIL -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
-    - ./.circle-ci/setup-gcloud-environment.sh
-    - ./.circle-ci/download-build-deps.sh
+    - ./tools/ci/setup-build-environment.sh
+    - ./tools/ci/download-build-deps.sh
 
   cache_directories:
     - "vendor"
@@ -38,7 +38,7 @@ deployment:
     branch: /.*/
     commands:
       - make docker-build-circle
-      - ./.circle-ci/deploy-k8s-testing.sh
+      - ./tools/ci/deploy-k8s-testing.sh
   release:
     tag: /.*/
     commands:
