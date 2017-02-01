@@ -40,16 +40,10 @@ func Up_20170127020455(tx *sql.Tx) error {
 			"`key`  " +
 			") VALUES (1, FALSE, '');",
 	)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 func Down_20170127020455(tx *sql.Tx) error {
 	_, err := tx.Exec(`DELETE FROM public_keys;`)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }

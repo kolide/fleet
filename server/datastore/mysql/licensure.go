@@ -11,7 +11,7 @@ import (
 // validateToken will insure that a jwt token is signed properly and that we
 // have the public key we need to validate it.  The public key string is returned
 // on success
-func (ds *Datastore) validateToken(token string) (string, error) {
+func (ds *Datastore) PublicKey(token string) (string, error) {
 	var (
 		publicKeyHash string
 		publicKey     string
@@ -30,9 +30,10 @@ func (ds *Datastore) validateToken(token string) (string, error) {
 			return "", errors.New("kid is not expected type")
 		}
 
-		sql := `SELECT pk.key
-						FROM public_keys pk
-						WHERE hash = ?`
+		sql := `
+			SELECT pk.key
+				FROM public_keys pk
+				WHERE hash = ?`
 
 		err := ds.db.Get(&publicKey, sql, publicKeyHash)
 		if err != nil {
@@ -43,18 +44,14 @@ func (ds *Datastore) validateToken(token string) (string, error) {
 	return publicKey, err
 }
 
-func (ds *Datastore) SaveLicense(token string) (*kolide.License, error) {
-	publicKeyString, err := ds.validateToken(token)
-	if err != nil {
-		return nil, errors.Wrap(err, "token validation failed")
-	}
+func (ds *Datastore) SaveLicense(token, publicKey string) (*kolide.License, error) {
+	sqlStatement :=
+		"UPDATE licensure SET " +
+			"  token = ?, " +
+			"	`key` = ? " +
+			"WHERE id = 1"
 
-	sqlStatement := "UPDATE licensure SET " +
-		"  token = ?, " +
-		"	`key` = ? " +
-		"WHERE id = 1"
-
-	_, err = ds.db.Exec(sqlStatement, token, publicKeyString)
+	_, err := ds.db.Exec(sqlStatement, token, publicKey)
 	if err != nil {
 		return nil, errors.Wrap(err, "saving license")
 	}
@@ -67,9 +64,9 @@ func (ds *Datastore) SaveLicense(token string) (*kolide.License, error) {
 
 func (ds *Datastore) License() (*kolide.License, error) {
 	query := `
-  SELECT * FROM licensure
-    WHERE id = 1
-  `
+	  SELECT * FROM licensure
+	    WHERE id = 1
+	  `
 	var license kolide.License
 	err := ds.db.Get(&license, query)
 	if err != nil {

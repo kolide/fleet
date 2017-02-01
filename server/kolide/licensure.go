@@ -12,13 +12,16 @@ import (
 const (
 	LicenseTimeLayout  = "2006-01-02 15:04:05 MST"
 	LicenseGracePeriod = time.Hour * 24 * 60 // 60 days
+	hostLimitUnlimited = 0
 )
 
 type LicenseStore interface {
 	// SaveLicense saves jwt formatted customer license information
-	SaveLicense(tokenString string) (*License, error)
+	SaveLicense(tokenString, publicKey string) (*License, error)
 	// License returns a structure with the jwt customer license if it exists.
 	License() (*License, error)
+	// PublicKey gets the public key associated with this license
+	PublicKey(tokenString string) (string, error)
 }
 
 type LicenseService interface {
@@ -57,6 +60,8 @@ type Claims struct {
 	Evaluation bool
 	// ExpiresAt time when license expires
 	ExpiresAt time.Time
+	// HostCount number of enrolled hosts
+	HostCount int
 }
 
 // Expired returns true if the license is expired
@@ -68,6 +73,17 @@ func (c *Claims) Expired(current time.Time) bool {
 		return false
 	}
 	if current.Sub(c.ExpiresAt.Add(LicenseGracePeriod)) >= 0 {
+		return true
+	}
+	return false
+}
+
+// CanEnrollHost
+func (c *Claims) CanEnrollHost() bool {
+	if c.HostLimit == hostLimitUnlimited {
+		return true
+	}
+	if c.HostCount <= c.HostLimit {
 		return true
 	}
 	return false
@@ -104,5 +120,6 @@ func (l *License) Claims() (*Claims, error) {
 		}
 		result.ExpiresAt = expiry
 	}
+	result.HostCount = int(l.HostCount)
 	return &result, nil
 }

@@ -6,9 +6,11 @@ import "github.com/kolide/kolide-ose/server/kolide"
 
 var _ kolide.LicenseStore = (*LicenseStore)(nil)
 
-type SaveLicenseFunc func(tokenString string) (*kolide.License, error)
+type SaveLicenseFunc func(tokenString string, publicKey string) (*kolide.License, error)
 
 type LicenseFunc func() (*kolide.License, error)
+
+type PublicKeyFunc func(tokenString string) (string, error)
 
 type LicenseStore struct {
 	SaveLicenseFunc        SaveLicenseFunc
@@ -16,14 +18,22 @@ type LicenseStore struct {
 
 	LicenseFunc        LicenseFunc
 	LicenseFuncInvoked bool
+
+	PublicKeyFunc        PublicKeyFunc
+	PublicKeyFuncInvoked bool
 }
 
-func (s *LicenseStore) SaveLicense(tokenString string) (*kolide.License, error) {
+func (s *LicenseStore) SaveLicense(tokenString string, publicKey string) (*kolide.License, error) {
 	s.SaveLicenseFuncInvoked = true
-	return s.SaveLicenseFunc(tokenString)
+	return s.SaveLicenseFunc(tokenString, publicKey)
 }
 
 func (s *LicenseStore) License() (*kolide.License, error) {
 	s.LicenseFuncInvoked = true
 	return s.LicenseFunc()
+}
+
+func (s *LicenseStore) PublicKey(tokenString string) (string, error) {
+	s.PublicKeyFuncInvoked = true
+	return s.PublicKeyFunc(tokenString)
 }

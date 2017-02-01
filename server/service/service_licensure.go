@@ -14,17 +14,11 @@ func (svc service) License(ctx context.Context) (*kolide.License, error) {
 }
 
 func (svc service) SaveLicense(ctx context.Context, jwtToken string) (*kolide.License, error) {
-	license, err := svc.ds.License()
+	publicKey, err := svc.ds.PublicKey(jwtToken)
 	if err != nil {
 		return nil, err
 	}
-	// check license validity
-	license.Token = &jwtToken
-	_, err = license.Claims()
-	if err != nil {
-		return nil, err
-	}
-	updated, err := svc.ds.SaveLicense(jwtToken)
+	updated, err := svc.ds.SaveLicense(jwtToken, publicKey)
 	if err != nil {
 		return nil, err
 	}

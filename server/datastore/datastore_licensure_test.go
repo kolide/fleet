@@ -30,7 +30,10 @@ func testLicensure(t *testing.T, ds kolide.Datastore) {
 	require.Nil(t, err)
 	assert.Nil(t, license.Token)
 
-	_, err = ds.SaveLicense(token)
+	publicKey, err := ds.PublicKey(token)
+	require.Nil(t, err)
+
+	_, err = ds.SaveLicense(token, publicKey)
 	require.Nil(t, err)
 	license, err = ds.License()
 	require.Nil(t, err)
