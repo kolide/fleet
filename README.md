@@ -20,3 +20,4 @@ If you have any questions, please don't hesitate to reach out to [support@kolide
 Our philosophy is to enable everyone to defend themselves against cyber threats of increasing sophistication. We accomplish this by codifying our expertise in products that improve the utility and effectiveness of open-source security software and encourage trustworthy, community-supported detection and response.
 
 [![Team](./assets/images/team.png)](https://kolide.co/company)
+
