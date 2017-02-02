@@ -10,7 +10,6 @@ import (
 )
 
 const (
-	LicenseTimeLayout  = "2006-01-02 15:04:05 MST"
 	LicenseGracePeriod = time.Hour * 24 * 60 // 60 days
 	hostLimitUnlimited = 0
 )
@@ -20,8 +19,8 @@ type LicenseStore interface {
 	SaveLicense(tokenString, publicKey string) (*License, error)
 	// License returns a structure with the jwt customer license if it exists.
 	License() (*License, error)
-	// PublicKey gets the public key associated with this license
-	PublicKey(tokenString string) (string, error)
+	// LicensePublicKey gets the public key associated with this license
+	LicensePublicKey(tokenString string) (string, error)
 }
 
 type LicenseService interface {
@@ -114,7 +113,7 @@ func (l *License) Claims() (*Claims, error) {
 		result.OrganizationUUID = claims["organization_uuid"].(string)
 		result.HostLimit = int(claims["host_limit"].(float64))
 		result.Evaluation = claims["evaluation"].(bool)
-		expiry, err := time.Parse(LicenseTimeLayout, claims["expires_at"].(string))
+		expiry, err := time.Parse(time.RFC3339, claims["expires_at"].(string))
 		if err != nil {
 			return nil, err
 		}

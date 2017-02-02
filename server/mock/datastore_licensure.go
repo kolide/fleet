@@ -33,7 +33,7 @@ func (s *LicenseStore) License() (*kolide.License, error) {
 	return s.LicenseFunc()
 }
 
-func (s *LicenseStore) PublicKey(tokenString string) (string, error) {
+func (s *LicenseStore) LicensePublicKey(tokenString string) (string, error) {
 	s.PublicKeyFuncInvoked = true
 	return s.PublicKeyFunc(tokenString)
 }
