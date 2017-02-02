@@ -8,7 +8,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-// validateToken will insure that a jwt token is signed properly and that we
+// LicensePublicKey will insure that a jwt token is signed properly and that we
 // have the public key we need to validate it.  The public key string is returned
 // on success
 func (ds *Datastore) LicensePublicKey(token string) (string, error) {
@@ -45,8 +45,8 @@ func (ds *Datastore) LicensePublicKey(token string) (string, error) {
 }
 
 func (ds *Datastore) SaveLicense(token, publicKey string) (*kolide.License, error) {
-	sqlStatement :=
-		`UPDATE licenses SET
+	sqlStatement := `
+		 UPDATE licenses SET
 			token = ?,
 			` + "`key`" + ` = ?
 		 WHERE id = 1`

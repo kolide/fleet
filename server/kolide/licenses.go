@@ -1,11 +1,11 @@
 package kolide
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 )
 
@@ -66,12 +66,12 @@ type Claims struct {
 // Expired returns true if the license is expired
 func (c *Claims) Expired(current time.Time) bool {
 	if c.Evaluation {
-		if current.Sub(c.ExpiresAt) >= 0 {
+		if c.ExpiresAt.Before(current) {
 			return true
 		}
 		return false
 	}
-	if current.Sub(c.ExpiresAt.Add(LicenseGracePeriod)) >= 0 {
+	if c.ExpiresAt.Add(LicenseGracePeriod).Before(current) {
 		return true
 	}
 	return false
@@ -99,12 +99,12 @@ func (l *License) Claims() (*Claims, error) {
 		}
 		key, err := jwt.ParseRSAPublicKeyFromPEM([]byte(l.PublicKey))
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "reading license token")
 		}
 		return key, nil
 	})
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "reading licence token")
 	}
 	var result Claims
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
@@ -118,6 +118,8 @@ func (l *License) Claims() (*Claims, error) {
 			return nil, err
 		}
 		result.ExpiresAt = expiry
+	} else {
+		return nil, errors.New("license token is not valid")
 	}
 	result.HostCount = int(l.HostCount)
 	return &result, nil

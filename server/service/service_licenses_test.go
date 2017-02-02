@@ -68,7 +68,7 @@ vQIDAQAB
 	assert.True(t, claims.Evaluation)
 
 	// Eval license expires without grace period
-	tm, err := time.Parse(time.RFC3339, "2017-03-04T14:38:56Z")
+	tm, err := time.Parse(time.RFC3339, "2017-03-04T14:38:57Z")
 	require.Nil(t, err)
 	c := clock.NewMockClock(tm)
 	assert.False(t, claims.Expired(c.Now()))
@@ -76,7 +76,7 @@ vQIDAQAB
 	assert.True(t, claims.Expired(c.Now()))
 	// Non eval gets a sixty day grace period
 	claims.Evaluation = false
-	tm, err = time.Parse(time.RFC3339, "2017-03-04T14:38:56Z")
+	tm, err = time.Parse(time.RFC3339, "2017-03-04T14:38:57Z")
 	tm = tm.Add(kolide.LicenseGracePeriod)
 	c = clock.NewMockClock(tm)
 	assert.False(t, claims.Expired(c.Now()))

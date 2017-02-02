@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"database/sql"
 	"fmt"
+	"strings"
 
 	"github.com/kolide/kolide/server/datastore/internal/appstate"
 )
@@ -14,14 +15,8 @@ func init() {
 
 // hexadecimal md5 hash grouped by 2 characters separated by colons
 func fingerprintMD5(pem string) string {
-	var fingerPrint string
-	hash := md5.Sum([]byte(pem))
-	for _, h := range hash {
-		if len(fingerPrint) > 0 {
-			fingerPrint += ":"
-		}
-		fingerPrint += fmt.Sprintf("%.2x", h)
-	}
+	fingerPrint := fmt.Sprintf("% x", md5.Sum([]byte(pem)))
+	fingerPrint = strings.Replace(fingerPrint, " ", ":", 15)
 	return fingerPrint
 }
 

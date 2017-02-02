@@ -13,8 +13,8 @@ func Up_20170127014618(tx *sql.Tx) error {
 		"`id` int(10) NOT NULL AUTO_INCREMENT, " +
 		"`updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, " +
 		"`revoked` tinyint(1) unsigned NOT NULL DEFAULT FALSE, " +
-		"`public_key` text NOT NULL, " +
-		"`license` text, " +
+		"`key` text NOT NULL, " +
+		"`token` text, " +
 		"PRIMARY KEY (`id`) " +
 		") ENGINE=InnoDB DEFAULT CHARSET=utf8;"
 	_, err := tx.Exec(sqlStatement)
