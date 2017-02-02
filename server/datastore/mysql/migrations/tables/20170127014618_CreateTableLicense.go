@@ -9,7 +9,7 @@ func init() {
 }
 
 func Up_20170127014618(tx *sql.Tx) error {
-	sqlStatement := "CREATE TABLE `licensure` ( " +
+	sqlStatement := "CREATE TABLE `licenses` ( " +
 		"`id` int(10) NOT NULL AUTO_INCREMENT, " +
 		"`updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, " +
 		"`revoked` tinyint(1) unsigned NOT NULL DEFAULT FALSE, " +
@@ -25,7 +25,7 @@ func Up_20170127014618(tx *sql.Tx) error {
 }
 
 func Down_20170127014618(tx *sql.Tx) error {
-	_, err := tx.Exec("DROP TABLE IF EXISTS `licensure`;")
+	_, err := tx.Exec("DROP TABLE IF EXISTS `licenses`;")
 	if err != nil {
 		return err
 	}

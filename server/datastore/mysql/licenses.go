@@ -46,7 +46,7 @@ func (ds *Datastore) LicensePublicKey(token string) (string, error) {
 
 func (ds *Datastore) SaveLicense(token, publicKey string) (*kolide.License, error) {
 	sqlStatement :=
-		`UPDATE licensure SET
+		`UPDATE licenses SET
 			token = ?,
 			` + "`key`" + ` = ?
 		 WHERE id = 1`
@@ -64,7 +64,7 @@ func (ds *Datastore) SaveLicense(token, publicKey string) (*kolide.License, erro
 
 func (ds *Datastore) License() (*kolide.License, error) {
 	query := `
-	  SELECT * FROM licensure
+	  SELECT * FROM licenses
 	    WHERE id = 1
 	  `
 	var license kolide.License

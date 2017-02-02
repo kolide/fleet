@@ -10,7 +10,7 @@ func init() {
 
 func Up_20170201011732(tx *sql.Tx) error {
 	_, err := tx.Exec(
-		"ALTER TABLE `kolide`.`licensure` CHANGE COLUMN `public_key` " +
+		"ALTER TABLE `kolide`.`licenses` CHANGE COLUMN `public_key` " +
 			"`key` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL " +
 			" COMMENT '' AFTER `revoked`;",
 	)
@@ -18,7 +18,7 @@ func Up_20170201011732(tx *sql.Tx) error {
 		return err
 	}
 	_, err = tx.Exec(
-		"ALTER TABLE `kolide`.`licensure` CHANGE COLUMN `license` " +
+		"ALTER TABLE `kolide`.`licenses` CHANGE COLUMN `license` " +
 			"`token` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL " +
 			" COMMENT '' AFTER `key`;",
 	)
@@ -30,7 +30,7 @@ func Up_20170201011732(tx *sql.Tx) error {
 
 func Down_20170201011732(tx *sql.Tx) error {
 	_, err := tx.Exec(
-		"ALTER TABLE `kolide`.`licensure` CHANGE COLUMN `key` " +
+		"ALTER TABLE `kolide`.`licenses` CHANGE COLUMN `key` " +
 			"`public_key` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL " +
 			" COMMENT '' AFTER `revoked`;",
 	)
@@ -38,7 +38,7 @@ func Down_20170201011732(tx *sql.Tx) error {
 		return err
 	}
 	_, err = tx.Exec(
-		"ALTER TABLE `kolide`.`licensure` CHANGE COLUMN `token` " +
+		"ALTER TABLE `kolide`.`licenses` CHANGE COLUMN `token` " +
 			"`license` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL " +
 			" COMMENT '' AFTER `public_key`;",
 	)

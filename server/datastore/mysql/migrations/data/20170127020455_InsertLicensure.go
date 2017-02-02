@@ -34,7 +34,7 @@ func Up_20170127020455(tx *sql.Tx) error {
 		}
 	}
 	_, err := tx.Exec(
-		"INSERT INTO licensure ( " +
+		"INSERT INTO licenses ( " +
 			"id, " +
 			"revoked, " +
 			"`key`  " +
