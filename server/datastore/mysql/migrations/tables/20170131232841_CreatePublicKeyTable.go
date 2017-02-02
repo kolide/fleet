@@ -15,16 +15,10 @@ func Up_20170131232841(tx *sql.Tx) error {
 		"PRIMARY KEY (`hash`) " +
 		") ENGINE=InnoDB DEFAULT CHARSET=utf8;"
 	_, err := tx.Exec(create)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 func Down_20170131232841(tx *sql.Tx) error {
 	_, err := tx.Exec("DROP TABLE IF EXISTS `public_keys`;")
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }

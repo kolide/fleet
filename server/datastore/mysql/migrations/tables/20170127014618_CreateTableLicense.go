@@ -18,16 +18,10 @@ func Up_20170127014618(tx *sql.Tx) error {
 		"PRIMARY KEY (`id`) " +
 		") ENGINE=InnoDB DEFAULT CHARSET=utf8;"
 	_, err := tx.Exec(sqlStatement)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 func Down_20170127014618(tx *sql.Tx) error {
 	_, err := tx.Exec("DROP TABLE IF EXISTS `licenses`;")
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
