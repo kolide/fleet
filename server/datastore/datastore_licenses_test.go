@@ -1,7 +1,9 @@
 package datastore
 
 import (
+	"math/rand"
 	"testing"
+	"time"
 
 	"github.com/kolide/kolide/server/kolide"
 	"github.com/stretchr/testify/assert"
@@ -19,7 +21,7 @@ var token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6IjRkOmM1OmRlOmE1OjczOm"
 	"ZWyV-YpuHaWlx-VpTv4c2vQo2eQWTpTH7YdcQ7Mo_5QdN7247qKo_ORTtqLLTjg7BoxB__ydWMhxO" +
 	"QuRJGQAMc0OsZ72uLd7JKzvWpSLFk7mdVk718mweq6X2R0BPKtTc6lYjbPScoTysM2Owe5Hi7A"
 
-func testLicensure(t *testing.T, ds kolide.Datastore) {
+func testLicense(t *testing.T, ds kolide.Datastore) {
 	if ds.Name() == "inmem" {
 		t.Skip("inmem is being deprecated")
 	}
@@ -38,5 +40,17 @@ func testLicensure(t *testing.T, ds kolide.Datastore) {
 	require.Nil(t, err)
 	require.NotNil(t, license.Token)
 	assert.Equal(t, token, *license.Token)
+
+	// screw around with the token in random ways and make sure that A) it doesn't
+	// panic and B) returns an error
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	for i := 0; i < 10; i++ {
+		j := r.Uint32()
+		k := j % uint32(len(token))
+		buff := []byte(token)
+		buff[k] = buff[k] + 1
+		_, err = ds.LicensePublicKey(string(buff))
+		require.NotNil(t, err)
+	}
 
 }

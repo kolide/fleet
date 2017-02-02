@@ -68,7 +68,7 @@ func licensedUser(svc kolide.Service, next endpoint.Endpoint) endpoint.Endpoint 
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		lic, err := svc.License(ctx)
 		if err != nil {
-			return nil, err
+			return nil, licensingError{reason: err.Error()}
 		}
 		if lic.Token == nil {
 			return nil, licensingError{reason: "license not present"}

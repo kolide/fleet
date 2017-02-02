@@ -65,19 +65,17 @@ type Claims struct {
 
 // Expired returns true if the license is expired
 func (c *Claims) Expired(current time.Time) bool {
-	if c.Evaluation {
-		if c.ExpiresAt.Before(current) {
-			return true
-		}
-		return false
+	if c.Evaluation && c.ExpiresAt.Before(current) {
+		return true
 	}
-	if c.ExpiresAt.Add(LicenseGracePeriod).Before(current) {
+	if !c.Evaluation && c.ExpiresAt.Add(LicenseGracePeriod).Before(current) {
 		return true
 	}
 	return false
 }
 
-// CanEnrollHost
+// CanEnrollHost returns true if the user is licensed to enroll additional
+// hosts
 func (c *Claims) CanEnrollHost() bool {
 	if c.HostLimit == hostLimitUnlimited {
 		return true
