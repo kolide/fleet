@@ -1,16 +1,12 @@
 package main
 
 import (
-	"bytes"
-	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
-	"os/exec"
 	"path/filepath"
-	"reflect"
 	"sort"
 	"strings"
 	"time"
@@ -32,51 +28,6 @@ type Dependency struct {
 	Repository string
 	Version    string
 	Path       string
-}
-
-// getJavascriptDependencies retrieves the licensing metadata for javascript
-// dependencies by execing the node license-checker script
-func getJavascriptDependencies() ([]Dependency, error) {
-	out, err := exec.Command("node_modules/license-checker/bin/license-checker", "--csv").Output()
-	if err != nil {
-		return nil, errors.Wrap(err, "running license-checker")
-	}
-
-	reader := csv.NewReader(bytes.NewReader(out))
-
-	fields, err := reader.Read()
-	if err != nil {
-		return nil, errors.Wrap(err, "reading fields")
-	}
-	if !reflect.DeepEqual(fields, []string{"module name", "license", "repository"}) {
-		return nil, errors.Wrap(err, "unexpected fields")
-	}
-
-	packages, err := reader.ReadAll()
-	if err != nil {
-		return nil, errors.Wrap(err, "reading lines")
-	}
-
-	var deps []Dependency
-	for _, p := range packages {
-		dep := Dependency{
-			Name:       p[0],
-			License:    p[1],
-			Repository: p[2],
-		}
-
-		// When license-checker can't find a 'license' key in the
-		// package.json, it "guesses" the license by looking for a
-		// LICENSE or COPYING file. If the license was inferred by
-		// that, there will be a trailing '*'
-		if dep.License[len(dep.License)-1] == '*' {
-			dep.License = dep.License[:len(dep.License)-1]
-		}
-
-		deps = append(deps, dep)
-	}
-
-	return deps, nil
 }
 
 type packageJSON struct {
