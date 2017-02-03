@@ -17,7 +17,29 @@ func (svc service) ScheduleQuery(ctx context.Context, sq *kolide.ScheduledQuery)
 	return svc.ds.NewScheduledQuery(sq)
 }
 
-func (svc service) ModifyScheduledQuery(ctx context.Context, sq *kolide.ScheduledQuery) (*kolide.ScheduledQuery, error) {
+func (svc service) ModifyScheduledQuery(ctx context.Context, id uint, p *kolide.ScheduledQueryPayload) (*kolide.ScheduledQuery, error) {
+	sq := &kolide.ScheduledQuery{
+		ID: id,
+	}
+
+	if p.PackID != nil {
+		sq.PackID = *p.PackID
+	}
+
+	if p.QueryID != nil {
+		sq.QueryID = *p.QueryID
+	}
+
+	if p.Interval != nil {
+		sq.Interval = *p.Interval
+	}
+
+	sq.Snapshot = p.Snapshot
+	sq.Removed = p.Removed
+	sq.Platform = p.Platform
+	sq.Version = p.Version
+	sq.Shard = p.Shard
+
 	return svc.ds.SaveScheduledQuery(sq)
 }
 
