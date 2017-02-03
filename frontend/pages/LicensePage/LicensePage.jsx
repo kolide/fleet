@@ -33,7 +33,8 @@ class LicensePage extends Component {
     dispatch(createLicense({ license }))
       .then(() => {
         dispatch(push(SETUP));
-      });
+      })
+      .catch(() => false);
 
     return false;
   }

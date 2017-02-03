@@ -165,7 +165,7 @@ describe('Auth - actions', () => {
         },
       ];
       const errorResponse = {
-        status: 500,
+        status: 422,
         message: {
           message: 'Unable to get license',
           errors,
@@ -194,7 +194,7 @@ describe('Auth - actions', () => {
           { type: LICENSE_REQUEST },
           {
             type: LICENSE_FAILURE,
-            payload: { errors: { base: 'Unable to get license', http_status: 500 } },
+            payload: { errors: { base: 'Unable to get license', http_status: 422 } },
           },
         ];
 
