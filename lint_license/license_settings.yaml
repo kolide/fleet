@@ -2,13 +2,57 @@
 allowed_licenses:
   ? MIT
   ? BSD
-  ? Apache?1.0
-  ? Apache?2.0
+  ? Apache-1.0
+  ? Apache-2.0
   ? JSON
   ? Postgres
   ? ISC
+  ? Public Domain
+  ? Public domain
+  ? WTFPL
 
 # Packages for which licensing has been manually reviewed and determined to be
-# acceptable
+# acceptable. A comment should be left above each manual exception (or group of
+# related manual exceptions).
 exceptions:
-  ? Kolide@0.1.0
+  ## Covered by valid parent dir license (usually tests/examples with package.json)
+  # ISC
+  ? node_modules/in-publish/test
+  # ISC
+  ? node_modules/read-package-json/test/fixtures/readmes
+  # MIT
+  ? node_modules/readdirp/examples
+  # BSD-3-Clause
+  ? node_modules/fsevents/node_modules/node-pre-gyp/lib/util/nw-pre-gyp
+  # MIT
+  ? node_modules/brace/example
+  # MIT
+  ? node_modules/uuid/benchmark
+  # MIT
+  ? node_modules/resolve/test/module_dir/zmodules/bbb
+  ? node_modules/resolve/test/resolver/baz
+  ? node_modules/resolve/test/resolver/incorrect_main
+  # MIT
+  ? node_modules/stream-http/test/browser
+  # MIT
+  ? node_modules/browserify-zlib/test
+
+  ## License specified in README or LICENSE file
+  # public domain (cc0)
+  ? node_modules/string-hash
+  # MIT
+  ? node_modules/indexof
+  # MIT
+  ? node_modules/css-color-function/node_modules/debug
+  # MIT
+  ? node_modules/cli-table
+  # MIT
+  ? node_modules/async-foreach
+  # (BSD-2-Clause OR MIT OR Apache-2.0)
+  ? node_modules/fsevents/node_modules/rc
+  # (GPL-2.0 OR MIT)
+  ? node_modules/ua-parser-js
+  # MIT
+  ? node_modules/spdx-expression-parse
+  # (WTFPL OR MIT)
+  ? node_modules/path-is-inside

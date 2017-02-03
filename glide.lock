@@ -1,5 +1,5 @@
-hash: 086e1db57e34a55cdf49734eaf8539c1fe53d477df5e20f936aa01c1dd0054b3
-updated: 2017-02-06T19:59:16.230695694-08:00
+hash: 2e60f99104f57234e2a153d088d23ae4db10245052c3335696e9abe7e9e2064e
+updated: 2017-02-06T20:07:36.944953826-08:00
 imports:
 - name: github.com/alecthomas/template
   version: a0175ee3bccc567396460bf5acd36800cb10c49c
@@ -115,6 +115,8 @@ imports:
   - model
 - name: github.com/prometheus/procfs
   version: 1878d9fbb537119d24b21ca07effd591627cd160
+- name: github.com/ryanuber/go-license
+  version: 027a317812857d68bb611443b5c08bbe96e88598
 - name: github.com/spf13/afero
   version: 72b31426848c6ef12a7a8e216708cb0d1530f074
   subpackages:
