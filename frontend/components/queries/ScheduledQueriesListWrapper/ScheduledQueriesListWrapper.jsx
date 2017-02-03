@@ -22,8 +22,7 @@ class ScheduledQueriesListWrapper extends Component {
 
     this.state = {
       querySearchText: '',
-      selectAll: false,
-      selectedScheduledQueryIDs: [],
+      checkedScheduledQueryIDs: [],
     };
   }
 
@@ -31,35 +30,35 @@ class ScheduledQueriesListWrapper extends Component {
     evt.preventDefault();
 
     const { onRemoveScheduledQueries: handleRemoveScheduledQueries } = this.props;
-    const { selectedScheduledQueryIDs } = this.state;
+    const { checkedScheduledQueryIDs } = this.state;
 
-    this.setState({ selectedScheduledQueryIDs: [] });
+    this.setState({ checkedScheduledQueryIDs: [] });
 
-    return handleRemoveScheduledQueries(selectedScheduledQueryIDs);
+    return handleRemoveScheduledQueries(checkedScheduledQueryIDs);
   }
 
-  onSelectAllQueries = (shouldSelectAll) => {
-    if (shouldSelectAll) {
+  onCheckAllQueries = (shouldCheckAll) => {
+    if (shouldCheckAll) {
       const allScheduledQueries = this.getQueries();
-      const selectedScheduledQueryIDs = allScheduledQueries.map(sq => sq.id);
+      const checkedScheduledQueryIDs = allScheduledQueries.map(sq => sq.id);
 
-      this.setState({ selectedScheduledQueryIDs });
+      this.setState({ checkedScheduledQueryIDs });
 
       return false;
     }
 
-    this.setState({ selectedScheduledQueryIDs: [] });
+    this.setState({ checkedScheduledQueryIDs: [] });
 
     return false;
   }
 
-  onSelectQuery = (shouldAddQuery, scheduledQueryID) => {
-    const { selectedScheduledQueryIDs } = this.state;
-    const newSelectedScheduledQueryIDs = shouldAddQuery ?
-      selectedScheduledQueryIDs.concat(scheduledQueryID) :
-      pull(selectedScheduledQueryIDs, scheduledQueryID);
+  onCheckQuery = (shouldCheckQuery, scheduledQueryID) => {
+    const { checkedScheduledQueryIDs } = this.state;
+    const newCheckedScheduledQueryIDs = shouldCheckQuery ?
+      checkedScheduledQueryIDs.concat(scheduledQueryID) :
+      pull(checkedScheduledQueryIDs, scheduledQueryID);
 
-    this.setState({ selectedScheduledQueryIDs: newSelectedScheduledQueryIDs });
+    this.setState({ checkedScheduledQueryIDs: newCheckedScheduledQueryIDs });
 
     return false;
   }
@@ -77,9 +76,9 @@ class ScheduledQueriesListWrapper extends Component {
 
   renderButton = () => {
     const { onRemoveScheduledQueries } = this;
-    const { selectedScheduledQueryIDs } = this.state;
+    const { checkedScheduledQueryIDs } = this.state;
 
-    const scheduledQueryCount = selectedScheduledQueryIDs.length;
+    const scheduledQueryCount = checkedScheduledQueryIDs.length;
 
     if (scheduledQueryCount) {
       const queryText = scheduledQueryCount === 1 ? 'Query' : 'Queries';
@@ -107,19 +106,19 @@ class ScheduledQueriesListWrapper extends Component {
   }
 
   renderQueriesList = () => {
-    const { getQueries, onHidePackForm, onSelectAllQueries, onSelectQuery } = this;
+    const { getQueries, onHidePackForm, onCheckAllQueries, onCheckQuery } = this;
     const { onScheduledQueryFormSubmit, scheduledQueries } = this.props;
-    const { selectedScheduledQueryIDs } = this.state;
+    const { checkedScheduledQueryIDs } = this.state;
 
     return (
       <div className={`${baseClass}__queries-list-wrapper`}>
         <QueriesList
           onHidePackForm={onHidePackForm}
           onScheduledQueryFormSubmit={onScheduledQueryFormSubmit}
-          onSelectAllQueries={onSelectAllQueries}
-          onSelectQuery={onSelectQuery}
+          onCheckAllQueries={onCheckAllQueries}
+          onCheckQuery={onCheckQuery}
           scheduledQueries={getQueries()}
-          selectedScheduledQueryIDs={selectedScheduledQueryIDs}
+          checkedScheduledQueryIDs={checkedScheduledQueryIDs}
           isScheduledQueriesAvailable={!!scheduledQueries.length}
         />
       </div>

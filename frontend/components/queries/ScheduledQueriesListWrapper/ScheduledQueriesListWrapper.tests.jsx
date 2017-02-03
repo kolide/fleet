@@ -81,10 +81,10 @@ describe('ScheduledQueriesListWrapper - component', () => {
 
     selectAllCheckbox.simulate('change');
 
-    expect(component.state('selectedScheduledQueryIDs')).toEqual(allScheduledQueryIDs);
+    expect(component.state('checkedScheduledQueryIDs')).toEqual(allScheduledQueryIDs);
 
     selectAllCheckbox.simulate('change');
 
-    expect(component.state('selectedScheduledQueryIDs')).toEqual([]);
+    expect(component.state('checkedScheduledQueryIDs')).toEqual([]);
   });
 });
