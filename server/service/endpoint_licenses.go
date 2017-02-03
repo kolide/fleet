@@ -60,7 +60,7 @@ func makeGetLicenseEndpoint(svc kolide.Service) endpoint.Endpoint {
 		if err != nil {
 			return licenseResponse{Err: err}, nil
 		}
-		response := &licenseResponse{
+		response := licenseResponse{
 			License: license{
 				Expiry:       claims.ExpiresAt,
 				AllowedHosts: claims.HostLimit,
