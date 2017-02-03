@@ -1,6 +1,9 @@
 package license
 
 import (
+	"encoding/json"
+	"fmt"
+	"net/http"
 	"os"
 	"time"
 
@@ -10,6 +13,8 @@ import (
 
 const defaultPollFrequency = time.Hour
 
+// Checker checks remote kolide/cloud app for license revocation
+// status
 type Checker interface {
 	// Start begins checking for license revocation
 	Start()
@@ -30,6 +35,16 @@ type Option func(opts *options)
 type options struct {
 	logger        log.Logger
 	pollFrequency time.Duration
+}
+
+type revokeInfo struct {
+	UUID    string `json:"uuid"`
+	Revoked bool   `json:"revoked"`
+}
+
+type revokeError struct {
+	Status int    `json:"status"`
+	Error  string `json:"error"`
 }
 
 // Logger set the logger that will be used by the Checker
@@ -72,12 +87,12 @@ func NewChecker(ds kolide.Datastore, licenseEndpointURL string, opts ...Option) 
 func (cc *checker) Start() {
 	cc.finish = make(chan struct{})
 	go func(chk checker) {
-		logMsg(cc, "starting")
+		logMsg(&chk, "starting")
 		for {
-
+			updateLicenseRevocation(&chk)
 			select {
 			case <-chk.finish:
-				logMsg(cc, "finishing")
+				logMsg(&chk, "finishing")
 				return
 			case <-time.After(chk.pollFrequency):
 				return
@@ -100,12 +115,47 @@ func updateLicenseRevocation(chk *checker) {
 	license, err := chk.ds.License()
 	if err != nil {
 		logErr(chk, "couldn't fetch license", err.Error())
-	}
-	if license.Token == nil {
-		logMsg(chk, "no license present")
 		return
 	}
-
+	claims, err := license.Claims()
+	if err != nil {
+		logErr(chk, "fetching claims", err.Error())
+		return
+	}
+	url := fmt.Sprintf("%s/%s", chk.url, claims.LicenseUUID)
+	resp, err := http.Get(url)
+	if err != nil {
+		logErr(chk, fmt.Sprintf("fetching %s", url), err.Error())
+		return
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode == http.StatusOK {
+		var revInfo revokeInfo
+		err = json.NewDecoder(resp.Body).Decode(&revInfo)
+		if err != nil {
+			logErr(chk, "decoding response", err.Error())
+			return
+		}
+		err = chk.ds.RevokeLicense(revInfo.Revoked)
+		if err != nil {
+			logErr(chk, "revoke status", err.Error())
+			return
+		}
+		// success
+		logMsg(chk, fmt.Sprintf("license revocation status retrieved succesfully, revoked: %t", revInfo.Revoked))
+		return
+	}
+	if resp.StatusCode == http.StatusNotFound {
+		var revInfo revokeError
+		err = json.NewDecoder(resp.Body).Decode(&revInfo)
+		if err != nil {
+			logErr(chk, "decoding response", err.Error())
+			return
+		}
+		logErr(chk, "host response", fmt.Sprintf("status: %d error: %s", revInfo.Status, revInfo.Error))
+		return
+	}
+	logErr(chk, "host response", fmt.Sprintf("unexpected response status from host, status %s", resp.Status))
 }
 
 func logMsg(chk *checker, msg string) {
