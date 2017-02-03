@@ -14,6 +14,7 @@ class ScheduledQueriesList extends Component {
     isScheduledQueriesAvailable: PropTypes.bool,
     onCheckAllQueries: PropTypes.func.isRequired,
     onCheckQuery: PropTypes.func.isRequired,
+    onSelectQuery: PropTypes.func.isRequired,
     scheduledQueries: PropTypes.arrayOf(queryInterface).isRequired,
     checkedScheduledQueryIDs: PropTypes.arrayOf(PropTypes.number).isRequired,
   };
@@ -83,7 +84,7 @@ class ScheduledQueriesList extends Component {
   }
 
   render () {
-    const { onCheckQuery, scheduledQueries, checkedScheduledQueryIDs } = this.props;
+    const { onCheckQuery, onSelectQuery, scheduledQueries, checkedScheduledQueryIDs } = this.props;
     const { allQueriesSelected } = this.state;
     const { renderHelpText, handleSelectAllQueries } = this;
 
@@ -116,7 +117,8 @@ class ScheduledQueriesList extends Component {
                 <QueriesListItem
                   checked={this.isChecked(scheduledQuery)}
                   key={`scheduled-query-${scheduledQuery.id}`}
-                  onSelect={onCheckQuery}
+                  onCheck={onCheckQuery}
+                  onSelect={onSelectQuery}
                   scheduledQuery={scheduledQuery}
                 />
               );

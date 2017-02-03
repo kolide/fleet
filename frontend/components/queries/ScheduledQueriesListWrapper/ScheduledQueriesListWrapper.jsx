@@ -14,6 +14,7 @@ class ScheduledQueriesListWrapper extends Component {
   static propTypes = {
     onRemoveScheduledQueries: PropTypes.func,
     onScheduledQueryFormSubmit: PropTypes.func,
+    onSelectScheduledQuery: PropTypes.func,
     scheduledQueries: PropTypes.arrayOf(queryInterface),
   };
 
@@ -107,7 +108,7 @@ class ScheduledQueriesListWrapper extends Component {
 
   renderQueriesList = () => {
     const { getQueries, onHidePackForm, onCheckAllQueries, onCheckQuery } = this;
-    const { onScheduledQueryFormSubmit, scheduledQueries } = this.props;
+    const { onScheduledQueryFormSubmit, onSelectScheduledQuery, scheduledQueries } = this.props;
     const { checkedScheduledQueryIDs } = this.state;
 
     return (
@@ -117,6 +118,7 @@ class ScheduledQueriesListWrapper extends Component {
           onScheduledQueryFormSubmit={onScheduledQueryFormSubmit}
           onCheckAllQueries={onCheckAllQueries}
           onCheckQuery={onCheckQuery}
+          onSelectQuery={onSelectScheduledQuery}
           scheduledQueries={getQueries()}
           checkedScheduledQueryIDs={checkedScheduledQueryIDs}
           isScheduledQueriesAvailable={!!scheduledQueries.length}
