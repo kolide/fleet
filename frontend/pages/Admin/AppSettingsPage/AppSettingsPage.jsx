@@ -19,6 +19,7 @@ class AppSettingsPage extends Component {
     dispatch: PropTypes.func.isRequired,
     error: PropTypes.object, // eslint-disable-line react/forbid-prop-types
     license: licenseInterface,
+    loadingLicense: PropTypes.bool,
   };
 
   constructor (props) {
@@ -82,17 +83,17 @@ class AppSettingsPage extends Component {
   }
 
   render () {
-    const { appConfig, error, license } = this.props;
+    const { appConfig, error, license, loadingLicense } = this.props;
     const { onDismissSmtpWarning, onFormSubmit, onUpdateLicense } = this;
     const { showSmtpWarning } = this.state;
     const { configured: smtpConfigured } = appConfig;
     const shouldShowWarning = !smtpConfigured && showSmtpWarning;
 
-    if (!size(appConfig) || !license.license) {
+    if (!size(appConfig) || loadingLicense) {
       return false;
     }
 
-    const formData = { ...appConfig, license: license.license };
+    const formData = { ...appConfig, license: license.token };
 
     return (
       <div className={`${baseClass} body-wrap`}>
@@ -116,9 +117,9 @@ class AppSettingsPage extends Component {
 
 const mapStateToProps = ({ app, auth }) => {
   const { config: appConfig, error } = app;
-  const { license } = auth;
+  const { license, loading: loadingLicense } = auth;
 
-  return { appConfig, error, license };
+  return { appConfig, error, license, loadingLicense };
 };
 
 export default connect(mapStateToProps)(AppSettingsPage);

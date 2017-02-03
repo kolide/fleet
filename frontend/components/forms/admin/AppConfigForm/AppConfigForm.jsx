@@ -74,7 +74,7 @@ class AppConfigForm extends Component {
 
     const { fields, license } = this.props;
 
-    return fields.license.onChange(license.license);
+    return fields.license.onChange(license.token);
   }
 
   onToggleAdvancedOptions = (evt) => {
