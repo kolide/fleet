@@ -97,7 +97,7 @@ func getJSDeps() ([]Dependency, error) {
 			fmt.Printf("Error reading path %s: %s\n", path, err.Error())
 		}
 
-		// Traversal can ignore anything that is not package.json
+		// JS packages should always have a package.json
 		if info.IsDir() || info.Name() != "package.json" {
 			return nil
 		}
@@ -118,6 +118,53 @@ func getJSDeps() ([]Dependency, error) {
 
 	if err != nil {
 		return nil, errors.Wrap(err, "walking node_modules")
+	}
+
+	return deps, nil
+}
+
+type glideImport struct {
+	Name    string `yaml:"name"`
+	Version string `yaml:"version"`
+}
+
+// glideLock is a yaml schema for the relevant portions of glide.lock
+type glideLock struct {
+	Imports []glideImport `yaml:"imports"`
+}
+
+func extractGoPackageInfo(pkg glideImport) (Dependency, error) {
+	dep := Dependency{
+		Path:    filepath.Join("vendor", pkg.Name),
+		Name:    pkg.Name,
+		Version: pkg.Version,
+	}
+
+	if l, err := license.NewFromDir(dep.Path); err == nil {
+		dep.License = l.Type
+	}
+
+	return dep, nil
+}
+
+func getGoDeps() ([]Dependency, error) {
+	glockContents, err := ioutil.ReadFile("glide.lock")
+	if err != nil {
+		return nil, errors.Wrap(err, "error reading glide.lock")
+	}
+
+	var glock glideLock
+	err = yaml.Unmarshal(glockContents, &glock)
+	if err != nil {
+		log.Fatal("error unmarshaling settings: ", err)
+	}
+
+	var deps []Dependency
+	for _, pkg := range glock.Imports {
+		dep, err := extractGoPackageInfo(pkg)
+		if err == nil {
+			deps = append(deps, dep)
+		}
 	}
 
 	return deps, nil
@@ -168,6 +215,7 @@ func main() {
 		log.Fatal("error unmarshaling settings: ", err)
 	}
 
+	// Javascript
 	fmt.Println("Retrieving JS dependencies")
 
 	jsDeps, err := getJSDeps()
@@ -188,7 +236,30 @@ func main() {
 		}
 	}
 
-	if len(incompatibleJS) > 0 {
+	fmt.Printf("\n\n")
+
+	// Go
+	fmt.Println("Retrieving Go dependencies")
+
+	goDeps, err := getGoDeps()
+	if err != nil {
+		log.Fatal("error retrieving GO deps: ", err)
+	}
+
+	fmt.Printf("Checking %d GO dependencies\n", len(goDeps))
+
+	incompatibleGo := checkLicenses(settings, goDeps)
+
+	fmt.Printf("Found %d incompatible licenses\n", len(incompatibleGo))
+
+	if len(incompatibleGo) > 0 {
+		for _, dep := range incompatibleGo {
+			fmt.Printf("Incompatible license '%s' for dependency '%s' (path '%s')\n",
+				dep.License, dep.Name, dep.Path)
+		}
+	}
+
+	if len(incompatibleJS) > 0 || len(incompatibleGo) > 0 {
 		os.Exit(1)
 	}
 }

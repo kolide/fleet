@@ -1,15 +1,19 @@
 # License names that are allowable for use in Kolide
 allowed_licenses:
   ? MIT
+  ? MIT/X11
   ? BSD
   ? Apache-1.0
   ? Apache-2.0
+  ? Apache License, Version 2.0
   ? JSON
   ? Postgres
   ? ISC
   ? Public Domain
   ? Public domain
   ? WTFPL
+  ? CC0-1.0
+  ? Unlicense
 
 # Packages for which licensing has been manually reviewed and determined to be
 # acceptable. A comment should be left above each manual exception (or group of
@@ -56,3 +60,15 @@ exceptions:
   ? node_modules/spdx-expression-parse
   # (WTFPL OR MIT)
   ? node_modules/path-is-inside
+  # BSD-3-Clause OR MIT
+  ? node_modules/amdefine
+  # Unlicense
+  ? node_modules/stackframe
+  # MIT
+  ? node_modules/rgb
+  # MIT
+  ? vendor/github.com/pelletier/go-buffruneio
+  # MIT
+  ? vendor/github.com/kr/logfmt
+  # ISC
+  ? vendor/github.com/davecgh/go-spew
