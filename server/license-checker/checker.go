@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/go-kit/kit/log"
@@ -12,30 +11,7 @@ import (
 )
 
 const defaultPollFrequency = time.Hour
-
-// Checker checks remote kolide/cloud app for license revocation
-// status
-type Checker interface {
-	// Start begins checking for license revocation
-	Start()
-	// Stop ends checking
-	Stop()
-}
-
-type checker struct {
-	ds            kolide.Datastore
-	logger        log.Logger
-	url           string
-	pollFrequency time.Duration
-	finish        chan struct{}
-}
-
-type Option func(opts *options)
-
-type options struct {
-	logger        log.Logger
-	pollFrequency time.Duration
-}
+const defaultHttpClientTimeout = 10 * time.Second
 
 type revokeInfo struct {
 	UUID    string `json:"uuid"`
@@ -47,17 +23,39 @@ type revokeError struct {
 	Error  string `json:"error"`
 }
 
+// Checker checks remote kolide/cloud app for license revocation
+// status
+type Checker struct {
+	ds                kolide.Datastore
+	logger            log.Logger
+	url               string
+	pollFrequency     time.Duration
+	httpClientTimeout time.Duration
+	finish            chan struct{}
+}
+
+type Option func(chk *Checker)
+
 // Logger set the logger that will be used by the Checker
 func Logger(logger log.Logger) Option {
-	return func(opts *options) {
-		opts.logger = logger
+	return func(chk *Checker) {
+		chk.logger = logger
 	}
 }
 
-// PollFrequency defines frequency to check for license revocation
+// PollFrequency defines frequency to check for license revocation.
+// Default is once per hour.
 func PollFrequency(freq time.Duration) Option {
-	return func(opt *options) {
-		opt.pollFrequency = freq
+	return func(chk *Checker) {
+		chk.pollFrequency = freq
+	}
+}
+
+// HTTPClientTimeout determines how long to wait for requests to remote
+// host to response.  Defaults to 10 seconds
+func HTTPClientTimeout(timeout time.Duration) Option {
+	return func(chk *Checker) {
+		chk.httpClientTimeout = timeout
 	}
 }
 
@@ -66,66 +64,66 @@ func PollFrequency(freq time.Duration) Option {
 // https://cloud.kolide.co/api/v0/licenses
 // You may optionally set a logger, and/or supply a polling frequency that defines
 // how often we check for revocation.
-func NewChecker(ds kolide.Datastore, licenseEndpointURL string, opts ...Option) Checker {
-	settings := options{pollFrequency: defaultPollFrequency}
+func NewChecker(ds kolide.Datastore, licenseEndpointURL string, opts ...Option) *Checker {
+	response := &Checker{
+		pollFrequency:     defaultPollFrequency,
+		httpClientTimeout: defaultHttpClientTimeout,
+		logger:            log.NewNopLogger(),
+		ds:                ds,
+		url:               licenseEndpointURL,
+	}
 	for _, o := range opts {
-		o(&settings)
+		o(response)
 	}
-	if settings.logger == nil {
-		w := log.NewSyncWriter(os.Stderr)
-		settings.logger = log.NewLogfmtLogger(w)
-	}
-
-	return &checker{
-		ds:            ds,
-		logger:        settings.logger,
-		pollFrequency: settings.pollFrequency,
-		url:           licenseEndpointURL,
-	}
+	response.logger = log.NewContext(response.logger).With("component", "license-checker")
+	return response
 }
 
-func (cc *checker) Start() {
+// Start begins checking for license revocation
+func (cc *Checker) Start() {
 	cc.finish = make(chan struct{})
-	go func(chk checker) {
-		logMsg(&chk, "starting")
+	// pass in copy of receiver to avoid race conditions
+	go func(chk Checker) {
+		chk.logger.Log("msg", "starting")
 		for {
-			updateLicenseRevocation(&chk)
 			select {
 			case <-chk.finish:
-				logMsg(&chk, "finishing")
+				chk.logger.Log("msg", "finishing")
 				return
 			case <-time.After(chk.pollFrequency):
-				return
+				updateLicenseRevocation(&chk)
 			}
 		}
 	}(*cc)
 }
 
-func (cc *checker) Stop() {
+// Stop ends checking for license revocation.
+func (cc *Checker) Stop() {
 	if cc.finish != nil {
 		close(cc.finish)
 		cc.finish = nil
 	}
 }
 
-func updateLicenseRevocation(chk *checker) {
-	logMsg(chk, "begin license check")
-	defer logMsg(chk, "ending license check")
+func updateLicenseRevocation(chk *Checker) {
+	chk.logger.Log("msg", "begin license check")
+	defer chk.logger.Log("msg", "ending license check")
 
 	license, err := chk.ds.License()
 	if err != nil {
-		logErr(chk, "couldn't fetch license", err.Error())
+		chk.logger.Log("msg", "couldn't fetch license", "err", err)
 		return
 	}
 	claims, err := license.Claims()
 	if err != nil {
-		logErr(chk, "fetching claims", err.Error())
+		chk.logger.Log("msg", "fetching claims", "err", err)
 		return
 	}
 	url := fmt.Sprintf("%s/%s", chk.url, claims.LicenseUUID)
-	resp, err := http.Get(url)
+	client := http.Client{Timeout: chk.httpClientTimeout}
+	resp, err := client.Get(url)
 	if err != nil {
-		logErr(chk, fmt.Sprintf("fetching %s", url), err.Error())
+		chk.logger.Log("msg", fmt.Sprintf("fetching %s", url), "err", err)
 		return
 	}
 	defer resp.Body.Close()
@@ -133,35 +131,27 @@ func updateLicenseRevocation(chk *checker) {
 		var revInfo revokeInfo
 		err = json.NewDecoder(resp.Body).Decode(&revInfo)
 		if err != nil {
-			logErr(chk, "decoding response", err.Error())
+			chk.logger.Log("msg", "decoding response", "err", err)
 			return
 		}
 		err = chk.ds.RevokeLicense(revInfo.Revoked)
 		if err != nil {
-			logErr(chk, "revoke status", err.Error())
+			chk.logger.Log("msg", "revoke status", "err", err)
 			return
 		}
 		// success
-		logMsg(chk, fmt.Sprintf("license revocation status retrieved succesfully, revoked: %t", revInfo.Revoked))
+		chk.logger.Log("msg", fmt.Sprintf("license revocation status retrieved succesfully, revoked: %t", revInfo.Revoked))
 		return
 	}
 	if resp.StatusCode == http.StatusNotFound {
 		var revInfo revokeError
 		err = json.NewDecoder(resp.Body).Decode(&revInfo)
 		if err != nil {
-			logErr(chk, "decoding response", err.Error())
+			chk.logger.Log("msg", "decoding response", "err", err)
 			return
 		}
-		logErr(chk, "host response", fmt.Sprintf("status: %d error: %s", revInfo.Status, revInfo.Error))
+		chk.logger.Log("msg", "host response", "err", fmt.Sprintf("status: %d error: %s", revInfo.Status, revInfo.Error))
 		return
 	}
-	logErr(chk, "host response", fmt.Sprintf("unexpected response status from host, status %s", resp.Status))
-}
-
-func logMsg(chk *checker, msg string) {
-	chk.logger.Log("component", "license-checker", "msg", msg)
-}
-
-func logErr(chk *checker, msg, errMsg string) {
-	chk.logger.Log("component", "license-checker", "msg", msg, "err", errMsg)
+	chk.logger.Log("msg", "host response", "err", fmt.Sprintf("unexpected response status from host, status %s", resp.Status))
 }

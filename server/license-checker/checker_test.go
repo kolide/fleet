@@ -2,8 +2,12 @@ package license
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"regexp"
+	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -35,6 +39,9 @@ vQIDAQAB
 `
 
 func TestLicenseFound(t *testing.T) {
+	var licFunInvoked int64
+	var revokeFunInvoked int64
+
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		response := revokeInfo{
 			UUID:    "DEADBEEF",
@@ -47,6 +54,7 @@ func TestLicenseFound(t *testing.T) {
 
 	ds := new(mock.Store)
 	ds.LicenseFunc = func() (*kolide.License, error) {
+		atomic.AddInt64(&licFunInvoked, 1)
 		result := &kolide.License{
 			UpdateTimestamp: kolide.UpdateTimestamp{
 				UpdatedAt: time.Now().Add(-5 * time.Minute),
@@ -59,19 +67,27 @@ func TestLicenseFound(t *testing.T) {
 		return result, nil
 	}
 	ds.RevokeLicenseFunc = func(revoked bool) error {
+		atomic.AddInt64(&revokeFunInvoked, 1)
 		return nil
 	}
 
-	checker := NewChecker(ds, ts.URL, PollFrequency(500*time.Millisecond))
+	checker := NewChecker(ds, ts.URL,
+		PollFrequency(100*time.Millisecond),
+	)
 	checker.Start()
 	<-time.After(time.Second)
 	checker.Stop()
-	assert.True(t, ds.LicenseFuncInvoked)
-	assert.True(t, ds.RevokeLicenseFuncInvoked)
+	// verify muliple checks occurred, we have to use atomic because if we
+	// use the  flags from the mock package to indicate function invocation race detector will
+	// complain
+	assert.True(t, atomic.LoadInt64(&licFunInvoked) > 5)
+	assert.True(t, atomic.LoadInt64(&revokeFunInvoked) > 5)
 
 }
 
 func TestLicenseNotFound(t *testing.T) {
+	var licFunInvoked int64
+	var revokeFunInvoked int64
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		response := revokeError{
@@ -85,6 +101,7 @@ func TestLicenseNotFound(t *testing.T) {
 
 	ds := new(mock.Store)
 	ds.LicenseFunc = func() (*kolide.License, error) {
+		atomic.AddInt64(&licFunInvoked, 1)
 		result := &kolide.License{
 			UpdateTimestamp: kolide.UpdateTimestamp{
 				UpdatedAt: time.Now().Add(-5 * time.Minute),
@@ -97,14 +114,96 @@ func TestLicenseNotFound(t *testing.T) {
 		return result, nil
 	}
 	ds.RevokeLicenseFunc = func(revoked bool) error {
+		atomic.AddInt64(&revokeFunInvoked, 1)
 		return nil
 	}
 
-	checker := NewChecker(ds, ts.URL, PollFrequency(500*time.Millisecond))
+	checker := NewChecker(ds, ts.URL,
+		PollFrequency(100*time.Millisecond),
+	)
 	checker.Start()
 	<-time.After(time.Second)
 	checker.Stop()
-	assert.True(t, ds.LicenseFuncInvoked)
-	assert.False(t, ds.RevokeLicenseFuncInvoked)
+
+	assert.True(t, atomic.LoadInt64(&licFunInvoked) > 5)
+	assert.Equal(t, int64(0), atomic.LoadInt64(&revokeFunInvoked))
+
+}
+
+type testLogger struct {
+	logContent string
+	lock       sync.Mutex
+}
+
+func (tl *testLogger) Log(keyVals ...interface{}) error {
+	tl.lock.Lock()
+	defer tl.lock.Unlock()
+	tl.logContent += fmt.Sprint(keyVals...)
+	return nil
+}
+
+func (tl *testLogger) read() string {
+	var buff []byte
+	tl.lock.Lock()
+	buff = make([]byte, len(tl.logContent))
+	copy(buff, tl.logContent)
+	tl.lock.Unlock()
+	return string(buff)
+}
+
+func TestLicenseTimeout(t *testing.T) {
+	var licFunInvoked int64
+	var revokeFunInvoked int64
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		<-time.After(300 * time.Millisecond)
+		response := revokeInfo{
+			UUID:    "DEADBEEF",
+			Revoked: true,
+		}
+		json.NewEncoder(w).Encode(response)
+	}))
+	defer ts.Close()
+
+	ds := new(mock.Store)
+	ds.LicenseFunc = func() (*kolide.License, error) {
+		atomic.AddInt64(&licFunInvoked, 1)
+		result := &kolide.License{
+			UpdateTimestamp: kolide.UpdateTimestamp{
+				UpdatedAt: time.Now().Add(-5 * time.Minute),
+			},
+			Token:     &tokenString,
+			PublicKey: publicKey,
+			Revoked:   false,
+			ID:        1,
+		}
+		return result, nil
+	}
+	ds.RevokeLicenseFunc = func(revoked bool) error {
+		atomic.AddInt64(&revokeFunInvoked, 1)
+		return nil
+	}
+
+	// inject our custom logger so we can get log without breaking race
+	// detection
+	logger := &testLogger{}
+
+	checker := NewChecker(ds, ts.URL,
+		PollFrequency(500*time.Millisecond),
+		HTTPClientTimeout(200*time.Millisecond),
+		Logger(logger),
+	)
+	checker.Start()
+	<-time.After(time.Second)
+	checker.Stop()
+
+	assert.True(t, atomic.LoadInt64(&licFunInvoked) > 0)
+	assert.True(t, atomic.LoadInt64(&revokeFunInvoked) == 0)
+
+	match, _ := regexp.MatchString("(Client.Timeout exceeded while awaiting headers)", logger.read())
+	assert.True(t, match)
+	// check to make sure things cleanly shut down.
+	match, _ = regexp.MatchString("finishing", logger.read())
+	assert.True(t, match)
 
 }
