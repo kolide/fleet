@@ -2,10 +2,13 @@ package license
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
+	"sync"
 	"time"
 
+	"github.com/WatchBeam/clock"
 	"github.com/go-kit/kit/log"
 	"github.com/kolide/kolide/server/kolide"
 )
@@ -14,6 +17,14 @@ const (
 	defaultPollFrequency     = time.Hour
 	defaultHttpClientTimeout = 10 * time.Second
 )
+
+type timer struct {
+	*time.Ticker
+}
+
+func (t *timer) Chan() <-chan time.Time {
+	return t.C
+}
 
 type revokeInfo struct {
 	UUID    string `json:"uuid"`
@@ -32,8 +43,10 @@ type Checker struct {
 	logger        log.Logger
 	url           string
 	pollFrequency time.Duration
+	ticker        clock.Ticker
 	client        *http.Client
 	finish        chan struct{}
+	wait          sync.WaitGroup
 }
 
 type Option func(chk *Checker)
@@ -45,18 +58,19 @@ func Logger(logger log.Logger) Option {
 	}
 }
 
-// PollFrequency defines frequency to check for license revocation.
-// Default is once per hour.
-func PollFrequency(freq time.Duration) Option {
-	return func(chk *Checker) {
-		chk.pollFrequency = freq
-	}
-}
-
 // HTTPClient supply your own http client
 func HTTPClient(client *http.Client) Option {
 	return func(chk *Checker) {
 		chk.client = client
+	}
+}
+
+func PollFrequency(freq time.Duration) Option {
+	ticker := &timer{
+		Ticker: time.NewTicker(freq),
+	}
+	return func(chk *Checker) {
+		chk.ticker = ticker
 	}
 }
 
@@ -66,12 +80,16 @@ func HTTPClient(client *http.Client) Option {
 // You may optionally set a logger, and/or supply a polling frequency that defines
 // how often we check for revocation.
 func NewChecker(ds kolide.Datastore, licenseEndpointURL string, opts ...Option) *Checker {
+	defaultTicker := &timer{
+		Ticker: time.NewTicker(defaultPollFrequency),
+	}
 	response := &Checker{
-		pollFrequency: defaultPollFrequency,
-		logger:        log.NewNopLogger(),
-		ds:            ds,
-		client:        &http.Client{Timeout: defaultHttpClientTimeout},
-		url:           licenseEndpointURL,
+		logger: log.NewNopLogger(),
+		ds:     ds,
+		client: &http.Client{Timeout: defaultHttpClientTimeout},
+		url:    licenseEndpointURL,
+		ticker: defaultTicker,
+		finish: make(chan struct{}),
 	}
 	for _, o := range opts {
 		o(response)
@@ -81,30 +99,38 @@ func NewChecker(ds kolide.Datastore, licenseEndpointURL string, opts ...Option) 
 	return response
 }
 
-// Start begins checking for license revocation
-func (cc *Checker) Start() {
-	cc.finish = make(chan struct{})
+// Start begins checking for license revocation. Note that start can only
+// be called once. If Stop is called you must create a new checker to use
+// it again.
+func (cc *Checker) Start() error {
+	if cc.finish == nil {
+		return errors.New("start called on stopped checker")
+	}
 	// pass in copy of receiver to avoid race conditions
 	go func(chk Checker) {
+		cc.wait.Add(1)
+		defer cc.wait.Done()
 		chk.logger.Log("msg", "starting")
 		for {
 			select {
 			case <-chk.finish:
 				chk.logger.Log("msg", "finishing")
 				return
-			case <-time.After(chk.pollFrequency):
+			case <-chk.ticker.Chan():
 				updateLicenseRevocation(&chk)
 			}
 		}
 	}(*cc)
+
+	return nil
 }
 
 // Stop ends checking for license revocation.
 func (cc *Checker) Stop() {
-	if cc.finish != nil {
-		close(cc.finish)
-		cc.finish = nil
-	}
+	cc.ticker.Stop()
+	close(cc.finish)
+	cc.wait.Wait()
+	cc.finish = nil
 }
 
 func updateLicenseRevocation(chk *Checker) {

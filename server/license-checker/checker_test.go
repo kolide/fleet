@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/WatchBeam/clock"
 	"github.com/kolide/kolide/server/kolide"
 	"github.com/kolide/kolide/server/mock"
 	"github.com/stretchr/testify/assert"
@@ -37,6 +38,12 @@ dW1E6jHcq8PQFK+4bI1gKZVbV4dFGSSMUyD7ov77aWHjxdQe6YEGcSXKzfyMaUtQ
 vQIDAQAB
 -----END PUBLIC KEY-----
 `
+
+func mockTicker(ticker clock.Ticker) Option {
+	return func(chk *Checker) {
+		chk.ticker = ticker
+	}
+}
 
 func TestLicenseFound(t *testing.T) {
 	var licFunInvoked int64
@@ -70,19 +77,23 @@ func TestLicenseFound(t *testing.T) {
 		atomic.AddInt64(&revokeFunInvoked, 1)
 		return nil
 	}
-
+	c := clock.NewMockClock()
 	checker := NewChecker(ds, ts.URL,
-		PollFrequency(100*time.Millisecond),
+		mockTicker(c.NewTicker(time.Millisecond)),
 	)
 	checker.Start()
-	<-time.After(time.Second)
+	<-time.After(10 * time.Millisecond)
+	c.AddTime(time.Millisecond)
+	c.AddTime(time.Millisecond)
+	<-time.After(10 * time.Millisecond)
 	checker.Stop()
+
 	// verify muliple checks occurred, we have to use atomic because if we
 	// use the  flags from the mock package to indicate function invocation race detector will
 	// complain
-	assert.True(t, atomic.LoadInt64(&licFunInvoked) > 5)
-	assert.True(t, atomic.LoadInt64(&revokeFunInvoked) > 5)
 
+	assert.Equal(t, int64(2), atomic.LoadInt64(&licFunInvoked))
+	assert.Equal(t, int64(2), atomic.LoadInt64(&revokeFunInvoked))
 }
 
 func TestLicenseNotFound(t *testing.T) {
@@ -118,16 +129,18 @@ func TestLicenseNotFound(t *testing.T) {
 		return nil
 	}
 
+	c := clock.NewMockClock()
 	checker := NewChecker(ds, ts.URL,
-		PollFrequency(100*time.Millisecond),
+		mockTicker(c.NewTicker(time.Millisecond)),
 	)
 	checker.Start()
-	<-time.After(time.Second)
+	<-time.After(10 * time.Millisecond)
+	c.AddTime(time.Millisecond)
+	<-time.After(10 * time.Millisecond)
 	checker.Stop()
 
-	assert.True(t, atomic.LoadInt64(&licFunInvoked) > 5)
+	assert.Equal(t, int64(1), atomic.LoadInt64(&licFunInvoked))
 	assert.Equal(t, int64(0), atomic.LoadInt64(&revokeFunInvoked))
-
 }
 
 type testLogger struct {
@@ -187,19 +200,21 @@ func TestLicenseTimeout(t *testing.T) {
 	// inject our custom logger so we can get log without breaking race
 	// detection
 	logger := &testLogger{}
+	c := clock.NewMockClock()
 
 	checker := NewChecker(ds, ts.URL,
-		PollFrequency(500*time.Millisecond),
-		HTTPClient(&http.Client{Timeout: 200 * time.Millisecond}),
+		mockTicker(c.NewTicker(time.Millisecond)),
+		HTTPClient(&http.Client{Timeout: 2 * time.Millisecond}),
 		Logger(logger),
 	)
 	checker.Start()
-	<-time.After(time.Second)
+	<-time.After(10 * time.Millisecond)
+	c.AddTime(time.Millisecond)
+	<-time.After(10 * time.Millisecond)
 	checker.Stop()
 
-	assert.True(t, atomic.LoadInt64(&licFunInvoked) > 0)
-	assert.True(t, atomic.LoadInt64(&revokeFunInvoked) == 0)
-	<-time.After(200 * time.Millisecond)
+	assert.Equal(t, int64(1), atomic.LoadInt64(&licFunInvoked))
+	assert.Equal(t, int64(0), atomic.LoadInt64(&revokeFunInvoked))
 	match, _ := regexp.MatchString("(Client.Timeout exceeded while awaiting headers)", logger.read())
 	assert.True(t, match)
 	// check to make sure things cleanly shut down.
