@@ -199,7 +199,7 @@ func TestLicenseTimeout(t *testing.T) {
 
 	assert.True(t, atomic.LoadInt64(&licFunInvoked) > 0)
 	assert.True(t, atomic.LoadInt64(&revokeFunInvoked) == 0)
-
+	<-time.After(200 * time.Millisecond)
 	match, _ := regexp.MatchString("(Client.Timeout exceeded while awaiting headers)", logger.read())
 	assert.True(t, match)
 	// check to make sure things cleanly shut down.
