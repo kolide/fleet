@@ -214,8 +214,9 @@ class Kolide extends Base {
     update: (scheduledQuery, updatedAttributes) => {
       const { SCHEDULED_QUERIES } = endpoints;
       const endpoint = this.endpoint(`${SCHEDULED_QUERIES}/${scheduledQuery.id}`);
+      const params = helpers.formatScheduledQueryForServer(updatedAttributes);
 
-      return this.authenticatedPatch(endpoint, JSON.stringify(updatedAttributes))
+      return this.authenticatedPatch(endpoint, JSON.stringify(params))
         .then(response => response.scheduled);
     },
   }

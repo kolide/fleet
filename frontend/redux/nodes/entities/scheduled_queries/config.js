@@ -1,3 +1,4 @@
+import helpers from 'kolide/helpers';
 import Kolide from 'kolide';
 import reduxConfig from 'redux/nodes/entities/base/reduxConfig';
 import schemas from 'redux/nodes/entities/base/schemas';
@@ -9,6 +10,7 @@ export default reduxConfig({
   destroyFunc: Kolide.scheduledQueries.destroy,
   entityName: 'scheduled_queries',
   loadAllFunc: Kolide.scheduledQueries.loadAll,
+  parseEntityFunc: helpers.formatScheduledQueryForClient,
   schema,
   updateFunc: Kolide.scheduledQueries.update,
 });
