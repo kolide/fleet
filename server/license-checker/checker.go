@@ -10,8 +10,10 @@ import (
 	"github.com/kolide/kolide/server/kolide"
 )
 
-const defaultPollFrequency = time.Hour
-const defaultHttpClientTimeout = 10 * time.Second
+const (
+	defaultPollFrequency     = time.Hour
+	defaultHttpClientTimeout = 10 * time.Second
+)
 
 type revokeInfo struct {
 	UUID    string `json:"uuid"`
@@ -26,12 +28,12 @@ type revokeError struct {
 // Checker checks remote kolide/cloud app for license revocation
 // status
 type Checker struct {
-	ds                kolide.Datastore
-	logger            log.Logger
-	url               string
-	pollFrequency     time.Duration
-	httpClientTimeout time.Duration
-	finish            chan struct{}
+	ds            kolide.Datastore
+	logger        log.Logger
+	url           string
+	pollFrequency time.Duration
+	client        *http.Client
+	finish        chan struct{}
 }
 
 type Option func(chk *Checker)
@@ -51,11 +53,10 @@ func PollFrequency(freq time.Duration) Option {
 	}
 }
 
-// HTTPClientTimeout determines how long to wait for requests to remote
-// host to response.  Defaults to 10 seconds
-func HTTPClientTimeout(timeout time.Duration) Option {
+// HTTPClient supply your own http client
+func HTTPClient(client *http.Client) Option {
 	return func(chk *Checker) {
-		chk.httpClientTimeout = timeout
+		chk.client = client
 	}
 }
 
@@ -66,15 +67,16 @@ func HTTPClientTimeout(timeout time.Duration) Option {
 // how often we check for revocation.
 func NewChecker(ds kolide.Datastore, licenseEndpointURL string, opts ...Option) *Checker {
 	response := &Checker{
-		pollFrequency:     defaultPollFrequency,
-		httpClientTimeout: defaultHttpClientTimeout,
-		logger:            log.NewNopLogger(),
-		ds:                ds,
-		url:               licenseEndpointURL,
+		pollFrequency: defaultPollFrequency,
+		logger:        log.NewNopLogger(),
+		ds:            ds,
+		client:        &http.Client{Timeout: defaultHttpClientTimeout},
+		url:           licenseEndpointURL,
 	}
 	for _, o := range opts {
 		o(response)
 	}
+
 	response.logger = log.NewContext(response.logger).With("component", "license-checker")
 	return response
 }
@@ -120,14 +122,14 @@ func updateLicenseRevocation(chk *Checker) {
 		return
 	}
 	url := fmt.Sprintf("%s/%s", chk.url, claims.LicenseUUID)
-	client := http.Client{Timeout: chk.httpClientTimeout}
-	resp, err := client.Get(url)
+	resp, err := chk.client.Get(url)
 	if err != nil {
 		chk.logger.Log("msg", fmt.Sprintf("fetching %s", url), "err", err)
 		return
 	}
 	defer resp.Body.Close()
-	if resp.StatusCode == http.StatusOK {
+	switch resp.StatusCode {
+	case http.StatusOK:
 		var revInfo revokeInfo
 		err = json.NewDecoder(resp.Body).Decode(&revInfo)
 		if err != nil {
@@ -141,9 +143,7 @@ func updateLicenseRevocation(chk *Checker) {
 		}
 		// success
 		chk.logger.Log("msg", fmt.Sprintf("license revocation status retrieved succesfully, revoked: %t", revInfo.Revoked))
-		return
-	}
-	if resp.StatusCode == http.StatusNotFound {
+	case http.StatusNotFound:
 		var revInfo revokeError
 		err = json.NewDecoder(resp.Body).Decode(&revInfo)
 		if err != nil {
@@ -151,7 +151,7 @@ func updateLicenseRevocation(chk *Checker) {
 			return
 		}
 		chk.logger.Log("msg", "host response", "err", fmt.Sprintf("status: %d error: %s", revInfo.Status, revInfo.Error))
-		return
+	default:
+		chk.logger.Log("msg", "host response", "err", fmt.Sprintf("unexpected response status from host, status %s", resp.Status))
 	}
-	chk.logger.Log("msg", "host response", "err", fmt.Sprintf("unexpected response status from host, status %s", resp.Status))
 }

@@ -190,7 +190,7 @@ func TestLicenseTimeout(t *testing.T) {
 
 	checker := NewChecker(ds, ts.URL,
 		PollFrequency(500*time.Millisecond),
-		HTTPClientTimeout(200*time.Millisecond),
+		HTTPClient(&http.Client{Timeout: 200 * time.Millisecond}),
 		Logger(logger),
 	)
 	checker.Start()
