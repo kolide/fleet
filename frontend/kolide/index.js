@@ -69,10 +69,15 @@ class Kolide extends Base {
   }
 
   labels = {
-    create: ({ description, name, query }) => {
+    create: ({ description, name, platform, query }) => {
       const { LABELS } = endpoints;
+      let platformParam = platform;
 
-      return this.authenticatedPost(this.endpoint(LABELS), JSON.stringify({ description, name, query }))
+      if (platform === 'all') {
+        platformParam = '';
+      }
+
+      return this.authenticatedPost(this.endpoint(LABELS), JSON.stringify({ description, name, platform: platformParam, query }))
         .then((response) => {
           const { label } = response;
 

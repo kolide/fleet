@@ -83,8 +83,9 @@ describe('Kolide - API client', () => {
       it('calls the appropriate endpoint with the correct parameters', (done) => {
         const description = 'label description';
         const name = 'label name';
+        const platform = 'windows';
         const query = 'SELECT * FROM users';
-        const labelParams = { description, name, query };
+        const labelParams = { description, name, platform, query };
         const request = validCreateLabelRequest(bearerToken, labelParams);
 
         Kolide.setBearerToken(bearerToken);
@@ -97,6 +98,23 @@ describe('Kolide - API client', () => {
               slug: 'label-name',
               type: 'custom',
             });
+            done();
+          })
+          .catch(done);
+      });
+
+      it('sends the platform as an empty string when the platform is all', (done) => {
+        const description = 'label description';
+        const name = 'label name';
+        const platform = '';
+        const query = 'SELECT * FROM users';
+        const labelParams = { description, name, platform, query };
+        const request = validCreateLabelRequest(bearerToken, labelParams);
+
+        Kolide.setBearerToken(bearerToken);
+        Kolide.labels.create({ ...labelParams, platform: 'all' })
+          .then(() => {
+            expect(request.isDone()).toEqual(true);
             done();
           })
           .catch(done);
