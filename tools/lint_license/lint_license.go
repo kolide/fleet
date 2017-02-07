@@ -20,8 +20,8 @@ import (
 
 // This script is intended to be run from the root of the Kolide repo. All
 // paths are relative to that directory.
-const configPath = "./lint_license/license_settings.yaml"
-const templatePath = "./lint_license/dependencies.md.tmpl"
+const configPath = "./tools/lint_license/license_settings.yaml"
+const templatePath = "./tools/lint_license/dependencies.md.tmpl"
 const templateName = "dependencies.md.tmpl"
 const glideLockPath = "./glide.lock"
 const nodeModulesPath = "./node_modules"

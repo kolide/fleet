@@ -106,7 +106,7 @@ lint-go:
 	go vet $(shell glide nv)
 
 lint-license:
-	go run lint_license/lint_license.go
+	go run tools/lint_license/lint_license.go
 
 lint: lint-go lint-js lint-scss lint-ts lint-license
 
