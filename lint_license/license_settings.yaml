@@ -53,7 +53,7 @@ allowed_licenses:
 # Packages that are detected as dependencies because they have a package.json,
 # but are actually tests for their parent directories. These packages are
 # covered under the license of their parent directory, and will not be listed
-# as dependencies.
+# as dependencies. Path should be relative to $GOPATH/github.com/kolide/kolide.
 tests:
   ? node_modules/in-publish/test
   ? node_modules/readdirp/examples
@@ -68,7 +68,7 @@ tests:
 
 # Packages for which automatic license detection fails. The given license type
 # will be used. Usually this license is manually determined from the README or
-# license file.
+# license file. Path should be relative to $GOPATH/github.com/kolide/kolide.
 overrides:
   node_modules/string-hash:
     CC0-1.0

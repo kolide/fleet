@@ -57,10 +57,20 @@ type dependency struct {
 	Path string
 }
 
-// makePath concatenates the provided path onto
+// absolutePath concatenates the provided path onto
 // $GOPATH/src/github.com/kolide/kolide
-func makePath(path string) string {
+func absolutePath(path string) string {
 	return filepath.Join(os.Getenv("GOPATH"), "src/github.com/kolide/kolide", path)
+}
+
+// relativePath strips the leading $GOPATH/src/github.com/kolide/kolide from
+// the provided path. If it fails, the original path is returned.
+func relativePath(path string) string {
+	rel, err := filepath.Rel(absolutePath(""), path)
+	if err != nil {
+		return path
+	}
+	return rel
 }
 
 // packageJSON is a schema for the relevant bits of package.json
@@ -94,7 +104,7 @@ func extractJSPackageInfo(config settings, path string) (dependency, error) {
 	dep.Version = pkg.Version
 	dep.SourceURL = jsSourceURLBase + dep.Name
 
-	if lic, ok := config.Overrides[dep.Path]; ok {
+	if lic, ok := config.Overrides[relativePath(dep.Path)]; ok {
 		dep.License = lic
 		return dep, nil
 	}
@@ -145,7 +155,7 @@ func getJSDeps(config settings) ([]dependency, error) {
 
 		// Skip test packages that are explicitly excluded by the
 		// config file
-		if _, ok := config.Tests[filepath.Dir(path)]; ok {
+		if _, ok := config.Tests[relativePath(filepath.Dir(path))]; ok {
 			return nil
 		}
 
@@ -158,7 +168,7 @@ func getJSDeps(config settings) ([]dependency, error) {
 		return nil
 	}
 
-	err := filepath.Walk(nodeModulesPath, walkFn)
+	err := filepath.Walk(absolutePath(nodeModulesPath), walkFn)
 	if err != nil {
 		return nil, errors.Wrap(err, "walking node_modules")
 	}
@@ -179,13 +189,13 @@ type glideLock struct {
 
 func extractGoPackageInfo(config settings, pkg glideImport) (dependency, error) {
 	dep := dependency{
-		Path:      filepath.Join(vendorPath, pkg.Name),
+		Path:      absolutePath(filepath.Join(vendorPath, pkg.Name)),
 		Name:      pkg.Name,
 		SourceURL: "https://" + pkg.Name,
 		Version:   pkg.Version,
 	}
 
-	if lic, ok := config.Overrides[dep.Path]; ok {
+	if lic, ok := config.Overrides[relativePath(dep.Path)]; ok {
 		dep.License = lic
 		return dep, nil
 	}
@@ -198,7 +208,7 @@ func extractGoPackageInfo(config settings, pkg glideImport) (dependency, error) 
 }
 
 func getGoDeps(config settings) ([]dependency, error) {
-	glockContents, err := ioutil.ReadFile(glideLockPath)
+	glockContents, err := ioutil.ReadFile(absolutePath(glideLockPath))
 	if err != nil {
 		return nil, errors.Wrap(err, "error reading glide.lock")
 	}
@@ -249,7 +259,7 @@ func writeDependenciesMarkdown(config settings, deps map[string]dependency, out 
 
 	tmpl, err := template.New("").
 		Funcs(funcs).
-		ParseFiles(templatePath)
+		ParseFiles(absolutePath(templatePath))
 	if err != nil {
 		return errors.Wrap(err, "reading markdown template")
 	}
@@ -263,7 +273,7 @@ func writeDependenciesMarkdown(config settings, deps map[string]dependency, out 
 }
 
 func main() {
-	configContents, err := ioutil.ReadFile(configPath)
+	configContents, err := ioutil.ReadFile(absolutePath(configPath))
 	if err != nil {
 		log.Fatal("error reading config file: ", err)
 	}
@@ -316,7 +326,7 @@ func main() {
 		allDeps[dep.Name] = dep
 	}
 
-	out, err := os.Create(generatedMarkdownPath)
+	out, err := os.Create(absolutePath(generatedMarkdownPath))
 	if err != nil {
 		log.Fatal("opening markdown file for writing: ", err)
 	}
