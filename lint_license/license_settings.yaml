@@ -1,74 +1,118 @@
-# License names that are allowable for use in Kolide
+# License names that are allowable for use in Kolide. Map from license name to
+# URL for that license.
 allowed_licenses:
-  ? MIT
-  ? MIT/X11
-  ? BSD
-  ? Apache-1.0
-  ? Apache-2.0
-  ? Apache License, Version 2.0
-  ? JSON
-  ? Postgres
-  ? ISC
-  ? Public Domain
-  ? Public domain
-  ? WTFPL
-  ? CC0-1.0
-  ? Unlicense
+  MIT:
+    https://opensource.org/licenses/MIT
+  MIT/X11:
+    https://opensource.org/licenses/MIT
+  Apache-1.0:
+    https://www.apache.org/licenses/LICENSE-1.0
+  Apache-2.0:
+    https://www.apache.org/licenses/LICENSE-2.0
+  Apache License, Version 2.0:
+    https://www.apache.org/licenses/LICENSE-2.0
+  JSON:
+    http://www.json.org/license.html
+  Postgres:
+    https://opensource.org/licenses/PostgreSQL
+  ISC:
+    https://opensource.org/licenses/ISC
+  WTFPL:
+    http://www.wtfpl.net/txt/copying/
+  CC0-1.0:
+    https://creativecommons.org/publicdomain/zero/1.0/
+  Unlicense:
+    http://unlicense.org/UNLICENSE
+  AFLv2.1:
+    http://www.moedae.org/opensource/licenses/aflv2.1
+  CC-BY-4.0:
+    https://creativecommons.org/licenses/by/4.0/
+  MPL-2.0:
+    https://www.mozilla.org/en-US/MPL/2.0/
+  Public Domain:
+    \#
+  Public domain:
+    \#
 
-# Packages for which licensing has been manually reviewed and determined to be
-# acceptable. A comment should be left above each manual exception (or group of
-# related manual exceptions).
-exceptions:
-  ## Covered by valid parent dir license (usually tests/examples with package.json)
-  # ISC
+  # FreeBSD and BSD-2-Clause refer to the same license
+  FreeBSD:
+    https://opensource.org/licenses/BSD-2-Clause
+  BSD-2-Clause:
+    https://opensource.org/licenses/BSD-2-Clause
+
+  # NewBSD and BSD-3-Clause refer to the same license
+  NewBSD:
+    https://opensource.org/licenses/BSD-3-Clause
+  BSD-3-Clause:
+    https://opensource.org/licenses/BSD-3-Clause
+  # Assume "BSD" refers to the stricter BSD-3-Clause
+  BSD:
+    https://opensource.org/licenses/BSD-3-Clause
+
+
+# Packages that are detected as dependencies because they have a package.json,
+# but are actually tests for their parent directories. These packages are
+# covered under the license of their parent directory, and will not be listed
+# as dependencies.
+tests:
   ? node_modules/in-publish/test
-  # ISC
-  ? node_modules/read-package-json/test/fixtures/readmes
-  # MIT
   ? node_modules/readdirp/examples
-  # BSD-3-Clause
   ? node_modules/fsevents/node_modules/node-pre-gyp/lib/util/nw-pre-gyp
-  # MIT
   ? node_modules/brace/example
-  # MIT
   ? node_modules/uuid/benchmark
-  # MIT
-  ? node_modules/resolve/test/module_dir/zmodules/bbb
   ? node_modules/resolve/test/resolver/baz
   ? node_modules/resolve/test/resolver/incorrect_main
-  # MIT
   ? node_modules/stream-http/test/browser
-  # MIT
+  ? node_modules/resolve/test/module_dir/zmodules/bbb
   ? node_modules/browserify-zlib/test
 
-  ## License specified in README or LICENSE file
-  # public domain (cc0)
-  ? node_modules/string-hash
-  # MIT
-  ? node_modules/indexof
-  # MIT
-  ? node_modules/css-color-function/node_modules/debug
-  # MIT
-  ? node_modules/cli-table
-  # MIT
-  ? node_modules/async-foreach
+# Packages for which automatic license detection fails. The given license type
+# will be used. Usually this license is manually determined from the README or
+# license file.
+overrides:
+  node_modules/string-hash:
+    CC0-1.0
+  node_modules/indexof:
+    MIT
+  node_modules/css-color-function/node_modules/debug:
+    MIT
+  node_modules/cli-table:
+    MIT
+  node_modules/async-foreach:
+    MIT
   # (BSD-2-Clause OR MIT OR Apache-2.0)
-  ? node_modules/fsevents/node_modules/rc
+  node_modules/fsevents/node_modules/rc:
+    MIT
   # (GPL-2.0 OR MIT)
-  ? node_modules/ua-parser-js
-  # MIT
-  ? node_modules/spdx-expression-parse
+  node_modules/ua-parser-js:
+    MIT
+  node_modules/spdx-expression-parse:
+    MIT
   # (WTFPL OR MIT)
-  ? node_modules/path-is-inside
+  node_modules/path-is-inside:
+    MIT
   # BSD-3-Clause OR MIT
-  ? node_modules/amdefine
-  # Unlicense
-  ? node_modules/stackframe
-  # MIT
-  ? node_modules/rgb
-  # MIT
-  ? vendor/github.com/pelletier/go-buffruneio
-  # MIT
-  ? vendor/github.com/kr/logfmt
-  # ISC
-  ? vendor/github.com/davecgh/go-spew
+  node_modules/amdefine:
+    MIT
+  node_modules/stackframe:
+    Unlicense
+  node_modules/fsevents/node_modules/bcrypt-pbkdf:
+    BSD-3-Clause
+  node_modules/ripemd160:
+    MIT
+  node_modules/entities:
+    BSD-2-Clause
+  node_modules/css-what:
+    BSD-2-Clause
+  node_modules/css-select:
+    BSD-2-Clause
+  node_modules/rgb:
+    MIT
+  vendor/github.com/pelletier/go-buffruneio:
+    MIT
+  vendor/github.com/kr/logfmt:
+    MIT
+  vendor/github.com/davecgh/go-spew:
+    ISC
+  vendor/github.com/go-sql-driver/mysql:
+    MPL-2.0

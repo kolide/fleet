@@ -3,13 +3,14 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
-	"time"
+	"text/template"
 
 	"github.com/pkg/errors"
 	license "github.com/ryanuber/go-license"
@@ -17,19 +18,46 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-type Settings struct {
-	AllowedLicenses map[string]interface{} `yaml:"allowed_licenses"`
-	Exceptions      map[string]interface{} `yaml:"exceptions"`
+// This script is intended to be run from the root of the Kolide repo. All
+// paths are relative to that directory.
+const configPath = "./lint_license/license_settings.yaml"
+const templatePath = "./lint_license/dependencies.md.tmpl"
+const templateName = "dependencies.md.tmpl"
+const glideLockPath = "./glide.lock"
+const nodeModulesPath = "./node_modules"
+const vendorPath = "./vendor"
+const jsSourceURLBase = "https://www.npmjs.com/package/"
+const generatedMarkdownPath = "./docs/third-party/dependencies.md"
+
+// settings defines the config options for this script
+type settings struct {
+	// AllowedLicenses is a map from acceptable license name to the URL for
+	// that license.
+	AllowedLicenses map[string]string `yaml:"allowed_licenses"`
+	// Overrides is a map of package paths to override license names. These
+	// licenses are determined by a human and manually overridden.
+	Overrides map[string]string `yaml:"overrides"`
+	// Tests is a set of packages that are tests for another package, and
+	// should not be counted as a separate dependency. They are determined
+	// by a human and manually overridden.
+	Tests map[string]struct{} `yaml:"tests"`
 }
 
-type Dependency struct {
-	Name       string
-	License    string
-	Repository string
-	Version    string
-	Path       string
+// dependency stores all the relevant info for a Kolide dependency
+type dependency struct {
+	// Name is the package name
+	Name string
+	// License is the name of the license used
+	License string
+	// SourceURL is the URL for the package
+	SourceURL string
+	// Version is the version we are using
+	Version string
+	// Path is the local directory path
+	Path string
 }
 
+// packageJSON is a schema for the relevant bits of package.json
 type packageJSON struct {
 	Name    string `json:"name"`
 	Version string `json:"version"`
@@ -39,8 +67,8 @@ type packageJSON struct {
 	Licenses []interface{} `json:"licenses"`
 }
 
-func extractJSPackageInfo(path string) (Dependency, error) {
-	dep := Dependency{
+func extractJSPackageInfo(config settings, path string) (dependency, error) {
+	dep := dependency{
 		Path: filepath.Dir(path),
 	}
 
@@ -57,6 +85,12 @@ func extractJSPackageInfo(path string) (Dependency, error) {
 
 	dep.Name = pkg.Name
 	dep.Version = pkg.Version
+	dep.SourceURL = jsSourceURLBase + dep.Name
+
+	if lic, ok := config.Overrides[dep.Path]; ok {
+		dep.License = lic
+		return dep, nil
+	}
 
 	// Pick whichever top-level license key we found
 	var licObj interface{}
@@ -90,8 +124,8 @@ func extractJSPackageInfo(path string) (Dependency, error) {
 	return dep, nil
 }
 
-func getJSDeps() ([]Dependency, error) {
-	var deps []Dependency
+func getJSDeps(config settings) ([]dependency, error) {
+	var deps []dependency
 	walkFn := func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			fmt.Printf("Error reading path %s: %s\n", path, err.Error())
@@ -102,7 +136,13 @@ func getJSDeps() ([]Dependency, error) {
 			return nil
 		}
 
-		dep, err := extractJSPackageInfo(path)
+		// Skip test packages that are explicitly excluded by the
+		// config file
+		if _, ok := config.Tests[filepath.Dir(path)]; ok {
+			return nil
+		}
+
+		dep, err := extractJSPackageInfo(config, path)
 		if err != nil {
 			fmt.Printf("Error analyzing path %s: %s\n", path, err.Error())
 		}
@@ -111,11 +151,7 @@ func getJSDeps() ([]Dependency, error) {
 		return nil
 	}
 
-	fmt.Println("starting walk")
-	t := time.Now()
-	err := filepath.Walk("./node_modules", walkFn)
-	fmt.Println("completed in ", time.Now().Sub(t))
-
+	err := filepath.Walk(nodeModulesPath, walkFn)
 	if err != nil {
 		return nil, errors.Wrap(err, "walking node_modules")
 	}
@@ -123,6 +159,7 @@ func getJSDeps() ([]Dependency, error) {
 	return deps, nil
 }
 
+//
 type glideImport struct {
 	Name    string `yaml:"name"`
 	Version string `yaml:"version"`
@@ -133,11 +170,17 @@ type glideLock struct {
 	Imports []glideImport `yaml:"imports"`
 }
 
-func extractGoPackageInfo(pkg glideImport) (Dependency, error) {
-	dep := Dependency{
-		Path:    filepath.Join("vendor", pkg.Name),
-		Name:    pkg.Name,
-		Version: pkg.Version,
+func extractGoPackageInfo(config settings, pkg glideImport) (dependency, error) {
+	dep := dependency{
+		Path:      filepath.Join(vendorPath, pkg.Name),
+		Name:      pkg.Name,
+		SourceURL: "https://" + pkg.Name,
+		Version:   pkg.Version,
+	}
+
+	if lic, ok := config.Overrides[dep.Path]; ok {
+		dep.License = lic
+		return dep, nil
 	}
 
 	if l, err := license.NewFromDir(dep.Path); err == nil {
@@ -147,8 +190,8 @@ func extractGoPackageInfo(pkg glideImport) (Dependency, error) {
 	return dep, nil
 }
 
-func getGoDeps() ([]Dependency, error) {
-	glockContents, err := ioutil.ReadFile("glide.lock")
+func getGoDeps(config settings) ([]dependency, error) {
+	glockContents, err := ioutil.ReadFile(glideLockPath)
 	if err != nil {
 		return nil, errors.Wrap(err, "error reading glide.lock")
 	}
@@ -156,12 +199,12 @@ func getGoDeps() ([]Dependency, error) {
 	var glock glideLock
 	err = yaml.Unmarshal(glockContents, &glock)
 	if err != nil {
-		log.Fatal("error unmarshaling settings: ", err)
+		log.Fatal("error unmarshaling glide.lock: ", err)
 	}
 
-	var deps []Dependency
+	var deps []dependency
 	for _, pkg := range glock.Imports {
-		dep, err := extractGoPackageInfo(pkg)
+		dep, err := extractGoPackageInfo(config, pkg)
 		if err == nil {
 			deps = append(deps, dep)
 		}
@@ -170,24 +213,18 @@ func getGoDeps() ([]Dependency, error) {
 	return deps, nil
 }
 
-func isLicenseCompatible(settings Settings, dep Dependency) bool {
-	// Manual exception by path
-	if _, ok := settings.Exceptions[dep.Path]; ok {
-		return true
-	}
-
-	// License matches allowable licenses
-	if _, ok := settings.AllowedLicenses[dep.License]; ok {
+func isLicenseCompatible(config settings, dep dependency) bool {
+	if _, ok := config.AllowedLicenses[dep.License]; ok {
 		return true
 	}
 
 	return false
 }
 
-func checkLicenses(settings Settings, deps []Dependency) []Dependency {
-	var incompatible []Dependency
+func checkLicenses(config settings, deps []dependency) []dependency {
+	var incompatible []dependency
 	for _, dep := range deps {
-		if !isLicenseCompatible(settings, dep) {
+		if !isLicenseCompatible(config, dep) {
 			incompatible = append(incompatible, dep)
 		}
 	}
@@ -203,29 +240,53 @@ func checkLicenses(settings Settings, deps []Dependency) []Dependency {
 	return incompatible
 }
 
+func writeDependenciesMarkdown(config settings, deps map[string]dependency, out io.Writer) error {
+	funcs := template.FuncMap{
+		"getLicenseURL": func(license string) string {
+			return config.AllowedLicenses[license]
+		},
+	}
+
+	tmpl, err := template.New("").
+		Funcs(funcs).
+		ParseFiles(templatePath)
+	if err != nil {
+		return errors.Wrap(err, "reading markdown template")
+	}
+
+	err = tmpl.ExecuteTemplate(out, templateName, deps)
+	if err != nil {
+		return errors.Wrap(err, "executing markdown template")
+	}
+
+	return nil
+}
+
 func main() {
-	settingsContents, err := ioutil.ReadFile("lint_license/license_settings.yaml")
+	fmt.Println("Validating dependency licenses\n")
+
+	configContents, err := ioutil.ReadFile(configPath)
 	if err != nil {
-		log.Fatal("error reading settings file: ", err)
+		log.Fatal("error reading config file: ", err)
 	}
 
-	var settings Settings
-	err = yaml.Unmarshal(settingsContents, &settings)
+	var config settings
+	err = yaml.Unmarshal(configContents, &config)
 	if err != nil {
-		log.Fatal("error unmarshaling settings: ", err)
+		log.Fatal("error unmarshaling config: ", err)
 	}
 
-	// Javascript
+	// Check JS deps
 	fmt.Println("Retrieving JS dependencies")
 
-	jsDeps, err := getJSDeps()
+	jsDeps, err := getJSDeps(config)
 	if err != nil {
 		log.Fatal("error retrieving JS deps: ", err)
 	}
 
 	fmt.Printf("Checking %d JS dependencies\n", len(jsDeps))
 
-	incompatibleJS := checkLicenses(settings, jsDeps)
+	incompatibleJS := checkLicenses(config, jsDeps)
 
 	fmt.Printf("Found %d incompatible licenses\n", len(incompatibleJS))
 
@@ -236,19 +297,19 @@ func main() {
 		}
 	}
 
-	fmt.Printf("\n\n")
+	fmt.Printf("\n")
 
-	// Go
+	// Check Go deps
 	fmt.Println("Retrieving Go dependencies")
 
-	goDeps, err := getGoDeps()
+	goDeps, err := getGoDeps(config)
 	if err != nil {
-		log.Fatal("error retrieving GO deps: ", err)
+		log.Fatal("error retrieving Go deps: ", err)
 	}
 
-	fmt.Printf("Checking %d GO dependencies\n", len(goDeps))
+	fmt.Printf("Checking %d Go dependencies\n", len(goDeps))
 
-	incompatibleGo := checkLicenses(settings, goDeps)
+	incompatibleGo := checkLicenses(config, goDeps)
 
 	fmt.Printf("Found %d incompatible licenses\n", len(incompatibleGo))
 
@@ -259,7 +320,27 @@ func main() {
 		}
 	}
 
+	// Exit nonzero if incompatible licenses found
 	if len(incompatibleJS) > 0 || len(incompatibleGo) > 0 {
 		os.Exit(1)
+	}
+
+	// Write markdown documentation file with package/license info
+	allDeps := map[string]dependency{}
+	for _, dep := range jsDeps {
+		allDeps[dep.Name] = dep
+	}
+	for _, dep := range goDeps {
+		allDeps[dep.Name] = dep
+	}
+
+	out, err := os.Create(generatedMarkdownPath)
+	if err != nil {
+		log.Fatal("opening markdown file for writing: ", err)
+	}
+
+	err = writeDependenciesMarkdown(config, allDeps, out)
+	if err != nil {
+		log.Fatal("error writing dependencies markdown: ", err)
 	}
 }
