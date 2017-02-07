@@ -57,6 +57,12 @@ type dependency struct {
 	Path string
 }
 
+// makePath concatenates the provided path onto
+// $GOPATH/src/github.com/kolide/kolide
+func makePath(path string) string {
+	return filepath.Join(os.Getenv("GOPATH"), "src/github.com/kolide/kolide", path)
+}
+
 // packageJSON is a schema for the relevant bits of package.json
 type packageJSON struct {
 	Name    string `json:"name"`
@@ -76,6 +82,7 @@ func extractJSPackageInfo(config settings, path string) (dependency, error) {
 	if err != nil {
 		return dep, errors.Wrap(err, "opening package.json")
 	}
+	defer f.Close()
 
 	var pkg packageJSON
 	err = json.NewDecoder(f).Decode(&pkg)
@@ -144,7 +151,7 @@ func getJSDeps(config settings) ([]dependency, error) {
 
 		dep, err := extractJSPackageInfo(config, path)
 		if err != nil {
-			fmt.Printf("Error analyzing path %s: %s\n", path, err.Error())
+			fmt.Printf("Error analyzing JS package %s: %s\n", path, err.Error())
 		}
 		deps = append(deps, dep)
 
@@ -205,26 +212,19 @@ func getGoDeps(config settings) ([]dependency, error) {
 	var deps []dependency
 	for _, pkg := range glock.Imports {
 		dep, err := extractGoPackageInfo(config, pkg)
-		if err == nil {
-			deps = append(deps, dep)
+		if err != nil {
+			fmt.Printf("Error analyzing go package %s: %s\n", pkg.Name, err.Error())
 		}
+		deps = append(deps, dep)
 	}
 
 	return deps, nil
 }
 
-func isLicenseCompatible(config settings, dep dependency) bool {
-	if _, ok := config.AllowedLicenses[dep.License]; ok {
-		return true
-	}
-
-	return false
-}
-
 func checkLicenses(config settings, deps []dependency) []dependency {
 	var incompatible []dependency
 	for _, dep := range deps {
-		if !isLicenseCompatible(config, dep) {
+		if _, ok := config.AllowedLicenses[dep.License]; !ok {
 			incompatible = append(incompatible, dep)
 		}
 	}
@@ -263,8 +263,6 @@ func writeDependenciesMarkdown(config settings, deps map[string]dependency, out 
 }
 
 func main() {
-	fmt.Printf("Validating dependency licenses\n\n")
-
 	configContents, err := ioutil.ReadFile(configPath)
 	if err != nil {
 		log.Fatal("error reading config file: ", err)
@@ -277,19 +275,12 @@ func main() {
 	}
 
 	// Check JS deps
-	fmt.Println("Retrieving JS dependencies")
-
 	jsDeps, err := getJSDeps(config)
 	if err != nil {
 		log.Fatal("error retrieving JS deps: ", err)
 	}
 
-	fmt.Printf("Checking %d JS dependencies\n", len(jsDeps))
-
 	incompatibleJS := checkLicenses(config, jsDeps)
-
-	fmt.Printf("Found %d incompatible licenses\n", len(incompatibleJS))
-
 	if len(incompatibleJS) > 0 {
 		for _, dep := range incompatibleJS {
 			fmt.Printf("Incompatible license '%s' for dependency '%s' (path '%s')\n",
@@ -297,22 +288,13 @@ func main() {
 		}
 	}
 
-	fmt.Printf("\n")
-
 	// Check Go deps
-	fmt.Println("Retrieving Go dependencies")
-
 	goDeps, err := getGoDeps(config)
 	if err != nil {
 		log.Fatal("error retrieving Go deps: ", err)
 	}
 
-	fmt.Printf("Checking %d Go dependencies\n", len(goDeps))
-
 	incompatibleGo := checkLicenses(config, goDeps)
-
-	fmt.Printf("Found %d incompatible licenses\n", len(incompatibleGo))
-
 	if len(incompatibleGo) > 0 {
 		for _, dep := range incompatibleGo {
 			fmt.Printf("Incompatible license '%s' for dependency '%s' (path '%s')\n",
@@ -338,8 +320,8 @@ func main() {
 	if err != nil {
 		log.Fatal("opening markdown file for writing: ", err)
 	}
+	defer out.Close()
 
-	fmt.Println("Writing ", generatedMarkdownPath)
 	err = writeDependenciesMarkdown(config, allDeps, out)
 	if err != nil {
 		log.Fatal("error writing dependencies markdown: ", err)
