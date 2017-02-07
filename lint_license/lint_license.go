@@ -263,7 +263,7 @@ func writeDependenciesMarkdown(config settings, deps map[string]dependency, out 
 }
 
 func main() {
-	fmt.Println("Validating dependency licenses\n")
+	fmt.Printf("Validating dependency licenses\n\n")
 
 	configContents, err := ioutil.ReadFile(configPath)
 	if err != nil {
@@ -339,6 +339,7 @@ func main() {
 		log.Fatal("opening markdown file for writing: ", err)
 	}
 
+	fmt.Println("Writing ", generatedMarkdownPath)
 	err = writeDependenciesMarkdown(config, allDeps, out)
 	if err != nil {
 		log.Fatal("error writing dependencies markdown: ", err)
