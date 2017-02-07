@@ -119,19 +119,19 @@ func TestImportScheduledQueries(t *testing.T) {
 			"q1": kolide.QueryDetails{
 				Query:    "select pid from processes",
 				Interval: 60,
-				Platform: stringPtr("linux"),
+				Platform: "linux",
 			},
 			"q2": kolide.QueryDetails{
 				Query:    "select uid from users",
 				Interval: 120,
-				Platform: stringPtr("linux"),
-				Version:  stringPtr("1.0"),
+				Platform: "linux",
+				Version:  "1.0",
 			},
 			"q3": kolide.QueryDetails{
 				Query:    "select name from os",
 				Interval: 240,
-				Platform: stringPtr("linux"),
-				Snapshot: boolPtr(true),
+				Platform: "linux",
+				Snapshot: true,
 			},
 		},
 	}
@@ -246,23 +246,23 @@ func TestPacksImportConfig(t *testing.T) {
 	q1 := kolide.QueryDetails{
 		Query:    "select * from foo",
 		Interval: 100,
-		Removed:  boolPtr(false),
-		Platform: stringPtr("linux"),
-		Version:  stringPtr("1.0"),
+		Removed:  false,
+		Platform: "linux",
+		Version:  "1.0",
 	}
 	q2 := kolide.QueryDetails{
 		Query:    "select * from bar",
 		Interval: 50,
-		Removed:  boolPtr(false),
-		Platform: stringPtr("linux"),
-		Version:  stringPtr("1.0"),
+		Removed:  false,
+		Platform: "linux",
+		Version:  "1.0",
 	}
 	q3 := kolide.QueryDetails{
 		Query:    "select * from baz",
 		Interval: 500,
-		Removed:  boolPtr(false),
-		Platform: stringPtr("linux"),
-		Version:  stringPtr("1.0"),
+		Removed:  false,
+		Platform: "linux",
+		Version:  "1.0",
 	}
 
 	importConfig := kolide.ImportConfig{

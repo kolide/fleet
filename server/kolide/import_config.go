@@ -102,11 +102,11 @@ type QueryDetails struct {
 	Query    string `json:"query"`
 	Interval uint   `json:"interval"`
 	// Optional fields
-	Removed  *bool   `json:"removed"`
-	Platform *string `json:"platform"`
-	Version  *string `json:"version"`
-	Shard    *uint   `json:"shard"`
-	Snapshot *bool   `json:"snapshot"`
+	Removed  bool   `json:"removed"`
+	Platform string `json:"platform"`
+	Version  string `json:"version"`
+	Shard    uint   `json:"shard"`
+	Snapshot bool   `json:"snapshot"`
 }
 
 // PackDetails represents the "packs" section of an osquery configuration

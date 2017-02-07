@@ -34,11 +34,25 @@ func (svc service) ModifyScheduledQuery(ctx context.Context, id uint, p *kolide.
 		sq.Interval = *p.Interval
 	}
 
-	sq.Snapshot = p.Snapshot
-	sq.Removed = p.Removed
-	sq.Platform = p.Platform
-	sq.Version = p.Version
-	sq.Shard = p.Shard
+	if p.Snapshot != nil {
+		sq.Snapshot = *p.Snapshot
+	}
+
+	if p.Removed != nil {
+		sq.Removed = *p.Removed
+	}
+
+	if p.Platform != nil {
+		sq.Platform = *p.Platform
+	}
+
+	if p.Version != nil {
+		sq.Version = *p.Version
+	}
+
+	if p.Shard != nil {
+		sq.Shard = *p.Shard
+	}
 
 	return svc.ds.SaveScheduledQuery(sq)
 }

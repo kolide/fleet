@@ -93,10 +93,10 @@ func unmarshalQueryDetail(val interface{}) QueryDetails {
 	return QueryDetails{
 		Query:    v["query"].(string),
 		Interval: uint(v["interval"].(float64)),
-		Removed:  boolptr(v["removed"]),
-		Platform: strptr(v["platform"]),
-		Version:  strptr(v["version"]),
-		Shard:    uintptr(v["shard"]),
-		Snapshot: boolptr(v["snapshot"]),
+		Removed:  v["removed"].(bool),
+		Platform: v["platform"].(string),
+		Version:  v["version"].(string),
+		Shard:    uint(v["shard"].(float64)),
+		Snapshot: v["snapshot"].(bool),
 	}
 }

@@ -241,12 +241,11 @@ func (d *Datastore) createDevPacksAndQueries() error {
 		return err
 	}
 
-	t := true
 	_, err = d.NewScheduledQuery(&kolide.ScheduledQuery{
 		QueryID:  query3.ID,
 		PackID:   pack1.ID,
 		Interval: 60,
-		Snapshot: &t,
+		Snapshot: true,
 	})
 	if err != nil {
 		return err
