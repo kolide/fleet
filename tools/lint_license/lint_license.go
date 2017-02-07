@@ -250,7 +250,7 @@ func checkLicenses(config settings, deps []dependency) []dependency {
 	return incompatible
 }
 
-func writeDependenciesMarkdown(config settings, deps map[string]dependency, out io.Writer) error {
+func writeDependenciesMarkdown(config settings, deps []dependency, out io.Writer) error {
 	funcs := template.FuncMap{
 		"getLicenseURL": func(license string) string {
 			return config.AllowedLicenses[license]
@@ -264,7 +264,12 @@ func writeDependenciesMarkdown(config settings, deps map[string]dependency, out 
 		return errors.Wrap(err, "reading markdown template")
 	}
 
-	err = tmpl.ExecuteTemplate(out, templateName, deps)
+	depMap := map[string]dependency{}
+	for _, dep := range deps {
+		depMap[dep.Name] = dep
+	}
+
+	err = tmpl.ExecuteTemplate(out, templateName, depMap)
 	if err != nil {
 		return errors.Wrap(err, "executing markdown template")
 	}
@@ -318,21 +323,13 @@ func main() {
 	}
 
 	// Write markdown documentation file with package/license info
-	allDeps := map[string]dependency{}
-	for _, dep := range jsDeps {
-		allDeps[dep.Name] = dep
-	}
-	for _, dep := range goDeps {
-		allDeps[dep.Name] = dep
-	}
-
 	out, err := os.Create(absolutePath(generatedMarkdownPath))
 	if err != nil {
 		log.Fatal("opening markdown file for writing: ", err)
 	}
 	defer out.Close()
 
-	err = writeDependenciesMarkdown(config, allDeps, out)
+	err = writeDependenciesMarkdown(config, append(jsDeps, goDeps...), out)
 	if err != nil {
 		log.Fatal("error writing dependencies markdown: ", err)
 	}
