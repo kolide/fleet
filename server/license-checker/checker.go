@@ -46,7 +46,6 @@ type Checker struct {
 	ticker        clock.Ticker
 	client        *http.Client
 	finish        chan struct{}
-	wait          sync.WaitGroup
 }
 
 type Option func(chk *Checker)
@@ -99,6 +98,8 @@ func NewChecker(ds kolide.Datastore, licenseEndpointURL string, opts ...Option) 
 	return response
 }
 
+var wait sync.WaitGroup
+
 // Start begins checking for license revocation. Note that start can only
 // be called once. If Stop is called you must create a new checker to use
 // it again.
@@ -107,9 +108,9 @@ func (cc *Checker) Start() error {
 		return errors.New("start called on stopped checker")
 	}
 	// pass in copy of receiver to avoid race conditions
-	go func(chk Checker) {
-		cc.wait.Add(1)
-		defer cc.wait.Done()
+	go func(chk Checker, wait *sync.WaitGroup) {
+		wait.Add(1)
+		defer wait.Done()
 		chk.logger.Log("msg", "starting")
 		for {
 			select {
@@ -120,7 +121,7 @@ func (cc *Checker) Start() error {
 				updateLicenseRevocation(&chk)
 			}
 		}
-	}(*cc)
+	}(*cc, &wait)
 
 	return nil
 }
@@ -129,7 +130,7 @@ func (cc *Checker) Start() error {
 func (cc *Checker) Stop() {
 	cc.ticker.Stop()
 	close(cc.finish)
-	cc.wait.Wait()
+	wait.Wait()
 	cc.finish = nil
 }
 
