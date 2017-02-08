@@ -33,9 +33,6 @@ type LicenseService interface {
 	// SaveLicense writes jwt token string to database after performing
 	// validation
 	SaveLicense(ctx context.Context, jwtToken string) (*License, error)
-
-	// RequireLicense returns true if a license has not been uploaded
-	RequireLicense() (bool, error)
 }
 
 // Contains information needed to extract customer license particulars.

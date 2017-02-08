@@ -28,18 +28,17 @@ func (r setupResponse) error() error { return r.Err }
 func makeSetupEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		var (
-			admin           *kolide.User
-			config          *kolide.AppConfig
-			configPayload   kolide.AppConfigPayload
-			licenseRequired bool
-			err             error
+			admin         *kolide.User
+			config        *kolide.AppConfig
+			configPayload kolide.AppConfigPayload
+			err           error
 		)
 		req := request.(setupRequest)
-		licenseRequired, err = svc.RequireLicense()
+		license, err := svc.License(ctx)
 		if err != nil {
 			return setupResponse{Err: err}, nil
 		}
-		if licenseRequired {
+		if license.Token == nil {
 			return licensingError{reason: "missing license"}, nil
 		}
 		if req.OrgInfo != nil {

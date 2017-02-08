@@ -455,13 +455,13 @@ func RedirectLoginToSetup(svc kolide.Service, logger kitlog.Logger, next http.Ha
 				return
 			}
 			newURL := r.URL
-			licenseRequired, err := svc.RequireLicense()
+			license, err := svc.License(context.Background())
 			if err != nil {
 				logger.Log("msg", "fetching license info from db", "err", err)
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
-			if licenseRequired {
+			if license.Token == nil {
 				newURL.Path = "/license"
 			} else {
 				newURL.Path = "/setup"
@@ -486,15 +486,22 @@ func RedirectLoginToSetup(svc kolide.Service, logger kitlog.Logger, next http.Ha
 // RequireSetup checks to see if the service has a license and has been setup.
 // if either of these things has not been done, return true
 func RequireSetup(svc kolide.Service) (bool, error) {
-	requireLicense, err := svc.RequireLicense()
+	ctx := context.Background()
+	license, err := svc.License(ctx)
 	if err != nil {
 		return false, err
 	}
-	requireUsers, err := svc.RequireUsers()
+	if license.Token == nil {
+		return true, nil
+	}
+	users, err := svc.ListUsers(ctx, kolide.ListOptions{Page: 0, PerPage: 1})
 	if err != nil {
 		return false, err
 	}
-	return requireLicense || requireUsers, nil
+	if len(users) == 0 {
+		return true, nil
+	}
+	return false, nil
 }
 
 // RedirectSetupToLogin forces the /setup and /license path to be redirected to login. This middleware is used after

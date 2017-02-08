@@ -88,11 +88,11 @@ func makeGetLicenseEndpoint(svc kolide.Service) endpoint.Endpoint {
 func makePostLicenseEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(licenseRequest)
-		requireLicense, err := svc.RequireLicense()
+		lic, err := svc.License(ctx)
 		if err != nil {
 			return licenseResponse{Err: err}, nil
 		}
-		if !requireLicense {
+		if lic.Token != nil {
 			return licenseResponse{Err: errors.New("license can only be uploaded once")}, nil
 		}
 		saved, err := svc.SaveLicense(ctx, req.License)
