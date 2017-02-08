@@ -83,6 +83,9 @@ type UserService interface {
 	// ChangeUserEmail is used to confirm new email address and if confirmed,
 	// write the new email address to user.
 	ChangeUserEmail(ctx context.Context, token string) (string, error)
+
+	// RequireUsers returns true if there aren't any users in the database
+	RequireUsers() (bool, error)
 }
 
 // User is the model struct which represents a kolide user

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"time"
 
 	"github.com/go-kit/kit/endpoint"
@@ -18,6 +19,8 @@ type license struct {
 	AllowedHosts int       `json:"allowed_hosts"`
 	Hosts        uint      `json:"hosts"`
 	Evaluation   bool      `json:"evaluation"`
+	Revoked      bool      `json:"revoked"`
+	Organization string    `json:"organization"`
 }
 
 type licenseResponse struct {
@@ -44,6 +47,8 @@ func makeUpdateLicenseEndpoint(svc kolide.Service) endpoint.Endpoint {
 				Expiry:       claims.ExpiresAt,
 				AllowedHosts: claims.HostLimit,
 				Hosts:        updated.HostCount,
+				Revoked:      updated.Revoked,
+				Organization: claims.OrganizationName,
 			},
 		}
 		return response, nil
@@ -66,6 +71,42 @@ func makeGetLicenseEndpoint(svc kolide.Service) endpoint.Endpoint {
 				AllowedHosts: claims.HostLimit,
 				Hosts:        lic.HostCount,
 				Token:        *lic.Token,
+				Revoked:      lic.Revoked,
+				Organization: claims.OrganizationName,
+			},
+		}
+		return response, nil
+	}
+}
+
+// makePostLicenseEndpoint is only to be used once, if a license is successfully
+// installed we return an error if it is called again
+func makePostLicenseEndpoint(svc kolide.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(licenseRequest)
+		requireLicense, err := svc.RequireLicense()
+		if err != nil {
+			return licenseResponse{Err: err}, nil
+		}
+		if !requireLicense {
+			return licenseResponse{Err: errors.New("license can only be uploaded once")}, err
+		}
+		saved, err := svc.SaveLicense(ctx, req.License)
+		if err != nil {
+			return licenseResponse{Err: err}, nil
+		}
+		claims, err := saved.Claims()
+		if err != nil {
+			return licenseResponse{Err: err}, nil
+		}
+		response := licenseResponse{
+			License: license{
+				Token:        *saved.Token,
+				Revoked:      saved.Revoked,
+				Expiry:       claims.ExpiresAt,
+				AllowedHosts: claims.HostLimit,
+				Hosts:        saved.HostCount,
+				Organization: claims.OrganizationName,
 			},
 		}
 		return response, nil

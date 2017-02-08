@@ -113,19 +113,19 @@ func MakeKolideServerEndpoints(svc kolide.Service, jwtKey string) KolideEndpoint
 		DeleteSession:                  authenticatedUser(jwtKey, svc, mustBeAdmin(makeDeleteSessionEndpoint(svc))),
 		GetAppConfig:                   authenticatedUser(jwtKey, svc, canPerformActions(makeGetAppConfigEndpoint(svc))),
 		ModifyAppConfig:                authenticatedUser(jwtKey, svc, mustBeAdmin(makeModifyAppConfigEndpoint(svc))),
-		CreateInvite:                   authenticatedUser(jwtKey, svc, mustBeAdmin(licensedUser(svc, makeCreateInviteEndpoint(svc)))),
+		CreateInvite:                   authenticatedUser(jwtKey, svc, mustBeAdmin(makeCreateInviteEndpoint(svc))),
 		ListInvites:                    authenticatedUser(jwtKey, svc, mustBeAdmin(makeListInvitesEndpoint(svc))),
 		DeleteInvite:                   authenticatedUser(jwtKey, svc, mustBeAdmin(makeDeleteInviteEndpoint(svc))),
 		GetQuery:                       authenticatedUser(jwtKey, svc, makeGetQueryEndpoint(svc)),
 		ListQueries:                    authenticatedUser(jwtKey, svc, makeListQueriesEndpoint(svc)),
-		CreateQuery:                    authenticatedUser(jwtKey, svc, licensedUser(svc, makeCreateQueryEndpoint(svc))),
+		CreateQuery:                    authenticatedUser(jwtKey, svc, makeCreateQueryEndpoint(svc)),
 		ModifyQuery:                    authenticatedUser(jwtKey, svc, makeModifyQueryEndpoint(svc)),
 		DeleteQuery:                    authenticatedUser(jwtKey, svc, makeDeleteQueryEndpoint(svc)),
 		DeleteQueries:                  authenticatedUser(jwtKey, svc, makeDeleteQueriesEndpoint(svc)),
-		CreateDistributedQueryCampaign: authenticatedUser(jwtKey, svc, licensedUser(svc, makeCreateDistributedQueryCampaignEndpoint(svc))),
+		CreateDistributedQueryCampaign: authenticatedUser(jwtKey, svc, makeCreateDistributedQueryCampaignEndpoint(svc)),
 		GetPack:                   authenticatedUser(jwtKey, svc, makeGetPackEndpoint(svc)),
 		ListPacks:                 authenticatedUser(jwtKey, svc, makeListPacksEndpoint(svc)),
-		CreatePack:                authenticatedUser(jwtKey, svc, licensedUser(svc, makeCreatePackEndpoint(svc))),
+		CreatePack:                authenticatedUser(jwtKey, svc, makeCreatePackEndpoint(svc)),
 		ModifyPack:                authenticatedUser(jwtKey, svc, makeModifyPackEndpoint(svc)),
 		DeletePack:                authenticatedUser(jwtKey, svc, makeDeletePackEndpoint(svc)),
 		ScheduleQuery:             authenticatedUser(jwtKey, svc, makeScheduleQueryEndpoint(svc)),
@@ -139,7 +139,7 @@ func MakeKolideServerEndpoints(svc kolide.Service, jwtKey string) KolideEndpoint
 		DeleteHost:                authenticatedUser(jwtKey, svc, makeDeleteHostEndpoint(svc)),
 		GetLabel:                  authenticatedUser(jwtKey, svc, makeGetLabelEndpoint(svc)),
 		ListLabels:                authenticatedUser(jwtKey, svc, makeListLabelsEndpoint(svc)),
-		CreateLabel:               authenticatedUser(jwtKey, svc, licensedUser(svc, makeCreateLabelEndpoint(svc))),
+		CreateLabel:               authenticatedUser(jwtKey, svc, makeCreateLabelEndpoint(svc)),
 		DeleteLabel:               authenticatedUser(jwtKey, svc, makeDeleteLabelEndpoint(svc)),
 		SearchTargets:             authenticatedUser(jwtKey, svc, makeSearchTargetsEndpoint(svc)),
 		GetOptions:                authenticatedUser(jwtKey, svc, mustBeAdmin(makeGetOptionsEndpoint(svc))),
@@ -289,7 +289,7 @@ func makeKolideKitHandlers(ctx context.Context, e KolideEndpoints, opts []kithtt
 		ImportConfig:                  newServer(e.ImportConfig, decodeImportConfigRequest),
 		GetCertificate:                newServer(e.GetCertificate, decodeNoParamsRequest),
 		ChangeEmail:                   newServer(e.ChangeEmail, decodeChangeEmailRequest),
-		UpdateLicense:                 newServer(e.UpdateLicense, decodeUpdateLicenseRequest),
+		UpdateLicense:                 newServer(e.UpdateLicense, decodeLicenseRequest),
 		GetLicense:                    newServer(e.GetLicense, decodeNoParamsRequest),
 	}
 }
@@ -408,8 +408,8 @@ func attachKolideAPIRoutes(r *mux.Router, h *kolideHandlers) {
 	r.Handle("/api/v1/osquery/log", h.SubmitLogs).Methods("POST").Name("submit_logs")
 }
 
-// WithSetup is an http middleware that checks if a database user exists.
-// If one does, it serves the API with a setup middleware.
+// WithSetup is an http middleware that checks is setup procedures have been completed.
+// If setup hasn't been completed it serves the API with a setup middleware.
 // If the server is already configured, the default API handler is exposed.
 func WithSetup(svc kolide.Service, logger kitlog.Logger, next http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -420,18 +420,28 @@ func WithSetup(svc kolide.Service, logger kitlog.Logger, next http.Handler) http
 			decodeSetupRequest,
 			encodeResponse,
 		))
-
+		configRouter.Handle("/api/v1/license", kithttp.NewServer(
+			context.Background(),
+			makePostLicenseEndpoint(svc),
+			decodeLicenseRequest,
+			encodeResponse,
+		))
 		// whitelist osqueryd endpoints
 		if strings.HasPrefix(r.URL.Path, "/api/v1/osquery") {
 			next.ServeHTTP(w, r)
 			return
 		}
-
-		if RequireSetup(svc, logger) {
-			configRouter.ServeHTTP(w, r)
-		} else {
-			next.ServeHTTP(w, r)
+		requireSetup, err := RequireSetup(svc)
+		if err != nil {
+			logger.Log("msg", "fetching setup info from db", "err", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
 		}
+		if requireSetup {
+			configRouter.ServeHTTP(w, r)
+			return
+		}
+		next.ServeHTTP(w, r)
 	}
 }
 
@@ -440,37 +450,64 @@ func WithSetup(svc kolide.Service, logger kitlog.Logger, next http.Handler) http
 func RedirectLoginToSetup(svc kolide.Service, logger kitlog.Logger, next http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		redirect := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.URL.Path == "/setup" {
+			if r.URL.Path == "/setup" || r.URL.Path == "/license" {
 				next.ServeHTTP(w, r)
 				return
 			}
 			newURL := r.URL
-			newURL.Path = "/setup"
+			licenseRequired, err := svc.RequireLicense()
+			if err != nil {
+				logger.Log("msg", "fetching license info from db", "err", err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			if licenseRequired {
+				newURL.Path = "/license"
+			} else {
+				newURL.Path = "/setup"
+			}
 			http.Redirect(w, r, newURL.String(), http.StatusTemporaryRedirect)
 		})
-		if RequireSetup(svc, logger) {
-			redirect.ServeHTTP(w, r)
-		} else {
-			RedirectSetupToLogin(svc, logger, next).ServeHTTP(w, r)
+
+		setupRequired, err := RequireSetup(svc)
+		if err != nil {
+			logger.Log("msg", "fetching license info from db", "err", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
 		}
+		if setupRequired {
+			redirect.ServeHTTP(w, r)
+			return
+		}
+		next.ServeHTTP(w, r)
 	}
 }
 
-// RequireSetup checks if the service must be configured by an administrator.
-func RequireSetup(svc kolide.Service, logger kitlog.Logger) bool {
-	users, err := svc.ListUsers(context.Background(), kolide.ListOptions{Page: 0, PerPage: 1})
+// RequireSetup checks to see if the service has a license and has been setup.
+// if either of these things has not been done, return true
+func RequireSetup(svc kolide.Service) (bool, error) {
+	requireLicense, err := svc.RequireLicense()
 	if err != nil {
-		logger.Log("err", err)
-		return false
+		return false, err
 	}
-	return len(users) == 0
+	requireUsers, err := svc.RequireUsers()
+	if err != nil {
+		return false, err
+	}
+	return requireLicense || requireUsers, nil
 }
 
-// RedirectSetupToLogin forces the /setup path to be redirected to login. This middleware is used after
+// RedirectSetupToLogin forces the /setup and /license path to be redirected to login. This middleware is used after
 // the app has been setup.
 func RedirectSetupToLogin(svc kolide.Service, logger kitlog.Logger, next http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/setup" {
+			newURL := r.URL
+			newURL.Path = "/login"
+			http.Redirect(w, r, newURL.String(), http.StatusTemporaryRedirect)
+			return
+		}
+		if r.URL.Path == "/license" {
 			newURL := r.URL
 			newURL.Path = "/login"
 			http.Redirect(w, r, newURL.String(), http.StatusTemporaryRedirect)
