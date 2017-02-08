@@ -49,14 +49,6 @@ func (svc service) newUser(p kolide.UserPayload) (*kolide.User, error) {
 	return user, nil
 }
 
-func (svc service) RequireUsers() (bool, error) {
-	users, err := svc.ds.ListUsers(kolide.ListOptions{Page: 0, PerPage: 1})
-	if err != nil {
-		return false, err
-	}
-	return len(users) == 0, nil
-}
-
 func (svc service) ChangeUserAdmin(ctx context.Context, id uint, isAdmin bool) (*kolide.User, error) {
 	user, err := svc.ds.UserByID(id)
 	if err != nil {

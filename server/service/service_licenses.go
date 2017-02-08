@@ -24,11 +24,3 @@ func (svc service) SaveLicense(ctx context.Context, jwtToken string) (*kolide.Li
 	}
 	return updated, nil
 }
-
-func (svc service) RequireLicense() (bool, error) {
-	lic, err := svc.ds.License()
-	if err != nil {
-		return false, err
-	}
-	return lic.Token == nil, nil
-}
