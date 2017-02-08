@@ -7,7 +7,7 @@ import { licenseStub } from 'test/stubs';
 import LicenseSuccess from 'components/LicenseSuccess';
 
 const defaultProps = {
-  license: licenseStub,
+  license: licenseStub(),
   onConfirmLicense: noop,
 };
 

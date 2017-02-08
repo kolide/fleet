@@ -48,6 +48,7 @@ describe('Auth - actions', () => {
         const mockStore = reduxMockStore(store);
         const expectedActions = [
           { type: LICENSE_REQUEST },
+          { type: 'HIDE_PERSISTENT_FLASH' },
           {
             type: LICENSE_SUCCESS,
             payload: { license: { license } },
@@ -141,6 +142,7 @@ describe('Auth - actions', () => {
         const mockStore = reduxMockStore(store);
         const expectedActions = [
           { type: LICENSE_REQUEST },
+          { type: 'HIDE_PERSISTENT_FLASH' },
           {
             type: LICENSE_SUCCESS,
             payload: { license: { license } },

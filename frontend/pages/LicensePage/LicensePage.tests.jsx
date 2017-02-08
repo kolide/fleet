@@ -20,7 +20,7 @@ describe('LicensePage - component', () => {
     it('renders the license success content when a license is present', () => {
       const store = {
         auth: {
-          license: licenseStub,
+          license: licenseStub(),
           loading: false,
           user: null,
         },

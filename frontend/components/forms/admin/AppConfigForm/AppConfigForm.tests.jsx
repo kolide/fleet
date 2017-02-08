@@ -12,7 +12,7 @@ describe('AppConfigForm - form', () => {
     formData: { org_name: 'Kolide' },
     handleSubmit: noop,
     handleUpdateLicense: noop,
-    license: licenseStub,
+    license: licenseStub(),
     smtpConfigured: false,
   };
   const form = mount(<AppConfigForm {...defaultProps} />);
