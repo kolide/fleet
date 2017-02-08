@@ -1,8 +1,11 @@
 package main
 
 import (
+	"crypto/sha256"
 	"encoding/json"
 	"flag"
+	"fmt"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -19,9 +22,10 @@ const (
 )
 
 type pkg struct {
-	Name        string `json:"name"`
-	DownloadURL string `json:"download_url"`
-	Kind        string `json:"kind"`
+	Name        string `json:"name,omitempty"`
+	DownloadURL string `json:"download_url,omitempty"`
+	Kind        string `json:"kind,omitempty"`
+	SHA256      string `json:"sha_256,omitempty"`
 }
 type metadata struct {
 	Current  []pkg `json:"current"`
@@ -59,10 +63,15 @@ func getMetadata(repoPath, current string) (*metadata, error) {
 		return func(path string, info os.FileInfo, err error) error {
 			switch ext := filepath.Ext(path); ext {
 			case ".rpm", ".deb", ".zip":
+				hash, err := shaFile(path)
+				if err != nil {
+					return err
+				}
 				p := pkg{
 					Name:        info.Name(),
 					DownloadURL: repoBaseURL + dir + "/" + info.Name(),
 					Kind:        dir,
+					SHA256:      hash,
 				}
 				if isCurrent(info.Name(), current, dir) {
 					m.Current = append(m.Current, p)
@@ -80,7 +89,26 @@ func getMetadata(repoPath, current string) (*metadata, error) {
 			return nil, errors.Wrapf(err, "walking %s", repoPath)
 		}
 	}
+	// add current release docker hub link
+	p := pkg{
+		Kind: "docker",
+		Name: "kolide/kolide:" + current,
+	}
+	m.Current = append(m.Current, p)
 	return &m, nil
+}
+
+func shaFile(path string) (string, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return "", errors.Wrapf(err, "open file %s for hashing", f.Name())
+	}
+	defer f.Close()
+	h := sha256.New()
+	if _, err := io.Copy(h, f); err != nil {
+		return "", errors.Wrapf(err, "hash file %s", f.Name())
+	}
+	return fmt.Sprintf("%x", h.Sum(nil)), nil
 }
 
 // determines wether the file is the current version
