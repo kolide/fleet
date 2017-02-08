@@ -5,7 +5,7 @@ import { logoutUser } from 'redux/nodes/auth/actions';
 import { push } from 'react-router-redux';
 
 import configInterface from 'interfaces/config';
-import FlashMessage from 'components/FlashMessage';
+import FlashMessage from 'components/flash_messages/FlashMessage';
 import SiteNavHeader from 'components/side_panels/SiteNavHeader';
 import SiteNavSidePanel from 'components/side_panels/SiteNavSidePanel';
 import userInterface from 'interfaces/user';
