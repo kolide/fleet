@@ -114,7 +114,7 @@ export class UserManagementPage extends Component {
   onEditUser = (user, updatedUser) => {
     const { currentUser, dispatch } = this.props;
     const { onToggleEditUser } = this;
-    const { update } = userActions;
+    const { silentUpdate } = userActions;
     const updatedAttrs = deepDifference(updatedUser, user);
 
     if (currentUser.id === user.id) {
@@ -128,9 +128,9 @@ export class UserManagementPage extends Component {
         .catch(() => false);
     }
 
-    return dispatch(update(user, updatedAttrs))
+    return dispatch(silentUpdate(user, updatedAttrs))
       .then(() => {
-        dispatch(renderFlash('success', 'User updated', update(user, user)));
+        dispatch(renderFlash('success', 'User updated', silentUpdate(user, user)));
         onToggleEditUser(user);
 
         return false;

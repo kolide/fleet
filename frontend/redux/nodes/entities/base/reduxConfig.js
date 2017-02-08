@@ -279,6 +279,24 @@ const reduxConfig = ({
     };
   };
 
+  const silentUpdate = (...args) => {
+    return (dispatch) => {
+      return updateFunc(...args)
+        .then((response) => {
+          dispatch(successAction(response, updateSuccess));
+
+          return response;
+        })
+        .catch((response) => {
+          const errorsObject = formatErrorResponse(response);
+
+          dispatch(updateFailure(errorsObject));
+
+          throw errorsObject;
+        });
+    };
+  };
+
   const actions = {
     clearErrors,
     create,
@@ -288,6 +306,7 @@ const reduxConfig = ({
     silentCreate,
     silentDestroy,
     silentLoadAll,
+    silentUpdate,
     update,
   };
 

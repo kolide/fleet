@@ -415,6 +415,84 @@ describe('reduxConfig', () => {
     });
   });
 
+  describe('#silentUpdate', () => {
+    describe('successful call', () => {
+      const mockStore = reduxMockStore(store);
+      const updateFunc = createSpy().andReturn(Promise.resolve([{ ...user, updated: true }]));
+      const config = reduxConfig({
+        updateFunc,
+        entityName: 'users',
+        schema: schemas.USERS,
+      });
+      const { actions } = config;
+
+      it('dispatches the correct actions', (done) => {
+        mockStore.dispatch(actions.silentUpdate())
+          .then(() => {
+            const dispatchedActions = mockStore.getActions();
+            const dispatchedActionTypes = dispatchedActions.map((action) => { return action.type; });
+
+            expect(dispatchedActionTypes).toNotInclude('users_UPDATE_REQUEST');
+            expect(dispatchedActionTypes).toInclude('users_UPDATE_SUCCESS');
+            expect(dispatchedActionTypes).toNotInclude('users_UPDATE_FAILURE');
+
+            done();
+          })
+          .catch(done);
+      });
+    });
+
+    describe('unsuccessful call', () => {
+      describe('unprocessable entitiy', () => {
+        const mockStore = reduxMockStore(store);
+
+        const errors = [
+          { name: 'first_name',
+            reason: 'is not valid',
+          },
+          { name: 'last_name',
+            reason: 'must be changed or something',
+          },
+        ];
+        const errorResponse = {
+          status: 422,
+          message: {
+            message: 'Validation Failed',
+            errors,
+          },
+        };
+        const formattedErrors = formatErrorResponse(errorResponse);
+        const updateFunc = createSpy().andReturn(Promise.reject(errorResponse));
+        const config = reduxConfig({
+          entityName: 'users',
+          schema: schemas.USERS,
+          updateFunc,
+        });
+        const { actions } = config;
+
+        it('dispatches the correct actions', (done) => {
+          mockStore.dispatch(actions.silentUpdate())
+            .then(done)
+            .catch(() => {
+              const dispatchedActions = mockStore.getActions();
+              const dispatchedActionTypes = dispatchedActions.map((action) => { return action.type; });
+
+              expect(dispatchedActionTypes).toNotInclude('users_UPDATE_REQUEST');
+              expect(dispatchedActionTypes).toNotInclude('users_UPDATE_SUCCESS');
+
+              const updateFailureAction = find(dispatchedActions, { type: 'users_UPDATE_FAILURE' });
+
+              expect(updateFailureAction.payload).toEqual({
+                errors: formattedErrors,
+              });
+
+              done();
+            });
+        });
+      });
+    });
+  });
+
   describe('dispatching the destroy action', () => {
     describe('successful destroy call', () => {
       const mockStore = reduxMockStore(store);
