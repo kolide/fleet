@@ -6,24 +6,20 @@ GPG_PATH="/Users/${USER}/.gnupg"
 
 build_createrepo_container() {
     cd ../ci/docker/createrepo && \
-        docker build -t createrepo .
+        docker build -t createrepo . && cd -
 }
 
 build_aptly_container() {
     cd ../ci/docker/aptly && \
-        docker build -t aptly .
+        docker build -t aptly . && cd -
 }
 
 update_yum_repo() {
     # generate new yum repo snapshot
     docker run -it --rm \
-        -v "${LOCAL_REPO_PATH}/rpm:/repo" \
-        -v "${LOCAL_REPO_PATH}/centos:/repo/repodata" \
+        -v "${LOCAL_REPO_PATH}/yum:/repo" \
+        -v "${GPG_PATH}:/root/.gnupg" \
         createrepo
-    
-    # remove artifact from mounting folders to this path
-    rm -rf "${LOCAL_REPO_PATH}/rpm/repodata"
-    
 }
 
 update_apt_repo() {
@@ -40,9 +36,9 @@ update_apt_repo() {
 
 
 main() {
-    # build_createrepo_container
+    build_createrepo_container
     build_aptly_container
-    # update_yum_repo
+    update_yum_repo
     update_apt_repo
 }
 

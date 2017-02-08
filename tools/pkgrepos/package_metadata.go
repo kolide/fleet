@@ -16,7 +16,7 @@ import (
 
 const (
 	debDir      = "deb"
-	rpmDir      = "rpm"
+	rpmDir      = "yum"
 	binDir      = "bin"
 	repoBaseURL = "https://dl.kolide.co/"
 )
@@ -124,7 +124,7 @@ func isCurrent(have, current, kind string) bool {
 	case "deb":
 		debSplit := strings.SplitN(have, "_", 3)[1]
 		return debSplit == current
-	case "rpm":
+	case "yum":
 		rpmSplit := strings.SplitN(have, "-", 3)[1]
 		rpmSplit = strings.Replace(rpmSplit, "_", "-", -1)
 		return rpmSplit == current

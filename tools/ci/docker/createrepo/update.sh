@@ -1,13 +1,6 @@
 #!/bin/bash
-# create new snapshot folder
-mkdir -p /newrepo
-
-# copy current conents to new snapshot
-cp -R /repo/* /newrepo
-
 # run createrepo to re-generate metadata
-createrepo --update /newrepo
+createrepo --update /repo
 
-# replace original repodata with snapshot
-rm -rf /repo/repodata/*
-mv /newrepo/repodata/* /repo/repodata
+# sign repo with GPG key
+gpg --detach-sign --armor /repo/repodata/repomd.xml
