@@ -78,7 +78,6 @@ the way that the kolide server works.
 				ds,
 				"https://kolide.co/api/v0/licenses",
 				license.Logger(logger),
-				license.PollFrequency(8*time.Hour),
 			)
 
 			err = licenseService.Start()

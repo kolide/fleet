@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	defaultPollFrequency     = time.Hour
+	defaultPollFrequency     = 8 * time.Hour
 	defaultHttpClientTimeout = 10 * time.Second
 )
 

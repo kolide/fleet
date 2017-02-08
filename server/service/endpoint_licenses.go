@@ -30,6 +30,8 @@ type licenseResponse struct {
 
 func (lr licenseResponse) error() error { return lr.Err }
 
+// makeUpdateLicenseEndpoint is used by admins to replace or update
+// licenses.
 func makeUpdateLicenseEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		lr := request.(licenseRequest)
@@ -80,7 +82,9 @@ func makeGetLicenseEndpoint(svc kolide.Service) endpoint.Endpoint {
 }
 
 // makePostLicenseEndpoint is only to be used once, if a license is successfully
-// installed we return an error if it is called again
+// installed we return an error if it is called again.  Note that this endpoint
+// requires no authentication.  Once a license is installed the user will be
+// redirected to login or setup, depending on whether setup is complete or not
 func makePostLicenseEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(licenseRequest)
@@ -89,7 +93,7 @@ func makePostLicenseEndpoint(svc kolide.Service) endpoint.Endpoint {
 			return licenseResponse{Err: err}, nil
 		}
 		if !requireLicense {
-			return licenseResponse{Err: errors.New("license can only be uploaded once")}, err
+			return licenseResponse{Err: errors.New("license can only be uploaded once")}, nil
 		}
 		saved, err := svc.SaveLicense(ctx, req.License)
 		if err != nil {
