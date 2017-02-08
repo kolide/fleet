@@ -11,14 +11,32 @@ const {
   reduxMockStore,
 } = helpers;
 const {
+  licenseStub,
   userStub,
 } = stubs;
 
 describe('LicensePage - component', () => {
   describe('rendering', () => {
+    it('renders the license success content when a license is present', () => {
+      const store = {
+        auth: {
+          license: licenseStub,
+          loading: false,
+          user: null,
+        },
+      };
+      const Component = connectedComponent(LicensePage, {
+        mockStore: reduxMockStore(store),
+      });
+
+      expect(mount(Component).find('LicenseForm').length).toEqual(0, 'Expected the LicenseForm to not be on the page when a license is present');
+      expect(mount(Component).find('LicenseSuccess').length).toEqual(1, 'Expected the LicenseSuccess component to be on the page when a license is present');
+    });
+
     it('renders when not authenticated', () => {
       const store = {
         auth: {
+          license: {},
           loading: false,
           user: null,
         },
@@ -33,6 +51,7 @@ describe('LicensePage - component', () => {
     it('does not render when a user is logged in', () => {
       const store = {
         auth: {
+          license: {},
           loading: false,
           user: userStub,
         },
@@ -47,6 +66,7 @@ describe('LicensePage - component', () => {
     it('does not render when loading the user', () => {
       const store = {
         auth: {
+          license: {},
           loading: true,
           user: null,
         },
@@ -58,9 +78,10 @@ describe('LicensePage - component', () => {
       expect(mount(Component).find('LicensePage').length).toEqual(0);
     });
 
-    it('renders a LicenseForm', () => {
+    it('renders a LicenseForm when a license is not present', () => {
       const store = {
         auth: {
+          license: {},
           loading: false,
           user: null,
         },
@@ -69,7 +90,7 @@ describe('LicensePage - component', () => {
         mockStore: reduxMockStore(store),
       });
 
-      expect(mount(Component).find('LicenseForm').length).toEqual(1);
+      expect(mount(Component).find('LicenseForm').length).toEqual(1, 'Expected the LicenseForm to be on the page');
     });
   });
 
@@ -81,6 +102,7 @@ describe('LicensePage - component', () => {
 
       const store = {
         auth: {
+          license: {},
           loading: false,
           user: null,
         },
