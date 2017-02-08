@@ -7,6 +7,7 @@ import InputField from 'components/forms/fields/InputField';
 import validate from 'components/forms/LicenseForm/validate';
 
 import freeTrial from '../../../../assets/images/sign-up-pencil.svg';
+import key from '../../../../assets/images/key.svg';
 
 const fields = ['license'];
 const baseClass = 'license-form';
@@ -25,7 +26,10 @@ class LicenseForm extends Component {
     return (
       <form className={baseClass} onSubmit={handleSubmit}>
         <div className={`${baseClass}__container`}>
-          <h2>Kolide License</h2>
+          <h2>
+            <img alt="Kolide License" className={`${baseClass}__key-img`} src={key} />
+            Kolide License
+          </h2>
           <InputField
             {...formFields.license}
             hint={<p className={`${baseClass}__help-text`}>Found under <span>Account Settings</span> at Kolide.co</p>}
