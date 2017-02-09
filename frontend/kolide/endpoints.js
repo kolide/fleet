@@ -25,6 +25,7 @@ export default {
     return `/v1/kolide/packs/${pack.id}/scheduled`;
   },
   SETUP: '/v1/setup',
+  SETUP_LICENSE: '/v1/license',
   STATUS_LABEL_COUNTS: '/v1/kolide/host_summary',
   TARGETS: '/v1/kolide/targets',
   USERS: '/v1/kolide/users',

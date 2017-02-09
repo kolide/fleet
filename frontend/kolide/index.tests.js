@@ -40,6 +40,7 @@ const {
   validRevokeInviteRequest,
   validRunQueryRequest,
   validSetupRequest,
+  validSetupLicenseRequest,
   validStatusLabelsGetCountsRequest,
   validUpdateAdminRequest,
   validUpdateConfigOptionsRequest,
@@ -148,6 +149,24 @@ describe('Kolide - API client', () => {
 
         Kolide.setBearerToken(bearerToken);
         Kolide.license.load()
+          .then(() => {
+            expect(request.isDone()).toEqual(true);
+            done();
+          })
+          .catch(() => {
+            expect(request.isDone()).toEqual(true);
+            done();
+          });
+      });
+    });
+
+    describe('#setup', () => {
+      it('calls the correct endpoint with the correct parameters', (done) => {
+        const jwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ';
+        const request = validSetupLicenseRequest(bearerToken, jwtToken);
+
+        Kolide.setBearerToken(bearerToken);
+        Kolide.license.setup(jwtToken)
           .then(() => {
             expect(request.isDone()).toEqual(true);
             done();

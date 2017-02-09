@@ -54,6 +54,26 @@ export const validCreateLicenseRequest = (bearerToken, jwtToken) => {
     });
 };
 
+export const validSetupLicenseRequest = (bearerToken, jwtToken) => {
+  const expiryDate = new Date();
+
+  return nock('http://localhost:8080', {
+    reqHeaders: {
+      Authorization: `Bearer ${bearerToken}`,
+    },
+  })
+    .post('/api/v1/license', JSON.stringify({ license: jwtToken }))
+    .reply(201, {
+      license: {
+        license: jwtToken,
+        expiry: expiryDate.toISOString(),
+        allowed_hosts: 100,
+        hosts: 70,
+        evaluation: true,
+      },
+    });
+};
+
 export const validGetLicenseRequest = (bearerToken) => {
   const expiryDate = new Date();
   const jwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ';
@@ -517,6 +537,7 @@ export default {
   validRevokeInviteRequest,
   validRunQueryRequest,
   validSetupRequest,
+  validSetupLicenseRequest,
   validStatusLabelsGetCountsRequest,
   validUpdateAdminRequest,
   validUpdateConfigOptionsRequest,

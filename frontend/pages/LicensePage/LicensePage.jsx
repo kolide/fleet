@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
 
 import APP_CONSTANTS from 'app_constants';
-import { createLicense } from 'redux/nodes/auth/actions';
+import { setupLicense } from 'redux/nodes/auth/actions';
 import EnsureUnauthenticated from 'components/EnsureUnauthenticated';
 import Footer from 'components/Footer';
 import LicenseForm from 'components/forms/LicenseForm';
@@ -43,7 +43,7 @@ class LicensePage extends Component {
   handleSubmit = ({ license }) => {
     const { dispatch } = this.props;
 
-    dispatch(createLicense({ license }))
+    dispatch(setupLicense({ license }))
       .catch(() => false);
 
     return false;

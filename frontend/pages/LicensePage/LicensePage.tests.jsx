@@ -97,8 +97,8 @@ describe('LicensePage - component', () => {
   describe('submitting the form', () => {
     afterEach(restoreSpies);
 
-    it('calls the Kolide create license endpoint', () => {
-      spyOn(Kolide.license, 'create').andReturn(Promise.resolve());
+    it('calls the Kolide setup license endpoint', () => {
+      spyOn(Kolide.license, 'setup').andReturn(Promise.resolve());
 
       const store = {
         auth: {
@@ -117,7 +117,7 @@ describe('LicensePage - component', () => {
       helpers.fillInFormInput(LicenseField, jwtToken);
       Form.simulate('submit');
 
-      expect(Kolide.license.create).toHaveBeenCalledWith(jwtToken);
+      expect(Kolide.license.setup).toHaveBeenCalledWith(jwtToken);
     });
   });
 });

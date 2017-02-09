@@ -33,6 +33,24 @@ export const licenseSuccess = (license) => {
     payload: { license },
   };
 };
+export const setupLicense = ({ license }) => {
+  return (dispatch) => {
+    dispatch(licenseRequest);
+
+    return Kolide.license.setup(license)
+      .then((response) => {
+        dispatch(licenseSuccess(response));
+
+        return response;
+      })
+      .catch((response) => {
+        const errorsObject = formatErrorResponse(response);
+        dispatch(licenseFailure(errorsObject));
+
+        throw response;
+      });
+  };
+};
 export const createLicense = ({ license }) => {
   return (dispatch) => {
     dispatch(licenseRequest);
