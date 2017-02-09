@@ -10,7 +10,7 @@ export default ({ license }) => {
   }
 
   if (license && !validJwtToken(license)) {
-    errors.license = 'License is not a valid JWT token';
+    errors.license = 'License syntax is not valid. Please ensure you have entered the entire license. Please contact support@kolide.co if you need assistance';
   }
 
   const valid = !size(errors);

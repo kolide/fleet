@@ -24,6 +24,8 @@ describe('LicenseForm - validation', () => {
     const { errors, valid } = validate({ license: jwtToken });
 
     expect(valid).toEqual(false);
-    expect(errors).toEqual({ license: 'License is not a valid JWT token' });
+    expect(errors).toEqual({
+      license: 'License syntax is not valid. Please ensure you have entered the entire license. Please contact support@kolide.co if you need assistance',
+    });
   });
 });
