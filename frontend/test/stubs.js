@@ -145,6 +145,9 @@ export const licenseStub = () => {
     expiry: tomorrow.toISOString(),
     allowed_hosts: 100,
     hosts: 70,
+    evaluation: false,
+    revoked: false,
+    organization: 'Kolide',
   };
 };
 
