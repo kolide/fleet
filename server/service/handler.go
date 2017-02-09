@@ -479,7 +479,7 @@ func RedirectLoginToSetup(svc kolide.Service, logger kitlog.Logger, next http.Ha
 			redirect.ServeHTTP(w, r)
 			return
 		}
-		next.ServeHTTP(w, r)
+		RedirectSetupToLogin(svc, logger, next).ServeHTTP(w, r)
 	}
 }
 

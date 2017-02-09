@@ -114,8 +114,7 @@ func (cc *Checker) Start() error {
 		wait.Add(1)
 		defer wait.Done()
 		chk.logger.Log("msg", "starting")
-		chk.logger.Log("poll-frequency", fmt.Sprintf("polling frequency %s", cc.pollFrequency),
-			"http-timeout", fmt.Sprintf("http timeout %s", cc.client.Timeout))
+		chk.logger.Log("poll-frequency", cc.pollFrequency, "http-timeout", cc.client.Timeout)
 
 		for {
 			select {
