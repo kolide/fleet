@@ -14,6 +14,7 @@ const baseClass = 'license-form';
 
 class LicenseForm extends Component {
   static propTypes = {
+    baseError: PropTypes.string,
     fields: PropTypes.shape({
       license: formFieldInterface.isRequired,
     }).isRequired,
@@ -21,7 +22,7 @@ class LicenseForm extends Component {
   };
 
   render () {
-    const { fields: formFields, handleSubmit } = this.props;
+    const { baseError, fields: formFields, handleSubmit } = this.props;
 
     return (
       <form className={baseClass} onSubmit={handleSubmit}>
@@ -30,6 +31,7 @@ class LicenseForm extends Component {
             <img alt="Kolide License" className={`${baseClass}__key-img`} src={key} />
             Kolide License
           </h2>
+          {baseError && <div className="form__base-error">{baseError}</div>}
           <InputField
             {...formFields.license}
             hint={<p className={`${baseClass}__help-text`}>Found under <a href="https://www.kolide.co/account">Account Settings</a> at Kolide.co</p>}

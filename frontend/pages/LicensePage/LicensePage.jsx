@@ -19,6 +19,10 @@ const { PATHS: { SETUP } } = APP_CONSTANTS;
 class LicensePage extends Component {
   static propTypes = {
     dispatch: PropTypes.func,
+    errors: PropTypes.shape({
+      base: PropTypes.string,
+      license: PropTypes.string,
+    }),
     license: licenseInterface.isRequired,
   };
 
@@ -51,7 +55,7 @@ class LicensePage extends Component {
 
   render () {
     const { handleSubmit, onConfirmLicense } = this;
-    const { license } = this.props;
+    const { errors, license } = this.props;
 
     if (license.token) {
       return (
@@ -74,7 +78,7 @@ class LicensePage extends Component {
           src={kolideLogo}
           className={`${baseClass}__logo`}
         />
-        <LicenseForm handleSubmit={handleSubmit} />
+        <LicenseForm handleSubmit={handleSubmit} serverErrors={errors} />
         <Footer />
       </div>
     );
@@ -82,9 +86,9 @@ class LicensePage extends Component {
 }
 
 const mapStateToProps = (state) => {
-  const { license } = state.auth;
+  const { errors, license } = state.auth;
 
-  return { license };
+  return { errors, license };
 };
 
 const ConnectedComponent = connect(mapStateToProps)(LicensePage);
