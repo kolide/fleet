@@ -36,15 +36,12 @@ func testLicense(t *testing.T, ds kolide.Datastore) {
 	if ds.Name() == "inmem" {
 		t.Skip("inmem is deprecated")
 	}
-	//	t.Skip("Need to replace token with a token generated on kolide.co")
+
 	err := ds.MigrateData()
 	require.Nil(t, err)
 	license, err := ds.License()
 	require.Nil(t, err)
 	assert.Nil(t, license.Token)
-
-	// publicKey, err := ds.LicensePublicKey(token)
-	// require.Nil(t, err)
 
 	_, err = ds.SaveLicense(token, publicKey)
 	require.Nil(t, err)
