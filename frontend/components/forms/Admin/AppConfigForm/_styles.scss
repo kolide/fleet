@@ -58,11 +58,34 @@
   &__license-form {
     float: right;
 
+    a {
+      float: right;
+      font-size: 15px;
+      line-height: 25px;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
     h3 {
+      @include display(inline-flex);
       color: #858495;
       font-size: 20px;
       font-weight: $normal;
+      line-height: 25px;
       margin-top: 0;
+
+      img {
+        height: 25px;
+        margin-right: 14px;
+      }
+    }
+
+    textarea {
+      font-family: SourceCodePro, $monospace;
+      resize: none;
     }
   }
 

@@ -13,6 +13,8 @@ import OrgLogoIcon from 'components/icons/OrgLogoIcon';
 import Slider from 'components/forms/fields/Slider';
 import validate from 'components/forms/admin/AppConfigForm/validate';
 
+import key from '../../../../../assets/images/key.svg';
+
 const authMethodOptions = [
   { label: 'Plain', value: 'authmethod_plain' },
   { label: 'Cram MD5', value: 'authmethod_cram_md5' },
@@ -54,9 +56,6 @@ class AppConfigForm extends Component {
       user_name: formFieldInterface.isRequired,
       verify_ssl_certs: formFieldInterface.isRequired,
     }).isRequired,
-    formData: PropTypes.shape({
-      org_name: PropTypes.string.isRequired,
-    }),
     handleSubmit: PropTypes.func.isRequired,
     handleUpdateLicense: PropTypes.func.isRequired,
     license: licenseInterface.isRequired,
@@ -161,7 +160,7 @@ class AppConfigForm extends Component {
   }
 
   render () {
-    const { fields, formData, handleSubmit, license, smtpConfigured } = this.props;
+    const { fields, handleSubmit, license, smtpConfigured } = this.props;
     const { onToggleAdvancedOptions, onResetLicense, onToggleRevealSecret, onUpdateLicense, renderAdvancedOptions, renderSmtpSection } = this;
     const { revealSecret, showAdvancedOptions } = this.state;
     const expiryMoment = license && moment(license.expiry);
@@ -194,7 +193,7 @@ class AppConfigForm extends Component {
             <div className={`${baseClass}__license-info-row`}>
               <div className={`${baseClass}__license-detail-icon`}><Icon name="business" /></div>
               <div className={`${baseClass}__license-detail-text-wrapper`}>
-                <p className={`${baseClass}__license-detail-text`}>{formData.org_name}</p>
+                <p className={`${baseClass}__license-detail-text`}>{license.organization}</p>
                 {hostWarning && <p className={`${baseClass}__license-detail-warning`}>Exceeding Host Limit</p>}
               </div>
             </div>
@@ -214,7 +213,10 @@ class AppConfigForm extends Component {
             </div>
           </div>
           <div className={`${baseClass}__license-form`}>
-            <h3>License String</h3>
+            <h3><img alt="License String" src={key} />License String</h3>
+            <a href="https://www.kolide.co/account" rel="noopener noreferrer" target="_blank">
+              View License Options <Icon name="external-link" />
+            </a>
             <InputField
               {...fields.license}
               inputClassName={`${baseClass}__license-input`}
