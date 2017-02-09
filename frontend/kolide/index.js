@@ -125,7 +125,18 @@ class Kolide extends Base {
       const { RUN_QUERY } = endpoints;
 
       return this.authenticatedPost(this.endpoint(RUN_QUERY), JSON.stringify({ query, selected }))
-        .then(response => response.campaign);
+        .then((response) => {
+          const { campaign } = response;
+
+          return {
+            ...campaign,
+            hosts_count: {
+              successful: 0,
+              failed: 0,
+              total: 0,
+            },
+          };
+        });
     },
   }
 
