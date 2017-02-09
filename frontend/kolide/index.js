@@ -125,20 +125,20 @@ class Kolide extends Base {
       const { SETUP_LICENSE } = endpoints;
 
       return this.authenticatedPost(this.endpoint(SETUP_LICENSE), JSON.stringify({ license: jwtToken }))
-        .then(response => response.license);
+        .then(response => helpers.parseLicense(response.license));
     },
     create: (jwtToken) => {
       const { LICENSE } = endpoints;
 
       return this.authenticatedPost(this.endpoint(LICENSE), JSON.stringify({ license: jwtToken }))
-        .then(response => response.license);
+        .then(response => helpers.parseLicense(response.license));
     },
 
     load: () => {
       const { LICENSE } = endpoints;
 
       return this.authenticatedGet(this.endpoint(LICENSE))
-        .then(response => response.license);
+        .then(response => helpers.parseLicense(response.license));
     },
   }
 

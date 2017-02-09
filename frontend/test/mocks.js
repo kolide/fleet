@@ -34,9 +34,7 @@ export const validCreateLabelRequest = (bearerToken, labelParams) => {
     .reply(201, { label: { ...labelParams, display_text: labelParams.name } });
 };
 
-export const validCreateLicenseRequest = (bearerToken, jwtToken) => {
-  const expiryDate = new Date();
-
+export const validCreateLicenseRequest = (bearerToken, jwtToken, response = stubs.licenseStub()) => {
   return nock('http://localhost:8080', {
     reqHeaders: {
       Authorization: `Bearer ${bearerToken}`,
@@ -45,18 +43,13 @@ export const validCreateLicenseRequest = (bearerToken, jwtToken) => {
     .post('/api/v1/kolide/license', JSON.stringify({ license: jwtToken }))
     .reply(201, {
       license: {
-        license: jwtToken,
-        expiry: expiryDate.toISOString(),
-        allowed_hosts: 100,
-        hosts: 70,
-        evaluation: true,
+        ...response,
+        token: jwtToken,
       },
     });
 };
 
-export const validSetupLicenseRequest = (bearerToken, jwtToken) => {
-  const expiryDate = new Date();
-
+export const validSetupLicenseRequest = (bearerToken, jwtToken, response = stubs.licenseStub()) => {
   return nock('http://localhost:8080', {
     reqHeaders: {
       Authorization: `Bearer ${bearerToken}`,
@@ -65,17 +58,13 @@ export const validSetupLicenseRequest = (bearerToken, jwtToken) => {
     .post('/api/v1/license', JSON.stringify({ license: jwtToken }))
     .reply(201, {
       license: {
+        ...response,
         license: jwtToken,
-        expiry: expiryDate.toISOString(),
-        allowed_hosts: 100,
-        hosts: 70,
-        evaluation: true,
       },
     });
 };
 
-export const validGetLicenseRequest = (bearerToken) => {
-  const expiryDate = new Date();
+export const validGetLicenseRequest = (bearerToken, response = stubs.licenseStub()) => {
   const jwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ';
 
   return nock('http://localhost:8080', {
@@ -86,11 +75,8 @@ export const validGetLicenseRequest = (bearerToken) => {
     .get('/api/v1/kolide/license')
     .reply(200, {
       license: {
+        ...response,
         license: jwtToken,
-        expiry: expiryDate.toISOString(),
-        allowed_hosts: 100,
-        hosts: 70,
-        evaluation: true,
       },
     });
 };
