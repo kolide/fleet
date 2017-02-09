@@ -63,6 +63,9 @@ func getMetadata(repoPath, current string) (*metadata, error) {
 		return func(path string, info os.FileInfo, err error) error {
 			switch ext := filepath.Ext(path); ext {
 			case ".rpm", ".deb", ".zip":
+				if strings.Contains(path, "-repo-") { // don't add repo.noarch file to manifest.
+					return nil
+				}
 				hash, err := shaFile(path)
 				if err != nil {
 					return err
