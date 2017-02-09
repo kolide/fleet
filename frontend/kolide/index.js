@@ -1,4 +1,4 @@
-import { get, omit } from 'lodash';
+import { get, omit, trim } from 'lodash';
 
 import { appendTargetTypeToTargets } from 'redux/nodes/entities/targets/helpers';
 import Base from 'kolide/base';
@@ -124,13 +124,13 @@ class Kolide extends Base {
     setup: (jwtToken) => {
       const { SETUP_LICENSE } = endpoints;
 
-      return this.authenticatedPost(this.endpoint(SETUP_LICENSE), JSON.stringify({ license: jwtToken }))
+      return this.authenticatedPost(this.endpoint(SETUP_LICENSE), JSON.stringify({ license: trim(jwtToken) }))
         .then(response => helpers.parseLicense(response.license));
     },
     create: (jwtToken) => {
       const { LICENSE } = endpoints;
 
-      return this.authenticatedPost(this.endpoint(LICENSE), JSON.stringify({ license: jwtToken }))
+      return this.authenticatedPost(this.endpoint(LICENSE), JSON.stringify({ license: trim(jwtToken) }))
         .then(response => helpers.parseLicense(response.license));
     },
 

@@ -1,4 +1,4 @@
-import { size, some } from 'lodash';
+import { size, some, trim } from 'lodash';
 
 import APP_CONSTANTS from 'app_constants';
 import validJwtToken from 'components/forms/validators/valid_jwt_token';
@@ -27,7 +27,7 @@ export default (formData) => {
     errors.license = 'License must be present';
   }
 
-  if (license && !validJwtToken(license)) {
+  if (license && !validJwtToken(trim(license))) {
     errors.license = 'License is not a valid JWT token';
   }
 

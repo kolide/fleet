@@ -67,7 +67,7 @@ class AppSettingsPage extends Component {
   onUpdateLicense = (license) => {
     const { dispatch, license: licenseProp } = this.props;
 
-    if (license === licenseProp.license) {
+    if (license === licenseProp.token) {
       return false;
     }
 
