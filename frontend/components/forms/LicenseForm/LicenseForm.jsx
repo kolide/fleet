@@ -32,7 +32,7 @@ class LicenseForm extends Component {
           </h2>
           <InputField
             {...formFields.license}
-            hint={<p className={`${baseClass}__help-text`}>Found under <span>Account Settings</span> at Kolide.co</p>}
+            hint={<p className={`${baseClass}__help-text`}>Found under <a href="https://www.kolide.co/account">Account Settings</a> at Kolide.co</p>}
             inputClassName={`${baseClass}__input`}
             label="Enter License File"
             type="textarea"
@@ -42,11 +42,9 @@ class LicenseForm extends Component {
           </Button>
           <p className="form-field__label">Don&apos;t have a license?</p>
           <p className={`${baseClass}__free-trial-text`}>Start a free trial of Kolide today!</p>
-          <Button
-            block
-            className={`${baseClass}__free-trial-btn`}
-            onClick={() => false}
-            variant="unstyled"
+          <a
+            className={`${baseClass}__free-trial-btn button button--unstyled`}
+            href="https://www.kolide.co/register"
           >
             <img
               alt="Free trial"
@@ -54,7 +52,7 @@ class LicenseForm extends Component {
               className={`${baseClass}__free-trial-img`}
             />
             <span>Sign up for Free Kolide Trial</span>
-          </Button>
+          </a>
         </div>
       </form>
     );

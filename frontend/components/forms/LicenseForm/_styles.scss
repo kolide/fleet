@@ -4,6 +4,10 @@
   @include justify-content(center);
   @include flex-grow(1);
 
+  textarea {
+    resize: none;
+  }
+
   &__key-img {
     height: 43px;
     margin-right: 15px;
@@ -27,6 +31,14 @@
     box-sizing: border-box;
     padding: 25px 35px;
     margin-top: -55px;
+
+    a {
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
   }
 
   &__free-trial-btn {
@@ -73,6 +85,8 @@
     background-color: $bg-light;
     border-radius: 4px;
     box-shadow: inset 0 0 5px 0 rgba(32, 36, 50, 0.24);
+    font-family: SourceCodePro, $monospace;
+    line-height: 28px;
     width: 100%;
   }
 
