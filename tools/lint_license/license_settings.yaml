@@ -57,6 +57,7 @@ allowed_licenses:
 tests:
   ? node_modules/in-publish/test
   ? node_modules/readdirp/examples
+  ? node_modules/node-pre-gyp/lib/util/nw-pre-gyp
   ? node_modules/fsevents/node_modules/node-pre-gyp/lib/util/nw-pre-gyp
   ? node_modules/brace/example
   ? node_modules/uuid/benchmark
@@ -82,6 +83,9 @@ overrides:
     MIT
   # (BSD-2-Clause OR MIT OR Apache-2.0)
   node_modules/fsevents/node_modules/rc:
+    MIT
+  # (BSD-2-Clause OR MIT OR Apache-2.0)
+  node_modules/rc:
     MIT
   # (GPL-2.0 OR MIT)
   node_modules/ua-parser-js:
