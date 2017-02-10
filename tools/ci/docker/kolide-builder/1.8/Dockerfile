@@ -14,6 +14,8 @@ RUN go get -u -v github.com/Masterminds/glide
 RUN echo -e 'http://dl-cdn.alpinelinux.org/alpine/edge/main\nhttp://dl-cdn.alpinelinux.org/alpine/edge/community\nhttp://dl-cdn.alpinelinux.org/alpine/edge/testing' > /etc/apk/repositories && \
   apk add --no-cache yarn
 
+# git must be explicitly instructed to follow redirects for compatibility with
+# gopkg.in
 RUN git config --global http.https://gopkg.in.followRedirects true
 
 COPY rootfs /
