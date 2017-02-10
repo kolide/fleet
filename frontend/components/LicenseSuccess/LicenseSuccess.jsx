@@ -1,7 +1,6 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
 import moment from 'moment';
 
-import Button from 'components/buttons/Button';
 import Icon from 'components/icons/Icon';
 import licenseInterface from 'interfaces/license';
 
@@ -9,7 +8,7 @@ import key from '../../../assets/images/key.svg';
 
 const baseClass = 'license-success';
 
-const LicenseSuccess = ({ license, onConfirmLicense }) => {
+const LicenseSuccess = ({ license }) => {
   const { allowed_hosts: allowedHosts, expiry } = license;
   const expiryMoment = moment(expiry);
   const timeToExpiration = expiryMoment.toNow(true);
@@ -28,9 +27,9 @@ const LicenseSuccess = ({ license, onConfirmLicense }) => {
           <li><Icon name="single-host" />{allowedHosts}&nbsp;{hostText}</li>
           {timeToExpiration && <li><Icon name="clock" />Expires in {timeToExpiration}</li>}
         </ul>
-        <Button block onClick={onConfirmLicense} variant="success">
+        <a href="/setup" className="button button--success">
           SETUP KOLIDE
-        </Button>
+        </a>
       </div>
     </div>
   );
@@ -38,7 +37,6 @@ const LicenseSuccess = ({ license, onConfirmLicense }) => {
 
 LicenseSuccess.propTypes = {
   license: licenseInterface.isRequired,
-  onConfirmLicense: PropTypes.func.isRequired,
 };
 
 export default LicenseSuccess;

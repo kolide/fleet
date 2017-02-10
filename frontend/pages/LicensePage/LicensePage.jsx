@@ -1,8 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { push } from 'react-router-redux';
 
-import APP_CONSTANTS from 'app_constants';
 import { setupLicense } from 'redux/nodes/auth/actions';
 import EnsureUnauthenticated from 'components/EnsureUnauthenticated';
 import Footer from 'components/Footer';
@@ -14,7 +12,6 @@ import { showBackgroundImage } from 'redux/nodes/app/actions';
 import kolideLogo from '../../../assets/images/kolide-logo-condensed.svg';
 
 const baseClass = 'license-page';
-const { PATHS: { SETUP } } = APP_CONSTANTS;
 
 class LicensePage extends Component {
   static propTypes = {
@@ -34,16 +31,6 @@ class LicensePage extends Component {
     return false;
   }
 
-  onConfirmLicense = (evt) => {
-    evt.preventDefault();
-
-    const { dispatch } = this.props;
-
-    dispatch(push(SETUP));
-
-    return false;
-  }
-
   handleSubmit = ({ license }) => {
     const { dispatch } = this.props;
 
@@ -54,7 +41,7 @@ class LicensePage extends Component {
   }
 
   render () {
-    const { handleSubmit, onConfirmLicense } = this;
+    const { handleSubmit } = this;
     const { errors, license } = this.props;
 
     if (license.token) {
@@ -65,7 +52,7 @@ class LicensePage extends Component {
             src={kolideLogo}
             className={`${baseClass}__logo`}
           />
-          <LicenseSuccess license={license} onConfirmLicense={onConfirmLicense} />
+          <LicenseSuccess license={license} />
           <Footer />
         </div>
       );

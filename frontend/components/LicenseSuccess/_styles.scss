@@ -69,13 +69,15 @@
     }
   }
 
-  button {
+  a {
     background-color: #48c586;
     border-radius: 4px;
     box-shadow: 0 6px 6px 0 rgba(32, 36, 50, 0.24), 0 6px 0 0 #1d9056;
+    display: block;
     font-size: 24px;
     font-weight: $bold;
     height: 60px;
+    line-height: 60px;
 
     &:hover {
       background-color: #48c586;
