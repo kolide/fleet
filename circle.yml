@@ -16,7 +16,6 @@ dependencies:
     - docker login -e $DOCKER_HUB_EMAIL -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
     - ./tools/ci/setup-build-environment.sh
     - ./tools/ci/download-build-deps.sh
-    - curl -o- -L https://yarnpkg.com/install.sh | bash
 
   cache_directories:
     - "vendor"
@@ -25,13 +24,13 @@ dependencies:
     - "/opt/google-cloud-sdk"
 
   override:
-    - docker run -v $(pwd):/go/src/github.com/kolide/kolide -v /home/ubuntu/.go_workspace/pkg:/go/pkg kolide/kolide-builder:1.8 --deps
+    - docker run -v $(pwd):/go/src/github.com/kolide/kolide -v /home/ubuntu/.go_workspace/pkg:/go/pkg kolide/kolide-builder:1.8-yarn --deps
 
 test:
   override:
       - docker run -d --name redis redis
       - docker run -d --name mysql -e MYSQL_ROOT_PASSWORD=toor -e MYSQL_DATABASE=kolide -e MYSQL_USER=kolide -e MYSQL_PASSWORD=kolide mysql:5.7
-      - docker run --link redis:redis --link mysql:mysql -e MYSQL_TEST=true -e REDIS_TEST=true -v $(pwd):/go/src/github.com/kolide/kolide -v /home/ubuntu/.go_workspace/pkg:/go/pkg kolide/kolide-builder:1.8 --build
+      - docker run --link redis:redis --link mysql:mysql -e MYSQL_TEST=true -e REDIS_TEST=true -v $(pwd):/go/src/github.com/kolide/kolide -v /home/ubuntu/.go_workspace/pkg:/go/pkg kolide/kolide-builder:1.8-yarn --build
       - docker stop $(docker ps -a -q)
 
 deployment:
