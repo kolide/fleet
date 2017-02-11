@@ -195,6 +195,15 @@ export const scheduledQueryStub = {
   snapshot: true,
 };
 
+export const statusLabelStub = {
+  errors: {},
+  loading_counts: false,
+  mia_count: 0,
+  new_count: 10,
+  offline_count: 0,
+  online_count: 10,
+};
+
 export const userStub = {
   id: 1,
   admin: false,
@@ -214,5 +223,6 @@ export default {
   packStub,
   queryStub,
   scheduledQueryStub,
+  statusLabelStub,
   userStub,
 };

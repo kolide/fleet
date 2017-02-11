@@ -1,8 +1,9 @@
 import React, { Component, PropTypes } from 'react';
-import { filter } from 'lodash';
+import { filter, isEqual, keys, size } from 'lodash';
 
-import Icon from 'components/icons/Icon';
 import Button from 'components/buttons/Button';
+import deepDifference from 'utilities/deep_difference';
+import Icon from 'components/icons/Icon';
 import InputField from 'components/forms/fields/InputField';
 import labelInterface from 'interfaces/label';
 import PanelGroup from 'components/side_panels/HostSidePanel/PanelGroup';
@@ -25,6 +26,22 @@ class HostSidePanel extends Component {
     super(props);
 
     this.state = { labelFilter: '' };
+  }
+
+  shouldComponentUpdate (nextProps, nextState) {
+    if (isEqual(this.props, nextProps) && isEqual(this.state, nextState)) {
+      return false;
+    }
+
+    const changedProps = deepDifference(nextProps, this.props);
+    const changedStatusLabels = changedProps.statusLabels || {};
+    const changedStatusLabelKeys = keys(changedStatusLabels);
+
+    if (size(changedProps) === 1 && isEqual(changedStatusLabelKeys, ['loading_counts'])) {
+      return false;
+    }
+
+    return true;
   }
 
   onFilterLabels = (labelFilter) => {
