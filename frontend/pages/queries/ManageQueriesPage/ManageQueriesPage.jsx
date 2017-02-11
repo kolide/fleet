@@ -28,7 +28,8 @@ export class ManageQueriesPage extends Component {
   }
 
   static defaultProps = {
-    dispatch: noop,
+    dispatch: () => Promise.resolve(),
+    loadingQueries: false,
   };
 
   constructor (props) {
@@ -45,7 +46,8 @@ export class ManageQueriesPage extends Component {
   componentWillMount() {
     const { dispatch } = this.props;
 
-    dispatch(queryActions.loadAll());
+    dispatch(queryActions.loadAll())
+      .catch(() => false);
 
     return false;
   }
