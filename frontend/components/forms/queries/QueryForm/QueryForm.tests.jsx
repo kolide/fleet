@@ -4,8 +4,8 @@ import { mount } from 'enzyme';
 import { noop } from 'lodash';
 
 import { fillInFormInput } from 'test/helpers';
-import QueryForm from './index';
 import targetStub from 'test/target_stub';
+import QueryForm from './index';
 
 const query = {
   id: 1,
