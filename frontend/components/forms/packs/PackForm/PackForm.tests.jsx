@@ -5,8 +5,10 @@ import { noop } from 'lodash';
 
 import { fillInFormInput } from 'test/helpers';
 import PackForm from './index';
+import targetStub from 'test/target_stub';
 
 describe('PackForm - component', () => {
+  beforeEach(targetStub);
   afterEach(restoreSpies);
 
   it('renders the base error', () => {

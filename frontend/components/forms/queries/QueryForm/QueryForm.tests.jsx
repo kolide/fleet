@@ -5,6 +5,7 @@ import { noop } from 'lodash';
 
 import { fillInFormInput } from 'test/helpers';
 import QueryForm from './index';
+import targetStub from 'test/target_stub';
 
 const query = {
   id: 1,
@@ -15,6 +16,7 @@ const query = {
 const queryText = 'SELECT * FROM users';
 
 describe('QueryForm - component', () => {
+  beforeEach(targetStub);
   afterEach(restoreSpies);
 
   it('renders the base error', () => {
