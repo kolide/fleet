@@ -8,6 +8,7 @@ import labelActions from 'redux/nodes/entities/labels/actions';
 import ConnectedManageHostsPage, { ManageHostsPage } from 'pages/hosts/ManageHostsPage/ManageHostsPage';
 import { connectedComponent, createAceSpy, reduxMockStore, stubbedOsqueryTable } from 'test/helpers';
 import { hostStub } from 'test/stubs';
+import * as manageHostsPageActions from 'redux/nodes/components/ManageHostsPage/actions';
 
 const allHostsLabel = { id: 1, display_text: 'All Hosts', slug: 'all-hosts', type: 'all', count: 22 };
 const windowsLabel = { id: 2, display_text: 'Windows', slug: 'windows', type: 'platform', count: 22 };
@@ -58,8 +59,17 @@ describe('ManageHostsPage - component', () => {
   };
 
   beforeEach(() => {
+    const spyResponse = () => Promise.resolve([]);
+
+    spyOn(hostActions, 'loadAll')
+      .andReturn(spyResponse);
+    spyOn(labelActions, 'loadAll')
+      .andReturn(spyResponse);
+    spyOn(manageHostsPageActions, 'getStatusLabelCounts')
+      .andReturn(spyResponse);
     createAceSpy();
   });
+
   afterEach(restoreSpies);
 
   describe('side panels', () => {
