@@ -27,7 +27,7 @@ func TestModifyLabel(t *testing.T) {
 	}
 	svc, err := newTestService(ds, nil)
 	require.Nil(t, err)
-	lp := &kolide.ModifyLabelPayload{
+	lp := kolide.ModifyLabelPayload{
 		Name:        stringPtr("new name"),
 		Description: stringPtr("new desc"),
 	}

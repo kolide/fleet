@@ -8,7 +8,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-func (mw metricsMiddleware) ModifyLabel(ctx context.Context, id uint, p *kolide.ModifyLabelPayload) (*kolide.Label, error) {
+func (mw metricsMiddleware) ModifyLabel(ctx context.Context, id uint, p kolide.ModifyLabelPayload) (*kolide.Label, error) {
 	var (
 		lic *kolide.Label
 		err error

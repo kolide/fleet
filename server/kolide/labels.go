@@ -45,7 +45,7 @@ type LabelService interface {
 	DeleteLabel(ctx context.Context, id uint) (err error)
 
 	// ModifyLabel is used to change editable fields belonging to a Label
-	ModifyLabel(ctx context.Context, id uint, payload *ModifyLabelPayload) (*Label, error)
+	ModifyLabel(ctx context.Context, id uint, payload ModifyLabelPayload) (*Label, error)
 
 	// HostIDsForLabel returns ids of hosts that belong to the label identified
 	// by lid
