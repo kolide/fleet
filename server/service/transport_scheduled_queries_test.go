@@ -23,7 +23,7 @@ func TestDecodeScheduleQueryRequest(t *testing.T) {
 		assert.Equal(t, uint(5), params.PackID)
 		assert.Equal(t, uint(1), params.QueryID)
 		assert.Equal(t, uint(60), params.Interval)
-		assert.Equal(t, true, *params.Snapshot)
+		assert.Equal(t, true, params.Snapshot)
 	}).Methods("POST")
 
 	var body bytes.Buffer

@@ -15,14 +15,14 @@ type OsqueryService interface {
 type OsqueryDistributedQueryResults map[string][]map[string]string
 
 type QueryContent struct {
-	Query       string  `json:"query"`
-	Description string  `json:"description,omitempty"`
-	Interval    uint    `json:"interval"`
-	Platform    *string `json:"platform,omitempty"`
-	Version     *string `json:"version,omitempty"`
-	Snapshot    *bool   `json:"snapshot,omitempty"`
-	Removed     *bool   `json:"removed,omitempty"`
-	Shard       *uint   `json:"shard,omitempty"`
+	Query       string `json:"query"`
+	Description string `json:"description,omitempty"`
+	Interval    uint   `json:"interval"`
+	Platform    string `json:"platform,omitempty"`
+	Version     string `json:"version,omitempty"`
+	Snapshot    bool   `json:"snapshot,omitempty"`
+	Removed     bool   `json:"removed"`
+	Shard       uint   `json:"shard"`
 }
 
 type Queries map[string]QueryContent
@@ -30,7 +30,7 @@ type Queries map[string]QueryContent
 type PackContent struct {
 	Platform  string   `json:"platform,omitempty"`
 	Version   string   `json:"version,omitempty"`
-	Shard     uint     `json:"shard,omitempty"`
+	Shard     uint     `json:"shard"`
 	Discovery []string `json:"discovery,omitempty"`
 	Queries   Queries  `json:"queries"`
 }

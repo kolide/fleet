@@ -134,8 +134,8 @@ func NewScheduledQuery(t *testing.T, ds kolide.Datastore, pid, qid, interval uin
 		PackID:   pid,
 		QueryID:  qid,
 		Interval: interval,
-		Snapshot: &snapshot,
-		Removed:  &removed,
+		Snapshot: snapshot,
+		Removed:  removed,
 	})
 	require.Nil(t, err)
 	require.NotZero(t, sq.ID)

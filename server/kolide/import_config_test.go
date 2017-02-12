@@ -16,10 +16,7 @@ func TestPackNameMapUnmarshal(t *testing.T) {
 				"q1": QueryDetails{
 					Query:    "select from foo",
 					Interval: 100,
-					Removed:  new(bool),
-					Platform: strptr("linux"),
-					Shard:    new(uint),
-					Snapshot: new(bool),
+					Platform: "linux",
 				},
 			},
 			Discovery: []string{
@@ -40,10 +37,6 @@ func TestPackNameMapUnmarshal(t *testing.T) {
 				"q1": QueryDetails{
 					Query:    "select from foo",
 					Interval: 100,
-					Removed:  new(bool),
-					Platform: strptr("linux"),
-					Shard:    new(uint),
-					Snapshot: new(bool),
 				},
 			},
 			Shard:    uintptr(float64(10)),
@@ -58,10 +51,6 @@ func TestPackNameMapUnmarshal(t *testing.T) {
 				"q1": QueryDetails{
 					Query:    "select from bar",
 					Interval: 100,
-					Removed:  new(bool),
-					Platform: strptr("linux"),
-					Shard:    new(uint),
-					Snapshot: new(bool),
 				},
 			},
 			Shard:    uintptr(float64(10)),

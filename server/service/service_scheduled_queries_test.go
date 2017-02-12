@@ -71,8 +71,10 @@ func TestModifyScheduledQuery(t *testing.T) {
 	require.Nil(t, err)
 	assert.Equal(t, uint(60), query.Interval)
 
-	query.Interval = uint(120)
-	query, err = svc.ModifyScheduledQuery(ctx, query)
+	i := uint(120)
+	query, err = svc.ModifyScheduledQuery(ctx, query.ID, &kolide.ScheduledQueryPayload{
+		Interval: &i,
+	})
 	assert.Equal(t, uint(120), query.Interval)
 
 	queryVerify, err := svc.GetScheduledQuery(ctx, sq1.ID)
