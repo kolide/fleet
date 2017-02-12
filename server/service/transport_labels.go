@@ -53,6 +53,6 @@ func decodeModifyLabelRequest(ctx context.Context, r *http.Request) (interface{}
 	if err != nil {
 		return nil, err
 	}
-	resp.id = id
+	resp.ID = id
 	return resp, nil
 }
