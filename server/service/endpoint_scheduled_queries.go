@@ -127,7 +127,7 @@ func makeScheduleQueryEndpoint(svc kolide.Service) endpoint.Endpoint {
 
 type modifyScheduledQueryRequest struct {
 	ID      uint
-	payload *kolide.ScheduledQueryPayload
+	payload kolide.ScheduledQueryPayload
 }
 
 type modifyScheduledQueryResponse struct {

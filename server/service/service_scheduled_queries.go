@@ -18,7 +18,7 @@ func (svc service) ScheduleQuery(ctx context.Context, sq *kolide.ScheduledQuery)
 	return svc.ds.NewScheduledQuery(sq)
 }
 
-func (svc service) ModifyScheduledQuery(ctx context.Context, id uint, p *kolide.ScheduledQueryPayload) (*kolide.ScheduledQuery, error) {
+func (svc service) ModifyScheduledQuery(ctx context.Context, id uint, p kolide.ScheduledQueryPayload) (*kolide.ScheduledQuery, error) {
 	sq, err := svc.GetScheduledQuery(ctx, id)
 	if err != nil {
 		return nil, errors.Wrap(err, "getting scheduled query to modify")

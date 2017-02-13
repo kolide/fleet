@@ -17,7 +17,7 @@ type ScheduledQueryService interface {
 	GetScheduledQueriesInPack(ctx context.Context, id uint, opts ListOptions) (queries []*ScheduledQuery, err error)
 	ScheduleQuery(ctx context.Context, sq *ScheduledQuery) (query *ScheduledQuery, err error)
 	DeleteScheduledQuery(ctx context.Context, id uint) (err error)
-	ModifyScheduledQuery(ctx context.Context, id uint, p *ScheduledQueryPayload) (query *ScheduledQuery, err error)
+	ModifyScheduledQuery(ctx context.Context, id uint, p ScheduledQueryPayload) (query *ScheduledQuery, err error)
 }
 
 type ScheduledQuery struct {
