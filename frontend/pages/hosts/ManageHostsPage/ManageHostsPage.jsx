@@ -381,7 +381,7 @@ export class ManageHostsPage extends Component {
 
     return (
       <div className={`${baseClass}__delete-label`}>
-        <Button onClick={toggleEditLabel} variant="brand">Edit</Button>
+        <Button onClick={toggleEditLabel} variant="inverse">Edit</Button>
         <Button onClick={toggleDeleteLabelModal} variant="alert">Delete</Button>
       </div>
     );
