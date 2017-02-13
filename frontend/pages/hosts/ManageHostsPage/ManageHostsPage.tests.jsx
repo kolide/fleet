@@ -229,11 +229,18 @@ describe('ManageHostsPage - component', () => {
   describe('Delete a label', () => {
     it('Deleted label after confirmation modal', () => {
       const ownProps = { location: {}, params: { active_label: 'custom-label' } };
-      const component = connectedComponent(ConnectedManageHostsPage, { props: ownProps, mockStore });
+      const component = connectedComponent(ConnectedManageHostsPage, {
+        props: ownProps,
+        mockStore,
+      });
       const page = mount(component);
       const deleteBtn = page.find('.manage-hosts__delete-label').find('button');
 
-      spyOn(labelActions, 'destroy').andCallThrough();
+      spyOn(labelActions, 'destroy').andReturn((dispatch) => {
+        dispatch({ type: 'labels_LOAD_REQUEST' });
+
+        return Promise.resolve();
+      });
 
       expect(page.find('Modal').length).toEqual(0);
 
@@ -257,7 +264,11 @@ describe('ManageHostsPage - component', () => {
       const page = mount(component);
       const deleteBtn = page.find('HostDetails').last().find('Button');
 
-      spyOn(hostActions, 'destroy').andCallThrough();
+      spyOn(hostActions, 'destroy').andReturn((dispatch) => {
+        dispatch({ type: 'hosts_LOAD_REQUEST' });
+
+        return Promise.resolve();
+      });
 
       expect(page.find('Modal').length).toEqual(0);
 
