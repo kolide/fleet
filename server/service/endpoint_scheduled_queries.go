@@ -3,7 +3,6 @@ package service
 import (
 	"github.com/go-kit/kit/endpoint"
 	"github.com/kolide/kolide/server/kolide"
-	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 )
 
@@ -142,44 +141,7 @@ func makeModifyScheduledQueryEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(modifyScheduledQueryRequest)
 
-		sq, err := svc.GetScheduledQuery(ctx, req.ID)
-		if err != nil {
-			return nil, errors.Wrap(err, "getting scheduled query to modify")
-		}
-
-		if req.payload.PackID != nil {
-			sq.PackID = *req.payload.PackID
-		}
-
-		if req.payload.QueryID != nil {
-			sq.QueryID = *req.payload.QueryID
-		}
-
-		if req.payload.Interval != nil {
-			sq.Interval = *req.payload.Interval
-		}
-
-		if req.payload.Snapshot != nil {
-			sq.Snapshot = req.payload.Snapshot
-		}
-
-		if req.payload.Removed != nil {
-			sq.Removed = req.payload.Removed
-		}
-
-		if req.payload.Platform != nil {
-			sq.Platform = req.payload.Platform
-		}
-
-		if req.payload.Version != nil {
-			sq.Version = req.payload.Version
-		}
-
-		if req.payload.Shard != nil {
-			sq.Shard = req.payload.Shard
-		}
-
-		sq, err = svc.ModifyScheduledQuery(ctx, sq)
+		sq, err := svc.ModifyScheduledQuery(ctx, req.ID, req.payload)
 		if err != nil {
 			return modifyScheduledQueryResponse{Err: err}, nil
 		}
