@@ -40,7 +40,6 @@ export class PackComposerPage extends Component {
     const { dispatch } = this.props;
 
     dispatch(push(`/packs/${packID}`));
-    dispatch(renderFlash('success', 'Pack created!'));
 
     return false;
   }
