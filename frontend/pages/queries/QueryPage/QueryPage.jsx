@@ -27,6 +27,11 @@ import validateQuery from 'components/forms/validators/validate_query';
 import Spinner from 'components/loaders/Spinner';
 
 const baseClass = 'query-page';
+const DEFAULT_CAMPAIGN = {
+  hosts_count: {
+    total: 0,
+  },
+};
 
 export class QueryPage extends Component {
   static propTypes = {
@@ -52,9 +57,7 @@ export class QueryPage extends Component {
     super(props);
 
     this.state = {
-      campaign: {
-        hosts_count: { total: 0 },
-      },
+      campaign: DEFAULT_CAMPAIGN,
       queryIsRunning: false,
       targetsCount: 0,
       targetsError: null,
@@ -306,6 +309,10 @@ export class QueryPage extends Component {
       [`${baseClass}__results--loading`]: loading,
     });
     let resultBody = '';
+
+    if (!loading && isEqual(campaign, DEFAULT_CAMPAIGN)) {
+      return false;
+    }
 
     if (loading) {
       resultBody = <Spinner />;
