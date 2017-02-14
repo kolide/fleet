@@ -6,7 +6,6 @@ import { push } from 'react-router-redux';
 import packActions from 'redux/nodes/entities/packs/actions';
 import PackForm from 'components/forms/packs/PackForm';
 import PackInfoSidePanel from 'components/side_panels/PackInfoSidePanel';
-import { renderFlash } from 'redux/nodes/notifications/actions';
 
 const baseClass = 'pack-composer';
 
