@@ -142,19 +142,20 @@ class QueryForm extends Component {
     return (
       <form className={`${baseClass}__wrapper`} onSubmit={handleSubmit}>
         <h1>New Query</h1>
-        <KolideAce
-          {...fields.query}
-          error={fields.query.error || errors.query}
-          onLoad={onLoad}
-          readOnly={queryIsRunning}
-          wrapperClassName={`${baseClass}__text-editor-wrapper`}
-        />
         {baseError && <div className="form__base-error">{baseError}</div>}
         <InputField
           {...fields.name}
           error={fields.name.error || errors.name}
           inputClassName={`${baseClass}__query-title`}
           label="Query Title"
+        />
+        <KolideAce
+          {...fields.query}
+          error={fields.query.error || errors.query}
+          label="SQL"
+          onLoad={onLoad}
+          readOnly={queryIsRunning}
+          wrapperClassName={`${baseClass}__text-editor-wrapper`}
         />
         <InputField
           {...fields.description}

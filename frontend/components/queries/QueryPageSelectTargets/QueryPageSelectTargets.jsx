@@ -47,9 +47,9 @@ class QueryPageSelectTargets extends Component {
         <Button
           className={`${baseClass}__run-query-btn`}
           onClick={onRunQuery}
-          variant="brand"
+          variant="success"
         >
-          Run Query
+          Run
         </Button>
       </div>
     );
@@ -61,7 +61,7 @@ class QueryPageSelectTargets extends Component {
           onClick={onStopQuery}
           variant="alert"
         >
-          Stop Query
+          Stop
         </Button>
       </div>
     );
