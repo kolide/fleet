@@ -18,6 +18,7 @@ import QueryForm from 'components/forms/queries/QueryForm';
 import osqueryTableInterface from 'interfaces/osquery_table';
 import queryActions from 'redux/nodes/entities/queries/actions';
 import queryInterface from 'interfaces/query';
+import QueryPageSelectTargets from 'components/queries/QueryPageSelectTargets';
 import QueryResultsTable from 'components/queries/QueryResultsTable';
 import QuerySidePanel from 'components/side_panels/QuerySidePanel';
 import { renderFlash } from 'redux/nodes/notifications/actions';
@@ -59,6 +60,7 @@ export class QueryPage extends Component {
     this.state = {
       campaign: DEFAULT_CAMPAIGN,
       queryIsRunning: false,
+      queryText: props.query.query,
       targetsCount: 0,
       targetsError: null,
     };
@@ -96,6 +98,10 @@ export class QueryPage extends Component {
   onChangeQueryFormField = (fieldName, value) => {
     if (fieldName === 'name') {
       this.csvQueryName = value;
+    }
+
+    if (fieldName === 'query') {
+      this.setState({ queryText: value });
     }
 
     return false;
@@ -274,7 +280,7 @@ export class QueryPage extends Component {
 
     if (this.campaign || campaign) {
       this.campaign = null;
-      this.setState({ campaign: {} });
+      this.setState({ campaign: DEFAULT_CAMPAIGN });
     }
 
     return false;
@@ -327,26 +333,45 @@ export class QueryPage extends Component {
     );
   }
 
+  renderTargetsInput = () => {
+    const { onFetchTargets, onRunQuery, onStopQuery, onTargetSelect } = this;
+    const { campaign, queryIsRunning, queryText, targetsCount, targetsError } = this.state;
+    const { selectedTargets } = this.props;
+
+    return (
+      <QueryPageSelectTargets
+        campaign={campaign}
+        error={targetsError}
+        onFetchTargets={onFetchTargets}
+        onRunQuery={onRunQuery}
+        onStopQuery={onStopQuery}
+        onTargetSelect={onTargetSelect}
+        query={queryText}
+        queryIsRunning={queryIsRunning}
+        selectedTargets={selectedTargets}
+        targetsCount={targetsCount}
+      />
+    );
+  }
+
   render () {
     const {
       onChangeQueryFormField,
-      onFetchTargets,
       onOsqueryTableSelect,
       onRunQuery,
       onSaveQueryFormSubmit,
       onStopQuery,
-      onTargetSelect,
       onTextEditorInputChange,
       onUpdateQuery,
       renderResultsTable,
+      renderTargetsInput,
     } = this;
-    const { queryIsRunning, targetsCount, targetsError } = this.state;
+    const { queryIsRunning } = this.state;
     const {
       errors,
       loadingQueries,
       query,
       selectedOsqueryTable,
-      selectedTargets,
     } = this.props;
 
     if (loadingQueries) {
@@ -361,20 +386,16 @@ export class QueryPage extends Component {
               formData={query}
               handleSubmit={onSaveQueryFormSubmit}
               onChangeFunc={onChangeQueryFormField}
-              onFetchTargets={onFetchTargets}
               onOsqueryTableSelect={onOsqueryTableSelect}
               onRunQuery={onRunQuery}
               onStopQuery={onStopQuery}
-              onTargetSelect={onTargetSelect}
               onUpdate={onUpdateQuery}
               queryIsRunning={queryIsRunning}
-              selectedTargets={selectedTargets}
               serverErrors={errors}
-              targetsCount={targetsCount}
-              targetsError={targetsError}
               selectedOsqueryTable={selectedOsqueryTable}
             />
           </div>
+          {renderTargetsInput()}
           {renderResultsTable()}
         </div>
         <QuerySidePanel
