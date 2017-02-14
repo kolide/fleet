@@ -265,6 +265,7 @@ export class EditPackPage extends Component {
         <ScheduleQuerySidePanel
           onConfigurePackQuerySubmit={handleConfigurePackQuerySubmit}
           allQueries={allQueries}
+          onFormCancel={onSelectScheduledQuery}
           onSelectQuery={onSelectQuery}
           onUpdateScheduledQuery={onUpdateScheduledQuery}
           selectedQuery={selectedQuery}

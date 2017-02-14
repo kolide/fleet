@@ -11,6 +11,7 @@ const baseClass = 'schedule-query-side-panel';
 const ScheduleQuerySidePanel = ({
   allQueries,
   onConfigurePackQuerySubmit,
+  onFormCancel,
   onUpdateScheduledQuery,
   onSelectQuery,
   selectedQuery,
@@ -31,6 +32,7 @@ const ScheduleQuerySidePanel = ({
       <ConfigurePackQueryForm
         formData={formData}
         handleSubmit={handleSubmit}
+        onCancel={onFormCancel}
       />
     );
   };
@@ -50,6 +52,7 @@ const ScheduleQuerySidePanel = ({
 ScheduleQuerySidePanel.propTypes = {
   allQueries: PropTypes.arrayOf(queryInterface),
   onConfigurePackQuerySubmit: PropTypes.func,
+  onFormCancel: PropTypes.func,
   onSelectQuery: PropTypes.func,
   onUpdateScheduledQuery: PropTypes.func,
   selectedQuery: queryInterface,
