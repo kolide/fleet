@@ -385,6 +385,13 @@ func (man Manager) loadConfigFile() {
 // Individual tests may want to override some of the values provided.
 func TestConfig() KolideConfig {
 	return KolideConfig{
+		Mysql: MysqlConfig{
+			// XXX TODO: fix this
+			Address:  "127.0.0.1:3306",
+			Username: "kolide",
+			Password: "kolide",
+			Database: "kolide",
+		},
 		App: AppConfig{
 			TokenKey:                  "CHANGEME",
 			InviteTokenValidityPeriod: 5 * 24 * time.Hour,
