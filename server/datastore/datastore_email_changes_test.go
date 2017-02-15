@@ -9,9 +9,6 @@ import (
 )
 
 func testChangeEmail(t *testing.T, ds kolide.Datastore) {
-	if ds.Name() == "inmem" {
-		t.Skip("inmem is being deprecated, test skipped")
-	}
 	user := &kolide.User{
 		Username: "bob",
 		Password: []byte("foobar"),

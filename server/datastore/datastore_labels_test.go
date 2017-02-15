@@ -357,9 +357,6 @@ func testListUniqueHostsInLabels(t *testing.T, db kolide.Datastore) {
 }
 
 func testSaveLabel(t *testing.T, db kolide.Datastore) {
-	if db.Name() == "inmem" {
-		t.Skip("inmem is being deprecated")
-	}
 	label := &kolide.Label{
 		Name:        "my label",
 		Description: "a label",

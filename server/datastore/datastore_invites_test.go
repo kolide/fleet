@@ -56,12 +56,6 @@ func setupTestInvites(t *testing.T, ds kolide.Datastore) {
 }
 
 func testListInvites(t *testing.T, ds kolide.Datastore) {
-	// TODO: fix this for inmem
-	if ds.Name() == "inmem" {
-		fmt.Println("Busted test skipped for inmem")
-		return
-	}
-
 	setupTestInvites(t, ds)
 
 	opt := kolide.ListOptions{
