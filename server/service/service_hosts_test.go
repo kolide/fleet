@@ -12,7 +12,7 @@ import (
 )
 
 func TestListHosts(t *testing.T) {
-	ds, err := mysql.New(config.TestConfig(), clock.NewMockClock())
+	ds, err := mysql.New(config.TestConfig().Mysql, clock.NewMockClock())
 	assert.Nil(t, err)
 
 	svc, err := newTestService(ds, nil)
@@ -35,7 +35,7 @@ func TestListHosts(t *testing.T) {
 }
 
 func TestGetHost(t *testing.T) {
-	ds, err := mysql.New(config.TestConfig(), clock.NewMockClock())
+	ds, err := mysql.New(config.TestConfig().Mysql, clock.NewMockClock())
 	assert.Nil(t, err)
 
 	svc, err := newTestService(ds, nil)
@@ -56,7 +56,7 @@ func TestGetHost(t *testing.T) {
 }
 
 func TestDeleteHost(t *testing.T) {
-	ds, err := mysql.New(config.TestConfig(), clock.NewMockClock())
+	ds, err := mysql.New(config.TestConfig().Mysql, clock.NewMockClock())
 	assert.Nil(t, err)
 
 	svc, err := newTestService(ds, nil)

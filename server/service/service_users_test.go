@@ -19,7 +19,7 @@ import (
 )
 
 func TestAuthenticatedUser(t *testing.T) {
-	ds, err := mysql.New(config.TestConfig(), clock.NewMockClock())
+	ds, err := mysql.New(config.TestConfig().Mysql, clock.NewMockClock())
 	require.Nil(t, err)
 	createTestUsers(t, ds)
 	svc, err := newTestService(ds, nil)
@@ -202,7 +202,7 @@ func TestModifyAdminUserEmailPassword(t *testing.T) {
 }
 
 func TestRequestPasswordReset(t *testing.T) {
-	ds, err := mysql.New(config.TestConfig(), clock.NewMockClock())
+	ds, err := mysql.New(config.TestConfig().Mysql, clock.NewMockClock())
 	require.Nil(t, err)
 	createTestAppConfig(t, ds)
 
@@ -277,7 +277,7 @@ func TestRequestPasswordReset(t *testing.T) {
 }
 
 func TestCreateUser(t *testing.T) {
-	ds, _ := mysql.New(config.TestConfig(), clock.NewMockClock())
+	ds, _ := mysql.New(config.TestConfig().Mysql, clock.NewMockClock())
 	svc, _ := newTestService(ds, nil)
 	invites := setupInvites(t, ds, []string{"admin2@example.com"})
 	ctx := context.Background()
@@ -408,7 +408,7 @@ func setupInvites(t *testing.T, ds kolide.Datastore, emails []string) map[string
 }
 
 func TestChangePassword(t *testing.T) {
-	ds, _ := mysql.New(config.TestConfig(), clock.NewMockClock())
+	ds, _ := mysql.New(config.TestConfig().Mysql, clock.NewMockClock())
 	svc, _ := newTestService(ds, nil)
 	users := createTestUsers(t, ds)
 	var passwordChangeTests = []struct {
@@ -479,7 +479,7 @@ func TestChangePassword(t *testing.T) {
 }
 
 func TestResetPassword(t *testing.T) {
-	ds, _ := mysql.New(config.TestConfig(), clock.NewMockClock())
+	ds, _ := mysql.New(config.TestConfig().Mysql, clock.NewMockClock())
 	svc, _ := newTestService(ds, nil)
 	createTestUsers(t, ds)
 	var passwordResetTests = []struct {
@@ -544,7 +544,7 @@ func TestResetPassword(t *testing.T) {
 }
 
 func TestRequirePasswordReset(t *testing.T) {
-	ds, err := mysql.New(config.TestConfig(), clock.NewMockClock())
+	ds, err := mysql.New(config.TestConfig().Mysql, clock.NewMockClock())
 	require.Nil(t, err)
 	svc, err := newTestService(ds, nil)
 	require.Nil(t, err)
@@ -592,7 +592,7 @@ func TestRequirePasswordReset(t *testing.T) {
 }
 
 func TestPerformRequiredPasswordReset(t *testing.T) {
-	ds, err := mysql.New(config.TestConfig(), clock.NewMockClock())
+	ds, err := mysql.New(config.TestConfig().Mysql, clock.NewMockClock())
 	require.Nil(t, err)
 	svc, err := newTestService(ds, nil)
 	require.Nil(t, err)

@@ -25,7 +25,7 @@ import (
 )
 
 func TestLogin(t *testing.T) {
-	ds, _ := mysql.New(config.TestConfig(), clock.NewMockClock())
+	ds, _ := mysql.New(config.TestConfig().Mysql, clock.NewMockClock())
 	svc, _ := newTestService(ds, nil)
 	users := createTestUsers(t, ds)
 	logger := kitlog.NewLogfmtLogger(os.Stdout)

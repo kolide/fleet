@@ -13,7 +13,7 @@ import (
 )
 
 func TestCreateAppConfig(t *testing.T) {
-	ds, err := mysql.New(config.TestConfig(), clock.NewMockClock())
+	ds, err := mysql.New(config.TestConfig().Mysql, clock.NewMockClock())
 	require.Nil(t, err)
 	require.Nil(t, ds.MigrateData())
 

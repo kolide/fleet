@@ -14,7 +14,7 @@ import (
 )
 
 func TestAPIRoutes(t *testing.T) {
-	ds, err := mysql.New(config.TestConfig(), clock.NewMockClock())
+	ds, err := mysql.New(config.TestConfig().Mysql, clock.NewMockClock())
 	assert.Nil(t, err)
 
 	svc, err := newTestService(ds, nil)
