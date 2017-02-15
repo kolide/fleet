@@ -11,6 +11,7 @@ import (
 	"github.com/kolide/kolide/server/datastore/mysql/migrations/data"
 	"github.com/kolide/kolide/server/datastore/mysql/migrations/tables"
 	"github.com/kolide/kolide/server/kolide"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -66,8 +67,28 @@ func New(config config.MysqlConfig, c clock.Clock, opts ...DBOption) (*Datastore
 		config: config,
 	}
 
-	return ds, nil
+	if err := ds.MigrateTables(); err != nil {
+		return nil, errors.Wrap(err, "migrating tables for new database instance")
+	}
 
+	return ds, nil
+}
+
+func NewTestDB(config config.MysqlConfig, c clock.Clock, opts ...DBOption) (*Datastore, error) {
+	ds, err := New(config, c, opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := ds.Drop(); err != nil {
+		return nil, errors.Wrap(err, "dropping test database tables")
+	}
+
+	if err := ds.MigrateTables(); err != nil {
+		return nil, errors.Wrap(err, "creating test database tables")
+	}
+
+	return ds, nil
 }
 
 func (d *Datastore) Name() string {

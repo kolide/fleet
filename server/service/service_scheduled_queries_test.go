@@ -3,8 +3,9 @@ package service
 import (
 	"testing"
 
+	"github.com/WatchBeam/clock"
 	"github.com/kolide/kolide/server/config"
-	"github.com/kolide/kolide/server/datastore/inmem"
+	"github.com/kolide/kolide/server/datastore/mysql"
 	"github.com/kolide/kolide/server/kolide"
 	"github.com/kolide/kolide/server/test"
 	"github.com/stretchr/testify/assert"
@@ -13,7 +14,7 @@ import (
 )
 
 func TestGetScheduledQueriesInPack(t *testing.T) {
-	ds, err := inmem.New(config.TestConfig())
+	ds, err := mysql.NewTestDB(config.TestConfig().Mysql, clock.NewMockClock())
 	assert.Nil(t, err)
 	svc, err := newTestService(ds, nil)
 	assert.Nil(t, err)
@@ -39,7 +40,7 @@ func TestGetScheduledQueriesInPack(t *testing.T) {
 }
 
 func TestGetScheduledQuery(t *testing.T) {
-	ds, err := inmem.New(config.TestConfig())
+	ds, err := mysql.NewTestDB(config.TestConfig().Mysql, clock.NewMockClock())
 	assert.Nil(t, err)
 	svc, err := newTestService(ds, nil)
 	assert.Nil(t, err)
@@ -56,7 +57,7 @@ func TestGetScheduledQuery(t *testing.T) {
 }
 
 func TestModifyScheduledQuery(t *testing.T) {
-	ds, err := inmem.New(config.TestConfig())
+	ds, err := mysql.NewTestDB(config.TestConfig().Mysql, clock.NewMockClock())
 	assert.Nil(t, err)
 	svc, err := newTestService(ds, nil)
 	assert.Nil(t, err)
@@ -84,7 +85,7 @@ func TestModifyScheduledQuery(t *testing.T) {
 }
 
 func TestDeleteScheduledQuery(t *testing.T) {
-	ds, err := inmem.New(config.TestConfig())
+	ds, err := mysql.NewTestDB(config.TestConfig().Mysql, clock.NewMockClock())
 	assert.Nil(t, err)
 	svc, err := newTestService(ds, nil)
 	assert.Nil(t, err)

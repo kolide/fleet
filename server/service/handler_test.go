@@ -5,15 +5,16 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/WatchBeam/clock"
 	"github.com/gorilla/mux"
 	"github.com/kolide/kolide/server/config"
-	"github.com/kolide/kolide/server/datastore/inmem"
+	"github.com/kolide/kolide/server/datastore/mysql"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
 )
 
 func TestAPIRoutes(t *testing.T) {
-	ds, err := inmem.New(config.TestConfig())
+	ds, err := mysql.NewTestDB(config.TestConfig().Mysql, clock.NewMockClock())
 	assert.Nil(t, err)
 
 	svc, err := newTestService(ds, nil)

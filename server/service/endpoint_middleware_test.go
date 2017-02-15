@@ -3,10 +3,11 @@ package service
 import (
 	"testing"
 
+	"github.com/WatchBeam/clock"
 	"github.com/go-kit/kit/endpoint"
 	"github.com/kolide/kolide/server/config"
 	"github.com/kolide/kolide/server/contexts/viewer"
-	"github.com/kolide/kolide/server/datastore/inmem"
+	"github.com/kolide/kolide/server/datastore/mysql"
 	"github.com/kolide/kolide/server/kolide"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -18,7 +19,7 @@ import (
 // permissions to access or modify resources
 func TestEndpointPermissions(t *testing.T) {
 	req := struct{}{}
-	ds, err := inmem.New(config.TestConfig())
+	ds, err := mysql.NewTestDB(config.TestConfig().Mysql, clock.NewMockClock())
 	assert.Nil(t, err)
 
 	createTestUsers(t, ds)
@@ -197,7 +198,7 @@ func TestGetNodeKey(t *testing.T) {
 }
 
 func TestAuthenticatedHost(t *testing.T) {
-	ds, err := inmem.New(config.TestConfig())
+	ds, err := mysql.NewTestDB(config.TestConfig().Mysql, clock.NewMockClock())
 	require.Nil(t, err)
 	_, err = ds.NewAppConfig(&kolide.AppConfig{EnrollSecret: "foobarbaz"})
 	require.Nil(t, err)

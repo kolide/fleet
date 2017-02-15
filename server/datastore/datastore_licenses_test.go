@@ -33,10 +33,6 @@ var publicKey = `-----BEGIN PUBLIC KEY-----
  `
 
 func testLicense(t *testing.T, ds kolide.Datastore) {
-	if ds.Name() == "inmem" {
-		t.Skip("inmem is deprecated")
-	}
-
 	err := ds.MigrateData()
 	require.Nil(t, err)
 	license, err := ds.License()
