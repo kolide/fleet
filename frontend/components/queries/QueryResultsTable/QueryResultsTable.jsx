@@ -15,12 +15,16 @@ class QueryResultsTable extends Component {
   static propTypes = {
     campaign: campaignInterface.isRequired,
     onExportQueryResults: PropTypes.func,
+    onToggleQueryFullScreen: PropTypes.func,
+    isQueryFullScreen: PropTypes.bool,
   };
 
   constructor (props) {
     super(props);
 
-    this.state = { resultsFilter: {} };
+    this.state = {
+      resultsFilter: {},
+    };
   }
 
   onFilterAttribute = (attribute) => {
@@ -101,12 +105,27 @@ class QueryResultsTable extends Component {
   }
 
   render () {
-    const { campaign, onExportQueryResults } = this.props;
+    const {
+      campaign,
+      onExportQueryResults,
+      isQueryFullScreen,
+      onToggleQueryFullScreen,
+    } = this.props;
+
     const {
       renderTableHeaderRow,
       renderTableRows,
     } = this;
+
     const { hosts_count: hostsCount } = campaign;
+
+    const resultsTableWrapClass = classnames(baseClass, {
+      [`${baseClass}--full-screen`]: isQueryFullScreen,
+    });
+
+    const toggleFullScreenBtnClass = classnames(`${baseClass}__fullscreen-btn`, {
+      [`${baseClass}__fullscreen-btn--active`]: isQueryFullScreen,
+    });
 
     if (!hostsCount || !hostsCount.total) {
       return false;
@@ -117,13 +136,20 @@ class QueryResultsTable extends Component {
     }
 
     return (
-      <div className={baseClass}>
+      <div className={resultsTableWrapClass}>
         <Button
           className={`${baseClass}__export-btn`}
           onClick={onExportQueryResults}
           variant="link"
         >
           Export
+        </Button>
+        <Button
+          className={toggleFullScreenBtnClass}
+          onClick={onToggleQueryFullScreen}
+          variant="unstyled"
+        >
+          Toggle Full Screen
         </Button>
         <div className={`${baseClass}__table-wrapper`}>
           <table className={`${baseClass}__table`}>

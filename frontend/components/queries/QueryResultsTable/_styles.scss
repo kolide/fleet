@@ -3,6 +3,7 @@
   padding: $pad-base;
   max-width: 100%;
   box-sizing: border-box;
+  position: relative;
 
   &__export-btn {
     float: right;
@@ -70,6 +71,28 @@
       &:nth-child(even) {
         background-color: $bg-light;
       }
+    }
+  }
+
+  &--full-screen {
+    position: fixed;
+    top: $pad-half;
+    right: $pad-half;
+    bottom: $pad-half;
+    left: $pad-half;
+    z-index: 99;
+    border-radius: 3px;
+    box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.1);
+    border: solid 1px $silver;
+
+    .query-results-table__table-wrapper {
+      max-height: 86vh;
+    }
+  }
+
+  &__fullscreen-btn {
+    &--active {
+      color: $alert;
     }
   }
 }

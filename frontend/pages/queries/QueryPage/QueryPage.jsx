@@ -63,6 +63,8 @@ export class QueryPage extends Component {
       queryText: props.query.query,
       targetsCount: 0,
       targetsError: null,
+      isQueryFullScreen: false,
+      queryPosition: {},
     };
 
     this.csvQueryName = 'Query Results';
@@ -275,6 +277,13 @@ export class QueryPage extends Component {
     return false;
   };
 
+  onToggleQueryFullScreen = (evt) => {
+    const { isQueryFullScreen, queryPosition } = this.state;
+
+    this.setState({ isQueryFullScreen: !isQueryFullScreen });
+    return false;
+  }
+
   destroyCampaign = () => {
     const { campaign } = this.state;
 
@@ -308,11 +317,12 @@ export class QueryPage extends Component {
   }
 
   renderResultsTable = () => {
-    const { campaign, queryIsRunning } = this.state;
-    const { onExportQueryResults } = this;
+    const { campaign, queryIsRunning, isQueryFullScreen } = this.state;
+    const { onExportQueryResults, onToggleQueryFullScreen } = this;
     const loading = queryIsRunning && !campaign.hosts_count.total;
     const resultsClasses = classnames(`${baseClass}__results`, 'body-wrap', {
       [`${baseClass}__results--loading`]: loading,
+      [`${baseClass}__results--full-screen`]: isQueryFullScreen,
     });
     let resultBody = '';
 
@@ -323,7 +333,7 @@ export class QueryPage extends Component {
     if (loading) {
       resultBody = <Spinner />;
     } else {
-      resultBody = <QueryResultsTable campaign={campaign} onExportQueryResults={onExportQueryResults} />;
+      resultBody = <QueryResultsTable campaign={campaign} onExportQueryResults={onExportQueryResults} isQueryFullScreen={isQueryFullScreen} onToggleQueryFullScreen={onToggleQueryFullScreen} />;
     }
 
     return (

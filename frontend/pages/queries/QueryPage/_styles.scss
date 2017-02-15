@@ -7,8 +7,10 @@
   }
 
   &__results {
+    @include transition(all 750ms ease-in-out);
     @include display(flex);
     @include flex-grow(1);
+    position: relative;
 
     &--loading {
       @include align-items(center);
