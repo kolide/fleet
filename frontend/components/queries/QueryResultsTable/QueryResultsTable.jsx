@@ -113,7 +113,11 @@ class QueryResultsTable extends Component {
     }
 
     if (!hostsCount.successful) {
-      return <div className={baseClass} />;
+      return (
+        <div className={`${baseClass} ${baseClass}__no-results`}>
+          <em>No results found</em>
+        </div>
+      );
     }
 
     return (

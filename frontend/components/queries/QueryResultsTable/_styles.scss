@@ -1,7 +1,7 @@
 .query-results-table {
   background-color: $white;
   padding: $pad-base;
-  max-width: 100%;
+  width: 100%;
   box-sizing: border-box;
 
   &__export-btn {
@@ -12,6 +12,12 @@
     &--is-active {
       color: $brand;
     }
+  }
+
+  &__no-results {
+    @include display(flex);
+    @include align-items(center);
+    @include justify-content(center);
   }
 
   &__progress-details {
