@@ -21,13 +21,13 @@ func testChangeEmail(t *testing.T, ds kolide.Datastore) {
 	require.Nil(t, err)
 	err = ds.PendingEmailChange(user.ID, "xxxx@yyy.com", "abcd12345")
 	require.Nil(t, err)
-	newMail, err := ds.ConfirmPendingEmailChange("abcd12345")
+	newMail, err := ds.ConfirmPendingEmailChange(user.ID, "abcd12345")
 	require.Nil(t, err)
 	assert.Equal(t, "xxxx@yyy.com", newMail)
 	user, err = ds.UserByID(user.ID)
 	require.Nil(t, err)
 	assert.Equal(t, "xxxx@yyy.com", user.Email)
 	// this should fail because it doesn't exist
-	newMail, err = ds.ConfirmPendingEmailChange("abcd12345")
+	newMail, err = ds.ConfirmPendingEmailChange(user.ID, "abcd12345")
 	assert.NotNil(t, err)
 }
