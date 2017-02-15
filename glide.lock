@@ -75,7 +75,7 @@ imports:
 - name: github.com/jordan-wright/email
   version: fd703108daeb23d77c124d12978e9b6c4f28f034
 - name: github.com/kolide/goose
-  version: 5221ed7545f6b931a24f99d9bd3e7bcf36aee71b
+  version: 053a33b2ca57eedf695cfd6f342f03ecaa21e8ff
 - name: github.com/kr/logfmt
   version: b84e30acd515aadc4b783ad4ff83aff3299bdfe0
 - name: github.com/magiconair/properties
