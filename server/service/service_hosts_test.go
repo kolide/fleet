@@ -3,15 +3,16 @@ package service
 import (
 	"testing"
 
+	"github.com/WatchBeam/clock"
 	"github.com/kolide/kolide/server/config"
-	"github.com/kolide/kolide/server/datastore/inmem"
+	"github.com/kolide/kolide/server/datastore/mysql"
 	"github.com/kolide/kolide/server/kolide"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
 )
 
 func TestListHosts(t *testing.T) {
-	ds, err := inmem.New(config.TestConfig())
+	ds, err := mysql.New(config.TestConfig(), clock.NewMockClock())
 	assert.Nil(t, err)
 
 	svc, err := newTestService(ds, nil)
@@ -34,7 +35,7 @@ func TestListHosts(t *testing.T) {
 }
 
 func TestGetHost(t *testing.T) {
-	ds, err := inmem.New(config.TestConfig())
+	ds, err := mysql.New(config.TestConfig(), clock.NewMockClock())
 	assert.Nil(t, err)
 
 	svc, err := newTestService(ds, nil)
@@ -55,7 +56,7 @@ func TestGetHost(t *testing.T) {
 }
 
 func TestDeleteHost(t *testing.T) {
-	ds, err := inmem.New(config.TestConfig())
+	ds, err := mysql.New(config.TestConfig(), clock.NewMockClock())
 	assert.Nil(t, err)
 
 	svc, err := newTestService(ds, nil)

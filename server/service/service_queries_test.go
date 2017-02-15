@@ -3,9 +3,10 @@ package service
 import (
 	"testing"
 
+	"github.com/WatchBeam/clock"
 	"github.com/kolide/kolide/server/config"
 	"github.com/kolide/kolide/server/contexts/viewer"
-	"github.com/kolide/kolide/server/datastore/inmem"
+	"github.com/kolide/kolide/server/datastore/mysql"
 	"github.com/kolide/kolide/server/kolide"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -13,7 +14,7 @@ import (
 )
 
 func TestListQueries(t *testing.T) {
-	ds, err := inmem.New(config.TestConfig())
+	ds, err := mysql.New(config.TestConfig(), clock.NewMockClock())
 	assert.Nil(t, err)
 
 	svc, err := newTestService(ds, nil)
@@ -39,7 +40,7 @@ func TestListQueries(t *testing.T) {
 }
 
 func TestGetQuery(t *testing.T) {
-	ds, err := inmem.New(config.TestConfig())
+	ds, err := mysql.New(config.TestConfig(), clock.NewMockClock())
 	assert.Nil(t, err)
 
 	svc, err := newTestService(ds, nil)
@@ -61,7 +62,7 @@ func TestGetQuery(t *testing.T) {
 }
 
 func TestNewQuery(t *testing.T) {
-	ds, err := inmem.New(config.TestConfig())
+	ds, err := mysql.New(config.TestConfig(), clock.NewMockClock())
 	assert.Nil(t, err)
 
 	createTestUsers(t, ds)
@@ -92,7 +93,7 @@ func TestNewQuery(t *testing.T) {
 }
 
 func TestModifyQuery(t *testing.T) {
-	ds, err := inmem.New(config.TestConfig())
+	ds, err := mysql.New(config.TestConfig(), clock.NewMockClock())
 	assert.Nil(t, err)
 
 	svc, err := newTestService(ds, nil)
@@ -119,7 +120,7 @@ func TestModifyQuery(t *testing.T) {
 }
 
 func TestDeleteQuery(t *testing.T) {
-	ds, err := inmem.New(config.TestConfig())
+	ds, err := mysql.New(config.TestConfig(), clock.NewMockClock())
 	assert.Nil(t, err)
 
 	svc, err := newTestService(ds, nil)

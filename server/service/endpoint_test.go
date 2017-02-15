@@ -11,11 +11,12 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/WatchBeam/clock"
 	kitlog "github.com/go-kit/kit/log"
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
 	"github.com/kolide/kolide/server/config"
-	"github.com/kolide/kolide/server/datastore/inmem"
+	"github.com/kolide/kolide/server/datastore/mysql"
 	"github.com/kolide/kolide/server/kolide"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
@@ -39,7 +40,7 @@ func setupEndpointTest(t *testing.T) *testResource {
 	test := &testResource{}
 
 	var err error
-	test.ds, err = inmem.New(config.TestConfig())
+	test.ds, err = mysql.New(config.TestConfig(), clock.NewMockClock())
 	require.Nil(t, err)
 	require.Nil(t, test.ds.MigrateData())
 

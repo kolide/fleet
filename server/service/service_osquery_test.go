@@ -15,7 +15,7 @@ import (
 	"github.com/kolide/kolide/server/config"
 	hostctx "github.com/kolide/kolide/server/contexts/host"
 	"github.com/kolide/kolide/server/contexts/viewer"
-	"github.com/kolide/kolide/server/datastore/inmem"
+	"github.com/kolide/kolide/server/datastore/mysql"
 	"github.com/kolide/kolide/server/kolide"
 	"github.com/kolide/kolide/server/pubsub"
 	"github.com/kolide/kolide/server/test"
@@ -348,7 +348,7 @@ func TestLabelQueries(t *testing.T) {
 }
 
 func TestGetClientConfig(t *testing.T) {
-	ds, err := inmem.New(config.TestConfig())
+	ds, err := mysql.New(config.TestConfig(), clock.NewMockClock())
 	require.Nil(t, err)
 	require.Nil(t, ds.MigrateData())
 
@@ -577,7 +577,7 @@ func TestDetailQueries(t *testing.T) {
 }
 
 func TestDistributedQueries(t *testing.T) {
-	ds, err := inmem.New(config.TestConfig())
+	ds, err := mysql.New(config.TestConfig(), clock.NewMockClock())
 	require.Nil(t, err)
 
 	_, err = ds.NewAppConfig(&kolide.AppConfig{EnrollSecret: ""})
@@ -703,7 +703,7 @@ func TestDistributedQueries(t *testing.T) {
 }
 
 func TestOrphanedQueryCampaign(t *testing.T) {
-	ds, err := inmem.New(config.TestConfig())
+	ds, err := mysql.New(config.TestConfig(), clock.NewMockClock())
 	require.Nil(t, err)
 
 	_, err = ds.NewAppConfig(&kolide.AppConfig{EnrollSecret: ""})
@@ -763,7 +763,7 @@ func TestOrphanedQueryCampaign(t *testing.T) {
 }
 
 func setupOsqueryTests(t *testing.T) (kolide.Datastore, kolide.Service, *clock.MockClock) {
-	ds, err := inmem.New(config.TestConfig())
+	ds, err := mysql.New(config.TestConfig(), clock.NewMockClock())
 	require.Nil(t, err)
 
 	_, err = ds.NewAppConfig(&kolide.AppConfig{EnrollSecret: ""})

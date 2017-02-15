@@ -5,7 +5,7 @@ import (
 
 	"github.com/WatchBeam/clock"
 	"github.com/kolide/kolide/server/config"
-	"github.com/kolide/kolide/server/datastore/inmem"
+	"github.com/kolide/kolide/server/datastore/mysql"
 	"github.com/kolide/kolide/server/kolide"
 	"github.com/kolide/kolide/server/test"
 	"github.com/stretchr/testify/assert"
@@ -14,7 +14,7 @@ import (
 )
 
 func TestListPacks(t *testing.T) {
-	ds, err := inmem.New(config.TestConfig())
+	ds, err := mysql.New(config.TestConfig(), clock.NewMockClock())
 	assert.Nil(t, err)
 
 	svc, err := newTestService(ds, nil)
@@ -37,7 +37,7 @@ func TestListPacks(t *testing.T) {
 }
 
 func TestGetPack(t *testing.T) {
-	ds, err := inmem.New(config.TestConfig())
+	ds, err := mysql.New(config.TestConfig(), clock.NewMockClock())
 	assert.Nil(t, err)
 
 	svc, err := newTestService(ds, nil)
@@ -59,7 +59,7 @@ func TestGetPack(t *testing.T) {
 }
 
 func TestNewPack(t *testing.T) {
-	ds, err := inmem.New(config.TestConfig())
+	ds, err := mysql.New(config.TestConfig(), clock.NewMockClock())
 	assert.Nil(t, err)
 
 	svc, err := newTestService(ds, nil)
@@ -95,7 +95,7 @@ func TestNewPack(t *testing.T) {
 }
 
 func TestModifyPack(t *testing.T) {
-	ds, err := inmem.New(config.TestConfig())
+	ds, err := mysql.New(config.TestConfig(), clock.NewMockClock())
 	assert.Nil(t, err)
 
 	svc, err := newTestService(ds, nil)
@@ -148,7 +148,7 @@ func TestModifyPack(t *testing.T) {
 }
 
 func TestDeletePack(t *testing.T) {
-	ds, err := inmem.New(config.TestConfig())
+	ds, err := mysql.New(config.TestConfig(), clock.NewMockClock())
 	assert.Nil(t, err)
 
 	svc, err := newTestService(ds, nil)
@@ -172,7 +172,7 @@ func TestDeletePack(t *testing.T) {
 }
 
 func TestListPacksForHost(t *testing.T) {
-	ds, err := inmem.New(config.TestConfig())
+	ds, err := mysql.New(config.TestConfig(), clock.NewMockClock())
 	assert.Nil(t, err)
 
 	mockClock := clock.NewMockClock()

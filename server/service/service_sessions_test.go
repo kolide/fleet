@@ -4,9 +4,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/WatchBeam/clock"
 	"github.com/kolide/kolide/server/config"
 	"github.com/kolide/kolide/server/contexts/token"
-	"github.com/kolide/kolide/server/datastore/inmem"
+	"github.com/kolide/kolide/server/datastore/mysql"
 	"github.com/kolide/kolide/server/kolide"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -16,7 +17,7 @@ import (
 const bcryptCost = 6
 
 func TestAuthenticate(t *testing.T) {
-	ds, err := inmem.New(config.TestConfig())
+	ds, err := mysql.New(config.TestConfig(), clock.NewMockClock())
 	require.Nil(t, err)
 	svc, err := newTestService(ds, nil)
 	require.Nil(t, err)
