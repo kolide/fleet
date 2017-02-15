@@ -12,7 +12,7 @@ import (
 )
 
 func createServiceMockForImport(t *testing.T) *service {
-	ds, err := mysql.New(config.TestConfig().Mysql, clock.NewMockClock())
+	ds, err := mysql.NewTestDB(config.TestConfig().Mysql, clock.NewMockClock())
 	require.Nil(t, err)
 	err = ds.MigrateData()
 	require.Nil(t, err)

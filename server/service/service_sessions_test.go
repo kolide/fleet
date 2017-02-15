@@ -17,7 +17,7 @@ import (
 const bcryptCost = 6
 
 func TestAuthenticate(t *testing.T) {
-	ds, err := mysql.New(config.TestConfig().Mysql, clock.NewMockClock())
+	ds, err := mysql.NewTestDB(config.TestConfig().Mysql, clock.NewMockClock())
 	require.Nil(t, err)
 	svc, err := newTestService(ds, nil)
 	require.Nil(t, err)

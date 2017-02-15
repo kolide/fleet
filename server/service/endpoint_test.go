@@ -40,7 +40,7 @@ func setupEndpointTest(t *testing.T) *testResource {
 	test := &testResource{}
 
 	var err error
-	test.ds, err = mysql.New(config.TestConfig().Mysql, clock.NewMockClock())
+	test.ds, err = mysql.NewTestDB(config.TestConfig().Mysql, clock.NewMockClock())
 	require.Nil(t, err)
 	require.Nil(t, test.ds.MigrateData())
 

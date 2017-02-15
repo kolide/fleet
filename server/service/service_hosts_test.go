@@ -2,6 +2,7 @@ package service
 
 import (
 	"testing"
+	"time"
 
 	"github.com/WatchBeam/clock"
 	"github.com/kolide/kolide/server/config"
@@ -12,7 +13,7 @@ import (
 )
 
 func TestListHosts(t *testing.T) {
-	ds, err := mysql.New(config.TestConfig().Mysql, clock.NewMockClock())
+	ds, err := mysql.NewTestDB(config.TestConfig().Mysql, clock.NewMockClock())
 	assert.Nil(t, err)
 
 	svc, err := newTestService(ds, nil)
@@ -25,7 +26,11 @@ func TestListHosts(t *testing.T) {
 	assert.Len(t, hosts, 0)
 
 	_, err = ds.NewHost(&kolide.Host{
-		HostName: "foo",
+		DetailUpdateTime: time.Now(),
+		SeenTime:         time.Now(),
+		NodeKey:          "1",
+		UUID:             "1",
+		HostName:         "foo",
 	})
 	assert.Nil(t, err)
 
@@ -35,7 +40,7 @@ func TestListHosts(t *testing.T) {
 }
 
 func TestGetHost(t *testing.T) {
-	ds, err := mysql.New(config.TestConfig().Mysql, clock.NewMockClock())
+	ds, err := mysql.NewTestDB(config.TestConfig().Mysql, clock.NewMockClock())
 	assert.Nil(t, err)
 
 	svc, err := newTestService(ds, nil)
@@ -44,7 +49,11 @@ func TestGetHost(t *testing.T) {
 	ctx := context.Background()
 
 	host, err := ds.NewHost(&kolide.Host{
-		HostName: "foo",
+		DetailUpdateTime: time.Now(),
+		SeenTime:         time.Now(),
+		NodeKey:          "1",
+		UUID:             "1",
+		HostName:         "foo",
 	})
 	assert.Nil(t, err)
 	assert.NotZero(t, host.ID)
@@ -56,7 +65,7 @@ func TestGetHost(t *testing.T) {
 }
 
 func TestDeleteHost(t *testing.T) {
-	ds, err := mysql.New(config.TestConfig().Mysql, clock.NewMockClock())
+	ds, err := mysql.NewTestDB(config.TestConfig().Mysql, clock.NewMockClock())
 	assert.Nil(t, err)
 
 	svc, err := newTestService(ds, nil)
@@ -65,7 +74,11 @@ func TestDeleteHost(t *testing.T) {
 	ctx := context.Background()
 
 	host, err := ds.NewHost(&kolide.Host{
-		HostName: "foo",
+		DetailUpdateTime: time.Now(),
+		SeenTime:         time.Now(),
+		NodeKey:          "1",
+		UUID:             "1",
+		HostName:         "foo",
 	})
 	assert.Nil(t, err)
 	assert.NotZero(t, host.ID)

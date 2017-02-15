@@ -19,7 +19,7 @@ import (
 // permissions to access or modify resources
 func TestEndpointPermissions(t *testing.T) {
 	req := struct{}{}
-	ds, err := mysql.New(config.TestConfig().Mysql, clock.NewMockClock())
+	ds, err := mysql.NewTestDB(config.TestConfig().Mysql, clock.NewMockClock())
 	assert.Nil(t, err)
 
 	createTestUsers(t, ds)
@@ -198,7 +198,7 @@ func TestGetNodeKey(t *testing.T) {
 }
 
 func TestAuthenticatedHost(t *testing.T) {
-	ds, err := mysql.New(config.TestConfig().Mysql, clock.NewMockClock())
+	ds, err := mysql.NewTestDB(config.TestConfig().Mysql, clock.NewMockClock())
 	require.Nil(t, err)
 	_, err = ds.NewAppConfig(&kolide.AppConfig{EnrollSecret: "foobarbaz"})
 	require.Nil(t, err)

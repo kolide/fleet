@@ -40,7 +40,7 @@ func TestModifyLabel(t *testing.T) {
 }
 
 func TestListLabels(t *testing.T) {
-	ds, err := mysql.New(config.TestConfig().Mysql, clock.NewMockClock())
+	ds, err := mysql.NewTestDB(config.TestConfig().Mysql, clock.NewMockClock())
 	assert.Nil(t, err)
 
 	svc, err := newTestService(ds, nil)
@@ -65,7 +65,7 @@ func TestListLabels(t *testing.T) {
 }
 
 func TestGetLabel(t *testing.T) {
-	ds, err := mysql.New(config.TestConfig().Mysql, clock.NewMockClock())
+	ds, err := mysql.NewTestDB(config.TestConfig().Mysql, clock.NewMockClock())
 	assert.Nil(t, err)
 
 	svc, err := newTestService(ds, nil)
@@ -87,7 +87,7 @@ func TestGetLabel(t *testing.T) {
 }
 
 func TestNewLabel(t *testing.T) {
-	ds, err := mysql.New(config.TestConfig().Mysql, clock.NewMockClock())
+	ds, err := mysql.NewTestDB(config.TestConfig().Mysql, clock.NewMockClock())
 	assert.Nil(t, err)
 
 	svc, err := newTestService(ds, nil)
@@ -112,7 +112,7 @@ func TestNewLabel(t *testing.T) {
 }
 
 func TestDeleteLabel(t *testing.T) {
-	ds, err := mysql.New(config.TestConfig().Mysql, clock.NewMockClock())
+	ds, err := mysql.NewTestDB(config.TestConfig().Mysql, clock.NewMockClock())
 	assert.Nil(t, err)
 
 	svc, err := newTestService(ds, nil)

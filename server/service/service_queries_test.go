@@ -14,7 +14,7 @@ import (
 )
 
 func TestListQueries(t *testing.T) {
-	ds, err := mysql.New(config.TestConfig().Mysql, clock.NewMockClock())
+	ds, err := mysql.NewTestDB(config.TestConfig().Mysql, clock.NewMockClock())
 	assert.Nil(t, err)
 
 	svc, err := newTestService(ds, nil)
@@ -40,7 +40,7 @@ func TestListQueries(t *testing.T) {
 }
 
 func TestGetQuery(t *testing.T) {
-	ds, err := mysql.New(config.TestConfig().Mysql, clock.NewMockClock())
+	ds, err := mysql.NewTestDB(config.TestConfig().Mysql, clock.NewMockClock())
 	assert.Nil(t, err)
 
 	svc, err := newTestService(ds, nil)
@@ -62,7 +62,7 @@ func TestGetQuery(t *testing.T) {
 }
 
 func TestNewQuery(t *testing.T) {
-	ds, err := mysql.New(config.TestConfig().Mysql, clock.NewMockClock())
+	ds, err := mysql.NewTestDB(config.TestConfig().Mysql, clock.NewMockClock())
 	assert.Nil(t, err)
 
 	createTestUsers(t, ds)
@@ -93,7 +93,7 @@ func TestNewQuery(t *testing.T) {
 }
 
 func TestModifyQuery(t *testing.T) {
-	ds, err := mysql.New(config.TestConfig().Mysql, clock.NewMockClock())
+	ds, err := mysql.NewTestDB(config.TestConfig().Mysql, clock.NewMockClock())
 	assert.Nil(t, err)
 
 	svc, err := newTestService(ds, nil)
@@ -120,7 +120,7 @@ func TestModifyQuery(t *testing.T) {
 }
 
 func TestDeleteQuery(t *testing.T) {
-	ds, err := mysql.New(config.TestConfig().Mysql, clock.NewMockClock())
+	ds, err := mysql.NewTestDB(config.TestConfig().Mysql, clock.NewMockClock())
 	assert.Nil(t, err)
 
 	svc, err := newTestService(ds, nil)
