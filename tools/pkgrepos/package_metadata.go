@@ -1,3 +1,14 @@
+/*
+
+	package_metadata.go creates a JSON file of all the artifacts in the
+	dl.kolide.co static file repository.
+	It contains links to both current and previous versions of artifacts.
+	Run with go run package_metadata.go -repo /path/to/local/copy/of/dl.kolide.co -git-tag=1.0.0
+
+	The final version of this file is found at https://dl.kolide.co/metadata.json
+
+*/
+
 package main
 
 import (
@@ -57,6 +68,8 @@ func main() {
 	}
 }
 
+// getMetadata walks all the subdirectories of the dl.kolide.co repository and generates
+// the metadata file of versioned rpm, deb and zip archives.
 func getMetadata(repoPath, current string) (*metadata, error) {
 	var m metadata
 	walkFn := func(dir string) filepath.WalkFunc {
