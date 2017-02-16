@@ -49,18 +49,7 @@ func New(config config.MysqlConfig, c clock.Clock, opts ...DBOption) (*Datastore
 		}
 	}
 
-	var dsn string
-	if config.DSN != "" {
-		dsn = config.DSN
-		// only parsing DSN to validate.
-		_, err := mysql.ParseDSN(dsn)
-		if err != nil {
-			return nil, errors.Wrap(err, "parsing mysql DSN")
-		}
-	} else {
-		dsn = generateMysqlConnectionString(config)
-	}
-
+	dsn := generateMysqlConnectionString(config)
 	db, err := sqlx.Open("mysql", dsn)
 	if err != nil {
 		return nil, err
@@ -227,11 +216,17 @@ func registerTLS(config config.MysqlConfig) error {
 // generateMysqlConnectionString returns a MySQL connection string using the
 // provided configuration.
 func generateMysqlConnectionString(conf config.MysqlConfig) string {
-	return fmt.Sprintf(
+	dsn := fmt.Sprintf(
 		"%s:%s@(%s)/%s?charset=utf8&parseTime=true&loc=UTC",
 		conf.Username,
 		conf.Password,
 		conf.Address,
 		conf.Database,
 	)
+
+	if conf.TLSConfig != "" {
+		dsn = fmt.Sprintf("%s&tls=%s", dsn, conf.TLSConfig)
+	}
+
+	return dsn
 }
