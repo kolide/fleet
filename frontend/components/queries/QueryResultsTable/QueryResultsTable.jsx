@@ -17,6 +17,7 @@ class QueryResultsTable extends Component {
     onExportQueryResults: PropTypes.func,
     onToggleQueryFullScreen: PropTypes.func,
     isQueryFullScreen: PropTypes.bool,
+    isQueryShrinking: PropTypes.bool,
   };
 
   constructor (props) {
@@ -109,6 +110,7 @@ class QueryResultsTable extends Component {
       campaign,
       onExportQueryResults,
       isQueryFullScreen,
+      isQueryShrinking,
       onToggleQueryFullScreen,
     } = this.props;
 
@@ -121,6 +123,7 @@ class QueryResultsTable extends Component {
 
     const resultsTableWrapClass = classnames(baseClass, {
       [`${baseClass}--full-screen`]: isQueryFullScreen,
+      [`${baseClass}--shrinking`]: isQueryShrinking,
     });
 
     const toggleFullScreenBtnClass = classnames(`${baseClass}__fullscreen-btn`, {

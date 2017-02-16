@@ -1,6 +1,4 @@
 .query-results-table {
-  animation: shrinkFullScreen 2500ms;
-  animation-fill-mode: both;
   background-color: $white;
   padding: $pad-base;
   max-width: 100%;
@@ -77,8 +75,8 @@
   }
 
   &--full-screen {
-    animation: growFullScreen 2500ms;
-    animation-fill-mode: both;
+    animation: growFullScreen 500ms;
+    animation-fill-mode: forwards;
     border-radius: 3px;
     box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.1);
     border: solid 1px $silver;
@@ -86,6 +84,11 @@
     // .query-results-table__table-wrapper {
     //   max-height: 86vh;
     // }
+  }
+
+  &--shrinking {
+    animation: shrinkFullScreen 500ms;
+    animation-fill-mode: forwards;
   }
 
   &__fullscreen-btn {
@@ -96,23 +99,27 @@
 }
 
 @include keyframes(growFullScreen) {
-   100% {
+  100% {
     top: $pad-half;
     right: $pad-half;
     bottom: $pad-half;
     left: $pad-half;
     max-width: 100vw;
+    min-width: 100vw;
     max-height: 100vh;
+    min-height: 100vh;
   }
 }
 
 @include keyframes(shrinkFullScreen) {
-   0% {
+  0% {
     top: $pad-half;
     right: auto;
     bottom: auto;
     left: $pad-half;
     max-width: 100vw;
+    min-width: 100vw;
     max-height: 100vh;
+    min-height: 100vh;
   }
 }

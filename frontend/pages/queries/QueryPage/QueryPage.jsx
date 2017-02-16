@@ -34,6 +34,11 @@ const DEFAULT_CAMPAIGN = {
   },
 };
 
+const QUERY_RESULTS_OPTIONS = {
+  FULL_SCREEN: 'FULL_SCREEN',
+  SHRINKING: 'SHRINKING',
+};
+
 export class QueryPage extends Component {
   static propTypes = {
     dispatch: PropTypes.func,
@@ -63,7 +68,7 @@ export class QueryPage extends Component {
       queryText: props.query.query,
       targetsCount: 0,
       targetsError: null,
-      isQueryFullScreen: false,
+      queryResultsToggle: null,
       queryPosition: {},
     };
 
@@ -278,36 +283,57 @@ export class QueryPage extends Component {
   };
 
   onToggleQueryFullScreen = (evt) => {
-    const { document: { body } } = global;
-    const { isQueryFullScreen, queryPosition } = this.state;
-    const rect = evt.target.parentNode.getBoundingClientRect();
-    const parent = evt.target.parentNode;
-    const grandParent = evt.target.parentNode.parentNode;
+    const { document: { body }, window } = global;
+    const { queryResultsToggle, queryPosition } = this.state;
+    const { parentNode: parent } = evt.target;
+    const { parentNode: grandParent } = parent;
+    const rect = parent.getBoundingClientRect();
+
     const defaultPosition = {
-      top: `${rect.top + body.scrollTop}px`,
-      left: `${rect.left + body.scrollLeft}px`,
+      top: `${rect.top}px`,
+      left: `${rect.left}px`,
       right: `${rect.right - rect.left}px`,
-      bottom: `${rect.bottom - parent.offsetHeight - rect.top}px`,
+      bottom: `${rect.bottom - rect.top}px`,
       maxWidth: `${parent.offsetWidth}px`,
       minWidth: `${parent.offsetWidth}px`,
       maxHeight: `${parent.offsetHeight}px`,
+      minHeight: `${parent.offsetHeight}px`,
       position: 'fixed',
     };
     let newPosition = clone(defaultPosition);
+    let newState;
+    let callback;
 
-    if(!isQueryFullScreen) {
-      this.setState({ queryPosition: defaultPosition });
+    if (queryResultsToggle !== QUERY_RESULTS_OPTIONS.FULL_SCREEN) {
+      newState = {
+        queryResultsToggle: QUERY_RESULTS_OPTIONS.FULL_SCREEN,
+        queryPosition: defaultPosition,
+      };
+
+      callback = () => {
+        body.style.overflow = 'hidden';
+        merge(parent.style, newPosition);
+        grandParent.style.height = `${newPosition.maxHeight}`;
+      };
     } else {
-      newPosition = queryPosition;
-      window.setTimeout(function(){
-        parent.style.position = 'static';
-      }, 2500);
+      newState = {
+        queryResultsToggle: QUERY_RESULTS_OPTIONS.SHRINKING,
+      };
+
+      callback = () => {
+        body.style.overflow = 'visible';
+        newPosition = queryPosition;
+        merge(parent.style, newPosition);
+        grandParent.style.height = `${newPosition.maxHeight}`;
+
+        window.setTimeout(() => {
+          parent.style.position = 'static';
+        }, 500);
+      };
     }
 
-    merge(parent.style, newPosition);
-    // grandParent.style.minHeight = `${parent.offsetHeight}px`;
+    this.setState(newState, callback);
 
-    this.setState({ isQueryFullScreen: !isQueryFullScreen });
     return false;
   }
 
@@ -344,9 +370,11 @@ export class QueryPage extends Component {
   }
 
   renderResultsTable = () => {
-    const { campaign, queryIsRunning, isQueryFullScreen } = this.state;
+    const { campaign, queryIsRunning, queryResultsToggle } = this.state;
     const { onExportQueryResults, onToggleQueryFullScreen } = this;
     const loading = queryIsRunning && !campaign.hosts_count.total;
+    const isQueryFullScreen = queryResultsToggle === QUERY_RESULTS_OPTIONS.FULL_SCREEN;
+    const isQueryShrinking = queryResultsToggle === QUERY_RESULTS_OPTIONS.SHRINKING;
     const resultsClasses = classnames(`${baseClass}__results`, 'body-wrap', {
       [`${baseClass}__results--loading`]: loading,
       [`${baseClass}__results--full-screen`]: isQueryFullScreen,
@@ -360,7 +388,7 @@ export class QueryPage extends Component {
     if (loading) {
       resultBody = <Spinner />;
     } else {
-      resultBody = <QueryResultsTable campaign={campaign} onExportQueryResults={onExportQueryResults} isQueryFullScreen={isQueryFullScreen} onToggleQueryFullScreen={onToggleQueryFullScreen} />;
+      resultBody = <QueryResultsTable campaign={campaign} onExportQueryResults={onExportQueryResults} isQueryFullScreen={isQueryFullScreen} isQueryShrinking={isQueryShrinking} onToggleQueryFullScreen={onToggleQueryFullScreen} />;
     }
 
     return (

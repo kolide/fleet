@@ -105,7 +105,7 @@ describe('QueryResultsTable - component', () => {
     const spy = createSpy();
     const component = mount(<QueryResultsTable campaign={campaignWithQueryResults} onExportQueryResults={spy} />);
 
-    const exportBtn = component.find('Button');
+    const exportBtn = component.find('.query-results-table__export-btn');
 
     expect(spy).toNotHaveBeenCalled();
 
