@@ -30,4 +30,17 @@ func testChangeEmail(t *testing.T, ds kolide.Datastore) {
 	// this should fail because it doesn't exist
 	newMail, err = ds.ConfirmPendingEmailChange(user.ID, "abcd12345")
 	assert.NotNil(t, err)
+
+	// test that wrong user can't confirm e-mail change
+	err = ds.PendingEmailChange(user.ID, "other@bob.com", "uniquetoken")
+	require.Nil(t, err)
+	otheruser, err := ds.NewUser(&kolide.User{
+		Username: "fred",
+		Password: []byte("supersecret"),
+		Email:    "other@bobcom",
+	})
+	require.Nil(t, err)
+	_, err = ds.ConfirmPendingEmailChange(otheruser.ID, "uniquetoken")
+	assert.NotNil(t, err)
+
 }
