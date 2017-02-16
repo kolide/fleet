@@ -3,7 +3,7 @@ import React, { Component, PropTypes } from 'react';
 import Checkbox from 'components/forms/fields/Checkbox';
 import Icon from 'components/icons/Icon';
 import PlatformIcon from 'components/icons/PlatformIcon';
-import { isEqual } from 'lodash';
+import { isEmpty, isEqual } from 'lodash';
 import scheduledQueryInterface from 'interfaces/scheduled_query';
 
 class ScheduledQueriesListItem extends Component {
@@ -44,9 +44,9 @@ class ScheduledQueriesListItem extends Component {
 
   renderPlatformIcon = () => {
     const { scheduledQuery: { platform } } = this.props;
-    const platformArr = platform.split(',');
+    const platformArr = platform ? platform.split(',') : [];
 
-    if (platformArr.includes('all')) {
+    if (isEmpty(platformArr) || platformArr.includes('all')) {
       return <PlatformIcon name="" />;
     }
 
