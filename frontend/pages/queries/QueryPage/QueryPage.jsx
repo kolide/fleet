@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import classnames from 'classnames';
 import { connect } from 'react-redux';
 import FileSaver from 'file-saver';
-import { filter, includes, isArray, isEqual } from 'lodash';
+import { clone, filter, includes, isArray, isEqual, merge } from 'lodash';
 import moment from 'moment';
 import { push } from 'react-router-redux';
 
@@ -278,7 +278,34 @@ export class QueryPage extends Component {
   };
 
   onToggleQueryFullScreen = (evt) => {
+    const { document: { body } } = global;
     const { isQueryFullScreen, queryPosition } = this.state;
+    const rect = evt.target.parentNode.getBoundingClientRect();
+    const parent = evt.target.parentNode;
+    const grandParent = evt.target.parentNode.parentNode;
+    const defaultPosition = {
+      top: `${rect.top + body.scrollTop}px`,
+      left: `${rect.left + body.scrollLeft}px`,
+      right: `${rect.right - rect.left}px`,
+      bottom: `${rect.bottom - parent.offsetHeight - rect.top}px`,
+      maxWidth: `${parent.offsetWidth}px`,
+      minWidth: `${parent.offsetWidth}px`,
+      maxHeight: `${parent.offsetHeight}px`,
+      position: 'fixed',
+    };
+    let newPosition = clone(defaultPosition);
+
+    if(!isQueryFullScreen) {
+      this.setState({ queryPosition: defaultPosition });
+    } else {
+      newPosition = queryPosition;
+      window.setTimeout(function(){
+        parent.style.position = 'static';
+      }, 2500);
+    }
+
+    merge(parent.style, newPosition);
+    // grandParent.style.minHeight = `${parent.offsetHeight}px`;
 
     this.setState({ isQueryFullScreen: !isQueryFullScreen });
     return false;

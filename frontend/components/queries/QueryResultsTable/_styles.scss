@@ -1,9 +1,11 @@
 .query-results-table {
+  animation: shrinkFullScreen 2500ms;
+  animation-fill-mode: both;
   background-color: $white;
   padding: $pad-base;
   max-width: 100%;
   box-sizing: border-box;
-  position: relative;
+  z-index: 99;
 
   &__export-btn {
     float: right;
@@ -75,24 +77,42 @@
   }
 
   &--full-screen {
-    position: fixed;
-    top: $pad-half;
-    right: $pad-half;
-    bottom: $pad-half;
-    left: $pad-half;
-    z-index: 99;
+    animation: growFullScreen 2500ms;
+    animation-fill-mode: both;
     border-radius: 3px;
     box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.1);
     border: solid 1px $silver;
 
-    .query-results-table__table-wrapper {
-      max-height: 86vh;
-    }
+    // .query-results-table__table-wrapper {
+    //   max-height: 86vh;
+    // }
   }
 
   &__fullscreen-btn {
     &--active {
       color: $alert;
     }
+  }
+}
+
+@include keyframes(growFullScreen) {
+   100% {
+    top: $pad-half;
+    right: $pad-half;
+    bottom: $pad-half;
+    left: $pad-half;
+    max-width: 100vw;
+    max-height: 100vh;
+  }
+}
+
+@include keyframes(shrinkFullScreen) {
+   0% {
+    top: $pad-half;
+    right: auto;
+    bottom: auto;
+    left: $pad-half;
+    max-width: 100vw;
+    max-height: 100vh;
   }
 }

@@ -82,7 +82,7 @@ class QueryPageSelectTargets extends Component {
             <b>{hostsCount.total}</b>&nbsp;of&nbsp;
             <b>{totalHostsCount} Hosts</b>&nbsp;Returning&nbsp;
             <b>{totalRowsCount} Records&nbsp;</b>
-            ({hostsCount.failed} failed)
+            <em>({hostsCount.failed} failed)</em>
           </span>
           <ProgressBar
             error={hostsCount.failed}

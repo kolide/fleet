@@ -5,7 +5,12 @@
 
   &__progress-details {
     display: inline-block;
-    width: 378px;
+    width: 420px;
+
+    em {
+      color: $accent-text;
+      font-size: 0.8em;
+    }
   }
 
   &__query-btn-wrapper {
