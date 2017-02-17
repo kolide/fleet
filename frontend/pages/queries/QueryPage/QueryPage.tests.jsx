@@ -99,6 +99,36 @@ describe('QueryPage - component', () => {
 
       expect(page.find('QuerySidePanel').length).toEqual(1);
     });
+
+    describe('results table', () => {
+      const props = { dispatch: noop, query: queryStub, selectedOsqueryTable: defaultSelectedOsqueryTable };
+      const queryResult = { org_name: 'Kolide', org_url: 'https://kolide.co' };
+      const campaign = {
+        id: 1,
+        hosts_count: { failed: 0, successful: 1, total: 1 },
+        query_results: [queryResult],
+        totals: { count: 1 },
+      };
+
+      it('renders the results table when there are result totals', () => {
+        const Page = mount(<QueryPage {...props} />);
+
+        Page.setState({ campaign });
+
+        expect(Page.find('.query-page__results').length)
+          .toEqual(1, 'Expected the results section to render');
+      });
+
+      it('does not render the results table when there are no result totals', () => {
+        const Page = mount(<QueryPage {...props} />);
+        const campaignWithoutResults = { id: 1, hosts_count: { failed: 0, successful: 0, total: 0 } };
+
+        Page.setState({ campaign: campaignWithoutResults });
+
+        expect(Page.find('.query-page__results').length)
+          .toEqual(0, 'Expected the results section not to render');
+      });
+    });
   });
 
   it('sets selectedTargets based on host_ids', () => {
@@ -201,6 +231,9 @@ describe('QueryPage - component', () => {
           total: 1,
         },
         query_results: [queryResult],
+        totals: {
+          count: 1,
+        },
       };
       const queryResultsCSV = convertToCSV([queryResult]);
       const fileSaveSpy = spyOn(FileSave, 'saveAs');
