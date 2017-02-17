@@ -15,7 +15,6 @@ class Base {
     const { host, origin } = global.window.location;
 
     this.baseURL = `${origin}/api`;
-    this.websocketBaseURL = `wss://${host}/api`;
     this.bearerToken = local.getItem('auth_token');
   }
 
@@ -119,4 +118,3 @@ class Base {
 }
 
 export default Base;
-

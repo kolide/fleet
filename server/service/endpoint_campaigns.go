@@ -1,10 +1,12 @@
 package service
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/go-kit/kit/endpoint"
 	kitlog "github.com/go-kit/kit/log"
+	"github.com/igm/sockjs-go/sockjs"
 	"github.com/kolide/kolide/server/contexts/viewer"
 	"github.com/kolide/kolide/server/kolide"
 	"github.com/kolide/kolide/server/websocket"
@@ -45,15 +47,13 @@ func makeCreateDistributedQueryCampaignEndpoint(svc kolide.Service) endpoint.End
 // Stream Distributed Query Campaign Results and Metadata
 ////////////////////////////////////////////////////////////////////////////////
 
-func makeStreamDistributedQueryCampaignResultsHandler(svc kolide.Service, jwtKey string, logger kitlog.Logger) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		// Upgrade to websocket connection
-		conn, err := websocket.Upgrade(w, r)
-		if err != nil {
-			logger.Log("err", err, "msg", "could not upgrade to websocket")
-			return
-		}
-		defer conn.Close()
+func makeStreamDistributedQueryCampaignResultsHandler(svc kolide.Service, jwtKey string, logger kitlog.Logger) http.Handler {
+	opt := sockjs.DefaultOptions
+	opt.Websocket = true
+	return sockjs.NewHandler("/api/v1/kolide/results", opt, func(session sockjs.Session) {
+		defer session.Close(0, "none")
+
+		conn := &websocket.Conn{session}
 
 		// Receive the auth bearer token
 		token, err := conn.ReadAuthToken()
@@ -72,14 +72,22 @@ func makeStreamDistributedQueryCampaignResultsHandler(svc kolide.Service, jwtKey
 
 		ctx := viewer.NewContext(context.Background(), *vc)
 
-		campaignID, err := idFromRequest(r, "id")
+		msg, err := conn.ReadJSONMessage()
 		if err != nil {
-			logger.Log("err", err, "invalid campaign ID")
-			conn.WriteJSONError("invalid campaign ID")
+			logger.Log("err", err, "msg", "receiving campaign ID")
+			conn.WriteJSONError("expected campaign ID")
 			return
 		}
+		if msg.Type != "select_campaign" {
+			logger.Log(err, "unexpected msg type, expected select_campaign", "msg", msg.Type)
+		}
 
-		svc.StreamCampaignResults(ctx, conn, campaignID)
+		var info struct {
+			CampaignID uint `json:"campaign_id"`
+		}
+		json.Unmarshal(*(msg.Data.(*json.RawMessage)), &info)
 
-	}
+		svc.StreamCampaignResults(ctx, conn, info.CampaignID)
+
+	})
 }

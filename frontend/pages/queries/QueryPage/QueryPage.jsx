@@ -189,6 +189,7 @@ export class QueryPage extends Component {
         return Kolide.websockets.queries.run(campaignResponse.id)
           .then((socket) => {
             this.setupDistributedQuery(socket);
+
             this.setState({
               campaign: campaignResponse,
               queryIsRunning: true,
@@ -198,27 +199,19 @@ export class QueryPage extends Component {
               const socketData = JSON.parse(data);
               const { previousSocketData } = this;
 
-              if (previousSocketData && isEqual(socketData, previousSocketData)) {
-                this.previousSocketData = socketData;
+              this.previousSocketData = socketData;
 
+              if (previousSocketData && isEqual(socketData, previousSocketData)) {
                 return false;
               }
 
-              return campaignHelpers.update(this.state.campaign, socketData)
-                .then((updatedCampaign) => {
-                  const { status } = updatedCampaign;
+              this.setState(campaignHelpers.updateCampaignState(socketData));
 
-                  if (status === 'finished') {
-                    this.teardownDistributedQuery();
+              if (socketData.type === 'status' && socketData.data === 'finished') {
+                return this.teardownDistributedQuery();
+              }
 
-                    return false;
-                  }
-
-                  this.previousSocketData = socketData;
-                  this.setState({ campaign: updatedCampaign });
-
-                  return false;
-                });
+              return false;
             };
           });
       })
