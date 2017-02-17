@@ -5,11 +5,13 @@ GPG_PATH="/Users/${USER}/.gnupg"
 
 build_binaries() {
     cd ../..
-    GOOS=darwin CGO_ENABLED=0 make build 
+    make generate
+
+    GOOS=darwin CGO_ENABLED=0 make build
     mkdir -p build/darwin
     mv build/kolide build/darwin/kolide_darwin_amd64
 
-    GOOS=linux CGO_ENABLED=0 make build 
+    GOOS=linux CGO_ENABLED=0 make build
     mkdir -p build/linux
     mv build/kolide build/linux/kolide_linux_amd64
 }
