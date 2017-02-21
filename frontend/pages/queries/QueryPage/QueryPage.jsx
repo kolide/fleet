@@ -285,7 +285,7 @@ export class QueryPage extends Component {
   onToggleQueryFullScreen = (evt) => {
     const { document: { body }, window } = global;
     const { queryResultsToggle, queryPosition } = this.state;
-    const { parentNode: parent } = evt.target;
+    const { parentNode: { parentNode: parent } } = evt.currentTarget;
     const { parentNode: grandParent } = parent;
     const rect = parent.getBoundingClientRect();
 
@@ -312,6 +312,8 @@ export class QueryPage extends Component {
 
       callback = () => {
         body.style.overflow = 'hidden';
+        document.getElementsByClassName('site-nav')[0].classList.add('site-nav--small');
+        document.getElementsByClassName('core-wrapper')[0].classList.add('core-wrapper--small');
         merge(parent.style, newPosition);
         grandParent.style.height = `${newPosition.maxHeight}`;
       };
@@ -322,12 +324,20 @@ export class QueryPage extends Component {
 
       callback = () => {
         body.style.overflow = 'visible';
+        document.getElementsByClassName('site-nav')[0].classList.remove('site-nav--small');
+        document.getElementsByClassName('core-wrapper')[0].classList.remove('core-wrapper--small');
         newPosition = queryPosition;
         merge(parent.style, newPosition);
         grandParent.style.height = `${newPosition.maxHeight}`;
 
         window.setTimeout(() => {
-          parent.style.position = 'static';
+          parent.style = {
+            position: 'static',
+            maxWidth: 'auto',
+            minWidth: 'auto',
+            maxHeight: 'auto',
+            minHeight: 'auto',
+          }
         }, 500);
       };
     }

@@ -144,20 +144,22 @@ class QueryResultsTable extends Component {
 
     return (
       <div className={resultsTableWrapClass}>
-        <Button
-          className={`${baseClass}__export-btn`}
-          onClick={onExportQueryResults}
-          variant="link"
-        >
-          Export
-        </Button>
-        <Button
-          className={toggleFullScreenBtnClass}
-          onClick={onToggleQueryFullScreen}
-          variant="unstyled"
-        >
-          Toggle Full Screen
-        </Button>
+        <header className={`${baseClass}__button-wrap`}>
+          <Button
+            className={toggleFullScreenBtnClass}
+            onClick={onToggleQueryFullScreen}
+            variant="unstyled"
+          >
+            <Icon name={isQueryFullScreen ? 'windowed' : 'fullscreen'} />
+          </Button>
+          <Button
+            className={`${baseClass}__export-btn`}
+            onClick={onExportQueryResults}
+            variant="link"
+          >
+            Export
+          </Button>
+        </header>
         <div className={`${baseClass}__table-wrapper`}>
           <table className={`${baseClass}__table`}>
             <thead>
