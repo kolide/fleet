@@ -7,6 +7,7 @@ REVISION = $(shell git rev-parse HEAD)
 REVSHORT = $(shell git rev-parse --short HEAD)
 USER = $(shell whoami)
 DOCKER_IMAGE_NAME = kolide/kolide
+GO_DIRS = ./server/... ./cli/... ./tools/...
 
 ifneq ($(OS), Windows_NT)
 	# If on macOS, set the shell to bash explicitly
@@ -103,7 +104,7 @@ lint-scss:
 	sass-lint --verbose
 
 lint-go:
-	go vet $(shell glide nv)
+	go vet $(GO_DIRS)
 
 lint-license:
 	go run tools/lint_license/lint_license.go
@@ -111,10 +112,10 @@ lint-license:
 lint: lint-go lint-js lint-scss lint-ts lint-license
 
 test-go:
-	go test $(shell glide nv)
+	go test $(GO_DIRS)
 
 analyze-go:
-	go test -race -cover $(shell glide nv)
+	go test -race -cover $(GO_DIRS)
 
 
 test-js: export NODE_PATH = ./frontend
@@ -149,9 +150,9 @@ generate-dev: .prefix
 deps:
 	yarn
 	go get github.com/jteeuwen/go-bindata/...
-	go get github.com/Masterminds/glide
+	go get -u github.com/golang/dep/...
 	go get github.com/groob/mockimpl
-	glide install --strip-vendor
+	dep ensure -update
 
 distclean:
 ifeq ($(OS), Windows_NT)
