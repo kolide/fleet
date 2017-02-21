@@ -2,6 +2,7 @@ import fetch from 'isomorphic-fetch';
 
 import local from '../utilities/local';
 
+const DEFAULT_BODY = JSON.stringify({});
 const REQUEST_METHODS = {
   DELETE: 'DELETE',
   GET: 'GET',
@@ -66,7 +67,7 @@ class Base {
   authenticatedDelete (endpoint, overrideHeaders = {}) {
     const { DELETE } = REQUEST_METHODS;
 
-    return this._authenticatedRequest(DELETE, endpoint, {}, overrideHeaders);
+    return this._authenticatedRequest(DELETE, endpoint, DEFAULT_BODY, overrideHeaders);
   }
 
   authenticatedGet (endpoint, overrideHeaders = {}) {
@@ -81,7 +82,7 @@ class Base {
     return this._authenticatedRequest(PATCH, endpoint, body, overrideHeaders);
   }
 
-  authenticatedPost (endpoint, body = JSON.stringify({}), overrideHeaders = {}) {
+  authenticatedPost (endpoint, body = DEFAULT_BODY, overrideHeaders = {}) {
     const { POST } = REQUEST_METHODS;
 
     return this._authenticatedRequest(POST, endpoint, body, overrideHeaders);
