@@ -23,6 +23,7 @@ class QueryResultsTable extends Component {
     onStopQuery: PropTypes.func.isRequired,
     query: PropTypes.string,
     queryIsRunning: PropTypes.bool,
+    queryTimerMilliseconds: PropTypes.number,
   };
 
   constructor (props) {
@@ -121,6 +122,7 @@ class QueryResultsTable extends Component {
       onStopQuery,
       query,
       queryIsRunning,
+      queryTimerMilliseconds,
     } = this.props;
 
     const {
@@ -161,6 +163,7 @@ class QueryResultsTable extends Component {
             query={query}
             queryIsRunning={queryIsRunning}
             className={`${baseClass}__full-screen`}
+            queryTimerMilliseconds={queryTimerMilliseconds}
           />}
 
           <Button

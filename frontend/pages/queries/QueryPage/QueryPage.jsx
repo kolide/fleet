@@ -22,6 +22,7 @@ import QueryPageSelectTargets from 'components/queries/QueryPageSelectTargets';
 import QueryResultsTable from 'components/queries/QueryResultsTable';
 import QuerySidePanel from 'components/side_panels/QuerySidePanel';
 import { renderFlash } from 'redux/nodes/notifications/actions';
+import { toggleSmallNav } from 'redux/nodes/app/actions';
 import { selectOsqueryTable, setSelectedTargets, setSelectedTargetsQuery } from 'redux/nodes/components/QueryPages/actions';
 import targetInterface from 'interfaces/target';
 import validateQuery from 'components/forms/validators/validate_query';
@@ -66,6 +67,7 @@ export class QueryPage extends Component {
       campaign: DEFAULT_CAMPAIGN,
       queryIsRunning: false,
       queryText: props.query.query,
+      runQueryMilliseconds: 0,
       targetsCount: 0,
       targetsError: null,
       queryResultsToggle: null,
@@ -184,9 +186,12 @@ export class QueryPage extends Component {
       .then((campaignResponse) => {
         return Kolide.websockets.queries.run(campaignResponse.id)
           .then((socket) => {
-            this.setState({ campaign: campaignResponse });
-            this.socket = socket;
-            this.setState({ queryIsRunning: true });
+            this.setupDistributedQuery(socket);
+            // this.socket = socket;
+            this.setState({
+              campaign: campaignResponse,
+              queryIsRunning: true,
+            });
 
             this.socket.onmessage = ({ data }) => {
               const socketData = JSON.parse(data);
@@ -204,7 +209,7 @@ export class QueryPage extends Component {
 
                   if (status === 'finished') {
                     this.setState({ queryIsRunning: false });
-                    removeSocket();
+                    this.teardownDistributedQuery();
 
                     return false;
                   }
@@ -283,25 +288,9 @@ export class QueryPage extends Component {
   };
 
   onToggleQueryFullScreen = (evt) => {
-    const toggleSmallNav = () => {
-      const { document } = global;
-
-      const siteNav = document.getElementsByClassName('site-nav');
-      const coreWrapper = document.getElementsByClassName('core-wrapper');
-
-      if (siteNav.length) {
-        siteNav[0].classList.toggle('site-nav--small');
-      }
-
-      if (siteNav.length) {
-        coreWrapper[0].classList.toggle('core-wrapper--small');
-      }
-
-      return false;
-    };
-
     const { document: { body }, window } = global;
     const { queryResultsToggle, queryPosition } = this.state;
+    const { dispatch } = this.props;
     const { parentNode: { parentNode: parent } } = evt.currentTarget;
     const { parentNode: grandParent } = parent;
     const rect = parent.getBoundingClientRect();
@@ -329,7 +318,7 @@ export class QueryPage extends Component {
 
       callback = () => {
         body.style.overflow = 'hidden';
-        toggleSmallNav();
+        dispatch(toggleSmallNav);
         merge(parent.style, newPosition);
         grandParent.style.height = `${newPosition.maxHeight}`;
       };
@@ -340,7 +329,7 @@ export class QueryPage extends Component {
 
       callback = () => {
         body.style.overflow = 'visible';
-        toggleSmallNav();
+        dispatch(toggleSmallNav);
         newPosition = queryPosition;
         merge(parent.style, newPosition);
         grandParent.style.height = `${newPosition.maxHeight}`;
@@ -358,6 +347,35 @@ export class QueryPage extends Component {
     }
 
     this.setState(newState, callback);
+
+    return false;
+  }
+
+  setupDistributedQuery = (socket) => {
+    this.socket = socket;
+    const update = () => {
+      const { runQueryMilliseconds } = this.state;
+
+      this.setState({ runQueryMilliseconds: runQueryMilliseconds + 1000 });
+    };
+
+    if (!this.runQueryInterval) {
+      this.runQueryInterval = setInterval(update, 1000);
+    }
+
+    return false;
+  }
+
+  teardownDistributedQuery = () => {
+    const { runQueryInterval } = this;
+
+    if (runQueryInterval) {
+      clearInterval(runQueryInterval);
+      this.runQueryInterval = null;
+    }
+
+    this.setState({ runQueryMilliseconds: 0 });
+    this.removeSocket();
 
     return false;
   }
@@ -395,7 +413,7 @@ export class QueryPage extends Component {
   }
 
   renderResultsTable = () => {
-    const { campaign, queryIsRunning, queryResultsToggle, queryText } = this.state;
+    const { campaign, queryIsRunning, queryResultsToggle, queryText, runQueryMilliseconds } = this.state;
     const { onExportQueryResults, onToggleQueryFullScreen, onRunQuery, onStopQuery, onTargetSelect } = this;
     const loading = queryIsRunning && !campaign.hosts_count.total;
     const isQueryFullScreen = queryResultsToggle === QUERY_RESULTS_OPTIONS.FULL_SCREEN;
@@ -425,6 +443,7 @@ export class QueryPage extends Component {
           onTargetSelect={onTargetSelect}
           query={queryText}
           queryIsRunning={queryIsRunning}
+          queryTimerMilliseconds={runQueryMilliseconds}
         />
       );
     }
@@ -438,7 +457,7 @@ export class QueryPage extends Component {
 
   renderTargetsInput = () => {
     const { onFetchTargets, onRunQuery, onStopQuery, onTargetSelect } = this;
-    const { campaign, queryIsRunning, queryText, targetsCount, targetsError } = this.state;
+    const { campaign, queryIsRunning, queryText, targetsCount, targetsError, runQueryMilliseconds } = this.state;
     const { selectedTargets } = this.props;
 
     return (
@@ -453,6 +472,7 @@ export class QueryPage extends Component {
         queryIsRunning={queryIsRunning}
         selectedTargets={selectedTargets}
         targetsCount={targetsCount}
+        queryTimerMilliseconds={runQueryMilliseconds}
       />
     );
   }
