@@ -1,3 +1,4 @@
+## Kolide 1.0.1 (February 22, 2016) ##
 *   Improve platform detection accuracy
 
     Previously we were using `build_platform`, which does not always properly
