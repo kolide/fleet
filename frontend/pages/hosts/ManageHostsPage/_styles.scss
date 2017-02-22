@@ -34,12 +34,18 @@
   &__delete-label {
     float: right;
     margin-bottom: 15px;
+
+    button {
+      &:first-child {
+        margin-right: 15px;
+      }
+    }
   }
 
   &__description {
     line-height: 1.54;
     letter-spacing: 0.5px;
-    margin: 0;
+    margin: 0 0 15px;
 
     h2 {
       text-transform: uppercase;

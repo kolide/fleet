@@ -93,29 +93,21 @@ class Kolide extends Base {
       const { LABELS } = endpoints;
 
       return this.authenticatedGet(this.endpoint(LABELS))
-        .then((response) => {
-          const labelTypeForDisplayText = {
-            'All Hosts': 'all',
-            'MS Windows': 'platform',
-            'CentOS Linux': 'platform',
-            'Mac OS X': 'platform',
-            'Ubuntu Linux': 'platform',
-          };
-          const labels = response.labels.map((label) => {
-            return {
-              ...label,
-              slug: helpers.labelSlug(label),
-              type: labelTypeForDisplayText[label.display_text] || 'custom',
-            };
-          });
-          const stubbedLabels = [
-            { id: 'new', display_text: 'NEW', description: '(added in last 24hrs)', slug: 'recently_added', type: 'status', count: 0, statusLabelKey: 'new_count' },
-            { id: 'online', display_text: 'ONLINE', slug: 'online', type: 'status', count: 0, statusLabelKey: 'online_count' },
-            { id: 'offline', display_text: 'OFFLINE', slug: 'offline', type: 'status', count: 0, statusLabelKey: 'offline_count' },
-            { id: 'mia', display_text: 'MIA', description: '(offline > 30 days)', slug: 'mia', type: 'status', count: 0, statusLabelKey: 'mia_count' },
-          ];
+        .then(response => helpers.formatLabelResponse(response));
+    },
+    update: (label, updateAttrs) => {
+      const { LABELS } = endpoints;
+      const endpoint = this.endpoint(`${LABELS}/${label.id}`);
 
-          return labels.concat(stubbedLabels);
+      return this.authenticatedPatch(endpoint, JSON.stringify(updateAttrs))
+        .then((response) => {
+          const { label: updatedLabel } = response;
+
+          return {
+            ...updatedLabel,
+            slug: helpers.labelSlug(updatedLabel),
+            type: 'custom',
+          };
         });
     },
   }
@@ -159,6 +151,50 @@ class Kolide extends Base {
             },
           };
         });
+    },
+  }
+
+  scheduledQueries = {
+    create: (formData) => {
+      const { SCHEDULED_QUERIES } = endpoints;
+      const { interval, logging_type: loggingType, pack_id: packID, platform, query_id: queryID, shard, version } = formData;
+      const removed = loggingType === 'differential';
+      const snapshot = loggingType === 'snapshot';
+
+      const params = {
+        interval: Number(interval),
+        pack_id: Number(packID),
+        platform,
+        query_id: Number(queryID),
+        removed,
+        snapshot,
+        shard: Number(shard),
+        version,
+      };
+
+      return this.authenticatedPost(this.endpoint(SCHEDULED_QUERIES), JSON.stringify(params))
+        .then(response => response.scheduled);
+    },
+    destroy: ({ id }) => {
+      const { SCHEDULED_QUERIES } = endpoints;
+      const endpoint = `${this.endpoint(SCHEDULED_QUERIES)}/${id}`;
+
+      return this.authenticatedDelete(endpoint);
+    },
+    loadAll: (pack) => {
+      const { SCHEDULED_QUERY } = endpoints;
+      const scheduledQueryPath = SCHEDULED_QUERY(pack);
+
+      return this.authenticatedGet(this.endpoint(scheduledQueryPath))
+        .then(response => response.scheduled);
+    },
+    update: (scheduledQuery, updatedAttributes) => {
+      const { SCHEDULED_QUERIES } = endpoints;
+      const endpoint = this.endpoint(`${SCHEDULED_QUERIES}/${scheduledQuery.id}`);
+      const params = helpers.formatScheduledQueryForServer(updatedAttributes);
+
+      return this.authenticatedPatch(endpoint, JSON.stringify(params))
+        .then(response => response.scheduled);
     },
   }
 
@@ -221,25 +257,6 @@ class Kolide extends Base {
       .then((response) => { return response.query; });
   }
 
-  createScheduledQuery = ({ interval, logging_type: loggingType, pack_id: packID, platform, query_id: queryID, shard, version }) => {
-    const removed = loggingType === 'differential';
-    const snapshot = loggingType === 'snapshot';
-
-    const formData = {
-      interval: Number(interval),
-      pack_id: Number(packID),
-      platform,
-      query_id: Number(queryID),
-      removed,
-      snapshot,
-      shard: Number(shard),
-      version,
-    };
-
-    return this.authenticatedPost(this.endpoint('/v1/kolide/schedule'), JSON.stringify(formData))
-      .then(response => response.scheduled);
-  }
-
   destroyQuery = ({ id }) => {
     const { QUERIES } = endpoints;
     const endpoint = `${this.endpoint(QUERIES)}/${id}`;
@@ -250,12 +267,6 @@ class Kolide extends Base {
   destroyPack = ({ id }) => {
     const { PACKS } = endpoints;
     const endpoint = `${this.endpoint(PACKS)}/${id}`;
-
-    return this.authenticatedDelete(endpoint);
-  }
-
-  destroyScheduledQuery = ({ id }) => {
-    const endpoint = `${this.endpoint('/v1/kolide/schedule')}/${id}`;
 
     return this.authenticatedDelete(endpoint);
   }
@@ -380,14 +391,6 @@ class Kolide extends Base {
 
     return this.authenticatedGet(this.endpoint(PACKS))
       .then((response) => { return response.packs; });
-  }
-
-  getScheduledQueries = (pack) => {
-    const { SCHEDULED_QUERIES } = endpoints;
-    const scheduledQueryPath = SCHEDULED_QUERIES(pack);
-
-    return this.authenticatedGet(this.endpoint(scheduledQueryPath))
-      .then(response => response.scheduled);
   }
 
   getUsers = () => {

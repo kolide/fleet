@@ -188,16 +188,16 @@ describe('ManageHostsPage - component', () => {
     const ownProps = { location: { hash: '#new_label' }, params: {} };
     const component = connectedComponent(ConnectedManageHostsPage, { props: ownProps, mockStore });
 
-    it('renders a QueryForm component', () => {
+    it('renders a LabelForm component', () => {
       const page = mount(component);
 
-      expect(page.find('QueryForm').length).toEqual(1);
+      expect(page.find('LabelForm').length).toEqual(1);
     });
 
     it('displays "New Label Query" as the query form header', () => {
       const page = mount(component);
 
-      expect(page.find('QueryForm').text()).toInclude('New Label Query');
+      expect(page.find('LabelForm').text()).toInclude('New Label Query');
     });
   });
 
@@ -224,6 +224,61 @@ describe('ManageHostsPage - component', () => {
         selectedLabel: windowsLabel,
       });
     });
+
+    it('Renders the default description if the selected label does not have a description', () => {
+      const defaultDescription = 'No description available.';
+      const noDescriptionLabel = { ...allHostsLabel, description: undefined };
+      const pageProps = {
+        ...props,
+        selectedLabel: noDescriptionLabel,
+      };
+
+      const Page = mount(<ManageHostsPage {...pageProps} />);
+
+      expect(Page.find('.manage-hosts__header').text())
+        .toInclude(defaultDescription);
+    });
+
+    it('Renders the label description if the selected label has a description', () => {
+      const defaultDescription = 'No description available.';
+      const labelDescription = 'This is the label description';
+      const noDescriptionLabel = { ...allHostsLabel, description: labelDescription };
+      const pageProps = {
+        ...props,
+        selectedLabel: noDescriptionLabel,
+      };
+
+      const Page = mount(<ManageHostsPage {...pageProps} />);
+
+      expect(Page.find('.manage-hosts__header').text())
+        .toInclude(labelDescription);
+      expect(Page.find('.manage-hosts__header').text())
+        .toNotInclude(defaultDescription);
+    });
+  });
+
+  describe('Edit a label', () => {
+    const ownProps = { location: {}, params: { active_label: 'custom-label' } };
+    const Component = connectedComponent(ConnectedManageHostsPage, { props: ownProps, mockStore });
+
+    it('renders the LabelForm when Edit is clicked', () => {
+      const Page = mount(Component);
+      const EditButton = Page
+        .find('.manage-hosts__delete-label')
+        .find('Button')
+        .first();
+
+      expect(Page.find('LabelForm').length).toEqual(0, 'Expected the LabelForm to not be on the page');
+
+      EditButton.simulate('click');
+
+      const LabelForm = Page.find('LabelForm');
+
+      expect(LabelForm.length).toEqual(1, 'Expected the LabelForm to be on the page');
+
+      expect(LabelForm.prop('formData')).toEqual(customLabel);
+      expect(LabelForm.prop('isEdit')).toEqual(true);
+    });
   });
 
   describe('Delete a label', () => {
@@ -234,7 +289,10 @@ describe('ManageHostsPage - component', () => {
         mockStore,
       });
       const page = mount(component);
-      const deleteBtn = page.find('.manage-hosts__delete-label').find('button');
+      const deleteBtn = page
+        .find('.manage-hosts__delete-label')
+        .find('Button')
+        .last();
 
       spyOn(labelActions, 'destroy').andReturn((dispatch) => {
         dispatch({ type: 'labels_LOAD_REQUEST' });

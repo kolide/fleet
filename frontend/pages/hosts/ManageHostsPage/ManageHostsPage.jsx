@@ -5,6 +5,7 @@ import FileSaver from 'file-saver';
 import { orderBy, sortBy } from 'lodash';
 import { push } from 'react-router-redux';
 
+import deepDifference from 'utilities/deep_difference';
 import entityGetter from 'redux/utilities/entityGetter';
 import { getStatusLabelCounts, setDisplay, silentGetStatusLabelCounts } from 'redux/nodes/components/ManageHostsPage/actions';
 import helpers from 'pages/hosts/ManageHostsPage/helpers';
@@ -15,6 +16,7 @@ import HostDetails from 'components/hosts/HostDetails';
 import hostInterface from 'interfaces/host';
 import HostSidePanel from 'components/side_panels/HostSidePanel';
 import HostsTable from 'components/hosts/HostsTable';
+import LabelForm from 'components/forms/LabelForm';
 import LonelyHost from 'components/hosts/LonelyHost';
 import AddHostModal from 'components/hosts/AddHostModal';
 import Icon from 'components/icons/Icon';
@@ -22,7 +24,6 @@ import Kolide from 'kolide';
 import PlatformIcon from 'components/icons/PlatformIcon';
 import osqueryTableInterface from 'interfaces/osquery_table';
 import paths from 'router/paths';
-import QueryForm from 'components/forms/queries/QueryForm';
 import QuerySidePanel from 'components/side_panels/QuerySidePanel';
 import { renderFlash } from 'redux/nodes/notifications/actions';
 import Rocker from 'components/buttons/Rocker';
@@ -64,6 +65,7 @@ export class ManageHostsPage extends Component {
     super(props);
 
     this.state = {
+      isEditLabel: false,
       labelQueryText: '',
       showDeleteHostModal: false,
       showAddHostModal: false,
@@ -136,6 +138,19 @@ export class ManageHostsPage extends Component {
       });
 
     return false;
+  }
+
+  onEditLabel = (formData) => {
+    const { dispatch, selectedLabel } = this.props;
+    const updateAttrs = deepDifference(formData, selectedLabel);
+
+    return dispatch(labelActions.update(selectedLabel, updateAttrs))
+      .then(() => {
+        this.toggleEditLabel();
+
+        return false;
+      })
+      .catch(() => false);
   }
 
   onFetchCertificate = () => {
@@ -262,6 +277,14 @@ export class ManageHostsPage extends Component {
     return false;
   }
 
+  toggleEditLabel = () => {
+    const { isEditLabel } = this.state;
+
+    this.setState({ isEditLabel: !isEditLabel });
+
+    return false;
+  }
+
   filterHosts = () => {
     const { hosts, selectedLabel } = this.props;
 
@@ -348,7 +371,7 @@ export class ManageHostsPage extends Component {
   }
 
   renderDeleteButton = () => {
-    const { toggleDeleteLabelModal } = this;
+    const { toggleDeleteLabelModal, toggleEditLabel } = this;
     const { selectedLabel: { type } } = this.props;
 
     if (type !== 'custom') {
@@ -357,6 +380,7 @@ export class ManageHostsPage extends Component {
 
     return (
       <div className={`${baseClass}__delete-label`}>
+        <Button onClick={toggleEditLabel} variant="inverse">Edit</Button>
         <Button onClick={toggleDeleteLabelModal} variant="alert">Delete</Button>
       </div>
     );
@@ -418,25 +442,20 @@ export class ManageHostsPage extends Component {
 
     const hostCount = type === 'status' ? statusLabels[`${statusLabelKey}`] : count;
     const hostsTotalDisplay = hostCount === 1 ? '1 Host Total' : `${hostCount} Hosts Total`;
+    const defaultDescription = 'No description available.';
 
     return (
       <div className={`${baseClass}__header`}>
         {renderDeleteButton()}
-
         <h1 className={`${baseClass}__title`}>
           {renderIcon()}
           <span>{displayText}</span>
         </h1>
-
-        { renderQuery() }
-
-        {description &&
-          <div className={`${baseClass}__description`}>
-            <h2>Description</h2>
-            <p>{description}</p>
-          </div>
-        }
-
+        {renderQuery()}
+        <div className={`${baseClass}__description`}>
+          <h2>Description</h2>
+          <p>{description || <em>{defaultDescription}</em>}</p>
+        </div>
         <div className={`${baseClass}__topper`}>
           <p className={`${baseClass}__host-count`}>{hostsTotalDisplay}</p>
           <Rocker
@@ -516,24 +535,38 @@ export class ManageHostsPage extends Component {
 
 
   renderForm = () => {
-    const { isAddLabel, labelErrors } = this.props;
+    const { isAddLabel, labelErrors, selectedLabel } = this.props;
+    const { isEditLabel } = this.state;
     const {
       onCancelAddLabel,
+      onEditLabel,
       onOsqueryTableSelect,
       onSaveAddLabel,
+      toggleEditLabel,
     } = this;
-    const queryStub = { description: '', name: '', query: '' };
 
     if (isAddLabel) {
       return (
         <div className="body-wrap">
-          <QueryForm
-            key="query-composer"
+          <LabelForm
             onCancel={onCancelAddLabel}
             onOsqueryTableSelect={onOsqueryTableSelect}
             handleSubmit={onSaveAddLabel}
-            queryType="label"
-            query={queryStub}
+            serverErrors={labelErrors}
+          />
+        </div>
+      );
+    }
+
+    if (isEditLabel) {
+      return (
+        <div className="body-wrap">
+          <LabelForm
+            formData={selectedLabel}
+            onCancel={toggleEditLabel}
+            onOsqueryTableSelect={onOsqueryTableSelect}
+            handleSubmit={onEditLabel}
+            isEdit
             serverErrors={labelErrors}
           />
         </div>
@@ -582,6 +615,7 @@ export class ManageHostsPage extends Component {
   render () {
     const { renderForm, renderHeader, renderHosts, renderSidePanel, renderAddHostModal, renderDeleteHostModal, renderDeleteLabelModal } = this;
     const { display, isAddLabel, loadingHosts, loadingLabels } = this.props;
+    const { isEditLabel } = this.state;
 
     if (loadingHosts || loadingLabels) {
       return false;
@@ -590,7 +624,7 @@ export class ManageHostsPage extends Component {
     return (
       <div className="has-sidebar">
         {renderForm()}
-        {!isAddLabel &&
+        {!isAddLabel && !isEditLabel &&
           <div className={`${baseClass} body-wrap`}>
             {renderHeader()}
             <div className={`${baseClass}__list ${baseClass}__list--${display.toLowerCase()}`}>

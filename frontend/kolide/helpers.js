@@ -1,4 +1,4 @@
-import { flatMap, kebabCase, pick, size } from 'lodash';
+import { flatMap, kebabCase, omit, pick, size } from 'lodash';
 import md5 from 'js-md5';
 
 const ORG_INFO_ATTRS = ['org_name', 'org_logo_url'];
@@ -26,6 +26,46 @@ const labelSlug = (label) => {
   return kebabCase(lowerDisplayText);
 };
 
+const labelStubs = [
+  {
+    id: 'new',
+    count: 0,
+    display_text: 'NEW',
+    slug: 'recently_added',
+    statusLabelKey: 'new_count',
+    title_description: '(added in last 24hrs)',
+    type: 'status',
+  },
+  {
+    id: 'online',
+    count: 0,
+    description: 'Hosts that have recently checked-in to kolide and are ready to run queries.',
+    display_text: 'ONLINE',
+    slug: 'online',
+    statusLabelKey: 'online_count',
+    type: 'status',
+  },
+  {
+    id: 'offline',
+    count: 0,
+    description: 'Hosts that have not checked-in to kolide recently.',
+    display_text: 'OFFLINE',
+    slug: 'offline',
+    statusLabelKey: 'offline_count',
+    type: 'status',
+  },
+  {
+    id: 'mia',
+    count: 0,
+    description: 'Hosts that have not been seen by Kolide in more than 30 days.',
+    display_text: 'MIA',
+    slug: 'mia',
+    statusLabelKey: 'mia_count',
+    title_description: '(offline > 30 days)',
+    type: 'status',
+  },
+];
+
 const filterTarget = (targetType) => {
   return (target) => {
     return target.target_type === targetType ? [target.id] : [];
@@ -51,6 +91,26 @@ export const formatConfigDataForServer = (config) => {
   };
 };
 
+const formatLabelResponse = (response) => {
+  const labelTypeForDisplayText = {
+    'All Hosts': 'all',
+    'MS Windows': 'platform',
+    'CentOS Linux': 'platform',
+    'Mac OS X': 'platform',
+    'Ubuntu Linux': 'platform',
+  };
+
+  const labels = response.labels.map((label) => {
+    return {
+      ...label,
+      slug: labelSlug(label),
+      type: labelTypeForDisplayText[label.display_text] || 'custom',
+    };
+  });
+
+  return labels.concat(labelStubs);
+};
+
 export const formatSelectedTargetsForApi = (selectedTargets, appendID = false) => {
   const targets = selectedTargets || [];
   const hosts = flatMap(targets, filterTarget('hosts'));
@@ -67,6 +127,61 @@ const parseLicense = (license) => {
   const allowedHosts = license.allowed_hosts === 0 ? 'Unlimited' : license.allowed_hosts;
 
   return { ...license, allowed_hosts: allowedHosts };
+};
+
+export const formatScheduledQueryForServer = (scheduledQuery) => {
+  const {
+    interval,
+    logging_type: loggingType,
+    pack_id: packID,
+    platform,
+    query_id: queryID,
+    shard,
+  } = scheduledQuery;
+  const result = omit(scheduledQuery, ['logging_type']);
+
+  if (platform === 'all') {
+    result.platform = '';
+  }
+
+  if (interval) {
+    result.interval = Number(interval);
+  }
+
+  if (loggingType) {
+    result.removed = loggingType === 'differential';
+    result.snapshot = loggingType === 'snapshot';
+  }
+
+  if (packID) {
+    result.pack_id = Number(packID);
+  }
+
+  if (queryID) {
+    result.query_id = Number(queryID);
+  }
+
+  if (shard) {
+    result.shard = Number(shard);
+  }
+
+  return result;
+};
+
+export const formatScheduledQueryForClient = (scheduledQuery) => {
+  if (scheduledQuery.platform === '') {
+    scheduledQuery.platform = 'all';
+  }
+
+  if (scheduledQuery.snapshot) {
+    scheduledQuery.logging_type = 'snapshot';
+  } else if (scheduledQuery.removed) {
+    scheduledQuery.logging_type = 'differential';
+  } else {
+    scheduledQuery.logging_type = 'differential_ignore_removals';
+  }
+
+  return scheduledQuery;
 };
 
 const setupData = (formData) => {
@@ -88,6 +203,9 @@ const setupData = (formData) => {
 export default {
   addGravatarUrlToResource,
   formatConfigDataForServer,
+  formatLabelResponse,
+  formatScheduledQueryForClient,
+  formatScheduledQueryForServer,
   formatSelectedTargetsForApi,
   labelSlug,
   parseLicense,

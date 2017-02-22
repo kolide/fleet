@@ -102,7 +102,6 @@ func (svc service) ModifyUser(ctx context.Context, userID uint, p kolide.UserPay
 		if err != nil {
 			return nil, err
 		}
-		return user, nil
 	}
 
 	if p.Position != nil {
@@ -126,7 +125,7 @@ func (svc service) modifyEmailAddress(ctx context.Context, user *kolide.User, em
 	if password != nil {
 		err := user.ValidatePassword(*password)
 		if err != nil {
-			return permissionError{message: "incorrect password"}
+			return newPermissionError("password", "incorrect password")
 		}
 	}
 	random, err := kolide.RandomText(svc.config.App.TokenKeySize)
@@ -159,7 +158,11 @@ func (svc service) modifyEmailAddress(ctx context.Context, user *kolide.User, em
 }
 
 func (svc service) ChangeUserEmail(ctx context.Context, token string) (string, error) {
-	return svc.ds.ConfirmPendingEmailChange(token)
+	vc, ok := viewer.FromContext(ctx)
+	if !ok {
+		return "", errNoContext
+	}
+	return svc.ds.ConfirmPendingEmailChange(vc.UserID(), token)
 }
 
 func (svc service) User(ctx context.Context, id uint) (*kolide.User, error) {
