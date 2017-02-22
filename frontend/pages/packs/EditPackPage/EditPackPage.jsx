@@ -169,9 +169,6 @@ export class EditPackPage extends Component {
     };
 
     dispatch(create(scheduledQueryData))
-      .then(() => {
-        dispatch(renderFlash('success', 'Query scheduled!'));
-      })
       .catch(() => {
         dispatch(renderFlash('error', 'Unable to schedule your query.'));
       });
