@@ -94,6 +94,10 @@
     .query-results-table__table-wrapper {
       max-height: 86%;
     }
+
+    .query-progress-details__run-btn {
+      display: none;
+    }
   }
 
   &--shrinking {

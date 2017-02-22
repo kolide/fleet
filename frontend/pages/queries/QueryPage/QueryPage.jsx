@@ -26,7 +26,6 @@ import { toggleSmallNav } from 'redux/nodes/app/actions';
 import { selectOsqueryTable, setSelectedTargets, setSelectedTargetsQuery } from 'redux/nodes/components/QueryPages/actions';
 import targetInterface from 'interfaces/target';
 import validateQuery from 'components/forms/validators/validate_query';
-import Spinner from 'components/loaders/Spinner';
 
 const baseClass = 'query-page';
 const DEFAULT_CAMPAIGN = {
@@ -187,7 +186,6 @@ export class QueryPage extends Component {
         return Kolide.websockets.queries.run(campaignResponse.id)
           .then((socket) => {
             this.setupDistributedQuery(socket);
-            // this.socket = socket;
             this.setState({
               campaign: campaignResponse,
               queryIsRunning: true,
@@ -208,7 +206,6 @@ export class QueryPage extends Component {
                   const { status } = updatedCampaign;
 
                   if (status === 'finished') {
-                    this.setState({ queryIsRunning: false });
                     this.teardownDistributedQuery();
 
                     return false;
@@ -258,11 +255,9 @@ export class QueryPage extends Component {
   onStopQuery = (evt) => {
     evt.preventDefault();
 
-    const { removeSocket } = this;
+    const { teardownDistributedQuery } = this;
 
-    this.setState({ queryIsRunning: false });
-
-    return removeSocket();
+    return teardownDistributedQuery();
   }
 
   onTargetSelect = (selectedTargets) => {
@@ -375,7 +370,10 @@ export class QueryPage extends Component {
       this.runQueryInterval = null;
     }
 
-    this.setState({ runQueryMilliseconds: 0 });
+    this.setState({
+      queryIsRunning: false,
+      runQueryMilliseconds: 0,
+    });
     this.removeSocket();
 
     return false;
@@ -414,7 +412,13 @@ export class QueryPage extends Component {
   }
 
   renderResultsTable = () => {
-    const { campaign, queryIsRunning, queryResultsToggle, queryText, runQueryMilliseconds } = this.state;
+    const {
+      campaign,
+      queryIsRunning,
+      queryResultsToggle,
+      queryText,
+      runQueryMilliseconds,
+    } = this.state;
     const { onExportQueryResults, onToggleQueryFullScreen, onRunQuery, onStopQuery, onTargetSelect } = this;
     const loading = queryIsRunning && !campaign.hosts_count.total;
     const isQueryFullScreen = queryResultsToggle === QUERY_RESULTS_OPTIONS.FULL_SCREEN;
@@ -429,10 +433,8 @@ export class QueryPage extends Component {
       return false;
     }
 
-    if (loading) {
-      resultBody = <Spinner />;
-    } else {
-      resultBody = (
+    return (
+      <div className={resultsClasses}>
         <QueryResultsTable
           campaign={campaign}
           onExportQueryResults={onExportQueryResults}
@@ -446,12 +448,6 @@ export class QueryPage extends Component {
           queryIsRunning={queryIsRunning}
           queryTimerMilliseconds={runQueryMilliseconds}
         />
-      );
-    }
-
-    return (
-      <div className={resultsClasses}>
-        {resultBody}
       </div>
     );
   }

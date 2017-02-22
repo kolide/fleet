@@ -9,6 +9,7 @@ import Icon from 'components/icons/Icon';
 import InputField from 'components/forms/fields/InputField';
 import QueryResultsRow from 'components/queries/QueryResultsTable/QueryResultsRow';
 import QueryProgressDetails from 'components/queries/QueryProgressDetails';
+import Spinner from 'components/loaders/Spinner';
 
 const baseClass = 'query-results-table';
 
@@ -111,12 +112,39 @@ class QueryResultsTable extends Component {
     });
   }
 
+  renderTable = () => {
+    const {
+      renderTableHeaderRow,
+      renderTableRows,
+    } = this;
+
+    const { queryIsRunning, campaign } = this.props;
+
+    const loading = queryIsRunning && !campaign.hosts_count.total;
+
+    if (loading) {
+      return <Spinner />;
+    }
+
+    return (
+      <table className={`${baseClass}__table`}>
+        <thead>
+          {renderTableHeaderRow()}
+        </thead>
+        <tbody>
+          {renderTableRows()}
+        </tbody>
+      </table>
+    );
+  }
+
   render () {
     const {
       campaign,
       onExportQueryResults,
       isQueryFullScreen,
       isQueryShrinking,
+      isQueryLoading,
       onToggleQueryFullScreen,
       onRunQuery,
       onStopQuery,
@@ -125,10 +153,7 @@ class QueryResultsTable extends Component {
       queryTimerMilliseconds,
     } = this.props;
 
-    const {
-      renderTableHeaderRow,
-      renderTableRows,
-    } = this;
+    const { renderTable } = this;
 
     const { hosts_count: hostsCount } = campaign;
 
@@ -182,14 +207,7 @@ class QueryResultsTable extends Component {
           </Button>
         </header>
         <div className={`${baseClass}__table-wrapper`}>
-          <table className={`${baseClass}__table`}>
-            <thead>
-              {renderTableHeaderRow()}
-            </thead>
-            <tbody>
-              {renderTableRows()}
-            </tbody>
-          </table>
+          {renderTable()}
         </div>
       </div>
     );
