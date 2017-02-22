@@ -302,6 +302,19 @@ export class QueryPage extends Component {
       minHeight: `${parent.offsetHeight}px`,
       position: 'fixed',
     };
+
+    const resetPosition = {
+      position: 'static',
+      maxWidth: 'auto',
+      minWidth: 'auto',
+      maxHeight: 'auto',
+      minHeight: 'auto',
+      top: 'auto',
+      right: 'auto',
+      bottom: 'auto',
+      left: 'auto',
+    };
+
     let newPosition = clone(defaultPosition);
     let newState;
     let callback;
@@ -331,13 +344,7 @@ export class QueryPage extends Component {
         grandParent.style.height = `${newPosition.maxHeight}`;
 
         window.setTimeout(() => {
-          parent.style = {
-            position: 'static',
-            maxWidth: 'auto',
-            minWidth: 'auto',
-            maxHeight: 'auto',
-            minHeight: 'auto',
-          };
+          merge(parent.style, resetPosition);
         }, 500);
       };
     }
