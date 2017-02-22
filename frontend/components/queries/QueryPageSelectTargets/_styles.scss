@@ -2,22 +2,4 @@
   &__wrapper {
     padding: $base;
   }
-
-  &__progress-details {
-    display: inline-block;
-    width: 420px;
-
-    em {
-      color: $accent-text;
-      font-size: 0.8em;
-    }
-  }
-
-  &__query-btn-wrapper {
-    float: right;
-
-    button {
-      margin-left: 10px;
-    }
-  }
 }

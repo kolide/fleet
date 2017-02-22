@@ -283,6 +283,23 @@ export class QueryPage extends Component {
   };
 
   onToggleQueryFullScreen = (evt) => {
+    const toggleSmallNav = () => {
+      const { document } = global;
+
+      const siteNav = document.getElementsByClassName('site-nav');
+      const coreWrapper = document.getElementsByClassName('core-wrapper');
+
+      if (siteNav.length) {
+        siteNav[0].classList.toggle('site-nav--small');
+      }
+
+      if (siteNav.length) {
+        coreWrapper[0].classList.toggle('core-wrapper--small');
+      }
+
+      return false;
+    };
+
     const { document: { body }, window } = global;
     const { queryResultsToggle, queryPosition } = this.state;
     const { parentNode: { parentNode: parent } } = evt.currentTarget;
@@ -312,8 +329,7 @@ export class QueryPage extends Component {
 
       callback = () => {
         body.style.overflow = 'hidden';
-        document.getElementsByClassName('site-nav')[0].classList.add('site-nav--small');
-        document.getElementsByClassName('core-wrapper')[0].classList.add('core-wrapper--small');
+        toggleSmallNav();
         merge(parent.style, newPosition);
         grandParent.style.height = `${newPosition.maxHeight}`;
       };
@@ -324,8 +340,7 @@ export class QueryPage extends Component {
 
       callback = () => {
         body.style.overflow = 'visible';
-        document.getElementsByClassName('site-nav')[0].classList.remove('site-nav--small');
-        document.getElementsByClassName('core-wrapper')[0].classList.remove('core-wrapper--small');
+        toggleSmallNav();
         newPosition = queryPosition;
         merge(parent.style, newPosition);
         grandParent.style.height = `${newPosition.maxHeight}`;
@@ -337,7 +352,7 @@ export class QueryPage extends Component {
             minWidth: 'auto',
             maxHeight: 'auto',
             minHeight: 'auto',
-          }
+          };
         }, 500);
       };
     }
@@ -380,8 +395,8 @@ export class QueryPage extends Component {
   }
 
   renderResultsTable = () => {
-    const { campaign, queryIsRunning, queryResultsToggle } = this.state;
-    const { onExportQueryResults, onToggleQueryFullScreen } = this;
+    const { campaign, queryIsRunning, queryResultsToggle, queryText } = this.state;
+    const { onExportQueryResults, onToggleQueryFullScreen, onRunQuery, onStopQuery, onTargetSelect } = this;
     const loading = queryIsRunning && !campaign.hosts_count.total;
     const isQueryFullScreen = queryResultsToggle === QUERY_RESULTS_OPTIONS.FULL_SCREEN;
     const isQueryShrinking = queryResultsToggle === QUERY_RESULTS_OPTIONS.SHRINKING;
@@ -398,7 +413,20 @@ export class QueryPage extends Component {
     if (loading) {
       resultBody = <Spinner />;
     } else {
-      resultBody = <QueryResultsTable campaign={campaign} onExportQueryResults={onExportQueryResults} isQueryFullScreen={isQueryFullScreen} isQueryShrinking={isQueryShrinking} onToggleQueryFullScreen={onToggleQueryFullScreen} />;
+      resultBody = (
+        <QueryResultsTable
+          campaign={campaign}
+          onExportQueryResults={onExportQueryResults}
+          isQueryFullScreen={isQueryFullScreen}
+          isQueryShrinking={isQueryShrinking}
+          onToggleQueryFullScreen={onToggleQueryFullScreen}
+          onRunQuery={onRunQuery}
+          onStopQuery={onStopQuery}
+          onTargetSelect={onTargetSelect}
+          query={queryText}
+          queryIsRunning={queryIsRunning}
+        />
+      );
     }
 
     return (

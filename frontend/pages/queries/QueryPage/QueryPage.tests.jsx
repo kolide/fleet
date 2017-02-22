@@ -114,7 +114,7 @@ describe('QueryPage - component', () => {
   it('sets targetError in state when the query is run and there are no selected targets', () => {
     const page = mount(connectedComponent(ConnectedQueryPage, { mockStore, props: locationProp }));
     const QueryPageSelectTargets = page.find('QueryPageSelectTargets');
-    const runQueryBtn = page.find('.query-page-select-targets__run-query-btn');
+    const runQueryBtn = page.find('.query-progress-details__run-btn');
 
     expect(QueryPageSelectTargets.prop('error')).toNotExist();
 

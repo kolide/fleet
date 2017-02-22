@@ -35,7 +35,7 @@
     border-radius: 3px;
     box-shadow: inset 0 0 8px 0 rgba(0, 0, 0, 0.12);
     overflow: scroll;
-    margin-top: 58px;
+    margin-top: 30px;
     max-height: 550px;
     width: 100%;
   }
@@ -104,12 +104,6 @@
   &__fullscreen-btn {
     float: right;
     margin-left: 15px;
-    color:  #c3cad3;
-
-    .kolidecon {
-      font-size: 30px;
-      line-height: 38px;
-    }
   }
 }
 

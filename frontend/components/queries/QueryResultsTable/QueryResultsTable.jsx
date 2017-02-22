@@ -8,6 +8,7 @@ import filterArrayByHash from 'utilities/filter_array_by_hash';
 import Icon from 'components/icons/Icon';
 import InputField from 'components/forms/fields/InputField';
 import QueryResultsRow from 'components/queries/QueryResultsTable/QueryResultsRow';
+import QueryProgressDetails from 'components/queries/QueryProgressDetails';
 
 const baseClass = 'query-results-table';
 
@@ -18,6 +19,10 @@ class QueryResultsTable extends Component {
     onToggleQueryFullScreen: PropTypes.func,
     isQueryFullScreen: PropTypes.bool,
     isQueryShrinking: PropTypes.bool,
+    onRunQuery: PropTypes.func.isRequired,
+    onStopQuery: PropTypes.func.isRequired,
+    query: PropTypes.string,
+    queryIsRunning: PropTypes.bool,
   };
 
   constructor (props) {
@@ -112,6 +117,10 @@ class QueryResultsTable extends Component {
       isQueryFullScreen,
       isQueryShrinking,
       onToggleQueryFullScreen,
+      onRunQuery,
+      onStopQuery,
+      query,
+      queryIsRunning,
     } = this.props;
 
     const {
@@ -145,10 +154,19 @@ class QueryResultsTable extends Component {
     return (
       <div className={resultsTableWrapClass}>
         <header className={`${baseClass}__button-wrap`}>
+          {isQueryFullScreen && <QueryProgressDetails
+            campaign={campaign}
+            onRunQuery={onRunQuery}
+            onStopQuery={onStopQuery}
+            query={query}
+            queryIsRunning={queryIsRunning}
+            className={`${baseClass}__full-screen`}
+          />}
+
           <Button
             className={toggleFullScreenBtnClass}
             onClick={onToggleQueryFullScreen}
-            variant="unstyled"
+            variant="muted"
           >
             <Icon name={isQueryFullScreen ? 'windowed' : 'fullscreen'} />
           </Button>
