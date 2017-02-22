@@ -291,6 +291,7 @@ export class QueryPage extends Component {
     const { document: { body }, window } = global;
     const { queryResultsToggle, queryPosition } = this.state;
     const { dispatch } = this.props;
+    window.scrollTo(0, 0);
     const { parentNode: { parentNode: parent } } = evt.currentTarget;
     const { parentNode: grandParent } = parent;
     const rect = parent.getBoundingClientRect();
