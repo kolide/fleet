@@ -144,7 +144,6 @@ class QueryResultsTable extends Component {
       onExportQueryResults,
       isQueryFullScreen,
       isQueryShrinking,
-      isQueryLoading,
       onToggleQueryFullScreen,
       onRunQuery,
       onStopQuery,
