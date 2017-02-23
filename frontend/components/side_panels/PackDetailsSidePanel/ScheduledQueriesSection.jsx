@@ -1,8 +1,6 @@
 import React, { Component, PropTypes } from 'react';
-import { take } from 'lodash';
 import { Link } from 'react-router';
 
-import Button from 'components/buttons/Button';
 import Icon from 'components/icons/Icon';
 import scheduledQueryInterface from 'interfaces/scheduled_query';
 
