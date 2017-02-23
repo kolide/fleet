@@ -25,7 +25,9 @@ global.window.getSelection = () => {
     removeAllRanges: () => { return true; },
   };
 };
+
 global.navigator = global.window.navigator;
+
 chrome.setDefaultService(new chrome.ServiceBuilder(chromedriver.path).build());
 global.webDriver = new webdriver.Builder()
   .withCapabilities(webdriver.Capabilities.chrome())

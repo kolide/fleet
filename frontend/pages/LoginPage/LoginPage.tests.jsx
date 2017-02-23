@@ -1,11 +1,41 @@
 import expect from 'expect';
 import { mount } from 'enzyme';
+import selenium from 'selenium-webdriver';
 
 import { connectedComponent, reduxMockStore } from '../../test/helpers';
 import local from '../../utilities/local';
 import LoginPage from './LoginPage';
 
 describe('LoginPage - component', () => {
+  describe('acceptance', () => {
+    after(() => global.webDriver.quit());
+
+    it('logs a user in', () => {
+      const driver = global.webDriver;
+      const { By } = selenium;
+
+      driver.get('https://localhost:8080');
+
+      driver
+        .findElement(By.name('username'))
+        .sendKeys('admin');
+
+      const passwordInput = driver
+        .findElement(By.name('password'));
+
+      passwordInput.sendKeys('p@ssw0rd');
+
+      passwordInput.submit();
+
+      const el = driver.findElement(By.css('.login-success'));
+
+      return el.getText()
+        .then((text) => {
+          expect(text).toInclude('Taking you to the Kolide application...');
+        });
+    }).timeout(5000);
+  });
+
   context('when the user is not logged in', () => {
     const mockStore = reduxMockStore({ auth: {} });
 
