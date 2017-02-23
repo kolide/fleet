@@ -1,4 +1,7 @@
 import jsdom from 'jsdom';
+import webdriver from 'selenium-webdriver';
+import chrome from 'selenium-webdriver/chrome';
+import chromedriver from 'chromedriver';
 
 const doc = jsdom.jsdom(
   `<!doctype html>
@@ -23,6 +26,10 @@ global.window.getSelection = () => {
   };
 };
 global.navigator = global.window.navigator;
+chrome.setDefaultService(new chrome.ServiceBuilder(chromedriver.path).build());
+global.webDriver = new webdriver.Builder()
+  .withCapabilities(webdriver.Capabilities.chrome())
+  .build();
 
 function mockStorage() {
   let storage = {};
