@@ -87,10 +87,6 @@ describe('QueryResultsTable - component', () => {
     expect(QueryProgressDetails.length).toEqual(0, 'QueryProgressDetails did not render');
   });
 
-  it('does not return HTML when there are no query results', () => {
-    expect(componentWithoutQueryResults.html()).toNotExist();
-  });
-
   it('sets the column headers to the keys of the query results', () => {
     const queryResultKeys = keys(queryResult.rows[0]);
     const tableHeaderText = componentWithQueryResults.find('thead').text();

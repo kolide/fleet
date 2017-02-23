@@ -165,11 +165,7 @@ class QueryResultsTable extends Component {
       [`${baseClass}__fullscreen-btn--active`]: isQueryFullScreen,
     });
 
-    if (!hostsCount || !hostsCount.total) {
-      return false;
-    }
-
-    if (!hostsCount.successful) {
+    if (!queryIsRunning && !hostsCount.successful) {
       return (
         <div className={`${baseClass} ${baseClass}__no-results`}>
           <em>No results found</em>

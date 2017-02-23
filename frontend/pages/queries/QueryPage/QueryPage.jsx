@@ -435,7 +435,7 @@ export class QueryPage extends Component {
       [`${baseClass}__results--full-screen`]: isQueryFullScreen,
     });
 
-    if (!loading && isEqual(campaign, DEFAULT_CAMPAIGN)) {
+    if (isEqual(campaign, DEFAULT_CAMPAIGN)) {
       return false;
     }
 

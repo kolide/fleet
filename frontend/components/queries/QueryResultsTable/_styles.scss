@@ -31,13 +31,19 @@
   }
 
   &__table-wrapper {
+    @include display(flex);
     border: solid 1px $accent-dark;
     border-radius: 3px;
     box-shadow: inset 0 0 8px 0 rgba(0, 0, 0, 0.12);
     overflow: scroll;
     margin-top: 30px;
+    min-height: 400px;
     max-height: 550px;
     width: 100%;
+
+    .kolide-spinner {
+      @include align-self(center);
+    }
   }
 
   &__table {
