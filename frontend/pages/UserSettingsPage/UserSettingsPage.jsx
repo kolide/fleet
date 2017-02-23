@@ -37,6 +37,7 @@ export class UserSettingsPage extends Component {
     super(props);
 
     this.state = {
+      pendingEmail: undefined,
       showEmailModal: false,
       showPasswordModal: false,
       updatedUser: {},
@@ -102,6 +103,10 @@ export class UserSettingsPage extends Component {
 
     return dispatch(updateUser(user, updatedUser))
       .then(() => {
+        if (updatedUser.email) {
+          this.setState({ pendingEmail: updatedUser.email });
+        }
+
         dispatch(renderFlash('success', 'Account updated!'));
 
         return true;
@@ -185,6 +190,7 @@ export class UserSettingsPage extends Component {
       renderPasswordModal,
     } = this;
     const { errors, user } = this.props;
+    const { pendingEmail } = this.state;
 
     if (!user) {
       return false;
@@ -202,6 +208,7 @@ export class UserSettingsPage extends Component {
             formData={user}
             handleSubmit={handleSubmit}
             onCancel={onCancel}
+            pendingEmail={pendingEmail}
             serverErrors={errors}
           />
         </div>
