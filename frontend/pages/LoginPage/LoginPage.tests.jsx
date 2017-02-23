@@ -1,10 +1,10 @@
 import expect from 'expect';
 import { mount } from 'enzyme';
-import selenium from 'selenium-webdriver';
 
-import { connectedComponent, reduxMockStore } from '../../test/helpers';
-import local from '../../utilities/local';
-import LoginPage from './LoginPage';
+import { connectedComponent, reduxMockStore } from 'test/helpers';
+import local from 'utilities/local';
+import LoginPage from 'pages/LoginPage';
+import LoginPageObject from 'test/PageObjects/LoginPage';
 
 describe('LoginPage - component', () => {
   describe('acceptance', () => {
@@ -12,24 +12,14 @@ describe('LoginPage - component', () => {
 
     it('logs a user in', () => {
       const driver = global.webDriver;
-      const { By } = selenium;
+      const page = LoginPageObject(driver);
 
-      driver.get('https://localhost:8080');
+      page.navigate();
+      page.enterUsername('admin');
+      page.enterPassword('p@ssw0rd');
+      page.submit();
 
-      driver
-        .findElement(By.name('username'))
-        .sendKeys('admin');
-
-      const passwordInput = driver
-        .findElement(By.name('password'));
-
-      passwordInput.sendKeys('p@ssw0rd');
-
-      passwordInput.submit();
-
-      const el = driver.findElement(By.css('.login-success'));
-
-      return el.getText()
+      return page.getSuccessText()
         .then((text) => {
           expect(text).toInclude('Taking you to the Kolide application...');
         });
