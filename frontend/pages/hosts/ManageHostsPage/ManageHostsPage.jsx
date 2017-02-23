@@ -20,6 +20,7 @@ import LabelForm from 'components/forms/LabelForm';
 import LonelyHost from 'components/hosts/LonelyHost';
 import AddHostModal from 'components/hosts/AddHostModal';
 import Icon from 'components/icons/Icon';
+import Spinner from 'components/loaders/Spinner';
 import Kolide from 'kolide';
 import PlatformIcon from 'components/icons/PlatformIcon';
 import osqueryTableInterface from 'interfaces/osquery_table';
@@ -240,7 +241,7 @@ export class ManageHostsPage extends Component {
     const { dispatch } = this.props;
 
     const promises = [
-      dispatch(hostActions.silentLoadAll()),
+      dispatch(hostActions.loadAll()),
       dispatch(labelActions.silentLoadAll()),
       dispatch(silentGetStatusLabelCounts),
     ];
@@ -493,7 +494,7 @@ export class ManageHostsPage extends Component {
   }
 
   renderHosts = () => {
-    const { display, isAddLabel, selectedLabel } = this.props;
+    const { display, isAddLabel, selectedLabel, loadingHosts } = this.props;
     const { toggleDeleteHostModal, filterHosts, onQueryHost, sortHosts, renderNoHosts, toggleAddHostModal } = this;
 
     if (isAddLabel) {
@@ -503,7 +504,11 @@ export class ManageHostsPage extends Component {
     const filteredHosts = filterHosts();
     const sortedHosts = sortHosts(filteredHosts);
 
-    if (sortedHosts.length === 0) {
+    if (loadingHosts) {
+      return <Spinner />;
+    }
+
+    if (sortedHosts.length === 0 && !loadingHosts) {
       if (selectedLabel && selectedLabel.type === 'all') {
         return <LonelyHost onClick={toggleAddHostModal} />;
       }
@@ -614,16 +619,13 @@ export class ManageHostsPage extends Component {
 
   render () {
     const { renderForm, renderHeader, renderHosts, renderSidePanel, renderAddHostModal, renderDeleteHostModal, renderDeleteLabelModal } = this;
-    const { display, isAddLabel, loadingHosts, loadingLabels } = this.props;
+    const { display, isAddLabel, loadingLabels } = this.props;
     const { isEditLabel } = this.state;
-
-    if (loadingHosts || loadingLabels) {
-      return false;
-    }
 
     return (
       <div className="has-sidebar">
         {renderForm()}
+
         {!isAddLabel && !isEditLabel &&
           <div className={`${baseClass} body-wrap`}>
             {renderHeader()}
@@ -633,7 +635,7 @@ export class ManageHostsPage extends Component {
           </div>
         }
 
-        {renderSidePanel()}
+        {!loadingLabels && renderSidePanel()}
         {renderAddHostModal()}
         {renderDeleteHostModal()}
         {renderDeleteLabelModal()}
