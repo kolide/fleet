@@ -94,7 +94,7 @@ func updateNicsForHost(tx *sqlx.Tx, host *kolide.Host) ([]*kolide.NetworkInterfa
 			type
 		) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 		ON DUPLICATE KEY UPDATE
-                        id = LAST_INSERT_ID(id),
+			id = LAST_INSERT_ID(id),
 			mac = VALUES(mac),
 			broadcast = VALUES(broadcast),
 			ibytes = VALUES(ibytes),
@@ -213,23 +213,11 @@ func (d *Datastore) SaveHost(host *kolide.Host) error {
 		return errors.Wrap(err, "executing main SQL statement")
 	}
 
-	fmt.Println("debug before update nics")
-	fmt.Printf("%+v\n", *host)
-	for _, n := range host.NetworkInterfaces {
-		fmt.Printf("%+v\n", *n)
-	}
-	fmt.Println("")
 	host.NetworkInterfaces, err = updateNicsForHost(tx, host)
 	if err != nil {
 		tx.Rollback()
 		return errors.Wrap(err, "updating nics")
 	}
-	fmt.Println("debug after update nics")
-	fmt.Printf("%+v\n", *host)
-	for _, n := range host.NetworkInterfaces {
-		fmt.Printf("%+v\n", *n)
-	}
-	fmt.Println("")
 
 	if err = removedUnusedNics(tx, host); err != nil {
 		tx.Rollback()

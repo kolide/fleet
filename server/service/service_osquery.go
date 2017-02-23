@@ -293,13 +293,6 @@ var detailQueries = map[string]struct {
 			}
 			networkInterfaces := []*kolide.NetworkInterface{}
 
-			fmt.Println("debug network ingest")
-			fmt.Printf("%+v\n", *host)
-			for _, n := range host.NetworkInterfaces {
-				fmt.Printf("%+v\n", *n)
-			}
-			fmt.Println("")
-
 			for _, row := range rows {
 				nic := kolide.NetworkInterface{}
 
@@ -346,13 +339,6 @@ var detailQueries = map[string]struct {
 			}
 
 			host.NetworkInterfaces = networkInterfaces
-
-			fmt.Println("debug after ingest")
-			fmt.Printf("%+v\n", *host)
-			for _, n := range host.NetworkInterfaces {
-				fmt.Printf("%+v\n", *n)
-			}
-			fmt.Println("")
 
 			return nil
 		},
