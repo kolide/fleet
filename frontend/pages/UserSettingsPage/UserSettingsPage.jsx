@@ -102,15 +102,11 @@ export class UserSettingsPage extends Component {
 
     return dispatch(updateUser(user, updatedUser))
       .then(() => {
-        return dispatch(renderFlash('success', 'Account updated!'));
-      })
-      .catch((response) => {
-        if (response.password) {
-          dispatch(renderFlash('error', response.password));
-        }
+        dispatch(renderFlash('success', 'Account updated!'));
 
-        return false;
-      });
+        return true;
+      })
+      .catch(() => false);
   }
 
   handleSubmitPasswordForm = (formData) => {
@@ -126,13 +122,15 @@ export class UserSettingsPage extends Component {
   }
 
   renderEmailModal = () => {
+    const { errors } = this.props;
     const { updatedUser, showEmailModal } = this.state;
     const { handleSubmit, onToggleEmailModal } = this;
 
     const emailSubmit = (formData) => {
-      console.log(formData);
-      onToggleEmailModal();
-      handleSubmit(formData);
+      handleSubmit(formData)
+        .then((r) => {
+          return r ? onToggleEmailModal() : false;
+        });
     };
 
     if (!showEmailModal) {
@@ -148,6 +146,7 @@ export class UserSettingsPage extends Component {
           formData={updatedUser}
           handleSubmit={emailSubmit}
           onCancel={onToggleEmailModal}
+          serverErrors={errors}
         />
       </Modal>
     );
