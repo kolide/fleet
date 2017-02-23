@@ -5,16 +5,19 @@ import Form from 'components/forms/Form';
 import formFieldInterface from 'interfaces/form_field';
 import InputField from 'components/forms/fields/InputField';
 
+const baseClass = 'change-email-form';
+
 class ChangeEmailForm extends Component {
   static propTypes = {
     fields: PropTypes.shape({
       password: formFieldInterface.isRequired,
     }).isRequired,
     handleSubmit: PropTypes.func.isRequired,
+    onCancel: PropTypes.func.isRequired,
   };
 
   render () {
-    const { fields, handleSubmit } = this.props;
+    const { fields, handleSubmit, onCancel } = this.props;
 
     return (
       <form onSubmit={handleSubmit}>
@@ -24,9 +27,12 @@ class ChangeEmailForm extends Component {
           label="Password"
           type="password"
         />
-        <Button block type="submit" variant="brand">
-          Submit
-        </Button>
+        <div className={`${baseClass}__btn-wrap`}>
+          <Button className={`${baseClass}__btn`} type="submit" variant="brand">
+            Submit
+          </Button>
+          <Button onClick={onCancel} variant="inverse" className={`${baseClass}__btn`}>Cancel</Button>
+        </div>
       </form>
     );
   }
