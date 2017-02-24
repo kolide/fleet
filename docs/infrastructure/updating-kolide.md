@@ -35,7 +35,7 @@ docker pull kolide/kolide
 Update Kolide through the Apt repository (the repository should have been added during initial install):
 
 ```
-sudo apt-get install kolide
+sudo apt-get update && sudo apt-get install kolide
 ```
 
 #### Yum Packages (CentOS, RHEL, Amazon Linux)
