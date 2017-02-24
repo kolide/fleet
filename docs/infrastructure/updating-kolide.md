@@ -8,6 +8,8 @@ There are two steps to perform a typical Kolide update. If any other steps are r
 1. [Update the Kolide binary](#updating-the-kolide-binary)
 2. [Run database migrations](#running-database-migrations)
 
+As with any enterprise software update, it's a good idea to back up your MySQL data before updating Kolide.
+
 ## Updating the Kolide binary
 
 Follow the binary update instructions corresponding to the original installation method used to install Kolide.
