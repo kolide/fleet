@@ -28,7 +28,11 @@ class TargetOption extends Component {
       target_type: targetType,
     } = target;
 
-    if (targetType === 'hosts' && hostIpAddress) {
+    if (targetType === 'hosts') {
+      if (!hostIpAddress) {
+        return false;
+      }
+
       return (
         <span>
           <span className={`${baseClass}__delimeter`}>&bull;</span>
