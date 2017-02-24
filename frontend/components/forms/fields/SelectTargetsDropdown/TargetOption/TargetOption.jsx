@@ -28,7 +28,7 @@ class TargetOption extends Component {
       target_type: targetType,
     } = target;
 
-    if (targetType === 'hosts') {
+    if (targetType === 'hosts' && hostIpAddress) {
       return (
         <span>
           <span className={`${baseClass}__delimeter`}>&bull;</span>
@@ -54,13 +54,13 @@ class TargetOption extends Component {
 
     return (
       <div className={wrapperClassName}>
-        <button className={`button button--unstyled ${baseClass}__add-btn`} onClick={handleSelect}>
-          <Icon name="add-button" />
-        </button>
         <button className={`button button--unstyled ${baseClass}__target-content`} onClick={onMoreInfoClick(target)}>
           <TargetIcon target={target} />
           <span className={`${baseClass}__label-label`}>{displayText}</span>
           {renderTargetDetail()}
+        </button>
+        <button className={`button button--unstyled ${baseClass}__add-btn`} onClick={handleSelect}>
+          <Icon name="add-button" />
         </button>
       </div>
     );
