@@ -5,8 +5,8 @@ This guide explains how to update and run new versions of Kolide. For initial in
 
 There are two steps to perform a typical Kolide update. If any other steps are required, they will be noted in the release notes.
 
-1. Update the Kolide binary
-2. Run database migrations
+1. [Update the Kolide binary](#updating-the-kolide-binary)
+2. [Run database migrations](#running-database-migrations)
 
 ## Updating the Kolide binary
 
