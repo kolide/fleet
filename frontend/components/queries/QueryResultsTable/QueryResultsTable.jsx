@@ -119,8 +119,9 @@ class QueryResultsTable extends Component {
     } = this;
 
     const { queryIsRunning, campaign } = this.props;
+    const { query_results: queryResults } = campaign;
 
-    const loading = queryIsRunning && !campaign.hosts_count.total;
+    const loading = queryIsRunning && (!queryResults || !queryResults.length);
 
     if (loading) {
       return <Spinner />;
@@ -154,7 +155,7 @@ class QueryResultsTable extends Component {
 
     const { renderTable } = this;
 
-    const { hosts_count: hostsCount } = campaign;
+    const { hosts_count: hostsCount, query_results: queryResults } = campaign;
 
     const resultsTableWrapClass = classnames(baseClass, {
       [`${baseClass}--full-screen`]: isQueryFullScreen,
@@ -165,7 +166,7 @@ class QueryResultsTable extends Component {
       [`${baseClass}__fullscreen-btn--active`]: isQueryFullScreen,
     });
 
-    if (!queryIsRunning && !hostsCount.successful) {
+    if (!queryIsRunning && (!hostsCount.successful || (!queryResults || !queryResults.length))) {
       return (
         <div className={`${baseClass} ${baseClass}__no-results`}>
           <em>No results found</em>

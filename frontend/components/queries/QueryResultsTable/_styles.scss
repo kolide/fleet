@@ -3,7 +3,6 @@
   padding: $pad-base;
   width: 100%;
   box-sizing: border-box;
-  z-index: 99;
 
   &__button-wrap {
     @include clearfix;
@@ -96,6 +95,7 @@
     border-radius: 3px;
     box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.1);
     border: solid 1px $silver;
+    z-index: 99;
 
     .query-results-table__table-wrapper {
       max-height: 86%;
@@ -109,6 +109,7 @@
   &--shrinking {
     animation: shrinkFullScreen 500ms;
     animation-fill-mode: forwards;
+    z-index: 99;
   }
 
   &__fullscreen-btn {
