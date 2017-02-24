@@ -2,15 +2,18 @@ package license
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"sync"
 	"time"
 
 	"github.com/WatchBeam/clock"
 	"github.com/go-kit/kit/log"
 	"github.com/kolide/kolide/server/kolide"
+	"github.com/kolide/kolide/server/version"
+	"github.com/pkg/errors"
+	"golang.org/x/net/context"
 )
 
 const (
@@ -46,6 +49,7 @@ type Checker struct {
 	ticker        clock.Ticker
 	client        *http.Client
 	finish        chan struct{}
+	run           chan struct{}
 }
 
 type Option func(chk *Checker)
@@ -90,6 +94,7 @@ func NewChecker(ds kolide.Datastore, licenseEndpointURL string, opts ...Option) 
 		client:        &http.Client{Timeout: defaultHttpClientTimeout},
 		url:           licenseEndpointURL,
 		ticker:        defaultTicker,
+		run:           make(chan struct{}),
 		finish:        make(chan struct{}),
 	}
 	for _, o := range opts {
@@ -123,6 +128,8 @@ func (cc *Checker) Start() error {
 				return
 			case <-chk.ticker.Chan():
 				updateLicenseRevocation(&chk)
+			case <-cc.run:
+				updateLicenseRevocation(&chk)
 			}
 		}
 	}(*cc, &wait)
@@ -136,6 +143,27 @@ func (cc *Checker) Stop() {
 	close(cc.finish)
 	wait.Wait()
 	cc.finish = nil
+}
+
+// CheckinLicense signals the Checker to run immediately instead of waiting
+// for time.Ticker.
+func (cc *Checker) CheckinLicense(ctx context.Context) {
+	go func() { cc.run <- struct{}{} }()
+}
+
+// addVersionInfo parses the license URL and adds the current revision of the
+// kolide binary to the query params. The reported revision is set using
+// ldflags by the make command, otherwise defaults to 'unknown'.
+func addVersionInfo(licenseURL string) (*url.URL, error) {
+	ur, err := url.Parse(licenseURL)
+	if err != nil {
+		return nil, errors.Wrapf(err, "license checker failed to parse URL string %q", licenseURL)
+	}
+	revision := version.Version().Revision
+	q := ur.Query()
+	q.Set("version", revision)
+	ur.RawQuery = q.Encode()
+	return ur, nil
 }
 
 func updateLicenseRevocation(chk *Checker) {
@@ -152,13 +180,20 @@ func updateLicenseRevocation(chk *Checker) {
 		chk.logger.Log("msg", "fetching claims", "err", err)
 		return
 	}
-	url := fmt.Sprintf("%s/%s", chk.url, claims.LicenseUUID)
-	resp, err := chk.client.Get(url)
+
+	licenseURL, err := addVersionInfo(fmt.Sprintf("%s/%s", chk.url, claims.LicenseUUID))
 	if err != nil {
-		chk.logger.Log("msg", fmt.Sprintf("fetching %s", url), "err", err)
+		chk.logger.Log("msg", "adding version informatin to license", "err", err)
+		return
+	}
+
+	resp, err := chk.client.Get(licenseURL.String())
+	if err != nil {
+		chk.logger.Log("msg", fmt.Sprintf("fetching %s", licenseURL.String()), "err", err)
 		return
 	}
 	defer resp.Body.Close()
+
 	switch resp.StatusCode {
 	case http.StatusOK:
 		var revInfo revokeInfo
