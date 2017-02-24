@@ -80,7 +80,13 @@ func (svc service) GetClientConfig(ctx context.Context) (*kolide.OsqueryConfig, 
 
 	config := &kolide.OsqueryConfig{
 		Options: options,
-		Packs:   kolide.Packs{},
+		Decorators: kolide.Decorators{
+			Load: []string{
+				"SELECT uuid AS host_uuid FROM system_info;",
+				"SELECT hostname AS hostname FROM system_info;",
+			},
+		},
+		Packs: kolide.Packs{},
 	}
 
 	packs, err := svc.ListPacksForHost(ctx, host.ID)
@@ -195,7 +201,6 @@ var detailQueries = map[string]struct {
 				return nil
 			}
 
-			host.Platform = rows[0]["build_platform"]
 			host.OsqueryVersion = rows[0]["version"]
 
 			return nil
@@ -258,6 +263,7 @@ var detailQueries = map[string]struct {
 				host.Build = build
 			}
 
+			host.Platform = rows[0]["platform"]
 			host.PlatformLike = rows[0]["platform_like"]
 			host.CodeName = rows[0]["code_name"]
 			return nil
