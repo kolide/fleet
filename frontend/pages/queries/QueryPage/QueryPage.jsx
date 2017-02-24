@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import classnames from 'classnames';
 import { connect } from 'react-redux';
 import FileSaver from 'file-saver';
-import { filter, includes, isArray, isEqual } from 'lodash';
+import { filter, get, includes, isArray, isEqual } from 'lodash';
 import moment from 'moment';
 import { push } from 'react-router-redux';
 
@@ -310,14 +310,16 @@ export class QueryPage extends Component {
     const { campaign, queryIsRunning } = this.state;
     const { onExportQueryResults } = this;
     const loading = queryIsRunning && !campaign.hosts_count.total;
+    const totalHostsCount = get(campaign, ['totals', 'count'], 0);
+
+    if (!loading && !totalHostsCount) {
+      return false;
+    }
+
     const resultsClasses = classnames(`${baseClass}__results`, 'body-wrap', {
       [`${baseClass}__results--loading`]: loading,
     });
     let resultBody = '';
-
-    if (!loading && isEqual(campaign, DEFAULT_CAMPAIGN)) {
-      return false;
-    }
 
     if (loading) {
       resultBody = <Spinner />;
