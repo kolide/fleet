@@ -84,7 +84,7 @@ func TestLicenseFound(t *testing.T) {
 		mockTicker(c.NewTicker(time.Millisecond)),
 	)
 	checker.Start()
-	checker.CheckinLicense(context.Background())
+	checker.RunLicenseCheck(context.Background())
 	<-time.After(10 * time.Millisecond)
 	c.AddTime(time.Millisecond)
 	c.AddTime(time.Millisecond)
@@ -137,7 +137,7 @@ func TestLicenseNotFound(t *testing.T) {
 		mockTicker(c.NewTicker(time.Millisecond)),
 	)
 	checker.Start()
-	checker.CheckinLicense(context.Background())
+	checker.RunLicenseCheck(context.Background())
 	<-time.After(10 * time.Millisecond)
 	c.AddTime(time.Millisecond)
 	<-time.After(10 * time.Millisecond)
@@ -212,7 +212,7 @@ func TestLicenseTimeout(t *testing.T) {
 		Logger(logger),
 	)
 	checker.Start()
-	checker.CheckinLicense(context.Background())
+	checker.RunLicenseCheck(context.Background())
 	<-time.After(10 * time.Millisecond)
 	c.AddTime(time.Millisecond)
 	<-time.After(10 * time.Millisecond)

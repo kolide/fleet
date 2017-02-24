@@ -145,9 +145,9 @@ func (cc *Checker) Stop() {
 	cc.finish = nil
 }
 
-// CheckinLicense signals the Checker to run immediately instead of waiting
+// RunLicenseCheck signals the Checker to run immediately instead of waiting
 // for time.Ticker.
-func (cc *Checker) CheckinLicense(ctx context.Context) {
+func (cc *Checker) RunLicenseCheck(ctx context.Context) {
 	go func() { cc.run <- struct{}{} }()
 }
 
@@ -183,7 +183,7 @@ func updateLicenseRevocation(chk *Checker) {
 
 	licenseURL, err := addVersionInfo(fmt.Sprintf("%s/%s", chk.url, claims.LicenseUUID))
 	if err != nil {
-		chk.logger.Log("msg", "adding version informatin to license", "err", err)
+		chk.logger.Log("msg", "adding version information to license", "err", err)
 		return
 	}
 

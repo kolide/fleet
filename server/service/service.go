@@ -9,12 +9,11 @@ import (
 	kitlog "github.com/go-kit/kit/log"
 	"github.com/kolide/kolide/server/config"
 	"github.com/kolide/kolide/server/kolide"
-	"golang.org/x/net/context"
 	lumberjack "gopkg.in/natefinch/lumberjack.v2"
 )
 
 // NewService creates a new service from the config struct
-func NewService(ds kolide.Datastore, resultStore kolide.QueryResultStore, logger kitlog.Logger, kolideConfig config.KolideConfig, mailService kolide.MailService, c clock.Clock, checker LicenseChecker) (kolide.Service, error) {
+func NewService(ds kolide.Datastore, resultStore kolide.QueryResultStore, logger kitlog.Logger, kolideConfig config.KolideConfig, mailService kolide.MailService, c clock.Clock, checker kolide.LicenseChecker) (kolide.Service, error) {
 	var svc kolide.Service
 
 	logFile := func(path string) io.Writer {
@@ -48,7 +47,7 @@ type service struct {
 	logger         kitlog.Logger
 	config         config.KolideConfig
 	clock          clock.Clock
-	licenseChecker LicenseChecker
+	licenseChecker kolide.LicenseChecker
 
 	osqueryStatusLogWriter io.Writer
 	osqueryResultLogWriter io.Writer
@@ -62,10 +61,4 @@ func (s service) SendEmail(mail kolide.Email) error {
 
 func (s service) Clock() clock.Clock {
 	return s.clock
-}
-
-// LicenseChecker allows checking that a license is valid by calling in to
-// a remote URL.
-type LicenseChecker interface {
-	CheckinLicense(ctx context.Context)
 }
