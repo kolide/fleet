@@ -1,4 +1,6 @@
 .query-results-table {
+  @include display(flex);
+  @include flex-direction(column);
   background-color: $white;
   padding: $pad-base;
   width: 100%;
@@ -18,12 +20,6 @@
     }
   }
 
-  &__no-results {
-    @include display(flex);
-    @include align-items(center);
-    @include justify-content(center);
-  }
-
   &__progress-details {
     display: inline-block;
     width: 378px;
@@ -31,17 +27,23 @@
 
   &__table-wrapper {
     @include display(flex);
+    @include flex-grow(1);
     border: solid 1px $accent-dark;
     border-radius: 3px;
     box-shadow: inset 0 0 8px 0 rgba(0, 0, 0, 0.12);
     overflow: scroll;
     margin-top: 30px;
     min-height: 400px;
-    max-height: 550px;
     width: 100%;
 
     .kolide-spinner {
       @include align-self(center);
+    }
+
+    .no-results-message {
+      @include flex-grow(1);
+      @include align-self(center);
+      text-align: center;
     }
   }
 
@@ -96,10 +98,6 @@
     box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.1);
     border: solid 1px $silver;
     z-index: 99;
-
-    .query-results-table__table-wrapper {
-      max-height: 86%;
-    }
 
     .query-progress-details__run-btn {
       display: none;

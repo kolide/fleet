@@ -156,23 +156,17 @@ class QueryResultsTable extends Component {
     const { renderTable } = this;
 
     const { hosts_count: hostsCount, query_results: queryResults } = campaign;
+    const hasNoResults = !queryIsRunning && (!hostsCount.successful || (!queryResults || !queryResults.length));
 
     const resultsTableWrapClass = classnames(baseClass, {
       [`${baseClass}--full-screen`]: isQueryFullScreen,
       [`${baseClass}--shrinking`]: isQueryShrinking,
+      [`${baseClass}__no-results`]: hasNoResults,
     });
 
     const toggleFullScreenBtnClass = classnames(`${baseClass}__fullscreen-btn`, {
       [`${baseClass}__fullscreen-btn--active`]: isQueryFullScreen,
     });
-
-    if (!queryIsRunning && (!hostsCount.successful || (!queryResults || !queryResults.length))) {
-      return (
-        <div className={`${baseClass} ${baseClass}__no-results`}>
-          <em>No results found</em>
-        </div>
-      );
-    }
 
     return (
       <div className={resultsTableWrapClass}>
@@ -203,7 +197,8 @@ class QueryResultsTable extends Component {
           </Button>
         </header>
         <div className={`${baseClass}__table-wrapper`}>
-          {renderTable()}
+          {hasNoResults && <em className="no-results-message">No results found</em>}
+          {!hasNoResults && renderTable()}
         </div>
       </div>
     );
