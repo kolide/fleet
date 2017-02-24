@@ -61,10 +61,11 @@ class SelectTargetsDropdown extends Component {
   }
 
   onInputClose = () => {
+    const { document } = global;
     const coreWrapper = document.querySelector('.core-wrapper');
 
     this.setState({ moreInfoTarget: null, query: '' });
-    coreWrapper.style.height =  'auto';
+    coreWrapper.style.height = 'auto';
 
     return false;
   }
@@ -88,7 +89,7 @@ class SelectTargetsDropdown extends Component {
         const currentWrapperHeight = coreWrapper.scrollHeight;
         if (wrapperHeight < currentWrapperHeight) {
           console.log(`Grow wrapper by ${currentWrapperHeight - wrapperHeight}px`);
-          coreWrapper.style.height =  `${wrapperHeight + (currentWrapperHeight - wrapperHeight) + 15}px`;
+          coreWrapper.style.height = `${wrapperHeight + (currentWrapperHeight - wrapperHeight) + 15}px`;
         }
       }
     }, 5);
