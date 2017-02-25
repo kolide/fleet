@@ -8,7 +8,7 @@
 
 *   Automatically decorate the status and result logs with the host's UUID and hostname .
 
-*   Fix an issue where Kolide users on Safari were unable to delete queries or packs.
+*   Fix an issue where Kolide users on Safari were unable to delete queries or packs.
 
 *   Improve platform detection accuracy.
 
@@ -40,3 +40,5 @@
     where rejected by the client-side JS that controls the setup form.
 
 *   Automatically login the user once initial setup is completed.
+
+*   Fix an issue that prevented users from replacing deleted labels with a new label of the same name.
