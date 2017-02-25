@@ -49,7 +49,6 @@ type Checker struct {
 	ticker        clock.Ticker
 	client        *http.Client
 	finish        chan struct{}
-	run           chan struct{}
 }
 
 type Option func(chk *Checker)
@@ -94,7 +93,6 @@ func NewChecker(ds kolide.Datastore, licenseEndpointURL string, opts ...Option) 
 		client:        &http.Client{Timeout: defaultHttpClientTimeout},
 		url:           licenseEndpointURL,
 		ticker:        defaultTicker,
-		run:           make(chan struct{}),
 		finish:        make(chan struct{}),
 	}
 	for _, o := range opts {
@@ -127,9 +125,7 @@ func (cc *Checker) Start() error {
 				chk.logger.Log("msg", "finishing")
 				return
 			case <-chk.ticker.Chan():
-				updateLicenseRevocation(&chk)
-			case <-cc.run:
-				updateLicenseRevocation(&chk)
+				chk.RunLicenseCheck(context.Background())
 			}
 		}
 	}(*cc, &wait)
@@ -143,12 +139,6 @@ func (cc *Checker) Stop() {
 	close(cc.finish)
 	wait.Wait()
 	cc.finish = nil
-}
-
-// RunLicenseCheck signals the Checker to run immediately instead of waiting
-// for time.Ticker.
-func (cc *Checker) RunLicenseCheck(ctx context.Context) {
-	go func() { cc.run <- struct{}{} }()
 }
 
 // addVersionInfo parses the license URL and adds the current revision of the
@@ -166,30 +156,30 @@ func addVersionInfo(licenseURL string) (*url.URL, error) {
 	return ur, nil
 }
 
-func updateLicenseRevocation(chk *Checker) {
-	chk.logger.Log("msg", "begin license check")
-	defer chk.logger.Log("msg", "ending license check")
+func (cc *Checker) RunLicenseCheck(ctx context.Context) {
+	cc.logger.Log("msg", "begin license check")
+	defer cc.logger.Log("msg", "ending license check")
 
-	license, err := chk.ds.License()
+	license, err := cc.ds.License()
 	if err != nil {
-		chk.logger.Log("msg", "couldn't fetch license", "err", err)
+		cc.logger.Log("msg", "couldn't fetch license", "err", err)
 		return
 	}
 	claims, err := license.Claims()
 	if err != nil {
-		chk.logger.Log("msg", "fetching claims", "err", err)
+		cc.logger.Log("msg", "fetching claims", "err", err)
 		return
 	}
 
-	licenseURL, err := addVersionInfo(fmt.Sprintf("%s/%s", chk.url, claims.LicenseUUID))
+	licenseURL, err := addVersionInfo(fmt.Sprintf("%s/%s", cc.url, claims.LicenseUUID))
 	if err != nil {
-		chk.logger.Log("msg", "adding version information to license", "err", err)
+		cc.logger.Log("msg", "adding version information to license", "err", err)
 		return
 	}
 
-	resp, err := chk.client.Get(licenseURL.String())
+	resp, err := cc.client.Get(licenseURL.String())
 	if err != nil {
-		chk.logger.Log("msg", fmt.Sprintf("fetching %s", licenseURL.String()), "err", err)
+		cc.logger.Log("msg", fmt.Sprintf("fetching %s", licenseURL.String()), "err", err)
 		return
 	}
 	defer resp.Body.Close()
@@ -199,25 +189,25 @@ func updateLicenseRevocation(chk *Checker) {
 		var revInfo revokeInfo
 		err = json.NewDecoder(resp.Body).Decode(&revInfo)
 		if err != nil {
-			chk.logger.Log("msg", "decoding response", "err", err)
+			cc.logger.Log("msg", "decoding response", "err", err)
 			return
 		}
-		err = chk.ds.RevokeLicense(revInfo.Revoked)
+		err = cc.ds.RevokeLicense(revInfo.Revoked)
 		if err != nil {
-			chk.logger.Log("msg", "revoke status", "err", err)
+			cc.logger.Log("msg", "revoke status", "err", err)
 			return
 		}
 		// success
-		chk.logger.Log("msg", fmt.Sprintf("license revocation status retrieved succesfully, revoked: %t", revInfo.Revoked))
+		cc.logger.Log("msg", fmt.Sprintf("license revocation status retrieved succesfully, revoked: %t", revInfo.Revoked))
 	case http.StatusNotFound:
 		var revInfo revokeError
 		err = json.NewDecoder(resp.Body).Decode(&revInfo)
 		if err != nil {
-			chk.logger.Log("msg", "decoding response", "err", err)
+			cc.logger.Log("msg", "decoding response", "err", err)
 			return
 		}
-		chk.logger.Log("msg", "host response", "err", fmt.Sprintf("status: %d error: %s", revInfo.Status, revInfo.Error))
+		cc.logger.Log("msg", "host response", "err", fmt.Sprintf("status: %d error: %s", revInfo.Status, revInfo.Error))
 	default:
-		chk.logger.Log("msg", "host response", "err", fmt.Sprintf("unexpected response status from host, status %s", resp.Status))
+		cc.logger.Log("msg", "host response", "err", fmt.Sprintf("unexpected response status from host, status %s", resp.Status))
 	}
 }
