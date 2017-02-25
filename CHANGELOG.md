@@ -1,3 +1,5 @@
+*   Fix an issue that prevented users from replacing deleted labels with a new label of the same name.
+
 *   Improve the reliability of IP and MAC address data in the host cards and table.
 
 *   Add full screen support for distributed query results.
@@ -40,5 +42,3 @@
     where rejected by the client-side JS that controls the setup form.
 
 *   Automatically login the user once initial setup is completed.
-
-*   Fix an issue that prevented users from replacing deleted labels with a new label of the same name.
