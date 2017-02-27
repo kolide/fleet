@@ -1,0 +1,34 @@
+{
+    "dependencies": {
+        "github.com/go-sql-driver/mysql": {
+            "branch": "master"
+        },
+        "github.com/gorilla/mux": {
+            "branch": "master"
+        },
+        "github.com/gorilla/websocket": {
+            "branch": "master"
+        },
+        "github.com/jmoiron/sqlx": {
+            "branch": "master"
+        },
+        "github.com/kolide/goose": {
+            "revision": "e545845c75693e1499ac992bd16dd00d6f33cb03"
+        },
+        "github.com/pkg/errors": {
+            "branch": "master"
+        },
+        "github.com/spf13/cobra": {
+            "branch": "master"
+        },
+        "github.com/stretchr/testify": {
+            "branch": "master"
+        },
+        "golang.org/x/net": {
+            "branch": "master"
+        },
+        "gopkg.in/yaml.v2": {
+            "branch": "v2"
+        }
+    }
+}
