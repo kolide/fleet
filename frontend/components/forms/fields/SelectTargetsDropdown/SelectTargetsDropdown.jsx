@@ -105,10 +105,6 @@ class SelectTargetsDropdown extends Component {
         return false;
       }
 
-      // TODO: If the target's target_type is 'labels'
-      // get the hosts for the label
-      // append the hosts to the moreInfoTarget in state
-
       this.setState({ moreInfoTarget });
 
       return false;
