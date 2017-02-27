@@ -87,6 +87,11 @@ describe('SelectTargetsDropdown - component', () => {
         labels: [],
       },
     };
+    const defaultSelectedTargets = { hosts: [], labels: [] };
+    const defaultParams = {
+      query: '',
+      selected: defaultSelectedTargets,
+    };
     const expectedApiClientResponseWithTargets = {
       targets: [{ ...Test.Stubs.labelStub, target_type: 'labels' }],
     };
@@ -94,8 +99,9 @@ describe('SelectTargetsDropdown - component', () => {
     afterEach(() => restoreSpies());
 
     it('calls the api', () => {
-      const params = { query: '', selected: { hosts: [], labels: [] } };
-      const request = Test.Mocks.targetMock(params, apiResponseWithTargets);
+      nock.cleanAll();
+
+      const request = Test.Mocks.targetMock(defaultParams, apiResponseWithTargets);
       const Component = mount(<SelectTargetsDropdown {...defaultProps} />);
       const node = Component.node;
 
@@ -106,13 +112,14 @@ describe('SelectTargetsDropdown - component', () => {
     });
 
     it('calls the onFetchTargets prop', () => {
+      nock.cleanAll();
+
       const onFetchTargets = createSpy();
-      const params = { query: '', selected: { hosts: [], labels: [] } };
       const props = { ...defaultProps, onFetchTargets };
       const Component = mount(<SelectTargetsDropdown {...props} />);
       const node = Component.node;
 
-      Test.Mocks.targetMock(params, apiResponseWithTargets);
+      Test.Mocks.targetMock(defaultParams, apiResponseWithTargets);
 
       return node.fetchTargets()
         .then(() => {
@@ -133,11 +140,10 @@ describe('SelectTargetsDropdown - component', () => {
     });
 
     it('sets state correctly when no targets are returned', () => {
-      const params = { query: '', selected: { hosts: [], labels: [] } };
       const Component = mount(<SelectTargetsDropdown {...defaultProps} />);
       const node = Component.node;
 
-      Test.Mocks.targetMock(params, apiResponseWithoutTargets);
+      Test.Mocks.targetMock(defaultParams, apiResponseWithoutTargets);
 
       return node.fetchTargets()
         .then(() => {
@@ -149,11 +155,10 @@ describe('SelectTargetsDropdown - component', () => {
 
     it('returns the query', () => {
       const query = 'select * from users';
-      const params = { query, selected: { hosts: [], labels: [] } };
       const Component = mount(<SelectTargetsDropdown {...defaultProps} />);
       const node = Component.node;
 
-      Test.Mocks.targetMock(params);
+      Test.Mocks.targetMock(defaultParams);
 
       return node.fetchTargets(query)
         .then((q) => {
