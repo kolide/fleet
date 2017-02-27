@@ -35,13 +35,13 @@ class SelectTargetsDropdown extends Component {
       moreInfoTarget: null,
       query: '',
       targets: [],
-      wrapperHeight: 0,
     };
   }
 
   componentWillMount () {
-    this.mounted = true;
     this.fetchTargets();
+    this.mounted = true;
+    this.wrapperHeight = 0;
 
     return false;
   }
