@@ -199,11 +199,10 @@ export class QueryPage extends Component {
               const socketData = JSON.parse(data);
               const { previousSocketData } = this;
 
-              this.previousSocketData = socketData;
-
               if (previousSocketData && isEqual(socketData, previousSocketData)) {
                 return false;
               }
+              this.previousSocketData = socketData;
 
               this.setState(campaignHelpers.updateCampaignState(socketData));
 
