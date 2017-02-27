@@ -76,6 +76,10 @@ export class ManageHostsPage extends Component {
   }
 
   componentWillMount () {
+    const { dispatch } = this.props;
+
+    dispatch(hostActions.loadAll());
+
     return this.getEntities();
   }
 
@@ -241,7 +245,7 @@ export class ManageHostsPage extends Component {
     const { dispatch } = this.props;
 
     const promises = [
-      dispatch(hostActions.loadAll()),
+      dispatch(hostActions.silentLoadAll()),
       dispatch(labelActions.silentLoadAll()),
       dispatch(silentGetStatusLabelCounts),
     ];
