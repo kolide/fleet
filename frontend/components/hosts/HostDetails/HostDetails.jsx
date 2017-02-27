@@ -59,14 +59,14 @@ const HostDetails = ({ host, onDestroyHost, onQueryHost }) => {
           <span className={`${baseClass}__host-content`}>{osVersion}</span>
         </li>}
 
-        {!!hostCpu && <li className={` ${baseClass}__detail ${baseClass}__detail--cpu`}>
-          <Icon name="cpu" className={`${baseClass}__icon`} />
-          <span className={`${baseClass}__host-content`}>{hostCpu}</span>
-        </li>}
-
         {!!osqueryVersion && <li className={` ${baseClass}__detail ${baseClass}__detail--osquery`}>
           <Icon name="osquery" className={`${baseClass}__icon`} />
           <span className={`${baseClass}__host-content`}>{osqueryVersion}</span>
+        </li>}
+
+        {!!hostCpu && <li className={` ${baseClass}__detail ${baseClass}__detail--cpu`}>
+          <Icon name="cpu" className={`${baseClass}__icon`} />
+          <span className={`${baseClass}__host-content`}>{hostCpu}</span>
         </li>}
 
         {!!memory && <li className={` ${baseClass}__detail ${baseClass}__detail--memory`}>

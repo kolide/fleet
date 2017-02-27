@@ -9,8 +9,9 @@
   margin: 30px 7px 0;
   position: relative;
   text-align: center;
-  min-width: 240px;
+  min-width: 250px;
   max-width: 300px;
+  height: 360px;
   display: inline-block;
 
   &--online {
@@ -38,7 +39,8 @@
   }
 
   &__status {
-    font-size: $medium;
+    font-size: 20px;
+    font-weight: $bold;
     text-align: left;
     text-transform: uppercase;
     margin: 0;
@@ -57,12 +59,12 @@
 
   &__cta-host-icon {
     color: $link;
-    font-size: 20px;
+    font-size: 24px;
   }
 
   &__hostname {
     @include ellipsis;
-    font-size: 16px;
+    font-size: 20px;
     font-weight: $bold;
     letter-spacing: 1px;
     text-align: center;
@@ -78,33 +80,32 @@
     @include justify-content(space-around);
     border-top: 1px solid $accent-light;
     list-style: none;
-    margin: 8px auto;
+    margin: 0 auto 8px;
     padding: 8px 0;
     max-width: 222px;
   }
 
   &__detail {
-    font-size: 14px;
-    font-weight: $light;
-    color: $text-ultradark;
+    @include flex-basis(100%);
+    font-size: 18px;
+    color: #727083;
     padding: 7px 0;
     text-align: center;
 
     .kolidecon {
-      color: $text-light;
-      font-size: 19px;
+      color: $text-dark;
+      font-size: 23px;
       margin-right: 9px;
     }
 
-    &--os,
-    &--mac,
-    &--ip {
-      @include flex-basis(100%);
+    &--os {
+      .kolidecon {
+        font-size: 28px;
+        vertical-align: bottom;
+      }
     }
 
     &--memory,
-    &--cpu,
-    &--osquery,
     &--uptime {
       @include flex-basis(50%);
     }
