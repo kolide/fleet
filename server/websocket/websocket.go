@@ -4,7 +4,6 @@ package websocket
 
 import (
 	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/igm/sockjs-go/sockjs"
@@ -75,7 +74,6 @@ func (c *Conn) WriteJSONError(data interface{}) error {
 //  	json.Unmarshal(*(msg.Data.(*json.RawMessage)), &foo)
 //  }
 func (c *Conn) ReadJSONMessage() (*JSONMessage, error) {
-	fmt.Println(c.GetSessionState(), sockjs.SessionActive)
 	data, err := c.Recv()
 	if err != nil {
 		return nil, errors.Wrap(err, "reading from websocket")

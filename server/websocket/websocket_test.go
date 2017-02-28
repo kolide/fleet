@@ -51,7 +51,8 @@ func writeJSONMessage(t *testing.T, conn *websocket.Conn, typ string, data inter
 	d, err := json.Marshal([]string{string(buf)})
 	require.Nil(t, err)
 
-	conn.WriteMessage(websocket.TextMessage, []byte("a"+string(d)))
+	// Writes from the client to the server do not include the "a"
+	conn.WriteMessage(websocket.TextMessage, d)
 }
 
 func TestWriteJSONMessage(t *testing.T) {
@@ -241,12 +242,11 @@ func TestReadJSONMessage(t *testing.T) {
 	}
 }
 
-/*
 func TestReadAuthToken(t *testing.T) {
 	var cases = []struct {
 		typ   string
 		data  authData
-		token token.Token
+		token string
 		err   error
 	}{
 		{
@@ -269,12 +269,11 @@ func TestReadAuthToken(t *testing.T) {
 	for _, tt := range cases {
 		t.Run("", func(t *testing.T) {
 			completed := make(chan struct{})
-			handler := func(w http.ResponseWriter, req *http.Request) {
+			handler := sockjs.NewHandler("/test", sockjs.DefaultOptions, func(session sockjs.Session) {
+				defer session.Close(0, "none")
 				defer func() { completed <- struct{}{} }()
 
-				conn, err := Upgrade(w, req)
-				require.Nil(t, err)
-				defer conn.Close()
+				conn := &Conn{session}
 
 				token, err := conn.ReadAuthToken()
 				if tt.err == nil {
@@ -284,19 +283,22 @@ func TestReadAuthToken(t *testing.T) {
 					return
 				}
 
-				assert.Equal(t, tt.token, token)
-			}
+				assert.EqualValues(t, tt.token, token)
+			})
 
 			// Connect to websocket handler server
-			srv := httptest.NewServer(http.HandlerFunc(handler))
+			srv := httptest.NewServer(handler)
 			u, _ := url.Parse(srv.URL)
 			u.Scheme = "ws"
-			wsConn, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
+			u.Path += "/test/123/abcdefghijklmnop/websocket"
+
+			conn, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
 			require.Nil(t, err)
-			conn := &Conn{wsConn, defaultTimeout}
 			defer conn.Close()
 
-			require.Nil(t, conn.WriteJSONMessage(tt.typ, tt.data))
+			readOpenMessage(t, conn)
+
+			writeJSONMessage(t, conn, tt.typ, tt.data)
 
 			select {
 			case <-completed:
@@ -307,4 +309,3 @@ func TestReadAuthToken(t *testing.T) {
 		})
 	}
 }
-*/
