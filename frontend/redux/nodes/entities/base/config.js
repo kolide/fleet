@@ -2,18 +2,14 @@ import BaseConfig from 'redux/nodes/entities/base/base_config';
 import { entitiesExceptID } from 'redux/nodes/entities/base/helpers';
 
 class ReduxConfig extends BaseConfig {
-  constructor (inputs) {
-    super(inputs);
-  }
-
   get actions () {
     return this.allActions();
   }
 
   get reducer () {
-    const { actionTypes, entityName, initialState } = this;
+    const { actionTypes, entityName } = this;
 
-    return (state = initialState, { type, payload }) => {
+    return (state = BaseConfig.initialState, { type, payload }) => {
       switch (type) {
         case actionTypes.CLEAR_ERRORS:
           return {
@@ -74,6 +70,6 @@ class ReduxConfig extends BaseConfig {
       }
     };
   }
-};
+}
 
 export default ReduxConfig;

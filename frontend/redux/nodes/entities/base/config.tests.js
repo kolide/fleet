@@ -1,7 +1,7 @@
 import expect from 'expect';
 import { noop } from 'lodash';
 
-import ReduxConfig from './config';
+import ReduxConfig from 'redux/nodes/entities/base/config';
 import { userStub } from 'test/stubs';
 
 describe('ReduxConfig - class', () => {
@@ -40,7 +40,7 @@ describe('ReduxConfig - class', () => {
   describe('#_parse', () => {
     const apiResponse = {
       users: [userStub],
-    }
+    };
 
     context('when there is no parseApiResponseFunc or parseEntityFunc', () => {
       const config = new ReduxConfig({ entityName: 'users' });
@@ -51,7 +51,7 @@ describe('ReduxConfig - class', () => {
     });
 
     context('when there is a parseApiResponseFunc and no parseEntityFunc', () => {
-      const parseApiResponseFunc = (r) => r.users;
+      const parseApiResponseFunc = r => r.users;
       const config = new ReduxConfig({
         entityName: 'users',
         parseApiResponseFunc,
@@ -63,7 +63,7 @@ describe('ReduxConfig - class', () => {
     });
 
     context('when there is a parseEntityFunc and no parseApiResponseFunc', () => {
-      const parseEntityFunc = (u) => u.name;
+      const parseEntityFunc = u => u.name;
       const config = new ReduxConfig({
         entityName: 'users',
         parseEntityFunc,
@@ -83,7 +83,7 @@ describe('ReduxConfig - class', () => {
 
   describe('#actions', () => {
     const config = new ReduxConfig({ entityName: 'users' });
-    const { actions, actionTypes } = config;
+    const { actions } = config;
 
     it('returns all actions', () => {
       expect(actions).toEqual({

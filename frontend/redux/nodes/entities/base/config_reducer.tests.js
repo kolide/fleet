@@ -1,8 +1,6 @@
-import expect, { createSpy, restoreSpies } from 'expect';
-import { find, noop } from 'lodash';
+import expect from 'expect';
 
-import ReduxConfig from './config';
-import { reduxMockStore } from 'test/helpers';
+import ReduxConfig from 'redux/nodes/entities/base/config';
 import schemas from 'redux/nodes/entities/base/schemas';
 import { userStub } from 'test/stubs';
 
@@ -26,7 +24,7 @@ describe('ReduxConfig - reducer', () => {
       it('adds the user to state', () => {
         const createSuccessAction = actions.successAction([userStub], actions.createSuccess);
 
-        const newState = reducer(config.initialState, createSuccessAction);
+        const newState = reducer(ReduxConfig.initialState, createSuccessAction);
 
         expect(newState).toEqual({
           loading: false,
@@ -43,7 +41,7 @@ describe('ReduxConfig - reducer', () => {
         const errors = { base: 'User is not authenticated' };
         const createFailureAction = actions.createFailure(errors);
 
-        const newState = reducer(config.initialState, createFailureAction);
+        const newState = reducer(ReduxConfig.initialState, createFailureAction);
 
         expect(newState).toEqual({
           loading: false,
@@ -101,7 +99,7 @@ describe('ReduxConfig - reducer', () => {
       it('adds the user to state', () => {
         const loadSuccessAction = actions.successAction([userStub], actions.loadSuccess);
 
-        const newState = reducer(config.initialState, loadSuccessAction);
+        const newState = reducer(ReduxConfig.initialState, loadSuccessAction);
 
         expect(newState).toEqual({
           loading: false,
@@ -118,7 +116,7 @@ describe('ReduxConfig - reducer', () => {
         const errors = { base: 'User is not authenticated' };
         const loadFailureAction = actions.loadFailure(errors);
 
-        const newState = reducer(config.initialState, loadFailureAction);
+        const newState = reducer(ReduxConfig.initialState, loadFailureAction);
 
         expect(newState).toEqual({
           loading: false,

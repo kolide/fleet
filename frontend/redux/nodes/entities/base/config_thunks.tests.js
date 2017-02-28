@@ -1,7 +1,7 @@
 import expect, { createSpy, restoreSpies } from 'expect';
-import { find, noop } from 'lodash';
+import { find } from 'lodash';
 
-import ReduxConfig from './config';
+import ReduxConfig from 'redux/nodes/entities/base/config';
 import { reduxMockStore } from 'test/helpers';
 import schemas from 'redux/nodes/entities/base/schemas';
 import { userStub } from 'test/stubs';
@@ -28,7 +28,7 @@ const standardError = {
       {
         name: 'base',
         reason: 'User is not authenticated',
-      }
+      },
     ],
   },
 };
@@ -60,7 +60,6 @@ describe('ReduxConfig - thunks', () => {
       it('dispatches the correct actions', () => {
         return mockStore.dispatch(config.actions.create())
           .then(() => {
-
             const dispatchedActions = mockStore.getActions();
             const dispatchedActionTypes = dispatchedActions.map((action) => { return action.type; });
             const successAction = find(dispatchedActions, { type: 'users_CREATE_SUCCESS' });

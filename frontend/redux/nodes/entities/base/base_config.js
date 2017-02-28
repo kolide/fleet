@@ -21,6 +21,12 @@ class BaseConfig {
     this._parse = this._parse.bind(this);
   }
 
+  static initialState = {
+    loading: false,
+    errors: {},
+    data: {},
+  }
+
   static TYPES = {
     CREATE: 'CREATE',
     DESTROY: 'DESTROY',
@@ -84,14 +90,6 @@ class BaseConfig {
       UPDATE_FAILURE: `${entityName}_UPDATE_FAILURE`,
       UPDATE_REQUEST: `${entityName}_UPDATE_REQUEST`,
       UPDATE_SUCCESS: `${entityName}_UPDATE_SUCCESS`,
-    };
-  }
-
-  get initialState () {
-    return {
-      loading: false,
-      errors: {},
-      data: {},
     };
   }
 
@@ -188,8 +186,8 @@ class BaseConfig {
 
             throw errorsObject;
           });
-      }
-    }
+      };
+    };
   }
 
   _genericRequest (type) {
