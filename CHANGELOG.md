@@ -1,4 +1,4 @@
-*   Fix issue with Distributed Query Pack results full screen feature that layered results above Select Target dropdown
+*   Fix issue with Distributed Query Pack results full screen feature that broke the browser scrolling abilities
 
 ## Kolide 1.0.1 (February 27, 2017) ##
 
