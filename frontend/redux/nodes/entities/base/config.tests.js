@@ -37,7 +37,7 @@ describe('ReduxConfig - class', () => {
     });
   });
 
-  describe('#parse', () => {
+  describe('#_parse', () => {
     const apiResponse = {
       users: [userStub],
     }
@@ -46,7 +46,7 @@ describe('ReduxConfig - class', () => {
       const config = new ReduxConfig({ entityName: 'users' });
 
       it('returns the api response', () => {
-        expect(config.parse(apiResponse)).toEqual(apiResponse);
+        expect(config._parse(apiResponse)).toEqual(apiResponse);
       });
     });
 
@@ -58,7 +58,7 @@ describe('ReduxConfig - class', () => {
       });
 
       it('returns the result of the parseApiResponseFunc', () => {
-        expect(config.parse(apiResponse)).toEqual([userStub]);
+        expect(config._parse(apiResponse)).toEqual([userStub]);
       });
     });
 
@@ -72,18 +72,18 @@ describe('ReduxConfig - class', () => {
       it('returns the result of the parseEntitiesFunc when the response is an array', () => {
         const { users } = apiResponse;
 
-        expect(config.parse(users)).toEqual(['Gnar Mike']);
+        expect(config._parse(users)).toEqual(['Gnar Mike']);
       });
 
       it('throws an error when the response is not an array', () => {
-        expect(() => config.parse(apiResponse)).toThrow('parseEntityFunc must be called on an array. Use the parseApiResponseFunc to format the response correctly.');
+        expect(() => config._parse(apiResponse)).toThrow('parseEntityFunc must be called on an array. Use the parseApiResponseFunc to format the response correctly.');
       });
     });
   });
 
   describe('#actions', () => {
     const config = new ReduxConfig({ entityName: 'users' });
-    const { actions } = config;
+    const { actions, actionTypes } = config;
 
     it('returns all actions', () => {
       expect(actions).toEqual({

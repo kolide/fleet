@@ -13,12 +13,12 @@ class BaseConfig {
     this.parseApiResponseFunc = inputs.parseApiResponseFunc;
     this.parseEntityFunc = inputs.parseEntityFunc;
     this.schema = inputs.schema;
+    this.successAction = this.successAction.bind(this);
     this.updateFunc = inputs.updateFunc;
 
     this._clearErrors = this._clearErrors.bind(this);
     this._genericActions = this._genericActions.bind(this);
-    this.parse = this.parse.bind(this);
-    this.successAction = this.successAction.bind(this);
+    this._parse = this._parse.bind(this);
   }
 
   static TYPES = {
@@ -111,42 +111,85 @@ class BaseConfig {
     };
   }
 
-  parse (response) {
-    let result = response;
-    const { parseApiResponseFunc, parseEntityFunc } = this;
-
-    if (!parseApiResponseFunc && !parseEntityFunc) {
-      return result;
+  successAction (apiResponse, thunk) {
+    let response = apiResponse;
+    if (!response) {
+      response = {};
     }
 
-    result = parseApiResponseFunc
-      ? parseApiResponseFunc(response)
-      : response;
+    const { _parse, schema } = this;
+    const parsable = isArray(response) ? response : [response];
+    const parsed = _parse(parsable);
+    const { entities } = normalize(parsed, arrayOf(schema));
 
-    if (!isArray(result) && parseEntityFunc) {
-      throw new Error('parseEntityFunc must be called on an array. Use the parseApiResponseFunc to format the response correctly.');
+    return thunk(entities);
+  }
+
+  // PRIVATE METHODS
+
+  _apiCallForType (type) {
+    const { TYPES } = BaseConfig;
+
+    switch (type) {
+      case TYPES.CREATE:
+        return this.createFunc;
+      case TYPES.DESTROY:
+        return this.destroyFunc;
+      case TYPES.LOAD:
+        return this.loadFunc;
+      case TYPES.LOAD_ALL:
+        return this.loadAllFunc;
+      case TYPES.UPDATE:
+        return this.updateFunc;
+      default:
+        throw new Error(`Unknown api call for type: ${type}`);
+    }
+  }
+
+  _genericActions (type) {
+    if (!type) {
+      throw new Error('generic action type is not defined');
     }
 
-    result = parseEntityFunc
-      ? result.map(r => parseEntityFunc(r))
-      : result;
+    const lowerType = type.toLowerCase();
+    const capitalType = capitalize(type);
 
-    return result;
-  }
-
-  _clearErrors () {
-    return { type: this.actionTypes.CLEAR_ERRORS };
-  }
-
-  _genericFailure (type) {
-    const { actionTypes } = this;
-
-    return (errors) => {
-      return {
-        type: BaseConfig.failureActionTypeFor(actionTypes, type),
-        payload: { errors },
-      };
+    return {
+      [lowerType]: this._genericThunkAction(type),
+      [`silent${capitalType}`]: this._genericThunkAction(type, { silent: true }),
+      [`${lowerType}Request`]: this._genericRequest(type),
+      [`${lowerType}Success`]: this._genericSuccess(type),
+      [`${lowerType}Failure`]: this._genericFailure(type),
     };
+  }
+
+  _genericThunkAction (type, options = {}) {
+    const apiCall = this._apiCallForType(type);
+
+    return (...args) => {
+      return (dispatch) => {
+        if (!options.silent) {
+          dispatch(this._genericRequest(type)());
+        }
+
+        return apiCall(...args)
+          .then((response) => {
+            const thunk = this._genericSuccess(type);
+
+            dispatch(this.successAction(response, thunk));
+
+            return response;
+          })
+          .catch((response) => {
+            const thunk = this._genericFailure(type);
+            const errorsObject = formatErrorResponse(response);
+
+            dispatch(thunk(errorsObject));
+
+            throw errorsObject;
+          });
+      }
+    }
   }
 
   _genericRequest (type) {
@@ -186,83 +229,42 @@ class BaseConfig {
     };
   }
 
-  successAction (apiResponse, thunk) {
-    let response = apiResponse;
-    if (!response) {
-      response = {};
-    }
+  _genericFailure (type) {
+    const { actionTypes } = this;
 
-    const { parse, schema } = this;
-    const parsable = isArray(response) ? response : [response];
-    const parsed = parse(parsable);
-    const { entities } = normalize(parsed, arrayOf(schema));
-
-    return thunk(entities);
-  }
-
-  _genericThunkAction (type, options = {}) {
-    const apiCall = this._apiCallForType(type);
-
-    return (...args) => {
-      return (dispatch) => {
-        if (!options.silent) {
-          dispatch(this._genericRequest(type)());
-        }
-
-        return apiCall(...args)
-          .then((response) => {
-            const thunk = this._genericSuccess(type);
-
-            dispatch(this.successAction(response, thunk));
-
-            return response;
-          })
-          .catch((response) => {
-            const thunk = this._genericFailure(type);
-            const errorsObject = formatErrorResponse(response);
-
-            dispatch(thunk(errorsObject));
-
-            throw errorsObject;
-          });
-      }
-    }
-  }
-
-  _genericActions (type) {
-    if (!type) {
-      throw new Error('generic action type is not defined');
-    }
-
-    const lowerType = type.toLowerCase();
-    const capitalType = capitalize(type);
-
-    return {
-      [lowerType]: this._genericThunkAction(type),
-      [`silent${capitalType}`]: this._genericThunkAction(type, { silent: true }),
-      [`${lowerType}Request`]: this._genericRequest(type),
-      [`${lowerType}Success`]: this._genericSuccess(type),
-      [`${lowerType}Failure`]: this._genericFailure(type),
+    return (errors) => {
+      return {
+        type: BaseConfig.failureActionTypeFor(actionTypes, type),
+        payload: { errors },
+      };
     };
   }
 
-  _apiCallForType (type) {
-    const { TYPES } = BaseConfig;
+  _parse (response) {
+    let result = response;
+    const { parseApiResponseFunc, parseEntityFunc } = this;
 
-    switch (type) {
-      case TYPES.CREATE:
-        return this.createFunc;
-      case TYPES.DESTROY:
-        return this.destroyFunc;
-      case TYPES.LOAD:
-        return this.loadFunc;
-      case TYPES.LOAD_ALL:
-        return this.loadAllFunc;
-      case TYPES.UPDATE:
-        return this.updateFunc;
-      default:
-        throw new Error(`Unknown api call for type: ${type}`);
+    if (!parseApiResponseFunc && !parseEntityFunc) {
+      return result;
     }
+
+    result = parseApiResponseFunc
+      ? parseApiResponseFunc(response)
+      : response;
+
+    if (!isArray(result) && parseEntityFunc) {
+      throw new Error('parseEntityFunc must be called on an array. Use the parseApiResponseFunc to format the response correctly.');
+    }
+
+    result = parseEntityFunc
+      ? result.map(r => parseEntityFunc(r))
+      : result;
+
+    return result;
+  }
+
+  _clearErrors () {
+    return { type: this.actionTypes.CLEAR_ERRORS };
   }
 }
 
