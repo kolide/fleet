@@ -17,7 +17,8 @@
   &--online {
     border-top: 6px solid $success;
 
-    .host-details__status {
+    .host-details__status,
+    .host-details__hostname {
       color: $success;
     }
   }
@@ -25,7 +26,8 @@
   &--offline {
     border-top: 6px solid $alert;
 
-    .host-details__status {
+    .host-details__status,
+    .host-details__hostname {
       color: $alert;
     }
   }
@@ -33,7 +35,8 @@
   &--mia {
     border-top: 6px solid $text-dark;
 
-    .host-details__status {
+    .host-details__status,
+    .host-details__hostname {
       color: $text-dark;
     }
   }
@@ -68,7 +71,6 @@
     font-weight: $bold;
     letter-spacing: 1px;
     text-align: center;
-    color: $link;
     clear: both;
     margin: 0;
     width: 100%;
