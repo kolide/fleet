@@ -240,11 +240,7 @@ class Kolide extends Base {
     queries: {
       run: (campaignID) => {
         return new Promise((resolve) => {
-          const options = {
-            debug: true,
-            devel: true,
-          };
-          const socket = new SockJS(`${this.baseURL}/v1/kolide/results`, undefined, options);
+          const socket = new SockJS(`${this.baseURL}/v1/kolide/results`, undefined, {});
 
           socket.onopen = () => {
             socket.send(JSON.stringify({ type: 'auth', data: { token: local.getItem('auth_token') } }));

@@ -1,5 +1,5 @@
-hash: d686deeb52e83197bf126707a854b4844134ed57248a52d44aaa364b297289bb
-updated: 2017-02-17T16:39:33.362243401-08:00
+hash: 23a51e1dbed0a504e02209cd5ef0fbb1bcb894ca7861a818154f7e8fab5fac48
+updated: 2017-02-28T11:03:55.538531823-08:00
 imports:
 - name: github.com/alecthomas/template
   version: a0175ee3bccc567396460bf5acd36800cb10c49c
@@ -68,6 +68,8 @@ imports:
   - json/token
 - name: github.com/igm/sockjs-go
   version: 1f275fbd3bcc9a21ec90217b80f40db44404410b
+  subpackages:
+  - sockjs
 - name: github.com/inconshreveable/mousetrap
   version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
 - name: github.com/jmoiron/sqlx
@@ -165,10 +167,6 @@ imports:
   version: e9044be3ab2a8e11d4e1f418d12f0790d57e8d70
 - name: gopkg.in/go-playground/validator.v8
   version: 5f57d2222ad794d0dffb07e664ea05e2ee07d60c
-- name: gopkg.in/igm/sockjs-go.v2
-  version: d276e9ffe5cc5c271b81198cc77a2adf6c4482d2
-  subpackages:
-  - sockjs
 - name: gopkg.in/natefinch/lumberjack.v2
   version: dd45e6a67c53f673bb49ca8a001fd3a63ceb640e
 - name: gopkg.in/yaml.v2
