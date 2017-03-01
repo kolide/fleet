@@ -45,49 +45,49 @@ const HostDetails = ({ host, onDestroyHost, onQueryHost }) => {
 
   return (
     <div className={`${baseClass} ${baseClass}--${status}`}>
-      <span className={`${baseClass}__cta-host`}>
-        <ActionButton host={host} onDestroyHost={onDestroyHost} onQueryHost={onQueryHost} />
-      </span>
+      <header className={`${baseClass}__header`}>
+        <span className={`${baseClass}__cta-host`}>
+          <ActionButton host={host} onDestroyHost={onDestroyHost} onQueryHost={onQueryHost} />
+        </span>
 
-      <p className={`${baseClass}__status`}>{status}</p>
-
-      <p className={`${baseClass}__hostname`}>{hostname}</p>
+        <p className={`${baseClass}__hostname`}>{hostname}</p>
+      </header>
 
       <ul className={`${baseClass}__details-list`}>
-        {!!osVersion && <li className={` ${baseClass}__detail ${baseClass}__detail--os`}>
-          <PlatformIcon name={platform} className={`${baseClass}__icon`} />
-          <span className={`${baseClass}__host-content`}>{osVersion}</span>
-        </li>}
+        <li className={` ${baseClass}__detail ${baseClass}__detail--os`}>
+          {platform && <PlatformIcon name={platform} className={`${baseClass}__icon`} />}
+          <span className={`${baseClass}__host-content`}>{osVersion || '--'}</span>
+        </li>
 
-        {!!osqueryVersion && <li className={` ${baseClass}__detail ${baseClass}__detail--osquery`}>
+        <li className={` ${baseClass}__detail ${baseClass}__detail--osquery`}>
           <Icon name="osquery" className={`${baseClass}__icon`} />
-          <span className={`${baseClass}__host-content`}>{osqueryVersion}</span>
-        </li>}
+          <span className={`${baseClass}__host-content`}>{osqueryVersion || '--'}</span>
+        </li>
 
-        {!!hostCpu && <li className={` ${baseClass}__detail ${baseClass}__detail--cpu`}>
+        <li className={` ${baseClass}__detail ${baseClass}__detail--cpu`}>
           <Icon name="cpu" className={`${baseClass}__icon`} />
-          <span className={`${baseClass}__host-content`}>{hostCpu}</span>
-        </li>}
+          <span className={`${baseClass}__host-content`}>{hostCpu || '--'}</span>
+        </li>
 
-        {!!memory && <li className={` ${baseClass}__detail ${baseClass}__detail--memory`}>
+        <li className={` ${baseClass}__detail ${baseClass}__detail--memory`}>
           <Icon name="memory" className={`${baseClass}__icon`} />
-          <span className={`${baseClass}__host-content`}>{humanMemory(memory)}</span>
-        </li>}
+          <span className={`${baseClass}__host-content`}>{humanMemory(memory) || '--'}</span>
+        </li>
 
-        {!!uptime && <li className={` ${baseClass}__detail ${baseClass}__detail--uptime`}>
+        <li className={` ${baseClass}__detail ${baseClass}__detail--uptime`}>
           <Icon name="uptime" className={`${baseClass}__icon`} />
-          <span className={`${baseClass}__host-content`}>{humanUptime(uptime)}</span>
-        </li>}
+          <span className={`${baseClass}__host-content`}>{humanUptime(uptime) || '--'}</span>
+        </li>
 
-        {!!hostMac && <li className={` ${baseClass}__detail ${baseClass}__detail--mac`}>
+        <li className={` ${baseClass}__detail ${baseClass}__detail--mac`}>
           <Icon name="mac" className={`${baseClass}__icon`} />
-          <span className={`${baseClass}__host-content ${baseClass}__host-content--mono`}>{hostMac}</span>
-        </li>}
+          <span className={`${baseClass}__host-content ${baseClass}__host-content--mono`}>{hostMac || '--'}</span>
+        </li>
 
-        {!!hostIpAddress && <li className={` ${baseClass}__detail ${baseClass}__detail--ip`}>
+        <li className={` ${baseClass}__detail ${baseClass}__detail--ip`}>
           <Icon name="world" className={`${baseClass}__icon`} />
-          <span className={`${baseClass}__host-content ${baseClass}__host-content--mono`}>{hostIpAddress}</span>
-        </li>}
+          <span className={`${baseClass}__host-content ${baseClass}__host-content--mono`}>{hostIpAddress || '--'}</span>
+        </li>
       </ul>
     </div>
   );
