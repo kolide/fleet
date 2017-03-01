@@ -521,7 +521,7 @@ func testDistributedQueriesForHost(t *testing.T, ds kolide.Datastore) {
 func testGenerateHostStatusStatistics(t *testing.T, ds kolide.Datastore) {
 	mockClock := clock.NewMockClock()
 
-	online, offline, mia, new, err := ds.GenerateHostStatusStatistics(mockClock.Now())
+	online, offline, mia, new, err := ds.GenerateHostStatusStatistics(mockClock.Now(), 60)
 	assert.Nil(t, err)
 	assert.Equal(t, uint(0), online)
 	assert.Equal(t, uint(0), offline)
@@ -584,7 +584,7 @@ func testGenerateHostStatusStatistics(t *testing.T, ds kolide.Datastore) {
 	})
 	assert.Nil(t, err)
 
-	online, offline, mia, new, err = ds.GenerateHostStatusStatistics(mockClock.Now())
+	online, offline, mia, new, err = ds.GenerateHostStatusStatistics(mockClock.Now(), 60)
 	assert.Nil(t, err)
 	assert.Equal(t, uint(2), online)
 	assert.Equal(t, uint(1), offline)

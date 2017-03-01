@@ -34,6 +34,9 @@ type OptionService interface {
 	// ModifyOptions will change values of the options in OptionRequest.  Note
 	// passing ReadOnly options will cause an error.
 	ModifyOptions(ctx context.Context, req OptionRequest) ([]Option, error)
+	// ExpectedCheckinInterval returns how often we should expect to hear from a
+	// host in seconds
+	ExpectedCheckinInterval(ctx context.Context) (uint, error)
 }
 
 const (
@@ -56,6 +59,11 @@ const (
 	optionTypeInt    = "int"
 	optionTypeBool   = "bool"
 )
+
+var OsqueryIntervalOptionNames = [...]string{
+	"distributed_interval",
+	"logger_tls_period",
+}
 
 // MarshalJSON marshals option type to strings
 func (ot OptionType) MarshalJSON() ([]byte, error) {

@@ -290,8 +290,8 @@ func (d *Datastore) ListHosts(opt kolide.ListOptions) ([]*kolide.Host, error) {
 	return hosts, nil
 }
 
-func (d *Datastore) GenerateHostStatusStatistics(now time.Time) (online, offline, mia, new uint, e error) {
-	sqlStatement := `
+func (d *Datastore) GenerateHostStatusStatistics(now time.Time, onlineInterval uint) (online, offline, mia, new uint, e error) {
+	sqlStatement := fmt.Sprintf(`
 		SELECT (
 			SELECT count(id)
 			FROM hosts
@@ -300,13 +300,13 @@ func (d *Datastore) GenerateHostStatusStatistics(now time.Time) (online, offline
 		(
 			SELECT count(id)
 			FROM hosts
-			WHERE DATE_ADD(seen_time, INTERVAL 30 MINUTE) <= ?
+			WHERE DATE_ADD(seen_time, INTERVAL %d SECOND) <= ?
 			AND DATE_ADD(seen_time, INTERVAL 30 DAY) >= ?
 		) AS offline,
 		(
 			SELECT count(id)
 			FROM hosts
-			WHERE DATE_ADD(seen_time, INTERVAL 30 MINUTE) > ?
+			WHERE DATE_ADD(seen_time, INTERVAL %d SECOND) > ?
 		) AS online,
 		(
 			SELECT count(id)
@@ -315,7 +315,7 @@ func (d *Datastore) GenerateHostStatusStatistics(now time.Time) (online, offline
 		) AS new
 		FROM hosts
 		LIMIT 1;
-	`
+	`, 2*onlineInterval, 2*onlineInterval)
 
 	counts := struct {
 		MIA     uint `db:"mia"`
