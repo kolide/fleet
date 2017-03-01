@@ -79,7 +79,7 @@ func makeStreamDistributedQueryCampaignResultsHandler(svc kolide.Service, jwtKey
 			return
 		}
 		if msg.Type != "select_campaign" {
-			logger.Log(err, "unexpected msg type, expected select_campaign", "msg", msg.Type)
+			logger.Log("err", "unexpected msg type, expected select_campaign", "msg-type", msg.Type)
 			conn.WriteJSONError("expected select_campaign")
 			return
 		}

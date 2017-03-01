@@ -12,7 +12,7 @@ const REQUEST_METHODS = {
 
 class Base {
   constructor () {
-    const { host, origin } = global.window.location;
+    const { origin } = global.window.location;
 
     this.baseURL = `${origin}/api`;
     this.bearerToken = local.getItem('auth_token');
