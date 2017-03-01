@@ -12,28 +12,19 @@ func init() {
 }
 
 func Up_20170301093653(tx *sql.Tx) error {
-	// Get the 'All Hosts' label ID
-	var allHostsID uint
-	err := tx.QueryRow(`
-		 SELECT id FROM labels
-                 WHERE name = 'All Hosts'
-                 AND label_type = ?
+	// Insert any host not currently in 'All Hosts' label into the label
+	_, err := tx.Exec(`
+		INSERT IGNORE INTO label_query_executions (
+                        host_id,
+                        label_id,
+                        matches
+                ) SELECT
+                id as host_id,
+                (SELECT id as label_id FROM labels WHERE name = 'All Hosts' AND label_type = ?),
+                true as matches
+                FROM hosts
 `,
-		kolide.LabelTypeBuiltIn).
-		Scan(&allHostsID)
-	if err != nil {
-		return errors.Wrap(err, "finding 'All Hosts' label")
-	}
-
-	// Insert any host not currently in that label into the label
-	_, err = tx.Exec(`
-		 INSERT IGNORE INTO label_query_executions (
-                         host_id,
-                         label_id,
-                         matches
-                 ) SELECT id as host_id, ?, true FROM hosts
-`,
-		allHostsID)
+		kolide.LabelTypeBuiltIn)
 	if err != nil {
 		return errors.Wrap(err, "adding hosts to 'All Hosts'")
 	}
