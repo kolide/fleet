@@ -53,7 +53,7 @@ func makeStreamDistributedQueryCampaignResultsHandler(svc kolide.Service, jwtKey
 	return sockjs.NewHandler("/api/v1/kolide/results", opt, func(session sockjs.Session) {
 		defer session.Close(0, "none")
 
-		conn := &websocket.Conn{session}
+		conn := &websocket.Conn{Session: session}
 
 		// Receive the auth bearer token
 		token, err := conn.ReadAuthToken()
