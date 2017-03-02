@@ -42,7 +42,6 @@ describe('SelectTargetsMenu - component', () => {
       const Component = mount(<SelectTargetsMenu {...defaultProps} />);
       const componentText = Component.text();
 
-      expect(componentText).toInclude('Unable to find any matching all.');
       expect(componentText).toInclude('Unable to find any matching labels.');
       expect(componentText).toInclude('Unable to find any matching hosts.');
     });
