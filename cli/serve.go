@@ -2,6 +2,7 @@ package cli
 
 import (
 	"crypto/tls"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -65,6 +66,11 @@ the way that the kolide server works.
 			ds, err = mysql.New(config.Mysql, clock.C, mysql.Logger(logger))
 			if err != nil {
 				initFatal(err, "initializing datastore")
+			}
+
+			if ds.MigrationStatus() != nil {
+				fmt.Printf("Database is missing required migrations. Run `%s prepare db` to perform migrations.\n", os.Args[0])
+				os.Exit(1)
 			}
 
 			if initializingDS, ok := ds.(initializer); ok {
