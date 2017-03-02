@@ -12,6 +12,7 @@
   position: relative;
   text-align: center;
   height: 280px;
+  max-width: 300px;
 
   &--online {
     border-top: 6px solid $success;
@@ -88,7 +89,7 @@
     line-height: 15px;
     color: #727083;
     padding: 0;
-    margin: 0 0 15px;
+    margin: 5px 0 15px;
     text-align: center;
 
     .kolidecon {
@@ -102,11 +103,6 @@
       @include flex-basis(49.5%);
       @include flex-grow(1);
       border-right: solid 1px rgba(73, 143, 226, 0.16);
-
-      .kolidecon {
-        font-size: 28px;
-        vertical-align: bottom;
-      }
     }
 
     &--osquery {
