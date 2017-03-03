@@ -9,9 +9,9 @@
 }
 
 .flash-message {
-  @include display(flex);
-  @include align-items(center);
-  @include justify-content(center);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   @include position(fixed, 0 0 null $nav-width);
   color: $white;
   padding: $pad-half;
@@ -41,7 +41,7 @@
   }
 
   &__content {
-    @include flex-grow(1);
+    flex-grow: 1;
     text-align: center;
 
     span {
@@ -69,7 +69,7 @@
     margin-left: 15px;
 
     .kolidecon {
-      @include transition(color 150ms ease-in-out);
+      transition: color 150ms ease-in-out;
       color: $text-light;
       font-size: 24px;
 

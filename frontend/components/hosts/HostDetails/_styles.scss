@@ -1,5 +1,5 @@
 .host-details {
-  @include flex-grow(1);
+  flex-grow: 1;
   background-color: $white;
   border: 1px solid $silver;
   border-radius: 3px;
@@ -73,9 +73,9 @@
   }
 
   &__details-list {
-    @include display(flex);
-    @include flex-wrap(wrap);
-    @include justify-content(space-around);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
     border-top: 1px solid $accent-light;
     list-style: none;
     margin: 8px auto;
@@ -99,14 +99,14 @@
     &--os,
     &--mac,
     &--ip {
-      @include flex-basis(100%);
+      flex-basis: 100%;
     }
 
     &--memory,
     &--cpu,
     &--osquery,
     &--uptime {
-      @include flex-basis(50%);
+      flex-basis: 50%;
     }
   }
 }

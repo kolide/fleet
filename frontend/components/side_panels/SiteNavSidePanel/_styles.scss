@@ -39,7 +39,7 @@
   }
 
   &__button {
-    @include transition(color 200ms ease-in-out);
+    transition: color 200ms ease-in-out;
     line-height: 40px;
     position: relative;
     color: $text-light;
@@ -106,11 +106,11 @@
 
     .site-nav-item__icon {
       @at-root .site-nav--small & {
-        @include transform(translate(-2px, 3px));
+        transform: translate(-2px, 3px);
       }
 
       @include breakpoint(smalldesk) {
-        @include transform(translate(-2px, 3px));
+        transform: translate(-2px, 3px);
       }
     }
 
@@ -184,7 +184,7 @@
   }
 
   &__button {
-    @include transition(color 150ms ease-in-out);
+    transition: color 150ms ease-in-out;
     color: rgba($white, 0.75);
     text-transform: none;
     cursor: pointer;
@@ -212,7 +212,7 @@
   }
 
   &__link {
-    @include transition(font-size 200ms ease-in-out);
+    transition: font-size 200ms ease-in-out;
     font-size: 14px;
 
     &--active {
@@ -271,7 +271,7 @@
 }
 
 .site-sub-items {
-  @include transition(width 100ms ease-in-out);
+  transition: width 100ms ease-in-out;
   background-color: $brand;
   box-shadow: inset 0 5px 8px 0 rgba($black, 0.12), inset 0 -5px 8px 0 rgba($black, 0.12);
   font-size: 13px;
@@ -280,12 +280,12 @@
   position: relative;
 
   @at-root .site-nav--small & {
-    @include linear-gradient(to bottom, #9a61c6 0%, $brand 18%, $brand 82%, #9a61c6 100%);
+    background-image: linear-gradient(to bottom, #9a61c6 0%, $brand 18%, $brand 82%, #9a61c6 100%);
     box-shadow: none;
   }
 
   @include breakpoint(smalldesk) {
-    @include linear-gradient(to bottom, #9a61c6 0%, $brand 18%, $brand 82%, #9a61c6 100%);
+    background-image: linear-gradient(to bottom, #9a61c6 0%, $brand 18%, $brand 82%, #9a61c6 100%);
     box-shadow: none;
   }
 

@@ -9,9 +9,9 @@
 }
 
 .persistent-flash {
-  @include display(flex);
-  @include align-items(center);
-  @include justify-content(center);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   @include position(fixed, 0 0 null $nav-width);
   color: $white;
   padding: $pad-half;
@@ -25,7 +25,7 @@
   }
 
   &__content {
-    @include flex-grow(1);
+    flex-grow: 1;
     text-align: center;
 
     i {
