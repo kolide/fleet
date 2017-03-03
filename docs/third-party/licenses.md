@@ -51,8 +51,6 @@ Third-Party Licenses
 | [async-each](https://www.npmjs.com/package/async-each) | [MIT](https://opensource.org/licenses/MIT) |
 | [async-foreach](https://www.npmjs.com/package/async-foreach) | [MIT](https://opensource.org/licenses/MIT) |
 | [asynckit](https://www.npmjs.com/package/asynckit) | [MIT](https://opensource.org/licenses/MIT) |
-| [autoprefixer](https://www.npmjs.com/package/autoprefixer) | [MIT](https://opensource.org/licenses/MIT) |
-| [autoprefixer-loader](https://www.npmjs.com/package/autoprefixer-loader) | [MIT](https://opensource.org/licenses/MIT) |
 | [aws-sign2](https://www.npmjs.com/package/aws-sign2) | [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0) |
 | [aws4](https://www.npmjs.com/package/aws4) | [MIT](https://opensource.org/licenses/MIT) |
 | [babel-code-frame](https://www.npmjs.com/package/babel-code-frame) | [MIT](https://opensource.org/licenses/MIT) |

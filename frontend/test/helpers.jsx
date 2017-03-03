@@ -81,6 +81,7 @@ export const createAceSpy = () => {
     on: noop,
     renderer: {
       setShowGutter: noop,
+      setScrollMargin: noop,
     },
     session: {
       on: noop,

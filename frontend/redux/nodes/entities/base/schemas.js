@@ -1,15 +1,15 @@
-import { Schema } from 'normalizr';
+import { schema } from 'normalizr';
 
-const campaignsSchema = new Schema('campaigns');
-const configOptionsSchema = new Schema('config_options');
-const hostsSchema = new Schema('hosts');
-const invitesSchema = new Schema('invites');
-const labelsSchema = new Schema('labels');
-const packsSchema = new Schema('packs');
-const queriesSchema = new Schema('queries');
-const scheduledQueriesSchema = new Schema('scheduled_queries');
-const targetsSchema = new Schema('targets');
-const usersSchema = new Schema('users');
+const campaignsSchema = new schema.Entity('campaigns');
+const configOptionsSchema = new schema.Entity('config_options');
+const hostsSchema = new schema.Entity('hosts');
+const invitesSchema = new schema.Entity('invites');
+const labelsSchema = new schema.Entity('labels');
+const packsSchema = new schema.Entity('packs');
+const queriesSchema = new schema.Entity('queries');
+const scheduledQueriesSchema = new schema.Entity('scheduled_queries');
+const targetsSchema = new schema.Entity('targets');
+const usersSchema = new schema.Entity('users');
 
 export default {
   CAMPAIGNS: campaignsSchema,
