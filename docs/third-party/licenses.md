@@ -237,7 +237,6 @@ Third-Party Licenses
 | [cssnano](https://www.npmjs.com/package/cssnano) | [MIT](https://opensource.org/licenses/MIT) |
 | [csso](https://www.npmjs.com/package/csso) | [MIT](https://opensource.org/licenses/MIT) |
 | [cssom](https://www.npmjs.com/package/cssom) | [MIT](https://opensource.org/licenses/MIT) |
-| [cssrecipes-defaults](https://www.npmjs.com/package/cssrecipes-defaults) | [MIT](https://opensource.org/licenses/MIT) |
 | [cssstyle](https://www.npmjs.com/package/cssstyle) | [MIT](https://opensource.org/licenses/MIT) |
 | [currently-unhandled](https://www.npmjs.com/package/currently-unhandled) | [MIT](https://opensource.org/licenses/MIT) |
 | [d](https://www.npmjs.com/package/d) | [MIT](https://opensource.org/licenses/MIT) |
