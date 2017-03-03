@@ -98,7 +98,10 @@ export class QueryPage extends Component {
   }
 
   componentWillUnmount () {
+    const { dispatch } = this.props;
+
     this.resetCampaignAndTargets();
+    dispatch(toggleSmallNav);
 
     return false;
   }
@@ -186,6 +189,7 @@ export class QueryPage extends Component {
         return Kolide.websockets.queries.run(campaignResponse.id)
           .then((socket) => {
             this.setupDistributedQuery(socket);
+
             this.setState({
               campaign: campaignResponse,
               queryIsRunning: true,
@@ -196,26 +200,17 @@ export class QueryPage extends Component {
               const { previousSocketData } = this;
 
               if (previousSocketData && isEqual(socketData, previousSocketData)) {
-                this.previousSocketData = socketData;
-
                 return false;
               }
+              this.previousSocketData = socketData;
 
-              return campaignHelpers.update(this.state.campaign, socketData)
-                .then((updatedCampaign) => {
-                  const { status } = updatedCampaign;
+              this.setState(campaignHelpers.updateCampaignState(socketData));
 
-                  if (status === 'finished') {
-                    this.teardownDistributedQuery();
+              if (socketData.type === 'status' && socketData.data === 'finished') {
+                return this.teardownDistributedQuery();
+              }
 
-                    return false;
-                  }
-
-                  this.previousSocketData = socketData;
-                  this.setState({ campaign: updatedCampaign });
-
-                  return false;
-                });
+              return false;
             };
           });
       })
@@ -296,22 +291,20 @@ export class QueryPage extends Component {
       right: `${rect.right - rect.left}px`,
       bottom: `${rect.bottom - rect.top}px`,
       maxWidth: `${parent.offsetWidth}px`,
-      minWidth: `${parent.offsetWidth}px`,
       maxHeight: `${parent.offsetHeight}px`,
-      minHeight: `${parent.offsetHeight}px`,
       position: 'fixed',
     };
 
     const resetPosition = {
-      position: 'static',
-      maxWidth: 'auto',
-      minWidth: 'auto',
-      maxHeight: 'auto',
-      minHeight: 'auto',
-      top: 'auto',
-      right: 'auto',
-      bottom: 'auto',
-      left: 'auto',
+      position: null,
+      maxWidth: null,
+      minWidth: null,
+      maxHeight: null,
+      minHeight: null,
+      top: null,
+      right: null,
+      bottom: null,
+      left: null,
     };
 
     let newPosition = clone(defaultPosition);

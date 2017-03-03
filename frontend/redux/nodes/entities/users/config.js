@@ -1,13 +1,13 @@
 import Kolide from 'kolide';
-import reduxConfig from 'redux/nodes/entities/base/reduxConfig';
+import Config from 'redux/nodes/entities/base/config';
 import schemas from 'redux/nodes/entities/base/schemas';
 
 const { USERS } = schemas;
 
-export default reduxConfig({
-  createFunc: Kolide.createUser,
+export default new Config({
+  createFunc: Kolide.users.create,
   entityName: 'users',
-  loadAllFunc: Kolide.getUsers,
+  loadAllFunc: Kolide.users.loadAll,
   schema: USERS,
-  updateFunc: Kolide.updateUser,
+  updateFunc: Kolide.users.update,
 });

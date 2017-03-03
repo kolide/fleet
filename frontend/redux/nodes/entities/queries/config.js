@@ -1,15 +1,15 @@
 import Kolide from 'kolide';
-import reduxConfig from 'redux/nodes/entities/base/reduxConfig';
+import Config from 'redux/nodes/entities/base/config';
 import schemas from 'redux/nodes/entities/base/schemas';
 
 const { QUERIES: schema } = schemas;
 
-export default reduxConfig({
-  createFunc: Kolide.createQuery,
-  destroyFunc: Kolide.destroyQuery,
+export default new Config({
+  createFunc: Kolide.queries.create,
+  destroyFunc: Kolide.queries.destroy,
   entityName: 'queries',
-  loadAllFunc: Kolide.getQueries,
-  loadFunc: Kolide.getQuery,
+  loadAllFunc: Kolide.queries.loadAll,
+  loadFunc: Kolide.queries.load,
   schema,
-  updateFunc: Kolide.updateQuery,
+  updateFunc: Kolide.queries.update,
 });
