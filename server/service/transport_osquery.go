@@ -87,10 +87,12 @@ func decodeSubmitLogsRequest(ctx context.Context, r *http.Request) (interface{},
 		if err != nil {
 			return nil, errors.Wrap(err, "decoding gzip")
 		}
+		defer body.Close()
 	}
+
 	var req submitLogsRequest
 	if err = json.NewDecoder(body).Decode(&req); err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "decoding JSON")
 	}
 
 	return req, nil
