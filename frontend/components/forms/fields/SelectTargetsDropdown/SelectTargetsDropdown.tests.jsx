@@ -7,7 +7,7 @@ import { noop } from 'lodash';
 import SelectTargetsDropdown from 'components/forms/fields/SelectTargetsDropdown';
 import Test from 'test';
 
-describe('SelectTargetsDropdown - component', () => {
+describe.only('SelectTargetsDropdown - component', () => {
   const defaultProps = {
     disabled: false,
     label: 'Select Targets',

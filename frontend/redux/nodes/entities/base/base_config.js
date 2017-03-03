@@ -12,7 +12,7 @@ class BaseConfig {
     this.loadFunc = inputs.loadFunc;
     this.parseApiResponseFunc = inputs.parseApiResponseFunc;
     this.parseEntityFunc = inputs.parseEntityFunc;
-    this.inputSchema = inputs.inputSchema;
+    this.inputSchema = inputs.schema;
     this.successAction = this.successAction.bind(this);
     this.updateFunc = inputs.updateFunc;
 
@@ -118,7 +118,7 @@ class BaseConfig {
     const { _parse, inputSchema } = this;
     const parsable = isArray(response) ? response : [response];
     const parsed = _parse(parsable);
-    const { entities } = normalize(parsed, new schema.Array(inputSchema));
+    const { entities } = normalize(parsed, [inputSchema]);
 
     return thunk(entities);
   }

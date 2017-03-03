@@ -36,3 +36,9 @@
     width: $nav-tablet-width;
   }
 }
+
+.kolide-load-bar {
+  background-color: $brand-light;
+  height: 3px;
+  position: absolute;
+}
