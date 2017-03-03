@@ -52,7 +52,7 @@ describe('QueryPage - component', () => {
 
   const store = {
     app: {
-      isSmallNav:  false,
+      isSmallNav: false,
     },
     components: {
       QueryPages: {
@@ -131,7 +131,7 @@ describe('QueryPage - component', () => {
     const locationWithQueryProp = { params: { id: 1 }, location: { query: {} } };
     const mockStoreWithQuery = reduxMockStore({
       app: {
-        isSmallNav:  false,
+        isSmallNav: false,
       },
       components: {
         QueryPages: {

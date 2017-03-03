@@ -1,5 +1,5 @@
 import { capitalize, isArray } from 'lodash';
-import { normalize, schema } from 'normalizr';
+import { normalize } from 'normalizr';
 
 import { formatErrorResponse } from 'redux/nodes/entities/base/helpers';
 

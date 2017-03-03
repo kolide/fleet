@@ -31,7 +31,11 @@ module.exports = {
     'linebreak-style': 0,
     'import/no-named-as-default': 'off',
     'import/no-named-as-default-member': 'off',
-    'no-underscore-dangle': 0
+    'no-underscore-dangle': 0,
+    'react/require-default-props': 0,
+    'comma-dangle': ['error', 'always-multiline'],
+    'no-restricted-syntax': 0,
+    'react/no-array-index-key': 0
   },
   settings: {
     'import/resolver': {
