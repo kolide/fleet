@@ -22,8 +22,8 @@
   }
 
   &__org {
-    transition: border 150ms $ease-in-quad;
     @include clearfix;
+    transition: border 150ms $ease-in-quad;
     position: relative;
     z-index: 2;
     border-bottom: 1px solid $accent-light;

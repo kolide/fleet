@@ -46,8 +46,8 @@
   }
 
   &__switch {
-    user-select: none;
     @include position(absolute, auto auto auto auto);
+    user-select: none;
     font-family: 'Oxygen', $helvetica;
     font-weight: 600;
     font-style: normal;

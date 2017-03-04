@@ -42,8 +42,8 @@
   }
 
   &__container {
-    align-self: center;
     @include size(500px auto);
+    align-self: center;
     border-radius: 4px;
     background-color: $white;
     box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.3);

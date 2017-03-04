@@ -1,6 +1,6 @@
 .stacked-white-boxes {
   @include position(absolute, null null null 50%);
-  transition: all 300ms ease-in;
+  transition: transform 300ms ease-in, opacity 300ms ease-in;
   margin: 75px 0 0 -262px;
   width: 524px;
 
