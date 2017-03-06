@@ -13,7 +13,7 @@ const LonelyHost = ({ onClick = noop }) => {
       <Button variant="unstyled" className={`${baseClass}__add-host-btn`} onClick={onClick}>
         <span className={`${baseClass}__title`}>Add New Host</span>
         <span className={`${baseClass}__icon`}>
-          <img src={laptop} className={`${baseClass}__laptop`} role="presentation" />
+          <img src={laptop} className={`${baseClass}__laptop`} alt="" />
         </span>
       </Button>
 
@@ -21,7 +21,7 @@ const LonelyHost = ({ onClick = noop }) => {
         <h1>It&#39;s Kinda Lonely In Here...</h1>
         <h2>Get started adding hosts to Kolide.</h2>
         <p>This can be done individually or across your entire fleet.</p>
-        <img src={swoop} className={`${baseClass}__swoop`} role="presentation" />
+        <img src={swoop} className={`${baseClass}__swoop`} alt="" />
       </div>
     </div>
   );

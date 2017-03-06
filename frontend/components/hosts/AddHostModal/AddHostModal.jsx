@@ -72,7 +72,7 @@ class AddHostModal extends Component {
               <p>Osquery requires the same TLS certificate that Kolide is using in order to authenticate. You can fetch the certificate below:</p>
               <p className={`${baseClass}__download-cert`}>
                 <Button variant="unstyled" onClick={onFetchCertificate}>
-                  <img src={certificate} role="presentation" />
+                  <img src={certificate} alt="" />
                   <span>Fetch Kolide Certificate</span>
                 </Button>
               </p>

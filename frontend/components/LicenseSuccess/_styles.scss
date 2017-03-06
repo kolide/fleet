@@ -1,12 +1,12 @@
 .license-success {
-  @include display(flex);
-  @include align-content(center);
-  @include justify-content(center);
-  @include flex-grow(1);
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  flex-grow: 1;
   padding: 20px;
 
   h2 {
-    @include display(flex);
+    display: flex;
     border-bottom: 1px solid $accent-medium;
     color: #48c586;
     font-size: 24px;
@@ -22,7 +22,7 @@
   }
 
   h3 {
-    @include display(flex);
+    display: flex;
     color: $link;
     font-size: 24px;
     font-weight: $bold;
@@ -42,8 +42,8 @@
   }
 
   &__container {
-    @include align-self(center);
     @include size(500px auto);
+    align-self: center;
     border-radius: 4px;
     background-color: $white;
     box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.3);
@@ -57,7 +57,7 @@
     text-decoration: none;
 
     li {
-      @include display(flex);
+      display: flex;
       font-size: 24px;
       line-height: 48px;
       margin-bottom: 30px;

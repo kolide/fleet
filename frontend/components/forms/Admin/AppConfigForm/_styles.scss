@@ -70,7 +70,7 @@
     }
 
     h3 {
-      @include display(inline-flex);
+      display: inline-flex;
       color: #858495;
       font-size: 20px;
       font-weight: $normal;
@@ -93,7 +93,7 @@
     float: left;
 
     &-row {
-      @include display(flex);
+      display: flex;
 
       margin-bottom: 25px;
     }

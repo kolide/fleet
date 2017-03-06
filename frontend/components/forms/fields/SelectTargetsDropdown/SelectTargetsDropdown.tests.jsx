@@ -4,6 +4,7 @@ import { mount } from 'enzyme';
 import nock from 'nock';
 import { noop } from 'lodash';
 
+import Kolide from 'kolide';
 import SelectTargetsDropdown from 'components/forms/fields/SelectTargetsDropdown';
 import Test from 'test';
 
@@ -75,33 +76,14 @@ describe('SelectTargetsDropdown - component', () => {
   });
 
   describe('#fetchTargets', () => {
-    const apiResponseWithTargets = {
-      targets: {
-        hosts: [],
-        labels: [Test.Stubs.labelStub],
-      },
-    };
-    const apiResponseWithoutTargets = {
-      targets: {
-        hosts: [],
-        labels: [],
-      },
-    };
-    const defaultSelectedTargets = { hosts: [], labels: [] };
-    const defaultParams = {
-      query: '',
-      selected: defaultSelectedTargets,
-    };
-    const expectedApiClientResponseWithTargets = {
-      targets: [{ ...Test.Stubs.labelStub, target_type: 'labels' }],
-    };
+    const bearerToken = 'bearerToken';
 
     afterEach(() => restoreSpies());
 
     it('calls the api', () => {
-      nock.cleanAll();
+      Kolide.setBearerToken(bearerToken);
 
-      const request = Test.Mocks.targetMock(defaultParams, apiResponseWithTargets);
+      const request = Test.Mocks.targets.loadAll.valid(bearerToken, '');
       const Component = mount(<SelectTargetsDropdown {...defaultProps} />);
       const node = Component.node;
 
@@ -112,18 +94,17 @@ describe('SelectTargetsDropdown - component', () => {
     });
 
     it('calls the onFetchTargets prop', () => {
-      nock.cleanAll();
+      Kolide.setBearerToken(bearerToken);
+      Test.Mocks.targets.loadAll.valid(bearerToken, '');
 
       const onFetchTargets = createSpy();
       const props = { ...defaultProps, onFetchTargets };
       const Component = mount(<SelectTargetsDropdown {...props} />);
       const node = Component.node;
 
-      Test.Mocks.targetMock(defaultParams, apiResponseWithTargets);
-
       return node.fetchTargets()
         .then(() => {
-          expect(onFetchTargets).toHaveBeenCalledWith('', expectedApiClientResponseWithTargets);
+          expect(onFetchTargets).toHaveBeenCalled();
         });
     });
 
@@ -143,7 +124,8 @@ describe('SelectTargetsDropdown - component', () => {
       const Component = mount(<SelectTargetsDropdown {...defaultProps} />);
       const node = Component.node;
 
-      Test.Mocks.targetMock(defaultParams, apiResponseWithoutTargets);
+      Kolide.setBearerToken(bearerToken);
+      Test.Mocks.targets.loadAll.valid(bearerToken, '');
 
       return node.fetchTargets()
         .then(() => {
@@ -158,7 +140,8 @@ describe('SelectTargetsDropdown - component', () => {
       const Component = mount(<SelectTargetsDropdown {...defaultProps} />);
       const node = Component.node;
 
-      Test.Mocks.targetMock(defaultParams);
+      Kolide.setBearerToken(bearerToken);
+      Test.Mocks.targets.loadAll.valid(bearerToken, query);
 
       return node.fetchTargets(query)
         .then((q) => {

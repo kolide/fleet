@@ -33,7 +33,7 @@
   }
 
   &__form {
-    @include display(flex);
+    display: flex;
 
     .form-field--dropdown {
       width: 300px;
@@ -42,7 +42,7 @@
     }
 
     .form-field--input {
-      @include flex-grow(1);
+      flex-grow: 1;
     }
   }
 

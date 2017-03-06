@@ -1,5 +1,5 @@
 .secondary-side-panel-container {
-  @include align-self(stretch);
+  align-self: stretch;
   background-color: $white;
   border-left: 1px solid $border-medium;
   border-top: 1px solid $border-medium;

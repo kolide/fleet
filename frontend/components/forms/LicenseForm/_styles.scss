@@ -1,8 +1,8 @@
 .license-form {
-  @include display(flex);
-  @include align-content(center);
-  @include justify-content(center);
-  @include flex-grow(1);
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  flex-grow: 1;
 
   textarea {
     resize: none;
@@ -14,7 +14,7 @@
   }
 
   h2 {
-    @include display(flex);
+    display: flex;
     color: $link;
     font-size: 24px;
     font-weight: $bold;
@@ -23,8 +23,8 @@
   }
 
   &__container {
-    @include align-self(center);
     @include size(500px auto);
+    align-self: center;
     border-radius: 4px;
     background-color: $white;
     box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.3);
@@ -42,8 +42,8 @@
   }
 
   &__free-trial-btn {
-    @include display(flex);
-    @include align-items(center);
+    display: flex;
+    align-items: center;
 
     background-color: $white;
     border: 1px solid $accent-light;

@@ -1,5 +1,5 @@
 import { capitalize, isArray } from 'lodash';
-import { normalize, arrayOf } from 'normalizr';
+import { normalize } from 'normalizr';
 
 import { formatErrorResponse } from 'redux/nodes/entities/base/helpers';
 
@@ -118,7 +118,7 @@ class BaseConfig {
     const { _parse, schema } = this;
     const parsable = isArray(response) ? response : [response];
     const parsed = _parse(parsable);
-    const { entities } = normalize(parsed, arrayOf(schema));
+    const { entities } = normalize(parsed, [schema]);
 
     return thunk(entities);
   }

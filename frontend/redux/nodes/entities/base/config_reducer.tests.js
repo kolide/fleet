@@ -23,7 +23,6 @@ describe('ReduxConfig - reducer', () => {
     describe('successful action', () => {
       it('adds the user to state', () => {
         const createSuccessAction = actions.successAction([userStub], actions.createSuccess);
-
         const newState = reducer(ReduxConfig.initialState, createSuccessAction);
 
         expect(newState).toEqual({

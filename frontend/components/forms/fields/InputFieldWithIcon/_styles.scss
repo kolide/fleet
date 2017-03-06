@@ -31,7 +31,9 @@
     color: $text-dark;
     font-weight: $light;
 
-    @include placeholder {
+    &:-ms-input-placeholder,
+    &::-ms-input-placeholder,
+    &::placeholder {
       color: $accent-text;
     }
 

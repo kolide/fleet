@@ -102,9 +102,12 @@ export class QueryPage extends Component {
     const { dispatch, isSmallNav } = this.props;
 
     this.resetCampaignAndTargets();
-
     if (isSmallNav) {
       dispatch(toggleSmallNav);
+    }
+
+    if (this.runQueryInterval) {
+      clearInterval(this.runQueryInterval);
     }
 
     return false;

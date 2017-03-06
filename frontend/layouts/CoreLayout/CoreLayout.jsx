@@ -103,7 +103,7 @@ export class CoreLayout extends Component {
 
     return (
       <div className="app-wrap">
-        <LoadingBar />
+        <LoadingBar className="kolide-load-bar" />
         <nav className={siteNavClasses}>
           <SiteNavHeader
             config={config}
