@@ -46,6 +46,7 @@ export class QueryPage extends Component {
       base: PropTypes.string,
     }),
     hostIDs: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
+    isSmallNav: PropTypes.bool.isRequired,
     loadingQueries: PropTypes.bool.isRequired,
     location: PropTypes.shape({
       pathname: PropTypes.string,
