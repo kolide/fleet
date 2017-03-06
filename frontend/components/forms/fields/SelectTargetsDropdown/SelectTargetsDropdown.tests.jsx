@@ -76,27 +76,7 @@ describe('SelectTargetsDropdown - component', () => {
   });
 
   describe('#fetchTargets', () => {
-    const apiResponseWithTargets = {
-      targets: {
-        hosts: [],
-        labels: [Test.Stubs.labelStub],
-      },
-    };
-    const apiResponseWithoutTargets = {
-      targets: {
-        hosts: [],
-        labels: [],
-      },
-    };
     const bearerToken = 'bearerToken';
-    const defaultSelectedTargets = { hosts: [], labels: [] };
-    const defaultParams = {
-      query: '',
-      selected: defaultSelectedTargets,
-    };
-    const expectedApiClientResponseWithTargets = {
-      targets: [{ ...Test.Stubs.labelStub, target_type: 'labels' }],
-    };
 
     afterEach(() => restoreSpies());
 

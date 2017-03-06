@@ -83,7 +83,7 @@ rules:
       allow-element-with-class: false
       allow-element-with-id: false
   no-trailing-zero: 1
-  no-transition-all: 1
+  no-transition-all: 0
   no-url-protocols: 1
   placeholder-name-format:
     - 1
