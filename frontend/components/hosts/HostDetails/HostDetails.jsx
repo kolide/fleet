@@ -81,7 +81,7 @@ const HostDetails = ({ host, onDestroyHost, onQueryHost }) => {
 
         <li className={` ${baseClass}__detail ${baseClass}__detail--mac`}>
           <Icon name="mac" className={`${baseClass}__icon`} title="MAC Address" />
-          <span className={`${baseClass}__host-content ${baseClass}__host-content--mono`}>{hostMac.toUpperCase() || '--'}</span>
+          <span className={`${baseClass}__host-content ${baseClass}__host-content--mono`}>{hostMac ? hostMac.toUpperCase() : '--'}</span>
         </li>
 
         <li className={` ${baseClass}__detail ${baseClass}__detail--ip`}>
