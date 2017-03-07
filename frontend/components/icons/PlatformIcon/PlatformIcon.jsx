@@ -19,7 +19,6 @@ export class PlatformIcon extends Component {
     const { className, name, fw, size, title } = this.props;
     const iconClasses = classnames(baseClass, className);
     let iconName = platformIconClass(name);
-    // const properNameCase = name.charAt(0).toUpperCase() + name.slice(1);
 
     if (!iconName) {
       iconName = 'single-host';
