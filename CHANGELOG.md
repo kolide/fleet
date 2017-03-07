@@ -1,3 +1,5 @@
+*   Update platform text "All" to use icon
+
 *   Update Host details cards UI
 
 *   Add support for rotating the osquery status and result log files by sending
