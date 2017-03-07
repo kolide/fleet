@@ -1,3 +1,5 @@
+*   Fix sequence of events that would make Select Targets dropdown not render Hosts
+
 *   Update Host details cards UI
 
 *   Add support for rotating the osquery status and result log files by sending
