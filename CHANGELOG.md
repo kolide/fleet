@@ -1,3 +1,5 @@
+*   When scheduling a query in a Pack if you select All platforms with other OSes it would only run on All, fixed UI to represent this.
+
 *   Update Host details cards UI
 
 *   Add support for rotating the osquery status and result log files by sending
