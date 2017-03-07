@@ -25,7 +25,12 @@ func (svc service) ExpectedCheckinInterval(ctx context.Context) (uint, error) {
 	interval := uint(0)
 	found := false
 
-	for _, option := range kolide.OsqueryIntervalOptionNames {
+	osqueryIntervalOptionNames := []string{
+		"distributed_interval",
+		"logger_tls_period",
+	}
+
+	for _, option := range osqueryIntervalOptionNames {
 		// for each option which is known to hold a TLS check-in interval, try to
 		// fetch it
 		opt, err := svc.ds.OptionByName(option)

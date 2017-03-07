@@ -60,11 +60,6 @@ const (
 	optionTypeBool   = "bool"
 )
 
-var OsqueryIntervalOptionNames = [...]string{
-	"distributed_interval",
-	"logger_tls_period",
-}
-
 // MarshalJSON marshals option type to strings
 func (ot OptionType) MarshalJSON() ([]byte, error) {
 	return []byte(fmt.Sprintf(`"%s"`, ot)), nil
