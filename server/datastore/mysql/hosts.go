@@ -291,7 +291,7 @@ func (d *Datastore) ListHosts(opt kolide.ListOptions) ([]*kolide.Host, error) {
 }
 
 func (d *Datastore) GenerateHostStatusStatistics(now time.Time, onlineInterval uint) (online, offline, mia, new uint, e error) {
-	sqlStatement := fmt.Sprintf(`
+	sqlStatement := `
 		SELECT (
 			SELECT count(id)
 			FROM hosts
@@ -300,13 +300,13 @@ func (d *Datastore) GenerateHostStatusStatistics(now time.Time, onlineInterval u
 		(
 			SELECT count(id)
 			FROM hosts
-			WHERE DATE_ADD(seen_time, INTERVAL %d SECOND) <= ?
+			WHERE DATE_ADD(seen_time, INTERVAL ? SECOND) <= ?
 			AND DATE_ADD(seen_time, INTERVAL 30 DAY) >= ?
 		) AS offline,
 		(
 			SELECT count(id)
 			FROM hosts
-			WHERE DATE_ADD(seen_time, INTERVAL %d SECOND) > ?
+			WHERE DATE_ADD(seen_time, INTERVAL ? SECOND) > ?
 		) AS online,
 		(
 			SELECT count(id)
@@ -315,7 +315,7 @@ func (d *Datastore) GenerateHostStatusStatistics(now time.Time, onlineInterval u
 		) AS new
 		FROM hosts
 		LIMIT 1;
-	`, 2*onlineInterval, 2*onlineInterval)
+	`
 
 	counts := struct {
 		MIA     uint `db:"mia"`
@@ -323,7 +323,7 @@ func (d *Datastore) GenerateHostStatusStatistics(now time.Time, onlineInterval u
 		Online  uint `db:"online"`
 		New     uint `db:"new"`
 	}{}
-	err := d.db.Get(&counts, sqlStatement, now, now, now, now, now)
+	err := d.db.Get(&counts, sqlStatement, now, 2*onlineInterval, now, now, 2*onlineInterval, now, now)
 	if err != nil && err != sql.ErrNoRows {
 		e = errors.Wrap(err, "generating host statistics")
 		return
