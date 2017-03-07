@@ -55,7 +55,7 @@ const HostDetails = ({ host, onDestroyHost, onQueryHost }) => {
 
       <ul className={`${baseClass}__details-list`}>
         {!!osVersion && <li className={` ${baseClass}__detail ${baseClass}__detail--os`}>
-          <PlatformIcon name={platform} className={`${baseClass}__icon`} />
+          <PlatformIcon name={platform} title={platform} className={`${baseClass}__icon`} />
           <span className={`${baseClass}__host-content`}>{osVersion}</span>
         </li>}
 

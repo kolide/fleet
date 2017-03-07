@@ -55,10 +55,10 @@ class ScheduledQueriesListItem extends Component {
     const platformArr = platform ? platform.split(',') : [];
 
     if (isEmpty(platformArr) || platformArr.includes('all')) {
-      return <PlatformIcon name="" />;
+      return <PlatformIcon name="all" title="All Platforms" />;
     }
 
-    return platformArr.map((pltf, idx) => <PlatformIcon name={pltf} key={`${idx}-${pltf}`} />);
+    return platformArr.map((pltf, idx) => <PlatformIcon name={pltf} title={pltf} key={`${idx}-${pltf}`} />);
   }
 
   render () {
