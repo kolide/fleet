@@ -1,4 +1,4 @@
-*   When scheduling a query in a Pack if you select All platforms with other OSes it would only run on All, fixed UI to represent this.
+*   When setting the platform for a scheduled query, selecting "All" now clears individually selected platforms.
 
 *   Update Host details cards UI
 
