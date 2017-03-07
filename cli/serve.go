@@ -70,6 +70,9 @@ the way that the kolide server works.
 
 			if ds.MigrationStatus() != nil {
 				fmt.Printf("Database is missing required migrations. Run `%s prepare db` to perform migrations.\n", os.Args[0])
+				if config.Logging.Debug {
+					fmt.Println("error: ", err.Error())
+				}
 				os.Exit(1)
 			}
 
