@@ -48,7 +48,7 @@ func (svc service) ExpectedCheckinInterval(ctx context.Context) (uint, error) {
 		// If an option has not been found yet, we want to save this interval.
 		// If an option HAS been found already and this one is less, we want to
 		// save that as our new minimum check-in interval.
-		if !found || (found && (val < interval)) {
+		if !found || val < interval {
 			found = true
 			interval = val
 		}
