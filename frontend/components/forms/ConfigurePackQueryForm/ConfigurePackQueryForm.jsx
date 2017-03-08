@@ -48,6 +48,14 @@ export class ConfigurePackQueryForm extends Component {
     onCancel: PropTypes.func,
   };
 
+  componentWillMount () {
+    const { fields } = this.props;
+
+    if (fields && fields.shared && !fields.shard.value) {
+      fields.shard.value = '';
+    }
+  }
+
   onCancel = (evt) => {
     evt.preventDefault();
 
@@ -91,10 +99,6 @@ export class ConfigurePackQueryForm extends Component {
   render () {
     const { fields, handleSubmit } = this.props;
     const { handlePlatformChoice, renderCancelButton } = this;
-
-    if (!fields.shard.value) {
-      fields.shard.value = '';
-    }
 
     return (
       <form className={baseClass} onSubmit={handleSubmit}>
