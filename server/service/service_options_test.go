@@ -40,11 +40,11 @@ func TestExpectedCheckinInterval(t *testing.T) {
 	options, err := svc.GetOptions(ctx)
 	require.Nil(t, err)
 	updateLocalOptionValues(options)
-	require.Equal(t, int(distributedInterval), 10)
-	require.Equal(t, int(loggerTlsPeriod), 10)
+	require.Equal(t, 10, int(distributedInterval))
+	require.Equal(t, 10, int(loggerTlsPeriod))
 	interval, err := svc.ExpectedCheckinInterval(ctx)
 	require.Nil(t, err)
-	assert.Equal(t, int(interval), 10)
+	assert.Equal(t, 10, int(interval))
 
 	options, err = svc.ModifyOptions(ctx, kolide.OptionRequest{
 		Options: []kolide.Option{
@@ -65,11 +65,11 @@ func TestExpectedCheckinInterval(t *testing.T) {
 	options, err = svc.GetOptions(ctx)
 	require.Nil(t, err)
 	updateLocalOptionValues(options)
-	require.Equal(t, int(distributedInterval), 5)
-	require.Equal(t, int(loggerTlsPeriod), 10)
+	require.Equal(t, 5, int(distributedInterval))
+	require.Equal(t, 10, int(loggerTlsPeriod))
 	interval, err = svc.ExpectedCheckinInterval(ctx)
 	require.Nil(t, err)
-	assert.Equal(t, int(interval), 5)
+	assert.Equal(t, 5, int(interval))
 
 	options, err = svc.ModifyOptions(ctx, kolide.OptionRequest{
 		Options: []kolide.Option{
@@ -90,9 +90,9 @@ func TestExpectedCheckinInterval(t *testing.T) {
 	options, err = svc.GetOptions(ctx)
 	require.Nil(t, err)
 	updateLocalOptionValues(options)
-	require.Equal(t, int(distributedInterval), 5)
-	require.Equal(t, int(loggerTlsPeriod), 1)
+	require.Equal(t, 5, int(distributedInterval))
+	require.Equal(t, 1, int(loggerTlsPeriod))
 	interval, err = svc.ExpectedCheckinInterval(ctx)
 	require.Nil(t, err)
-	assert.Equal(t, int(interval), 1)
+	assert.Equal(t, 1, int(interval))
 }
