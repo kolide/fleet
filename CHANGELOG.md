@@ -1,4 +1,4 @@
-*   Update platform text "All" to use icon
+*   Show a generic computer icon when when referring to hosts with an unknown platform instead of the text "All"
 
 *   Update Host details cards UI
 
