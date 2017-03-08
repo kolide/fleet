@@ -103,6 +103,42 @@ func (d *Datastore) MigrateData() error {
 	return nil
 }
 
+func (d *Datastore) MigrationStatus() error {
+	if tables.MigrationClient.Migrations == nil || data.MigrationClient.Migrations == nil {
+		return errors.New("unexpected nil migrations list")
+	}
+
+	lastTablesMigration, err := tables.MigrationClient.Migrations.Last()
+	if err != nil {
+		return errors.New("missing tables migrations")
+	}
+
+	currentTablesVersion, err := tables.MigrationClient.GetDBVersion(d.db.DB)
+	if err != nil {
+		return errors.New("cannot get table migration status")
+	}
+
+	if currentTablesVersion != lastTablesMigration.Version {
+		return errors.New("table migrations must be run")
+	}
+
+	lastDataMigration, err := data.MigrationClient.Migrations.Last()
+	if err != nil {
+		return errors.New("missing data migrations")
+	}
+
+	currentDataVersion, err := data.MigrationClient.GetDBVersion(d.db.DB)
+	if err != nil {
+		return errors.New("cannot get table migration status")
+	}
+
+	if currentDataVersion != lastDataMigration.Version {
+		return errors.New("data migrations must be run")
+	}
+
+	return nil
+}
+
 // Drop removes database
 func (d *Datastore) Drop() error {
 	tables := []struct {
@@ -217,7 +253,7 @@ func registerTLS(config config.MysqlConfig) error {
 // provided configuration.
 func generateMysqlConnectionString(conf config.MysqlConfig) string {
 	dsn := fmt.Sprintf(
-		"%s:%s@(%s)/%s?charset=utf8&parseTime=true&loc=UTC",
+		"%s:%s@(%s)/%s?charset=utf8mb4&parseTime=true&loc=UTC",
 		conf.Username,
 		conf.Password,
 		conf.Address,
