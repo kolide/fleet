@@ -45,9 +45,18 @@ func (svc service) ExpectedCheckinInterval(ctx context.Context) (uint, error) {
 		}
 
 		// try to cast the option as a uint. if this fails, the option has likely been set incorrectly
-		val, ok := opt.Value.Val.(uint)
-		if !ok {
-			return 0, errors.New("Option is not a uint: " + opt.Name)
+		var val uint
+		switch v := opt.Value.Val.(type) {
+		case int:
+			val = uint(v)
+		case uint:
+			val = v
+		case uint64:
+			val = uint(v)
+		case float64:
+			val = uint(v)
+		default:
+			return 0, errors.New("Option is not a number: " + opt.Name)
 		}
 
 		// If an option has not been found yet, we want to save this interval.
