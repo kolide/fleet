@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import classnames from 'classnames';
 
 import Checkbox from 'components/forms/fields/Checkbox';
 import ClickableTableRow from 'components/ClickableTableRow';
@@ -18,8 +19,14 @@ class ScheduledQueriesListItem extends Component {
     scheduledQuery: scheduledQueryInterface.isRequired,
   };
 
-  shouldComponentUpdate (nextProps) {
-    if (isEqual(nextProps, this.props)) {
+  constructor (props) {
+    super(props);
+
+    this.state = { isRowSelected: false };
+  }
+
+  shouldComponentUpdate (nextProps, nextState) {
+    if (isEqual(nextProps, this.props) && isEqual(nextState, this.state)) {
       return false;
     }
 
@@ -34,6 +41,9 @@ class ScheduledQueriesListItem extends Component {
 
   onSelect = () => {
     const { onSelect, scheduledQuery } = this.props;
+    const { isRowSelected } = this.state;
+
+    this.setState({ isRowSelected: !isRowSelected });
 
     return onSelect(scheduledQuery);
   }
@@ -65,11 +75,15 @@ class ScheduledQueriesListItem extends Component {
 
   render () {
     const { checked, disabled, scheduledQuery } = this.props;
+    const { isRowSelected } = this.state;
     const { id, name, interval, shard, version } = scheduledQuery;
     const { loggingTypeString, onCheck, onSelect, renderPlatformIcon } = this;
+    const rowClassname = classnames(baseClass, {
+      [`${baseClass}--selected`]: isRowSelected,
+    });
 
     return (
-      <ClickableTableRow onClick={onSelect} className={baseClass}>
+      <ClickableTableRow onClick={onSelect} className={rowClassname}>
         <td>
           <Checkbox
             disabled={disabled}

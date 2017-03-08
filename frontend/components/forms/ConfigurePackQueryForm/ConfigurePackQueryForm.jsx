@@ -92,6 +92,10 @@ export class ConfigurePackQueryForm extends Component {
     const { fields, handleSubmit } = this.props;
     const { handlePlatformChoice, renderCancelButton } = this;
 
+    if (!fields.shard.value) {
+      fields.shard.value = '';
+    }
+
     return (
       <form className={baseClass} onSubmit={handleSubmit}>
         <h2 className={`${baseClass}__title`}>configuration</h2>
