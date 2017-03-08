@@ -69,9 +69,13 @@ the way that the kolide server works.
 			}
 
 			if ds.MigrationStatus() != nil {
-				fmt.Printf("***WARNING***\n"+
-					"Database is missing required migrations. This is likely to cause errors in Kolide.\n"+
-					"Run `%s prepare db` to perform migrations.\n",
+				fmt.Printf("################################################################################\n"+
+					"# WARNING:\n"+
+					"#   Your Kolide database is missing required migrations. This is likely to cause\n"+
+					"#   errors in Kolide.\n"+
+					"#\n"+
+					"#   Run `%s prepare db` to perform migrations.\n"+
+					"################################################################################\n",
 					os.Args[0])
 				if config.Logging.Debug {
 					fmt.Println("error: ", err.Error())
