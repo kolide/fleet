@@ -8,6 +8,8 @@ import (
 	"golang.org/x/net/context"
 )
 
+const expectedCheckinIntervalMultiplier = 2
+
 func (svc service) GetOptions(ctx context.Context) ([]kolide.Option, error) {
 	opts, err := svc.ds.ListOptions()
 	if err != nil {
@@ -73,9 +75,9 @@ func (svc service) ExpectedCheckinInterval(ctx context.Context) (time.Duration, 
 	// if we never found any interval options set, the default distributed
 	// interval is 60, so we use that
 	if !found {
-		return 60 * time.Second * 2, nil
+		interval = 60
 	}
 
 	// return the lowest interval that we found
-	return time.Duration(interval) * time.Second * 2, nil
+	return time.Duration(interval) * time.Second * expectedCheckinIntervalMultiplier, nil
 }
