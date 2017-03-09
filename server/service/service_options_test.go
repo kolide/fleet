@@ -45,7 +45,7 @@ func TestExpectedCheckinInterval(t *testing.T) {
 	require.Equal(t, 10, int(loggerTlsPeriod))
 	interval, err := svc.ExpectedCheckinInterval(ctx)
 	require.Nil(t, err)
-	assert.Equal(t, 10*time.Second, interval)
+	assert.Equal(t, 20*time.Second, interval)
 
 	options, err = svc.ModifyOptions(ctx, kolide.OptionRequest{
 		Options: []kolide.Option{
@@ -70,7 +70,7 @@ func TestExpectedCheckinInterval(t *testing.T) {
 	require.Equal(t, 10, int(loggerTlsPeriod))
 	interval, err = svc.ExpectedCheckinInterval(ctx)
 	require.Nil(t, err)
-	assert.Equal(t, 5*time.Second, interval)
+	assert.Equal(t, 10*time.Second, interval)
 
 	options, err = svc.ModifyOptions(ctx, kolide.OptionRequest{
 		Options: []kolide.Option{
@@ -95,5 +95,5 @@ func TestExpectedCheckinInterval(t *testing.T) {
 	require.Equal(t, 1, int(loggerTlsPeriod))
 	interval, err = svc.ExpectedCheckinInterval(ctx)
 	require.Nil(t, err)
-	assert.Equal(t, time.Second, interval)
+	assert.Equal(t, 2*time.Second, interval)
 }

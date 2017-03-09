@@ -73,9 +73,9 @@ func (svc service) ExpectedCheckinInterval(ctx context.Context) (time.Duration, 
 	// if we never found any interval options set, the default distributed
 	// interval is 60, so we use that
 	if !found {
-		return 60 * time.Second, nil
+		return 60 * time.Second * 2, nil
 	}
 
 	// return the lowest interval that we found
-	return time.Duration(interval) * time.Second, nil
+	return time.Duration(interval) * time.Second * 2, nil
 }

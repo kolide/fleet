@@ -147,7 +147,7 @@ func (h *Host) Status(now time.Time, onlineInterval time.Duration) string {
 	switch {
 	case h.SeenTime.Add(MIADuration).Before(now):
 		return StatusMIA
-	case h.SeenTime.Add(2 * onlineInterval).Before(now):
+	case h.SeenTime.Add(onlineInterval).Before(now):
 		return StatusOffline
 	default:
 		return StatusOnline
