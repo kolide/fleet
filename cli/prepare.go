@@ -4,8 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"syscall"
-	"unsafe"
 
 	"github.com/WatchBeam/clock"
 	kitlog "github.com/go-kit/kit/log"
@@ -15,18 +13,8 @@ import (
 	"github.com/kolide/kolide/server/pubsub"
 	"github.com/kolide/kolide/server/service"
 	"github.com/spf13/cobra"
-	"golang.org/x/crypto/ssh/terminal"
 	"golang.org/x/net/context"
 )
-
-const ioctlReadTermios = 0x5401
-
-// isTerminal returns true if the given file descriptor is a terminal.
-func isTerminal(fd int) bool {
-	var termios syscall.Termios
-	_, _, err := syscall.Syscall6(syscall.SYS_IOCTL, uintptr(fd), ioctlReadTermios, uintptr(unsafe.Pointer(&termios)), 0, 0, 0)
-	return err == 0
-}
 
 func createPrepareCmd(configManager config.Manager) *cobra.Command {
 
@@ -42,6 +30,8 @@ To setup kolide infrastructure, use one of the available commands.
 			cmd.Help()
 		},
 	}
+
+	noPrompt := false
 
 	var dbCmd = &cobra.Command{
 		Use:   "db",
@@ -65,8 +55,7 @@ To setup kolide infrastructure, use one of the available commands.
 				return
 
 			case kolide.SomeMigrationsCompleted:
-				// Prompt if TTY
-				if terminal.IsTerminal(syscall.Stdin) {
+				if !noPrompt {
 					fmt.Printf("################################################################################\n" +
 						"# WARNING:\n" +
 						"#   This will perform Kolide database migrations. Please back up your data before\n" +
@@ -89,6 +78,8 @@ To setup kolide infrastructure, use one of the available commands.
 			fmt.Println("Migrations completed.")
 		},
 	}
+
+	dbCmd.PersistentFlags().BoolVar(&noPrompt, "no-prompt", false, "disable prompting before migrations (for use in scripts)")
 
 	prepareCmd.AddCommand(dbCmd)
 
