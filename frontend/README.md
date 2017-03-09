@@ -78,7 +78,7 @@ making a call to the Kolide API.
 The redux directory holds all of the application's redux middleware, actions,
 and reducers. The redux directory also creates the [store](https://github.com/kolide/kolide/blob/master/frontend/redux/store.js) which is used in the router.
 More information about the redux configuration can be found at the [Redux
-Documentation page]().
+Documentation page](https://github.com/kolide/kolide/tree/master/frontend/redux/README.md)
 
 ### [router](https://github.com/kolide/kolide/tree/master/frontend/router)
 
