@@ -1,6 +1,12 @@
 package cli
 
 import (
+	"bufio"
+	"fmt"
+	"os"
+	"syscall"
+	"unsafe"
+
 	"github.com/WatchBeam/clock"
 	kitlog "github.com/go-kit/kit/log"
 	"github.com/kolide/kolide/server/config"
@@ -9,8 +15,18 @@ import (
 	"github.com/kolide/kolide/server/pubsub"
 	"github.com/kolide/kolide/server/service"
 	"github.com/spf13/cobra"
+	"golang.org/x/crypto/ssh/terminal"
 	"golang.org/x/net/context"
 )
+
+const ioctlReadTermios = 0x5401
+
+// isTerminal returns true if the given file descriptor is a terminal.
+func isTerminal(fd int) bool {
+	var termios syscall.Termios
+	_, _, err := syscall.Syscall6(syscall.SYS_IOCTL, uintptr(fd), ioctlReadTermios, uintptr(unsafe.Pointer(&termios)), 0, 0, 0)
+	return err == 0
+}
 
 func createPrepareCmd(configManager config.Manager) *cobra.Command {
 
@@ -38,6 +54,30 @@ To setup kolide infrastructure, use one of the available commands.
 				initFatal(err, "creating db connection")
 			}
 
+			status, err := ds.MigrationStatus()
+			if err != nil {
+				initFatal(err, "retrieving migration status")
+			}
+
+			switch status {
+			case kolide.AllMigrationsCompleted:
+				fmt.Println("Migrations already completed. Nothing to do.")
+				return
+
+			case kolide.SomeMigrationsCompleted:
+				// Prompt if TTY
+				if terminal.IsTerminal(syscall.Stdin) {
+					fmt.Printf("################################################################################\n" +
+						"# WARNING:\n" +
+						"#   This will perform Kolide database migrations. Please back up your data before\n" +
+						"#   continuing.\n" +
+						"#\n" +
+						"#   Press Enter to continue, or Control-c to exit.\n" +
+						"################################################################################\n")
+					bufio.NewScanner(os.Stdin).Scan()
+				}
+			}
+
 			if err := ds.MigrateTables(); err != nil {
 				initFatal(err, "migrating db schema")
 			}
@@ -45,6 +85,8 @@ To setup kolide infrastructure, use one of the available commands.
 			if err := ds.MigrateData(); err != nil {
 				initFatal(err, "migrating builtin data")
 			}
+
+			fmt.Println("Migrations completed.")
 		},
 	}
 

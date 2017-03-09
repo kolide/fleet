@@ -23,6 +23,7 @@ import:
   subpackages:
   - bcrypt
   - blowfish
+  - ssh/terminal
 - package: golang.org/x/net
   version: 4d38db76854b199960801a1734443fd02870d7e1
   subpackages:

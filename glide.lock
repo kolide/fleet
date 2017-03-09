@@ -1,5 +1,5 @@
-hash: c1bacfac1e43a7b6cb050afc246e21a426e9781fac4146df1d5571d5c28c4d90
-updated: 2017-03-08T09:05:13.458507954-08:00
+hash: 1fc775a9826379c480d341cd8279a7eeac0e4be91cb33b13111bc0497efc2037
+updated: 2017-03-08T17:47:44.113488085-08:00
 imports:
 - name: github.com/alecthomas/template
   version: a0175ee3bccc567396460bf5acd36800cb10c49c
@@ -149,6 +149,7 @@ imports:
   subpackages:
   - bcrypt
   - blowfish
+  - ssh/terminal
 - name: golang.org/x/net
   version: 4d38db76854b199960801a1734443fd02870d7e1
   subpackages:
