@@ -22,7 +22,10 @@ class ScheduledQueriesList extends Component {
   constructor (props) {
     super(props);
 
-    this.state = { allQueriesSelected: false };
+    this.state = {
+      allQueriesSelected: false,
+      selectedQueryRowId: null,
+    };
   }
 
   isChecked = (scheduledQuery) => {
@@ -43,6 +46,14 @@ class ScheduledQueriesList extends Component {
     this.setState({ allQueriesSelected: !allQueriesSelected });
 
     return onCheckAllQueries(shouldSelectAllQueries);
+  }
+
+  handleSelectQuery = (scheduledQuery) => {
+    const { onSelectQuery } = this.props;
+
+    this.setState({ selectedQueryRowId: scheduledQuery.id });
+
+    onSelectQuery(scheduledQuery);
   }
 
   renderHelpText = () => {
@@ -84,9 +95,9 @@ class ScheduledQueriesList extends Component {
   }
 
   render () {
-    const { onCheckQuery, onSelectQuery, scheduledQueries, checkedScheduledQueryIDs } = this.props;
-    const { allQueriesSelected } = this.state;
-    const { renderHelpText, handleSelectAllQueries } = this;
+    const { onCheckQuery, scheduledQueries, checkedScheduledQueryIDs } = this.props;
+    const { allQueriesSelected, selectedQueryRowId } = this.state;
+    const { renderHelpText, handleSelectQuery, handleSelectAllQueries } = this;
 
     const wrapperClassName = classnames(`${baseClass}__table`, {
       [`${baseClass}__table--query-selected`]: size(checkedScheduledQueryIDs),
@@ -113,12 +124,14 @@ class ScheduledQueriesList extends Component {
           <tbody>
             {renderHelpText()}
             {!!scheduledQueries.length && sortBy(scheduledQueries, ['name']).map((scheduledQuery) => {
+              console.log(selectedQueryRowId, scheduledQuery.id);
               return (
                 <QueriesListItem
                   checked={this.isChecked(scheduledQuery)}
                   key={`scheduled-query-${scheduledQuery.id}`}
                   onCheck={onCheckQuery}
-                  onSelect={onSelectQuery}
+                  onSelect={handleSelectQuery}
+                  isSelected={selectedQueryRowId === scheduledQuery.id}
                   scheduledQuery={scheduledQuery}
                 />
               );

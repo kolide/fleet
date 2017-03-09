@@ -14,16 +14,11 @@ class ScheduledQueriesListItem extends Component {
   static propTypes = {
     checked: PropTypes.bool,
     disabled: PropTypes.bool,
+    isSelected: PropTypes.bool,
     onCheck: PropTypes.func.isRequired,
     onSelect: PropTypes.func.isRequired,
     scheduledQuery: scheduledQueryInterface.isRequired,
   };
-
-  constructor (props) {
-    super(props);
-
-    this.state = { isRowSelected: false };
-  }
 
   shouldComponentUpdate (nextProps, nextState) {
     if (isEqual(nextProps, this.props) && isEqual(nextState, this.state)) {
@@ -41,9 +36,6 @@ class ScheduledQueriesListItem extends Component {
 
   onSelect = () => {
     const { onSelect, scheduledQuery } = this.props;
-    const { isRowSelected } = this.state;
-
-    this.setState({ isRowSelected: !isRowSelected });
 
     return onSelect(scheduledQuery);
   }
@@ -74,12 +66,11 @@ class ScheduledQueriesListItem extends Component {
   }
 
   render () {
-    const { checked, disabled, scheduledQuery } = this.props;
-    const { isRowSelected } = this.state;
+    const { checked, disabled, isSelected, scheduledQuery } = this.props;
     const { id, name, interval, shard, version } = scheduledQuery;
     const { loggingTypeString, onCheck, onSelect, renderPlatformIcon } = this;
     const rowClassname = classnames(baseClass, {
-      [`${baseClass}--selected`]: isRowSelected,
+      [`${baseClass}--selected`]: isSelected,
     });
 
     return (
