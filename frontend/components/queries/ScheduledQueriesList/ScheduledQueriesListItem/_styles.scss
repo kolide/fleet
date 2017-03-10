@@ -1,5 +1,6 @@
 .scheduled-query-list-item {
   outline: none;
+  cursor: pointer;
 
   &--selected {
     background-color: $accent-light;

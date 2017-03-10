@@ -15,6 +15,7 @@ class ScheduledQueriesList extends Component {
     onCheckAllQueries: PropTypes.func.isRequired,
     onCheckQuery: PropTypes.func.isRequired,
     onSelectQuery: PropTypes.func.isRequired,
+    onDblClickQuery: PropTypes.func.isRequired,
     scheduledQueries: PropTypes.arrayOf(queryInterface).isRequired,
     checkedScheduledQueryIDs: PropTypes.arrayOf(PropTypes.number).isRequired,
   };
@@ -53,7 +54,13 @@ class ScheduledQueriesList extends Component {
 
     this.setState({ selectedQueryRowId: scheduledQuery.id });
 
-    onSelectQuery(scheduledQuery);
+    return onSelectQuery(scheduledQuery);
+  }
+
+  handleDblClickQuery = (scheduledQueryId) => {
+    const { onDblClickQuery } = this.props;
+
+    return onDblClickQuery(scheduledQueryId);
   }
 
   renderHelpText = () => {
@@ -97,7 +104,7 @@ class ScheduledQueriesList extends Component {
   render () {
     const { onCheckQuery, scheduledQueries, checkedScheduledQueryIDs } = this.props;
     const { allQueriesSelected, selectedQueryRowId } = this.state;
-    const { renderHelpText, handleSelectQuery, handleSelectAllQueries } = this;
+    const { renderHelpText, handleSelectQuery, handleDblClickQuery, handleSelectAllQueries } = this;
 
     const wrapperClassName = classnames(`${baseClass}__table`, {
       [`${baseClass}__table--query-selected`]: size(checkedScheduledQueryIDs),
@@ -124,13 +131,13 @@ class ScheduledQueriesList extends Component {
           <tbody>
             {renderHelpText()}
             {!!scheduledQueries.length && sortBy(scheduledQueries, ['name']).map((scheduledQuery) => {
-              console.log(selectedQueryRowId, scheduledQuery.id);
               return (
                 <QueriesListItem
                   checked={this.isChecked(scheduledQuery)}
                   key={`scheduled-query-${scheduledQuery.id}`}
                   onCheck={onCheckQuery}
                   onSelect={handleSelectQuery}
+                  onDblClick={handleDblClickQuery}
                   isSelected={selectedQueryRowId === scheduledQuery.id}
                   scheduledQuery={scheduledQuery}
                 />

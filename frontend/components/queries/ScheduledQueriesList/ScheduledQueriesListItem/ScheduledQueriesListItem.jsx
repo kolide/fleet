@@ -17,6 +17,7 @@ class ScheduledQueriesListItem extends Component {
     isSelected: PropTypes.bool,
     onCheck: PropTypes.func.isRequired,
     onSelect: PropTypes.func.isRequired,
+    onDblClick: PropTypes.func.isRequired,
     scheduledQuery: scheduledQueryInterface.isRequired,
   };
 
@@ -38,6 +39,12 @@ class ScheduledQueriesListItem extends Component {
     const { onSelect, scheduledQuery } = this.props;
 
     return onSelect(scheduledQuery);
+  }
+
+  onDblClick = () => {
+    const { onDblClick, scheduledQuery } = this.props;
+
+    return onDblClick(scheduledQuery.query_id);
   }
 
   loggingTypeString = () => {
@@ -68,13 +75,13 @@ class ScheduledQueriesListItem extends Component {
   render () {
     const { checked, disabled, isSelected, scheduledQuery } = this.props;
     const { id, name, interval, shard, version } = scheduledQuery;
-    const { loggingTypeString, onCheck, onSelect, renderPlatformIcon } = this;
+    const { loggingTypeString, onDblClick, onCheck, onSelect, renderPlatformIcon } = this;
     const rowClassname = classnames(baseClass, {
       [`${baseClass}--selected`]: isSelected,
     });
 
     return (
-      <ClickableTableRow onClick={onSelect} className={rowClassname}>
+      <ClickableTableRow onClick={onSelect} onDoubleClick={onDblClick} className={rowClassname}>
         <td>
           <Checkbox
             disabled={disabled}
