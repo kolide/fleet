@@ -102,7 +102,7 @@ The templates directory contains the HTML file that renders the React applicatio
 ### [test](./test)
 
 The test directory includes test helpers, API request mocks, and stubbed data entities for use in test files.
-More on request mocks [here](./test/mocks/README.md).
+More on test helpers, stubs, and request mocks [here](./test/README.md).
 
 ### [utilities](./utilities)
 
