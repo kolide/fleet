@@ -63,7 +63,7 @@ Component state contains data specific to React components.
 ### Entities State
 
 The entities state holds data on specific entities such as users, queries,
-packs, etc. They follow a similar configuration that can be found [here](https://github.com/kolide/kolide/tree/master/frontend/redux/nodes/entities/README.md).
+packs, etc. They follow a similar configuration that can be found [here](./nodes/entities/README.md).
 
 ### Notifications State
 

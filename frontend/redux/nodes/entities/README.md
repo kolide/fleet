@@ -8,7 +8,7 @@ part entities are configured as follows:
 ## Entity Configuration
 
 Entities are configured from the [base configuration
-class](https://github.com/kolide/kolide/tree/master/frontend/redux/nodes/entities/base/config.js).
+class](./base/config.js).
 The base configuration takes an options hash with the following attributes.
 
 `createFunc`: Function

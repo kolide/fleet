@@ -5,7 +5,7 @@ a number of entities (hosts, labels, packs, queries, users, etc), all of which
 have CRUD methods to perform on a specific entity or collection of entities.
 
 Entities are assigned to the API Client in the `constructor` function. Each
-entity's methods can be found in the [`/frontend/kolide/entities`](https://github.com/kolide/kolide/tree/master/frontend/kolide/entities) directory.
+entity's methods can be found in the [`/frontend/kolide/entities`](./entities) directory.
 
 The CRUD methods that are typically implemented in the API client are as follows:
 

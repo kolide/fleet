@@ -2,7 +2,7 @@
 
 Request mocks are used to intercept API requests when running tests. Requests
 are mocked to simulate valid and invalid requests. The naming convention is
-similar to the [API client entity CRUD methods](https://github.com/kolide/kolide/tree/master/frontend/kolide/README.md).
+similar to the [API client entity CRUD methods](../../kolide/README.md).
 
 ## Using Mocks
 
@@ -28,7 +28,9 @@ mocks.packs.create.valid(bearerToken, params);
 
 ## Creating Mocks
 
-Mocks are created using the [`createRequestMock`](https://github.com/kolide/kolide/tree/master/frontend/test/mocks/create_request_mock.js) function.
+Mocks are created using the [`createRequestMock`](./create_request_mock.js) function.
+
+The `createRequestMock` function returns a mocked request using the [nock](https://github.com/node-nock/nock) npm package.
 
 Example:
 
@@ -101,3 +103,15 @@ the `endpoint` option.
 * Required?: False
 * Default: 200
 * Purpose: This value is used for the response status of the API call.
+
+### Examples
+
+[API Request](../../kolide/entities/packs.tests.js#L16-L30)
+* The mocked request is saved as a variable in order to assert that the request
+  is made
+
+
+[Component Test](../../components/forms/fields/SelectTargetsDropdown/SelectTargetsDropdown.tests.jsx#L35-L40)
+* The request is not saved but we want to prevent attempting to make an API request.
+* There is no API to hit in tests so attempting to make an API call with result
+  in warnings in the test output.
