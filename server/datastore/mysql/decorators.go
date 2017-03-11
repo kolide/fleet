@@ -28,7 +28,7 @@ func (ds *Datastore) DeleteDecorator(id uint) error {
 	sqlStatement := `
     DELETE FROM decorators
       WHERE id = ?
-  `
+	 `
 	res, err := ds.db.Exec(sqlStatement, id)
 	if err != nil {
 		return errors.Wrap(err, "deleting decorator")

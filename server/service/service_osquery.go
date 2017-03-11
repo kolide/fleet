@@ -67,6 +67,29 @@ func (svc service) EnrollAgent(ctx context.Context, enrollSecret, hostIdentifier
 	return host.NodeKey, nil
 }
 
+func loadDecoratorQueries(ds kolide.Datastore) (*kolide.Decorators, error) {
+	result := new(kolide.Decorators)
+	decorators, err := ds.ListDecorators()
+	if err != nil {
+		return nil, osqueryError{message: "internal error: unable to load decorator queries, reason: " + err.Error()}
+	}
+	for _, decorator := range decorators {
+		switch decorator.Type {
+		case kolide.DecoratorLoad:
+			result.Load = append(result.Load, decorator.Query)
+		case kolide.DecoratorAlways:
+			result.Always = append(result.Always, decorator.Query)
+		case kolide.DecoratorInterval:
+			intervalKey := strconv.FormatUint(uint64(decorator.Interval), 10)
+			if result.Interval == nil {
+				result.Interval = make(map[string][]string)
+			}
+			result.Interval[intervalKey] = append(result.Interval[intervalKey], decorator.Query)
+		}
+	}
+	return result, nil
+}
+
 func (svc service) GetClientConfig(ctx context.Context) (*kolide.OsqueryConfig, error) {
 	host, ok := hostctx.FromContext(ctx)
 	if !ok {
@@ -80,14 +103,14 @@ func (svc service) GetClientConfig(ctx context.Context) (*kolide.OsqueryConfig, 
 
 	config := &kolide.OsqueryConfig{
 		Options: options,
-		Decorators: kolide.Decorators{
-			Load: []string{
-				"SELECT uuid AS host_uuid FROM system_info;",
-				"SELECT hostname AS hostname FROM system_info;",
-			},
-		},
-		Packs: kolide.Packs{},
+		Packs:   kolide.Packs{},
 	}
+
+	decorators, err := loadDecoratorQueries(svc.ds)
+	if err != nil {
+		return nil, err
+	}
+	config.Decorators = *decorators
 
 	packs, err := svc.ListPacksForHost(ctx, host.ID)
 	if err != nil {

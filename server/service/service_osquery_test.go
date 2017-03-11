@@ -17,11 +17,53 @@ import (
 	"github.com/kolide/kolide/server/contexts/viewer"
 	"github.com/kolide/kolide/server/datastore/inmem"
 	"github.com/kolide/kolide/server/kolide"
+	"github.com/kolide/kolide/server/mock"
 	"github.com/kolide/kolide/server/pubsub"
 	"github.com/kolide/kolide/server/test"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+func TestDecoratorQueries(t *testing.T) {
+	var store mock.Store
+	store.ListDecoratorsFunc = func() ([]*kolide.Decorator, error) {
+		return []*kolide.Decorator{
+			&kolide.Decorator{
+				Type:  kolide.DecoratorLoad,
+				Query: "select hostname FROM system_info;",
+			},
+			&kolide.Decorator{
+				Type:  kolide.DecoratorLoad,
+				Query: "select uuid from system_info;",
+			},
+			&kolide.Decorator{
+				Type:  kolide.DecoratorAlways,
+				Query: "select computer_name from system_info;",
+			},
+			&kolide.Decorator{
+				Type:     kolide.DecoratorInterval,
+				Interval: 3600,
+				Query:    "select foo from bar;",
+			},
+			&kolide.Decorator{
+				Type:     kolide.DecoratorInterval,
+				Interval: 600,
+				Query:    "select baz from bar;",
+			},
+			&kolide.Decorator{
+				Type:     kolide.DecoratorInterval,
+				Interval: 600,
+				Query:    "select zip from zim;",
+			},
+		}, nil
+	}
+
+	decs, err := loadDecoratorQueries(&store)
+	assert.Nil(t, err)
+	assert.Len(t, decs.Interval["600"], 2)
+	assert.Len(t, decs.Load, 2)
+	assert.Len(t, decs.Always, 1)
+}
 
 func TestEnrollAgent(t *testing.T) {
 	ds, svc, _ := setupOsqueryTests(t)
