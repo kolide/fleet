@@ -172,7 +172,7 @@ class BaseConfig {
 
         return apiCall(...args)
           .then((response) => {
-            const thunk = this._genericSuccess(type);
+            const thunk = this._genericSuccess(type, args);
 
             dispatch(this.successAction(response, thunk));
 
@@ -216,13 +216,23 @@ class BaseConfig {
     }
   }
 
-  _genericSuccess (type) {
+  _genericSuccess (type, args = {}) {
     const { actionTypes } = this;
 
     return (data) => {
+      const { TYPES } = BaseConfig;
+      let payload = { data };
+
+      switch  (type) {
+      case TYPES.DESTROY:
+        // In the case of a delete, the API does not return any object and we
+        // need to pull the ID from the request.
+        payload = { data: args[0].id };
+      }
+
       return {
         type: BaseConfig.successActionTypeFor(actionTypes, type),
-        payload: { data },
+        payload,
       };
     };
   }
