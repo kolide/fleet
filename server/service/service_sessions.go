@@ -27,11 +27,12 @@ func (svc service) Login(ctx context.Context, username, password string) (*kolid
 	if err = user.ValidatePassword(password); err != nil {
 		return nil, "", authError{reason: "bad password"}
 	}
+
 	token, err := svc.makeSession(user.ID)
+
 	if err != nil {
 		return nil, "", err
 	}
-
 	return user, token, nil
 }
 
@@ -61,7 +62,6 @@ func (svc service) makeSession(id uint) (string, error) {
 	if err != nil {
 		return "", errors.Wrap(err, "creating new session")
 	}
-
 	tokenString, err := generateJWT(session.Key, svc.config.Auth.JwtKey)
 	if err != nil {
 		return "", errors.Wrap(err, "generating JWT token")

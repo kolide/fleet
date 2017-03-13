@@ -12,7 +12,8 @@ import (
 )
 
 func testAdminUserSetAdmin(t *testing.T, r *testResource) {
-	user, err := r.ds.User("user1")
+	defer r.Close()
+	user, err := r.User("user1")
 	require.Nil(t, err)
 	assert.False(t, user.Admin)
 	inJson := `{"admin":true}`
@@ -30,13 +31,14 @@ func testAdminUserSetAdmin(t *testing.T, r *testResource) {
 	assert.Nil(t, actual.Err)
 	require.NotNil(t, actual.User)
 	assert.True(t, actual.User.Admin)
-	user, err = r.ds.User("user1")
+	user, err = r.User("user1")
 	require.Nil(t, err)
 	assert.True(t, user.Admin)
 }
 
 func testNonAdminUserSetAdmin(t *testing.T, r *testResource) {
-	user, err := r.ds.User("user1")
+	defer r.Close()
+	user, err := r.User("user1")
 	require.Nil(t, err)
 	assert.False(t, user.Admin)
 	inJson := `{"admin":true}`
@@ -52,13 +54,14 @@ func testNonAdminUserSetAdmin(t *testing.T, r *testResource) {
 	assert.Equal(t, http.StatusServiceUnavailable, resp.StatusCode)
 	rb := make([]byte, 500)
 	resp.Body.Read(rb)
-	user, err = r.ds.User("user1")
+	user, err = r.User("user1")
 	require.Nil(t, err)
 	assert.False(t, user.Admin)
 }
 
 func testAdminUserSetEnabled(t *testing.T, r *testResource) {
-	user, err := r.ds.User("user1")
+	defer r.Close()
+	user, err := r.User("user1")
 	require.Nil(t, err)
 	assert.True(t, user.Enabled)
 	inJson := `{"enabled":false}`
@@ -76,13 +79,14 @@ func testAdminUserSetEnabled(t *testing.T, r *testResource) {
 	assert.Nil(t, actual.Err)
 	require.NotNil(t, actual.User)
 	assert.False(t, actual.User.Enabled)
-	user, err = r.ds.User("user1")
+	user, err = r.User("user1")
 	require.Nil(t, err)
 	assert.False(t, user.Enabled)
 }
 
 func testNonAdminUserSetEnabled(t *testing.T, r *testResource) {
-	user, err := r.ds.User("user1")
+	defer r.Close()
+	user, err := r.User("user1")
 	require.Nil(t, err)
 	assert.True(t, user.Enabled)
 	inJson := `{"enabled":false}`
@@ -98,7 +102,7 @@ func testNonAdminUserSetEnabled(t *testing.T, r *testResource) {
 	assert.Equal(t, http.StatusServiceUnavailable, resp.StatusCode)
 	rb := make([]byte, 500)
 	resp.Body.Read(rb)
-	user, err = r.ds.User("user1")
+	user, err = r.User("user1")
 	require.Nil(t, err)
 	// shouldn't change
 	assert.True(t, user.Enabled)

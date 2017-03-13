@@ -40,9 +40,9 @@ const (
 	DecoratorInterval
 	DecoratorUndefined
 
-	DecoratorLoadName     = "load"
-	DecoratorAlwaysName   = "always"
-	DecoratorIntervalName = "interval"
+	DecoratorLoadName     = `"load"`
+	DecoratorAlwaysName   = `"always"`
+	DecoratorIntervalName = `"interval"`
 )
 
 func (dt DecoratorType) String() string {
@@ -58,12 +58,26 @@ func (dt DecoratorType) String() string {
 	}
 }
 
-func (dt DecoratorType) MarshalJSON() ([]byte, error) {
+func (dt *DecoratorType) MarshalJSON() ([]byte, error) {
 	name := dt.String()
 	if name == "" {
 		return nil, errors.New("Invalid decorator type")
 	}
 	return []byte(name), nil
+}
+
+func (dt *DecoratorType) UnmarshalJSON(data []byte) error {
+	switch string(data) {
+	case DecoratorLoadName:
+		*dt = DecoratorLoad
+	case DecoratorAlwaysName:
+		*dt = DecoratorAlways
+	case DecoratorIntervalName:
+		*dt = DecoratorInterval
+	default:
+		return errors.New("Invalid load type")
+	}
+	return nil
 }
 
 var decNameToType map[string]DecoratorType

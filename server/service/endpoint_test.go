@@ -14,18 +14,27 @@ import (
 	kitlog "github.com/go-kit/kit/log"
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
-	"github.com/kolide/kolide/server/config"
-	"github.com/kolide/kolide/server/datastore/inmem"
 	"github.com/kolide/kolide/server/kolide"
+	"github.com/kolide/kolide/server/mock"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
 )
 
+// type endpointMockDatastore struct {
+// 	mock.Store
+//
+// 	config *kolide.AppConfig
+// }
+
 type testResource struct {
+	*mock.Datastore
 	server     *httptest.Server
 	adminToken string
 	userToken  string
-	ds         kolide.Datastore
+}
+
+func (r *testResource) Close() {
+	r.Datastore.Close()
 }
 
 type endpointService struct {
@@ -35,13 +44,17 @@ type endpointService struct {
 func (svc endpointService) SendTestEmail(ctx context.Context, config *kolide.AppConfig) error {
 	return nil
 }
+
+func newTestResource() *testResource {
+	r := new(testResource)
+	r.Datastore = mock.NewDatastore()
+	return r
+}
+
 func setupEndpointTest(t *testing.T) *testResource {
-	test := &testResource{}
+	test := newTestResource()
 
 	var err error
-	test.ds, err = inmem.New(config.TestConfig())
-	require.Nil(t, err)
-	require.Nil(t, test.ds.MigrateData())
 
 	devOrgInfo := &kolide.AppConfig{
 		OrgName:                "Kolide",
@@ -52,10 +65,13 @@ func setupEndpointTest(t *testing.T) *testResource {
 		SMTPVerifySSLCerts:     true,
 		SMTPEnableStartTLS:     true,
 	}
-	test.ds.NewAppConfig(devOrgInfo)
-	svc, _ := newTestService(test.ds, nil)
+	test.NewAppConfig(devOrgInfo)
+	require.True(t, test.NewAppConfigFuncInvoked)
+
+	svc, _ := newTestService(test, nil)
 	svc = endpointService{svc}
-	createTestUsers(t, test.ds)
+	createTestUsers(t, test)
+	require.True(t, test.NewUserFuncInvoked)
 	logger := kitlog.NewLogfmtLogger(os.Stdout)
 
 	jwtKey := "CHANGEME"
@@ -90,7 +106,6 @@ func setupEndpointTest(t *testing.T) *testResource {
 	}{}
 	json.NewDecoder(resp.Body).Decode(&jsn)
 	test.adminToken = jsn.Token
-
 	// log in non admin user
 	userParam.Username = "user1"
 	userParam.Password = testUsers["user1"].PlaintextPassword
@@ -126,6 +141,11 @@ var testFunctions = [...]func(*testing.T, *testResource){
 	testNonAdminUserSetAdmin,
 	testAdminUserSetEnabled,
 	testNonAdminUserSetEnabled,
+	testListDecorator,
+	testNewDecorator,
+	testNewDecoratorFailType,
+	testNewDecoratorFailValidation,
+	testDeleteDecorator,
 }
 
 func TestEndpoints(t *testing.T) {

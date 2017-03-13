@@ -20,12 +20,13 @@ func (mw validationMiddleware) NewDecorator(ctx context.Context, payload kolide.
 	if decoratorType == kolide.DecoratorInterval {
 		if payload.Interval != nil && *payload.Interval != 0 {
 			if *payload.Interval%60 != 0 {
-				invalid.Append("interal", "interval value must be divisible by 60")
+				invalid.Append("interval", "interval value must be divisible by 60")
 			}
 		} else {
 			invalid.Append("interval", "missing required argument")
 		}
 	}
+
 	if invalid.HasErrors() {
 		return nil, invalid
 	}
