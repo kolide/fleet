@@ -103,7 +103,7 @@ class BaseConfig {
       silentLoadAll: this._genericThunkAction(TYPES.LOAD_ALL, { silent: true }),
       successAction: this.successAction,
       ...this._genericActions(TYPES.CREATE),
-      ...this._genericActions(TYPES.DESTROY),
+      ...this._destroyActions(),
       ...this._genericActions(TYPES.LOAD),
       ...this._genericActions(TYPES.UPDATE),
     };
@@ -158,6 +158,50 @@ class BaseConfig {
       [`${lowerType}Request`]: this._genericRequest(type),
       [`${lowerType}Success`]: this._genericSuccess(type),
       [`${lowerType}Failure`]: this._genericFailure(type),
+    };
+  }
+
+  _destroyActions () {
+    const { TYPES } = BaseConfig;
+
+    return {
+      ['destroy']: this._destroyThunkAction(),
+      ['silentDestroy']: this._destroyThunkAction({ silent: true }),
+      ['destroyRequest']: this._genericRequest(TYPES.DESTROY),
+      ['destroySuccess']: this._genericSuccess(TYPES.DESTROY),
+      ['destroyFailure']: this._genericFailure(TYPES.DESTROY),
+    };
+  }
+
+  _destroyThunkAction (options = {}) {
+    const { TYPES } = BaseConfig;
+    const type = TYPES.DESTROY;
+    const apiCall = this._apiCallForType(type);
+
+    return (...args) => {
+      return (dispatch) => {
+        if (!options.silent) {
+          dispatch(this._genericRequest(type)());
+        }
+
+        return apiCall(...args)
+          .then((response) => {
+            // KEY DIFFERENCE
+            const thunk = this._destroySuccess(type, args[0]);
+
+            dispatch(this.successAction(response, thunk));
+
+            return response;
+          })
+          .catch((response) => {
+            const thunk = this._genericFailure(type);
+            const errorsObject = formatErrorResponse(response);
+
+            dispatch(thunk(errorsObject));
+
+            throw errorsObject;
+          });
+      };
     };
   }
 
@@ -223,6 +267,17 @@ class BaseConfig {
       return {
         type: BaseConfig.successActionTypeFor(actionTypes, type),
         payload: { data },
+      };
+    };
+  }
+
+  _destroySuccess (type, entity) {
+    const { actionTypes } = this;
+
+    return () => {
+      return {
+        type: BaseConfig.successActionTypeFor(actionTypes, type),
+        payload: { data: entity.id },
       };
     };
   }

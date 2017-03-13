@@ -134,10 +134,9 @@ describe('ReduxConfig - thunks', () => {
         schema: schemas.USERS,
       });
       const mockStore = reduxMockStore(store);
+      const params = { id: 1 };
 
       it('calls the destroyFunc', () => {
-        const params = { id: 1 };
-
         return mockStore.dispatch(config.actions.destroy(params))
         .then(() => {
           expect(destroyFunc).toHaveBeenCalledWith(params);
@@ -145,7 +144,7 @@ describe('ReduxConfig - thunks', () => {
       });
 
       it('dispatches the correct actions', () => {
-        return mockStore.dispatch(config.actions.destroy())
+        return mockStore.dispatch(config.actions.destroy(params))
           .then(() => {
             const dispatchedActions = mockStore.getActions();
             const dispatchedActionTypes = dispatchedActions.map((action) => { return action.type; });
@@ -438,4 +437,3 @@ describe('ReduxConfig - thunks', () => {
     });
   });
 });
-
