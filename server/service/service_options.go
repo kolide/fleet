@@ -81,7 +81,7 @@ func (svc service) ExpectedCheckinInterval(ctx context.Context) (time.Duration, 
 
 	// The interval is multiplied to ensure that we are being generous in
 	// the calculation if the host is a bit slower than the interval to
-	// check in. This prevents flapping.
+	// check in. This prevents flapping of the online status.
 	calculatedInterval := time.Duration(interval) * time.Second * expectedCheckinIntervalMultiplier
 
 	// We use a minimum threshold here to ensure that online status does
