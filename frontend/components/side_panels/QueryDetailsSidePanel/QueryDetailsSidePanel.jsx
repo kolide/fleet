@@ -27,8 +27,6 @@ class QueryDetailsSidePanel extends Component {
     const { query } = this.props;
     const { packs } = query;
 
-    console.log(query);
-
     if (!packs || (packs && !packs.length)) {
       return <p>There are no packs associated with this query</p>;
     }
