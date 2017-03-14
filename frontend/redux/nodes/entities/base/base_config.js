@@ -174,13 +174,11 @@ class BaseConfig {
         return apiCall(...args)
           .then((response) => {
             let thunk = this._genericSuccess(type);
-            switch (type) {
-            case TYPES.DESTROY:
+            if (type === TYPES.DESTROY) {
               // Destroy is a special case in which the API does not return an
               // object, so we need to generate a thunk that stores the entity
               // ID for removal from the entity store.
               thunk = this._destroySuccess(...args);
-              break;
             }
 
             dispatch(this.successAction(response, thunk));

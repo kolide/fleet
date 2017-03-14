@@ -134,7 +134,7 @@ describe('ReduxConfig - thunks', () => {
         schema: schemas.USERS,
       });
       const mockStore = reduxMockStore(store);
-      beforeEach( () => { mockStore.clearActions() });
+      beforeEach(() => { mockStore.clearActions(); });
       const params = { id: 1 };
 
       it('calls the destroyFunc', () => {
@@ -148,8 +148,6 @@ describe('ReduxConfig - thunks', () => {
         return mockStore.dispatch(config.actions.destroy(params))
           .then(() => {
             const dispatchedActions = mockStore.getActions();
-            const dispatchedActionTypes = dispatchedActions.map((action) => { return action.type; });
-
             expect(dispatchedActions).toEqual([
               { type: 'users_DESTROY_REQUEST' },
               { type: 'users_DESTROY_SUCCESS', payload: { data: params.id } },
