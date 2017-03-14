@@ -219,6 +219,9 @@ type kolideHandlers struct {
 	CreateLabel                    http.Handler
 	DeleteLabel                    http.Handler
 	ModifyLabel                    http.Handler
+	ListDecorators                 http.Handler
+	NewDecorator                   http.Handler
+	DeleteDecorator                http.Handler
 	GetHost                        http.Handler
 	DeleteHost                     http.Handler
 	ListHosts                      http.Handler
@@ -289,7 +292,7 @@ func makeKolideKitHandlers(ctx context.Context, e KolideEndpoints, opts []kithtt
 		CreateLabel:                   newServer(e.CreateLabel, decodeCreateLabelRequest),
 		DeleteLabel:                   newServer(e.DeleteLabel, decodeDeleteLabelRequest),
 		ModifyLabel:                   newServer(e.ModifyLabel, decodeModifyLabelRequest),
-		ListDecorators:                newServer(e.ListDecorators, decodeListDecoratorRequest),
+		ListDecorators:                newServer(e.ListDecorators, decodeNoParamsRequest),
 		NewDecorator:                  newServer(e.NewDecorator, decodeNewDecoratorRequest),
 		DeleteDecorator:               newServer(e.DeleteDecorator, decodeDeleteDecoratorRequest),
 		GetHost:                       newServer(e.GetHost, decodeGetHostRequest),
