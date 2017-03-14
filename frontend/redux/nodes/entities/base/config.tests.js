@@ -92,7 +92,7 @@ describe('ReduxConfig - class', () => {
         createFailure: config._genericFailure('CREATE'),
         createRequest: config._genericRequest('CREATE'),
         createSuccess: config._genericSuccess('CREATE'),
-        destroy: config._destroyThunkAction(),
+        destroy: config._genericThunkAction('DESTROY'),
         destroyFailure: config._genericFailure('DESTROY'),
         destroyRequest: config._genericRequest('DESTROY'),
         destroySuccess: config._genericSuccess('DESTROY'),
@@ -103,7 +103,7 @@ describe('ReduxConfig - class', () => {
         loadRequest: config._genericRequest('LOAD'),
         loadSuccess: config._genericSuccess('LOAD'),
         silentCreate: config._genericThunkAction('CREATE', { silent: true }),
-        silentDestroy: config._destroyThunkAction({ silent: true }),
+        silentDestroy: config._genericThunkAction('DESTROY', { silent: true }),
         silentLoad: config._genericThunkAction('LOAD', { silent: true }),
         silentLoadAll: config._genericThunkAction('LOAD_ALL', { silent: true }),
         silentUpdate: config._genericThunkAction('UPDATE', { silent: true }),
@@ -164,13 +164,13 @@ describe('ReduxConfig - class', () => {
         });
       });
 
-      describe('#destroySuccess', () => {
-        it('sets the data in the payload', () => {
-          const data = { id: 1, name: 'Mike' };
+      describe('#_destroySuccess', () => {
+        it('sets the data in the request', () => {
+          const data = { id: 1 };
 
-          expect(actions.destroySuccess(data)).toEqual({
+          expect(config._destroySuccess(data)()).toEqual({
             type: 'users_DESTROY_SUCCESS',
-            payload: { data },
+            payload: { data: data.id },
           });
         });
       });
