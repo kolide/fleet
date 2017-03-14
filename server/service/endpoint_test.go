@@ -13,8 +13,6 @@ import (
 	"testing"
 
 	kitlog "github.com/go-kit/kit/log"
-	kithttp "github.com/go-kit/kit/transport/http"
-	"github.com/gorilla/mux"
 	"github.com/kolide/kolide/server/config"
 	"github.com/kolide/kolide/server/datastore/inmem"
 	"github.com/kolide/kolide/server/kolide"
@@ -57,21 +55,11 @@ func setupEndpointTest(t *testing.T) *testResource {
 	svc = endpointService{svc}
 	createTestUsers(t, test.ds)
 	logger := kitlog.NewLogfmtLogger(os.Stdout)
-
 	jwtKey := "CHANGEME"
-	opts := []kithttp.ServerOption{
-		kithttp.ServerBefore(setRequestsContexts(svc, jwtKey)),
-		kithttp.ServerErrorLogger(logger),
-		kithttp.ServerErrorEncoder(encodeError),
-		kithttp.ServerAfter(kithttp.SetContentType("application/json; charset=utf-8")),
-	}
 
-	router := mux.NewRouter()
-	ke := MakeKolideServerEndpoints(svc, jwtKey)
-	kh := makeKolideKitHandlers(ke, opts)
-	attachKolideAPIRoutes(router, kh)
+	routes := MakeHandler(svc, jwtKey, logger)
 
-	test.server = httptest.NewServer(router)
+	test.server = httptest.NewServer(routes)
 
 	userParam := loginRequest{
 		Username: "admin1",
