@@ -67,8 +67,8 @@ type KolideEndpoints struct {
 	DeleteLabel                    endpoint.Endpoint
 	ModifyLabel                    endpoint.Endpoint
 	ListDecorators                 endpoint.Endpoint
-NewDecorator                   endpoint.Endpoint
-DeleteDecorator                endpoint.Endpoint
+	NewDecorator                   endpoint.Endpoint
+	DeleteDecorator                endpoint.Endpoint
 	GetHost                        endpoint.Endpoint
 	DeleteHost                     endpoint.Endpoint
 	ListHosts                      endpoint.Endpoint
@@ -289,9 +289,9 @@ func makeKolideKitHandlers(ctx context.Context, e KolideEndpoints, opts []kithtt
 		CreateLabel:                   newServer(e.CreateLabel, decodeCreateLabelRequest),
 		DeleteLabel:                   newServer(e.DeleteLabel, decodeDeleteLabelRequest),
 		ModifyLabel:                   newServer(e.ModifyLabel, decodeModifyLabelRequest),
-		ListDecorators                 newServer(e.ListDecorators, decodeListDecoratorRequest),
-		NewDecorator                   newServer(e.NewDecorator, decodeNewDecoratorRequest),
-		DeleteDecorator                newServer(e.DeleteDecorator, decodeDeleteDecoratorRequest),
+		ListDecorators:                newServer(e.ListDecorators, decodeListDecoratorRequest),
+		NewDecorator:                  newServer(e.NewDecorator, decodeNewDecoratorRequest),
+		DeleteDecorator:               newServer(e.DeleteDecorator, decodeDeleteDecoratorRequest),
 		GetHost:                       newServer(e.GetHost, decodeGetHostRequest),
 		DeleteHost:                    newServer(e.DeleteHost, decodeDeleteHostRequest),
 		ListHosts:                     newServer(e.ListHosts, decodeListHostsRequest),
@@ -401,9 +401,8 @@ func attachKolideAPIRoutes(r *mux.Router, h *kolideHandlers) {
 	r.Handle("/api/v1/kolide/labels/{id}", h.ModifyLabel).Methods("PATCH").Name("modify_label")
 
 	r.Handle("/api/v1/kolide/decorators", h.ListDecorators).Methods("GET").Name("list_decorators")
-r.Handle("/api/v1/kolide/decorators", h.NewDecorator).Methods("POST").Name("new_decorator")
-r.Handle("/api/v1/kolide/decorators/{id}", h.DeleteDecorator).Methods("DELETE").Name("delete_decorator")
-
+	r.Handle("/api/v1/kolide/decorators", h.NewDecorator).Methods("POST").Name("new_decorator")
+	r.Handle("/api/v1/kolide/decorators/{id}", h.DeleteDecorator).Methods("DELETE").Name("delete_decorator")
 
 	r.Handle("/api/v1/kolide/hosts", h.ListHosts).Methods("GET").Name("list_hosts")
 	r.Handle("/api/v1/kolide/host_summary", h.GetHostSummary).Methods("GET").Name("get_host_summary")
