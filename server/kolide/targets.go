@@ -1,8 +1,6 @@
 package kolide
 
-import (
-	"golang.org/x/net/context"
-)
+import "context"
 
 type TargetSearchResults struct {
 	Hosts  []Host

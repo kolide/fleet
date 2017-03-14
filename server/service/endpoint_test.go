@@ -2,6 +2,7 @@ package service
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -18,7 +19,6 @@ import (
 	"github.com/kolide/kolide/server/datastore/inmem"
 	"github.com/kolide/kolide/server/kolide"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/net/context"
 )
 
 type testResource struct {
@@ -62,13 +62,13 @@ func setupEndpointTest(t *testing.T) *testResource {
 	opts := []kithttp.ServerOption{
 		kithttp.ServerBefore(setRequestsContexts(svc, jwtKey)),
 		kithttp.ServerErrorLogger(logger),
+		kithttp.ServerErrorEncoder(encodeError),
 		kithttp.ServerAfter(kithttp.SetContentType("application/json; charset=utf-8")),
 	}
 
 	router := mux.NewRouter()
 	ke := MakeKolideServerEndpoints(svc, jwtKey)
-	ctxt := context.Background()
-	kh := makeKolideKitHandlers(ctxt, ke, opts)
+	kh := makeKolideKitHandlers(ke, opts)
 	attachKolideAPIRoutes(router, kh)
 
 	test.server = httptest.NewServer(router)

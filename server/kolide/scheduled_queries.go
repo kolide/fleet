@@ -1,8 +1,6 @@
 package kolide
 
-import (
-	"golang.org/x/net/context"
-)
+import "context"
 
 type ScheduledQueryStore interface {
 	NewScheduledQuery(sq *ScheduledQuery) (*ScheduledQuery, error)
