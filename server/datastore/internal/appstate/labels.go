@@ -14,25 +14,25 @@ func Labels1() []kolide.Label {
 		{
 			Platform:  "darwin",
 			Name:      "Mac OS X",
-			Query:     "select 1 from osquery_info where build_platform = 'darwin';",
+			Query:     "select 1 from osquery_info where platform = 'darwin';",
 			LabelType: kolide.LabelTypeBuiltIn,
 		},
 		{
 			Platform:  "ubuntu",
 			Name:      "Ubuntu Linux",
-			Query:     "select 1 from osquery_info where build_platform = 'ubuntu';",
+			Query:     "select 1 from osquery_info where platform = 'ubuntu';",
 			LabelType: kolide.LabelTypeBuiltIn,
 		},
 		{
 			Platform:  "centos",
 			Name:      "CentOS Linux",
-			Query:     "select 1 from osquery_info where build_platform = 'centos';",
+			Query:     "select 1 from osquery_info where platform = 'centos';",
 			LabelType: kolide.LabelTypeBuiltIn,
 		},
 		{
 			Platform:  "windows",
 			Name:      "MS Windows",
-			Query:     "select 1 from osquery_info where build_platform = 'windows';",
+			Query:     "select 1 from osquery_info where platform = 'windows';",
 			LabelType: kolide.LabelTypeBuiltIn,
 		},
 	}
