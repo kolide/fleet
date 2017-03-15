@@ -8,7 +8,7 @@ type YARAFilePaths map[string][]string
 type YARAStore interface {
 	// NewYARASignatureGroup creates a new mapping of a name to
 	// a group of YARA signatures
-	NewYARASignatureGroup(*YARASignatureGroup) (*YARASignatureGroup, error)
+	NewYARASignatureGroup(ysg *YARASignatureGroup) (*YARASignatureGroup, error)
 	// NewYARAFilePath maps a named set of files to one or more
 	// groups of YARA signatures
 	NewYARAFilePath(fileSectionName, sigGroupName string) error

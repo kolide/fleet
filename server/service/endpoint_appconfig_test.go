@@ -22,6 +22,7 @@ type mockValidationError struct {
 }
 
 func testGetAppConfig(t *testing.T, r *testResource) {
+	defer r.Close()
 	req, err := http.NewRequest("GET", r.server.URL+"/api/v1/kolide/config", nil)
 	require.Nil(t, err)
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", r.adminToken))
@@ -43,6 +44,7 @@ func testGetAppConfig(t *testing.T, r *testResource) {
 }
 
 func testModifyAppConfig(t *testing.T, r *testResource) {
+	defer r.Close()
 	config := &kolide.AppConfig{
 		KolideServerURL:        "https://foo.com",
 		OrgName:                "Zip",
@@ -72,7 +74,7 @@ func testModifyAppConfig(t *testing.T, r *testResource) {
 	require.Nil(t, err)
 	require.NotNil(t, respBody.OrgInfo)
 	assert.Equal(t, config.OrgName, *respBody.OrgInfo.OrgName)
-	saved, err := r.ds.AppConfig()
+	saved, err := r.AppConfig()
 	require.Nil(t, err)
 	// verify email test succeeded
 	assert.True(t, saved.SMTPConfigured)
@@ -80,6 +82,7 @@ func testModifyAppConfig(t *testing.T, r *testResource) {
 }
 
 func testModifyAppConfigWithValidationFail(t *testing.T, r *testResource) {
+	defer r.Close()
 	config := &kolide.AppConfig{
 		SMTPEnableStartTLS: false,
 	}
@@ -100,12 +103,13 @@ func testModifyAppConfigWithValidationFail(t *testing.T, r *testResource) {
 	err = json.NewDecoder(resp.Body).Decode(&validationErrors)
 	require.Nil(t, err)
 	require.Equal(t, 0, len(validationErrors.Errors))
-	existing, err := r.ds.AppConfig()
+	existing, err := r.AppConfig()
 	assert.Nil(t, err)
 	assert.Equal(t, config.SMTPEnableStartTLS, existing.SMTPEnableStartTLS)
 }
 
 func appConfigPayloadFromAppConfig(config *kolide.AppConfig) *kolide.AppConfigPayload {
+
 	return &kolide.AppConfigPayload{
 		OrgInfo: &kolide.OrgInfo{
 			OrgLogoURL: &config.OrgLogoURL,
