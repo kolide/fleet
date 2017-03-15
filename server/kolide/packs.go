@@ -1,6 +1,8 @@
 package kolide
 
-import "context"
+import (
+	"context"
+)
 
 // PackStore is the datastore interface for managing query packs.
 type PackStore interface {

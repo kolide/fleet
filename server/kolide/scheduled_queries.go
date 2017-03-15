@@ -1,6 +1,8 @@
 package kolide
 
-import "context"
+import (
+	"context"
+)
 
 type ScheduledQueryStore interface {
 	NewScheduledQuery(sq *ScheduledQuery) (*ScheduledQuery, error)

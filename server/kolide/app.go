@@ -1,6 +1,8 @@
 package kolide
 
-import "context"
+import (
+	"context"
+)
 
 // AppConfigStore contains method for saving and retrieving
 // application configuration

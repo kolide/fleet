@@ -1,6 +1,8 @@
 package kolide
 
-import "context"
+import (
+	"context"
+)
 
 type TargetSearchResults struct {
 	Hosts  []Host

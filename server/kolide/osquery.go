@@ -1,6 +1,8 @@
 package kolide
 
-import "context"
+import (
+	"context"
+)
 
 type OsqueryService interface {
 	EnrollAgent(ctx context.Context, enrollSecret, hostIdentifier string) (nodeKey string, err error)
