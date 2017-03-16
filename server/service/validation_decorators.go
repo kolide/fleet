@@ -5,32 +5,87 @@ import (
 	"golang.org/x/net/context"
 )
 
+func validateNewDecoratorType(payload kolide.DecoratorPayload, invalid *invalidArgumentError) {
+	if payload.DecoratorType == nil {
+		invalid.Append("type", "missing required argument")
+		return
+	}
+	decoratorType, err := kolide.DecoratorTypeFromName(*payload.DecoratorType)
+	if err != nil {
+		invalid.Append("type", err.Error())
+		return
+	}
+	if decoratorType == kolide.DecoratorInterval {
+		if payload.Interval == nil {
+			invalid.Append("interval", "missing required argument")
+			return
+		}
+		if *payload.Interval%60 != 0 {
+			invalid.Append("interval", "must be divisible by 60")
+			return
+		}
+	}
+}
+
 // NewDecorator validator checks to make sure that a valid decorator type exists and
 // if the decorator is of an interval type, an interval value is present and is
 // divisable by 60
 // See https://osquery.readthedocs.io/en/stable/deployment/configuration/
 func (mw validationMiddleware) NewDecorator(ctx context.Context, payload kolide.DecoratorPayload) (*kolide.Decorator, error) {
 	invalid := &invalidArgumentError{}
-	decoratorType, err := kolide.DecoratorTypeFromName(payload.DecoratorType)
-	if err != nil {
-		invalid.Append("type", err.Error())
-	}
-	// If the type is interval, the interval value must be present and
-	// must be divisible by 60
-	if decoratorType == kolide.DecoratorInterval {
-		if payload.Interval != nil && *payload.Interval != 0 {
-			if *payload.Interval%60 != 0 {
-				invalid.Append("interval", "interval value must be divisible by 60")
-			}
-		} else {
-			invalid.Append("interval", "missing required argument")
-		}
+	validateNewDecoratorType(payload, invalid)
+
+	if payload.Query == nil {
+		invalid.Append("query", "missing required argument")
 	}
 
 	if invalid.HasErrors() {
 		return nil, invalid
 	}
 	return mw.Service.NewDecorator(ctx, payload)
+}
+
+func (mw validationMiddleware) validateModifyDecoratorType(payload kolide.DecoratorPayload, invalid *invalidArgumentError) error {
+	if payload.DecoratorType != nil {
+		decType, err := kolide.DecoratorTypeFromName(*payload.DecoratorType)
+		if err != nil {
+			invalid.Append("type", err.Error())
+			return nil
+		}
+		if decType != kolide.DecoratorInterval {
+			return nil
+		}
+		// special processing for interval type
+		existingDec, err := mw.ds.Decorator(payload.ID)
+		if err != nil {
+			// if decorator is not present we want to return a 404 to the client
+			return err
+		}
+		// if the type has changed from always or load to interval we need to
+		// check suitability of interval value
+		if existingDec.Type != kolide.DecoratorInterval {
+			if payload.Interval == nil {
+				invalid.Append("interval", "missing required argument")
+				return nil
+			}
+			if *payload.Interval%60 != 0 {
+				invalid.Append("interval", "value must be divisible by 60")
+			}
+		}
+	}
+	return nil
+}
+
+func (mw validationMiddleware) ModifyDecorator(ctx context.Context, payload kolide.DecoratorPayload) (*kolide.Decorator, error) {
+	invalid := &invalidArgumentError{}
+	err := mw.validateModifyDecoratorType(payload, invalid)
+	if err != nil {
+		return nil, err
+	}
+	if invalid.HasErrors() {
+		return nil, invalid
+	}
+	return mw.Service.ModifyDecorator(ctx, payload)
 }
 
 func (mw validationMiddleware) DeleteDecorator(ctx context.Context, id uint) error {

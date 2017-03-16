@@ -68,6 +68,7 @@ type KolideEndpoints struct {
 	ModifyLabel                    endpoint.Endpoint
 	ListDecorators                 endpoint.Endpoint
 	NewDecorator                   endpoint.Endpoint
+	ModifyDecorator                endpoint.Endpoint
 	DeleteDecorator                endpoint.Endpoint
 	GetHost                        endpoint.Endpoint
 	DeleteHost                     endpoint.Endpoint
@@ -148,6 +149,7 @@ func MakeKolideServerEndpoints(svc kolide.Service, jwtKey string) KolideEndpoint
 		ModifyLabel:               authenticatedUser(jwtKey, svc, makeModifyLabelEndpoint(svc)),
 		ListDecorators:            authenticatedUser(jwtKey, svc, makeListDecoratorsEndpoint(svc)),
 		NewDecorator:              authenticatedUser(jwtKey, svc, makeNewDecoratorEndpoint(svc)),
+		ModifyDecorator:           authenticatedUser(jwtKey, svc, makeNewDecoratorEndpoint(svc)),
 		DeleteDecorator:           authenticatedUser(jwtKey, svc, makeDeleteDecoratorEndpoint(svc)),
 		SearchTargets:             authenticatedUser(jwtKey, svc, makeSearchTargetsEndpoint(svc)),
 		GetOptions:                authenticatedUser(jwtKey, svc, mustBeAdmin(makeGetOptionsEndpoint(svc))),
@@ -221,6 +223,7 @@ type kolideHandlers struct {
 	ModifyLabel                    http.Handler
 	ListDecorators                 http.Handler
 	NewDecorator                   http.Handler
+	ModifyDecorator                http.Handler
 	DeleteDecorator                http.Handler
 	GetHost                        http.Handler
 	DeleteHost                     http.Handler
@@ -294,6 +297,7 @@ func makeKolideKitHandlers(ctx context.Context, e KolideEndpoints, opts []kithtt
 		ModifyLabel:                   newServer(e.ModifyLabel, decodeModifyLabelRequest),
 		ListDecorators:                newServer(e.ListDecorators, decodeNoParamsRequest),
 		NewDecorator:                  newServer(e.NewDecorator, decodeNewDecoratorRequest),
+		ModifyDecorator:               newServer(e.ModifyDecorator, decodeModifyDecoratorRequest),
 		DeleteDecorator:               newServer(e.DeleteDecorator, decodeDeleteDecoratorRequest),
 		GetHost:                       newServer(e.GetHost, decodeGetHostRequest),
 		DeleteHost:                    newServer(e.DeleteHost, decodeDeleteHostRequest),
@@ -405,6 +409,7 @@ func attachKolideAPIRoutes(r *mux.Router, h *kolideHandlers) {
 
 	r.Handle("/api/v1/kolide/decorators", h.ListDecorators).Methods("GET").Name("list_decorators")
 	r.Handle("/api/v1/kolide/decorators", h.NewDecorator).Methods("POST").Name("new_decorator")
+	r.Handle("/api/v1/kolide/decorators/{id}", h.ModifyDecorator).Methods("PATCH").Name("modify_decorator")
 	r.Handle("/api/v1/kolide/decorators/{id}", h.DeleteDecorator).Methods("DELETE").Name("delete_decorator")
 
 	r.Handle("/api/v1/kolide/hosts", h.ListHosts).Methods("GET").Name("list_hosts")

@@ -14,6 +14,8 @@ type DecoratorFunc func(id uint) (*kolide.Decorator, error)
 
 type ListDecoratorsFunc func() ([]*kolide.Decorator, error)
 
+type SaveDecoratorFunc func(dec *kolide.Decorator) error
+
 type DecoratorStore struct {
 	NewDecoratorFunc        NewDecoratorFunc
 	NewDecoratorFuncInvoked bool
@@ -26,6 +28,9 @@ type DecoratorStore struct {
 
 	ListDecoratorsFunc        ListDecoratorsFunc
 	ListDecoratorsFuncInvoked bool
+
+	SaveDecoratorFunc        SaveDecoratorFunc
+	SaveDecoratorFuncInvoked bool
 }
 
 func (s *DecoratorStore) NewDecorator(decorator *kolide.Decorator) (*kolide.Decorator, error) {
@@ -46,4 +51,9 @@ func (s *DecoratorStore) Decorator(id uint) (*kolide.Decorator, error) {
 func (s *DecoratorStore) ListDecorators() ([]*kolide.Decorator, error) {
 	s.ListDecoratorsFuncInvoked = true
 	return s.ListDecoratorsFunc()
+}
+
+func (s *DecoratorStore) SaveDecorator(dec *kolide.Decorator) error {
+	s.SaveDecoratorFuncInvoked = true
+	return s.SaveDecoratorFunc(dec)
 }

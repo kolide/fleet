@@ -8,6 +8,30 @@ import (
 	"github.com/kolide/kolide/server/kolide"
 )
 
+func (ds *Datastore) SaveDecorator(dec *kolide.Decorator) error {
+	sqlStatement :=
+		"UPDATE decorators SET " +
+			"`query` = ?, " +
+			"`type` = ?, " +
+			"`interval` = ? " +
+			"WHERE id = ?"
+	res, err := ds.db.Exec(
+		sqlStatement,
+		dec.Query,
+		dec.Type,
+		dec.Interval,
+		dec.ID,
+	)
+	if err != nil {
+		return errors.Wrap(err, "saving decorator")
+	}
+	rows, _ := res.RowsAffected()
+	if rows < 1 {
+		return notFound("Decorator").WithID(dec.ID)
+	}
+	return nil
+}
+
 func (ds *Datastore) NewDecorator(decorator *kolide.Decorator) (*kolide.Decorator, error) {
 	sqlStatement :=
 		"INSERT INTO decorators (" +

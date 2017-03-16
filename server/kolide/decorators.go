@@ -17,6 +17,8 @@ type DecoratorStore interface {
 	Decorator(id uint) (*Decorator, error)
 	// ListDecorators returns all decorator queries.
 	ListDecorators() ([]*Decorator, error)
+	// SaveDecorator updates an existing decorator
+	SaveDecorator(dec *Decorator) error
 }
 
 // DecoratorService exposes decorators data so it can be manipulated by
@@ -28,6 +30,8 @@ type DecoratorService interface {
 	DeleteDecorator(ctx context.Context, id uint) error
 	// NewDecorator creates a new decorator
 	NewDecorator(ctx context.Context, payload DecoratorPayload) (*Decorator, error)
+	// ModifyDecorator updates an existing decorator
+	ModifyDecorator(ctx context.Context, payload DecoratorPayload) (*Decorator, error)
 }
 
 // DecoratorType refers to the allowable types of decorator queries.
@@ -109,7 +113,8 @@ type Decorator struct {
 }
 
 type DecoratorPayload struct {
-	DecoratorType string `json:"decorator_type"`
-	Interval      *uint  `json:"interval"`
-	Query         string `json:"query"`
+	ID            uint    `json:"id"`
+	DecoratorType *string `json:"decorator_type"`
+	Interval      *uint   `json:"interval"`
+	Query         *string `json:"query"`
 }

@@ -39,6 +39,22 @@ func (mw loggingMiddleware) NewDecorator(ctx context.Context, payload kolide.Dec
 	return dec, err
 }
 
+func (mw loggingMiddleware) ModifyDecorator(ctx context.Context, payload kolide.DecoratorPayload) (*kolide.Decorator, error) {
+	var (
+		dec *kolide.Decorator
+		err error
+	)
+	defer func(begin time.Time) {
+		mw.logger.Log(
+			"method", "ModifyDecorator",
+			"err", err,
+			"took", time.Since(begin),
+		)
+	}(time.Now())
+	dec, err = mw.Service.ModifyDecorator(ctx, payload)
+	return dec, err
+}
+
 func (mw loggingMiddleware) DeleteDecorator(ctx context.Context, id uint) error {
 	var err error
 	defer func(begin time.Time) {

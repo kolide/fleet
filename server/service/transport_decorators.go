@@ -23,3 +23,17 @@ func decodeDeleteDecoratorRequest(ctx context.Context, req *http.Request) (inter
 	}
 	return deleteDecoratorRequest{ID: id}, nil
 }
+
+func decodeModifyDecoratorRequest(ctx context.Context, req *http.Request) (interface{}, error) {
+	var request newDecoratorRequest
+	id, err := idFromRequest(req, "id")
+	if err != nil {
+		return nil, err
+	}
+	err = json.NewDecoder(req.Body).Decode(&request)
+	if err != nil {
+		return nil, err
+	}
+	request.Payload.ID = id
+	return request, nil
+}
