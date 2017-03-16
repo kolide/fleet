@@ -1,3 +1,5 @@
+* Fix rounding error when showing % of online hosts
+
 * Add a workaround for CentOS6 detection.
 
   osquery 2.3.2 incorrectly reports an empty value for `platform` on CentOS6 hosts. We added a workaround to properly detect platform in Kolide, and also [submitted a fix](https://github.com/facebook/osquery/pull/3071) to upstream osquery.
