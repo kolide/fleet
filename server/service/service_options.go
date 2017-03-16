@@ -31,8 +31,14 @@ func (svc service) ExpectedCheckinInterval(ctx context.Context) (time.Duration, 
 	found := false
 
 	osqueryIntervalOptionNames := []string{
+		// Note that logger_tls_period cannot be used because the
+		// osqueryd client will not check in if there are no new logs
+		// to report. This makes it an unreliable indicator.
+		// config_tls_refresh could be used, however it can only be set
+		// as a flag and not a config option. Perhaps at some point we
+		// would extract that value and be able to use it for this
+		// calculation.
 		"distributed_interval",
-		"logger_tls_period",
 	}
 
 	for _, option := range osqueryIntervalOptionNames {
