@@ -31,6 +31,9 @@ func TestIntervalUnmarshal(t *testing.T) {
 }
 
 func TestPackNameMapUnmarshal(t *testing.T) {
+	s2p := func(s string) *string { return &s }
+	u2p := func(ui uint) *uint { return &ui }
+
 	pnm := PackNameMap{
 		"path": "/this/is/a/path",
 		"details": PackDetails{
@@ -39,7 +42,7 @@ func TestPackNameMapUnmarshal(t *testing.T) {
 					Query:    "select from foo",
 					Interval: 100,
 					Removed:  new(bool),
-					Platform: strptr("linux"),
+					Platform: s2p("linux"),
 					Shard:    new(uint),
 					Snapshot: new(bool),
 				},
@@ -63,13 +66,13 @@ func TestPackNameMapUnmarshal(t *testing.T) {
 					Query:    "select from foo",
 					Interval: 100,
 					Removed:  new(bool),
-					Platform: strptr("linux"),
+					Platform: s2p("linux"),
 					Shard:    new(uint),
 					Snapshot: new(bool),
 				},
 			},
-			Shard:    uintptr(float64(10)),
-			Version:  strptr("1.0"),
+			Shard:    u2p(10),
+			Version:  s2p("1.0"),
 			Platform: "linux",
 			Discovery: []string{
 				"select from something",
@@ -81,13 +84,13 @@ func TestPackNameMapUnmarshal(t *testing.T) {
 					Query:    "select from bar",
 					Interval: 100,
 					Removed:  new(bool),
-					Platform: strptr("linux"),
+					Platform: s2p("linux"),
 					Shard:    new(uint),
 					Snapshot: new(bool),
 				},
 			},
-			Shard:    uintptr(float64(10)),
-			Version:  strptr("1.0"),
+			Shard:    u2p(10),
+			Version:  s2p("1.0"),
 			Platform: "linux",
 		},
 	}

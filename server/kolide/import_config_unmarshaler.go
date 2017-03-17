@@ -6,6 +6,8 @@ import (
 	"strconv"
 )
 
+var wrongTypeError = errors.New("argument missing or unexpected type")
+
 // UnmarshalJSON custom unmarshaling for PackNameMap will determine whether
 // the pack section of an osquery config file refers to a file path, or
 // pack details.  Pack details are unmarshalled into into PackDetails structure
@@ -33,57 +35,99 @@ func (pnm PackNameMap) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-func strptr(v interface{}) *string {
+func strptr(v interface{}) (*string, error) {
 	if v == nil {
-		return nil
+		return nil, nil
 	}
-	s := new(string)
-	*s = v.(string)
-	return s
+	s, ok := v.(string)
+	if !ok {
+		return nil, wrongTypeError
+	}
+	return &s, nil
 }
 
-func boolptr(v interface{}) *bool {
+func boolptr(v interface{}) (*bool, error) {
 	if v == nil {
-		return nil
+		return nil, nil
 	}
-	b := new(bool)
-	*b = v.(bool)
-	return b
+	b, ok := v.(bool)
+	if !ok {
+		return nil, wrongTypeError
+	}
+	return &b, nil
 }
 
-func uintptr(v interface{}) *uint {
+// We expect a float64 here because of the way JSON represents numbers
+func uintptr(v interface{}) (*uint, error) {
 	if v == nil {
-		return nil
+		return nil, nil
 	}
-	i := new(uint)
-	*i = uint(v.(float64))
-	return i
+	f, ok := v.(float64)
+	if !ok {
+		return nil, wrongTypeError
+	}
+	i := uint(f)
+	return &i, nil
+}
+
+// Use this when we expext a string value, in this case nil is an error
+func toString(v interface{}) (string, error) {
+	if s, ok := v.(string); ok {
+		return s, nil
+	}
+	return "", wrongTypeError
 }
 
 func unmarshalPackDetails(v map[string]interface{}) (PackDetails, error) {
+	var result PackDetails
 	queries, err := unmarshalQueryDetails(v["queries"])
 	if err != nil {
-		return PackDetails{}, nil
+		return result, err
 	}
-	return PackDetails{
+	discovery, err := unmarshalDiscovery(v["discovery"])
+	if err != nil {
+		return result, err
+	}
+	platform, err := toString(v["platform"])
+	if err != nil {
+		return result, err
+	}
+	shard, err := uintptr(v["shard"])
+	if err != nil {
+		return result, err
+	}
+	version, err := strptr(v["version"])
+	if err != nil {
+		return result, err
+	}
+
+	result = PackDetails{
 		Queries:   queries,
-		Shard:     uintptr(v["shard"]),
-		Version:   strptr(v["version"]),
-		Platform:  v["platform"].(string),
-		Discovery: unmarshalDiscovery(v["discovery"]),
-	}, nil
+		Shard:     shard,
+		Version:   version,
+		Platform:  platform,
+		Discovery: discovery,
+	}
+	return result, nil
 }
 
-func unmarshalDiscovery(val interface{}) []string {
+func unmarshalDiscovery(val interface{}) ([]string, error) {
 	var result []string
 	if val == nil {
-		return result
+		return result, nil
 	}
-	v := val.([]interface{})
+	v, ok := val.([]interface{})
+	if !ok {
+		return result, wrongTypeError
+	}
 	for _, val := range v {
-		result = append(result, val.(string))
+		query, err := toString(val)
+		if err != nil {
+			return result, err
+		}
+		result = append(result, query)
 	}
-	return result
+	return result, nil
 }
 
 func unmarshalQueryDetails(v interface{}) (QueryNameToQueryDetailsMap, error) {
@@ -102,23 +146,49 @@ func unmarshalQueryDetails(v interface{}) (QueryNameToQueryDetailsMap, error) {
 }
 
 func unmarshalQueryDetail(val interface{}) (QueryDetails, error) {
+	var result QueryDetails
 	v, ok := val.(map[string]interface{})
 	if !ok {
-		return QueryDetails{}, errors.New("argument to unmarshalQueryDetails was missing or the wrong type")
+		return result, errors.New("argument was missing or the wrong type")
 	}
 	interval, err := unmarshalInterval(v["interval"])
 	if err != nil {
-		return QueryDetails{}, err
+		return result, err
 	}
-	return QueryDetails{
-		Query:    v["query"].(string),
+	query, err := toString(v["query"])
+	if err != nil {
+		return result, err
+	}
+	removed, err := boolptr(v["removed"])
+	if err != nil {
+		return result, err
+	}
+	platform, err := strptr(v["platform"])
+	if err != nil {
+		return result, err
+	}
+	version, err := strptr(v["version"])
+	if err != nil {
+		return result, err
+	}
+	shard, err := uintptr(v["shard"])
+	if err != nil {
+		return result, err
+	}
+	snapshot, err := boolptr(v["snapshot"])
+	if err != nil {
+		return result, nil
+	}
+	result = QueryDetails{
+		Query:    query,
 		Interval: interval,
-		Removed:  boolptr(v["removed"]),
-		Platform: strptr(v["platform"]),
-		Version:  strptr(v["version"]),
-		Shard:    uintptr(v["shard"]),
-		Snapshot: boolptr(v["snapshot"]),
-	}, nil
+		Removed:  removed,
+		Platform: platform,
+		Version:  version,
+		Shard:    shard,
+		Snapshot: snapshot,
+	}
+	return result, nil
 }
 
 // It is valid for the interval can be a string that is convertable to an int,
@@ -136,6 +206,6 @@ func unmarshalInterval(val interface{}) (uint, error) {
 	case float64:
 		return uint(v), nil
 	default:
-		return uint(0), errors.New("type mismatch for interval value")
+		return uint(0), wrongTypeError
 	}
 }
