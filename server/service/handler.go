@@ -149,7 +149,7 @@ func MakeKolideServerEndpoints(svc kolide.Service, jwtKey string) KolideEndpoint
 		ModifyLabel:               authenticatedUser(jwtKey, svc, makeModifyLabelEndpoint(svc)),
 		ListDecorators:            authenticatedUser(jwtKey, svc, makeListDecoratorsEndpoint(svc)),
 		NewDecorator:              authenticatedUser(jwtKey, svc, makeNewDecoratorEndpoint(svc)),
-		ModifyDecorator:           authenticatedUser(jwtKey, svc, makeNewDecoratorEndpoint(svc)),
+		ModifyDecorator:           authenticatedUser(jwtKey, svc, makeModifyDecoratorEndpoint(svc)),
 		DeleteDecorator:           authenticatedUser(jwtKey, svc, makeDeleteDecoratorEndpoint(svc)),
 		SearchTargets:             authenticatedUser(jwtKey, svc, makeSearchTargetsEndpoint(svc)),
 		GetOptions:                authenticatedUser(jwtKey, svc, mustBeAdmin(makeGetOptionsEndpoint(svc))),

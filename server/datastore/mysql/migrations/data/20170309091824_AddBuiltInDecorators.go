@@ -14,7 +14,7 @@ func Up_20170309091824(tx *sql.Tx) error {
 	sql := "INSERT INTO decorators (" +
 		"`type`, " +
 		"`query`, " +
-		"built_in, " +
+		"`built_in`, " +
 		"`interval`" +
 		") VALUES ( ?, ?, TRUE, 0 )"
 

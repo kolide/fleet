@@ -2,6 +2,7 @@ package kolide
 
 import (
 	"errors"
+	"strings"
 
 	"golang.org/x/net/context"
 )
@@ -44,9 +45,9 @@ const (
 	DecoratorInterval
 	DecoratorUndefined
 
-	DecoratorLoadName     = `"load"`
-	DecoratorAlwaysName   = `"always"`
-	DecoratorIntervalName = `"interval"`
+	DecoratorLoadName     = "load"
+	DecoratorAlwaysName   = "always"
+	DecoratorIntervalName = "interval"
 )
 
 func (dt DecoratorType) String() string {
@@ -67,11 +68,12 @@ func (dt *DecoratorType) MarshalJSON() ([]byte, error) {
 	if name == "" {
 		return nil, errors.New("Invalid decorator type")
 	}
-	return []byte(name), nil
+	return []byte(`"` + name + `"`), nil
 }
 
 func (dt *DecoratorType) UnmarshalJSON(data []byte) error {
-	switch string(data) {
+	name := strings.Trim(string(data), `"`)
+	switch name {
 	case DecoratorLoadName:
 		*dt = DecoratorLoad
 	case DecoratorAlwaysName:
@@ -105,7 +107,7 @@ type Decorator struct {
 	UpdateCreateTimestamps
 	ID   uint          `json:"id"`
 	Type DecoratorType `json:"type"`
-	// Interval note this is only pertainent for DecoratorInterval type.
+	// Interval note this is only pertinent for DecoratorInterval type.
 	Interval uint   `json:"interval"`
 	Query    string `json:"query"`
 	// BuiltIn decorators are loaded in migrations and may not be changed

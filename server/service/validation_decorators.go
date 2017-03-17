@@ -47,27 +47,31 @@ func (mw validationMiddleware) NewDecorator(ctx context.Context, payload kolide.
 
 func (mw validationMiddleware) validateModifyDecoratorType(payload kolide.DecoratorPayload, invalid *invalidArgumentError) error {
 	if payload.DecoratorType != nil {
+
 		decType, err := kolide.DecoratorTypeFromName(*payload.DecoratorType)
 		if err != nil {
 			invalid.Append("type", err.Error())
 			return nil
 		}
-		if decType != kolide.DecoratorInterval {
-			return nil
-		}
-		// special processing for interval type
-		existingDec, err := mw.ds.Decorator(payload.ID)
-		if err != nil {
-			// if decorator is not present we want to return a 404 to the client
-			return err
-		}
-		// if the type has changed from always or load to interval we need to
-		// check suitability of interval value
-		if existingDec.Type != kolide.DecoratorInterval {
-			if payload.Interval == nil {
-				invalid.Append("interval", "missing required argument")
-				return nil
+
+		if decType == kolide.DecoratorInterval {
+			// special processing for interval type
+			existingDec, err := mw.ds.Decorator(payload.ID)
+			if err != nil {
+				// if decorator is not present we want to return a 404 to the client
+				return err
 			}
+			// if the type has changed from always or load to interval we need to
+			// check suitability of interval value
+			if existingDec.Type != kolide.DecoratorInterval {
+				if payload.Interval == nil {
+					invalid.Append("interval", "missing required argument")
+					return nil
+				}
+			}
+		}
+
+		if payload.Interval != nil {
 			if *payload.Interval%60 != 0 {
 				invalid.Append("interval", "value must be divisible by 60")
 			}

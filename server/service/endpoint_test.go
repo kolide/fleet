@@ -126,6 +126,12 @@ var testFunctions = [...]func(*testing.T, *testResource){
 	testNonAdminUserSetAdmin,
 	testAdminUserSetEnabled,
 	testNonAdminUserSetEnabled,
+	testModifyDecorator,
+	testListDecorator,
+	testNewDecorator,
+	testNewDecoratorFailType,
+	testNewDecoratorFailValidation,
+	testDeleteDecorator,
 }
 
 func TestEndpoints(t *testing.T) {
