@@ -9,29 +9,24 @@ import (
 )
 
 func TestIntervalUnmarshal(t *testing.T) {
-	{
-		// interval can be a string, or a number
-		testJson := "100"
-		v, e := unmarshalInterval(testJson)
-		require.Nil(t, e)
-		require.Equal(t, uint(100), v)
+	scenarios := []struct {
+		testVal        interface{}
+		errExpected    bool
+		expectedResult uint
+	}{
+		{"100", false, 100},
+		{float64(123), false, 123},
+		{nil, false, 0},
+		{"hi there", true, 0},
 	}
-	{
-		// JSON marshals to float
-		testJson := float64(123)
-		v, e := unmarshalInterval(testJson)
-		require.Nil(t, e)
-		require.Equal(t, uint(123), v)
-	}
-	{
-		v, e := unmarshalInterval(nil)
-		require.Nil(t, e)
-		require.Equal(t, uint(0), v)
-	}
-	{
-		testJson := "hi there"
-		_, e := unmarshalInterval(testJson)
-		require.NotNil(t, e)
+	for _, scenario := range scenarios {
+		v, e := unmarshalInterval(scenario.testVal)
+		if scenario.errExpected {
+			assert.NotNil(t, e)
+			continue
+		}
+		assert.Nil(t, e)
+		assert.Equal(t, scenario.expectedResult, v)
 	}
 }
 

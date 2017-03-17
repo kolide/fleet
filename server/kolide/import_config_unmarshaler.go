@@ -21,10 +21,11 @@ func (pnm PackNameMap) UnmarshalJSON(b []byte) error {
 		case string:
 			pnm[key] = t
 		case map[string]interface{}:
-			pnm[key], err = unmarshalPackDetails(t)
+			val, err := unmarshalPackDetails(t)
 			if err != nil {
 				return err
 			}
+			pnm[key] = val
 		default:
 			return errors.New("can't unmarshal json")
 		}
@@ -101,7 +102,10 @@ func unmarshalQueryDetails(v interface{}) (QueryNameToQueryDetailsMap, error) {
 }
 
 func unmarshalQueryDetail(val interface{}) (QueryDetails, error) {
-	v := val.(map[string]interface{})
+	v, ok := val.(map[string]interface{})
+	if !ok {
+		return QueryDetails{}, errors.New("argument to unmarshalQueryDetails was missing or the wrong type")
+	}
 	interval, err := unmarshalInterval(v["interval"])
 	if err != nil {
 		return QueryDetails{}, err
