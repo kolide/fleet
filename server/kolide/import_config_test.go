@@ -8,6 +8,33 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestIntervalUnmarshal(t *testing.T) {
+	{
+		// interval can be a string, or a number
+		testJson := "100"
+		v, e := unmarshalInterval(testJson)
+		require.Nil(t, e)
+		require.Equal(t, uint(100), v)
+	}
+	{
+		// JSON marshals to float
+		testJson := float64(123)
+		v, e := unmarshalInterval(testJson)
+		require.Nil(t, e)
+		require.Equal(t, uint(123), v)
+	}
+	{
+		v, e := unmarshalInterval(nil)
+		require.Nil(t, e)
+		require.Equal(t, uint(0), v)
+	}
+	{
+		testJson := "hi there"
+		_, e := unmarshalInterval(testJson)
+		require.NotNil(t, e)
+	}
+}
+
 func TestPackNameMapUnmarshal(t *testing.T) {
 	pnm := PackNameMap{
 		"path": "/this/is/a/path",
