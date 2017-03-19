@@ -7,15 +7,14 @@ import (
 
 func validateNewDecoratorType(payload kolide.DecoratorPayload, invalid *invalidArgumentError) {
 	if payload.DecoratorType == nil {
-		invalid.Append("type", "missing required argument")
+		invalid.Append("decorator_type", "missing required argument")
 		return
 	}
-	decoratorType, err := kolide.DecoratorTypeFromName(*payload.DecoratorType)
-	if err != nil {
-		invalid.Append("type", err.Error())
+	if *payload.DecoratorType == kolide.DecoratorUndefined {
+		invalid.Append("decorator_type", "invalid value, must be load, always, or interval")
 		return
 	}
-	if decoratorType == kolide.DecoratorInterval {
+	if *payload.DecoratorType == kolide.DecoratorInterval {
 		if payload.Interval == nil {
 			invalid.Append("interval", "missing required argument")
 			return
@@ -48,13 +47,11 @@ func (mw validationMiddleware) NewDecorator(ctx context.Context, payload kolide.
 func (mw validationMiddleware) validateModifyDecoratorType(payload kolide.DecoratorPayload, invalid *invalidArgumentError) error {
 	if payload.DecoratorType != nil {
 
-		decType, err := kolide.DecoratorTypeFromName(*payload.DecoratorType)
-		if err != nil {
-			invalid.Append("type", err.Error())
+		if *payload.DecoratorType == kolide.DecoratorUndefined {
+			invalid.Append("decorator_type", "invalid value, must be load, always, or interval")
 			return nil
 		}
-
-		if decType == kolide.DecoratorInterval {
+		if *payload.DecoratorType == kolide.DecoratorInterval {
 			// special processing for interval type
 			existingDec, err := mw.ds.Decorator(payload.ID)
 			if err != nil {

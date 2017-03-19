@@ -408,7 +408,7 @@ func attachKolideAPIRoutes(r *mux.Router, h *kolideHandlers) {
 	r.Handle("/api/v1/kolide/labels/{id}", h.ModifyLabel).Methods("PATCH").Name("modify_label")
 
 	r.Handle("/api/v1/kolide/decorators", h.ListDecorators).Methods("GET").Name("list_decorators")
-	r.Handle("/api/v1/kolide/decorators", h.NewDecorator).Methods("POST").Name("new_decorator")
+	r.Handle("/api/v1/kolide/decorators", h.NewDecorator).Methods("POST").Name("create_decorator")
 	r.Handle("/api/v1/kolide/decorators/{id}", h.ModifyDecorator).Methods("PATCH").Name("modify_decorator")
 	r.Handle("/api/v1/kolide/decorators/{id}", h.DeleteDecorator).Methods("DELETE").Name("delete_decorator")
 

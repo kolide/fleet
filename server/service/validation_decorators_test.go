@@ -10,6 +10,8 @@ import (
 	"golang.org/x/net/context"
 )
 
+var dtPtr = func(t kolide.DecoratorType) *kolide.DecoratorType { return &t }
+
 func TestDecoratorValidation(t *testing.T) {
 	ds := mock.Store{}
 	ds.DecoratorFunc = func(id uint) (*kolide.Decorator, error) {
@@ -32,7 +34,7 @@ func TestDecoratorValidation(t *testing.T) {
 
 	payload := kolide.DecoratorPayload{
 		ID:            uint(1),
-		DecoratorType: stringPtr("interval"),
+		DecoratorType: dtPtr(kolide.DecoratorInterval),
 		Interval:      uintPtr(3600),
 	}
 
@@ -64,7 +66,7 @@ func TestDecoratorValidationIntervalMissing(t *testing.T) {
 
 	payload := kolide.DecoratorPayload{
 		ID:            uint(1),
-		DecoratorType: stringPtr("interval"),
+		DecoratorType: dtPtr(kolide.DecoratorInterval),
 	}
 
 	_, err := validator.ModifyDecorator(context.Background(), payload)
@@ -97,7 +99,7 @@ func TestDecoratorValidationIntervalSameType(t *testing.T) {
 
 	payload := kolide.DecoratorPayload{
 		ID:            uint(1),
-		DecoratorType: stringPtr("interval"),
+		DecoratorType: dtPtr(kolide.DecoratorInterval),
 		Interval:      uintPtr(1200),
 	}
 
@@ -129,7 +131,7 @@ func TestDecoratorValidationIntervalInvalid(t *testing.T) {
 
 	payload := kolide.DecoratorPayload{
 		ID:            uint(1),
-		DecoratorType: stringPtr("interval"),
+		DecoratorType: dtPtr(kolide.DecoratorInterval),
 		Interval:      uintPtr(1203),
 	}
 

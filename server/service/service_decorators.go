@@ -16,7 +16,7 @@ func (svc service) DeleteDecorator(ctx context.Context, uid uint) error {
 func (svc service) NewDecorator(ctx context.Context, payload kolide.DecoratorPayload) (*kolide.Decorator, error) {
 	var dec kolide.Decorator
 	dec.Query = *payload.Query
-	dec.Type, _ = kolide.DecoratorTypeFromName(*payload.DecoratorType)
+	dec.Type = *payload.DecoratorType
 	if payload.Interval != nil {
 		dec.Interval = *payload.Interval
 	}
@@ -29,7 +29,7 @@ func (svc service) ModifyDecorator(ctx context.Context, payload kolide.Decorator
 		return nil, err
 	}
 	if payload.DecoratorType != nil {
-		dec.Type, _ = kolide.DecoratorTypeFromName(*payload.DecoratorType)
+		dec.Type = *payload.DecoratorType
 	}
 	if payload.Query != nil {
 		dec.Query = *payload.Query

@@ -71,6 +71,12 @@ func (dt *DecoratorType) MarshalJSON() ([]byte, error) {
 	return []byte(`"` + name + `"`), nil
 }
 
+var decNameToType = map[string]DecoratorType{
+	DecoratorLoadName:     DecoratorLoad,
+	DecoratorAlwaysName:   DecoratorAlways,
+	DecoratorIntervalName: DecoratorInterval,
+}
+
 func (dt *DecoratorType) UnmarshalJSON(data []byte) error {
 	name := strings.Trim(string(data), `"`)
 	switch name {
@@ -81,25 +87,9 @@ func (dt *DecoratorType) UnmarshalJSON(data []byte) error {
 	case DecoratorIntervalName:
 		*dt = DecoratorInterval
 	default:
-		return errors.New("Invalid load type")
+		*dt = DecoratorUndefined
 	}
 	return nil
-}
-
-var decNameToType map[string]DecoratorType
-
-func DecoratorTypeFromName(name string) (DecoratorType, error) {
-	if decNameToType == nil {
-		decNameToType = map[string]DecoratorType{
-			"load":     DecoratorLoad,
-			"always":   DecoratorAlways,
-			"interval": DecoratorInterval,
-		}
-	}
-	if typ, ok := decNameToType[name]; ok {
-		return typ, nil
-	}
-	return DecoratorUndefined, errors.New("undefined decorator type")
 }
 
 // Decorator contains information about a decorator query.
@@ -115,8 +105,8 @@ type Decorator struct {
 }
 
 type DecoratorPayload struct {
-	ID            uint    `json:"id"`
-	DecoratorType *string `json:"decorator_type"`
-	Interval      *uint   `json:"interval"`
-	Query         *string `json:"query"`
+	ID            uint           `json:"id"`
+	DecoratorType *DecoratorType `json:"decorator_type"`
+	Interval      *uint          `json:"interval"`
+	Query         *string        `json:"query"`
 }

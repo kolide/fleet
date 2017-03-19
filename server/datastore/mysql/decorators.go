@@ -15,7 +15,7 @@ func (ds *Datastore) SaveDecorator(dec *kolide.Decorator) error {
 			"`type` = ?, " +
 			"`interval` = ? " +
 			"WHERE id = ?"
-	res, err := ds.db.Exec(
+	_, err := ds.db.Exec(
 		sqlStatement,
 		dec.Query,
 		dec.Type,
@@ -24,10 +24,6 @@ func (ds *Datastore) SaveDecorator(dec *kolide.Decorator) error {
 	)
 	if err != nil {
 		return errors.Wrap(err, "saving decorator")
-	}
-	rows, _ := res.RowsAffected()
-	if rows < 1 {
-		return notFound("Decorator").WithID(dec.ID)
 	}
 	return nil
 }

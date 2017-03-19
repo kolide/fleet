@@ -132,6 +132,7 @@ var testFunctions = [...]func(*testing.T, *testResource){
 	testNewDecoratorFailType,
 	testNewDecoratorFailValidation,
 	testDeleteDecorator,
+	testModifyDecoratorNoChanges,
 }
 
 func TestEndpoints(t *testing.T) {
