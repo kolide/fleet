@@ -1,7 +1,9 @@
 package kolide
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -10,29 +12,54 @@ import (
 
 func TestIntervalUnmarshal(t *testing.T) {
 	scenarios := []struct {
+		name           string
 		testVal        interface{}
 		errExpected    bool
-		expectedResult uint
+		expectedResult OsQueryConfigInt
 	}{
-		{"100", false, 100},
-		{float64(123), false, 123},
-		{nil, false, 0},
-		{"hi there", true, 0},
+		{"string to uint", "100", false, 100},
+		{"float to uint", float64(123), false, 123},
+		{"nil to zero value int", nil, false, 0},
+		{"invalid string", "hi there", true, 0},
 	}
 	for _, scenario := range scenarios {
-		v, e := unmarshalInterval(scenario.testVal)
-		if scenario.errExpected {
-			assert.NotNil(t, e)
-			continue
-		}
-		assert.Nil(t, e)
-		assert.Equal(t, scenario.expectedResult, v)
+		t.Run(fmt.Sprintf(": %s", scenario.name), func(tt *testing.T) {
+			v, e := unmarshalInteger(scenario.testVal)
+			if scenario.errExpected {
+				assert.NotNil(t, e)
+			} else {
+				require.Nil(t, e)
+				assert.Equal(t, scenario.expectedResult, v)
+			}
+		})
 	}
+}
+
+type importIntTest struct {
+	Val OsQueryConfigInt `json:"val"`
+}
+
+func TestConfigImportInt(t *testing.T) {
+	buff := bytes.NewBufferString(`{"val":"23"}`)
+	var ts importIntTest
+	err := json.NewDecoder(buff).Decode(&ts)
+	assert.Nil(t, err)
+	assert.Equal(t, 23, int(ts.Val))
+
+	buff = bytes.NewBufferString(`{"val":456}`)
+	err = json.NewDecoder(buff).Decode(&ts)
+	assert.Nil(t, err)
+	assert.Equal(t, 456, int(ts.Val))
+
+	buff = bytes.NewBufferString(`{"val":"hi 456"}`)
+	err = json.NewDecoder(buff).Decode(&ts)
+	assert.NotNil(t, err)
+
 }
 
 func TestPackNameMapUnmarshal(t *testing.T) {
 	s2p := func(s string) *string { return &s }
-	u2p := func(ui uint) *uint { return &ui }
+	u2p := func(ui uint) *OsQueryConfigInt { ci := OsQueryConfigInt(ui); return &ci }
 
 	pnm := PackNameMap{
 		"path": "/this/is/a/path",
@@ -43,7 +70,7 @@ func TestPackNameMapUnmarshal(t *testing.T) {
 					Interval: 100,
 					Removed:  new(bool),
 					Platform: s2p("linux"),
-					Shard:    new(uint),
+					Shard:    new(OsQueryConfigInt),
 					Snapshot: new(bool),
 				},
 			},
@@ -67,7 +94,7 @@ func TestPackNameMapUnmarshal(t *testing.T) {
 					Interval: 100,
 					Removed:  new(bool),
 					Platform: s2p("linux"),
-					Shard:    new(uint),
+					Shard:    new(OsQueryConfigInt),
 					Snapshot: new(bool),
 				},
 			},
@@ -85,7 +112,7 @@ func TestPackNameMapUnmarshal(t *testing.T) {
 					Interval: 100,
 					Removed:  new(bool),
 					Platform: s2p("linux"),
-					Shard:    new(uint),
+					Shard:    new(OsQueryConfigInt),
 					Snapshot: new(bool),
 				},
 			},

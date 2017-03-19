@@ -58,15 +58,14 @@ func boolptr(v interface{}) (*bool, error) {
 }
 
 // We expect a float64 here because of the way JSON represents numbers
-func uintptr(v interface{}) (*uint, error) {
+func uintptr(v interface{}) (*OsQueryConfigInt, error) {
 	if v == nil {
 		return nil, nil
 	}
-	f, ok := v.(float64)
-	if !ok {
-		return nil, wrongTypeError
+	i, err := unmarshalInteger(v)
+	if err != nil {
+		return nil, err
 	}
-	i := uint(f)
 	return &i, nil
 }
 
@@ -151,7 +150,7 @@ func unmarshalQueryDetail(val interface{}) (QueryDetails, error) {
 	if !ok {
 		return result, errors.New("argument was missing or the wrong type")
 	}
-	interval, err := unmarshalInterval(v["interval"])
+	interval, err := unmarshalInteger(v["interval"])
 	if err != nil {
 		return result, err
 	}
@@ -181,7 +180,7 @@ func unmarshalQueryDetail(val interface{}) (QueryDetails, error) {
 	}
 	result = QueryDetails{
 		Query:    query,
-		Interval: interval,
+		Interval: OsQueryConfigInt(interval),
 		Removed:  removed,
 		Platform: platform,
 		Version:  version,
@@ -194,18 +193,18 @@ func unmarshalQueryDetail(val interface{}) (QueryDetails, error) {
 // It is valid for the interval can be a string that is convertable to an int,
 // or an float64. The float64 is how all numbers in JSON are represented, so
 // we need to convert to uint
-func unmarshalInterval(val interface{}) (uint, error) {
+func unmarshalInteger(val interface{}) (OsQueryConfigInt, error) {
 	// if interval is nil return zero value
 	if val == nil {
-		return uint(0), nil
+		return OsQueryConfigInt(0), nil
 	}
 	switch v := val.(type) {
 	case string:
 		i, err := strconv.ParseUint(v, 10, 64)
-		return uint(i), err
+		return OsQueryConfigInt(i), err
 	case float64:
-		return uint(v), nil
+		return OsQueryConfigInt(v), nil
 	default:
-		return uint(0), wrongTypeError
+		return OsQueryConfigInt(0), wrongTypeError
 	}
 }
