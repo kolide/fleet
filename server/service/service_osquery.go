@@ -35,6 +35,7 @@ func (svc service) AuthenticateHost(ctx context.Context, nodeKey string) (*kolid
 			nodeInvalid: true,
 		}
 	}
+
 	host, err := svc.ds.AuthenticateHost(nodeKey)
 	if err != nil {
 		return nil, osqueryError{
@@ -42,10 +43,13 @@ func (svc service) AuthenticateHost(ctx context.Context, nodeKey string) (*kolid
 			nodeInvalid: true,
 		}
 	}
+
+	// Update the "seen" time used to calculate online status
 	err = svc.ds.MarkHostSeen(host, svc.clock.Now())
 	if err != nil {
-		return nil, osqueryError{message: "failed to make host seen: " + err.Error()}
+		return nil, osqueryError{message: "failed to mark host seen: " + err.Error()}
 	}
+
 	return host, nil
 }
 
@@ -148,7 +152,7 @@ func (svc service) GetClientConfig(ctx context.Context) (*kolide.OsqueryConfig, 
 }
 
 func (svc service) SubmitStatusLogs(ctx context.Context, logs []kolide.OsqueryStatusLog) error {
-	host, ok := hostctx.FromContext(ctx)
+	_, ok := hostctx.FromContext(ctx)
 	if !ok {
 		return osqueryError{message: "internal error: missing host from request context"}
 	}
@@ -160,16 +164,11 @@ func (svc service) SubmitStatusLogs(ctx context.Context, logs []kolide.OsquerySt
 		}
 	}
 
-	err := svc.ds.MarkHostSeen(&host, svc.clock.Now())
-	if err != nil {
-		return osqueryError{message: "failed to update host seen: " + err.Error()}
-	}
-
 	return nil
 }
 
 func (svc service) SubmitResultLogs(ctx context.Context, logs []kolide.OsqueryResultLog) error {
-	host, ok := hostctx.FromContext(ctx)
+	_, ok := hostctx.FromContext(ctx)
 	if !ok {
 		return osqueryError{message: "internal error: missing host from request context"}
 	}
@@ -179,11 +178,6 @@ func (svc service) SubmitResultLogs(ctx context.Context, logs []kolide.OsqueryRe
 		if err != nil {
 			return osqueryError{message: "error writing result log: " + err.Error()}
 		}
-	}
-
-	err := svc.ds.MarkHostSeen(&host, svc.clock.Now())
-	if err != nil {
-		return osqueryError{message: "failed to update host seen: " + err.Error()}
 	}
 
 	return nil
@@ -536,11 +530,7 @@ func (svc service) SubmitDistributedQueryResults(ctx context.Context, results ko
 		return osqueryError{message: "internal error: missing host from request context"}
 	}
 
-	err := svc.ds.MarkHostSeen(&host, svc.clock.Now())
-	if err != nil {
-		return osqueryError{message: "failed to update host seen: " + err.Error()}
-	}
-
+	var err error
 	detailUpdated := false
 	labelResults := map[uint]bool{}
 	for query, rows := range results {
