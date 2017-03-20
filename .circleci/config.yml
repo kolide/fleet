@@ -8,3 +8,5 @@ jobs:
     steps:
       - checkout
       - run: make deps
+      - run: make generate
+      - run: make build
