@@ -1,0 +1,9 @@
+version: 2
+jobs:
+  build:
+    docker:
+        - image: kolide/kolide-builder:ubuntu
+    working_directory: /go/src/github.com/kolide/kolide
+    steps:
+      - checkout
+      - run: make deps
