@@ -1,0 +1,4 @@
+steps:
+- name: 'kolide/kolide-builder:1.8'
+  args: ['--deps']
+  images: ['kolide/kolide-builder:1.8']
