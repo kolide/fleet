@@ -4,6 +4,7 @@ jobs:
     docker:
         - image: kolide/kolide-builder:ubuntu
     working_directory: /go/src/github.com/kolide/kolide
+    # ugh
     steps:
       - checkout
       - run: make deps
