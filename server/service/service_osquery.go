@@ -94,6 +94,9 @@ func (svc service) GetClientConfig(ctx context.Context) (*kolide.OsqueryConfig, 
 		case kolide.DecoratorInterval:
 			key := strconv.Itoa(int(dec.Interval))
 			decConfig.Interval[key] = append(decConfig.Interval[key], dec.Query)
+		default:
+			svc.logger.Log("component", "service", "method", "GetClientConfig", "err",
+				"unknown decorator type")
 		}
 	}
 
