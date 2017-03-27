@@ -137,7 +137,7 @@ func (man Manager) addConfigs() {
 		"Kolide TLS key path")
 	man.addConfigBool("server.tls", true,
 		"Enable TLS (required for osqueryd communication)")
-	man.addConfigString(TLSProfileKey, TLSProfileIntermediate,
+	man.addConfigString(TLSProfileKey, TLSProfileModern,
 		fmt.Sprintf("TLS security profile choose one of %s, %s or %s",
 			TLSProfileModern, TLSProfileIntermediate, TLSProfileOld))
 

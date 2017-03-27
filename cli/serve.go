@@ -199,7 +199,7 @@ the way that the kolide server works.
 					errs <- srv.ListenAndServe()
 				} else {
 					logger.Log("transport", "https", "address", config.Server.Address, "msg", "listening")
-					srv.TLSConfig = getTLSConfig(config.Server)
+					srv.TLSConfig = getTLSConfig(config.Server.TLSProfile)
 					errs <- srv.ListenAndServeTLS(
 						config.Server.Cert,
 						config.Server.Key,
@@ -250,12 +250,12 @@ func healthz(logger kitlog.Logger, deps map[string]interface{}) http.HandlerFunc
 
 // Support for TLS security profiles, we set up the TLS configuation based on
 // value supplied to server_tls_compatibility command line flag. The default
-// profile is 'intermediate'.
+// profile is 'modern'.
 // See https://wiki.mozilla.org/Security/Server_Side_TLS
-func getTLSConfig(serverConfig config.ServerConfig) *tls.Config {
-	var cfg tls.Config
-	cfg.PreferServerCipherSuites = true
-	switch serverConfig.TLSProfile {
+func getTLSConfig(profile string) *tls.Config {
+	cfg := tls.Config{PreferServerCipherSuites: true}
+
+	switch profile {
 	case config.TLSProfileModern:
 		cfg.MinVersion = tls.VersionTLS12
 		cfg.CurvePreferences = append(cfg.CurvePreferences,
@@ -321,7 +321,7 @@ func getTLSConfig(serverConfig config.ServerConfig) *tls.Config {
 			tls.TLS_RSA_WITH_3DES_EDE_CBC_SHA,
 		)
 	default:
-		panic("invalid tls profile " + serverConfig.TLSProfile)
+		panic("invalid tls profile " + profile)
 	}
 
 	return &cfg
