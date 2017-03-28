@@ -12,6 +12,8 @@ import defaultConfigOptions from 'pages/config/ConfigOptionsPage/default_config_
 import entityGetter from 'redux/utilities/entityGetter';
 import helpers from 'pages/config/ConfigOptionsPage/helpers';
 import { renderFlash } from 'redux/nodes/notifications/actions';
+import Kolide from 'kolide';
+
 
 const baseClass = 'config-options-page';
 const DEFAULT_CONFIG_OPTION = { name: '', value: '' };
@@ -102,8 +104,20 @@ export class ConfigOptionsPage extends Component {
   }
 
   onResetConfigOptions = () => {
-    this.setState({ configOptions: defaultConfigOptions });
 
+    const { configOptions, dispatch } = this.props;
+
+    Kolide.configOptions.reset().then(
+      () => {
+        dispatch(configOptionActions.loadAll());
+        dispatch(renderFlash('success', 'Options reset to defaults!'));
+        return false;
+      },
+      () => {
+        dispatch(renderFlash('error', 'Options reset failed!'));
+        return false;
+      }
+    )
     return false;
   }
 

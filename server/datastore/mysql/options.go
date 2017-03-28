@@ -3,9 +3,76 @@ package mysql
 import (
 	"database/sql"
 
+	"github.com/kolide/kolide/server/datastore/internal/appstate"
 	"github.com/kolide/kolide/server/kolide"
 	"github.com/pkg/errors"
 )
+
+func (d *Datastore) ResetOptions() ([]kolide.Option, error) {
+	// Atomically remove all existing options, reset auto increment so id's will be the
+	// same as original defaults, and re-insert defaults in option table.
+	txn, err := d.db.Begin()
+	if err != nil {
+		return nil, errors.Wrap(err, "reset options begin transaction")
+	}
+	var success bool
+	defer func() {
+		if success {
+			if err = txn.Commit(); err == nil {
+				return
+			}
+		}
+		txn.Rollback()
+	}()
+	_, err = d.db.Exec("DELETE FROM options")
+	if err != nil {
+		return nil, errors.Wrap(err, "deleting options in reset options")
+	}
+	// Reset auto increment
+	_, err = d.db.Exec("ALTER TABLE `options` AUTO_INCREMENT = 1")
+	if err != nil {
+		return nil, errors.Wrap(err, "resetting auto increment counter in reset options")
+	}
+	sqlStatement := `
+		INSERT INTO options (
+			name,
+			type,
+			value,
+			read_only
+		) VALUES (?, ?, ?, ?)
+	`
+	var options []kolide.Option
+	for _, defaultOpt := range appstate.Options() {
+		opt := kolide.Option{
+			Name:     defaultOpt.Name,
+			ReadOnly: defaultOpt.ReadOnly,
+			Type:     defaultOpt.Type,
+			Value: kolide.OptionValue{
+				Val: defaultOpt.Value,
+			},
+		}
+		dbResponse, err := d.db.Exec(
+			sqlStatement,
+			opt.Name,
+			opt.Type,
+			opt.Value,
+			opt.ReadOnly,
+		)
+		if err != nil {
+			return nil, errors.Wrap(err, "inserting default option in reset options")
+		}
+		id, err := dbResponse.LastInsertId()
+		if err != nil {
+			return nil, errors.Wrap(err, "fetching id in reset options")
+		}
+		opt.ID = uint(id)
+		options = append(options, opt)
+	}
+	// We've removed all old options and restored defaults, indicate success
+	// so our work will be committed in our defer func
+	success = true
+	return options, nil
+}
 
 func (d *Datastore) OptionByName(name string) (*kolide.Option, error) {
 	sqlStatement := `
