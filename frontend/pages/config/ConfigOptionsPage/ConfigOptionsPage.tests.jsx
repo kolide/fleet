@@ -4,7 +4,6 @@ import { mount } from 'enzyme';
 
 import { ConfigOptionsPage } from 'pages/config/ConfigOptionsPage/ConfigOptionsPage';
 import { configOptionStub } from 'test/stubs';
-import defaultConfigOptions from 'pages/config/ConfigOptionsPage/default_config_options';
 import { fillInFormInput } from 'test/helpers';
 
 describe('ConfigOptionsPage - component', () => {
