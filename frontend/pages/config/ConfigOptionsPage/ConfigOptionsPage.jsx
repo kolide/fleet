@@ -105,7 +105,7 @@ export class ConfigOptionsPage extends Component {
 
   onResetConfigOptions = () => {
 
-    const { configOptions, dispatch } = this.props;
+    const { dispatch } = this.props;
 
     Kolide.configOptions.reset().then(
       () => {

@@ -45,7 +45,7 @@ describe('ConfigOptionsPage - component', () => {
 
     resetButton.simulate('click');
 
-    expect(page.state('configOptions')).toEqual(defaultConfigOptions);
+    expect(page.state('configOptions')).toEqual([]);
   });
 
   describe('removing a config option', () => {
