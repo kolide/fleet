@@ -53,6 +53,7 @@ func TestRedis(t *testing.T) {
 
 	for _, f := range testFunctions {
 		t.Run(functionName(f), func(t *testing.T) {
+			assert.True(t, false)
 			f(t, store)
 		})
 	}
