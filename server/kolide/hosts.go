@@ -130,6 +130,20 @@ func (h *Host) ResetPrimaryNetwork() bool {
 
 }
 
+func (h *Host) PrimaryNetworkInterface() *NetworkInterface {
+	if h.PrimaryNetworkInterfaceID == nil {
+		return nil
+	}
+
+	for _, ni := range h.NetworkInterfaces {
+		if ni.ID == *h.PrimaryNetworkInterfaceID {
+			return ni
+		}
+	}
+
+	return nil
+}
+
 // RandomText returns a stdEncoded string of
 // just what it says
 func RandomText(keySize int) (string, error) {
