@@ -2,8 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
-	"time"
 
 	"github.com/go-kit/kit/endpoint"
 	"github.com/kolide/kolide/server/kolide"
@@ -24,21 +22,16 @@ type packResponse struct {
 
 func packResponseForPack(ctx context.Context, svc kolide.Service, pack kolide.Pack) (*packResponse, error) {
 	opts := kolide.ListOptions{}
-	start := time.Now()
 	queries, err := svc.GetScheduledQueriesInPack(ctx, pack.ID, opts)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("getScheduledQueriesInPack", time.Since(start))
 
-	start = time.Now()
 	hosts, err := svc.ListExplicitHostsInPack(ctx, pack.ID, opts)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("listExplicitHostsInPack", time.Since(start))
 
-	start = time.Now()
 	labels, err := svc.ListLabelsForPack(ctx, pack.ID)
 	labelIDs := make([]uint, len(labels), len(labels))
 	for i, label := range labels {
@@ -47,14 +40,11 @@ func packResponseForPack(ctx context.Context, svc kolide.Service, pack kolide.Pa
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("listLabelsForPack", time.Since(start))
 
-	start = time.Now()
 	hostMetrics, err := svc.CountHostsInTargets(ctx, hosts, labelIDs)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("CountHostsInTargets", time.Since(start))
 
 	return &packResponse{
 		Pack:            pack,

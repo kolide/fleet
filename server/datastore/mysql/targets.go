@@ -9,6 +9,11 @@ import (
 )
 
 func (d *Datastore) CountHostsInTargets(hostIDs []uint, labelIDs []uint, now time.Time, onlineInterval time.Duration) (kolide.TargetMetrics, error) {
+	if len(hostIDs) == 0 && len(labelIDs) == 0 {
+		// No need to query if no targets selected
+		return kolide.TargetMetrics{}, nil
+	}
+
 	sql := `
 SELECT
 COUNT(*) total,
@@ -22,11 +27,21 @@ hosts h
 OR (id IN (SELECT DISTINCT host_id FROM label_query_executions WHERE label_id IN (?) AND matches = 1))
 		AND NOT deleted
 `
-	// DIRTY HACK -- FIX
-	labelIDs = append(labelIDs, 0)
-	hostIDs = append(hostIDs, 0)
 
-	query, args, err := sqlx.In(sql, now, onlineInterval.Seconds(), now, now, onlineInterval.Seconds(), now, now, hostIDs, labelIDs)
+	// Using -1 in the ID slices for the IN clause allows us to include the
+	// IN clause even if we have no IDs to use. -1 will not match the
+	// auto-increment IDs, and will also allow us to use the same query in
+	// all situations (no need to remove the clause when there are no values)
+	queryLabelIDs := []int{-1}
+	for _, id := range labelIDs {
+		queryLabelIDs = append(queryLabelIDs, int(id))
+	}
+	queryHostIDs := []int{-1}
+	for _, id := range hostIDs {
+		queryHostIDs = append(queryHostIDs, int(id))
+	}
+
+	query, args, err := sqlx.In(sql, now, onlineInterval.Seconds(), now, now, onlineInterval.Seconds(), now, now, queryHostIDs, queryLabelIDs)
 	if err != nil {
 		return kolide.TargetMetrics{}, errors.Wrap(err, "sqlx.In CountHostsInTargets")
 	}
