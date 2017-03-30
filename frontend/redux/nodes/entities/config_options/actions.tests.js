@@ -9,22 +9,20 @@ import {
   resetOptionsStart,
   resetOptionsSuccess,
 } from './actions';
-import config from './config';
 
-const store = {entities: { config_options: {}}};
+const store = { entities: { config_options: {} } };
 const options = [
-  {id: 1, name: 'option1', type: 'int', value: 10},
-  {id: 2, name: 'option2', type: 'string', value: 'wappa'},
+  { id: 1, name: 'option1', type: 'int', value: 10 },
+  { id: 2, name: 'option2', type: 'string', value: 'wappa' },
 ];
-
 
 describe('Options - actions', () => {
   describe('resetOptions', () => {
     describe('successful request', () => {
       beforeEach(() => {
-          spyOn(Kolide.configOptions, 'reset').andCall(() => {
-              return Promise.resolve(options);
-          });
+        spyOn(Kolide.configOptions, 'reset').andCall(() => {
+          return Promise.resolve(options);
+        });
       });
 
       afterEach(restoreSpies);
@@ -35,23 +33,23 @@ describe('Options - actions', () => {
           .then(() => {
             expect(Kolide.configOptions.reset).toHaveBeenCalled();
           });
-        });
+      });
 
-        it('dispatches the correct actions', (done) => {
-          const mockStore = reduxMockStore(store);
-          mockStore.dispatch(resetOptions())
-            .then(() => {
-              const dispatchedActions = mockStore.getActions();
+      it('dispatches the correct actions', (done) => {
+        const mockStore = reduxMockStore(store);
+        mockStore.dispatch(resetOptions())
+          .then(() => {
+            const dispatchedActions = mockStore.getActions();
 
-              expect(dispatchedActions).toEqual([
-                resetOptionsStart,
-                resetOptionsSuccess(options),
-              ]);
+            expect(dispatchedActions).toEqual([
+              resetOptionsStart,
+              resetOptionsSuccess(options),
+            ]);
 
-              done();
-            })
-            .catch(done);
-        });
+            done();
+          })
+          .catch(done);
+      });
     });
   });
 });

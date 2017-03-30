@@ -4,7 +4,6 @@ import { differenceWith, find, filter, isEqual, noop } from 'lodash';
 
 import Button from 'components/buttons/Button';
 import configOptionActions from 'redux/nodes/entities/config_options/actions';
-//import resetOptions from 'redux/nodes/entities/config_options/actions';
 import ConfigOptionsForm from 'components/forms/ConfigOptionsForm';
 import Icon from 'components/icons/Icon';
 import configOptionInterface from 'interfaces/config_option';
@@ -12,8 +11,6 @@ import debounce from 'utilities/debounce';
 import entityGetter from 'redux/utilities/entityGetter';
 import helpers from 'pages/config/ConfigOptionsPage/helpers';
 import { renderFlash } from 'redux/nodes/notifications/actions';
-import Kolide from 'kolide';
-
 
 const baseClass = 'config-options-page';
 const DEFAULT_CONFIG_OPTION = { name: '', value: '' };

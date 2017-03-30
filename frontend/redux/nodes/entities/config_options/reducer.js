@@ -2,13 +2,12 @@ import {
   RESET_OPTIONS_START,
   RESET_OPTIONS_SUCCESS,
   RESET_OPTIONS_FAILURE,
-} from './actions'
+} from './actions';
 
-import config, {initialState} from './config';
+import config, { initialState } from './config';
 
-export default  (state = initialState, {type, payload}) => {
-
-  switch(type) {
+export default (state = initialState, { type, payload }) => {
+  switch (type) {
     case RESET_OPTIONS_START:
       return {
         ...state,
@@ -23,14 +22,14 @@ export default  (state = initialState, {type, payload}) => {
         ...state,
         errors: {},
         loading: false,
-        data: payload.config_options,
-      }
+        data: payload.configOptions,
+      };
     case RESET_OPTIONS_FAILURE:
       return {
         ...state,
         errors: payload.errors,
       };
     default:
-      return config.reducer(state, {type, payload});
-  };
+      return config.reducer(state, { type, payload });
+  }
 };
