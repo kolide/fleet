@@ -21,9 +21,22 @@ func (d *Datastore) ResetOptions() ([]kolide.Option, error) {
 			if err = txn.Commit(); err == nil {
 				return
 			}
+			d.logger.Log(
+				"method", "ResetOptions",
+				"activity", "db commit",
+				"err", err,
+			)
 		}
-		txn.Rollback()
+		if err = txn.Rollback(); err == nil {
+			return
+		}
+		d.logger.Log(
+			"method", "ResetOptions",
+			"activity", "db rollback",
+			"err", err,
+		)
 	}()
+
 	_, err = d.db.Exec("DELETE FROM options")
 	if err != nil {
 		return nil, errors.Wrap(err, "deleting options in reset options")
