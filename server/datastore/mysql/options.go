@@ -18,6 +18,7 @@ func (d *Datastore) ResetOptions() (opts []kolide.Option, err error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "reset options begin transaction")
 	}
+	// Rollback transaction unless everything succeeds
 	var success bool
 	defer func() {
 		if !success {
