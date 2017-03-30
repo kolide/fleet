@@ -8,35 +8,25 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (d *Datastore) ResetOptions() ([]kolide.Option, error) {
+// ResetOptions note we use named return values so we can preserve and return
+// errors in our defer function
+func (d *Datastore) ResetOptions() (opts []kolide.Option, err error) {
 	// Atomically remove all existing options, reset auto increment so id's will be the
 	// same as original defaults, and re-insert defaults in option table.
-	txn, err := d.db.Begin()
+	var txn *sql.Tx
+	txn, err = d.db.Begin()
 	if err != nil {
 		return nil, errors.Wrap(err, "reset options begin transaction")
 	}
 	var success bool
 	defer func() {
-		if success {
-			if err = txn.Commit(); err == nil {
-				return
+		if !success {
+			err = txn.Rollback()
+			if err != nil {
+				errors.Wrap(err, "rolling back reset options")
 			}
-			d.logger.Log(
-				"method", "ResetOptions",
-				"activity", "db commit",
-				"err", err,
-			)
 		}
-		if err = txn.Rollback(); err == nil {
-			return
-		}
-		d.logger.Log(
-			"method", "ResetOptions",
-			"activity", "db rollback",
-			"err", err,
-		)
 	}()
-
 	_, err = d.db.Exec("DELETE FROM options")
 	if err != nil {
 		return nil, errors.Wrap(err, "deleting options in reset options")
@@ -54,7 +44,6 @@ func (d *Datastore) ResetOptions() ([]kolide.Option, error) {
 			read_only
 		) VALUES (?, ?, ?, ?)
 	`
-	var options []kolide.Option
 	for _, defaultOpt := range appstate.Options() {
 		opt := kolide.Option{
 			Name:     defaultOpt.Name,
@@ -79,12 +68,16 @@ func (d *Datastore) ResetOptions() ([]kolide.Option, error) {
 			return nil, errors.Wrap(err, "fetching id in reset options")
 		}
 		opt.ID = uint(id)
-		options = append(options, opt)
+		opts = append(opts, opt)
+	}
+	err = txn.Commit()
+	if err != nil {
+		return nil, errors.Wrap(err, "commiting reset options")
 	}
 	// We've removed all old options and restored defaults, indicate success
-	// so our work will be committed in our defer func
+	// so our work won't be rolled back in the defer function
 	success = true
-	return options, nil
+	return opts, nil
 }
 
 func (d *Datastore) OptionByName(name string) (*kolide.Option, error) {
