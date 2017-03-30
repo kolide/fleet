@@ -22,5 +22,14 @@ export default {
       });
     },
   },
+  reset: {
+    valid: (bearerToken, params) => {
+      return createRequestMock({
+        bearerToken,
+        endpoint: '/api/v1/kolide/options/reset',
+        method: 'get',
+        response: { options: []},
+      });
+    },
+  },
 };
-

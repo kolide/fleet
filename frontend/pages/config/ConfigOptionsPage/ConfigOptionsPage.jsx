@@ -4,6 +4,7 @@ import { differenceWith, find, filter, isEqual, noop } from 'lodash';
 
 import Button from 'components/buttons/Button';
 import configOptionActions from 'redux/nodes/entities/config_options/actions';
+//import resetOptions from 'redux/nodes/entities/config_options/actions';
 import ConfigOptionsForm from 'components/forms/ConfigOptionsForm';
 import Icon from 'components/icons/Icon';
 import configOptionInterface from 'interfaces/config_option';
@@ -105,17 +106,15 @@ export class ConfigOptionsPage extends Component {
   onResetConfigOptions = () => {
     const { dispatch } = this.props;
 
-    Kolide.configOptions.reset().then(
-      () => {
-        dispatch(configOptionActions.loadAll());
-        dispatch(renderFlash('success', 'Options reset to defaults!'));
+    dispatch(configOptionActions.resetOptions())
+      .then(() => {
+        dispatch(renderFlash('success', 'Options reset to defaults.'));
         return false;
-      },
-      () => {
-        dispatch(renderFlash('error', 'Options reset failed!'));
+      })
+      .catch(() => {
+        dispatch(renderFlash('error', 'Options reset failed.'));
         return false;
-      }
-    );
+      });
     return false;
   }
 

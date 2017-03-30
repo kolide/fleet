@@ -35,18 +35,6 @@ describe('ConfigOptionsPage - component', () => {
     });
   });
 
-  it('resets config option defaults', () => {
-    const page = mount(<ConfigOptionsPage {...props} />);
-    const buttons = page.find('Button');
-    const resetButton = buttons.find('.config-options-page__reset-btn');
-
-    expect(page.state('configOptions')).toEqual([]);
-
-    resetButton.simulate('click');
-
-    expect(page.state('configOptions')).toEqual([]);
-  });
-
   describe('removing a config option', () => {
     it('sets the option value to null in state', () => {
       const page = mount(<ConfigOptionsPage configOptions={[configOptionStub]} />);
