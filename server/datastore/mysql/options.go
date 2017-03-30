@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/kolide/kolide/server/datastore/internal/appstate"
 	"github.com/kolide/kolide/server/kolide"
@@ -18,22 +19,20 @@ func (d *Datastore) ResetOptions() (opts []kolide.Option, err error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "reset options begin transaction")
 	}
-	// Rollback transaction unless everything succeeds
-	var success bool
+
 	defer func() {
-		if !success {
-			err = txn.Rollback()
-			if err != nil {
-				errors.Wrap(err, "rolling back reset options")
+		if err != nil {
+			if txErr := txn.Rollback(); txErr != nil {
+				err = errors.Wrap(err, fmt.Sprintf("reset options failed, transaction rollback failed with error: %s", txErr))
 			}
 		}
 	}()
-	_, err = d.db.Exec("DELETE FROM options")
+	_, err = txn.Exec("DELETE FROM options")
 	if err != nil {
 		return nil, errors.Wrap(err, "deleting options in reset options")
 	}
 	// Reset auto increment
-	_, err = d.db.Exec("ALTER TABLE `options` AUTO_INCREMENT = 1")
+	_, err = txn.Exec("ALTER TABLE `options` AUTO_INCREMENT = 1")
 	if err != nil {
 		return nil, errors.Wrap(err, "resetting auto increment counter in reset options")
 	}
@@ -54,7 +53,7 @@ func (d *Datastore) ResetOptions() (opts []kolide.Option, err error) {
 				Val: defaultOpt.Value,
 			},
 		}
-		dbResponse, err := d.db.Exec(
+		dbResponse, err := txn.Exec(
 			sqlStatement,
 			opt.Name,
 			opt.Type,
@@ -75,9 +74,7 @@ func (d *Datastore) ResetOptions() (opts []kolide.Option, err error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "commiting reset options")
 	}
-	// We've removed all old options and restored defaults, indicate success
-	// so our work won't be rolled back in the defer function
-	success = true
+
 	return opts, nil
 }
 
