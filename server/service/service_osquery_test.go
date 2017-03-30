@@ -95,17 +95,10 @@ func TestSubmitStatusLogs(t *testing.T) {
 	require.Nil(t, err)
 	require.Len(t, hosts, 1)
 	host := hosts[0]
+	ctx = hostctx.NewContext(ctx, *host)
 
 	// Hack to get at the service internals and modify the writer
 	serv := ((svc.(validationMiddleware)).Service).(service)
-
-	// Error due to missing host
-	err = serv.SubmitResultLogs(ctx, []kolide.OsqueryResultLog{})
-	require.NotNil(t, err)
-	assert.Contains(t, err.Error(), "missing host")
-
-	// Add that host
-	ctx = hostctx.NewContext(ctx, *host)
 
 	var statusBuf bytes.Buffer
 	serv.osqueryStatusLogWriter = &statusBuf
@@ -145,16 +138,10 @@ func TestSubmitResultLogs(t *testing.T) {
 	require.Nil(t, err)
 	require.Len(t, hosts, 1)
 	host := hosts[0]
+	ctx = hostctx.NewContext(ctx, *host)
 
 	// Hack to get at the service internals and modify the writer
 	serv := ((svc.(validationMiddleware)).Service).(service)
-
-	// Error due to missing host
-	err = serv.SubmitResultLogs(ctx, []kolide.OsqueryResultLog{})
-	assert.NotNil(t, err)
-	assert.Contains(t, err.Error(), "missing host")
-
-	ctx = hostctx.NewContext(ctx, *host)
 
 	var resultBuf bytes.Buffer
 	serv.osqueryResultLogWriter = &resultBuf

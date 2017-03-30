@@ -152,11 +152,6 @@ func (svc service) GetClientConfig(ctx context.Context) (*kolide.OsqueryConfig, 
 }
 
 func (svc service) SubmitStatusLogs(ctx context.Context, logs []kolide.OsqueryStatusLog) error {
-	_, ok := hostctx.FromContext(ctx)
-	if !ok {
-		return osqueryError{message: "internal error: missing host from request context"}
-	}
-
 	for _, log := range logs {
 		err := json.NewEncoder(svc.osqueryStatusLogWriter).Encode(log)
 		if err != nil {
@@ -168,11 +163,6 @@ func (svc service) SubmitStatusLogs(ctx context.Context, logs []kolide.OsquerySt
 }
 
 func (svc service) SubmitResultLogs(ctx context.Context, logs []kolide.OsqueryResultLog) error {
-	_, ok := hostctx.FromContext(ctx)
-	if !ok {
-		return osqueryError{message: "internal error: missing host from request context"}
-	}
-
 	for _, log := range logs {
 		err := json.NewEncoder(svc.osqueryResultLogWriter).Encode(log)
 		if err != nil {
