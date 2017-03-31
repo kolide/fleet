@@ -4,9 +4,9 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
 	"os/signal"
-	"strings"
 	"syscall"
 	"time"
 
@@ -195,10 +195,8 @@ the way that the kolide server works.
 				if err != nil {
 					initFatal(err, "generating debug token")
 				}
-				debugToken = strings.Replace(debugToken, "+", "-", -1)
-				debugToken = strings.Replace(debugToken, "/", "_", -1)
 				r.Handle("/debug/", http.StripPrefix("/debug/", netbug.AuthHandler(debugToken)))
-				fmt.Printf("*** Debug mode enabled ***\nAccess the debug endpoints at /debug/?token=%s\n", debugToken)
+				fmt.Printf("*** Debug mode enabled ***\nAccess the debug endpoints at /debug/?token=%s\n", url.QueryEscape(debugToken))
 			}
 
 			srv := &http.Server{
