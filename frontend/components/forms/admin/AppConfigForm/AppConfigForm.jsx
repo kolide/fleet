@@ -293,7 +293,7 @@ class AppConfigForm extends Component {
           <div className={`${baseClass}__details`}>
             <p>If your mail server requires authentication, you need to specify the authentication type here.</p>
             <p><strong>No Authentication</strong> - Select this if your SMTP is open.</p>
-            <p><strong>Username & Password</strong> - Select this if your SMTP server requires authentication with username and password.</p>
+            <p><strong>Username & Password</strong> - Select this if your SMTP server requires authentication with a username and password.</p>
           </div>
         </div>
         <div className={`${baseClass}__section`}>
