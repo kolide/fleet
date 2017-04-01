@@ -1,3 +1,5 @@
+* Added command line option to disable log rotation for osquery status and osquery results log files.
+
 * Add a debug endpoint for collecting performance statistics and profiles.
 
   When `kolide serve --debug` is used, additional handlers will be started to provide access to profiling tools. These endpoints are authenticated with a randomly generated token that is printed to the Kolide logs at startup. These profiling tools are not intended for general use, but they may be useful when providing performance-related bug reports to the Kolide developers.
