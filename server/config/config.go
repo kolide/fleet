@@ -74,6 +74,7 @@ type OsqueryConfig struct {
 	NodeKeySize         int           `yaml:"node_key_size"`
 	StatusLogFile       string        `yaml:"status_log_file"`
 	ResultLogFile       string        `yaml:"result_log_file"`
+	DisableLogRotation  bool          `yaml:"disable_log_rotation"`
 	LabelUpdateInterval time.Duration `yaml:"label_update_interval"`
 }
 
@@ -172,6 +173,8 @@ func (man Manager) addConfigs() {
 		"Path for osqueryd result logs")
 	man.addConfigDuration("osquery.label_update_interval", 1*time.Hour,
 		"Interval to update host label membership (i.e. 1h)")
+	man.addConfigBool("osquery.disable_log_rotation", false,
+		"Osquery log files will not be automatically rotated")
 
 	// Logging
 	man.addConfigBool("logging.debug", false,
@@ -229,6 +232,7 @@ func (man Manager) LoadConfig() KolideConfig {
 			StatusLogFile:       man.getConfigString("osquery.status_log_file"),
 			ResultLogFile:       man.getConfigString("osquery.result_log_file"),
 			LabelUpdateInterval: man.getConfigDuration("osquery.label_update_interval"),
+			DisableLogRotation:  man.getConfigBool("osquery.disable_log_rotation"),
 		},
 		Logging: LoggingConfig{
 			Debug:         man.getConfigBool("logging.debug"),

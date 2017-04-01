@@ -3,6 +3,7 @@
 package service
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"os/signal"
@@ -12,6 +13,7 @@ import (
 	kitlog "github.com/go-kit/kit/log"
 	"github.com/kolide/kolide/server/config"
 	"github.com/kolide/kolide/server/kolide"
+	"github.com/kolide/kolide/server/logger"
 	lumberjack "gopkg.in/natefinch/lumberjack.v2"
 )
 
@@ -19,8 +21,14 @@ import (
 func NewService(ds kolide.Datastore, resultStore kolide.QueryResultStore, logger kitlog.Logger, kolideConfig config.KolideConfig, mailService kolide.MailService, c clock.Clock, checker kolide.LicenseChecker) (kolide.Service, error) {
 	var svc kolide.Service
 
-	statusWriter := osqueryLogFile(kolideConfig.Osquery.StatusLogFile, logger)
-	resultWriter := osqueryLogFile(kolideConfig.Osquery.ResultLogFile, logger)
+	statusWriter, err := osqueryLogFile(kolideConfig.Osquery.StatusLogFile, logger, kolideConfig.Osquery.DisableLogRotation)
+	if err != nil {
+		return nil, err
+	}
+	resultWriter, err := osqueryLogFile(kolideConfig.Osquery.ResultLogFile, logger, kolideConfig.Osquery.DisableLogRotation)
+	if err != nil {
+		return nil, err
+	}
 
 	svc = service{
 		ds:             ds,
@@ -40,7 +48,11 @@ func NewService(ds kolide.Datastore, resultStore kolide.QueryResultStore, logger
 
 // osqueryLogFile creates a log file for osquery status/result logs
 // the logFile can be rotated by sending a `SIGHUP` signal to kolide.
-func osqueryLogFile(path string, appLogger kitlog.Logger) io.Writer {
+func osqueryLogFile(path string, appLogger kitlog.Logger, disableRotation bool) (io.WriteCloser, error) {
+	if disableRotation {
+		return logger.New(path)
+	}
+
 	osquerydLogger := &lumberjack.Logger{
 		Filename:   path,
 		MaxSize:    500, // megabytes
@@ -60,7 +72,7 @@ func osqueryLogFile(path string, appLogger kitlog.Logger) io.Writer {
 		}
 	}()
 
-	return osquerydLogger
+	return osquerydLogger, nil
 }
 
 type service struct {
@@ -71,8 +83,8 @@ type service struct {
 	clock          clock.Clock
 	licenseChecker kolide.LicenseChecker
 
-	osqueryStatusLogWriter io.Writer
-	osqueryResultLogWriter io.Writer
+	osqueryStatusLogWriter io.WriteCloser
+	osqueryResultLogWriter io.WriteCloser
 
 	mailService kolide.MailService
 }
@@ -83,4 +95,19 @@ func (s service) SendEmail(mail kolide.Email) error {
 
 func (s service) Clock() clock.Clock {
 	return s.clock
+}
+
+func (s *service) Close() error {
+	errResult := s.osqueryResultLogWriter.Close()
+	errStatus := s.osqueryStatusLogWriter.Close()
+	if errResult != nil && errStatus != nil {
+		return fmt.Errorf("Error closing osquery logs, result log error %s; status log error %s", errResult, errStatus)
+	}
+	if errResult != nil {
+		return errResult
+	}
+	if errStatus != nil {
+		return errStatus
+	}
+	return nil
 }

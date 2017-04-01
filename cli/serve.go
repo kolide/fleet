@@ -3,6 +3,7 @@ package cli
 import (
 	"crypto/tls"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"os"
@@ -232,6 +233,12 @@ the way that the kolide server works.
 
 			logger.Log("terminated", <-errs)
 			licenseService.Stop()
+			if closer, ok := svc.(io.Closer); ok {
+				err = closer.Close()
+				if err != nil {
+					logger.Log("method", "Close", "error", err)
+				}
+			}
 		},
 	}
 
