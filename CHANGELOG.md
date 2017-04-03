@@ -12,27 +12,26 @@
 
 * Manage packs page now loads much quicker when a large number of hosts are enrolled.
 
-* The "Reset Options" button was not updating options to their default values.
-It now resets options in the database to the original default values and updates the user interface with these changed values.
+* Fixed bug with the "Reset Options" button.
 
-* Occasionally saving an unchanged option caused a 500 error. This has been
-fixed.
+* Fixed 500 error resulting from saving unchanged options.
 
-* Added additional validation when editing configuration settings to address an issue where saving configuration settings with an empty SMTP port caused a server error. Additional
-validation was added to fix this problem by preventing a user from posting configuration changes if the SMTP port is not populated.  
+* Improved validation for SMTP settings.
 
-* Added server side support for user defined decorator queries.
+* Added command line support for `modern`, `intermediate`, and `old` TLS configuration
+profiles. The profile is set using the following command line argument.
+```
+--server_tls_compatibility=modern
+```
+See https://wiki.mozilla.org/Security/Server_Side_TLS for more information on the different profile options.
 
-* Added command line support for `Modern`, `Intermediate`, and `Old` TLS configuration
-profiles.  See https://wiki.mozilla.org/Security/Server_Side_TLS for more information.
+* The Options Configuration item in the sidebar is now only available to admin users.
 
-* The Options Configuration item in the sidebar is now only available to admin users. Previously this item was visible to non-admin users and if selected, a blank options page would be displayed since server side authorization constraints prevent regular users from viewing or changing options.  
+  Previously this item was visible to non-admin users and if selected, a blank options page would be displayed since server side authorization constraints prevent regular users from viewing or changing options.  
 
 * Improved validation for the Kolide server URL supplied in setup and configuration.
 
-* Fixed an issue where string values can be provided where numeric values are expected in
-Osquery configurations.  This fix was needed because numeric fields in Osquery configurations don't strictly follow JSON standards and can be either JSON strings or JSON numbers. 
-
+* Fixed an issue importing osquery configurations with numeric values represented as strings in JSON.
 
 ## Kolide 1.0.2 (March 14, 2017)
 
