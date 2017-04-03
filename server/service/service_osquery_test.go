@@ -516,6 +516,20 @@ func TestDetailQueries(t *testing.T) {
         "seconds": "13",
         "total_seconds": "1730893"
     }
+],
+"kolide_detail_query_osquery_flags": [
+    {
+      "name":"config_tls_refresh",
+      "value":"10"
+    },
+    {
+      "name":"distributed_interval",
+      "value":"5"
+    },
+    {
+      "name":"logger_tls_period",
+      "value":"60"
+    }
 ]
 }
 `
@@ -545,6 +559,11 @@ func TestDetailQueries(t *testing.T) {
 
 	// uptime
 	assert.Equal(t, 1730893*time.Second, host.Uptime)
+
+	// osquery_flags
+	assert.Equal(t, uint(10), host.ConfigTLSRefresh)
+	assert.Equal(t, uint(5), host.DistributedInterval)
+	assert.Equal(t, uint(60), host.LoggerTLSPeriod)
 
 	mockClock.AddTime(1 * time.Minute)
 
