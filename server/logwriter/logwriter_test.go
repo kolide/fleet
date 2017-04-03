@@ -1,11 +1,10 @@
-package logger
+package logwriter
 
 import (
 	"crypto/rand"
-	"encoding/base32"
+	"io/ioutil"
 	"os"
 	"path"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -13,14 +12,10 @@ import (
 	lumberjack "gopkg.in/natefinch/lumberjack.v2"
 )
 
-func randomFileName() string {
-	buff := make([]byte, 24)
-	rand.Read(buff)
-	return strings.TrimRight(base32.StdEncoding.EncodeToString(buff), "=")
-}
-
 func TestLogger(t *testing.T) {
-	fileName := path.Join(os.TempDir(), randomFileName())
+	tempPath, err := ioutil.TempDir("", "test")
+	require.Nil(t, err)
+	fileName := path.Join(tempPath, "logwriter")
 	lgr, err := New(fileName)
 	require.Nil(t, err)
 	defer os.Remove(fileName)
@@ -41,9 +36,9 @@ func TestLogger(t *testing.T) {
 	_, err = lgr.Write(randInput)
 	assert.NotNil(t, err)
 
-	// can't call close after logger has been closed
+	// call close twice noop
 	err = lgr.Close()
-	assert.NotNil(t, err)
+	assert.Nil(t, err)
 
 	info, err := os.Stat(fileName)
 	require.Nil(t, err)
@@ -52,7 +47,11 @@ func TestLogger(t *testing.T) {
 }
 
 func BenchmarkLogger(b *testing.B) {
-	fileName := path.Join(os.TempDir(), randomFileName())
+	tempPath, err := ioutil.TempDir("", "test")
+	if err != nil {
+		b.Fatal("temp dir failed", err)
+	}
+	fileName := path.Join(tempPath, "logwriter")
 	lgr, err := New(fileName)
 	if err != nil {
 		b.Fatal("new failed ", err)
@@ -76,7 +75,11 @@ func BenchmarkLogger(b *testing.B) {
 }
 
 func BenchmarkLumberjack(b *testing.B) {
-	fileName := path.Join(os.TempDir(), randomFileName())
+	tempPath, err := ioutil.TempDir("", "test")
+	if err != nil {
+		b.Fatal("temp dir failed", err)
+	}
+	fileName := path.Join(tempPath, "lumberjack")
 	lgr := &lumberjack.Logger{
 		Filename:   fileName,
 		MaxSize:    500, // megabytes
@@ -89,7 +92,7 @@ func BenchmarkLumberjack(b *testing.B) {
 	rand.Read(randInput)
 	// first lumberjack write opens file so we count that as part of initialization
 	// just to make sure we're comparing apples to apples with our logger
-	_, err := lgr.Write(randInput)
+	_, err = lgr.Write(randInput)
 	if err != nil {
 		b.Fatal("first write failed ", err)
 	}

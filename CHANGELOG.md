@@ -1,4 +1,6 @@
-* Added command line option to disable log rotation for osquery status and osquery results log files.
+## Kolide 1.0.2 (April 3, 2017)
+
+* Log rotation is no longer the default setting for Osquery status and results logs. To enable log rotation use the `--osquery_enable_log_rotation` flag.
 
 * Add a debug endpoint for collecting performance statistics and profiles.
 
