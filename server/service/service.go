@@ -93,18 +93,3 @@ func (s service) SendEmail(mail kolide.Email) error {
 func (s service) Clock() clock.Clock {
 	return s.clock
 }
-
-// func (s *service) Close() error {
-// 	errResult := s.osqueryResultLogWriter.Close()
-// 	errStatus := s.osqueryStatusLogWriter.Close()
-// 	if errResult != nil && errStatus != nil {
-// 		return fmt.Errorf("Error closing osquery logs, result log error %s; status log error %s", errResult, errStatus)
-// 	}
-// 	if errResult != nil {
-// 		return errResult
-// 	}
-// 	if errStatus != nil {
-// 		return errStatus
-// 	}
-// 	return nil
-// }
