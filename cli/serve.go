@@ -223,10 +223,11 @@ the way that the kolide server works.
 				}
 			}()
 			go func() {
-				sig := make(chan os.Signal)
+				sig := make(chan os.Signal, 1)
 				signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
 				<-sig //block on signal
-				ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+				ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+				defer cancel()
 				errs <- srv.Shutdown(ctx)
 			}()
 
