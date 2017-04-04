@@ -285,11 +285,16 @@ func logStackdriver(ctx context.Context, logger *logging.Logger, log interface{}
 		})
 		return
 	}
+	labels := map[string]string{
+		"osquery_host_hostname": host.HostName,
+		"osquery_host_uuid":     host.UUID,
+	}
+	if l, ok := log.(kolide.OsqueryResultLog); ok {
+		packName := strings.SplitN(l.Name, "/", 3)[1]
+		labels["pack_name"] = packName
+	}
 	entry := logging.Entry{
-		Labels: map[string]string{
-			"osquery_host_hostname": host.HostName,
-			"osquery_host_uuid":     host.UUID,
-		},
+		Labels:  labels,
 		Payload: log,
 	}
 	logger.Log(entry)
