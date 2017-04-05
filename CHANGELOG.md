@@ -1,8 +1,43 @@
 * Fix rounding error when showing % of online hosts
 
+## Kolide 1.0.3 (April 3, 2017)
+
+* Log rotation is no longer the default setting for Osquery status and results logs. To enable log rotation use the `--osquery_enable_log_rotation` flag.
+
+* Add a debug endpoint for collecting performance statistics and profiles.
+
+  When `kolide serve --debug` is used, additional handlers will be started to provide access to profiling tools. These endpoints are authenticated with a randomly generated token that is printed to the Kolide logs at startup. These profiling tools are not intended for general use, but they may be useful when providing performance-related bug reports to the Kolide developers.
+
 * Add a workaround for CentOS6 detection.
 
   osquery 2.3.2 incorrectly reports an empty value for `platform` on CentOS6 hosts. We added a workaround to properly detect platform in Kolide, and also [submitted a fix](https://github.com/facebook/osquery/pull/3071) to upstream osquery.
+
+* Ensure hosts enroll in labels immediately even when `distributed_interval` is set to a long interval.
+
+* Optimizations reduce the CPU and DB usage of the manage hosts page.
+
+* Manage packs page now loads much quicker when a large number of hosts are enrolled.
+
+* Fixed bug with the "Reset Options" button.
+
+* Fixed 500 error resulting from saving unchanged options.
+
+* Improved validation for SMTP settings.
+
+* Added command line support for `modern`, `intermediate`, and `old` TLS configuration
+profiles. The profile is set using the following command line argument.
+```
+--server_tls_compatibility=modern
+```
+See https://wiki.mozilla.org/Security/Server_Side_TLS for more information on the different profile options.
+
+* The Options Configuration item in the sidebar is now only available to admin users.
+
+  Previously this item was visible to non-admin users and if selected, a blank options page would be displayed since server side authorization constraints prevent regular users from viewing or changing options.  
+
+* Improved validation for the Kolide server URL supplied in setup and configuration.
+
+* Fixed an issue importing osquery configurations with numeric values represented as strings in JSON.
 
 ## Kolide 1.0.2 (March 14, 2017)
 

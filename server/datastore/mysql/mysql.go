@@ -19,7 +19,7 @@ import (
 )
 
 const (
-	defaultSelectLimit = 1000
+	defaultSelectLimit = 100000
 )
 
 // Datastore is an implementation of kolide.Datastore interface backed by
@@ -255,7 +255,7 @@ func registerTLS(config config.MysqlConfig) error {
 // provided configuration.
 func generateMysqlConnectionString(conf config.MysqlConfig) string {
 	dsn := fmt.Sprintf(
-		"%s:%s@(%s)/%s?charset=utf8mb4&parseTime=true&loc=UTC",
+		"%s:%s@(%s)/%s?charset=utf8mb4&parseTime=true&loc=UTC&clientFoundRows=true",
 		conf.Username,
 		conf.Password,
 		conf.Address,

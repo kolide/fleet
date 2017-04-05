@@ -35,6 +35,7 @@ func (svc service) AuthenticateHost(ctx context.Context, nodeKey string) (*kolid
 			nodeInvalid: true,
 		}
 	}
+
 	host, err := svc.ds.AuthenticateHost(nodeKey)
 	if err != nil {
 		return nil, osqueryError{
@@ -42,10 +43,13 @@ func (svc service) AuthenticateHost(ctx context.Context, nodeKey string) (*kolid
 			nodeInvalid: true,
 		}
 	}
+
+	// Update the "seen" time used to calculate online status
 	err = svc.ds.MarkHostSeen(host, svc.clock.Now())
 	if err != nil {
-		return nil, osqueryError{message: "failed to make host seen: " + err.Error()}
+		return nil, osqueryError{message: "failed to mark host seen: " + err.Error()}
 	}
+
 	return host, nil
 }
 
@@ -78,15 +82,32 @@ func (svc service) GetClientConfig(ctx context.Context) (*kolide.OsqueryConfig, 
 		return nil, osqueryError{message: "internal error: unable to fetch configuration options"}
 	}
 
+	decorators, err := svc.ds.ListDecorators()
+	if err != nil {
+		return nil, osqueryError{message: "internal error: unable to fetch decorators"}
+	}
+	decConfig := kolide.Decorators{
+		Interval: make(map[string][]string),
+	}
+	for _, dec := range decorators {
+		switch dec.Type {
+		case kolide.DecoratorLoad:
+			decConfig.Load = append(decConfig.Load, dec.Query)
+		case kolide.DecoratorAlways:
+			decConfig.Always = append(decConfig.Always, dec.Query)
+		case kolide.DecoratorInterval:
+			key := strconv.Itoa(int(dec.Interval))
+			decConfig.Interval[key] = append(decConfig.Interval[key], dec.Query)
+		default:
+			svc.logger.Log("component", "service", "method", "GetClientConfig", "err",
+				"unknown decorator type")
+		}
+	}
+
 	config := &kolide.OsqueryConfig{
-		Options: options,
-		Decorators: kolide.Decorators{
-			Load: []string{
-				"SELECT uuid AS host_uuid FROM system_info;",
-				"SELECT hostname AS hostname FROM system_info;",
-			},
-		},
-		Packs: kolide.Packs{},
+		Options:    options,
+		Decorators: decConfig,
+		Packs:      kolide.Packs{},
 	}
 
 	packs, err := svc.ListPacksForHost(ctx, host.ID)
@@ -130,45 +151,41 @@ func (svc service) GetClientConfig(ctx context.Context) (*kolide.OsqueryConfig, 
 	return config, nil
 }
 
-func (svc service) SubmitStatusLogs(ctx context.Context, logs []kolide.OsqueryStatusLog) error {
-	host, ok := hostctx.FromContext(ctx)
-	if !ok {
-		return osqueryError{message: "internal error: missing host from request context"}
-	}
+// If osqueryWriters are based on bufio we want to flush after a batch of
+// writes so log entry gets completely written to the logfile.
+type flusher interface {
+	Flush() error
+}
 
+func (svc service) SubmitStatusLogs(ctx context.Context, logs []kolide.OsqueryStatusLog) error {
 	for _, log := range logs {
 		err := json.NewEncoder(svc.osqueryStatusLogWriter).Encode(log)
 		if err != nil {
 			return osqueryError{message: "error writing status log: " + err.Error()}
 		}
 	}
-
-	err := svc.ds.MarkHostSeen(&host, svc.clock.Now())
-	if err != nil {
-		return osqueryError{message: "failed to update host seen: " + err.Error()}
+	if writer, ok := svc.osqueryStatusLogWriter.(flusher); ok {
+		err := writer.Flush()
+		if err != nil {
+			return osqueryError{message: "error flushing status log: " + err.Error()}
+		}
 	}
-
 	return nil
 }
 
 func (svc service) SubmitResultLogs(ctx context.Context, logs []kolide.OsqueryResultLog) error {
-	host, ok := hostctx.FromContext(ctx)
-	if !ok {
-		return osqueryError{message: "internal error: missing host from request context"}
-	}
-
 	for _, log := range logs {
 		err := json.NewEncoder(svc.osqueryResultLogWriter).Encode(log)
 		if err != nil {
 			return osqueryError{message: "error writing result log: " + err.Error()}
 		}
 	}
-
-	err := svc.ds.MarkHostSeen(&host, svc.clock.Now())
-	if err != nil {
-		return osqueryError{message: "failed to update host seen: " + err.Error()}
+	if writer, ok := svc.osqueryResultLogWriter.(flusher); ok {
+		err := writer.Flush()
+		if err != nil {
+			return osqueryError{message: "error flushing status log: " + err.Error()}
+		}
 	}
-
 	return nil
 }
 
@@ -378,10 +395,10 @@ func (svc service) hostDetailQueries(host kolide.Host) map[string]string {
 	return queries
 }
 
-func (svc service) GetDistributedQueries(ctx context.Context) (map[string]string, error) {
+func (svc service) GetDistributedQueries(ctx context.Context) (map[string]string, uint, error) {
 	host, ok := hostctx.FromContext(ctx)
 	if !ok {
-		return nil, osqueryError{message: "internal error: missing host from request context"}
+		return nil, 0, osqueryError{message: "internal error: missing host from request context"}
 	}
 
 	queries := svc.hostDetailQueries(host)
@@ -390,7 +407,7 @@ func (svc service) GetDistributedQueries(ctx context.Context) (map[string]string
 	cutoff := svc.clock.Now().Add(-svc.config.Osquery.LabelUpdateInterval)
 	labelQueries, err := svc.ds.LabelQueriesForHost(&host, cutoff)
 	if err != nil {
-		return nil, err
+		return nil, 0, osqueryError{message: "retrieving label queries: " + err.Error()}
 	}
 
 	for name, query := range labelQueries {
@@ -399,14 +416,22 @@ func (svc service) GetDistributedQueries(ctx context.Context) (map[string]string
 
 	distributedQueries, err := svc.ds.DistributedQueriesForHost(&host)
 	if err != nil {
-		return nil, osqueryError{message: "retrieving query campaigns: " + err.Error()}
+		return nil, 0, osqueryError{message: "retrieving query campaigns: " + err.Error()}
 	}
 
 	for id, query := range distributedQueries {
 		queries[hostDistributedQueryPrefix+strconv.Itoa(int(id))] = query
 	}
 
-	return queries, nil
+	accelerate := uint(0)
+	if host.HostName == "" && host.Platform == "" {
+		// Assume this host is just enrolling, and accelerate checkins
+		// (to allow for platform restricted labels to run quickly
+		// after platform is retrieved from details)
+		accelerate = 10
+	}
+
+	return queries, accelerate, nil
 }
 
 // ingestDetailQuery takes the results of a detail query and modifies the
@@ -511,11 +536,7 @@ func (svc service) SubmitDistributedQueryResults(ctx context.Context, results ko
 		return osqueryError{message: "internal error: missing host from request context"}
 	}
 
-	err := svc.ds.MarkHostSeen(&host, svc.clock.Now())
-	if err != nil {
-		return osqueryError{message: "failed to update host seen: " + err.Error()}
-	}
-
+	var err error
 	detailUpdated := false
 	labelResults := map[uint]bool{}
 	for query, rows := range results {

@@ -21,13 +21,15 @@ func TestRotateLoggerSIGHUP(t *testing.T) {
 	require.Nil(t, err)
 	defer f.Close()
 
-	logFile := osqueryLogFile(f.Name(), log.NewNopLogger())
+	logFile, err := osqueryLogFile(f.Name(), log.NewNopLogger(), false)
+	require.Nil(t, err)
 
 	// write a log line
 	logFile.Write([]byte("msg1"))
 
-	sig := make(chan os.Signal)
+	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, syscall.SIGHUP)
+	defer signal.Reset(syscall.SIGHUP)
 
 	// send SIGHUP to the process
 	err = syscall.Kill(syscall.Getpid(), syscall.SIGHUP)

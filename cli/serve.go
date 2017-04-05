@@ -1,15 +1,18 @@
 package cli
 
 import (
+	"context"
 	"crypto/tls"
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
 	"github.com/WatchBeam/clock"
+	"github.com/e-dard/netbug"
 	kitlog "github.com/go-kit/kit/log"
 	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
 	"github.com/kolide/kolide/server/config"
@@ -23,7 +26,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/cobra"
-	"golang.org/x/net/context"
 )
 
 type initializer interface {
@@ -33,6 +35,9 @@ type initializer interface {
 }
 
 func createServeCmd(configManager config.Manager) *cobra.Command {
+	// Whether to enable the debug endpoints
+	debug := false
+
 	serveCmd := &cobra.Command{
 		Use:   "serve",
 		Short: "Launch the kolide server",
@@ -183,6 +188,17 @@ the way that the kolide server works.
 			r.Handle("/api/", apiHandler)
 			r.Handle("/", frontendHandler)
 
+			if debug {
+				// Add debug endpoints with a random
+				// authorization token
+				debugToken, err := kolide.RandomText(24)
+				if err != nil {
+					initFatal(err, "generating debug token")
+				}
+				r.Handle("/debug/", http.StripPrefix("/debug/", netbug.AuthHandler(debugToken)))
+				fmt.Printf("*** Debug mode enabled ***\nAccess the debug endpoints at /debug/?token=%s\n", url.QueryEscape(debugToken))
+			}
+
 			srv := &http.Server{
 				Addr:              config.Server.Address,
 				Handler:           r,
@@ -199,25 +215,7 @@ the way that the kolide server works.
 					errs <- srv.ListenAndServe()
 				} else {
 					logger.Log("transport", "https", "address", config.Server.Address, "msg", "listening")
-					srv.TLSConfig = &tls.Config{
-						// Causes servers to use Go's default ciphersuite preferences,
-						// which are tuned to avoid attacks. Does nothing on clients.
-						PreferServerCipherSuites: true,
-						// Only use curves which have assembly implementations
-						CurvePreferences: []tls.CurveID{
-							tls.CurveP256,
-							tls.X25519,
-						},
-						MinVersion: tls.VersionTLS12,
-						CipherSuites: []uint16{
-							tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
-							tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
-							tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
-							tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
-							tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
-							tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
-						},
-					}
+					srv.TLSConfig = getTLSConfig(config.Server.TLSProfile)
 					errs <- srv.ListenAndServeTLS(
 						config.Server.Cert,
 						config.Server.Key,
@@ -225,10 +223,11 @@ the way that the kolide server works.
 				}
 			}()
 			go func() {
-				sig := make(chan os.Signal)
+				sig := make(chan os.Signal, 1)
 				signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
 				<-sig //block on signal
-				ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+				ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+				defer cancel()
 				errs <- srv.Shutdown(ctx)
 			}()
 
@@ -236,6 +235,8 @@ the way that the kolide server works.
 			licenseService.Stop()
 		},
 	}
+
+	serveCmd.PersistentFlags().BoolVar(&debug, "debug", false, "Enable debug endpoints")
 
 	return serveCmd
 }
@@ -264,4 +265,83 @@ func healthz(logger kitlog.Logger, deps map[string]interface{}) http.HandlerFunc
 			w.WriteHeader(http.StatusInternalServerError)
 		}
 	}
+}
+
+// Support for TLS security profiles, we set up the TLS configuation based on
+// value supplied to server_tls_compatibility command line flag. The default
+// profile is 'modern'.
+// See https://wiki.mozilla.org/Security/Server_Side_TLS
+func getTLSConfig(profile string) *tls.Config {
+	cfg := tls.Config{PreferServerCipherSuites: true}
+
+	switch profile {
+	case config.TLSProfileModern:
+		cfg.MinVersion = tls.VersionTLS12
+		cfg.CurvePreferences = append(cfg.CurvePreferences,
+			tls.CurveP256,
+			tls.CurveP384,
+			tls.CurveP521,
+			tls.X25519,
+		)
+		cfg.CipherSuites = append(cfg.CipherSuites,
+			tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
+			tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+			tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
+			tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
+			tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
+			tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+		)
+	case config.TLSProfileIntermediate:
+		cfg.MinVersion = tls.VersionTLS10
+		cfg.CurvePreferences = append(cfg.CurvePreferences,
+			tls.CurveP256,
+			tls.CurveP384,
+			tls.CurveP521,
+			tls.X25519,
+		)
+		cfg.CipherSuites = append(cfg.CipherSuites,
+			tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
+			tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
+			tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
+			tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+			tls.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,
+			tls.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,
+			tls.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,
+			tls.TLS_RSA_WITH_AES_128_GCM_SHA256,
+			tls.TLS_RSA_WITH_AES_256_GCM_SHA384,
+			tls.TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA,
+			tls.TLS_RSA_WITH_RC4_128_SHA,
+			tls.TLS_RSA_WITH_AES_128_CBC_SHA,
+			tls.TLS_RSA_WITH_AES_256_CBC_SHA,
+			tls.TLS_RSA_WITH_3DES_EDE_CBC_SHA,
+		)
+	case config.TLSProfileOld:
+		cfg.MinVersion = tls.VersionSSL30
+		cfg.CurvePreferences = append(cfg.CurvePreferences,
+			tls.CurveP256,
+			tls.CurveP384,
+			tls.CurveP521,
+			tls.X25519,
+		)
+		cfg.CipherSuites = append(cfg.CipherSuites,
+			tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
+			tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
+			tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
+			tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+			tls.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,
+			tls.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,
+			tls.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,
+			tls.TLS_RSA_WITH_AES_128_GCM_SHA256,
+			tls.TLS_RSA_WITH_AES_256_GCM_SHA384,
+			tls.TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA,
+			tls.TLS_RSA_WITH_RC4_128_SHA,
+			tls.TLS_RSA_WITH_AES_128_CBC_SHA,
+			tls.TLS_RSA_WITH_AES_256_CBC_SHA,
+			tls.TLS_RSA_WITH_3DES_EDE_CBC_SHA,
+		)
+	default:
+		panic("invalid tls profile " + profile)
+	}
+
+	return &cfg
 }

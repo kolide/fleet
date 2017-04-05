@@ -33,12 +33,20 @@ type RedisConfig struct {
 	Password string
 }
 
+const (
+	TLSProfileKey          = "server.tls_compatibility"
+	TLSProfileModern       = "modern"
+	TLSProfileIntermediate = "intermediate"
+	TLSProfileOld          = "old"
+)
+
 // ServerConfig defines configs related to the Kolide server
 type ServerConfig struct {
-	Address string
-	Cert    string
-	Key     string
-	TLS     bool
+	Address    string
+	Cert       string
+	Key        string
+	TLS        bool
+	TLSProfile string
 }
 
 // AuthConfig defines configs related to user authorization
@@ -66,6 +74,7 @@ type OsqueryConfig struct {
 	NodeKeySize         int           `yaml:"node_key_size"`
 	StatusLogFile       string        `yaml:"status_log_file"`
 	ResultLogFile       string        `yaml:"result_log_file"`
+	EnableLogRotation   bool          `yaml:"enable_log_rotation"`
 	LabelUpdateInterval time.Duration `yaml:"label_update_interval"`
 }
 
@@ -129,6 +138,9 @@ func (man Manager) addConfigs() {
 		"Kolide TLS key path")
 	man.addConfigBool("server.tls", true,
 		"Enable TLS (required for osqueryd communication)")
+	man.addConfigString(TLSProfileKey, TLSProfileModern,
+		fmt.Sprintf("TLS security profile choose one of %s, %s or %s",
+			TLSProfileModern, TLSProfileIntermediate, TLSProfileOld))
 
 	// Auth
 	man.addConfigString(
@@ -161,6 +173,8 @@ func (man Manager) addConfigs() {
 		"Path for osqueryd result logs")
 	man.addConfigDuration("osquery.label_update_interval", 1*time.Hour,
 		"Interval to update host label membership (i.e. 1h)")
+	man.addConfigBool("osquery.enable_log_rotation", false,
+		"Osquery log files will be automatically rotated")
 
 	// Logging
 	man.addConfigBool("logging.debug", false,
@@ -193,10 +207,11 @@ func (man Manager) LoadConfig() KolideConfig {
 			Password: man.getConfigString("redis.password"),
 		},
 		Server: ServerConfig{
-			Address: man.getConfigString("server.address"),
-			Cert:    man.getConfigString("server.cert"),
-			Key:     man.getConfigString("server.key"),
-			TLS:     man.getConfigBool("server.tls"),
+			Address:    man.getConfigString("server.address"),
+			Cert:       man.getConfigString("server.cert"),
+			Key:        man.getConfigString("server.key"),
+			TLS:        man.getConfigBool("server.tls"),
+			TLSProfile: man.getConfigTLSProfile(),
 		},
 		Auth: AuthConfig{
 			JwtKey:      man.getConfigString("auth.jwt_key"),
@@ -217,6 +232,7 @@ func (man Manager) LoadConfig() KolideConfig {
 			StatusLogFile:       man.getConfigString("osquery.status_log_file"),
 			ResultLogFile:       man.getConfigString("osquery.result_log_file"),
 			LabelUpdateInterval: man.getConfigDuration("osquery.label_update_interval"),
+			EnableLogRotation:   man.getConfigBool("osquery.enable_log_rotation"),
 		},
 		Logging: LoggingConfig{
 			Debug:         man.getConfigBool("logging.debug"),
@@ -314,6 +330,23 @@ func (man Manager) getConfigString(key string) string {
 	}
 
 	return stringVal
+}
+
+// Custom handling for TLSProfile which can only accept specific values
+// for the argument
+func (man Manager) getConfigTLSProfile() string {
+	ival := man.getInterfaceVal(TLSProfileKey)
+	sval, err := cast.ToStringE(ival)
+	if err != nil {
+		panic(fmt.Sprintf("%s requires a string value: %s", TLSProfileKey, err.Error()))
+	}
+	switch sval {
+	case TLSProfileModern, TLSProfileIntermediate, TLSProfileOld:
+	default:
+		panic(fmt.Sprintf("%s must be one of %s, %s or %s", TLSProfileKey,
+			TLSProfileModern, TLSProfileIntermediate, TLSProfileOld))
+	}
+	return sval
 }
 
 // addConfigInt adds a int config to the config options
@@ -420,8 +453,8 @@ func TestConfig() KolideConfig {
 		},
 		Osquery: OsqueryConfig{
 			NodeKeySize:         24,
-			StatusLogFile:       "",
-			ResultLogFile:       "",
+			StatusLogFile:       "/dev/null",
+			ResultLogFile:       "/dev/null",
 			LabelUpdateInterval: 1 * time.Hour,
 		},
 		Logging: LoggingConfig{
