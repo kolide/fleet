@@ -13,6 +13,7 @@ import (
 	"github.com/kolide/kolide/server/kolide"
 	"github.com/kolide/kolide/server/pubsub"
 	"github.com/pkg/errors"
+	"github.com/spf13/cast"
 )
 
 type osqueryError struct {
@@ -145,6 +146,32 @@ func (svc service) GetClientConfig(ctx context.Context) (*kolide.OsqueryConfig, 
 		config.Packs[pack.Name] = kolide.PackContent{
 			Platform: pack.Platform,
 			Queries:  configQueries,
+		}
+	}
+
+	// Save interval values if they have been updated. Note
+	// config_tls_refresh can only be set in the osquery flags so is
+	// ignored here.
+	saveHost := false
+
+	distributedIntervalVal, ok := config.Options["distributed_interval"]
+	distributedInterval, err := cast.ToUintE(distributedIntervalVal)
+	if ok && err == nil && host.DistributedInterval != distributedInterval {
+		host.DistributedInterval = distributedInterval
+		saveHost = true
+	}
+
+	loggerTLSPeriodVal, ok := config.Options["logger_tls_period"]
+	loggerTLSPeriod, err := cast.ToUintE(loggerTLSPeriodVal)
+	if ok && err == nil && host.LoggerTLSPeriod != loggerTLSPeriod {
+		host.LoggerTLSPeriod = loggerTLSPeriod
+		saveHost = true
+	}
+
+	if saveHost {
+		err := svc.ds.SaveHost(&host)
+		if err != nil {
+			return nil, err
 		}
 	}
 
