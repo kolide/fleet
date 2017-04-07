@@ -1,27 +1,36 @@
 package service
 
 import (
+	"context"
+	"time"
+
 	"github.com/kolide/kolide/server/kolide"
 	"github.com/pkg/errors"
-	"golang.org/x/net/context"
 )
+
+const expectedCheckinIntervalMultiplier = 2
+const minimumExpectedCheckinInterval = 10 * time.Second
+
+func (svc service) ResetOptions(ctx context.Context) ([]kolide.Option, error) {
+	return svc.ds.ResetOptions()
+}
 
 func (svc service) GetOptions(ctx context.Context) ([]kolide.Option, error) {
 	opts, err := svc.ds.ListOptions()
 	if err != nil {
-		return nil, errors.Wrap(err, "options service")
+		return nil, err
 	}
 	return opts, nil
 }
 
 func (svc service) ModifyOptions(ctx context.Context, req kolide.OptionRequest) ([]kolide.Option, error) {
 	if err := svc.ds.SaveOptions(req.Options); err != nil {
-		return nil, errors.Wrap(err, "modify options service")
+		return nil, err
 	}
 	return req.Options, nil
 }
 
-func (svc service) ExpectedCheckinInterval(ctx context.Context) (uint, error) {
+func (svc service) ExpectedCheckinInterval(ctx context.Context) (time.Duration, error) {
 	interval := uint(0)
 	found := false
 
@@ -71,9 +80,20 @@ func (svc service) ExpectedCheckinInterval(ctx context.Context) (uint, error) {
 	// if we never found any interval options set, the default distributed
 	// interval is 60, so we use that
 	if !found {
-		return 60, nil
+		interval = 60
+	}
+
+	// The interval is multiplied to ensure that we are being generous in
+	// the calculation if the host is a bit slower than the interval to
+	// check in. This prevents flapping of the online status.
+	calculatedInterval := time.Duration(interval) * time.Second * expectedCheckinIntervalMultiplier
+
+	// We use a minimum threshold here to ensure that online status does
+	// not flap when the interval is set very low.
+	if calculatedInterval < minimumExpectedCheckinInterval {
+		calculatedInterval = minimumExpectedCheckinInterval
 	}
 
 	// return the lowest interval that we found
-	return interval, nil
+	return calculatedInterval, nil
 }

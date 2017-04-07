@@ -1,11 +1,12 @@
 package kolide
 
 import (
+	"bytes"
+	"context"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
-
-	"golang.org/x/net/context"
 )
 
 type ImportConfigService interface {
@@ -99,21 +100,21 @@ const (
 // QueryDetails represents the query objects used in the packs and the
 // schedule section of an osquery configuration.
 type QueryDetails struct {
-	Query    string `json:"query"`
-	Interval uint   `json:"interval"`
+	Query    string           `json:"query"`
+	Interval OsQueryConfigInt `json:"interval"`
 	// Optional fields
-	Removed  *bool   `json:"removed"`
-	Platform *string `json:"platform"`
-	Version  *string `json:"version"`
-	Shard    *uint   `json:"shard"`
-	Snapshot *bool   `json:"snapshot"`
+	Removed  *bool             `json:"removed"`
+	Platform *string           `json:"platform"`
+	Version  *string           `json:"version"`
+	Shard    *OsQueryConfigInt `json:"shard"`
+	Snapshot *bool             `json:"snapshot"`
 }
 
 // PackDetails represents the "packs" section of an osquery configuration
 // file.
 type PackDetails struct {
 	Queries   QueryNameToQueryDetailsMap `json:"queries"`
-	Shard     *uint                      `json:"shard"`
+	Shard     *OsQueryConfigInt          `json:"shard"`
 	Version   *string                    `json:"version"`
 	Platform  string                     `json:"platform"`
 	Discovery []string                   `json:"discovery"`
@@ -215,4 +216,19 @@ func (ic *ImportConfig) CollectPacks() (PackNameToPackDetails, error) {
 		}
 	}
 	return result, nil
+}
+
+// OsQueryConfigInt is provided becase integers in the osquery config file may
+// be represented as strings in the json. If we know a particular field is
+// supposed to be an Integer, we convert from string to int if we can.
+type OsQueryConfigInt uint
+
+func (c *OsQueryConfigInt) UnmarshalJSON(b []byte) error {
+	stripped := bytes.Trim(b, `"`)
+	v, err := strconv.ParseUint(string(stripped), 10, 64)
+	if err != nil {
+		return err
+	}
+	*c = OsQueryConfigInt(v)
+	return nil
 }

@@ -39,6 +39,7 @@ type Datastore struct {
 	yaraSignatureGroups             map[uint]*kolide.YARASignatureGroup
 	appConfig                       *kolide.AppConfig
 	config                          *config.KolideConfig
+	kolide.TargetStore
 }
 
 func New(config config.KolideConfig) (*Datastore, error) {
@@ -128,8 +129,8 @@ func (d *Datastore) MigrateData() error {
 	return nil
 }
 
-func (m *Datastore) MigrationStatus() error {
-	return nil
+func (m *Datastore) MigrationStatus() (kolide.MigrationStatus, error) {
+	return 0, nil
 }
 
 func (d *Datastore) Drop() error {

@@ -1,11 +1,10 @@
 package kolide
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/base64"
 	"time"
-
-	"golang.org/x/net/context"
 )
 
 const (
@@ -23,10 +22,6 @@ const (
 	NewDuration = 24 * time.Hour
 
 	// OfflineDuration if a host hasn't been in communition for this
-	// period it is considered offline.
-	OfflineDuration = 30 * time.Minute
-
-	// OfflineDuration if a host hasn't been in communition for this
 	// period it is considered MIA.
 	MIADuration = 30 * 24 * time.Hour
 )
@@ -40,7 +35,7 @@ type HostStore interface {
 	EnrollHost(osqueryHostId string, nodeKeySize int) (*Host, error)
 	AuthenticateHost(nodeKey string) (*Host, error)
 	MarkHostSeen(host *Host, t time.Time) error
-	GenerateHostStatusStatistics(now time.Time, onlineInterval uint) (online, offline, mia, new uint, err error)
+	GenerateHostStatusStatistics(now time.Time, onlineInterval time.Duration) (online, offline, mia, new uint, err error)
 	SearchHosts(query string, omit ...uint) ([]*Host, error)
 	// DistributedQueriesForHost retrieves the distributed queries that the
 	// given host should run. The result map is a mapping from campaign ID
@@ -91,6 +86,9 @@ type Host struct {
 	// can be found in the NetworkInterfaces element with the same ip_address.
 	PrimaryNetworkInterfaceID *uint               `json:"primary_ip_id,omitempty" db:"primary_ip_id"`
 	NetworkInterfaces         []*NetworkInterface `json:"network_interfaces" db:"-"`
+	DistributedInterval       uint                `json:"distributed_interval" db:"distributed_interval"`
+	ConfigTLSRefresh          uint                `json:"config_tls_refresh" db:"config_tls_refresh"`
+	LoggerTLSPeriod           uint                `json:"logger_tls_period" db:"logger_tls_period"`
 }
 
 // HostSummary is a structure which represents a data summary about the total
@@ -147,11 +145,11 @@ func RandomText(keySize int) (string, error) {
 	return base64.StdEncoding.EncodeToString(key), nil
 }
 
-func (h *Host) Status(now time.Time) string {
+func (h *Host) Status(now time.Time, onlineInterval time.Duration) string {
 	switch {
 	case h.SeenTime.Add(MIADuration).Before(now):
 		return StatusMIA
-	case h.SeenTime.Add(OfflineDuration).Before(now):
+	case h.SeenTime.Add(onlineInterval).Before(now):
 		return StatusOffline
 	default:
 		return StatusOnline

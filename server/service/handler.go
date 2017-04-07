@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"net/http"
 	"strings"
 
@@ -10,7 +11,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/kolide/kolide/server/kolide"
 	"github.com/prometheus/client_golang/prometheus"
-	"golang.org/x/net/context"
 )
 
 // KolideEndpoints is a collection of RPC endpoints implemented by the Kolide API.
@@ -66,6 +66,10 @@ type KolideEndpoints struct {
 	CreateLabel                    endpoint.Endpoint
 	DeleteLabel                    endpoint.Endpoint
 	ModifyLabel                    endpoint.Endpoint
+	ListDecorators                 endpoint.Endpoint
+	NewDecorator                   endpoint.Endpoint
+	ModifyDecorator                endpoint.Endpoint
+	DeleteDecorator                endpoint.Endpoint
 	GetHost                        endpoint.Endpoint
 	DeleteHost                     endpoint.Endpoint
 	ListHosts                      endpoint.Endpoint
@@ -73,6 +77,7 @@ type KolideEndpoints struct {
 	SearchTargets                  endpoint.Endpoint
 	GetOptions                     endpoint.Endpoint
 	ModifyOptions                  endpoint.Endpoint
+	ResetOptions                   endpoint.Endpoint
 	ImportConfig                   endpoint.Endpoint
 	GetCertificate                 endpoint.Endpoint
 	ChangeEmail                    endpoint.Endpoint
@@ -143,9 +148,14 @@ func MakeKolideServerEndpoints(svc kolide.Service, jwtKey string) KolideEndpoint
 		CreateLabel:               authenticatedUser(jwtKey, svc, makeCreateLabelEndpoint(svc)),
 		DeleteLabel:               authenticatedUser(jwtKey, svc, makeDeleteLabelEndpoint(svc)),
 		ModifyLabel:               authenticatedUser(jwtKey, svc, makeModifyLabelEndpoint(svc)),
+		ListDecorators:            authenticatedUser(jwtKey, svc, makeListDecoratorsEndpoint(svc)),
+		NewDecorator:              authenticatedUser(jwtKey, svc, makeNewDecoratorEndpoint(svc)),
+		ModifyDecorator:           authenticatedUser(jwtKey, svc, makeModifyDecoratorEndpoint(svc)),
+		DeleteDecorator:           authenticatedUser(jwtKey, svc, makeDeleteDecoratorEndpoint(svc)),
 		SearchTargets:             authenticatedUser(jwtKey, svc, makeSearchTargetsEndpoint(svc)),
 		GetOptions:                authenticatedUser(jwtKey, svc, mustBeAdmin(makeGetOptionsEndpoint(svc))),
 		ModifyOptions:             authenticatedUser(jwtKey, svc, mustBeAdmin(makeModifyOptionsEndpoint(svc))),
+		ResetOptions:              authenticatedUser(jwtKey, svc, mustBeAdmin(makeResetOptionsEndpoint(svc))),
 		ImportConfig:              authenticatedUser(jwtKey, svc, makeImportConfigEndpoint(svc)),
 		GetCertificate:            authenticatedUser(jwtKey, svc, makeCertificateEndpoint(svc)),
 		ChangeEmail:               authenticatedUser(jwtKey, svc, makeChangeEmailEndpoint(svc)),
@@ -213,6 +223,10 @@ type kolideHandlers struct {
 	CreateLabel                    http.Handler
 	DeleteLabel                    http.Handler
 	ModifyLabel                    http.Handler
+	ListDecorators                 http.Handler
+	NewDecorator                   http.Handler
+	ModifyDecorator                http.Handler
+	DeleteDecorator                http.Handler
 	GetHost                        http.Handler
 	DeleteHost                     http.Handler
 	ListHosts                      http.Handler
@@ -220,6 +234,7 @@ type kolideHandlers struct {
 	SearchTargets                  http.Handler
 	GetOptions                     http.Handler
 	ModifyOptions                  http.Handler
+	ResetOptions                   http.Handler
 	ImportConfig                   http.Handler
 	GetCertificate                 http.Handler
 	ChangeEmail                    http.Handler
@@ -227,9 +242,9 @@ type kolideHandlers struct {
 	GetLicense                     http.Handler
 }
 
-func makeKolideKitHandlers(ctx context.Context, e KolideEndpoints, opts []kithttp.ServerOption) *kolideHandlers {
+func makeKolideKitHandlers(e KolideEndpoints, opts []kithttp.ServerOption) *kolideHandlers {
 	newServer := func(e endpoint.Endpoint, decodeFn kithttp.DecodeRequestFunc) http.Handler {
-		return kithttp.NewServer(ctx, e, decodeFn, encodeResponse, opts...)
+		return kithttp.NewServer(e, decodeFn, encodeResponse, opts...)
 	}
 	return &kolideHandlers{
 		Login:                          newServer(e.Login, decodeLoginRequest),
@@ -283,6 +298,10 @@ func makeKolideKitHandlers(ctx context.Context, e KolideEndpoints, opts []kithtt
 		CreateLabel:                   newServer(e.CreateLabel, decodeCreateLabelRequest),
 		DeleteLabel:                   newServer(e.DeleteLabel, decodeDeleteLabelRequest),
 		ModifyLabel:                   newServer(e.ModifyLabel, decodeModifyLabelRequest),
+		ListDecorators:                newServer(e.ListDecorators, decodeNoParamsRequest),
+		NewDecorator:                  newServer(e.NewDecorator, decodeNewDecoratorRequest),
+		ModifyDecorator:               newServer(e.ModifyDecorator, decodeModifyDecoratorRequest),
+		DeleteDecorator:               newServer(e.DeleteDecorator, decodeDeleteDecoratorRequest),
 		GetHost:                       newServer(e.GetHost, decodeGetHostRequest),
 		DeleteHost:                    newServer(e.DeleteHost, decodeDeleteHostRequest),
 		ListHosts:                     newServer(e.ListHosts, decodeListHostsRequest),
@@ -290,6 +309,7 @@ func makeKolideKitHandlers(ctx context.Context, e KolideEndpoints, opts []kithtt
 		SearchTargets:                 newServer(e.SearchTargets, decodeSearchTargetsRequest),
 		GetOptions:                    newServer(e.GetOptions, decodeNoParamsRequest),
 		ModifyOptions:                 newServer(e.ModifyOptions, decodeModifyOptionsRequest),
+		ResetOptions:                  newServer(e.ResetOptions, decodeNoParamsRequest),
 		ImportConfig:                  newServer(e.ImportConfig, decodeImportConfigRequest),
 		GetCertificate:                newServer(e.GetCertificate, decodeNoParamsRequest),
 		ChangeEmail:                   newServer(e.ChangeEmail, decodeChangeEmailRequest),
@@ -299,7 +319,7 @@ func makeKolideKitHandlers(ctx context.Context, e KolideEndpoints, opts []kithtt
 }
 
 // MakeHandler creates an HTTP handler for the Kolide server endpoints.
-func MakeHandler(ctx context.Context, svc kolide.Service, jwtKey string, logger kitlog.Logger) http.Handler {
+func MakeHandler(svc kolide.Service, jwtKey string, logger kitlog.Logger) http.Handler {
 	kolideAPIOptions := []kithttp.ServerOption{
 		kithttp.ServerBefore(
 			setRequestsContexts(svc, jwtKey),
@@ -312,7 +332,7 @@ func MakeHandler(ctx context.Context, svc kolide.Service, jwtKey string, logger 
 	}
 
 	kolideEndpoints := MakeKolideServerEndpoints(svc, jwtKey)
-	kolideHandlers := makeKolideKitHandlers(ctx, kolideEndpoints, kolideAPIOptions)
+	kolideHandlers := makeKolideKitHandlers(kolideEndpoints, kolideAPIOptions)
 
 	r := mux.NewRouter()
 	attachKolideAPIRoutes(r, kolideHandlers)
@@ -391,6 +411,11 @@ func attachKolideAPIRoutes(r *mux.Router, h *kolideHandlers) {
 	r.Handle("/api/v1/kolide/labels/{id}", h.DeleteLabel).Methods("DELETE").Name("delete_label")
 	r.Handle("/api/v1/kolide/labels/{id}", h.ModifyLabel).Methods("PATCH").Name("modify_label")
 
+	r.Handle("/api/v1/kolide/decorators", h.ListDecorators).Methods("GET").Name("list_decorators")
+	r.Handle("/api/v1/kolide/decorators", h.NewDecorator).Methods("POST").Name("create_decorator")
+	r.Handle("/api/v1/kolide/decorators/{id}", h.ModifyDecorator).Methods("PATCH").Name("modify_decorator")
+	r.Handle("/api/v1/kolide/decorators/{id}", h.DeleteDecorator).Methods("DELETE").Name("delete_decorator")
+
 	r.Handle("/api/v1/kolide/hosts", h.ListHosts).Methods("GET").Name("list_hosts")
 	r.Handle("/api/v1/kolide/host_summary", h.GetHostSummary).Methods("GET").Name("get_host_summary")
 	r.Handle("/api/v1/kolide/hosts/{id}", h.GetHost).Methods("GET").Name("get_host")
@@ -398,6 +423,7 @@ func attachKolideAPIRoutes(r *mux.Router, h *kolideHandlers) {
 
 	r.Handle("/api/v1/kolide/options", h.GetOptions).Methods("GET").Name("get_options")
 	r.Handle("/api/v1/kolide/options", h.ModifyOptions).Methods("PATCH").Name("modify_options")
+	r.Handle("/api/v1/kolide/options/reset", h.ResetOptions).Methods("GET").Name("reset_options")
 
 	r.Handle("/api/v1/kolide/targets", h.SearchTargets).Methods("POST").Name("search_targets")
 
@@ -420,13 +446,11 @@ func WithSetup(svc kolide.Service, logger kitlog.Logger, next http.Handler) http
 	return func(w http.ResponseWriter, r *http.Request) {
 		configRouter := http.NewServeMux()
 		configRouter.Handle("/api/v1/setup", kithttp.NewServer(
-			context.Background(),
 			makeSetupEndpoint(svc),
 			decodeSetupRequest,
 			encodeResponse,
 		))
 		configRouter.Handle("/api/v1/license", kithttp.NewServer(
-			context.Background(),
 			makeSetupLicenseEndpoint(svc),
 			decodeLicenseRequest,
 			encodeResponse,

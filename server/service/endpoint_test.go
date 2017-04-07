@@ -2,6 +2,7 @@ package service
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -12,13 +13,10 @@ import (
 	"testing"
 
 	kitlog "github.com/go-kit/kit/log"
-	kithttp "github.com/go-kit/kit/transport/http"
-	"github.com/gorilla/mux"
 	"github.com/kolide/kolide/server/config"
 	"github.com/kolide/kolide/server/datastore/inmem"
 	"github.com/kolide/kolide/server/kolide"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/net/context"
 )
 
 type testResource struct {
@@ -57,21 +55,11 @@ func setupEndpointTest(t *testing.T) *testResource {
 	svc = endpointService{svc}
 	createTestUsers(t, test.ds)
 	logger := kitlog.NewLogfmtLogger(os.Stdout)
-
 	jwtKey := "CHANGEME"
-	opts := []kithttp.ServerOption{
-		kithttp.ServerBefore(setRequestsContexts(svc, jwtKey)),
-		kithttp.ServerErrorLogger(logger),
-		kithttp.ServerAfter(kithttp.SetContentType("application/json; charset=utf-8")),
-	}
 
-	router := mux.NewRouter()
-	ke := MakeKolideServerEndpoints(svc, jwtKey)
-	ctxt := context.Background()
-	kh := makeKolideKitHandlers(ctxt, ke, opts)
-	attachKolideAPIRoutes(router, kh)
+	routes := MakeHandler(svc, jwtKey, logger)
 
-	test.server = httptest.NewServer(router)
+	test.server = httptest.NewServer(routes)
 
 	userParam := loginRequest{
 		Username: "admin1",
@@ -118,14 +106,23 @@ var testFunctions = [...]func(*testing.T, *testResource){
 	testGetOptions,
 	testModifyOptions,
 	testModifyOptionsValidationFail,
+	testOptionNotFound,
 	testImportConfig,
 	testImportConfigMissingExternal,
 	testImportConfigWithMissingGlob,
 	testImportConfigWithGlob,
+	testImportConfigWithIntAsString,
 	testAdminUserSetAdmin,
 	testNonAdminUserSetAdmin,
 	testAdminUserSetEnabled,
 	testNonAdminUserSetEnabled,
+	testModifyDecorator,
+	testListDecorator,
+	testNewDecorator,
+	testNewDecoratorFailType,
+	testNewDecoratorFailValidation,
+	testDeleteDecorator,
+	testModifyDecoratorNoChanges,
 }
 
 func TestEndpoints(t *testing.T) {

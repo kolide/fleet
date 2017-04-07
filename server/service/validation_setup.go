@@ -1,11 +1,11 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 
 	"github.com/kolide/kolide/server/kolide"
-	"golang.org/x/net/context"
 )
 
 func (mw validationMiddleware) NewAppConfig(ctx context.Context, payload kolide.AppConfigPayload) (*kolide.AppConfig, error) {
@@ -14,7 +14,7 @@ func (mw validationMiddleware) NewAppConfig(ctx context.Context, payload kolide.
 	if payload.ServerSettings == nil {
 		invalid.Append("kolide_server_url", "missing required argument")
 	} else {
-		serverURLString = *payload.ServerSettings.KolideServerURL
+		serverURLString = cleanupURL(*payload.ServerSettings.KolideServerURL)
 	}
 	if err := validateKolideServerURL(serverURLString); err != nil {
 		invalid.Append("kolide_server_url", err.Error())

@@ -144,13 +144,14 @@ generate-dev: .prefix
 		-o=server/service/bindata.go \
 		frontend/templates/ assets/...
 	go-bindata -pkg=kolide -o=server/kolide/bindata.go server/mail/templates
-	webpack --progress --colors --watch --notify
+	webpack --progress --colors --watch
 
 deps:
 	yarn
-	go get github.com/jteeuwen/go-bindata/...
-	go get github.com/Masterminds/glide
-	go get github.com/groob/mockimpl
+	go get -u \
+		github.com/jteeuwen/go-bindata/... \
+		github.com/Masterminds/glide \
+		github.com/groob/mockimpl
 	glide install --strip-vendor
 
 distclean:
