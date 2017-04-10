@@ -16,7 +16,7 @@ class KolideOffline extends Component {
           </a>
         </header>
         <main>
-          <h1>Oh noes, you're out of internets!</h1>
+          <h1>Oh noes, you ran out of internets!</h1>
           <h2>Offline!</h2>
           <p>You seem to have lost your connection.</p>
           <p>Try deleting system32 directory.</p>
