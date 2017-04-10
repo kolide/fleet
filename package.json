@@ -60,6 +60,7 @@
     "redux-thunk": "^2.1.0",
     "require-hacker": "^2.1.4",
     "select": "^1.0.6",
+    "serviceworker-webpack-plugin": "^0.2.1",
     "sockjs-client": "^1.1.2",
     "sqlite-parser": "^1.0.0",
     "tslint": "^3.15.1",
