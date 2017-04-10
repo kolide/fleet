@@ -55,7 +55,7 @@ class QueriesList extends Component {
     const { onCheckQuery } = this.props;
 
     if (allQueriesChecked) {
-      this.setState({ allQueriesChecked: !allQueriesChecked });
+      this.setState({ allQueriesChecked: false });
     }
 
     onCheckQuery(val, id);
