@@ -22,7 +22,7 @@ let CURRENT_CACHES = {
 const OFFLINE_URL = '/offline';
 
 function createCacheBustedRequest(url) {
-  let request = new Request(url, {cache: 'reload'});
+  let request = new Request(url, { cache: 'reload' });
   // See https://fetch.spec.whatwg.org/#concept-request-mode
   // This is not yet supported in Chrome as of M48, so we need to explicitly check to see
   // if the cache: 'reload' option had any effect.
