@@ -1,164 +1,102 @@
-// @flow weak
-/* eslint-disable no-console */
+/*
+ Copyright 2015 Google Inc. All Rights Reserved.
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
 
-const DEBUG = false;
+'use strict';
 
-// When the user navigates to your site,
-// the browser tries to redownload the script file that defined the service
-// worker in the background.
-// If there is even a byte's difference in the service worker file compared
-// to what it currently has, it considers it 'new'.
-const {
-  assets,
-} = global.serviceWorkerOption;
+// Incrementing CACHE_VERSION will kick off the install event and force previously cached
+// resources to be cached again.
+const CACHE_VERSION = 1;
+let CURRENT_CACHES = {
+  offline: 'offline-v' + CACHE_VERSION
+};
+const OFFLINE_URL = '/offline';
 
-const CACHE_NAME = (new Date()).toISOString();
-
-let assetsToCache = [
-  ...assets,
-  './',
-];
-
-assetsToCache = assetsToCache.map((path) => {
-  return new URL(path, global.location).toString();
-});
-
-// When the service worker is first added to a computer.
-self.addEventListener('install', (event) => {
-  // Perform install steps.
-  if (DEBUG) {
-    console.log('[SW] Install event');
+function createCacheBustedRequest(url) {
+  let request = new Request(url, {cache: 'reload'});
+  // See https://fetch.spec.whatwg.org/#concept-request-mode
+  // This is not yet supported in Chrome as of M48, so we need to explicitly check to see
+  // if the cache: 'reload' option had any effect.
+  if ('cache' in request) {
+    return request;
   }
 
-  // Add core website files to cache during serviceworker installation.
+  // If {cache: 'reload'} didn't have any effect, append a cache-busting URL parameter instead.
+  let bustedUrl = new URL(url, self.location.href);
+  bustedUrl.search += (bustedUrl.search ? '&' : '') + 'cachebust=' + Date.now();
+  return new Request(bustedUrl);
+}
+
+self.addEventListener('install', event => {
   event.waitUntil(
-    global.caches
-      .open(CACHE_NAME)
-      .then((cache) => {
-        return cache.addAll(assetsToCache);
-      })
-      .then(() => {
-        if (DEBUG) {
-          console.log('Cached assets: main', assetsToCache);
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-        throw error;
-      }),
+    // We can't use cache.add() here, since we want OFFLINE_URL to be the cache key, but
+    // the actual URL we end up requesting might include a cache-busting parameter.
+    fetch(createCacheBustedRequest(OFFLINE_URL)).then(function(response) {
+      return caches.open(CURRENT_CACHES.offline).then(function(cache) {
+        return cache.put(OFFLINE_URL, response);
+      });
+    })
   );
 });
 
-// After the install event.
-self.addEventListener('activate', (event) => {
-  if (DEBUG) {
-    console.log('[SW] Activate event');
-  }
+self.addEventListener('activate', event => {
+  // Delete all caches that aren't named in CURRENT_CACHES.
+  // While there is only one cache in this example, the same logic will handle the case where
+  // there are multiple versioned caches.
+  let expectedCacheNames = Object.keys(CURRENT_CACHES).map(function(key) {
+    return CURRENT_CACHES[key];
+  });
 
-  // Clean the caches
   event.waitUntil(
-    global.caches
-      .keys()
-      .then((cacheNames) => {
-        return Promise.all(
-          cacheNames.map((cacheName) => {
-            // Delete the caches that are not the current one.
-            if (cacheName.indexOf(CACHE_NAME) === 0) {
-              return null;
-            }
-
-            return global.caches.delete(cacheName);
-          }),
-        );
-      }),
-  );
-});
-
-self.addEventListener('message', (event) => {
-  switch (event.data.action) {
-    case 'skipWaiting':
-      if (self.skipWaiting) {
-        self.skipWaiting();
-        self.clients.claim();
-      }
-      break;
-    default:
-      break;
-  }
-});
-
-self.addEventListener('fetch', (event) => {
-  const request = event.request;
-
-  // Ignore not GET request.
-  if (request.method !== 'GET') {
-    if (DEBUG) {
-      console.log(`[SW] Ignore non GET request ${request.method}`);
-    }
-    return;
-  }
-
-  const requestUrl = new URL(request.url);
-
-  // Ignore difference origin.
-  if (requestUrl.origin !== location.origin) {
-    if (DEBUG) {
-      console.log(`[SW] Ignore difference origin ${requestUrl.origin}`);
-    }
-    return;
-  }
-
-  const resource = global.caches.match(request)
-    .then((response) => {
-      if (response) {
-        if (DEBUG) {
-          console.log(`[SW] fetch URL ${requestUrl.href} from cache`);
-        }
-
-        return response;
-      }
-
-      // Load and cache known assets.
-      return fetch(request)
-        .then((responseNetwork) => {
-          if (!responseNetwork || !responseNetwork.ok) {
-            if (DEBUG) {
-              console.log(`[SW] URL [${
-                requestUrl.toString()}] wrong responseNetwork: ${
-                responseNetwork.status} ${responseNetwork.type}`);
-            }
-
-            return responseNetwork;
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (expectedCacheNames.indexOf(cacheName) === -1) {
+            // If this cache name isn't present in the array of "expected" cache names,
+            // then delete it.
+            console.log('Deleting out of date cache:', cacheName);
+            return caches.delete(cacheName);
           }
-
-          if (DEBUG) {
-            console.log(`[SW] URL ${requestUrl.href} fetched`);
-          }
-
-          const responseCache = responseNetwork.clone();
-
-          global.caches
-            .open(CACHE_NAME)
-            .then((cache) => {
-              return cache.put(request, responseCache);
-            })
-            .then(() => {
-              if (DEBUG) {
-                console.log(`[SW] Cache asset: ${requestUrl.href}`);
-              }
-            });
-
-          return responseNetwork;
         })
-        .catch(() => {
-          // User is landing on our page.
-          if (event.request.mode === 'navigate') {
-            return global.caches.match('./');
-          }
+      );
+    })
+  );
+});
 
-          return null;
-        });
-    });
+self.addEventListener('fetch', event => {
+  // We only want to call event.respondWith() if this is a navigation request
+  // for an HTML page.
+  // request.mode of 'navigate' is unfortunately not supported in Chrome
+  // versions older than 49, so we need to include a less precise fallback,
+  // which checks for a GET request with an Accept: text/html header.
+  if (event.request.mode === 'navigate' ||
+      (event.request.method === 'GET' &&
+       event.request.headers.get('accept').includes('text/html'))) {
+    console.log('Handling fetch event for', event.request.url);
+    event.respondWith(
+      fetch(event.request).catch(error => {
+        // The catch is only triggered if fetch() throws an exception, which will most likely
+        // happen due to the server being unreachable.
+        // If fetch() returns a valid HTTP response with an response code in the 4xx or 5xx
+        // range, the catch() will NOT be called. If you need custom handling for 4xx or 5xx
+        // errors, see https://github.com/GoogleChrome/samples/tree/gh-pages/service-worker/fallback-response
+        console.log('Fetch failed; returning offline page instead.', error);
+        return caches.match(OFFLINE_URL);
+      })
+    );
+  }
 
-  event.respondWith(resource);
+  // If our if() condition is false, then this fetch handler won't intercept the request.
+  // If there are any other fetch handlers registered, they will get a chance to call
+  // event.respondWith(). If no fetch handlers call event.respondWith(), the request will be
+  // handled by the browser as if there were no service worker involvement.
 });
