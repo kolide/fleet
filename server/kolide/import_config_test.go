@@ -11,7 +11,38 @@ import (
 )
 
 func TestConfigUnmarshalling(t *testing.T) {
-	contents := `{"options":null,"schedule":null,"packs":{"internal_stuff":{"discovery":["select pid from processes where name = 'ldap';"],"platform":"linux","queries":{"active_directory":{"description":"Check each user's active directory cached settings.","interval":"1200","query":"select * from ad_config;"}},"version":"1.5.2"},"testing":{"queries":{"suid_bins":{"interval":"3600","query":"select * from suid_bins;"}},"shard":"10"}},"file_paths":null,"yara":null,"prometheus_targets":null,"decorators":null}
+	contents := `
+	{
+	"options":null,
+	"schedule":null,
+	"packs":{
+		"internal_stuff":{
+			"discovery":["select pid from processes where name = 'ldap';"],
+			"platform":"linux",
+			"queries":{
+				"active_directory":{
+					"description":"Check each user's active directory cached settings.",
+					"interval":"1200",
+					"query":"select * from ad_config;"
+					}
+				},
+				"version":"1.5.2"
+			},
+			"testing":{
+				"queries":{
+					"suid_bins":{
+						"interval":"3600",
+						"query":"select * from suid_bins;"
+					}
+				},
+				"shard":"10"
+			}
+		},
+		"file_paths":null,
+		"yara":null,
+		"prometheus_targets":null,
+		"decorators":null
+	}
 	`
 
 	conf := ImportConfig{
