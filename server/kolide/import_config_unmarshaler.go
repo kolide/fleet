@@ -71,15 +71,6 @@ func uintptr(v interface{}) (*OsQueryConfigInt, error) {
 	return &i, nil
 }
 
-// takes a default value
-func toString(v interface{}, def string) string {
-	s := cast.ToString(v)
-	if s == "" {
-		s = def
-	}
-	return s
-}
-
 func unmarshalPackDetails(v map[string]interface{}) (PackDetails, error) {
 	var result PackDetails
 	queries, err := unmarshalQueryDetails(v["queries"])
@@ -90,7 +81,7 @@ func unmarshalPackDetails(v map[string]interface{}) (PackDetails, error) {
 	if err != nil {
 		return result, err
 	}
-	platform := toString(v["platform"], "all")
+	platform := cast.ToString(v["platform"])
 	shard, err := uintptr(v["shard"])
 	if err != nil {
 		return result, err

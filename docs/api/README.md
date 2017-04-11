@@ -50,11 +50,9 @@ You can load packs, queries and other settings from an existing [Osquery configu
 
 /api/v1/kolide/osquery/config/import
 ```
-We provide [a utility program](https://github.com/kolide/configimporter) that will import the configuration automatically.  If you opt to manually import your Osquery configuration
-you will need to include the contents of externally referenced packs in your main Osquery
-configuration file before posting it to Kolide.
-
-For example, if you reference packs
+We provide [a utility program](https://github.com/kolide/configimporter) that will import the configuration automatically.  
+If you opt to manually import your Osquery configuration you will need to include the contents of externally
+referenced packs in your main Osquery configuration file before posting it to Kolide. If you reference packs
 in a file like the example below, you will need to get the pack from `external_pack.conf`
 and include it in the main configuration.
 ```
