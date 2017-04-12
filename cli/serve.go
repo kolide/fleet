@@ -109,7 +109,7 @@ the way that the kolide server works.
 					"#   A value must be supplied for --auth_jwt_key. This value is used to create\n"+
 					"#   session tokens for users.\n"+
 					"#\n"+
-					"#   Consider using the following randomly generated token:\n"+
+					"#   Consider using the following randomly generated key:\n"+
 					"#   %s\n"+
 					"################################################################################\n",
 					jwtKey)
