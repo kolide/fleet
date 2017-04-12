@@ -61,6 +61,7 @@ func (d *Datastore) IdentityProvider(id uint) (*kolide.IdentityProvider, error) 
     SELECT *
     FROM identity_providers
     WHERE id = ? AND NOT deleted
+
   `
 	var idp kolide.IdentityProvider
 	err := d.db.Get(&idp, query, id)
@@ -82,6 +83,7 @@ func (d *Datastore) ListIdentityProviders() ([]kolide.IdentityProvider, error) {
     SELECT *
     FROM identity_providers
     WHERE NOT deleted
+
   `
 	var idps []kolide.IdentityProvider
 	if err := d.db.Select(&idps, query); err != nil {
