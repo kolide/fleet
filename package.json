@@ -44,6 +44,7 @@
     "node-sass": "^4.5.0",
     "normalizr": "^2.2.1",
     "proxy-middleware": "^0.15.0",
+    "rc-pagination": "^1.8.4",
     "react": "^15.3.2",
     "react-ace": "^3.6.0",
     "react-addons-css-transition-group": "^15.3.2",

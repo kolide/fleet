@@ -2,25 +2,21 @@ import React, { Component, PropTypes } from 'react';
 import AceEditor from 'react-ace';
 import { connect } from 'react-redux';
 import FileSaver from 'file-saver';
-import { orderBy, sortBy } from 'lodash';
 import { push } from 'react-router-redux';
 
 import deepDifference from 'utilities/deep_difference';
 import entityGetter from 'redux/utilities/entityGetter';
 import { getStatusLabelCounts, setDisplay, silentGetStatusLabelCounts } from 'redux/nodes/components/ManageHostsPage/actions';
-import helpers from 'pages/hosts/ManageHostsPage/helpers';
+
 import hostActions from 'redux/nodes/entities/hosts/actions';
 import labelActions from 'redux/nodes/entities/labels/actions';
 import labelInterface from 'interfaces/label';
-import HostDetails from 'components/hosts/HostDetails';
+import HostContainer from 'components/hosts/HostContainer';
 import hostInterface from 'interfaces/host';
 import HostSidePanel from 'components/side_panels/HostSidePanel';
-import HostsTable from 'components/hosts/HostsTable';
 import LabelForm from 'components/forms/LabelForm';
-import LonelyHost from 'components/hosts/LonelyHost';
 import AddHostModal from 'components/hosts/AddHostModal';
 import Icon from 'components/icons/Icon';
-import Spinner from 'components/loaders/Spinner';
 import Kolide from 'kolide';
 import PlatformIcon from 'components/icons/PlatformIcon';
 import osqueryTableInterface from 'interfaces/osquery_table';
@@ -256,6 +252,10 @@ export class ManageHostsPage extends Component {
     return false;
   }
 
+  handlePaginationChange = () => {
+    console.log('pager clicked');
+  }
+
   toggleAddHostModal = () => {
     const { showAddHostModal } = this.state;
     this.setState({ showAddHostModal: !showAddHostModal });
@@ -288,19 +288,6 @@ export class ManageHostsPage extends Component {
     this.setState({ isEditLabel: !isEditLabel });
 
     return false;
-  }
-
-  filterHosts = () => {
-    const { hosts, selectedLabel } = this.props;
-
-    return helpers.filterHosts(hosts, selectedLabel);
-  }
-
-  sortHosts = (hosts) => {
-    const alphaHosts = sortBy(hosts, (h) => { return h.hostname; });
-    const orderedHosts = orderBy(alphaHosts, 'status', 'desc');
-
-    return orderedHosts;
   }
 
   renderAddHostModal = () => {
@@ -473,79 +460,6 @@ export class ManageHostsPage extends Component {
     );
   }
 
-  renderNoHosts = () => {
-    const { selectedLabel } = this.props;
-    const { type } = selectedLabel || '';
-    const isCustom = type === 'custom';
-
-    return (
-      <div className={`${baseClass}__no-hosts`}>
-        <h1>No matching hosts found.</h1>
-        <h2>Where are the missing hosts?</h2>
-        <ul>
-          {isCustom && <li>Check your SQL query above to confirm there are no mistakes.</li>}
-          <li>Check to confirm that your hosts are online.</li>
-          <li>Confirm that your expected hosts have osqueryd installed and configured.</li>
-        </ul>
-
-        <div className={`${baseClass}__no-hosts-contact`}>
-          <p>Still having trouble? Want to talk to a human?</p>
-          <p>Contact Kolide Support:</p>
-          <p><a href="mailto:support@kolide.co">support@kolide.co</a></p>
-        </div>
-      </div>
-    );
-  }
-
-  renderHosts = () => {
-    const { display, isAddLabel, selectedLabel, loadingHosts } = this.props;
-    const { toggleDeleteHostModal, filterHosts, onQueryHost, sortHosts, renderNoHosts, toggleAddHostModal } = this;
-
-    if (isAddLabel) {
-      return false;
-    }
-
-    const filteredHosts = filterHosts();
-    const sortedHosts = sortHosts(filteredHosts);
-
-    if (loadingHosts) {
-      return <Spinner />;
-    }
-
-    if (sortedHosts.length === 0 && !loadingHosts) {
-      if (selectedLabel && selectedLabel.type === 'all') {
-        return <LonelyHost onClick={toggleAddHostModal} />;
-      }
-
-      return renderNoHosts();
-    }
-
-    if (display === 'Grid') {
-      return sortedHosts.map((host) => {
-        const isLoading = !host.hostname;
-
-        return (
-          <HostDetails
-            host={host}
-            key={`host-${host.id}-details`}
-            onDestroyHost={toggleDeleteHostModal}
-            onQueryHost={onQueryHost}
-            isLoading={isLoading}
-          />
-        );
-      });
-    }
-
-    return (
-      <HostsTable
-        hosts={sortedHosts}
-        onDestroyHost={toggleDeleteHostModal}
-        onQueryHost={onQueryHost}
-      />
-    );
-  }
-
-
   renderForm = () => {
     const { isAddLabel, labelErrors, selectedLabel } = this.props;
     const { isEditLabel } = this.state;
@@ -625,8 +539,8 @@ export class ManageHostsPage extends Component {
   }
 
   render () {
-    const { renderForm, renderHeader, renderHosts, renderSidePanel, renderAddHostModal, renderDeleteHostModal, renderDeleteLabelModal } = this;
-    const { display, isAddLabel, loadingLabels } = this.props;
+    const { onQueryHost, renderForm, renderHeader, renderSidePanel, renderAddHostModal, renderDeleteHostModal, renderDeleteLabelModal, toggleAddHostModal, toggleDeleteHostModal } = this;
+    const { display, isAddLabel, loadingLabels, loadingHosts, hosts, selectedLabel } = this.props;
     const { isEditLabel } = this.state;
 
     return (
@@ -637,7 +551,15 @@ export class ManageHostsPage extends Component {
           <div className={`${baseClass} body-wrap`}>
             {renderHeader()}
             <div className={`${baseClass}__list ${baseClass}__list--${display.toLowerCase()}`}>
-              {renderHosts()}
+              <HostContainer
+                hosts={hosts}
+                selectedLabel={selectedLabel}
+                displayType={display}
+                loadingHosts={loadingHosts}
+                toggleAddHostModal={toggleAddHostModal}
+                toggleDeleteHostModal={toggleDeleteHostModal}
+                onQueryHost={onQueryHost}
+              />
             </div>
           </div>
         }
