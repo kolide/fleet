@@ -49,7 +49,7 @@ type IdentityProviderPayload struct {
 // IdentityProviderService exposes methods to manage IdentityProvider entities
 type IdentityProviderService interface {
 	// NewIdentityProvider creates a IdentityProvider
-	NewIdentityProvider(ctx context.Context, idp IdentityProvider) (*IdentityProvider, error)
+	NewIdentityProvider(ctx context.Context, payload IdentityProviderPayload) (*IdentityProvider, error)
 	// SaveIdentityProvider is used to modify an existing IdentityProvider.  Nonnil
 	// fields in the payload argument will be changed for an existing IdentityProvider
 	ModifyIdentityProvider(ctx context.Context, id uint, payload IdentityProviderPayload) (*IdentityProvider, error)
