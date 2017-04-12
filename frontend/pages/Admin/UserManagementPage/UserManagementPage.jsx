@@ -220,6 +220,8 @@ export class UserManagementPage extends Component {
       return false;
     }
 
+    const ssoEnabledForApp = this.props.config.enable_sso;
+  
     return (
       <Modal
         title="Invite New User"
@@ -231,6 +233,7 @@ export class UserManagementPage extends Component {
           invitedBy={currentUser}
           onCancel={onInviteCancel}
           onSubmit={onInviteUserSubmit}
+          canUseSSO={ssoEnabledForApp}
         />
       </Modal>
     );
