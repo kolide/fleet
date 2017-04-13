@@ -43,4 +43,4 @@ ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
 RUN mkdir -p "$GOPATH/src/github.com/kolide/kolide" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
 WORKDIR $GOPATH/src/github.com/kolide/kolide
 
-RUN npm install webpack -g
+RUN npm install webpack eslint -g
