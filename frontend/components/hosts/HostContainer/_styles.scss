@@ -39,6 +39,30 @@
     }
   }
 
+  &__pager-wrap {
+    flex-basis: 100%;
+    margin: 55px 0;
+    // padding: 0;
+    // list-style: none;
+    // text-align: center;
+
+    // li {
+    //   display: inline-block;
+    //   margin: 0 2px;
+    // }
+
+    // a {
+    //   padding: 10px;
+    //   border: 1px solid #ccc;
+    //   border-radius: 3px;
+    //   cursor: pointer;
+    // }
+
+    // .rc-pagination-item-active {
+    //   background-color: $brand;
+    // }
+  }
+
   &--grid {
     @include display(flex);
     @include justify-content(space-around);

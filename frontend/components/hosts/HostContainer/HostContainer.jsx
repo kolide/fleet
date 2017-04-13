@@ -1,7 +1,9 @@
 import React, { Component, PropTypes } from 'react';
-import { isEqual, orderBy, sortBy } from 'lodash';
-// import Pagination from 'rc-pagination';
+import { isEqual, orderBy, slice, sortBy } from 'lodash';
+import Pagination from 'rc-pagination';
+import Select from 'react-select';
 
+import en_US from 'rc-pagination/lib/locale/en_US';
 import hostInterface from 'interfaces/host';
 import labelInterface from 'interfaces/label';
 import HostsTable from 'components/hosts/HostsTable';
@@ -10,23 +12,10 @@ import LonelyHost from 'components/hosts/LonelyHost';
 import Spinner from 'components/loaders/Spinner';
 import helpers from './helpers';
 
+import 'rc-pagination/assets/index.css';
+
 const baseClass = 'host-container';
-// const PAGE_SIZE = 2;
-
-// const en_US = {
-//   // Options.jsx
-//   items_per_page: '/ page',
-//   jump_to: 'Goto',
-//   page: '',
-
-//   // Pagination.jsx
-//   prev_page: 'Previous Page',
-//   next_page: 'Next Page',
-//   prev_5: 'Previous 5 Pages',
-//   next_5: 'Next 5 Pages',
-//   prev_3: 'Previous 3 Pages',
-//   next_3: 'Next 3 Pages',
-// };
+let CURRENT_PAGE = 0;
 
 class HostContainer extends Component {
   static propTypes = {
@@ -44,9 +33,14 @@ class HostContainer extends Component {
 
     this.state = {
       allHostCount: 0,
-      currentPagination: 0,
-      sortedHosts: [],
+      hostsPerPage: 20,
+      pagedHosts: [],
+      showSpinner: false,
     };
+  }
+
+  componentWillMount () {
+    this.buildSortedHosts();
   }
 
   componentWillReceiveProps (nextProps) {
@@ -54,32 +48,34 @@ class HostContainer extends Component {
       return false;
     }
 
-    const { filterHosts, sortHosts } = this;
-
-    const filteredHosts = filterHosts();
-    const sortedHosts = sortHosts(filteredHosts);
-
-    this.setState({
-      allHostCount: filteredHosts.length,
-      sortedHosts,
-    });
-
+    this.buildSortedHosts();
     return true;
   }
 
-  shouldComponentUpdate (nextProps, nextState) {
-    if (isEqual(nextProps, this.props) &&
-        isEqual(nextState, this.state)) {
-      return false;
-    }
+  buildSortedHosts = () => {
+    const { filterHosts, sortHosts } = this;
+    const { hostsPerPage } = this.state;
 
-    return true;
+    const sortedHosts = sortHosts(filterHosts());
+
+    const currentPage = CURRENT_PAGE - 1 < 0 ? 0 : CURRENT_PAGE - 1;
+    const fromIndex = currentPage * hostsPerPage;
+    const toIndex = fromIndex + hostsPerPage;
+
+    const pagedHosts = slice(sortedHosts, fromIndex, toIndex);
+
+    this.setState({
+      allHostCount: sortedHosts.length,
+      pagedHosts,
+      showSpinner: false,
+    });
   }
 
   filterHosts = () => {
     const { hosts, selectedLabel } = this.props;
+    const { filterHosts } = helpers;
 
-    return helpers.filterHosts(hosts, selectedLabel);
+    return filterHosts(hosts, selectedLabel);
   }
 
   sortHosts = (hosts) => {
@@ -89,9 +85,21 @@ class HostContainer extends Component {
     return orderedHosts;
   }
 
-  // handlePaginationChange = () => {
-  //   console.log('clicky clicky');
-  // }
+  handlePaginationChange = (page) => {
+    CURRENT_PAGE = page;
+    this.buildSortedHosts();
+
+    return true;
+  }
+
+  handlePerPageChange = (option) => {
+    this.setState({
+      hostsPerPage: Number(option.value),
+      showSpinner: true,
+    });
+
+    return true;
+  }
 
   renderNoHosts = () => {
     const { selectedLabel } = this.props;
@@ -119,10 +127,10 @@ class HostContainer extends Component {
 
   renderHosts = () => {
     const { displayType, toggleDeleteHostModal, onQueryHost } = this.props;
-    const { sortedHosts } = this.state;
+    const { pagedHosts } = this.state;
 
     if (displayType === 'Grid') {
-      return sortedHosts.map((host) => {
+      return pagedHosts.map((host) => {
         const isLoading = !host.hostname;
 
         return (
@@ -138,7 +146,7 @@ class HostContainer extends Component {
     } else {
       return (
         <HostsTable
-          hosts={sortedHosts}
+          hosts={pagedHosts}
           onDestroyHost={toggleDeleteHostModal}
           onQueryHost={onQueryHost}
         />
@@ -146,12 +154,46 @@ class HostContainer extends Component {
     }
   }
 
+  renderPagination = () => {
+    const { handlePaginationChange, handlePerPageChange } = this;
+    const { allHostCount, hostsPerPage } = this.state;
+
+    const paginationSelectOpts = [
+      { value: 20, label: '20' },
+      { value: 100, label: '100' },
+      { value: 500, label: '500' },
+      { value: 1000, label: '1,000' },
+    ];
+    const currentPage = CURRENT_PAGE === 0 ? 1 : CURRENT_PAGE;
+
+    return (
+      <div className={`${baseClass}__pager-wrap`}>
+        <Pagination
+          onChange={handlePaginationChange}
+          current={currentPage}
+          total={allHostCount}
+          pageSize={hostsPerPage}
+          className={`${baseClass}__pagination`}
+          locale={en_US}
+          showLessItems
+        />
+        <Select
+          name="pager-host-count"
+          value={hostsPerPage}
+          options={paginationSelectOpts}
+          onChange={handlePerPageChange}
+          clearable={false}
+        />
+      </div>
+    );
+  }
+
   render () {
-    const { renderHosts, renderNoHosts } = this;
-    const { allHostCount } = this.state;
+    const { renderHosts, renderNoHosts, renderPagination } = this;
+    const { allHostCount, showSpinner } = this.state;
     const { displayType, loadingHosts, selectedLabel, toggleAddHostModal } = this.props;
 
-    if (loadingHosts) {
+    if (loadingHosts || showSpinner) {
       return <Spinner />;
     }
 
@@ -165,7 +207,9 @@ class HostContainer extends Component {
 
     return(
       <div className={`${baseClass} ${baseClass}--${displayType.toLowerCase()}`}>
+        {renderPagination()}
         {renderHosts()}
+        {renderPagination()}
       </div>
     );
   }
