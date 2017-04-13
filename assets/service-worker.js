@@ -89,6 +89,8 @@ var serviceWorkerOption = {
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+
+
 /*
  Copyright 2015 Google Inc. All Rights Reserved.
  Licensed under the Apache License, Version 2.0 (the "License");
@@ -103,13 +105,11 @@ var serviceWorkerOption = {
 */
 /* eslint-disable */
 
-
 // Incrementing CACHE_VERSION will kick off the install event and force previously cached
 // resources to be cached again.
-
 var CACHE_VERSION = 1;
 var CURRENT_CACHES = {
-  offline: 'offline-v' + CACHE_VERSION
+  offline: 'offline-v ' + CACHE_VERSION
 };
 var OFFLINE_URL = '/offline';
 
