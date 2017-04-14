@@ -213,7 +213,6 @@ class HostContainer extends Component {
 
     return (
       <div className={`${baseClass} ${baseClass}--${displayType.toLowerCase()}`}>
-        {renderPagination()}
         {renderHosts()}
         {renderPagination()}
       </div>
