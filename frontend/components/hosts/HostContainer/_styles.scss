@@ -49,7 +49,7 @@
   &__pagination {
     margin: 0 25px 0 0;
     padding: 0;
-    font-family: "Oxygen", "Helvetica Neue", "Helvetica", "Roboto", "Arial", sans-serif;
+    font-family: 'Oxygen', 'Helvetica Neue', 'Helvetica', 'Roboto', 'Arial', sans-serif;
 
     .rc-pagination-prev,
     .rc-pagination-next,
@@ -95,9 +95,18 @@
       }
     }
 
-    .rc-pagination-jump-prev:after,
-    .rc-pagination-jump-next::after {
-      color: $success;
+    .rc-pagination-jump-prev,
+    .rc-pagination-jump-next {
+      &::after {
+        color: $success;
+      }
+
+      &:hover {
+        &::after {
+          font-size: 22px;
+          line-height: 20px;
+        }
+      }
     }
 
     .rc-pagination-disabled {
@@ -110,12 +119,6 @@
       a {
         color: $white;
       }
-    }
-
-    .rc-pagination-jump-prev:hover::after,
-    .rc-pagination-jump-next:hover::after {
-      font-size: 22px;
-      line-height: 20px;
     }
   }
 
@@ -137,9 +140,13 @@
       box-shadow: none;
     }
 
-    &.Select--single > .Select-control .Select-value {
-      line-height: 30px;
-      border: 0;
+    &.Select--single {
+      > .Select-control {
+        .Select-value {
+          line-height: 30px;
+          border: 0;
+        }
+      }
     }
 
     .Select-input {
