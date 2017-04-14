@@ -43,6 +43,7 @@
     flex-basis: 100%;
     margin: 55px 0;
     display: flex;
+    flex-wrap: wrap;
   }
 
   &__pagination {
@@ -119,6 +120,11 @@
   }
 
   &__pager-count {
+    flex-basis: 100%;
+    margin: 15px 0 0;
+  }
+
+  &__count-select {
     width: 120px;
 
     .Select-control {
@@ -139,6 +145,10 @@
     .Select-input {
       height: 30px;
     }
+  }
+
+  &__pager-range {
+    margin: 0;
   }
 
   &--grid {

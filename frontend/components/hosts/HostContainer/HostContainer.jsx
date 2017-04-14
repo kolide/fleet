@@ -179,15 +179,17 @@ class HostContainer extends Component {
           locale={enUs}
           showLessItems
         />
-        <p>{`${startRange} - ${endRange}  of ${allHostCount} items`}</p>
-        <Select
-          name="pager-host-count"
-          value={hostsPerPage}
-          options={paginationSelectOpts}
-          onChange={handlePerPageChange}
-          className={`${baseClass}__pager-count`}
-          clearable={false}
-        />
+        <p className={`${baseClass}__pager-range`}>{`${startRange} - ${endRange} of ${allHostCount} items`}</p>
+        <div className={`${baseClass}__pager-count`}>
+          <Select
+            name="pager-host-count"
+            value={hostsPerPage}
+            options={paginationSelectOpts}
+            onChange={handlePerPageChange}
+            className={`${baseClass}__count-select`}
+            clearable={false}
+          />
+        </div>
       </div>
     );
   }
