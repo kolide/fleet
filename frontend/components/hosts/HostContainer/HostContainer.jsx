@@ -2,8 +2,9 @@ import React, { Component, PropTypes } from 'react';
 import { isEqual, orderBy, slice, sortBy } from 'lodash';
 import Pagination from 'rc-pagination';
 import Select from 'react-select';
+import 'rc-pagination/assets/index.css';
 
-import en_US from 'rc-pagination/lib/locale/en_US';
+import enUs from 'rc-pagination/lib/locale/en_US';
 import hostInterface from 'interfaces/host';
 import labelInterface from 'interfaces/label';
 import HostsTable from 'components/hosts/HostsTable';
@@ -12,7 +13,6 @@ import LonelyHost from 'components/hosts/LonelyHost';
 import Spinner from 'components/loaders/Spinner';
 import helpers from './helpers';
 
-import 'rc-pagination/assets/index.css';
 
 const baseClass = 'host-container';
 let CURRENT_PAGE = 0;
@@ -143,15 +143,15 @@ class HostContainer extends Component {
           />
         );
       });
-    } else {
-      return (
-        <HostsTable
-          hosts={pagedHosts}
-          onDestroyHost={toggleDeleteHostModal}
-          onQueryHost={onQueryHost}
-        />
-      );
     }
+
+    return (
+      <HostsTable
+        hosts={pagedHosts}
+        onDestroyHost={toggleDeleteHostModal}
+        onQueryHost={onQueryHost}
+      />
+    );
   }
 
   renderPagination = () => {
@@ -159,12 +159,14 @@ class HostContainer extends Component {
     const { allHostCount, hostsPerPage } = this.state;
 
     const paginationSelectOpts = [
-      { value: 20, label: '20' },
-      { value: 100, label: '100' },
-      { value: 500, label: '500' },
-      { value: 1000, label: '1,000' },
+      { value: 20, label: '20 Hosts' },
+      { value: 100, label: '100 Hosts' },
+      { value: 500, label: '500 Hosts' },
+      { value: 1000, label: '1,000 Hosts' },
     ];
     const currentPage = CURRENT_PAGE === 0 ? 1 : CURRENT_PAGE;
+    const startRange = currentPage === 1 ? 1 : ((currentPage - 1) * hostsPerPage) + 1;
+    const endRange = (currentPage * hostsPerPage) > allHostCount ? allHostCount : (currentPage * hostsPerPage);
 
     return (
       <div className={`${baseClass}__pager-wrap`}>
@@ -174,14 +176,16 @@ class HostContainer extends Component {
           total={allHostCount}
           pageSize={hostsPerPage}
           className={`${baseClass}__pagination`}
-          locale={en_US}
+          locale={enUs}
           showLessItems
         />
+        <p>{`${startRange} - ${endRange}  of ${allHostCount} items`}</p>
         <Select
           name="pager-host-count"
           value={hostsPerPage}
           options={paginationSelectOpts}
           onChange={handlePerPageChange}
+          className={`${baseClass}__pager-count`}
           clearable={false}
         />
       </div>
@@ -205,7 +209,7 @@ class HostContainer extends Component {
       return renderNoHosts();
     }
 
-    return(
+    return (
       <div className={`${baseClass} ${baseClass}--${displayType.toLowerCase()}`}>
         {renderPagination()}
         {renderHosts()}

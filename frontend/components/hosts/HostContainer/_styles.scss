@@ -42,25 +42,103 @@
   &__pager-wrap {
     flex-basis: 100%;
     margin: 55px 0;
-    // padding: 0;
-    // list-style: none;
-    // text-align: center;
+    display: flex;
+  }
 
-    // li {
-    //   display: inline-block;
-    //   margin: 0 2px;
-    // }
+  &__pagination {
+    margin: 0 25px 0 0;
+    padding: 0;
+    font-family: "Oxygen", "Helvetica Neue", "Helvetica", "Roboto", "Arial", sans-serif;
 
-    // a {
-    //   padding: 10px;
-    //   border: 1px solid #ccc;
-    //   border-radius: 3px;
-    //   cursor: pointer;
-    // }
+    .rc-pagination-prev,
+    .rc-pagination-next,
+    .rc-pagination-item {
+      border: 1px solid $success;
+      font-size: 15px;
+      box-sizing: border-box;
+      border-radius: 3px;
 
-    // .rc-pagination-item-active {
-    //   background-color: $brand;
-    // }
+      a {
+        color: $success;
+        font-weight: bold;
+      }
+    }
+
+    .rc-pagination-prev {
+      a {
+        &::after {
+          @extend %kolidecon;
+          content: '\f006';
+        }
+      }
+    }
+
+    .rc-pagination-next {
+      a {
+        &::after {
+          @extend %kolidecon;
+          content: '\f008';
+        }
+      }
+    }
+
+    .rc-pagination-item {
+      border: 0;
+
+      &:hover {
+        background-color: $success-light;
+
+        a {
+          color: $white;
+        }
+      }
+    }
+
+    .rc-pagination-jump-prev:after,
+    .rc-pagination-jump-next::after {
+      color: $success;
+    }
+
+    .rc-pagination-disabled {
+      opacity: 0.25;
+    }
+
+    .rc-pagination-item-active {
+      background-color: $success;
+
+      a {
+        color: $white;
+      }
+    }
+
+    .rc-pagination-jump-prev:hover::after,
+    .rc-pagination-jump-next:hover::after {
+      font-size: 22px;
+      line-height: 20px;
+    }
+  }
+
+  &__pager-count {
+    width: 120px;
+
+    .Select-control {
+      border-color: $success;
+      border-radius: 3px;
+      height: 30px;
+    }
+
+    .Select-value {
+      box-shadow: none;
+    }
+
+    &.Select--single > .Select-control .Select-value {
+      line-height: 30px;
+      border: 0;
+    }
+
+    .Select-input {
+      height: 30px;
+    }
   }
 
   &--grid {
