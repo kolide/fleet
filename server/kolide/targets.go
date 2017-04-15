@@ -39,7 +39,7 @@ type TargetService interface {
 }
 
 type TargetStore interface {
-	CountHostsInTargets(hostIDs []uint, labelIDs []uint, now time.Time, onlineInterval time.Duration) (TargetMetrics, error)
+	CountHostsInTargets(hostIDs []uint, labelIDs []uint, now time.Time) (TargetMetrics, error)
 }
 
 type TargetType int

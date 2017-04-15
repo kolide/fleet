@@ -8,7 +8,10 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (d *Datastore) CountHostsInTargets(hostIDs []uint, labelIDs []uint, now time.Time, onlineInterval time.Duration) (kolide.TargetMetrics, error) {
+func (d *Datastore) CountHostsInTargets(hostIDs []uint, labelIDs []uint, now time.Time) (kolide.TargetMetrics, error) {
+	// The logic in this function should remain synchronized with
+	// host.Status and GenerateHostStatusStatistics
+
 	if len(hostIDs) == 0 && len(labelIDs) == 0 {
 		// No need to query if no targets selected
 		return kolide.TargetMetrics{}, nil

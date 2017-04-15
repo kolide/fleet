@@ -67,42 +67,42 @@ func testCountHostsInTargets(t *testing.T, ds kolide.Datastore) {
 		assert.Nil(t, err)
 	}
 
-	metrics, err := ds.CountHostsInTargets(nil, []uint{l1.ID, l2.ID}, mockClock.Now(), 30*time.Minute)
+	metrics, err := ds.CountHostsInTargets(nil, []uint{l1.ID, l2.ID}, mockClock.Now())
 	require.Nil(t, err)
 	assert.Equal(t, uint(6), metrics.TotalHosts)
 	assert.Equal(t, uint(2), metrics.OfflineHosts)
 	assert.Equal(t, uint(3), metrics.OnlineHosts)
 	assert.Equal(t, uint(1), metrics.MissingInActionHosts)
 
-	metrics, err = ds.CountHostsInTargets([]uint{h1.ID, h2.ID}, []uint{l1.ID, l2.ID}, mockClock.Now(), 30*time.Minute)
+	metrics, err = ds.CountHostsInTargets([]uint{h1.ID, h2.ID}, []uint{l1.ID, l2.ID}, mockClock.Now())
 	require.Nil(t, err)
 	assert.Equal(t, uint(6), metrics.TotalHosts)
 	assert.Equal(t, uint(2), metrics.OfflineHosts)
 	assert.Equal(t, uint(3), metrics.OnlineHosts)
 	assert.Equal(t, uint(1), metrics.MissingInActionHosts)
 
-	metrics, err = ds.CountHostsInTargets([]uint{h1.ID, h2.ID}, nil, mockClock.Now(), 30*time.Minute)
+	metrics, err = ds.CountHostsInTargets([]uint{h1.ID, h2.ID}, nil, mockClock.Now())
 	require.Nil(t, err)
 	assert.Equal(t, uint(2), metrics.TotalHosts)
 	assert.Equal(t, uint(1), metrics.OnlineHosts)
 	assert.Equal(t, uint(1), metrics.OfflineHosts)
 	assert.Equal(t, uint(0), metrics.MissingInActionHosts)
 
-	metrics, err = ds.CountHostsInTargets([]uint{h1.ID}, []uint{l2.ID}, mockClock.Now(), 30*time.Minute)
+	metrics, err = ds.CountHostsInTargets([]uint{h1.ID}, []uint{l2.ID}, mockClock.Now())
 	require.Nil(t, err)
 	assert.Equal(t, uint(4), metrics.TotalHosts)
 	assert.Equal(t, uint(3), metrics.OnlineHosts)
 	assert.Equal(t, uint(1), metrics.OfflineHosts)
 	assert.Equal(t, uint(0), metrics.MissingInActionHosts)
 
-	metrics, err = ds.CountHostsInTargets(nil, nil, mockClock.Now(), 30*time.Minute)
+	metrics, err = ds.CountHostsInTargets(nil, nil, mockClock.Now())
 	require.Nil(t, err)
 	assert.Equal(t, uint(0), metrics.TotalHosts)
 	assert.Equal(t, uint(0), metrics.OnlineHosts)
 	assert.Equal(t, uint(0), metrics.OfflineHosts)
 	assert.Equal(t, uint(0), metrics.MissingInActionHosts)
 
-	metrics, err = ds.CountHostsInTargets([]uint{}, []uint{}, mockClock.Now(), 30*time.Minute)
+	metrics, err = ds.CountHostsInTargets([]uint{}, []uint{}, mockClock.Now())
 	require.Nil(t, err)
 	assert.Equal(t, uint(0), metrics.TotalHosts)
 	assert.Equal(t, uint(0), metrics.OnlineHosts)
@@ -111,7 +111,7 @@ func testCountHostsInTargets(t *testing.T, ds kolide.Datastore) {
 
 	// Advance clock so all hosts are offline
 	mockClock.AddTime(2 * time.Minute)
-	metrics, err = ds.CountHostsInTargets(nil, []uint{l1.ID, l2.ID}, mockClock.Now(), 30*time.Minute)
+	metrics, err = ds.CountHostsInTargets(nil, []uint{l1.ID, l2.ID}, mockClock.Now())
 	require.Nil(t, err)
 	assert.Equal(t, uint(6), metrics.TotalHosts)
 	assert.Equal(t, uint(0), metrics.OnlineHosts)
@@ -172,7 +172,7 @@ func testHostStatus(t *testing.T, ds kolide.Datastore) {
 			require.Nil(t, ds.MarkHostSeen(h, tt.seenTime))
 
 			// Verify status
-			metrics, err := ds.CountHostsInTargets([]uint{h.ID}, []uint{}, mockClock.Now(), 30*time.Minute)
+			metrics, err := ds.CountHostsInTargets([]uint{h.ID}, []uint{}, mockClock.Now())
 			require.Nil(t, err)
 			assert.Equal(t, tt.metrics, metrics)
 		})

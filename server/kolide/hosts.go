@@ -35,7 +35,7 @@ type HostStore interface {
 	EnrollHost(osqueryHostId string, nodeKeySize int) (*Host, error)
 	AuthenticateHost(nodeKey string) (*Host, error)
 	MarkHostSeen(host *Host, t time.Time) error
-	GenerateHostStatusStatistics(now time.Time, onlineInterval time.Duration) (online, offline, mia, new uint, err error)
+	GenerateHostStatusStatistics(now time.Time) (online, offline, mia, new uint, err error)
 	SearchHosts(query string, omit ...uint) ([]*Host, error)
 	// DistributedQueriesForHost retrieves the distributed queries that the
 	// given host should run. The result map is a mapping from campaign ID
@@ -145,11 +145,23 @@ func RandomText(keySize int) (string, error) {
 	return base64.StdEncoding.EncodeToString(key), nil
 }
 
-func (h *Host) Status(now time.Time, onlineInterval time.Duration) string {
+// Status calculates the online status of the host
+func (h *Host) Status(now time.Time) string {
+	// The logic in this function should remain synchronized with
+	// GenerateHostStatusStatistics and CountHostsInTargets
+
+	var onlineInterval uint
+	if h.DistributedInterval < h.ConfigTLSRefresh {
+		onlineInterval = h.DistributedInterval
+	} else {
+		onlineInterval = h.ConfigTLSRefresh
+	}
+	onlineInterval += 30
+
 	switch {
 	case h.SeenTime.Add(MIADuration).Before(now):
 		return StatusMIA
-	case h.SeenTime.Add(onlineInterval).Before(now):
+	case h.SeenTime.Add(time.Duration(onlineInterval) * time.Second).Before(now):
 		return StatusOffline
 	default:
 		return StatusOnline
