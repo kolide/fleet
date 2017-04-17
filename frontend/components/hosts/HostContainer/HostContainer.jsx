@@ -48,7 +48,7 @@ class HostContainer extends Component {
       return false;
     }
 
-    this.buildSortedHosts();
+    this.buildSortedHosts(nextProps);
     return true;
   }
 
@@ -57,15 +57,17 @@ class HostContainer extends Component {
       return false;
     }
 
-    this.buildSortedHosts();
+    this.buildSortedHosts(nextProps);
     return true;
   }
 
-  buildSortedHosts = () => {
+  buildSortedHosts = (nextProps) => {
+    const theProps = nextProps || this.props;
     const { filterHosts, sortHosts } = this;
     const { hostsPerPage } = this.state;
+    const { hosts, selectedLabel } = theProps;
 
-    const sortedHosts = sortHosts(filterHosts());
+    const sortedHosts = sortHosts(filterHosts(hosts, selectedLabel));
 
     const currentPage = CURRENT_PAGE - 1 < 0 ? 0 : CURRENT_PAGE - 1;
     const fromIndex = currentPage * hostsPerPage;
@@ -80,8 +82,7 @@ class HostContainer extends Component {
     });
   }
 
-  filterHosts = () => {
-    const { hosts, selectedLabel } = this.props;
+  filterHosts = (hosts, selectedLabel) => {
     const { filterHosts } = helpers;
 
     return filterHosts(hosts, selectedLabel);
