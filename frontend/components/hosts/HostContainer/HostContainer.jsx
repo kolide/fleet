@@ -96,13 +96,18 @@ class HostContainer extends Component {
   }
 
   handlePaginationChange = (page) => {
+    const { scrollToTop } = helpers;
+
     CURRENT_PAGE = page;
     this.buildSortedHosts();
+    scrollToTop();
 
     return true;
   }
 
   handlePerPageChange = (option) => {
+    CURRENT_PAGE = 0;
+
     this.setState({
       hostsPerPage: Number(option.value),
       showSpinner: true,
