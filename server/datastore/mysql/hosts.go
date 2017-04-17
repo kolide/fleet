@@ -318,15 +318,15 @@ func (d *Datastore) GenerateHostStatusStatistics(now time.Time) (online, offline
 	// The logic in this function should remain synchronized with
 	// host.Status and CountHostsInTargets
 
-	sqlStatement := `
+	sqlStatement := fmt.Sprintf(`
 		SELECT
 			COALESCE(SUM(CASE WHEN DATE_ADD(seen_time, INTERVAL 30 DAY) <= ? THEN 1 ELSE 0 END), 0) mia,
-			COALESCE(SUM(CASE WHEN DATE_ADD(seen_time, INTERVAL LEAST(distributed_interval, config_tls_refresh) + 30 SECOND) <= ? AND DATE_ADD(seen_time, INTERVAL 30 DAY) >= ? THEN 1 ELSE 0 END), 0) offline,
-			COALESCE(SUM(CASE WHEN DATE_ADD(seen_time, INTERVAL LEAST(distributed_interval, config_tls_refresh) + 30 SECOND) > ? THEN 1 ELSE 0 END), 0) online,
+			COALESCE(SUM(CASE WHEN DATE_ADD(seen_time, INTERVAL LEAST(distributed_interval, config_tls_refresh) + %d SECOND) <= ? AND DATE_ADD(seen_time, INTERVAL 30 DAY) >= ? THEN 1 ELSE 0 END), 0) offline,
+			COALESCE(SUM(CASE WHEN DATE_ADD(seen_time, INTERVAL LEAST(distributed_interval, config_tls_refresh) + %d SECOND) > ? THEN 1 ELSE 0 END), 0) online,
 			COALESCE(SUM(CASE WHEN DATE_ADD(created_at, INTERVAL 1 DAY) >= ? THEN 1 ELSE 0 END), 0) new
 		FROM hosts
 		LIMIT 1;
-	`
+	`, kolide.OnlineIntervalBuffer, kolide.OnlineIntervalBuffer)
 
 	counts := struct {
 		MIA     uint `db:"mia"`

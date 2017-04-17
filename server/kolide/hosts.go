@@ -24,6 +24,11 @@ const (
 	// OfflineDuration if a host hasn't been in communition for this
 	// period it is considered MIA.
 	MIADuration = 30 * 24 * time.Hour
+
+	// OnlineIntervalBuffer is the additional time in seconds to add to the
+	// online interval to avoid flapping of hosts that check in a bit later
+	// than their expected checkin interval.
+	OnlineIntervalBuffer = 30
 )
 
 type HostStore interface {
@@ -35,8 +40,10 @@ type HostStore interface {
 	EnrollHost(osqueryHostId string, nodeKeySize int) (*Host, error)
 	AuthenticateHost(nodeKey string) (*Host, error)
 	MarkHostSeen(host *Host, t time.Time) error
-	GenerateHostStatusStatistics(now time.Time) (online, offline, mia, new uint, err error)
 	SearchHosts(query string, omit ...uint) ([]*Host, error)
+	// GenerateHostStatusStatistics retrieves the count of online, offline,
+	// MIA and new hosts.
+	GenerateHostStatusStatistics(now time.Time) (online, offline, mia, new uint, err error)
 	// DistributedQueriesForHost retrieves the distributed queries that the
 	// given host should run. The result map is a mapping from campaign ID
 	// to query text.
@@ -150,13 +157,13 @@ func (h *Host) Status(now time.Time) string {
 	// The logic in this function should remain synchronized with
 	// GenerateHostStatusStatistics and CountHostsInTargets
 
-	var onlineInterval uint
+	onlineInterval := h.ConfigTLSRefresh
 	if h.DistributedInterval < h.ConfigTLSRefresh {
 		onlineInterval = h.DistributedInterval
-	} else {
-		onlineInterval = h.ConfigTLSRefresh
 	}
-	onlineInterval += 30
+
+	// Add a small buffer to prevent flapping
+	onlineInterval += OnlineIntervalBuffer
 
 	switch {
 	case h.SeenTime.Add(MIADuration).Before(now):
