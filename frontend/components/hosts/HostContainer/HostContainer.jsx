@@ -52,6 +52,15 @@ class HostContainer extends Component {
     return true;
   }
 
+  shouldComponentUpdate (nextProps, nextState) {
+    if (isEqual(nextProps, this.props) && isEqual(nextState, this.state)) {
+      return false;
+    }
+
+    this.buildSortedHosts();
+    return true;
+  }
+
   buildSortedHosts = () => {
     const { filterHosts, sortHosts } = this;
     const { hostsPerPage } = this.state;
