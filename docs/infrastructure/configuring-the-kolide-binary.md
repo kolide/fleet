@@ -313,9 +313,9 @@ Whether or not the server should be served over TLS.
 
 ##### `auth_jwt_key`
 
-The [JWT](https://jwt.io/) key to use when signing and validating session keys.
+The [JWT](https://jwt.io/) key to use when signing and validating session keys. If this value is not specified the Kolide server will fail to start and a randomly generated key will be provided for use.
 
-- Default value: `CHANGEME`
+- Default value: None
 - Environment variable: `KOLIDE_AUTH_JWT_KEY`
 - Config file format:
 
@@ -351,19 +351,6 @@ The key size of the salt which is generated when hashing user passwords.
 	```
 
 #### App
-
-##### `app_token_key`
-
-Secret key for generating invite and reset tokens.
-
-- Default value: `CHANGEME`
-- Environment variable:	`KOLIDE_APP_TOKEN_KEY`
-- Config file format
-
-	```
-	app:
-		token_key: JVnKw7CaUdJjZwYAqDgUHVYP
-	```
 
 ##### `app_token_key_size`
 
