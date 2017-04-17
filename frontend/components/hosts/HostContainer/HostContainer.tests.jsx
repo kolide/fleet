@@ -76,7 +76,7 @@ describe('HostsContainer - component', () => {
       />
     ).node;
 
-    expect(allHostsLabelPageNode.filterHosts()).toEqual([hostStub, offlineHost]);
-    expect(offlineHostsLabelPageNode.filterHosts()).toEqual([offlineHost]);
+    expect(allHostsLabelPageNode.filterHosts([hostStub, offlineHost], allHostsLabel)).toEqual([hostStub, offlineHost]);
+    expect(offlineHostsLabelPageNode.filterHosts([offlineHost], offlineHostsLabel)).toEqual([offlineHost]);
   });
 });
