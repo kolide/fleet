@@ -72,6 +72,8 @@ overrides:
   # loader-utils package.json says "JSF" but the license is actually MIT. See https://goo.gl/ptgu4y
   node_modules/css-loader/node_modules/loader-utils:
     MIT
+  node_modules/rc-pagination:
+    MIT
   node_modules/extract-text-webpack-plugin/node_modules/loader-utils:
     MIT
   node_modules/file-loader/node_modules/loader-utils:
