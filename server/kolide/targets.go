@@ -10,7 +10,8 @@ type TargetSearchResults struct {
 	Labels []Label
 }
 
-// TargetMetrics contains information about the online status of
+// TargetMetrics contains information about the online status of a set of
+// hosts.
 type TargetMetrics struct {
 	// TotalHosts is the total hosts in any status. It should equal
 	// OnlineHosts + OfflineHosts + MissingInActionHosts.
