@@ -15,7 +15,6 @@ setup_gcloud() {
     sudo chown -R ubuntu:ubuntu /home/ubuntu/.config
 }
 
-
 setup_gcloud
 
 # configure slack notification webhooks
