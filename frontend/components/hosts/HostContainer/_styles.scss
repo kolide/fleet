@@ -125,10 +125,12 @@
   &__pager-count {
     flex-basis: 100%;
     margin: 15px 0 0;
+    display: flex;
   }
 
   &__count-select {
-    width: 120px;
+    width: 90px;
+    margin-right: 15px;
 
     .Select-control {
       border-color: $success;
@@ -157,8 +159,10 @@
       height: 30px;
     }
 
-    .Select-option.is-focused {
-      background-color: $success;
+    .Select-option {
+      &.is-focused {
+        background-color: $success;
+      }
     }
   }
 

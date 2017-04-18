@@ -252,10 +252,6 @@ export class ManageHostsPage extends Component {
     return false;
   }
 
-  handlePaginationChange = () => {
-    console.log('pager clicked');
-  }
-
   toggleAddHostModal = () => {
     const { showAddHostModal } = this.state;
     this.setState({ showAddHostModal: !showAddHostModal });

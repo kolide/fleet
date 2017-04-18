@@ -15,7 +15,6 @@ import helpers from './helpers';
 
 
 const baseClass = 'host-container';
-let CURRENT_PAGE = 0;
 
 class HostContainer extends Component {
   static propTypes = {
@@ -33,6 +32,7 @@ class HostContainer extends Component {
 
     this.state = {
       allHostCount: 0,
+      currentPage: 0,
       hostsPerPage: 20,
       pagedHosts: [],
       showSpinner: false,
@@ -43,33 +43,22 @@ class HostContainer extends Component {
     this.buildSortedHosts();
   }
 
-  componentWillReceiveProps (nextProps) {
-    if (isEqual(nextProps, this.props)) {
-      return false;
-    }
-
-    this.buildSortedHosts(nextProps);
-    return true;
-  }
-
-  shouldComponentUpdate (nextProps, nextState) {
+  componentWillUpdate (nextProps, nextState) {
     if (isEqual(nextProps, this.props) && isEqual(nextState, this.state)) {
       return false;
     }
 
-    this.buildSortedHosts(nextProps);
+    this.buildSortedHosts(nextProps, nextState);
     return true;
   }
 
-  buildSortedHosts = (nextProps) => {
-    const theProps = nextProps || this.props;
+  buildSortedHosts = (nextProps, nextState) => {
     const { filterHosts, sortHosts } = this;
-    const { hostsPerPage } = this.state;
-    const { hosts, selectedLabel } = theProps;
+    const { currentPage, hostsPerPage } = nextState || this.state;
+    const { hosts, selectedLabel } = nextProps || this.props;
 
     const sortedHosts = sortHosts(filterHosts(hosts, selectedLabel));
 
-    const currentPage = CURRENT_PAGE - 1 < 0 ? 0 : CURRENT_PAGE - 1;
     const fromIndex = currentPage * hostsPerPage;
     const toIndex = fromIndex + hostsPerPage;
 
@@ -98,20 +87,25 @@ class HostContainer extends Component {
   handlePaginationChange = (page) => {
     const { scrollToTop } = helpers;
 
-    CURRENT_PAGE = page;
-    this.buildSortedHosts();
+    this.setState({
+      currentPage: page - 1,
+    });
+
     scrollToTop();
 
     return true;
   }
 
   handlePerPageChange = (option) => {
-    CURRENT_PAGE = 0;
+    const { scrollToTop } = helpers;
 
     this.setState({
+      currentPage: 0,
       hostsPerPage: Number(option.value),
       showSpinner: true,
     });
+
+    scrollToTop();
 
     return true;
   }
@@ -171,30 +165,31 @@ class HostContainer extends Component {
 
   renderPagination = () => {
     const { handlePaginationChange, handlePerPageChange } = this;
-    const { allHostCount, hostsPerPage } = this.state;
+    const { allHostCount, currentPage, hostsPerPage } = this.state;
 
     const paginationSelectOpts = [
-      { value: 20, label: '20 Hosts' },
-      { value: 100, label: '100 Hosts' },
-      { value: 500, label: '500 Hosts' },
-      { value: 1000, label: '1,000 Hosts' },
+      { value: 20, label: '20' },
+      { value: 100, label: '100' },
+      { value: 500, label: '500' },
+      { value: 1000, label: '1,000' },
     ];
-    const currentPage = CURRENT_PAGE === 0 ? 1 : CURRENT_PAGE;
-    const startRange = currentPage === 1 ? 1 : ((currentPage - 1) * hostsPerPage) + 1;
-    const endRange = (currentPage * hostsPerPage) > allHostCount ? allHostCount : (currentPage * hostsPerPage);
+
+    const humanPage = currentPage + 1;
+    const startRange = (currentPage * hostsPerPage) + 1;
+    const endRange = Math.min(humanPage * hostsPerPage, allHostCount);
 
     return (
       <div className={`${baseClass}__pager-wrap`}>
         <Pagination
           onChange={handlePaginationChange}
-          current={currentPage}
+          current={humanPage}
           total={allHostCount}
           pageSize={hostsPerPage}
           className={`${baseClass}__pagination`}
           locale={enUs}
           showLessItems
         />
-        <p className={`${baseClass}__pager-range`}>{`${startRange} - ${endRange} of ${allHostCount} items`}</p>
+        <p className={`${baseClass}__pager-range`}>{`${startRange} - ${endRange} of ${allHostCount} hosts`}</p>
         <div className={`${baseClass}__pager-count`}>
           <Select
             name="pager-host-count"
@@ -203,7 +198,7 @@ class HostContainer extends Component {
             onChange={handlePerPageChange}
             className={`${baseClass}__count-select`}
             clearable={false}
-          />
+          /> <span>Hosts per page</span>
         </div>
       </div>
     );
