@@ -40,11 +40,11 @@ type SessionService interface {
 	// user was accessing when prompted to log in.  The ssoHandle is a unique value generated in the front end
 	// and is used to reference information from the SSO process we initiate.
 	InitiateSSO(ctx context.Context, idpID uint, relayValue, ssoHandle string) (string, error)
-	// CallbackSSO handles the IDP response. The relayState, ssoHandle and userID are
-	// all extracted from the IDP response xml. The original URL the viewer attempted
+	// CallbackSSO handles the IDP response. The ssoHandle and userID are
+	// all extracted from the IDP response. The original URL the viewer attempted
 	// to access is returned from this function so we can redirect back to the front end and
 	// load the page the viewer originally attempted to access when prompted for login.
-	CallbackSSO(ctx context.Context, relayState, ssoHandle, userID string) (string, error)
+	CallbackSSO(ctx context.Context, ssoHandle, userID string) (string, error)
 	// LoginSSO is invoked from the front end after a successful SSO/SAML transaction
 	// to retrieve session information.
 	LoginSSO(ctx context.Context, ssoHandle string) (user *User, token string, err error)

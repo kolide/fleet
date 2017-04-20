@@ -29,13 +29,13 @@ func encodeResponse(ctx context.Context, w http.ResponseWriter, response interfa
 		}
 	}
 
-	// if redirect, ok := response.(redirecter); ok {
-	// 	if redirect.error() == nil {
-	// 		w.Header().Set("Location", redirect.redirect())
-	// 		// 302 redirect
-	// 		w.WriteHeader(http.StatusFound)
-	// 	}
-	// }
+	if redirect, ok := response.(redirecter); ok {
+		if redirect.error() == nil {
+			w.Header().Set("Location", redirect.redirect())
+			// 302 redirect
+			w.WriteHeader(http.StatusFound)
+		}
+	}
 
 	enc := json.NewEncoder(w)
 	enc.SetIndent("", "  ")

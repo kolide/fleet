@@ -56,7 +56,7 @@ func (svc service) InitiateSSO(ctx context.Context, idpID uint, relayURL, ssoHan
 	return idpURL, nil
 }
 
-func (svc service) CallbackSSO(ctx context.Context, relayState, ssoHandle, userID string) (string, error) {
+func (svc service) CallbackSSO(ctx context.Context, ssoHandle, userID string) (string, error) {
 	return "", nil
 }
 

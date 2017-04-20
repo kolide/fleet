@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-kit/kit/endpoint"
 	"github.com/kolide/kolide/server/kolide"
+	"github.com/kolide/kolide/server/sso"
 	"github.com/y0ssar1an/q"
 )
 
@@ -187,10 +188,6 @@ type initiateSSOResponse struct {
 
 func (r initiateSSOResponse) error() error { return r.Err }
 
-// if redirect is present when we encode our response we will
-// redirect (302) to this URL
-func (r initiateSSOResponse) redirect() string { return r.URL }
-
 func makeInitiateSSOEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		q.Q("endpoint")
@@ -209,8 +206,28 @@ func makeLoginSSOEndpoint(svc kolide.Service) endpoint.Endpoint {
 	}
 }
 
+type callbackSSOResponse struct {
+	URL string `json:"url,omitempty"`
+	Err error  `json:"error,omitempty"`
+}
+
+func (r callbackSSOResponse) error() error { return r.Err }
+
+// if redirect is present when we encode our response we will
+// redirect (302) to this URL
+func (r callbackSSOResponse) redirect() string { return r.URL }
+
 func makeCallbackSSOEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		return nil, nil
+		authResponse := request.(sso.AuthInfo)
+		// if these two elements are not present they'll be handled in the validation
+		// middleware
+		userID, _ := authResponse.UserID()
+		ssoHandle, _ := authResponse.RelayState()
+		redirectURL, err := svc.CallbackSSO(ctx, ssoHandle, userID)
+		if err != nil {
+			return callbackSSOResponse{Err: err}, nil
+		}
+		return callbackSSOResponse{URL: redirectURL}, nil
 	}
 }

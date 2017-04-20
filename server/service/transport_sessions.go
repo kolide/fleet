@@ -3,10 +3,11 @@ package service
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"net/http"
 	"strings"
 
+	"github.com/kolide/kolide/server/sso"
+	"github.com/pkg/errors"
 	"github.com/y0ssar1an/q"
 )
 
@@ -66,10 +67,9 @@ func decodeLoginSSORequest(ctx context.Context, r *http.Request) (interface{}, e
 }
 
 func decodeCallbackSSORequest(ctx context.Context, r *http.Request) (interface{}, error) {
-
-	buff := make([]byte, 10000)
-	r.Body.Read(buff)
-	q.Q(string(buff))
-
-	return nil, errors.New("not implemented")
+	authResponse, err := sso.DecodeAuthResponse(r.Body)
+	if err != nil {
+		return nil, errors.Wrap(err, "decoding sso callback")
+	}
+	return authResponse, nil
 }
