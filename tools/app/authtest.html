@@ -1,0 +1,45 @@
+<html>
+  <head>
+    <script
+      src="https://code.jquery.com/jquery-3.2.1.js"
+      integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE="
+      crossorigin="anonymous">
+    </script>
+    <script>
+      function guidGenerator() {
+        var S4 = function() {
+          return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+        };
+        return (S4()+S4()+S4()+S4());
+       }
+      $(document).ready(function(){
+          $("#clicker").click(function(){
+              $.ajax({
+                type: "POST",
+                url: "https://localhost:8080/api/v1/kolide/sso",
+                data: JSON.stringify(
+                  {
+                    identity_provider_id: parseInt($("#idpid").val()),
+                    relay_url: $("#relay").val(),
+                    token: guidGenerator()
+                  }
+                ),
+                contentType: "text/plain;",
+                dataType: "json",
+                success: function(data){
+                console.log(data);
+                  window.location.href = data.url;
+                },
+                failure: function(errMsg) {console.log(errMsg);}
+              });
+          });
+      });
+    </script>
+  </head>
+  <body>
+    <h2>Single Sign On Test Page</h2>
+    Identity Provider ID: <input type="text" name="idpid" id="idpid" /><br>
+    Relay URL: <input type="text" name="relay" id="relay" value="https://localhost:8080/test"/><br>
+    <a id='clicker' href='#'>Request Auth</a>
+  </body>
+</html>

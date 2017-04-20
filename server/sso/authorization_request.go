@@ -9,12 +9,10 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io"
-	"net/url"
 	"strings"
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/y0ssar1an/q"
 )
 
 const (
@@ -68,37 +66,42 @@ func CreateAuthorizationRequest(settings *Settings, options ...func(o *opts)) (s
 		},
 	}
 
-	u, err := url.Parse(destinationURL)
-	if err != nil {
-		return "", errors.Wrap(err, "parsing idp destination url")
-	}
-	queryVals := u.Query()
+	queryVals := make(map[string]string)
 
 	var writer bytes.Buffer
 	err = xml.NewEncoder(&writer).Encode(request)
 	if err != nil {
 		return "", errors.Wrap(err, "encoding auth request xml")
 	}
-	q.Q(writer.String())
 	authQueryVal, err := deflate(&writer)
 	if err != nil {
 		return "", errors.Wrap(err, "unable to compress auth info")
 	}
-	q.Q(authQueryVal)
-	queryVals.Set("SAMLRequest", authQueryVal)
-	// if optionalParams.relayState != "" {
-	// 	queryVals.Set("RelayState", url.PathEscape(optionalParams.relayState))
-	// }
+	queryVals["SAMLRequest"] = authQueryVal
+	if optionalParams.relayState != "" {
+		queryVals["RelayState"] = urlEncode(optionalParams.relayState)
+	}
 	if settings.Metadata.IDPSSODescriptor.WantAuthnRequestsSigned {
 		signature, err := sign(settings, authQueryVal)
 		if err != nil {
 			return "", errors.Wrap(err, "signing auth request")
 		}
-		queryVals.Set("Signature", signature)
+		queryVals["Signature"] = signature
 	}
-	//u.RawQuery = queryVals.Encode()
-	response := u.String() + "?SAMLRequest=" + authQueryVal
-	return response, nil
+	return buildRedirectURL(destinationURL, queryVals), nil
+}
+
+func buildRedirectURL(baseURL string, params map[string]string) string {
+	queryString := ""
+	for key, val := range params {
+		if queryString == "" {
+			queryString = "?"
+		} else {
+			queryString += "&"
+		}
+		queryString += key + "=" + val
+	}
+	return baseURL + queryString
 }
 
 func sign(settings *Settings, authString string) (string, error) {
@@ -129,7 +132,7 @@ func deflate(xmlBuffer *bytes.Buffer) (string, error) {
 	}
 	writer.Flush()
 	encbuff := deflated.Bytes()
-	// we have to remove the compression method, and flags bytes from the front
+	// We have to remove the compression method, and flag bytes from the front
 	// of the byte stream and the 32 bit checksum at the end. This is to
 	// retain compatibility with PKZIP and GZIP
 	// See https://tools.ietf.org/html/rfc1950
