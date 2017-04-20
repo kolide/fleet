@@ -38,7 +38,7 @@ describe('HostsContainer - component', () => {
   it('renders message if no hosts available and not on All Hosts', () => {
     const page = mount(<HostContainer {...props} hosts={[]} selectedLabel={customLabel} />);
 
-    expect(page.find('.host-container__no-hosts').length).toEqual(1);
+    expect(page.find('.host-container--no-hosts').length).toEqual(1);
   });
 
   it('renders hosts as HostDetails by default', () => {
@@ -58,25 +58,5 @@ describe('HostsContainer - component', () => {
     const page = mount(<HostContainer {...loadingProps} hosts={[]} selectedLabel={allHostsLabel} />);
 
     expect(page.find('HostSidePanel').length).toEqual(0);
-  });
-
-  it('filters hosts', () => {
-    const allHostsLabelPageNode = mount(
-      <HostContainer
-        {...props}
-        hosts={[hostStub, offlineHost]}
-        selectedLabel={allHostsLabel}
-      />
-    ).node;
-    const offlineHostsLabelPageNode = mount(
-      <HostContainer
-        {...props}
-        hosts={[hostStub, offlineHost]}
-        selectedLabel={offlineHostsLabel}
-      />
-    ).node;
-
-    expect(allHostsLabelPageNode.filterHosts([hostStub, offlineHost], allHostsLabel)).toEqual([hostStub, offlineHost]);
-    expect(offlineHostsLabelPageNode.filterHosts([offlineHost], offlineHostsLabel)).toEqual([offlineHost]);
   });
 });

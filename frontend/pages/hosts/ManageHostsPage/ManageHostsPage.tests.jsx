@@ -104,6 +104,28 @@ describe('ManageHostsPage - component', () => {
     });
   });
 
+  describe('host filtering', () => {
+    it('filters hosts', () => {
+      const allHostsLabelPageNode = mount(
+        <ManageHostsPage
+          {...props}
+          hosts={[hostStub, offlineHost]}
+          selectedLabel={allHostsLabel}
+        />
+      ).node;
+      const offlineHostsLabelPageNode = mount(
+        <ManageHostsPage
+          {...props}
+          hosts={[hostStub, offlineHost]}
+          selectedLabel={offlineHostsLabel}
+        />
+      ).node;
+
+      expect(allHostsLabelPageNode.filterAllHosts([hostStub, offlineHost], allHostsLabel)).toEqual([hostStub, offlineHost]);
+      expect(offlineHostsLabelPageNode.filterAllHosts([hostStub, offlineHost], offlineHostsLabel)).toEqual([offlineHost]);
+    });
+  });
+
   describe('Adding a new label', () => {
     beforeEach(() => createAceSpy());
     afterEach(restoreSpies);
