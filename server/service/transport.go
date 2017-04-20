@@ -29,6 +29,14 @@ func encodeResponse(ctx context.Context, w http.ResponseWriter, response interfa
 		}
 	}
 
+	// if redirect, ok := response.(redirecter); ok {
+	// 	if redirect.error() == nil {
+	// 		w.Header().Set("Location", redirect.redirect())
+	// 		// 302 redirect
+	// 		w.WriteHeader(http.StatusFound)
+	// 	}
+	// }
+
 	enc := json.NewEncoder(w)
 	enc.SetIndent("", "  ")
 	return enc.Encode(response)
@@ -38,6 +46,13 @@ func encodeResponse(ctx context.Context, w http.ResponseWriter, response interfa
 // http success status - default is 200 OK
 type statuser interface {
 	status() int
+}
+
+// redirector will redirect response to the given URL, we expose error here
+// so we can check for errors before redirecting
+type redirecter interface {
+	redirect() string
+	error() error
 }
 
 func idFromRequest(r *http.Request, name string) (uint, error) {

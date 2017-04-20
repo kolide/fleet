@@ -22,11 +22,14 @@ type IdentityProvider struct {
 	UpdateCreateTimestamps
 	DeleteFields
 	ID uint `json:"id"`
-	// SingleSignOnURL is the URL for the identity provider.
-	SingleSignOnURL string `json:"sso_url" db:"sso_url"`
-	// IssuerURI identity provider issuer
+	// DestinationURL is the URL for the identity provider and is required
+	// if Metadata is not present.
+	DestinationURL string `json:"destination_url" db:"destination_url"`
+	// IssuerURI identity provider issuer and is required if
+	// Metadata is not present
 	IssuerURI string `json:"issuer_uri" db:"issuer_uri"`
-	// Certificate is the identity provider's public certificate.
+	// Certificate is the identity provider's public certificate
+	// and is required if Metadata is not present.
 	Certificate string `json:"cert" db:"cert"`
 	// Name is the descriptive name for the identity provider that will
 	// be displayed in the UI.
@@ -34,16 +37,20 @@ type IdentityProvider struct {
 	// ImageURL is a link to an icon that will be displayed on the SSO
 	// button for a particular identity provider.
 	ImageURL string `json:"image_url" db:"image_url"`
+	// Metadata if the definition of the SAML contract for a particular
+	// IDP.
+	Metadata string `json:"metadata" db:"metadata"`
 }
 
 // IdentityProviderPayload user to update one or more fields of an IdentityProvider
 // by supplying values that correspond to fields that will be changed.
 type IdentityProviderPayload struct {
-	SingleSignOnURL *string `json:"sso_url"`
-	IssuerURI       *string `json:"issuer_uri"`
-	Certificate     *string `json:"cert"`
-	Name            *string `json:"name"`
-	ImageURL        *string `json:"image_url"`
+	DestinationURL *string `json:"destination_url"`
+	IssuerURI      *string `json:"issuer_uri"`
+	Certificate    *string `json:"cert"`
+	Name           *string `json:"name"`
+	ImageURL       *string `json:"image_url"`
+	Metadata       *string `json:"metadata"`
 }
 
 // IdentityProviderService exposes methods to manage IdentityProvider entities

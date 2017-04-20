@@ -10,11 +10,58 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/kolide/kolide/server/contexts/viewer"
 	"github.com/kolide/kolide/server/kolide"
+	"github.com/kolide/kolide/server/sso"
 	"github.com/pkg/errors"
+	"github.com/y0ssar1an/q"
 )
 
-func (svc service) SSOLogin(ctx context.Context, userId string) (*kolide.User, string, error) {
-	return nil, "", errors.New("not implemented")
+func (svc service) InitiateSSO(ctx context.Context, idpID uint, relayURL, ssoHandle string) (string, error) {
+	q.Q("initiate sso ")
+	isProvider, err := svc.ds.IdentityProvider(idpID)
+	if err != nil {
+		return "", err
+	}
+	q.Q(isProvider)
+	// get data about how to talk to the idp
+	if isProvider.Metadata == "" {
+		return "", errors.New("InitiateSSO missing metadata")
+	}
+	metadata, err := sso.ParseMetadata(isProvider.Metadata)
+	if err != nil {
+		return "", errors.Wrap(err, "InitiateSSO parsing metadata")
+	}
+	q.Q("got metadata")
+	appConfig, err := svc.ds.AppConfig()
+	if err != nil {
+		return "", errors.Wrap(err, "InitiateSSO getting app config")
+	}
+	settings := sso.Settings{
+		Metadata: metadata,
+		// construct call back url to send to idp
+		AssertionConsumerServiceURL: appConfig.KolideServerURL + "/api/v1/kolide/sso/callback",
+	}
+	idpURL, err := sso.CreateAuthorizationRequest(&settings, sso.RelayState(ssoHandle))
+	if err != nil {
+		return "", errors.Wrap(err, "InitiateSSO creating authorization")
+	}
+	q.Q("got url")
+	// we're all ready to invoke idp with our redirect url, create a session in redis
+	// so we can coordinate state across the idp, kolide, and the viewer, we set
+	// session lifetime to five minutes,
+	err = svc.ssoSessionStore.CreateSession(ssoHandle, relayURL, 300)
+	if err != nil {
+		return "", errors.Wrap(err, "creating sso session")
+	}
+	q.Q(idpURL)
+	return idpURL, nil
+}
+
+func (svc service) CallbackSSO(ctx context.Context, relayState, ssoHandle, userID string) (string, error) {
+	return "", nil
+}
+
+func (svc service) LoginSSO(ctx context.Context, ssoHandle string) (user *kolide.User, token string, err error) {
+	return
 }
 
 func (svc service) Login(ctx context.Context, username, password string) (*kolide.User, string, error) {

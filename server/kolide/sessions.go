@@ -33,9 +33,21 @@ type SessionStore interface {
 }
 
 type SessionService interface {
-	// SSOLogin handles creating a session for a user who is authenticated by
-	// a SAML identity provider, returning the user and a token on success
-	SSOLogin(ctx context.Context, userId string) (*User, string, error)
+	// InitiateSSO is used to initiate an SSO session and returns a URL that
+	// can be used in a redirect to the IDP.
+	// Arguments: idpID is the id of the Identity Provider, relayValue is a token
+	// that is stored in the browser state and is associated with the url that the
+	// user was accessing when prompted to log in.  The ssoHandle is a unique value generated in the front end
+	// and is used to reference information from the SSO process we initiate.
+	InitiateSSO(ctx context.Context, idpID uint, relayValue, ssoHandle string) (string, error)
+	// CallbackSSO handles the IDP response. The relayState, ssoHandle and userID are
+	// all extracted from the IDP response xml. The original URL the viewer attempted
+	// to access is returned from this function so we can redirect back to the front end and
+	// load the page the viewer originally attempted to access when prompted for login.
+	CallbackSSO(ctx context.Context, relayState, ssoHandle, userID string) (string, error)
+	// LoginSSO is invoked from the front end after a successful SSO/SAML transaction
+	// to retrieve session information.
+	LoginSSO(ctx context.Context, ssoHandle string) (user *User, token string, err error)
 	Login(ctx context.Context, username, password string) (user *User, token string, err error)
 	Logout(ctx context.Context) (err error)
 	DestroySession(ctx context.Context) (err error)

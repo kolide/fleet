@@ -3,8 +3,11 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strings"
+
+	"github.com/y0ssar1an/q"
 )
 
 func decodeGetInfoAboutSessionRequest(ctx context.Context, r *http.Request) (interface{}, error) {
@@ -46,4 +49,27 @@ func decodeLoginRequest(ctx context.Context, r *http.Request) (interface{}, erro
 	}
 	req.Username = strings.ToLower(req.Username)
 	return req, nil
+}
+
+func decodeInitiateSSORequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	var req initiateSSORequest
+	err := json.NewDecoder(r.Body).Decode(&req)
+	q.Q("decode", err, req)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
+func decodeLoginSSORequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	return nil, nil
+}
+
+func decodeCallbackSSORequest(ctx context.Context, r *http.Request) (interface{}, error) {
+
+	buff := make([]byte, 10000)
+	r.Body.Read(buff)
+	q.Q(string(buff))
+
+	return nil, errors.New("not implemented")
 }

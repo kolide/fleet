@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-kit/kit/endpoint"
 	"github.com/kolide/kolide/server/kolide"
+	"github.com/y0ssar1an/q"
 )
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -170,5 +171,46 @@ func makeDeleteSessionsForUserEndpoint(svc kolide.Service) endpoint.Endpoint {
 			return deleteSessionsForUserResponse{Err: err}, nil
 		}
 		return deleteSessionsForUserResponse{}, nil
+	}
+}
+
+type initiateSSORequest struct {
+	IdentityProviderID uint   `json:"identity_provider_id"`
+	RelayURL           string `json:"relay_url"`
+	Token              string `json:"token"`
+}
+
+type initiateSSOResponse struct {
+	URL string `json:"url,omitempty"`
+	Err error  `json:"error,omitempty"`
+}
+
+func (r initiateSSOResponse) error() error { return r.Err }
+
+// if redirect is present when we encode our response we will
+// redirect (302) to this URL
+func (r initiateSSOResponse) redirect() string { return r.URL }
+
+func makeInitiateSSOEndpoint(svc kolide.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		q.Q("endpoint")
+		req := request.(initiateSSORequest)
+		idProviderURL, err := svc.InitiateSSO(ctx, req.IdentityProviderID, req.RelayURL, req.Token)
+		if err != nil {
+			return initiateSSOResponse{Err: err}, nil
+		}
+		return initiateSSOResponse{URL: idProviderURL}, nil
+	}
+}
+
+func makeLoginSSOEndpoint(svc kolide.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		return nil, nil
+	}
+}
+
+func makeCallbackSSOEndpoint(svc kolide.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		return nil, nil
 	}
 }

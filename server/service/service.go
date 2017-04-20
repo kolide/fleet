@@ -13,11 +13,14 @@ import (
 	"github.com/kolide/kolide/server/config"
 	"github.com/kolide/kolide/server/kolide"
 	"github.com/kolide/kolide/server/logwriter"
+	"github.com/kolide/kolide/server/sso"
 	lumberjack "gopkg.in/natefinch/lumberjack.v2"
 )
 
 // NewService creates a new service from the config struct
-func NewService(ds kolide.Datastore, resultStore kolide.QueryResultStore, logger kitlog.Logger, kolideConfig config.KolideConfig, mailService kolide.MailService, c clock.Clock, checker kolide.LicenseChecker) (kolide.Service, error) {
+func NewService(ds kolide.Datastore, resultStore kolide.QueryResultStore,
+	logger kitlog.Logger, kolideConfig config.KolideConfig, mailService kolide.MailService,
+	c clock.Clock, checker kolide.LicenseChecker, sso sso.SessionStore) (kolide.Service, error) {
 	var svc kolide.Service
 	statusWriter, err := osqueryLogFile(kolideConfig.Osquery.StatusLogFile, logger, kolideConfig.Osquery.EnableLogRotation)
 	if err != nil {
@@ -39,6 +42,7 @@ func NewService(ds kolide.Datastore, resultStore kolide.QueryResultStore, logger
 		osqueryStatusLogWriter: statusWriter,
 		osqueryResultLogWriter: resultWriter,
 		mailService:            mailService,
+		ssoSessionStore:        sso,
 	}
 	svc = validationMiddleware{svc, ds}
 	return svc, nil
@@ -83,7 +87,8 @@ type service struct {
 	osqueryStatusLogWriter io.Writer
 	osqueryResultLogWriter io.Writer
 
-	mailService kolide.MailService
+	mailService     kolide.MailService
+	ssoSessionStore sso.SessionStore
 }
 
 func (s service) SendEmail(mail kolide.Email) error {

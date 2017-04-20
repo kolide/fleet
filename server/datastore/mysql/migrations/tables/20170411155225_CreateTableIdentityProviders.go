@@ -12,10 +12,11 @@ func Up_20170411155225(tx *sql.Tx) error {
 	statement :=
 		"CREATE TABLE `identity_providers` ( " +
 			"`id` int(11) NOT NULL AUTO_INCREMENT, " +
-			"`sso_url` varchar(1024) NOT NULL DEFAULT '', " +
+			"`destination_url` varchar(1024) NOT NULL DEFAULT '', " +
 			"`issuer_uri` varchar(1024) NOT NULL DEFAULT '', " +
 			"`cert` text NOT NULL, " +
 			"`name` varchar(128) NOT NULL DEFAULT '', " +
+			"`metadata` text NOT NULL, " +
 			"`image_url` varchar(1024) NOT NULL DEFAULT '', " +
 			"`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, " +
 			"`updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, " +

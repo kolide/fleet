@@ -70,6 +70,11 @@ type KolideEndpoints struct {
 	NewDecorator                   endpoint.Endpoint
 	ModifyDecorator                endpoint.Endpoint
 	DeleteDecorator                endpoint.Endpoint
+	ListIdentityProviders          endpoint.Endpoint
+	NewIdentityProvider            endpoint.Endpoint
+	ModifyIdentityProvider         endpoint.Endpoint
+	DeleteIdentityProvider         endpoint.Endpoint
+	GetIdentityProvider            endpoint.Endpoint
 	GetHost                        endpoint.Endpoint
 	DeleteHost                     endpoint.Endpoint
 	ListHosts                      endpoint.Endpoint
@@ -83,6 +88,9 @@ type KolideEndpoints struct {
 	ChangeEmail                    endpoint.Endpoint
 	UpdateLicense                  endpoint.Endpoint
 	GetLicense                     endpoint.Endpoint
+	InitiateSSO                    endpoint.Endpoint
+	LoginSSO                       endpoint.Endpoint
+	CallbackSSO                    endpoint.Endpoint
 }
 
 // MakeKolideServerEndpoints creates the Kolide API endpoints.
@@ -94,6 +102,9 @@ func MakeKolideServerEndpoints(svc kolide.Service, jwtKey string) KolideEndpoint
 		ResetPassword:  makeResetPasswordEndpoint(svc),
 		CreateUser:     makeCreateUserEndpoint(svc),
 		VerifyInvite:   makeVerifyInviteEndpoint(svc),
+		InitiateSSO:    makeInitiateSSOEndpoint(svc),
+		LoginSSO:       makeLoginSSOEndpoint(svc),
+		CallbackSSO:    makeCallbackSSOEndpoint(svc),
 
 		// Authenticated user endpoints
 		// Each of these endpoints should have exactly one
@@ -152,6 +163,11 @@ func MakeKolideServerEndpoints(svc kolide.Service, jwtKey string) KolideEndpoint
 		NewDecorator:              authenticatedUser(jwtKey, svc, makeNewDecoratorEndpoint(svc)),
 		ModifyDecorator:           authenticatedUser(jwtKey, svc, makeModifyDecoratorEndpoint(svc)),
 		DeleteDecorator:           authenticatedUser(jwtKey, svc, makeDeleteDecoratorEndpoint(svc)),
+		ListIdentityProviders:     authenticatedUser(jwtKey, svc, makeListIdentityProvidersEndpoint(svc)),
+		NewIdentityProvider:       authenticatedUser(jwtKey, svc, mustBeAdmin(makeNewIdentityProviderEndpoint(svc))),
+		ModifyIdentityProvider:    authenticatedUser(jwtKey, svc, mustBeAdmin(makeModifyIdentityProviderEndpoint(svc))),
+		DeleteIdentityProvider:    authenticatedUser(jwtKey, svc, mustBeAdmin(makeDeleteIdentityProviderEndpoint(svc))),
+		GetIdentityProvider:       authenticatedUser(jwtKey, svc, makeGetIdentityProviderEndpoint(svc)),
 		SearchTargets:             authenticatedUser(jwtKey, svc, makeSearchTargetsEndpoint(svc)),
 		GetOptions:                authenticatedUser(jwtKey, svc, mustBeAdmin(makeGetOptionsEndpoint(svc))),
 		ModifyOptions:             authenticatedUser(jwtKey, svc, mustBeAdmin(makeModifyOptionsEndpoint(svc))),
@@ -227,6 +243,11 @@ type kolideHandlers struct {
 	NewDecorator                   http.Handler
 	ModifyDecorator                http.Handler
 	DeleteDecorator                http.Handler
+	ListIdentityProviders          http.Handler
+	NewIdentityProvider            http.Handler
+	ModifyIdentityProvider         http.Handler
+	DeleteIdentityProvider         http.Handler
+	GetIdentityProvider            http.Handler
 	GetHost                        http.Handler
 	DeleteHost                     http.Handler
 	ListHosts                      http.Handler
@@ -240,6 +261,9 @@ type kolideHandlers struct {
 	ChangeEmail                    http.Handler
 	UpdateLicense                  http.Handler
 	GetLicense                     http.Handler
+	InitiateSSO                    http.Handler
+	LoginSSO                       http.Handler
+	CallbackSSO                    http.Handler
 }
 
 func makeKolideKitHandlers(e KolideEndpoints, opts []kithttp.ServerOption) *kolideHandlers {
@@ -302,6 +326,11 @@ func makeKolideKitHandlers(e KolideEndpoints, opts []kithttp.ServerOption) *koli
 		NewDecorator:                  newServer(e.NewDecorator, decodeNewDecoratorRequest),
 		ModifyDecorator:               newServer(e.ModifyDecorator, decodeModifyDecoratorRequest),
 		DeleteDecorator:               newServer(e.DeleteDecorator, decodeDeleteDecoratorRequest),
+		ListIdentityProviders:         newServer(e.ListIdentityProviders, decodeNoParamsRequest),
+		NewIdentityProvider:           newServer(e.NewIdentityProvider, decodeNewIdentityProviderRequest),
+		ModifyIdentityProvider:        newServer(e.ModifyIdentityProvider, decodeModifyIdentityProviderRequest),
+		DeleteIdentityProvider:        newServer(e.DeleteIdentityProvider, decodeDeleteIdentityProviderRequest),
+		GetIdentityProvider:           newServer(e.GetIdentityProvider, decodeGetIdentityProviderRequest),
 		GetHost:                       newServer(e.GetHost, decodeGetHostRequest),
 		DeleteHost:                    newServer(e.DeleteHost, decodeDeleteHostRequest),
 		ListHosts:                     newServer(e.ListHosts, decodeListHostsRequest),
@@ -315,6 +344,9 @@ func makeKolideKitHandlers(e KolideEndpoints, opts []kithttp.ServerOption) *koli
 		ChangeEmail:                   newServer(e.ChangeEmail, decodeChangeEmailRequest),
 		UpdateLicense:                 newServer(e.UpdateLicense, decodeLicenseRequest),
 		GetLicense:                    newServer(e.GetLicense, decodeNoParamsRequest),
+		InitiateSSO:                   newServer(e.InitiateSSO, decodeInitiateSSORequest),
+		LoginSSO:                      newServer(e.LoginSSO, decodeLoginSSORequest),
+		CallbackSSO:                   newServer(e.CallbackSSO, decodeCallbackSSORequest),
 	}
 }
 
@@ -363,7 +395,9 @@ func attachKolideAPIRoutes(r *mux.Router, h *kolideHandlers) {
 	r.Handle("/api/v1/kolide/me", h.Me).Methods("GET").Name("me")
 	r.Handle("/api/v1/kolide/change_password", h.ChangePassword).Methods("POST").Name("change_password")
 	r.Handle("/api/v1/kolide/perform_required_password_reset", h.PerformRequiredPasswordReset).Methods("POST").Name("perform_required_password_reset")
-
+	r.Handle("/api/v1/kolide/sso", h.InitiateSSO).Methods("POST").Name("intiate_sso")
+	r.Handle("/api/v1/kolide/sso/callback", h.CallbackSSO).Methods("POST").Name("callback_sso")
+	r.Handle("/api/v1/kolide/sso/login", h.LoginSSO).Methods("POST").Name("login_sso")
 	r.Handle("/api/v1/kolide/users", h.ListUsers).Methods("GET").Name("list_users")
 	r.Handle("/api/v1/kolide/users", h.CreateUser).Methods("POST").Name("create_user")
 	r.Handle("/api/v1/kolide/users/{id}", h.GetUser).Methods("GET").Name("get_user")
@@ -415,6 +449,12 @@ func attachKolideAPIRoutes(r *mux.Router, h *kolideHandlers) {
 	r.Handle("/api/v1/kolide/decorators", h.NewDecorator).Methods("POST").Name("create_decorator")
 	r.Handle("/api/v1/kolide/decorators/{id}", h.ModifyDecorator).Methods("PATCH").Name("modify_decorator")
 	r.Handle("/api/v1/kolide/decorators/{id}", h.DeleteDecorator).Methods("DELETE").Name("delete_decorator")
+
+	r.Handle("/api/v1/kolide/idps", h.ListIdentityProviders).Methods("GET").Name("list_identity_providers")
+	r.Handle("/api/v1/kolide/idps", h.NewIdentityProvider).Methods("POST").Name("create_identity_provider")
+	r.Handle("/api/v1/kolide/idps/{id}", h.ModifyIdentityProvider).Methods("PATCH").Name("modify_identity_provider")
+	r.Handle("/api/v1/kolide/idps/{id}", h.DeleteIdentityProvider).Methods("DELETE").Name("delete_identity_provider")
+	r.Handle("/api/v1/kolide/idps/{id}", h.GetIdentityProvider).Methods("GET").Name("get_identity_provider")
 
 	r.Handle("/api/v1/kolide/hosts", h.ListHosts).Methods("GET").Name("list_hosts")
 	r.Handle("/api/v1/kolide/host_summary", h.GetHostSummary).Methods("GET").Name("get_host_summary")

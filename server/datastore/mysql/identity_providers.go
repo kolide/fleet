@@ -10,15 +10,17 @@ import (
 func (d *Datastore) NewIdentityProvider(idp kolide.IdentityProvider) (*kolide.IdentityProvider, error) {
 	query := `
     INSERT INTO identity_providers (
-      sso_url,
+      destination_url,
       issuer_uri,
       cert,
       name,
-      image_url
+      image_url,
+      metadata
     )
-    VALUES ( ?, ?, ?, ?, ? )
+    VALUES ( ?, ?, ?, ?, ?, ? )
   `
-	result, err := d.db.Exec(query, idp.SingleSignOnURL, idp.IssuerURI, idp.Certificate, idp.Name, idp.ImageURL)
+	result, err := d.db.Exec(query, idp.DestinationURL, idp.IssuerURI, idp.Certificate,
+		idp.Name, idp.ImageURL, idp.Metadata)
 	if err != nil {
 		return nil, errors.Wrap(err, "creating identity provider")
 	}
@@ -34,15 +36,16 @@ func (d *Datastore) SaveIdentityProvider(idp kolide.IdentityProvider) error {
 	query := `
     UPDATE identity_providers
     SET
-      sso_url = ?,
+      destination_url = ?,
       issuer_uri = ?,
       cert = ?,
       name = ?,
-      image_url = ?
+      image_url = ?,
+      metadata = ?
     WHERE id = ?
   `
-	result, err := d.db.Exec(query, idp.SingleSignOnURL, idp.IssuerURI, idp.Certificate,
-		idp.Name, idp.ImageURL, idp.ID)
+	result, err := d.db.Exec(query, idp.DestinationURL, idp.IssuerURI, idp.Certificate,
+		idp.Name, idp.ImageURL, idp.Metadata, idp.ID)
 	if err != nil {
 		return errors.Wrap(err, "updating identity provider")
 	}

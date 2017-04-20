@@ -14,25 +14,26 @@ func testIdentityProvider(t *testing.T, ds kolide.Datastore) {
 	}
 	idps := []*kolide.IdentityProvider{
 		&kolide.IdentityProvider{
-			SingleSignOnURL: "https://idp1.com/sso",
-			IssuerURI:       "http://idp1.com/issuer/xyz123",
-			Certificate:     "DEADBEEFXXXXX12344",
-			Name:            "idp1",
-			ImageURL:        "https://idp1.com/logo.png",
+			DestinationURL: "https://idp1.com/sso",
+			IssuerURI:      "http://idp1.com/issuer/xyz123",
+			Certificate:    "DEADBEEFXXXXX12344",
+			Name:           "idp1",
+			ImageURL:       "https://idp1.com/logo.png",
+			Metadata:       "something",
 		},
 		&kolide.IdentityProvider{
-			SingleSignOnURL: "https://idp2.com/sso",
-			IssuerURI:       "http://idp2.com/issuer/xyz123",
-			Certificate:     "DEADBEEFXXXXX12344",
-			Name:            "idp2",
-			ImageURL:        "https://idp2.com/logo.png",
+			DestinationURL: "https://idp2.com/sso",
+			IssuerURI:      "http://idp2.com/issuer/xyz123",
+			Certificate:    "DEADBEEFXXXXX12344",
+			Name:           "idp2",
+			ImageURL:       "https://idp2.com/logo.png",
 		},
 		&kolide.IdentityProvider{
-			SingleSignOnURL: "https://idp3.com/sso",
-			IssuerURI:       "http://idp3.com/issuer/xyz123",
-			Certificate:     "DEADBEEFXXXXX12344",
-			Name:            "idp3",
-			ImageURL:        "https://idp3.com/logo.png",
+			DestinationURL: "https://idp3.com/sso",
+			IssuerURI:      "http://idp3.com/issuer/xyz123",
+			Certificate:    "DEADBEEFXXXXX12344",
+			Name:           "idp3",
+			ImageURL:       "https://idp3.com/logo.png",
 		},
 	}
 	var err error
@@ -49,9 +50,10 @@ func testIdentityProvider(t *testing.T, ds kolide.Datastore) {
 	require.Nil(t, err)
 	require.NotNil(t, idp)
 	require.Equal(t, "idp1", idp.Name)
+	assert.Equal(t, "something", idp.Metadata)
 	// test update
 	idp.ImageURL = "https://idpnew.com/logo.png"
-	idp.SingleSignOnURL = "https://idpnew.com/sso"
+	idp.DestinationURL = "https://idpnew.com/sso"
 	idp.IssuerURI = "https://idpnew.com/issuer"
 	idp.Certificate = "123456789"
 	idp.Name = "idpnew"
@@ -61,7 +63,7 @@ func testIdentityProvider(t *testing.T, ds kolide.Datastore) {
 	require.Nil(t, err)
 	require.NotNil(t, upd)
 	assert.Equal(t, idp.ImageURL, upd.ImageURL)
-	assert.Equal(t, idp.SingleSignOnURL, upd.SingleSignOnURL)
+	assert.Equal(t, idp.DestinationURL, upd.DestinationURL)
 	assert.Equal(t, idp.IssuerURI, upd.IssuerURI)
 	assert.Equal(t, idp.Certificate, upd.Certificate)
 	assert.Equal(t, idp.Name, upd.Name)
