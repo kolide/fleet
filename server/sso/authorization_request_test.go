@@ -15,14 +15,4 @@ func TestRequestCompression(t *testing.T) {
 	compressed, err := deflate(buff)
 	require.Nil(t, err)
 	assert.Equal(t, expected, compressed)
-
-	// reader, err := inflate([]byte(compressed))
-	// require.Nil(t, err)
-	// var authReq AuthnRequest
-	// err = xml.NewDecoder(reader).Decode(&authReq)
-	// require.Nil(t, err)
-	// assert.Equal(t, "https://sp.example.com/acs", authReq.AssertionConsumerServiceURL)
-	// assert.Equal(t, "https://idp.example.com/sso", authReq.Destination)
-	// assert.Equal(t, "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST", authReq.ProtocolBinding)
-
 }

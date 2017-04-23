@@ -37,7 +37,7 @@ func TestSessionStore(t *testing.T) {
 	p := newPool(t)
 	require.NotNil(t, p)
 	defer p.Close()
-	store := NewSessionStorage(p)
+	store := NewSessionStore(p)
 	require.NotNil(t, store)
 	// make sure session expires, create session that 'lives'
 	// for a second
@@ -49,32 +49,49 @@ func TestSessionStore(t *testing.T) {
 	require.NotNil(t, err)
 	assert.Equal(t, ErrSessionNotFound, err)
 
-	err = store.CreateSession("handle2", "http://bar.com", 30)
+	err = store.CreateSession("ssohandle2", "http://bar.com", 1)
 	require.Nil(t, err)
-	sess, err := store.GetSession("handle2")
+	sess, err := store.GetSession("ssohandle2")
 	require.Nil(t, err)
 	require.NotNil(t, sess)
 	assert.Equal(t, "http://bar.com", sess.OriginalURL)
-	sess.UserName = "user@xxx.com"
-	sess.OriginalURL = "http://new.com"
-	err = store.UpdateSession("handle2", sess, 10)
+	sess, err = store.UpdateSession("ssohandle2", "user@xxx.com")
 	require.Nil(t, err)
-	getSess, err := store.GetSession("handle2")
+	assert.Equal(t, "http://bar.com", sess.OriginalURL)
+	sess, err = store.GetSession("ssohandle2")
 	require.Nil(t, err)
-	require.NotNil(t, getSess)
+	assert.Equal(t, "user@xxx.com", sess.UserName)
 
-	assert.Equal(t, "user@xxx.com", getSess.UserName)
-	assert.Equal(t, "http://new.com", getSess.OriginalURL)
-
-	err = store.ExpireSession("handle2")
+	err = store.ExpireSession("ssohandle2")
 	require.Nil(t, err)
-	_, err = store.GetSession("handle2")
+	_, err = store.GetSession("ssohandle2")
 	require.NotNil(t, err)
 	assert.Equal(t, ErrSessionNotFound, err)
 
-	err = store.CreateSession("dup", "", 5)
+	err = store.CreateSession("ssohandle3", "", 5)
 	require.Nil(t, err)
-	err = store.CreateSession("dup", "", 5)
+	err = store.CreateSession("ssohandle3", "", 5)
 	require.NotNil(t, err)
-	assert.Equal(t, "session key 'dup' is already in use", err.Error())
+	assert.Equal(t, "session key 'ssohandle3' is already in use", err.Error())
+
+	err = store.CreateSession("short", "http://foo.com", 2)
+	require.Equal(t, "session handle must be 8 or more characters in length", err.Error())
+}
+
+func TestEncrypt(t *testing.T) {
+	if _, ok := os.LookupEnv("REDIS_TEST"); !ok {
+		t.Skip("skipping sso session store tests")
+	}
+	pool := newPool(t)
+	defer pool.Close()
+	st := &store{pool: pool}
+	key := CreateAESKey()
+	ssoHandle := "thistest"
+	relayState, err := st.EncryptSSOHandle(ssoHandle, key, 2)
+	require.Nil(t, err)
+	assert.NotEqual(t, ssoHandle, relayState)
+
+	ssoHandle2, err := st.DescryptSSOHandle(relayState, key)
+	require.Nil(t, err)
+	assert.Equal(t, ssoHandle, ssoHandle2)
 }

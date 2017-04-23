@@ -2,13 +2,11 @@ package sso
 
 import (
 	"bytes"
-	"compress/flate"
 	"compress/zlib"
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/xml"
 	"fmt"
-	"io"
 	"strings"
 	"time"
 
@@ -30,6 +28,9 @@ type opts struct {
 	relayState string
 }
 
+// CreateAuthorizationRequest creates a url suitable for use to satisfy the SAML
+// redirect binding.
+// See http://docs.oasis-open.org/security/saml/v2.0/saml-bindings-2.0-os.pdf Section 3.4
 func CreateAuthorizationRequest(settings *Settings, options ...func(o *opts)) (string, error) {
 	var optionalParams opts
 	for _, opt := range options {
@@ -79,7 +80,7 @@ func CreateAuthorizationRequest(settings *Settings, options ...func(o *opts)) (s
 	}
 	queryVals["SAMLRequest"] = authQueryVal
 	if optionalParams.relayState != "" {
-		queryVals["RelayState"] = urlEncode(optionalParams.relayState)
+		queryVals["RelayState"] = optionalParams.relayState
 	}
 	if settings.Metadata.IDPSSODescriptor.WantAuthnRequestsSigned {
 		signature, err := sign(settings, authQueryVal)
@@ -136,6 +137,7 @@ func deflate(xmlBuffer *bytes.Buffer) (string, error) {
 	// of the byte stream and the 32 bit checksum at the end. This is to
 	// retain compatibility with PKZIP and GZIP
 	// See https://tools.ietf.org/html/rfc1950
+	// If you change this, the Auth won't work and you'll be sad.
 	encbuff = encbuff[2 : len(encbuff)-4]
 	encoded := base64.StdEncoding.EncodeToString(encbuff)
 	// replace any whitespace, and URL encode base 64 output
@@ -146,25 +148,6 @@ func deflate(xmlBuffer *bytes.Buffer) (string, error) {
 func urlEncode(val string) string {
 	// replace any whitespace, and URL encode base 64 output
 	return strings.NewReplacer("\n", "", "+", "%2B", "/", "%2F", "=", "%3D").Replace(val)
-}
-
-func inflate(deflated []byte) (io.Reader, error) {
-	dstBuffer := make([]byte, len(deflated))
-	_, err := base64.StdEncoding.Decode(dstBuffer, deflated)
-	if err != nil {
-		return nil, errors.Wrap(err, "base 64 decoding in inflate")
-	}
-	reader := flate.NewReader(bytes.NewReader(dstBuffer))
-	if err != nil {
-		return nil, errors.Wrap(err, "setting up decompression")
-	}
-	defer reader.Close()
-	var outBuff bytes.Buffer
-	_, err = io.Copy(&outBuff, reader)
-	if err != nil {
-		return nil, errors.Wrap(err, "decompressing buffer")
-	}
-	return &outBuff, nil
 }
 
 // UUID per RFC 4122

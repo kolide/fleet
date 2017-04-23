@@ -112,6 +112,8 @@ type AppConfig struct {
 	SMTPVerifySSLCerts bool `db:"smtp_verify_ssl_certs"`
 	// SMTPEnableStartTLS detects of TLS is enabled on mail server and starts to use it (default true)
 	SMTPEnableStartTLS bool `db:"smtp_enable_start_tls"`
+	// AESKey for encryption
+	AESKey []byte `db:"aes_key"`
 }
 
 // ModifyAppConfigRequest contains application configuration information

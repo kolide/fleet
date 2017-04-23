@@ -138,7 +138,7 @@ the way that the kolide server works.
 			var resultStore kolide.QueryResultStore
 			redisPool := pubsub.NewRedisPool(config.Redis.Address, config.Redis.Password)
 			resultStore = pubsub.NewRedisQueryResults(redisPool)
-			ssoSessionStore := sso.NewSessionStorage(redisPool)
+			ssoSessionStore := sso.NewSessionStore(redisPool)
 
 			svc, err := service.NewService(ds, resultStore, logger, config, mailService, clock.C, licenseService, ssoSessionStore)
 			if err != nil {
@@ -208,11 +208,17 @@ the way that the kolide server works.
 			r.Handle("/api/", apiHandler)
 			r.Handle("/", frontendHandler)
 			if path, ok := os.LookupEnv("KOLIDE_TEST_PAGE_PATH"); ok {
-				testPage, err := ioutil.ReadFile(path)
+				// test that we can load this
+				_, err := ioutil.ReadFile(path)
 				if err != nil {
 					initFatal(err, "loading KOLIDE_TEST_PATH_PATH")
 				}
 				r.HandleFunc("/test", func(rw http.ResponseWriter, req *http.Request) {
+					testPage, err := ioutil.ReadFile(path)
+					if err != nil {
+						rw.WriteHeader(http.StatusNotFound)
+						return
+					}
 					rw.Write(testPage)
 					rw.WriteHeader(http.StatusOK)
 				})

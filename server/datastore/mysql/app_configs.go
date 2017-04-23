@@ -45,9 +45,10 @@ func (d *Datastore) SaveAppConfig(info *kolide.AppConfig) error {
 			smtp_user_name,
 			smtp_password,
 			smtp_verify_ssl_certs,
-			smtp_enable_start_tls
+			smtp_enable_start_tls,
+      aes_key
 		)
-		VALUES( 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
+		VALUES( 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
 		ON DUPLICATE KEY UPDATE
 			org_name = VALUES(org_name),
 			org_logo_url = VALUES(org_logo_url),
@@ -64,7 +65,8 @@ func (d *Datastore) SaveAppConfig(info *kolide.AppConfig) error {
 			smtp_user_name = VALUES(smtp_user_name),
 			smtp_password = VALUES(smtp_password),
 			smtp_verify_ssl_certs = VALUES(smtp_verify_ssl_certs),
-			smtp_enable_start_tls = VALUES(smtp_enable_start_tls)
+			smtp_enable_start_tls = VALUES(smtp_enable_start_tls),
+      aes_key = VALUES(aes_key)
 	`
 
 	_, err := d.db.Exec(insertStatement,
@@ -84,6 +86,7 @@ func (d *Datastore) SaveAppConfig(info *kolide.AppConfig) error {
 		info.SMTPPassword,
 		info.SMTPVerifySSLCerts,
 		info.SMTPEnableStartTLS,
+		info.AESKey,
 	)
 
 	return err

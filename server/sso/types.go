@@ -2,6 +2,9 @@ package sso
 
 import "encoding/xml"
 
+// AuthnRequest contains information needed to request authorization from
+// an IDP
+// See http://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf Section 3.4.1
 type AuthnRequest struct {
 	XMLName                     xml.Name
 	SAMLP                       string                 `xml:"xmlns:samlp,attr"`
@@ -18,6 +21,29 @@ type AuthnRequest struct {
 	RequestedAuthnContext       *RequestedAuthnContext `xml:"RequestedAuthnContext,omitempty"`
 	Signature                   *Signature             `xml:"Signature,omitempty"`
 	originalString              string
+}
+
+// Response is submitted to the service provider (Kolide) from the IDP via a callback.
+// It will contain information about a authenticated user that can in turn
+// be used to generate a session token.
+// See http://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf Section 3.3.3.
+type Response struct {
+	XMLName      xml.Name
+	SAMLP        string `xml:"xmlns:samlp,attr"`
+	SAML         string `xml:"xmlns:saml,attr"`
+	SAMLSIG      string `xml:"xmlns:samlsig,attr"`
+	Destination  string `xml:"Destination,attr"`
+	ID           string `xml:"ID,attr"`
+	Version      string `xml:"Version,attr"`
+	IssueInstant string `xml:"IssueInstant,attr"`
+	InResponseTo string `xml:"InResponseTo,attr"`
+
+	Assertion Assertion `xml:"Assertion"`
+	Signature Signature `xml:"Signature"`
+	Issuer    Issuer    `xml:"Issuer"`
+	Status    Status    `xml:"Status"`
+
+	originalString string
 }
 
 type Issuer struct {
@@ -171,25 +197,6 @@ type AssertionConsumerService struct {
 	Binding  string `xml:"Binding,attr"`
 	Location string `xml:"Location,attr"`
 	Index    string `xml:"index,attr"`
-}
-
-type Response struct {
-	XMLName      xml.Name
-	SAMLP        string `xml:"xmlns:samlp,attr"`
-	SAML         string `xml:"xmlns:saml,attr"`
-	SAMLSIG      string `xml:"xmlns:samlsig,attr"`
-	Destination  string `xml:"Destination,attr"`
-	ID           string `xml:"ID,attr"`
-	Version      string `xml:"Version,attr"`
-	IssueInstant string `xml:"IssueInstant,attr"`
-	InResponseTo string `xml:"InResponseTo,attr"`
-
-	Assertion Assertion `xml:"Assertion"`
-	Signature Signature `xml:"Signature"`
-	Issuer    Issuer    `xml:"Issuer"`
-	Status    Status    `xml:"Status"`
-
-	originalString string
 }
 
 type Assertion struct {

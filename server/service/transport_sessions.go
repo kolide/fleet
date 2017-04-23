@@ -8,7 +8,6 @@ import (
 
 	"github.com/kolide/kolide/server/sso"
 	"github.com/pkg/errors"
-	"github.com/y0ssar1an/q"
 )
 
 func decodeGetInfoAboutSessionRequest(ctx context.Context, r *http.Request) (interface{}, error) {
@@ -55,7 +54,6 @@ func decodeLoginRequest(ctx context.Context, r *http.Request) (interface{}, erro
 func decodeInitiateSSORequest(ctx context.Context, r *http.Request) (interface{}, error) {
 	var req initiateSSORequest
 	err := json.NewDecoder(r.Body).Decode(&req)
-	q.Q("decode", err, req)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +61,12 @@ func decodeInitiateSSORequest(ctx context.Context, r *http.Request) (interface{}
 }
 
 func decodeLoginSSORequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	return nil, nil
+	var req loginSSORequest
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
 }
 
 func decodeCallbackSSORequest(ctx context.Context, r *http.Request) (interface{}, error) {

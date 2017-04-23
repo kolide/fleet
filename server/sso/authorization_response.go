@@ -34,6 +34,7 @@ func (r *resp) UserID() (string, bool) {
 	return r.userID, true
 }
 
+// DecodeAuthResponse extracts SAML assertions from IDP response
 func DecodeAuthResponse(body io.Reader) (AuthInfo, error) {
 	var dest bytes.Buffer
 	_, err := io.Copy(&dest, body)
@@ -58,7 +59,7 @@ func DecodeAuthResponse(body io.Reader) (AuthInfo, error) {
 	if _, ok := params["RelayState"]; !ok {
 		return nil, errors.New("missing required RelayState")
 	}
-	response.relayState, err = url.PathUnescape(string(params["RelayState"]))
+	response.relayState = string(params["RelayState"])
 	// SAMLResponse is required
 	if _, ok := params["SAMLResponse"]; !ok {
 		return nil, errors.New("missing required SAMLResponse parameter")

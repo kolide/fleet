@@ -7,7 +7,6 @@ import (
 	"github.com/go-kit/kit/endpoint"
 	"github.com/kolide/kolide/server/kolide"
 	"github.com/kolide/kolide/server/sso"
-	"github.com/y0ssar1an/q"
 )
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -190,7 +189,6 @@ func (r initiateSSOResponse) error() error { return r.Err }
 
 func makeInitiateSSOEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		q.Q("endpoint")
 		req := request.(initiateSSORequest)
 		idProviderURL, err := svc.InitiateSSO(ctx, req.IdentityProviderID, req.RelayURL, req.Token)
 		if err != nil {
@@ -200,9 +198,18 @@ func makeInitiateSSOEndpoint(svc kolide.Service) endpoint.Endpoint {
 	}
 }
 
+type loginSSORequest struct {
+	Token string `json:"token"`
+}
+
 func makeLoginSSOEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		return nil, nil
+		req := request.(loginSSORequest)
+		user, token, err := svc.LoginSSO(ctx, req.Token)
+		if err != nil {
+			return loginResponse{Err: err}, nil
+		}
+		return loginResponse{User: user, Token: token}, nil
 	}
 }
 
