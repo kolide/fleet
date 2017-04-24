@@ -65,5 +65,5 @@ type IdentityProviderService interface {
 	// DeleteIdentityProvider removes an IdentityProvider
 	DeleteIdentityProvider(ctx context.Context, id uint) error
 	// ListIdentityProviders returns a list of all IdentityProvider entities
-	ListIdentityProviders(ctx context.Context, id uint) ([]IdentityProvider, error)
+	ListIdentityProviders(ctx context.Context) ([]IdentityProvider, error)
 }

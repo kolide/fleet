@@ -29,9 +29,18 @@ func makeGetIdentityProviderEndpoint(svc kolide.Service) endpoint.Endpoint {
 	}
 }
 
+type listIdentityProviderResponse struct {
+	IdentityProviders []kolide.IdentityProvider `json:"identity_providers,omitempty"`
+	Err               error                     `json:"error,omitempty"`
+}
+
 func makeListIdentityProvidersEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		return nil, nil
+		idps, err := svc.ListIdentityProviders(ctx)
+		if err != nil {
+			return listIdentityProviderResponse{Err: err}, nil
+		}
+		return listIdentityProviderResponse{IdentityProviders: idps}, nil
 	}
 }
 
@@ -57,14 +66,43 @@ func makeNewIdentityProviderEndpoint(svc kolide.Service) endpoint.Endpoint {
 	}
 }
 
+type modifyIdentityProviderRequest struct {
+	id      uint
+	Payload *kolide.IdentityProviderPayload `json:"payload"`
+}
+
+type modifyIdentityProviderResponse struct {
+	IdentityProvider *kolide.IdentityProvider `json:"identity_provider,omitempty"`
+	Err              error                    `json:"error,omitempty"`
+}
+
+func (r modifyIdentityProviderResponse) error() error { return r.Err }
+
 func makeModifyIdentityProviderEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		return nil, nil
+		req := request.(modifyIdentityProviderRequest)
+		idp, err := svc.ModifyIdentityProvider(ctx, req.id, *req.Payload)
+		if err != nil {
+			return modifyIdentityProviderResponse{Err: err}, nil
+		}
+		return modifyIdentityProviderResponse{IdentityProvider: idp}, nil
 	}
 }
 
+type deleteIdentityProviderRequest struct {
+	id uint
+}
+
+type deleteIdentityProviderResponse struct {
+	Err error `json:"error"`
+}
+
+func (r deleteIdentityProviderResponse) error() error { return r.Err }
+
 func makeDeleteIdentityProviderEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		return nil, nil
+		req := request.(deleteIdentityProviderRequest)
+		err := svc.DeleteIdentityProvider(ctx, req.id)
+		return deleteIdentityProviderResponse{Err: err}, nil
 	}
 }

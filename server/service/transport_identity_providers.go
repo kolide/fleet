@@ -16,8 +16,17 @@ func decodeNewIdentityProviderRequest(ctx context.Context, r *http.Request) (int
 }
 
 func decodeModifyIdentityProviderRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-
-	return nil, nil
+	id, err := idFromRequest(r, "id")
+	if err != nil {
+		return nil, err
+	}
+	var req modifyIdentityProviderRequest
+	err = json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		return nil, err
+	}
+	req.id = id
+	return req, nil
 }
 
 func decodeGetIdentityProviderRequest(ctx context.Context, r *http.Request) (interface{}, error) {
@@ -29,5 +38,9 @@ func decodeGetIdentityProviderRequest(ctx context.Context, r *http.Request) (int
 }
 
 func decodeDeleteIdentityProviderRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	return nil, nil
+	id, err := idFromRequest(r, "id")
+	if err != nil {
+		return nil, err
+	}
+	return deleteIdentityProviderRequest{id}, nil
 }
