@@ -1,3 +1,5 @@
+* Adding pagination to Manage Hosts view
+
 * Kolide server now requires `--auth_jwt_key` to be specified at startup.
 
   If no JWT key is provided by the user, the server will print a new suggested random JWT key for use.
