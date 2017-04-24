@@ -91,7 +91,7 @@ func TestEncrypt(t *testing.T) {
 	require.Nil(t, err)
 	assert.NotEqual(t, ssoHandle, relayState)
 
-	ssoHandle2, err := st.DescryptSSOHandle(relayState, key)
+	ssoHandle2, err := st.DecryptSSOHandle(relayState, key)
 	require.Nil(t, err)
 	assert.Equal(t, ssoHandle, ssoHandle2)
 }
