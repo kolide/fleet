@@ -64,6 +64,20 @@ func (mw metricsMiddleware) ListIdentityProviders(ctx context.Context) ([]kolide
 	return idps, err
 }
 
+func (mw metricsMiddleware) ListIdentityProvidersNoAuth(ctx context.Context) ([]kolide.IdentityProviderNoAuth, error) {
+	var (
+		idps []kolide.IdentityProviderNoAuth
+		err  error
+	)
+	defer func(begin time.Time) {
+		lvs := []string{"method", "ListIdentityProvidersNoAuth", "error", fmt.Sprint(err != nil)}
+		mw.requestCount.With(lvs...).Add(1)
+		mw.requestLatency.With(lvs...).Observe(time.Since(begin).Seconds())
+	}(time.Now())
+	idps, err = mw.Service.ListIdentityProvidersNoAuth(ctx)
+	return idps, err
+}
+
 func (mw metricsMiddleware) DeleteIdentityProvider(ctx context.Context, id uint) error {
 	var (
 		err error

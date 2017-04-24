@@ -86,3 +86,19 @@ func (mw loggingMiddleware) ListIdentityProviders(ctx context.Context) ([]kolide
 	idps, err = mw.Service.ListIdentityProviders(ctx)
 	return idps, err
 }
+
+func (mw loggingMiddleware) ListIdentityProvidersNoAuth(ctx context.Context) ([]kolide.IdentityProviderNoAuth, error) {
+	var (
+		idps []kolide.IdentityProviderNoAuth
+		err  error
+	)
+	defer func(begin time.Time) {
+		mw.logger.Log(
+			"method", "ListIdentityProvidersNoAuth",
+			"err", err,
+			"took", time.Since(begin),
+		)
+	}(time.Now())
+	idps, err = mw.Service.ListIdentityProvidersNoAuth(ctx)
+	return idps, err
+}

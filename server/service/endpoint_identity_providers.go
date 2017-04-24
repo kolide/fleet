@@ -34,6 +34,8 @@ type listIdentityProviderResponse struct {
 	Err               error                     `json:"error,omitempty"`
 }
 
+func (r listIdentityProviderResponse) error() error { return r.Err }
+
 func makeListIdentityProvidersEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		idps, err := svc.ListIdentityProviders(ctx)
@@ -41,6 +43,23 @@ func makeListIdentityProvidersEndpoint(svc kolide.Service) endpoint.Endpoint {
 			return listIdentityProviderResponse{Err: err}, nil
 		}
 		return listIdentityProviderResponse{IdentityProviders: idps}, nil
+	}
+}
+
+type listIdentityProvidersNoAuthResponse struct {
+	IdentityProvidersNoAuth []kolide.IdentityProviderNoAuth `json:"identity_providers,omitempty"`
+	Err                     error                           `json:"error,omitempty"`
+}
+
+func (r listIdentityProvidersNoAuthResponse) error() error { return r.Err }
+
+func makeListIdentityProvidersNoAuthEndpoint(svc kolide.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		idps, err := svc.ListIdentityProvidersNoAuth(ctx)
+		if err != nil {
+			return listIdentityProvidersNoAuthResponse{Err: err}, nil
+		}
+		return listIdentityProvidersNoAuthResponse{IdentityProvidersNoAuth: idps}, nil
 	}
 }
 

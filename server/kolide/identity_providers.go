@@ -15,6 +15,9 @@ type IdentityProviderStore interface {
 	DeleteIdentityProvider(id uint) error
 	// ListIdentityProviders returns all IdentityProvider entities
 	ListIdentityProviders() ([]IdentityProvider, error)
+	// ListIdentityProvidersNoAuth returns IDP information with sensitive information
+	// omitted.
+	ListIdentityProvidersNoAuth() ([]IdentityProviderNoAuth, error)
 }
 
 // IdentityProvider represents a SAML identity provider.
@@ -53,6 +56,17 @@ type IdentityProviderPayload struct {
 	Metadata       *string `json:"metadata"`
 }
 
+// IdentityProviderNoAuth used to display SSO information for unauthorized users.
+type IdentityProviderNoAuth struct {
+	ID uint `json:"id"`
+	// Name is the descriptive name for the identity provider that will
+	// be displayed in the UI.
+	Name string `json:"name"`
+	// ImageURL is a link to an icon that will be displayed on the SSO
+	// button for a particular identity provider.
+	ImageURL string `json:"image_url" db:"image_url"`
+}
+
 // IdentityProviderService exposes methods to manage IdentityProvider entities
 type IdentityProviderService interface {
 	// NewIdentityProvider creates a IdentityProvider
@@ -66,4 +80,7 @@ type IdentityProviderService interface {
 	DeleteIdentityProvider(ctx context.Context, id uint) error
 	// ListIdentityProviders returns a list of all IdentityProvider entities
 	ListIdentityProviders(ctx context.Context) ([]IdentityProvider, error)
+	// ListIdentityProvidersNoAuth returns a list of identity providers with sensitive
+	// security info removed so it can be used with unauthorized users.
+	ListIdentityProvidersNoAuth(ctx context.Context) ([]IdentityProviderNoAuth, error)
 }

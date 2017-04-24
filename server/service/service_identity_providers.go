@@ -49,6 +49,10 @@ func (svc service) ListIdentityProviders(ctx context.Context) ([]kolide.Identity
 	return svc.ds.ListIdentityProviders()
 }
 
+func (svc service) ListIdentityProvidersNoAuth(ctx context.Context) ([]kolide.IdentityProviderNoAuth, error) {
+	return svc.ds.ListIdentityProvidersNoAuth()
+}
+
 func (svc service) NewIdentityProvider(ctx context.Context, payload kolide.IdentityProviderPayload) (*kolide.IdentityProvider, error) {
 	var idp kolide.IdentityProvider
 	if payload.Name != nil {

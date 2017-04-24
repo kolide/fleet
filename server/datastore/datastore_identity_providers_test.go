@@ -79,5 +79,8 @@ func testIdentityProvider(t *testing.T, ds kolide.Datastore) {
 	assert.NotNil(t, err)
 	results, err = ds.ListIdentityProviders()
 	require.Nil(t, err)
-	assert.NotNil(t, results, 2)
+	assert.Len(t, results, 2)
+	resultsnoauth, err := ds.ListIdentityProvidersNoAuth()
+	require.Nil(t, err)
+	assert.Len(t, resultsnoauth, 2)
 }

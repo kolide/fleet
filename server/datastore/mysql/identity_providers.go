@@ -92,3 +92,16 @@ func (d *Datastore) ListIdentityProviders() ([]kolide.IdentityProvider, error) {
 	}
 	return idps, nil
 }
+
+func (d *Datastore) ListIdentityProvidersNoAuth() ([]kolide.IdentityProviderNoAuth, error) {
+	query := `
+    SELECT id, name, image_url
+    FROM identity_providers
+    WHERE NOT deleted
+  `
+	var idps []kolide.IdentityProviderNoAuth
+	if err := d.db.Select(&idps, query); err != nil {
+		return nil, errors.Wrap(err, "listing no auth identity providers")
+	}
+	return idps, nil
+}
