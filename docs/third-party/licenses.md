@@ -730,6 +730,7 @@ Third-Party Licenses
 | [process-nextick-args](https://www.npmjs.com/package/process-nextick-args) | [MIT](https://opensource.org/licenses/MIT) |
 | [progress](https://www.npmjs.com/package/progress) | [MIT](https://opensource.org/licenses/MIT) |
 | [promise](https://www.npmjs.com/package/promise) | [MIT](https://opensource.org/licenses/MIT) |
+| [prop-types](https://www.npmjs.com/package/prop-types) | [BSD-3-Clause](https://opensource.org/licenses/BSD-3-Clause) |
 | [propagate](https://www.npmjs.com/package/propagate) | [MIT](https://opensource.org/licenses/MIT) |
 | [proxy-addr](https://www.npmjs.com/package/proxy-addr) | [MIT](https://opensource.org/licenses/MIT) |
 | [proxy-middleware](https://www.npmjs.com/package/proxy-middleware) | [MIT](https://opensource.org/licenses/MIT) |
@@ -749,6 +750,7 @@ Third-Party Licenses
 | [range-parser](https://www.npmjs.com/package/range-parser) | [MIT](https://opensource.org/licenses/MIT) |
 | [raw-loader](https://www.npmjs.com/package/raw-loader) | [MIT](https://opensource.org/licenses/MIT) |
 | [rc](https://www.npmjs.com/package/rc) | [MIT](https://opensource.org/licenses/MIT) |
+| [rc-pagination](https://www.npmjs.com/package/rc-pagination) | [MIT](https://opensource.org/licenses/MIT) |
 | [react](https://www.npmjs.com/package/react) | [BSD-3-Clause](https://opensource.org/licenses/BSD-3-Clause) |
 | [react-ace](https://www.npmjs.com/package/react-ace) | [MIT](https://opensource.org/licenses/MIT) |
 | [react-addons-css-transition-group](https://www.npmjs.com/package/react-addons-css-transition-group) | [BSD-3-Clause](https://opensource.org/licenses/BSD-3-Clause) |
