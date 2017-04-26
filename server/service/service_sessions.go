@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/base64"
+	"net/url"
 	"strings"
 	"time"
 
@@ -21,13 +22,10 @@ func (svc service) InitiateSSO(ctx context.Context, idpID uint, relayURL, ssoHan
 	if err != nil {
 		return "", err
 	}
-	// Get information about how to talk to the idp.
-	if isProvider.Metadata == "" {
-		return "", errors.New("InitiateSSO missing metadata")
-	}
-	metadata, err := sso.ParseMetadata(isProvider.Metadata)
+	metadata, err := getMetadata(isProvider)
+
 	if err != nil {
-		return "", errors.Wrap(err, "InitiateSSO parsing metadata")
+		return "", errors.Wrap(err, "InitiateSSO getting metadata")
 	}
 	appConfig, err := svc.ds.AppConfig()
 	if err != nil {
@@ -43,7 +41,18 @@ func (svc service) InitiateSSO(ctx context.Context, idpID uint, relayURL, ssoHan
 	if err != nil {
 		return "", errors.Wrap(err, "encrypting sso session handle")
 	}
-	idpURL, err := sso.CreateAuthorizationRequest(&settings, sso.RelayState(encryptedSSOHandle))
+	// If issuer is not explicitly set, default to host name.
+	var issuer string
+	if isProvider.IssuerURI == "" {
+		u, err := url.Parse(appConfig.KolideServerURL)
+		if err != nil {
+			return "", errors.Wrap(err, "parsing kolide server url")
+		}
+		issuer = u.Hostname()
+	} else {
+		issuer = isProvider.IssuerURI
+	}
+	idpURL, err := sso.CreateAuthorizationRequest(&settings, issuer, sso.RelayState(encryptedSSOHandle))
 	if err != nil {
 		return "", errors.Wrap(err, "InitiateSSO creating authorization")
 	}
@@ -57,18 +66,48 @@ func (svc service) InitiateSSO(ctx context.Context, idpID uint, relayURL, ssoHan
 	return idpURL, nil
 }
 
-func (svc service) CallbackSSO(ctx context.Context, encryptedSSOHandle, userID string) (string, error) {
+func getMetadata(idp *kolide.IdentityProvider) (*sso.IDPMetadata, error) {
+	if idp.MetadataURL != "" {
+		metadata, err := sso.GetMetadata(idp.MetadataURL, 5*time.Second)
+		if err != nil {
+			return nil, err
+		}
+		return metadata, nil
+	}
+	if idp.Metadata != "" {
+		metadata, err := sso.ParseMetadata(idp.Metadata)
+		if err != nil {
+			return nil, err
+		}
+		return metadata, nil
+	}
+	return nil, errors.Errorf("missing metadata for idp %s", idp.Name)
+}
+
+func (svc service) CallbackSSO(ctx context.Context, auth kolide.Auth) (string, error) {
 	appConfig, err := svc.ds.AppConfig()
 	if err != nil {
 		return "", errors.Wrap(err, "sso authentication callback")
 	}
-	ssoHandle, err := svc.ssoSessionStore.DecryptSSOHandle(encryptedSSOHandle, appConfig.AESKey)
+	status, err := auth.Status()
+	if err != nil {
+		return "", errors.Wrap(err, "fetching sso response status")
+	}
+	if status != sso.Success {
+		svc.logger.Log(
+			"method", "CallbackSSO",
+			"err", auth.StatusDescription(),
+		)
+		// TODO: Create custom 401 page
+		return appConfig.KolideServerURL + "/404", nil
+	}
+	ssoHandle, err := svc.ssoSessionStore.DecryptSSOHandle(auth.RelayState(), appConfig.AESKey)
 	if err != nil {
 		return "", errors.Wrap(err, "deciphering sso handle")
 	}
 	// Setting user id that we get from the IDP indicates we have successfully
 	// authenticated.
-	sess, err := svc.ssoSessionStore.UpdateSession(ssoHandle, userID)
+	sess, err := svc.ssoSessionStore.UpdateSession(ssoHandle, auth.UserID())
 	// Because we're being called from an external IDP (via the browser) as opposed to returning json from
 	// an api call, the only thing that probably could go wrong is that the session expired
 	// because the user sat with the login page too long.  In this case, we'll reload

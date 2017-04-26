@@ -15,12 +15,13 @@ func (d *Datastore) NewIdentityProvider(idp kolide.IdentityProvider) (*kolide.Id
       cert,
       name,
       image_url,
-      metadata
+      metadata,
+      metadata_url
     )
-    VALUES ( ?, ?, ?, ?, ?, ? )
+    VALUES ( ?, ?, ?, ?, ?, ?, ? )
   `
 	result, err := d.db.Exec(query, idp.DestinationURL, idp.IssuerURI, idp.Certificate,
-		idp.Name, idp.ImageURL, idp.Metadata)
+		idp.Name, idp.ImageURL, idp.Metadata, idp.MetadataURL)
 	if err != nil {
 		return nil, errors.Wrap(err, "creating identity provider")
 	}
@@ -41,11 +42,12 @@ func (d *Datastore) SaveIdentityProvider(idp kolide.IdentityProvider) error {
       cert = ?,
       name = ?,
       image_url = ?,
-      metadata = ?
+      metadata = ?,
+      metadata_url = ?
     WHERE id = ?
   `
 	result, err := d.db.Exec(query, idp.DestinationURL, idp.IssuerURI, idp.Certificate,
-		idp.Name, idp.ImageURL, idp.Metadata, idp.ID)
+		idp.Name, idp.ImageURL, idp.Metadata, idp.MetadataURL, idp.ID)
 	if err != nil {
 		return errors.Wrap(err, "updating identity provider")
 	}

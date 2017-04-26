@@ -5,44 +5,108 @@ import (
 	"encoding/base64"
 	"encoding/xml"
 	"io"
+	"io/ioutil"
 	"net/url"
 
 	"github.com/pkg/errors"
 )
 
+const (
+	// These are response status codes described in the core SAML spec section
+	// 3.2.2.1 See http://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf
+	Success int = iota
+	Requestor
+	Responder
+	VersionMismatch
+	AuthnFailed
+	InvalidAttrNameOrValue
+	InvalidNameIDPolicy
+	NoAuthnContext
+	NoAvailableIDP
+	NoPassive
+	NoSupportedIDP
+	PartialLogout
+	ProxyCountExceeded
+	RequestDenied
+	RequestUnsupported
+	RequestVersionDeprecated
+	RequestVersionTooHigh
+	RequestVersionTooLow
+	ResourceNotRecognized
+	TooManyResponses
+	UnknownAttrProfile
+	UnknownPrincipal
+	UnsupportedBinding
+)
+
+var statusMap = map[string]int{
+	"urn:oasis:names:tc:SAML:2.0:status:Success":                  Success,
+	"urn:oasis:names:tc:SAML:2.0:status:Requester":                Requestor,
+	"urn:oasis:names:tc:SAML:2.0:status:Responder":                Responder,
+	"urn:oasis:names:tc:SAML:2.0:status:VersionMismatch":          VersionMismatch,
+	"urn:oasis:names:tc:SAML:2.0:status:AuthnFailed":              AuthnFailed,
+	"urn:oasis:names:tc:SAML:2.0:status:InvalidAttrNameOrValue":   InvalidAttrNameOrValue,
+	"urn:oasis:names:tc:SAML:2.0:status:InvalidNameIDPolicy":      InvalidNameIDPolicy,
+	"urn:oasis:names:tc:SAML:2.0:status:NoAuthnContext":           NoAuthnContext,
+	"urn:oasis:names:tc:SAML:2.0:status:NoAvailableIDP":           NoAvailableIDP,
+	"urn:oasis:names:tc:SAML:2.0:status:NoPassive":                NoPassive,
+	"urn:oasis:names:tc:SAML:2.0:status:NoSupportedIDP":           NoSupportedIDP,
+	"urn:oasis:names:tc:SAML:2.0:status:PartialLogout":            PartialLogout,
+	"urn:oasis:names:tc:SAML:2.0:status:ProxyCountExceeded":       ProxyCountExceeded,
+	"urn:oasis:names:tc:SAML:2.0:status:RequestDenied":            RequestDenied,
+	"urn:oasis:names:tc:SAML:2.0:status:RequestUnsupported":       RequestUnsupported,
+	"urn:oasis:names:tc:SAML:2.0:status:RequestVersionDeprecated": RequestVersionDeprecated,
+	"urn:oasis:names:tc:SAML:2.0:status:RequestVersionTooLow":     RequestVersionTooLow,
+	"urn:oasis:names:tc:SAML:2.0:status:ResourceNotRecognized":    ResourceNotRecognized,
+	"urn:oasis:names:tc:SAML:2.0:status:TooManyResponses":         TooManyResponses,
+	"urn:oasis:names:tc:SAML:2.0:status:UnknownAttrProfile":       UnknownAttrProfile,
+	"urn:oasis:names:tc:SAML:2.0:status:UnknownPrincipal":         UnknownPrincipal,
+	"urn:oasis:names:tc:SAML:2.0:status:UnsupportedBinding":       UnsupportedBinding,
+}
+
 type AuthInfo interface {
-	RelayState() (string, bool)
-	UserID() (string, bool)
+	RelayState() string
+	UserID() string
+	Status() (int, error)
+	StatusDescription() string
 }
 
 type resp struct {
 	relayState string
 	userID     string
+	status     string
 }
 
-func (r *resp) RelayState() (string, bool) {
-	if r.relayState == "" {
-		return "", false
-	}
-	return r.relayState, true
+func (r resp) StatusDescription() string {
+	return r.status
 }
 
-func (r *resp) UserID() (string, bool) {
-	if r.userID == "" {
-		return "", false
+func (r resp) RelayState() string {
+	return r.relayState
+}
+
+func (r resp) UserID() string {
+	return r.userID
+}
+
+func (r resp) Status() (int, error) {
+	if r.status == "" {
+		return AuthnFailed, errors.New("no status present")
 	}
-	return r.userID, true
+	if s, ok := statusMap[r.status]; ok {
+		return s, nil
+	}
+	return AuthnFailed, errors.Errorf("unhandled status %s", r.status)
 }
 
 // DecodeAuthResponse extracts SAML assertions from IDP response
 func DecodeAuthResponse(body io.Reader) (AuthInfo, error) {
-	var dest bytes.Buffer
-	_, err := io.Copy(&dest, body)
+	buffer, err := ioutil.ReadAll(body)
 	if err != nil {
-		return nil, errors.Wrap(err, "malformed auth response")
+		return nil, errors.Wrap(err, "unable to read auth response")
 	}
 	// parse form name/value pairs
-	args := bytes.Split(dest.Bytes(), []byte("&"))
+	args := bytes.Split(buffer, []byte("&"))
 	params := make(map[string][]byte)
 	for _, arg := range args {
 		// seperate name and values and assign to map to contextualize the
@@ -68,6 +132,7 @@ func DecodeAuthResponse(body io.Reader) (AuthInfo, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "decoding authorization response")
 	}
+	response.status = authResp.Status.StatusCode.Value
 	response.userID = authResp.Assertion.Subject.NameID.Value
 	return &response, nil
 }

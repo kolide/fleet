@@ -17,6 +17,7 @@ func Up_20170411155225(tx *sql.Tx) error {
 			"`cert` text NOT NULL, " +
 			"`name` varchar(128) NOT NULL DEFAULT '', " +
 			"`metadata` text NOT NULL, " +
+			"`metadata_url` varchar(1024) NOT NULL DEFAULT '', " +
 			"`image_url` varchar(1024) NOT NULL DEFAULT '', " +
 			"`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, " +
 			"`updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, " +

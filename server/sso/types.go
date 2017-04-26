@@ -16,6 +16,7 @@ type AuthnRequest struct {
 	AssertionConsumerServiceURL string                 `xml:"AssertionConsumerServiceURL,attr"`
 	Destination                 string                 `xml:"Destination,attr"`
 	IssueInstant                string                 `xml:"IssueInstant,attr"`
+	ProviderName                string                 `xml:"ProviderName,attr"`
 	Issuer                      Issuer                 `xml:"Issuer"`
 	NameIDPolicy                *NameIDPolicy          `xml:"NameIDPolicy,omitempty"`
 	RequestedAuthnContext       *RequestedAuthnContext `xml:"RequestedAuthnContext,omitempty"`

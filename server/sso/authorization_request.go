@@ -2,11 +2,12 @@ package sso
 
 import (
 	"bytes"
-	"compress/zlib"
+	"compress/flate"
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/xml"
 	"fmt"
+	"net/url"
 	"strings"
 	"time"
 
@@ -31,7 +32,7 @@ type opts struct {
 // CreateAuthorizationRequest creates a url suitable for use to satisfy the SAML
 // redirect binding.
 // See http://docs.oasis-open.org/security/saml/v2.0/saml-bindings-2.0-os.pdf Section 3.4
-func CreateAuthorizationRequest(settings *Settings, options ...func(o *opts)) (string, error) {
+func CreateAuthorizationRequest(settings *Settings, issuer string, options ...func(o *opts)) (string, error) {
 	var optionalParams opts
 	for _, opt := range options {
 		opt(&optionalParams)
@@ -59,15 +60,21 @@ func CreateAuthorizationRequest(settings *Settings, options ...func(o *opts)) (s
 		IssueInstant:                time.Now().UTC().Format("2006-01-02T15:04:05Z"),
 		ProtocolBinding:             RedirectBinding,
 		Version:                     samlVersion,
+		ProviderName:                "Kolide",
 		Issuer: Issuer{
 			XMLName: xml.Name{
 				Local: "saml:Issuer",
 			},
-			Url: settings.Metadata.EntityID,
+			Url: issuer,
 		},
 	}
 
-	queryVals := make(map[string]string)
+	//queryVals := make(map[string]string)
+	u, err := url.Parse(destinationURL)
+	if err != nil {
+		return "", errors.Wrap(err, "parsing destination url")
+	}
+	qry := u.Query()
 
 	var writer bytes.Buffer
 	err = xml.NewEncoder(&writer).Encode(request)
@@ -78,18 +85,23 @@ func CreateAuthorizationRequest(settings *Settings, options ...func(o *opts)) (s
 	if err != nil {
 		return "", errors.Wrap(err, "unable to compress auth info")
 	}
-	queryVals["SAMLRequest"] = authQueryVal
+	//queryVals["SAMLRequest"] = authQueryVal
+	qry.Set("SAMLRequest", authQueryVal)
 	if optionalParams.relayState != "" {
-		queryVals["RelayState"] = optionalParams.relayState
+		//queryVals["RelayState"] = optionalParams.relayState
+		qry.Set("RelayState", optionalParams.relayState)
 	}
 	if settings.Metadata.IDPSSODescriptor.WantAuthnRequestsSigned {
 		signature, err := sign(settings, authQueryVal)
 		if err != nil {
 			return "", errors.Wrap(err, "signing auth request")
 		}
-		queryVals["Signature"] = signature
+		//queryVals["Signature"] = signature
+		qry.Set("Signature", signature)
 	}
-	return buildRedirectURL(destinationURL, queryVals), nil
+	//return buildRedirectURL(destinationURL, queryVals), nil
+	u.RawQuery = qry.Encode()
+	return u.String(), nil
 }
 
 func buildRedirectURL(baseURL string, params map[string]string) string {
@@ -122,7 +134,10 @@ func getDestinationURL(settings *Settings) (string, error) {
 // Section 3.4.4.1
 func deflate(xmlBuffer *bytes.Buffer) (string, error) {
 	var deflated bytes.Buffer
-	writer := zlib.NewWriter(&deflated)
+	writer, err := flate.NewWriter(&deflated, flate.DefaultCompression)
+	if err != nil {
+		return "", err
+	}
 	defer writer.Close()
 	n, err := writer.Write(xmlBuffer.Bytes())
 	if n != xmlBuffer.Len() {
@@ -133,15 +148,9 @@ func deflate(xmlBuffer *bytes.Buffer) (string, error) {
 	}
 	writer.Flush()
 	encbuff := deflated.Bytes()
-	// We have to remove the compression method, and flag bytes from the front
-	// of the byte stream and the 32 bit checksum at the end. This is to
-	// retain compatibility with PKZIP and GZIP
-	// See https://tools.ietf.org/html/rfc1950
-	// If you change this, the Auth won't work and you'll be sad.
-	encbuff = encbuff[2 : len(encbuff)-4]
 	encoded := base64.StdEncoding.EncodeToString(encbuff)
 	// replace any whitespace, and URL encode base 64 output
-	encoded = urlEncode(encoded)
+	//encoded = urlEncode(encoded)
 	return encoded, nil
 }
 

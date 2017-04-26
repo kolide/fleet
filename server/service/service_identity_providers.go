@@ -31,6 +31,9 @@ func (svc service) ModifyIdentityProvider(ctx context.Context, id uint, payload 
 	if payload.Metadata != nil {
 		idp.Metadata = *payload.Metadata
 	}
+	if payload.MetadataURL != nil {
+		idp.MetadataURL = *payload.MetadataURL
+	}
 	if payload.Name != nil {
 		idp.Name = *payload.Name
 	}
@@ -72,6 +75,9 @@ func (svc service) NewIdentityProvider(ctx context.Context, payload kolide.Ident
 	}
 	if payload.Metadata != nil {
 		idp.Metadata = *payload.Metadata
+	}
+	if payload.MetadataURL != nil {
+		idp.MetadataURL = *payload.MetadataURL
 	}
 	return svc.ds.NewIdentityProvider(idp)
 }

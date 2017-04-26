@@ -227,11 +227,7 @@ func (r callbackSSOResponse) redirect() string { return r.URL }
 func makeCallbackSSOEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		authResponse := request.(sso.AuthInfo)
-		// if these two elements are not present they'll be handled in the validation
-		// middleware
-		userID, _ := authResponse.UserID()
-		ssoHandle, _ := authResponse.RelayState()
-		redirectURL, err := svc.CallbackSSO(ctx, ssoHandle, userID)
+		redirectURL, err := svc.CallbackSSO(ctx, authResponse)
 		if err != nil {
 			return callbackSSOResponse{Err: err}, nil
 		}

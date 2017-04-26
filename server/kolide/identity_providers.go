@@ -28,8 +28,8 @@ type IdentityProvider struct {
 	// DestinationURL is the URL for the identity provider and is required
 	// if Metadata is not present.
 	DestinationURL string `json:"destination_url" db:"destination_url"`
-	// IssuerURI identity provider issuer and is required if
-	// Metadata is not present
+	// IssuerURI is an optional identifier for this service provider. If not
+	// supplied it will default to the host name.
 	IssuerURI string `json:"issuer_uri" db:"issuer_uri"`
 	// Certificate is the identity provider's public certificate
 	// and is required if Metadata is not present.
@@ -43,6 +43,11 @@ type IdentityProvider struct {
 	// Metadata if the definition of the SAML contract for a particular
 	// IDP.
 	Metadata string `json:"metadata" db:"metadata"`
+	// MetadataURL is the discovery endpoint for the IDP, if a provider supplies
+	// this it is preferable to the metadata field as it gets the latest state
+	// for information on interacting with the IDP as opposed to the Metadata field which
+	// is static.
+	MetadataURL string `json:"metadata_url" db:"metadata_url"`
 }
 
 // IdentityProviderPayload user to update one or more fields of an IdentityProvider
@@ -54,6 +59,7 @@ type IdentityProviderPayload struct {
 	Name           *string `json:"name"`
 	ImageURL       *string `json:"image_url"`
 	Metadata       *string `json:"metadata"`
+	MetadataURL    *string `json:"metadata_url"`
 }
 
 // IdentityProviderNoAuth used to display SSO information for unauthorized users.
