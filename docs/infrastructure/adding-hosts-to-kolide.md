@@ -21,7 +21,7 @@ If your organization has a robust internal public key infrastructure (PKI) and y
 
 When Kolide uses a self-signed certificate, osquery agents will need a copy of that certificate in order to authenticate the Kolide server. If clients connect directly to the Kolide server, you can download the certificate through the Kolide UI. From the main dashboard (`/hosts/manage`), click "Add New Host" and "Fetch Kolide Certificate". If Kolide is running behind a load-balancer that terminates TLS, you will have to talk to your system administrator about where to find this certificate.
 
-It is important that the CNAME of this certificate matches the hostname or IP that osqueryd clients will use to connect.
+It is important that the CN of this certificate matches the hostname or IP that osqueryd clients will use to connect.
 
 Specify the path to this certificate with the `--tls_server_certs` flag when you launch osqueryd.
 
