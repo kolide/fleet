@@ -70,7 +70,11 @@ func decodeLoginSSORequest(ctx context.Context, r *http.Request) (interface{}, e
 }
 
 func decodeCallbackSSORequest(ctx context.Context, r *http.Request) (interface{}, error) {
-	authResponse, err := sso.DecodeAuthResponse(r.Body)
+	err := r.ParseForm()
+	if err != nil {
+		return nil, errors.Wrap(err, "decode sso callback")
+	}
+	authResponse, err := sso.DecodeAuthResponse(r.FormValue("SAMLResponse"), r.FormValue("RelayState"))
 	if err != nil {
 		return nil, errors.Wrap(err, "decoding sso callback")
 	}

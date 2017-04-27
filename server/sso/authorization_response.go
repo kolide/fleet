@@ -4,11 +4,10 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/xml"
-	"io"
-	"io/ioutil"
 	"net/url"
 
 	"github.com/pkg/errors"
+	"github.com/y0ssar1an/q"
 )
 
 const (
@@ -100,41 +99,29 @@ func (r resp) Status() (int, error) {
 }
 
 // DecodeAuthResponse extracts SAML assertions from IDP response
-func DecodeAuthResponse(body io.Reader) (AuthInfo, error) {
-	buffer, err := ioutil.ReadAll(body)
+func DecodeAuthResponse(samlResponse, relayState string) (AuthInfo, error) {
+	q.Q(samlResponse)
+	q.Q(relayState)
+	var authInfo resp
+	decoded, err := base64.StdEncoding.DecodeString(samlResponse)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to read auth response")
+		return nil, errors.Wrap(err, "decoding saml response")
 	}
-	// parse form name/value pairs
-	args := bytes.Split(buffer, []byte("&"))
-	params := make(map[string][]byte)
-	for _, arg := range args {
-		// seperate name and values and assign to map to contextualize the
-		// form data
-		vals := bytes.Split(arg, []byte("="))
-		if len(vals) != 2 {
-			return nil, errors.New("auth response form argument malformed")
-		}
-		params[string(vals[0])] = vals[1]
-	}
-	// We MUST have SAMLResponse, RelayState is also required per the spec as we supply
-	// it in the auth request
-	var response resp
-	if _, ok := params["RelayState"]; !ok {
-		return nil, errors.New("missing required RelayState")
-	}
-	response.relayState = string(params["RelayState"])
-	// SAMLResponse is required
-	if _, ok := params["SAMLResponse"]; !ok {
-		return nil, errors.New("missing required SAMLResponse parameter")
-	}
-	authResp, err := decodeAuthSAMLResponse(params["SAMLResponse"])
+	var saml Response
+	err = xml.NewDecoder(bytes.NewBuffer(decoded)).Decode(&saml)
 	if err != nil {
-		return nil, errors.Wrap(err, "decoding authorization response")
+		return nil, errors.Wrap(err, "decoding response xml")
 	}
-	response.status = authResp.Status.StatusCode.Value
-	response.userID = authResp.Assertion.Subject.NameID.Value
-	return &response, nil
+	authInfo.status = saml.Status.StatusCode.Value
+	status, err := authInfo.Status()
+	if err != nil {
+		return nil, errors.Wrap(err, "decoding auth response")
+	}
+	if status == Success {
+		authInfo.userID = saml.Assertion.Subject.NameID.Value
+	}
+	authInfo.relayState = relayState
+	return &authInfo, nil
 }
 
 // See http://docs.oasis-open.org/security/saml/v2.0/saml-bindings-2.0-os.pdf

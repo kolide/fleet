@@ -7,7 +7,6 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
-	"net/url"
 	"time"
 
 	"github.com/garyburd/redigo/redis"
@@ -159,12 +158,11 @@ func (s *store) EncryptSSOHandle(ssoHandle string, key []byte, lifetimeSecs uint
 	encrypted := make([]byte, len(cleartext))
 	encrypter.XORKeyStream(encrypted, cleartext)
 	encoded := base64.StdEncoding.EncodeToString(encrypted)
-	escaped := url.QueryEscape(encoded)
-	_, err = conn.Do("SETEX", escaped, lifetimeSecs, iv)
+	_, err = conn.Do("SETEX", encoded, lifetimeSecs, iv)
 	if err != nil {
 		return "", err
 	}
-	return escaped, nil
+	return encoded, nil
 }
 
 func (s *store) DecryptSSOHandle(relayState string, key []byte) (string, error) {
@@ -179,15 +177,11 @@ func (s *store) DecryptSSOHandle(relayState string, key []byte) (string, error) 
 	if err != nil {
 		return "", err
 	}
-	unescaped, err := url.QueryUnescape(relayState)
+	decoded, err := base64.StdEncoding.DecodeString(relayState)
 	if err != nil {
 		return "", err
 	}
-	unencoded, err := base64.StdEncoding.DecodeString(unescaped)
-	if err != nil {
-		return "", err
-	}
-	encrypted := []byte(unencoded)
+	encrypted := []byte(decoded)
 	decrypter := cipher.NewCFBDecrypter(block, iv)
 	unencrypted := make([]byte, len(encrypted))
 	decrypter.XORKeyStream(unencrypted, encrypted)
