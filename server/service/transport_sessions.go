@@ -3,9 +3,51 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"html/template"
 	"net/http"
 	"strings"
+
+	"github.com/pkg/errors"
 )
+
+func decodeSubmitAuthnResponseRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	redirectURL := r.URL.Query().Get("redirect_url")
+	token := r.URL.Query().Get("token")
+
+	return submitAuthnResponseRequest{RedirectURL: redirectURL, Token: token}, nil
+}
+
+func encodeSubmitAuthnResponseResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {
+	tmpl, err := template.New("foo").Parse(`
+<html>
+<script type='text/javascript'>
+var redirectURL = '{{.RedirectURL}}';
+if (!redirectURL.startsWith('/')) {
+  redirectURL = '/';
+}
+window.localStorage.setItem('KOLIDE::auth_token', '{{.Token}}');
+window.location = redirectURL;
+</script>
+<body>
+Redirecting to Kolide...
+</body>
+</html>
+`)
+	if err != nil {
+		return errors.Wrap(err, "parsing template")
+	}
+
+	if r, ok := response.(submitAuthnResponseResponse); ok {
+		err = tmpl.Execute(w, r)
+		if err != nil {
+			return errors.Wrap(err, "executing template")
+		}
+	} else {
+		return errors.Errorf("Unknown response type: %+v", response)
+	}
+
+	return nil
+}
 
 func decodeGetInfoAboutSessionRequest(ctx context.Context, r *http.Request) (interface{}, error) {
 	id, err := idFromRequest(r, "id")

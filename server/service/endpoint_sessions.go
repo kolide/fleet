@@ -9,6 +9,36 @@ import (
 )
 
 ////////////////////////////////////////////////////////////////////////////////
+// SubmitAuthnResponse
+////////////////////////////////////////////////////////////////////////////////
+
+type submitAuthnResponseRequest struct {
+	AuthnResponse string
+
+	// These params only here for testing, normally the token would be
+	// generated and the redirect URL would come from Redis
+	Token       string
+	RedirectURL string
+}
+
+type submitAuthnResponseResponse struct {
+	Token       string
+	RedirectURL string
+	Err         error
+}
+
+func (r submitAuthnResponseResponse) error() error { return r.Err }
+
+func makeSubmitAuthnResponseEndpoint(svc kolide.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(submitAuthnResponseRequest)
+		// Verify response, create token, etc. here
+
+		return submitAuthnResponseResponse{req.Token, req.RedirectURL, nil}, nil
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Login
 ////////////////////////////////////////////////////////////////////////////////
 

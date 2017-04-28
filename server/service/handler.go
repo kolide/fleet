@@ -15,6 +15,7 @@ import (
 
 // KolideEndpoints is a collection of RPC endpoints implemented by the Kolide API.
 type KolideEndpoints struct {
+	SubmitAuthnResponse            endpoint.Endpoint
 	Login                          endpoint.Endpoint
 	Logout                         endpoint.Endpoint
 	ForgotPassword                 endpoint.Endpoint
@@ -88,12 +89,13 @@ type KolideEndpoints struct {
 // MakeKolideServerEndpoints creates the Kolide API endpoints.
 func MakeKolideServerEndpoints(svc kolide.Service, jwtKey string) KolideEndpoints {
 	return KolideEndpoints{
-		Login:          makeLoginEndpoint(svc),
-		Logout:         makeLogoutEndpoint(svc),
-		ForgotPassword: makeForgotPasswordEndpoint(svc),
-		ResetPassword:  makeResetPasswordEndpoint(svc),
-		CreateUser:     makeCreateUserEndpoint(svc),
-		VerifyInvite:   makeVerifyInviteEndpoint(svc),
+		SubmitAuthnResponse: makeSubmitAuthnResponseEndpoint(svc),
+		Login:               makeLoginEndpoint(svc),
+		Logout:              makeLogoutEndpoint(svc),
+		ForgotPassword:      makeForgotPasswordEndpoint(svc),
+		ResetPassword:       makeResetPasswordEndpoint(svc),
+		CreateUser:          makeCreateUserEndpoint(svc),
+		VerifyInvite:        makeVerifyInviteEndpoint(svc),
 
 		// Authenticated user endpoints
 		// Each of these endpoints should have exactly one
@@ -172,6 +174,7 @@ func MakeKolideServerEndpoints(svc kolide.Service, jwtKey string) KolideEndpoint
 }
 
 type kolideHandlers struct {
+	SubmitAuthnResponse            http.Handler
 	Login                          http.Handler
 	Logout                         http.Handler
 	ForgotPassword                 http.Handler
@@ -247,6 +250,7 @@ func makeKolideKitHandlers(e KolideEndpoints, opts []kithttp.ServerOption) *koli
 		return kithttp.NewServer(e, decodeFn, encodeResponse, opts...)
 	}
 	return &kolideHandlers{
+		SubmitAuthnResponse:            kithttp.NewServer(e.SubmitAuthnResponse, decodeSubmitAuthnResponseRequest, encodeSubmitAuthnResponseResponse),
 		Login:                          newServer(e.Login, decodeLoginRequest),
 		Logout:                         newServer(e.Logout, decodeNoParamsRequest),
 		ForgotPassword:                 newServer(e.ForgotPassword, decodeForgotPasswordRequest),
@@ -356,6 +360,7 @@ func addMetrics(r *mux.Router) {
 }
 
 func attachKolideAPIRoutes(r *mux.Router, h *kolideHandlers) {
+	r.Handle("/api/v1/kolide/sso/response", h.SubmitAuthnResponse).Methods("GET").Name("submit_authn_response")
 	r.Handle("/api/v1/kolide/login", h.Login).Methods("POST").Name("login")
 	r.Handle("/api/v1/kolide/logout", h.Logout).Methods("POST").Name("logout")
 	r.Handle("/api/v1/kolide/forgot_password", h.ForgotPassword).Methods("POST").Name("forgot_password")
