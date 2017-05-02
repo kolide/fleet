@@ -6,7 +6,6 @@ import (
 
 	"github.com/go-kit/kit/endpoint"
 	"github.com/kolide/kolide/server/kolide"
-	"github.com/kolide/kolide/server/sso"
 )
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -177,7 +176,6 @@ func makeDeleteSessionsForUserEndpoint(svc kolide.Service) endpoint.Endpoint {
 type initiateSSORequest struct {
 	IdentityProviderID uint   `json:"identity_provider_id"`
 	RelayURL           string `json:"relay_url"`
-	Token              string `json:"token"`
 }
 
 type initiateSSOResponse struct {
@@ -190,7 +188,7 @@ func (r initiateSSOResponse) error() error { return r.Err }
 func makeInitiateSSOEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(initiateSSORequest)
-		idProviderURL, err := svc.InitiateSSO(ctx, req.IdentityProviderID, req.RelayURL, req.Token)
+		idProviderURL, err := svc.InitiateSSO(ctx, req.IdentityProviderID, req.RelayURL)
 		if err != nil {
 			return initiateSSOResponse{Err: err}, nil
 		}
@@ -198,39 +196,23 @@ func makeInitiateSSOEndpoint(svc kolide.Service) endpoint.Endpoint {
 	}
 }
 
-type loginSSORequest struct {
-	Token string `json:"token"`
-}
-
-func makeLoginSSOEndpoint(svc kolide.Service) endpoint.Endpoint {
-	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(loginSSORequest)
-		user, token, err := svc.LoginSSO(ctx, req.Token)
-		if err != nil {
-			return loginResponse{Err: err}, nil
-		}
-		return loginResponse{User: user, Token: token}, nil
-	}
-}
-
 type callbackSSOResponse struct {
-	URL string `json:"url,omitempty"`
-	Err error  `json:"error,omitempty"`
+	Content string `json:"url,omitempty"`
+	Err     error  `json:"error,omitempty"`
 }
 
 func (r callbackSSOResponse) error() error { return r.Err }
 
-// if redirect is present when we encode our response we will
-// redirect (302) to this URL
-func (r callbackSSOResponse) redirect() string { return r.URL }
+// If html is present we return a web page
+func (r callbackSSOResponse) html() string { return r.Content }
 
 func makeCallbackSSOEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		authResponse := request.(sso.AuthInfo)
-		redirectURL, err := svc.CallbackSSO(ctx, authResponse)
+		authResponse := request.(kolide.Auth)
+		content, err := svc.CallbackSSO(ctx, authResponse)
 		if err != nil {
 			return callbackSSOResponse{Err: err}, nil
 		}
-		return callbackSSOResponse{URL: redirectURL}, nil
+		return callbackSSOResponse{Content: content}, nil
 	}
 }

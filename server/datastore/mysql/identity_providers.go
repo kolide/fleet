@@ -12,16 +12,16 @@ func (d *Datastore) NewIdentityProvider(idp kolide.IdentityProvider) (*kolide.Id
     INSERT INTO identity_providers (
       destination_url,
       issuer_uri,
-      cert,
       name,
       image_url,
       metadata,
-      metadata_url
+      metadata_url,
+      idp_issuer_uri
     )
     VALUES ( ?, ?, ?, ?, ?, ?, ? )
   `
-	result, err := d.db.Exec(query, idp.DestinationURL, idp.IssuerURI, idp.Certificate,
-		idp.Name, idp.ImageURL, idp.Metadata, idp.MetadataURL)
+	result, err := d.db.Exec(query, idp.DestinationURL, idp.IssuerURI,
+		idp.Name, idp.ImageURL, idp.Metadata, idp.MetadataURL, idp.IDPIssuerURI)
 	if err != nil {
 		return nil, errors.Wrap(err, "creating identity provider")
 	}
@@ -39,15 +39,15 @@ func (d *Datastore) SaveIdentityProvider(idp kolide.IdentityProvider) error {
     SET
       destination_url = ?,
       issuer_uri = ?,
-      cert = ?,
       name = ?,
       image_url = ?,
       metadata = ?,
-      metadata_url = ?
+      metadata_url = ?,
+      idp_issuer_uri = ?
     WHERE id = ?
   `
-	result, err := d.db.Exec(query, idp.DestinationURL, idp.IssuerURI, idp.Certificate,
-		idp.Name, idp.ImageURL, idp.Metadata, idp.MetadataURL, idp.ID)
+	result, err := d.db.Exec(query, idp.DestinationURL, idp.IssuerURI,
+		idp.Name, idp.ImageURL, idp.Metadata, idp.MetadataURL, idp.IDPIssuerURI, idp.ID)
 	if err != nil {
 		return errors.Wrap(err, "updating identity provider")
 	}
@@ -74,6 +74,23 @@ func (d *Datastore) IdentityProvider(id uint) (*kolide.IdentityProvider, error) 
 	}
 	if err != nil {
 		return nil, errors.Wrap(err, "selecting identity provider")
+	}
+	return &idp, nil
+}
+
+func (d *Datastore) IdentityProviderByIDPIssuer(issuer string) (*kolide.IdentityProvider, error) {
+	query := `
+    SELECT *
+    FROM identity_providers
+    WHERE idp_identity_uri = ? AND NOT deleted
+  `
+	var idp kolide.IdentityProvider
+	err := d.db.Get(&idp, query, issuer)
+	if err == sql.ErrNoRows {
+		return nil, notFound("IdentityProvider").WithMessage(issuer)
+	}
+	if err != nil {
+		return nil, errors.Wrap(err, "identity provider by idp issuer")
 	}
 	return &idp, nil
 }

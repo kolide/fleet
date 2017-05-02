@@ -15,25 +15,25 @@ func testIdentityProvider(t *testing.T, ds kolide.Datastore) {
 	idps := []*kolide.IdentityProvider{
 		&kolide.IdentityProvider{
 			DestinationURL: "https://idp1.com/sso",
-			IssuerURI:      "http://idp1.com/issuer/xyz123",
-			Certificate:    "DEADBEEFXXXXX12344",
+			IssuerURI:      "http://sp1.com/issuer/xyz123",
 			Name:           "idp1",
 			ImageURL:       "https://idp1.com/logo.png",
 			Metadata:       "something",
+			IDPIssuerURI:   "http://idp1.com/issuer/xyz123",
 		},
 		&kolide.IdentityProvider{
 			DestinationURL: "https://idp2.com/sso",
-			IssuerURI:      "http://idp2.com/issuer/xyz123",
-			Certificate:    "DEADBEEFXXXXX12344",
+			IssuerURI:      "http://sp2.com/issuer/xyz123",
 			Name:           "idp2",
 			ImageURL:       "https://idp2.com/logo.png",
+			IDPIssuerURI:   "http://idp2.com/issuer/xyz123",
 		},
 		&kolide.IdentityProvider{
 			DestinationURL: "https://idp3.com/sso",
-			IssuerURI:      "http://idp3.com/issuer/xyz123",
-			Certificate:    "DEADBEEFXXXXX12344",
+			IssuerURI:      "http://sp3.com/issuer/xyz123",
 			Name:           "idp3",
 			ImageURL:       "https://idp3.com/logo.png",
+			IDPIssuerURI:   "http://idp3.com/issuer/xyz123",
 		},
 	}
 	var err error
@@ -55,7 +55,6 @@ func testIdentityProvider(t *testing.T, ds kolide.Datastore) {
 	idp.ImageURL = "https://idpnew.com/logo.png"
 	idp.DestinationURL = "https://idpnew.com/sso"
 	idp.IssuerURI = "https://idpnew.com/issuer"
-	idp.Certificate = "123456789"
 	idp.Name = "idpnew"
 	err = ds.SaveIdentityProvider(*idp)
 	require.Nil(t, err)
@@ -65,7 +64,6 @@ func testIdentityProvider(t *testing.T, ds kolide.Datastore) {
 	assert.Equal(t, idp.ImageURL, upd.ImageURL)
 	assert.Equal(t, idp.DestinationURL, upd.DestinationURL)
 	assert.Equal(t, idp.IssuerURI, upd.IssuerURI)
-	assert.Equal(t, idp.Certificate, upd.Certificate)
 	assert.Equal(t, idp.Name, upd.Name)
 	// test list
 	results, err := ds.ListIdentityProviders()

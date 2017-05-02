@@ -16,28 +16,7 @@ func (svc service) ModifyIdentityProvider(ctx context.Context, id uint, payload 
 	if err != nil {
 		return nil, errors.Wrap(err, "modifying identity provider")
 	}
-	if payload.Certificate != nil {
-		idp.Certificate = *payload.Certificate
-	}
-	if payload.DestinationURL != nil {
-		idp.DestinationURL = *payload.DestinationURL
-	}
-	if payload.ImageURL != nil {
-		idp.ImageURL = *payload.ImageURL
-	}
-	if payload.IssuerURI != nil {
-		idp.IssuerURI = *payload.IssuerURI
-	}
-	if payload.Metadata != nil {
-		idp.Metadata = *payload.Metadata
-	}
-	if payload.MetadataURL != nil {
-		idp.MetadataURL = *payload.MetadataURL
-	}
-	if payload.Name != nil {
-		idp.Name = *payload.Name
-	}
-	err = svc.ds.SaveIdentityProvider(*idp)
+	payloadToIdentityProvider(payload, idp)
 	if err != nil {
 		return nil, errors.Wrap(err, "modifying identity provider")
 	}
@@ -58,12 +37,12 @@ func (svc service) ListIdentityProvidersNoAuth(ctx context.Context) ([]kolide.Id
 
 func (svc service) NewIdentityProvider(ctx context.Context, payload kolide.IdentityProviderPayload) (*kolide.IdentityProvider, error) {
 	var idp kolide.IdentityProvider
-	if payload.Name != nil {
-		idp.Name = *payload.Name
-	}
-	if payload.Certificate != nil {
-		idp.Certificate = *payload.Certificate
-	}
+	payloadToIdentityProvider(payload, &idp)
+	return svc.ds.NewIdentityProvider(idp)
+}
+
+func payloadToIdentityProvider(payload kolide.IdentityProviderPayload, idp *kolide.IdentityProvider) {
+
 	if payload.DestinationURL != nil {
 		idp.DestinationURL = *payload.DestinationURL
 	}
@@ -79,5 +58,10 @@ func (svc service) NewIdentityProvider(ctx context.Context, payload kolide.Ident
 	if payload.MetadataURL != nil {
 		idp.MetadataURL = *payload.MetadataURL
 	}
-	return svc.ds.NewIdentityProvider(idp)
+	if payload.Name != nil {
+		idp.Name = *payload.Name
+	}
+	if payload.IDPIssuerURI != nil {
+		idp.IDPIssuerURI = *payload.IDPIssuerURI
+	}
 }

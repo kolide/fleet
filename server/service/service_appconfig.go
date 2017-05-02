@@ -8,7 +8,6 @@ import (
 	"github.com/kolide/kolide/server/contexts/viewer"
 	"github.com/kolide/kolide/server/kolide"
 	"github.com/kolide/kolide/server/mail"
-	"github.com/kolide/kolide/server/sso"
 	"github.com/pkg/errors"
 )
 
@@ -44,7 +43,6 @@ func (svc service) NewAppConfig(ctx context.Context, p kolide.AppConfigPayload) 
 		}
 		fromPayload.EnrollSecret = rand
 	}
-	fromPayload.AESKey = sso.CreateAESKey()
 	newConfig, err := svc.ds.NewAppConfig(fromPayload)
 	if err != nil {
 		return nil, err

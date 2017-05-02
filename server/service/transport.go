@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 	"strconv"
 
@@ -29,11 +30,11 @@ func encodeResponse(ctx context.Context, w http.ResponseWriter, response interfa
 		}
 	}
 
-	if redirect, ok := response.(redirecter); ok {
-		if redirect.error() == nil {
-			w.Header().Set("Location", redirect.redirect())
-			// 302 redirect
-			w.WriteHeader(http.StatusFound)
+	if page, ok := response.(htmlPage); ok {
+		if page.error() == nil {
+			w.Header().Set("Content-Type", "text/html; charset=UTF-8")
+			_, err := io.WriteString(w, page.html())
+			return err
 		}
 	}
 
@@ -48,10 +49,9 @@ type statuser interface {
 	status() int
 }
 
-// redirector will redirect response to the given URL, we expose error here
-// so we can check for errors before redirecting
-type redirecter interface {
-	redirect() string
+// loads a html page
+type htmlPage interface {
+	html() string
 	error() error
 }
 

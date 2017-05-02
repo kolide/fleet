@@ -18,6 +18,8 @@ type ListIdentityProvidersFunc func() ([]kolide.IdentityProvider, error)
 
 type ListIdentityProvidersNoAuthFunc func() ([]kolide.IdentityProviderNoAuth, error)
 
+type IdentityProviderByIDPIssuerFunc func(issuer string) (*kolide.IdentityProvider, error)
+
 type IdentityProviderStore struct {
 	NewIdentityProviderFunc        NewIdentityProviderFunc
 	NewIdentityProviderFuncInvoked bool
@@ -36,6 +38,9 @@ type IdentityProviderStore struct {
 
 	ListIdentityProvidersNoAuthFunc        ListIdentityProvidersNoAuthFunc
 	ListIdentityProvidersNoAuthFuncInvoked bool
+
+	IdentityProviderByIDPIssuerFunc        IdentityProviderByIDPIssuerFunc
+	IdentityProviderByIDPIssuerFuncInvoked bool
 }
 
 func (s *IdentityProviderStore) NewIdentityProvider(idp kolide.IdentityProvider) (*kolide.IdentityProvider, error) {
@@ -66,4 +71,9 @@ func (s *IdentityProviderStore) ListIdentityProviders() ([]kolide.IdentityProvid
 func (s *IdentityProviderStore) ListIdentityProvidersNoAuth() ([]kolide.IdentityProviderNoAuth, error) {
 	s.ListIdentityProvidersNoAuthFuncInvoked = true
 	return s.ListIdentityProvidersNoAuthFunc()
+}
+
+func (s *IdentityProviderStore) IdentityProviderByIDPIssuer(issuer string) (*kolide.IdentityProvider, error) {
+	s.IdentityProviderByIDPIssuerFuncInvoked = true
+	return s.IdentityProviderByIDPIssuerFunc(issuer)
 }

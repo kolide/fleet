@@ -27,3 +27,7 @@ func (d *Datastore) ListIdentityProviders() ([]kolide.IdentityProvider, error) {
 func (d *Datastore) ListIdentityProvidersNoAuth() ([]kolide.IdentityProviderNoAuth, error) {
 	panic("inmem is being deprecated")
 }
+
+func (d *Datastore) IdentityProviderByIDPIssuer(issuer string) (*kolide.IdentityProvider, error) {
+	panic("inmem is being deprecated")
+}

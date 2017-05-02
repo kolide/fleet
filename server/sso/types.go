@@ -182,11 +182,11 @@ type EntityAttributes struct {
 type SPSSODescriptors struct {
 }
 
-type KeyDescriptor struct {
-	XMLName xml.Name
-	Use     string  `xml:"use,attr"`
-	KeyInfo KeyInfo `xml:"KeyInfo"`
-}
+// type KeyDescriptor struct {
+// 	XMLName xml.Name
+// 	Use     string  `xml:"use,attr"`
+// 	KeyInfo KeyInfo `xml:"KeyInfo"`
+// }
 
 type SingleLogoutService struct {
 	Binding  string `xml:"Binding,attr"`

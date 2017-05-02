@@ -7,30 +7,39 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+
+	dsigtypes "github.com/russellhaering/goxmldsig/types"
 )
 
-type IDPKeyDescriptor struct {
-	Use         string `xml:"use,attr"`
-	Certificate string `xml:"KeyInfo>X509Data>X509Certificate"`
+type Metadata struct {
+	XMLName          xml.Name         `xml:"urn:oasis:names:tc:SAML:2.0:metadata EntityDescriptor"`
+	EntityID         string           `xml:"entityID,attr"`
+	IDPSSODescriptor IDPSSODescriptor `xml:"IDPSSODescriptor"`
 }
 
 type IDPSSODescriptor struct {
-	WantAuthnRequestsSigned    bool     `xml:"WantAuthnRequestsSigned,attr"`
-	ProtocolSupportEnumeration string   `xml:"protocolSupportEnumeration,attr"`
-	NameIDFormat               []string `xml:"NameIDFormat"`
-	SingleSignOnService        []SingleSignOnService
-	KeyDescriptor              IDPKeyDescriptor
+	XMLName             xml.Name              `xml:"urn:oasis:names:tc:SAML:2.0:metadata IDPSSODescriptor"`
+	KeyDescriptors      []KeyDescriptor       `xml:"KeyDescriptor"`
+	NameIDFormats       []NameIDFormat        `xml:"NameIDFormat"`
+	SingleSignOnService []SingleSignOnService `xml:"SingleSignOnService"`
+	Attributes          []Attribute           `xml:"Attribute"`
+}
+
+type KeyDescriptor struct {
+	XMLName xml.Name          `xml:"urn:oasis:names:tc:SAML:2.0:metadata KeyDescriptor"`
+	Use     string            `xml:"use,attr"`
+	KeyInfo dsigtypes.KeyInfo `xml:"KeyInfo"`
+}
+
+type NameIDFormat struct {
+	XMLName xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:metadata NameIDFormat"`
+	Value   string   `xml:",chardata"`
 }
 
 type SingleSignOnService struct {
-	Binding  string `xml:"Binding,attr"`
-	Location string `xml:"Location,attr"`
-}
-
-type IDPMetadata struct {
-	XMLName          xml.Name `xml:"EntityDescriptor"`
-	EntityID         string   `xml:"entityID,attr"`
-	IDPSSODescriptor IDPSSODescriptor
+	XMLName  xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:metadata SingleSignOnService"`
+	Binding  string   `xml:"Binding,attr"`
+	Location string   `xml:"Location,attr"`
 }
 
 const (
@@ -40,15 +49,17 @@ const (
 )
 
 type Settings struct {
-	Metadata *IDPMetadata
+	Metadata *Metadata
 	// AssertionConsumerServiceURL is the call back on the service provider which responds
 	// to the IDP
 	AssertionConsumerServiceURL string
+	SessionStore                SessionStore
+	OriginalURL                 string
 }
 
 // ParseMetadata writes metadata xml to a struct
-func ParseMetadata(metadata string) (*IDPMetadata, error) {
-	var md IDPMetadata
+func ParseMetadata(metadata string) (*Metadata, error) {
+	var md Metadata
 	err := xml.Unmarshal([]byte(metadata), &md)
 	if err != nil {
 		return nil, err
@@ -60,7 +71,7 @@ func ParseMetadata(metadata string) (*IDPMetadata, error) {
 // IDP via a remote URL. metadataURL is the location where the metadata is located
 // and timeout defines how long to wait to get a response form the metadata
 // server.
-func GetMetadata(metadataURL string, timeout time.Duration) (*IDPMetadata, error) {
+func GetMetadata(metadataURL string, timeout time.Duration) (*Metadata, error) {
 	request, err := http.NewRequest(http.MethodGet, metadataURL, nil)
 	if err != nil {
 		return nil, err
@@ -75,10 +86,11 @@ func GetMetadata(metadataURL string, timeout time.Duration) (*IDPMetadata, error
 		return nil, errors.Errorf("SAML metadata server at %s returned %s", metadataURL, resp.Status)
 	}
 	xmlData, err := ioutil.ReadAll(resp.Body)
+
 	if err != nil {
 		return nil, err
 	}
-	var md IDPMetadata
+	var md Metadata
 	err = xml.Unmarshal(xmlData, &md)
 	if err != nil {
 		return nil, err

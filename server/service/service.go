@@ -44,7 +44,7 @@ func NewService(ds kolide.Datastore, resultStore kolide.QueryResultStore,
 		mailService:            mailService,
 		ssoSessionStore:        sso,
 	}
-	svc = validationMiddleware{svc, ds}
+	svc = validationMiddleware{svc, ds, sso}
 	return svc, nil
 }
 
@@ -97,4 +97,10 @@ func (s service) SendEmail(mail kolide.Email) error {
 
 func (s service) Clock() clock.Clock {
 	return s.clock
+}
+
+type validationMiddleware struct {
+	kolide.Service
+	ds              kolide.Datastore
+	ssoSessionStore sso.SessionStore
 }

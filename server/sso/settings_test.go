@@ -49,8 +49,9 @@ func TestParseMetadata(t *testing.T) {
 	require.Nil(t, err)
 
 	assert.Equal(t, "http://www.okta.com/exka4zkf6dxm8pF220h7", settings.EntityID)
-	assert.Len(t, settings.IDPSSODescriptor.NameIDFormat, 2)
-	assert.True(t, settings.IDPSSODescriptor.KeyDescriptor.Certificate != "")
+	assert.Len(t, settings.IDPSSODescriptor.NameIDFormats, 2)
+	require.Len(t, settings.IDPSSODescriptor.KeyDescriptors, 1)
+	assert.True(t, settings.IDPSSODescriptor.KeyDescriptors[0].KeyInfo.X509Data.X509Certificate.Data != "")
 	require.Len(t, settings.IDPSSODescriptor.SingleSignOnService, 2)
 	assert.Equal(t, "https://dev-132038.oktapreview.com/app/kolidedev132038_kolide_1/exka4zkf6dxm8pF220h7/sso/saml",
 		settings.IDPSSODescriptor.SingleSignOnService[0].Location)
@@ -64,8 +65,9 @@ func TestGetMetadata(t *testing.T) {
 	settings, err := GetMetadata(ts.URL, 2*time.Second)
 	require.Nil(t, err)
 	assert.Equal(t, "http://www.okta.com/exka4zkf6dxm8pF220h7", settings.EntityID)
-	assert.Len(t, settings.IDPSSODescriptor.NameIDFormat, 2)
-	assert.True(t, settings.IDPSSODescriptor.KeyDescriptor.Certificate != "")
+	assert.Len(t, settings.IDPSSODescriptor.NameIDFormats, 2)
+	require.Len(t, settings.IDPSSODescriptor.KeyDescriptors, 1)
+	assert.True(t, settings.IDPSSODescriptor.KeyDescriptors[0].KeyInfo.X509Data.X509Certificate.Data != "")
 	require.Len(t, settings.IDPSSODescriptor.SingleSignOnService, 2)
 	assert.Equal(t, "https://dev-132038.oktapreview.com/app/kolidedev132038_kolide_1/exka4zkf6dxm8pF220h7/sso/saml",
 		settings.IDPSSODescriptor.SingleSignOnService[0].Location)

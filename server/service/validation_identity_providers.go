@@ -31,10 +31,13 @@ func validateIdentityProvider(payload *kolide.IdentityProviderPayload, invalid *
 	if payload.Name != nil && len(*payload.Name) == 0 {
 		invalid.Append("name", "can't be empty")
 	}
+	if payload.IDPIssuerURI == nil {
+		invalid.Append("idp_issuer_uri", "required value")
+	}
+	if payload.IDPIssuerURI != nil && len(*payload.IDPIssuerURI) == 0 {
+		invalid.Append("idp_issuer_uri", "can't be empty")
+	}
 	if payload.Metadata == nil && payload.MetadataURL == nil {
-		if payload.Certificate == nil {
-			invalid.Append("cert", "must be defined if metadata is undefined")
-		}
 		if payload.DestinationURL == nil {
 			invalid.Append("destination_url", "must be defined if metadata is undefined")
 		}

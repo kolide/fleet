@@ -8,14 +8,14 @@ import (
 	"encoding/xml"
 	"fmt"
 	"net/url"
-	"strings"
 	"time"
 
 	"github.com/pkg/errors"
 )
 
 const (
-	samlVersion = "2.0"
+	samlVersion   = "2.0"
+	cacheLifetime = 300 // five minutes
 )
 
 // RelayState sets optional relay state
@@ -68,8 +68,20 @@ func CreateAuthorizationRequest(settings *Settings, issuer string, options ...fu
 			Url: issuer,
 		},
 	}
-
-	//queryVals := make(map[string]string)
+	var reader bytes.Buffer
+	err = xml.NewEncoder(&reader).Encode(settings.Metadata)
+	if err != nil {
+		return "", errors.Wrap(err, "encoding metadata creating auth request")
+	}
+	// cache metadata so we can check the signatures on the response we get from the IDP
+	err = settings.SessionStore.create(requestID,
+		settings.OriginalURL,
+		reader.String(),
+		cacheLifetime,
+	)
+	if err != nil {
+		return "", errors.Wrap(err, "caching cert while creating auth request")
+	}
 	u, err := url.Parse(destinationURL)
 	if err != nil {
 		return "", errors.Wrap(err, "parsing destination url")
@@ -85,40 +97,12 @@ func CreateAuthorizationRequest(settings *Settings, issuer string, options ...fu
 	if err != nil {
 		return "", errors.Wrap(err, "unable to compress auth info")
 	}
-	//queryVals["SAMLRequest"] = authQueryVal
 	qry.Set("SAMLRequest", authQueryVal)
 	if optionalParams.relayState != "" {
-		//queryVals["RelayState"] = optionalParams.relayState
 		qry.Set("RelayState", optionalParams.relayState)
 	}
-	if settings.Metadata.IDPSSODescriptor.WantAuthnRequestsSigned {
-		signature, err := sign(settings, authQueryVal)
-		if err != nil {
-			return "", errors.Wrap(err, "signing auth request")
-		}
-		//queryVals["Signature"] = signature
-		qry.Set("Signature", signature)
-	}
-	//return buildRedirectURL(destinationURL, queryVals), nil
 	u.RawQuery = qry.Encode()
 	return u.String(), nil
-}
-
-func buildRedirectURL(baseURL string, params map[string]string) string {
-	queryString := ""
-	for key, val := range params {
-		if queryString == "" {
-			queryString = "?"
-		} else {
-			queryString += "&"
-		}
-		queryString += key + "=" + val
-	}
-	return baseURL + queryString
-}
-
-func sign(settings *Settings, authString string) (string, error) {
-	return "", nil
 }
 
 func getDestinationURL(settings *Settings) (string, error) {
@@ -149,14 +133,7 @@ func deflate(xmlBuffer *bytes.Buffer) (string, error) {
 	writer.Flush()
 	encbuff := deflated.Bytes()
 	encoded := base64.StdEncoding.EncodeToString(encbuff)
-	// replace any whitespace, and URL encode base 64 output
-	//encoded = urlEncode(encoded)
 	return encoded, nil
-}
-
-func urlEncode(val string) string {
-	// replace any whitespace, and URL encode base 64 output
-	return strings.NewReplacer("\n", "", "+", "%2B", "/", "%2F", "=", "%3D").Replace(val)
 }
 
 // UUID per RFC 4122

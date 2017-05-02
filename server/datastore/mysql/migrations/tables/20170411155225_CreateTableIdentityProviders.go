@@ -14,7 +14,7 @@ func Up_20170411155225(tx *sql.Tx) error {
 			"`id` int(11) NOT NULL AUTO_INCREMENT, " +
 			"`destination_url` varchar(1024) NOT NULL DEFAULT '', " +
 			"`issuer_uri` varchar(1024) NOT NULL DEFAULT '', " +
-			"`cert` text NOT NULL, " +
+			"`idp_issuer_uri` varchar(1024) NOT NULL DEFAULT '', " +
 			"`name` varchar(128) NOT NULL DEFAULT '', " +
 			"`metadata` text NOT NULL, " +
 			"`metadata_url` varchar(1024) NOT NULL DEFAULT '', " +
@@ -24,7 +24,8 @@ func Up_20170411155225(tx *sql.Tx) error {
 			"`deleted_at` timestamp NULL DEFAULT NULL, " +
 			"`deleted` tinyint(1) NOT NULL DEFAULT FALSE, " +
 			"PRIMARY KEY (`id`), " +
-			"UNIQUE KEY `idx_unique_identity_providers_name` (`name`) USING BTREE " +
+			"UNIQUE KEY `idx_unique_identity_providers_name` (`name`) USING BTREE, " +
+			"UNIQUE KEY `idx_unique_idp_issuer_uri` (`idp_issuer_uri`) USING BTREE " +
 			") ENGINE=InnoDB DEFAULT CHARSET=utf8;"
 	_, err := tx.Exec(statement)
 	return err

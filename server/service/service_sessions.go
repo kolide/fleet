@@ -1,9 +1,11 @@
 package service
 
 import (
+	"bytes"
 	"context"
 	"crypto/rand"
 	"encoding/base64"
+	"html/template"
 	"net/url"
 	"strings"
 	"time"
@@ -15,15 +17,12 @@ import (
 	"github.com/pkg/errors"
 )
 
-const ssoSessionExpiry = 300 // five minutes to complete sso login process
-
-func (svc service) InitiateSSO(ctx context.Context, idpID uint, relayURL, ssoHandle string) (string, error) {
+func (svc service) InitiateSSO(ctx context.Context, idpID uint, relayURL string) (string, error) {
 	isProvider, err := svc.ds.IdentityProvider(idpID)
 	if err != nil {
 		return "", err
 	}
 	metadata, err := getMetadata(isProvider)
-
 	if err != nil {
 		return "", errors.Wrap(err, "InitiateSSO getting metadata")
 	}
@@ -35,12 +34,10 @@ func (svc service) InitiateSSO(ctx context.Context, idpID uint, relayURL, ssoHan
 		Metadata: metadata,
 		// Construct call back url to send to idp
 		AssertionConsumerServiceURL: appConfig.KolideServerURL + "/api/v1/kolide/sso/callback",
+		SessionStore:                svc.ssoSessionStore,
+		OriginalURL:                 relayURL,
 	}
-	// encrypt sso handle before sending it to IDP
-	encryptedSSOHandle, err := svc.ssoSessionStore.EncryptSSOHandle(ssoHandle, appConfig.AESKey, ssoSessionExpiry)
-	if err != nil {
-		return "", errors.Wrap(err, "encrypting sso session handle")
-	}
+
 	// If issuer is not explicitly set, default to host name.
 	var issuer string
 	if isProvider.IssuerURI == "" {
@@ -52,21 +49,15 @@ func (svc service) InitiateSSO(ctx context.Context, idpID uint, relayURL, ssoHan
 	} else {
 		issuer = isProvider.IssuerURI
 	}
-	idpURL, err := sso.CreateAuthorizationRequest(&settings, issuer, sso.RelayState(encryptedSSOHandle))
+	idpURL, err := sso.CreateAuthorizationRequest(&settings, issuer)
 	if err != nil {
 		return "", errors.Wrap(err, "InitiateSSO creating authorization")
 	}
-	// We're all ready to invoke idp with our redirect url, create a session in redis
-	// so we can coordinate state across the idp, kolide, and the viewer, we set
-	// session lifetime to five minutes,
-	err = svc.ssoSessionStore.CreateSession(ssoHandle, relayURL, ssoSessionExpiry)
-	if err != nil {
-		return "", errors.Wrap(err, "creating sso session")
-	}
+
 	return idpURL, nil
 }
 
-func getMetadata(idp *kolide.IdentityProvider) (*sso.IDPMetadata, error) {
+func getMetadata(idp *kolide.IdentityProvider) (*sso.Metadata, error) {
 	if idp.MetadataURL != "" {
 		metadata, err := sso.GetMetadata(idp.MetadataURL, 5*time.Second)
 		if err != nil {
@@ -84,55 +75,58 @@ func getMetadata(idp *kolide.IdentityProvider) (*sso.IDPMetadata, error) {
 	return nil, errors.Errorf("missing metadata for idp %s", idp.Name)
 }
 
+var relayStateLoadPage = ` <html>
+ <script type='text/javascript'>
+ var redirectURL = {{.RedirectURL}};
+ window.localStorage.setItem('KOLIDE::auth_token', '{{.Token}}');
+ window.location = redirectURL;
+ </script>
+ <body>
+ Redirecting to Kolide...
+ </body>
+ </html>
+`
+
 func (svc service) CallbackSSO(ctx context.Context, auth kolide.Auth) (string, error) {
 	appConfig, err := svc.ds.AppConfig()
 	if err != nil {
 		return "", errors.Wrap(err, "sso authentication callback")
 	}
-	status, err := auth.Status()
+	// The signature and validity of auth response has been checked already in
+	// validation middleware.
+	sess, err := svc.ssoSessionStore.Get(auth.RequestID())
 	if err != nil {
-		return "", errors.Wrap(err, "fetching sso response status")
+		return "", errors.Wrap(err, "fetching sso session in callback")
 	}
-	if status != sso.Success {
-		svc.logger.Log(
-			"method", "CallbackSSO",
-			"err", auth.StatusDescription(),
-		)
-		// TODO: Create custom 401 page
-		return appConfig.KolideServerURL + "/404", nil
-	}
-	ssoHandle, err := svc.ssoSessionStore.DecryptSSOHandle(auth.RelayState(), appConfig.AESKey)
+	user, err := svc.userByEmailOrUsername(auth.UserID())
 	if err != nil {
-		return "", errors.Wrap(err, "deciphering sso handle")
+		return "", errors.Wrap(err, "finding user in sso callback")
 	}
-	// Setting user id that we get from the IDP indicates we have successfully
-	// authenticated.
-	sess, err := svc.ssoSessionStore.UpdateSession(ssoHandle, auth.UserID())
-	// Because we're being called from an external IDP (via the browser) as opposed to returning json from
-	// an api call, the only thing that probably could go wrong is that the session expired
-	// because the user sat with the login page too long.  In this case, we'll reload
-	// the original resource in the SPA, which will call LoginSSO, which will fail because
-	// the session expired and we can display a more useful message.
-	svc.logger.Log("method", "CallbackSSO", "err", err)
+	token, err := svc.makeSession(user.ID)
+	if err != nil {
+		return "", errors.Wrap(err, "making user session in sso callback")
+	}
+	var redirectURL string
 	if strings.HasPrefix(sess.OriginalURL, "/") {
-		return appConfig.KolideServerURL + sess.OriginalURL, nil
+		redirectURL = "'" + appConfig.KolideServerURL + sess.OriginalURL + "'"
+	} else {
+		redirectURL = "'" + appConfig.KolideServerURL + "/" + sess.OriginalURL + "'"
 	}
-	return appConfig.KolideServerURL + "/" + sess.OriginalURL, nil
-}
 
-func (svc service) LoginSSO(ctx context.Context, ssoHandle string) (user *kolide.User, token string, err error) {
-	var session *sso.Session
-	session, err = svc.ssoSessionStore.GetSession(ssoHandle)
+	tmplt, err := template.New("relayStateLoader").Parse(relayStateLoadPage)
 	if err != nil {
-		return nil, "", errors.Wrap(err, "sso login retrieving session")
+		return "", errors.Wrap(err, "loading sso response template")
 	}
-	defer func() { err = svc.ssoSessionStore.ExpireSession(ssoHandle) }()
-	user, err = svc.userByEmailOrUsername(session.UserName)
+	args := struct {
+		RedirectURL template.JS
+		Token       string
+	}{template.JS(redirectURL), token}
+	var writer bytes.Buffer
+	err = tmplt.Execute(&writer, args)
 	if err != nil {
-		return nil, "", errors.Wrap(err, "fetching username in sso login")
+		return "", errors.Wrap(err, "creating sso response page")
 	}
-	token, err = svc.makeSession(user.ID)
-	return user, token, nil
+	return writer.String(), nil
 }
 
 func (svc service) Login(ctx context.Context, username, password string) (*kolide.User, string, error) {

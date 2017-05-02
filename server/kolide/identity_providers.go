@@ -18,6 +18,8 @@ type IdentityProviderStore interface {
 	// ListIdentityProvidersNoAuth returns IDP information with sensitive information
 	// omitted.
 	ListIdentityProvidersNoAuth() ([]IdentityProviderNoAuth, error)
+	// IdentityProviderByIDPIssuer
+	IdentityProviderByIDPIssuer(issuer string) (*IdentityProvider, error)
 }
 
 // IdentityProvider represents a SAML identity provider.
@@ -31,9 +33,9 @@ type IdentityProvider struct {
 	// IssuerURI is an optional identifier for this service provider. If not
 	// supplied it will default to the host name.
 	IssuerURI string `json:"issuer_uri" db:"issuer_uri"`
-	// Certificate is the identity provider's public certificate
-	// and is required if Metadata is not present.
-	Certificate string `json:"cert" db:"cert"`
+	// IDPIssuerURI is a mandatory uri that identifies the IDP in authentication
+	// responses.
+	IDPIssuerURI string `json:"idp_issuer_uir" db:"idp_issuer_uri"`
 	// Name is the descriptive name for the identity provider that will
 	// be displayed in the UI.
 	Name string `json:"name"`
@@ -55,7 +57,7 @@ type IdentityProvider struct {
 type IdentityProviderPayload struct {
 	DestinationURL *string `json:"destination_url"`
 	IssuerURI      *string `json:"issuer_uri"`
-	Certificate    *string `json:"cert"`
+	IDPIssuerURI   *string `json:"idp_issuer_uri"`
 	Name           *string `json:"name"`
 	ImageURL       *string `json:"image_url"`
 	Metadata       *string `json:"metadata"`

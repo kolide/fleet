@@ -12,12 +12,7 @@
       crossorigin="anonymous">
     </script>
     <script>
-    function generateToken() {
-      var S4 = function() {
-        return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
-      };
-      return (S4()+S4()+S4()+S4());
-     }
+
     $(document).ready(function(){
         // User agent handling for SSO
 
@@ -28,17 +23,13 @@
         // we always delete the token in the user agent. We use the session token
         // to keep track of state from the user agent (Kolide SPA), the service provider
         // (Kolide back end), to the identity provider (IDP) and back.
-        var sessionToken = localStorage.getItem("ssoSession")
+        var sessionToken = localStorage.getItem("KOLIDE::auth_token")
         if( sessionToken != null ) {
           console.log("user should be authenticated, fetching user with token " + sessionToken);
           $.ajax({
-            type: "POST",
-            url: "https://localhost:8080/api/v1/kolide/sso/login",
-            data: JSON.stringify(
-              {
-                token: sessionToken,
-              }
-            ),
+            type: "GET",
+            url: "https://localhost:8080/api/v1/kolide/me",
+            headers: {"Authorization": "Bearer " + sessionToken},
             contentType: "text/plain;",
             dataType: "json",
             success: function(data) {
@@ -48,7 +39,7 @@
               $("#displayarea").empty();
               $("#displayarea").append(
                 "<h3>Authentication Succeeded</h3>" +
-                "<p>Token: " + data.token.substring(0, 16) + "..." + "</p>" +
+                "<p>Token: " + localStorage.getItem("KOLIDE::auth_token").substring(0, 16) + "..." + "</p>" +
                 "<p>User: " + data.user.email + "</p>"
               );
               // print user stuff
@@ -68,11 +59,6 @@
         // IDP trigger the following post.
         $(".clicker").click(function(e){
           e.preventDefault();
-          // Generate a unique token of 8 or more characters and write to local
-          // storage
-           var token = generateToken();
-           localStorage.setItem("ssoSession", token);
-           console.log("created session token " + token);
 
             $.ajax({
               type: "POST",
@@ -83,8 +69,6 @@
                   // supply the url of the resource user was trying to access when
                   // prompted for login
                   relay_url: $("#relay").val(),
-                  // pass local storage token
-                  token: token
                 }
               ),
               contentType: "text/plain;",

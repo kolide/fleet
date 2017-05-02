@@ -4,10 +4,9 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/xml"
-	"net/url"
 
+	"github.com/kolide/kolide/server/kolide"
 	"github.com/pkg/errors"
-	"github.com/y0ssar1an/q"
 )
 
 const (
@@ -63,46 +62,62 @@ var statusMap = map[string]int{
 	"urn:oasis:names:tc:SAML:2.0:status:UnsupportedBinding":       UnsupportedBinding,
 }
 
-type AuthInfo interface {
-	RelayState() string
-	UserID() string
-	Status() (int, error)
-	StatusDescription() string
-}
-
 type resp struct {
-	relayState string
-	userID     string
-	status     string
+	response *Response
+	rawResp  string
 }
 
-func (r resp) StatusDescription() string {
-	return r.status
+func (r *resp) setResponse(val *Response) {
+	r.response = val
 }
 
-func (r resp) RelayState() string {
-	return r.relayState
+func (r resp) statusDescription() string {
+	if r.response != nil {
+		return r.response.Status.StatusCode.Value
+	}
+	return "missing response"
 }
 
 func (r resp) UserID() string {
-	return r.userID
+	if r.response != nil {
+		return r.response.Assertion.Subject.NameID.Value
+	}
+	return ""
 }
 
-func (r resp) Status() (int, error) {
-	if r.status == "" {
-		return AuthnFailed, errors.New("no status present")
+func (r resp) status() (int, error) {
+	if r.response != nil {
+		statusURI := r.response.Status.StatusCode.Value
+		if code, ok := statusMap[statusURI]; ok {
+			return code, nil
+		}
 	}
-	if s, ok := statusMap[r.status]; ok {
-		return s, nil
+	return AuthnFailed, errors.New("malformed or missing auth response")
+}
+
+func (r resp) RequestID() string {
+	if r.response != nil {
+		return r.response.InResponseTo
 	}
-	return AuthnFailed, errors.Errorf("unhandled status %s", r.status)
+	return ""
+}
+
+func (r resp) rawResponse() string {
+	return r.rawResp
+}
+
+func (r resp) authResponse() (*Response, error) {
+	if r.response != nil {
+		return r.response, nil
+	}
+	return nil, errors.New("missing SAML response")
 }
 
 // DecodeAuthResponse extracts SAML assertions from IDP response
-func DecodeAuthResponse(samlResponse, relayState string) (AuthInfo, error) {
-	q.Q(samlResponse)
-	q.Q(relayState)
+func DecodeAuthResponse(samlResponse string) (kolide.Auth, error) {
 	var authInfo resp
+	authInfo.rawResp = samlResponse
+
 	decoded, err := base64.StdEncoding.DecodeString(samlResponse)
 	if err != nil {
 		return nil, errors.Wrap(err, "decoding saml response")
@@ -112,36 +127,6 @@ func DecodeAuthResponse(samlResponse, relayState string) (AuthInfo, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "decoding response xml")
 	}
-	authInfo.status = saml.Status.StatusCode.Value
-	status, err := authInfo.Status()
-	if err != nil {
-		return nil, errors.Wrap(err, "decoding auth response")
-	}
-	if status == Success {
-		authInfo.userID = saml.Assertion.Subject.NameID.Value
-	}
-	authInfo.relayState = relayState
+	authInfo.response = &saml
 	return &authInfo, nil
-}
-
-// See http://docs.oasis-open.org/security/saml/v2.0/saml-bindings-2.0-os.pdf
-// Section 3.5.4 for details on decoding SAML Response
-// Also we expect form to be application/x-www-form-urlencoded
-// See https://www.w3.org/TR/html401/interact/forms.html section 17.13.4
-func decodeAuthSAMLResponse(encodedResp []byte) (*Response, error) {
-	unescaped, err := url.PathUnescape(string(encodedResp))
-	if err != nil {
-		return nil, errors.Wrap(err, "processing SAMLResponse")
-	}
-	decoded, err := base64.StdEncoding.DecodeString(unescaped)
-	if err != nil {
-		return nil, errors.Wrap(err, "base46 decoding auth response")
-	}
-	var resp Response
-	reader := bytes.NewBuffer(decoded)
-	err = xml.NewDecoder(reader).Decode(&resp)
-	if err != nil {
-		return nil, errors.Wrap(err, "decoding authorization response xml")
-	}
-	return &resp, nil
 }
