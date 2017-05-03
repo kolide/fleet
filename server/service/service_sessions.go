@@ -1,11 +1,9 @@
 package service
 
 import (
-	"bytes"
 	"context"
 	"crypto/rand"
 	"encoding/base64"
-	"html/template"
 	"net/url"
 	"strings"
 	"time"
@@ -73,58 +71,29 @@ func getMetadata(config *kolide.AppConfig) (*sso.Metadata, error) {
 	return nil, errors.Errorf("missing metadata for idp %s", config.IDPName)
 }
 
-var relayStateLoadPage = ` <html>
- <script type='text/javascript'>
- var redirectURL = {{.RedirectURL}};
- window.localStorage.setItem('KOLIDE::auth_token', '{{.Token}}');
- window.location = redirectURL;
- </script>
- <body>
- Redirecting to Kolide...
- </body>
- </html>
-`
-
-func (svc service) CallbackSSO(ctx context.Context, auth kolide.Auth) (string, error) {
-	appConfig, err := svc.ds.AppConfig()
-	if err != nil {
-		return "", errors.Wrap(err, "sso authentication callback")
-	}
+func (svc service) CallbackSSO(ctx context.Context, auth kolide.Auth) (*kolide.SSOSession, error) {
 	// The signature and validity of auth response has been checked already in
 	// validation middleware.
 	sess, err := svc.ssoSessionStore.Get(auth.RequestID())
 	if err != nil {
-		return "", errors.Wrap(err, "fetching sso session in callback")
+		return nil, errors.Wrap(err, "fetching sso session in callback")
 	}
 	user, err := svc.userByEmailOrUsername(auth.UserID())
 	if err != nil {
-		return "", errors.Wrap(err, "finding user in sso callback")
+		return nil, errors.Wrap(err, "finding user in sso callback")
 	}
 	token, err := svc.makeSession(user.ID)
 	if err != nil {
-		return "", errors.Wrap(err, "making user session in sso callback")
+		return nil, errors.Wrap(err, "making user session in sso callback")
 	}
-	var redirectURL string
-	if strings.HasPrefix(sess.OriginalURL, "/") {
-		redirectURL = "'" + appConfig.KolideServerURL + sess.OriginalURL + "'"
-	} else {
-		redirectURL = "'" + appConfig.KolideServerURL + "/" + sess.OriginalURL + "'"
+	result := &kolide.SSOSession{
+		Token:       token,
+		RedirectURL: sess.OriginalURL,
 	}
-
-	tmplt, err := template.New("relayStateLoader").Parse(relayStateLoadPage)
-	if err != nil {
-		return "", errors.Wrap(err, "loading sso response template")
+	if !strings.HasPrefix(result.RedirectURL, "/") {
+		result.RedirectURL = "/" + result.RedirectURL
 	}
-	args := struct {
-		RedirectURL template.JS
-		Token       string
-	}{template.JS(redirectURL), token}
-	var writer bytes.Buffer
-	err = tmplt.Execute(&writer, args)
-	if err != nil {
-		return "", errors.Wrap(err, "creating sso response page")
-	}
-	return writer.String(), nil
+	return result, nil
 }
 
 func (svc service) Login(ctx context.Context, username, password string) (*kolide.User, string, error) {

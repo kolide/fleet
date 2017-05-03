@@ -31,11 +31,9 @@ func encodeResponse(ctx context.Context, w http.ResponseWriter, response interfa
 	}
 
 	if page, ok := response.(htmlPage); ok {
-		if page.error() == nil {
-			w.Header().Set("Content-Type", "text/html; charset=UTF-8")
-			_, err := io.WriteString(w, page.html())
-			return err
-		}
+		w.Header().Set("Content-Type", "text/html; charset=UTF-8")
+		_, err := io.WriteString(w, page.html())
+		return err
 	}
 
 	enc := json.NewEncoder(w)

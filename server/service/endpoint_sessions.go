@@ -1,7 +1,9 @@
 package service
 
 import (
+	"bytes"
 	"context"
+	"html/template"
 	"time"
 
 	"github.com/go-kit/kit/endpoint"
@@ -196,22 +198,50 @@ func makeInitiateSSOEndpoint(svc kolide.Service) endpoint.Endpoint {
 }
 
 type callbackSSOResponse struct {
-	Content string `json:"url,omitempty"`
-	Err     error  `json:"error,omitempty"`
+	content string
+	Err     error `json:"error,omitempty"`
 }
 
 func (r callbackSSOResponse) error() error { return r.Err }
 
 // If html is present we return a web page
-func (r callbackSSOResponse) html() string { return r.Content }
+func (r callbackSSOResponse) html() string { return r.content }
 
 func makeCallbackSSOEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		authResponse := request.(kolide.Auth)
-		content, err := svc.CallbackSSO(ctx, authResponse)
+		session, err := svc.CallbackSSO(ctx, authResponse)
+		var resp callbackSSOResponse
 		if err != nil {
-			return callbackSSOResponse{Err: err}, nil
+			// redirect to login page on front end if there was some problem,
+			// errors should still be logged
+			session = &kolide.SSOSession{
+				RedirectURL: "/login",
+				Token:       "",
+			}
+			resp.Err = err
 		}
-		return callbackSSOResponse{Content: content}, nil
+		relayStateLoadPage := ` <html>
+     <script type='text/javascript'>
+     var redirectURL = {{.RedirectURL}};
+     window.localStorage.setItem('KOLIDE::auth_token', '{{.Token}}');
+     window.location = redirectURL;
+     </script>
+     <body>
+     Redirecting to Kolide...
+     </body>
+     </html>
+    `
+		tmpl, err := template.New("relayStateLoader").Parse(relayStateLoadPage)
+		if err != nil {
+			return nil, err
+		}
+		var writer bytes.Buffer
+		err = tmpl.Execute(&writer, session)
+		if err != nil {
+			return nil, err
+		}
+		resp.content = writer.String()
+		return resp, nil
 	}
 }
