@@ -45,9 +45,16 @@ func (d *Datastore) SaveAppConfig(info *kolide.AppConfig) error {
 			smtp_user_name,
 			smtp_password,
 			smtp_verify_ssl_certs,
-			smtp_enable_start_tls
+			smtp_enable_start_tls,
+      entity_id,
+      issuer_uri,
+      idp_image_url,
+      metadata,
+      metadata_url,
+      idp_name,
+      enable_sso
 		)
-		VALUES( 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
+		VALUES( 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
 		ON DUPLICATE KEY UPDATE
 			org_name = VALUES(org_name),
 			org_logo_url = VALUES(org_logo_url),
@@ -64,7 +71,14 @@ func (d *Datastore) SaveAppConfig(info *kolide.AppConfig) error {
 			smtp_user_name = VALUES(smtp_user_name),
 			smtp_password = VALUES(smtp_password),
 			smtp_verify_ssl_certs = VALUES(smtp_verify_ssl_certs),
-			smtp_enable_start_tls = VALUES(smtp_enable_start_tls)
+			smtp_enable_start_tls = VALUES(smtp_enable_start_tls),
+      entity_id = VALUES(entity_id),
+      issuer_uri = VALUES(issuer_uri),
+      idp_image_url = VALUES(idp_image_url),
+      metadata = VALUES(metadata),
+      metadata_url = VALUES(metadata_url),
+      idp_name = VALUES(idp_name),
+      enable_sso = VALUES(enable_sso)
 	`
 
 	_, err := d.db.Exec(insertStatement,
@@ -84,6 +98,13 @@ func (d *Datastore) SaveAppConfig(info *kolide.AppConfig) error {
 		info.SMTPPassword,
 		info.SMTPVerifySSLCerts,
 		info.SMTPEnableStartTLS,
+		info.EntityID,
+		info.IssuerURI,
+		info.IDPImageURL,
+		info.Metadata,
+		info.MetadataURL,
+		info.IDPName,
+		info.EnableSSO,
 	)
 
 	return err

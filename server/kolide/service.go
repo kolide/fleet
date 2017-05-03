@@ -18,5 +18,4 @@ type Service interface {
 	ImportConfigService
 	LicenseService
 	DecoratorService
-	IdentityProviderService
 }

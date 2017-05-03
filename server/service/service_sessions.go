@@ -17,19 +17,17 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (svc service) InitiateSSO(ctx context.Context, idpID uint, relayURL string) (string, error) {
-	isProvider, err := svc.ds.IdentityProvider(idpID)
-	if err != nil {
-		return "", err
-	}
-	metadata, err := getMetadata(isProvider)
-	if err != nil {
-		return "", errors.Wrap(err, "InitiateSSO getting metadata")
-	}
+func (svc service) InitiateSSO(ctx context.Context, relayURL string) (string, error) {
 	appConfig, err := svc.ds.AppConfig()
 	if err != nil {
 		return "", errors.Wrap(err, "InitiateSSO getting app config")
 	}
+
+	metadata, err := getMetadata(appConfig)
+	if err != nil {
+		return "", errors.Wrap(err, "InitiateSSO getting metadata")
+	}
+
 	settings := sso.Settings{
 		Metadata: metadata,
 		// Construct call back url to send to idp
@@ -40,14 +38,14 @@ func (svc service) InitiateSSO(ctx context.Context, idpID uint, relayURL string)
 
 	// If issuer is not explicitly set, default to host name.
 	var issuer string
-	if isProvider.IssuerURI == "" {
+	if appConfig.EntityID == "" {
 		u, err := url.Parse(appConfig.KolideServerURL)
 		if err != nil {
 			return "", errors.Wrap(err, "parsing kolide server url")
 		}
 		issuer = u.Hostname()
 	} else {
-		issuer = isProvider.IssuerURI
+		issuer = appConfig.EntityID
 	}
 	idpURL, err := sso.CreateAuthorizationRequest(&settings, issuer)
 	if err != nil {
@@ -57,22 +55,22 @@ func (svc service) InitiateSSO(ctx context.Context, idpID uint, relayURL string)
 	return idpURL, nil
 }
 
-func getMetadata(idp *kolide.IdentityProvider) (*sso.Metadata, error) {
-	if idp.MetadataURL != "" {
-		metadata, err := sso.GetMetadata(idp.MetadataURL, 5*time.Second)
+func getMetadata(config *kolide.AppConfig) (*sso.Metadata, error) {
+	if config.MetadataURL != "" {
+		metadata, err := sso.GetMetadata(config.MetadataURL, 5*time.Second)
 		if err != nil {
 			return nil, err
 		}
 		return metadata, nil
 	}
-	if idp.Metadata != "" {
-		metadata, err := sso.ParseMetadata(idp.Metadata)
+	if config.Metadata != "" {
+		metadata, err := sso.ParseMetadata(config.Metadata)
 		if err != nil {
 			return nil, err
 		}
 		return metadata, nil
 	}
-	return nil, errors.Errorf("missing metadata for idp %s", idp.Name)
+	return nil, errors.Errorf("missing metadata for idp %s", config.IDPName)
 }
 
 var relayStateLoadPage = ` <html>

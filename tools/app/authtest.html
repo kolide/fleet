@@ -65,7 +65,6 @@
               url: "https://localhost:8080/api/v1/kolide/sso",
               data: JSON.stringify(
                 {
-                  identity_provider_id: parseInt($("#idpid").val()),
                   // supply the url of the resource user was trying to access when
                   // prompted for login
                   relay_url: $("#relay").val(),
@@ -87,23 +86,13 @@
   <body>
     <h3>Single Sign On Test Page</h3>
     <div class="content">
-      This page is used to test single sign on identity providers. Supply the database ID for the identity provider under test in
-      the <strong>Identity Provider ID</strong> field below.  The <strong>Relay URL</strong> field contains
+      This page is used to test single sign on identity providers.  The <strong>Relay URL</strong> field contains
       the URL of the Kolide resource to invoke after authentication with the IDP. It defaults to this page.
       Click <a class='clicker' href='#'>Request Authorization</a>
       to trigger the authorization process. The browser's javascript console may contain useful
       debugging information. The <a href="https://addons.mozilla.org/en-US/firefox/addon/saml-tracer/">SAML Tracer</a> add-on
       for Firefox is also useful in diagnosing problems with a particular identity provider.
     </div>
-    <div class="columns">
-      <div>
-        Identity Provider ID:
-      </div>
-      <div>
-        <input type="text" name="idpid" id="idpid" />
-      </div>
-    </div>
-    <div class="clear"></div>
     <div class="columns">
       <div>
           Relay URL:

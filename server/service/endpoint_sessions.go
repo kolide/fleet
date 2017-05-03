@@ -174,8 +174,7 @@ func makeDeleteSessionsForUserEndpoint(svc kolide.Service) endpoint.Endpoint {
 }
 
 type initiateSSORequest struct {
-	IdentityProviderID uint   `json:"identity_provider_id"`
-	RelayURL           string `json:"relay_url"`
+	RelayURL string `json:"relay_url"`
 }
 
 type initiateSSOResponse struct {
@@ -188,7 +187,7 @@ func (r initiateSSOResponse) error() error { return r.Err }
 func makeInitiateSSOEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(initiateSSORequest)
-		idProviderURL, err := svc.InitiateSSO(ctx, req.IdentityProviderID, req.RelayURL)
+		idProviderURL, err := svc.InitiateSSO(ctx, req.RelayURL)
 		if err != nil {
 			return initiateSSOResponse{Err: err}, nil
 		}

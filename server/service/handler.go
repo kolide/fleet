@@ -70,12 +70,6 @@ type KolideEndpoints struct {
 	NewDecorator                   endpoint.Endpoint
 	ModifyDecorator                endpoint.Endpoint
 	DeleteDecorator                endpoint.Endpoint
-	ListIdentityProvidersNoAuth    endpoint.Endpoint
-	ListIdentityProviders          endpoint.Endpoint
-	NewIdentityProvider            endpoint.Endpoint
-	ModifyIdentityProvider         endpoint.Endpoint
-	DeleteIdentityProvider         endpoint.Endpoint
-	GetIdentityProvider            endpoint.Endpoint
 	GetHost                        endpoint.Endpoint
 	DeleteHost                     endpoint.Endpoint
 	ListHosts                      endpoint.Endpoint
@@ -139,44 +133,38 @@ func MakeKolideServerEndpoints(svc kolide.Service, jwtKey string) KolideEndpoint
 		DeleteQuery:                    authenticatedUser(jwtKey, svc, makeDeleteQueryEndpoint(svc)),
 		DeleteQueries:                  authenticatedUser(jwtKey, svc, makeDeleteQueriesEndpoint(svc)),
 		CreateDistributedQueryCampaign: authenticatedUser(jwtKey, svc, makeCreateDistributedQueryCampaignEndpoint(svc)),
-		GetPack:                     authenticatedUser(jwtKey, svc, makeGetPackEndpoint(svc)),
-		ListPacks:                   authenticatedUser(jwtKey, svc, makeListPacksEndpoint(svc)),
-		CreatePack:                  authenticatedUser(jwtKey, svc, makeCreatePackEndpoint(svc)),
-		ModifyPack:                  authenticatedUser(jwtKey, svc, makeModifyPackEndpoint(svc)),
-		DeletePack:                  authenticatedUser(jwtKey, svc, makeDeletePackEndpoint(svc)),
-		ScheduleQuery:               authenticatedUser(jwtKey, svc, makeScheduleQueryEndpoint(svc)),
-		GetScheduledQueriesInPack:   authenticatedUser(jwtKey, svc, makeGetScheduledQueriesInPackEndpoint(svc)),
-		GetScheduledQuery:           authenticatedUser(jwtKey, svc, makeGetScheduledQueryEndpoint(svc)),
-		ModifyScheduledQuery:        authenticatedUser(jwtKey, svc, makeModifyScheduledQueryEndpoint(svc)),
-		DeleteScheduledQuery:        authenticatedUser(jwtKey, svc, makeDeleteScheduledQueryEndpoint(svc)),
-		GetHost:                     authenticatedUser(jwtKey, svc, makeGetHostEndpoint(svc)),
-		ListHosts:                   authenticatedUser(jwtKey, svc, makeListHostsEndpoint(svc)),
-		GetHostSummary:              authenticatedUser(jwtKey, svc, makeGetHostSummaryEndpoint(svc)),
-		DeleteHost:                  authenticatedUser(jwtKey, svc, makeDeleteHostEndpoint(svc)),
-		GetLabel:                    authenticatedUser(jwtKey, svc, makeGetLabelEndpoint(svc)),
-		ListLabels:                  authenticatedUser(jwtKey, svc, makeListLabelsEndpoint(svc)),
-		CreateLabel:                 authenticatedUser(jwtKey, svc, makeCreateLabelEndpoint(svc)),
-		DeleteLabel:                 authenticatedUser(jwtKey, svc, makeDeleteLabelEndpoint(svc)),
-		ModifyLabel:                 authenticatedUser(jwtKey, svc, makeModifyLabelEndpoint(svc)),
-		ListDecorators:              authenticatedUser(jwtKey, svc, makeListDecoratorsEndpoint(svc)),
-		NewDecorator:                authenticatedUser(jwtKey, svc, makeNewDecoratorEndpoint(svc)),
-		ModifyDecorator:             authenticatedUser(jwtKey, svc, makeModifyDecoratorEndpoint(svc)),
-		DeleteDecorator:             authenticatedUser(jwtKey, svc, makeDeleteDecoratorEndpoint(svc)),
-		ListIdentityProvidersNoAuth: makeListIdentityProvidersNoAuthEndpoint(svc),
-		ListIdentityProviders:       authenticatedUser(jwtKey, svc, makeListIdentityProvidersEndpoint(svc)),
-		NewIdentityProvider:         authenticatedUser(jwtKey, svc, mustBeAdmin(makeNewIdentityProviderEndpoint(svc))),
-		ModifyIdentityProvider:      authenticatedUser(jwtKey, svc, mustBeAdmin(makeModifyIdentityProviderEndpoint(svc))),
-		DeleteIdentityProvider:      authenticatedUser(jwtKey, svc, mustBeAdmin(makeDeleteIdentityProviderEndpoint(svc))),
-		GetIdentityProvider:         authenticatedUser(jwtKey, svc, makeGetIdentityProviderEndpoint(svc)),
-		SearchTargets:               authenticatedUser(jwtKey, svc, makeSearchTargetsEndpoint(svc)),
-		GetOptions:                  authenticatedUser(jwtKey, svc, mustBeAdmin(makeGetOptionsEndpoint(svc))),
-		ModifyOptions:               authenticatedUser(jwtKey, svc, mustBeAdmin(makeModifyOptionsEndpoint(svc))),
-		ResetOptions:                authenticatedUser(jwtKey, svc, mustBeAdmin(makeResetOptionsEndpoint(svc))),
-		ImportConfig:                authenticatedUser(jwtKey, svc, makeImportConfigEndpoint(svc)),
-		GetCertificate:              authenticatedUser(jwtKey, svc, makeCertificateEndpoint(svc)),
-		ChangeEmail:                 authenticatedUser(jwtKey, svc, makeChangeEmailEndpoint(svc)),
-		UpdateLicense:               authenticatedUser(jwtKey, svc, mustBeAdmin(makeUpdateLicenseEndpoint(svc))),
-		GetLicense:                  authenticatedUser(jwtKey, svc, makeGetLicenseEndpoint(svc)),
+		GetPack:                   authenticatedUser(jwtKey, svc, makeGetPackEndpoint(svc)),
+		ListPacks:                 authenticatedUser(jwtKey, svc, makeListPacksEndpoint(svc)),
+		CreatePack:                authenticatedUser(jwtKey, svc, makeCreatePackEndpoint(svc)),
+		ModifyPack:                authenticatedUser(jwtKey, svc, makeModifyPackEndpoint(svc)),
+		DeletePack:                authenticatedUser(jwtKey, svc, makeDeletePackEndpoint(svc)),
+		ScheduleQuery:             authenticatedUser(jwtKey, svc, makeScheduleQueryEndpoint(svc)),
+		GetScheduledQueriesInPack: authenticatedUser(jwtKey, svc, makeGetScheduledQueriesInPackEndpoint(svc)),
+		GetScheduledQuery:         authenticatedUser(jwtKey, svc, makeGetScheduledQueryEndpoint(svc)),
+		ModifyScheduledQuery:      authenticatedUser(jwtKey, svc, makeModifyScheduledQueryEndpoint(svc)),
+		DeleteScheduledQuery:      authenticatedUser(jwtKey, svc, makeDeleteScheduledQueryEndpoint(svc)),
+		GetHost:                   authenticatedUser(jwtKey, svc, makeGetHostEndpoint(svc)),
+		ListHosts:                 authenticatedUser(jwtKey, svc, makeListHostsEndpoint(svc)),
+		GetHostSummary:            authenticatedUser(jwtKey, svc, makeGetHostSummaryEndpoint(svc)),
+		DeleteHost:                authenticatedUser(jwtKey, svc, makeDeleteHostEndpoint(svc)),
+		GetLabel:                  authenticatedUser(jwtKey, svc, makeGetLabelEndpoint(svc)),
+		ListLabels:                authenticatedUser(jwtKey, svc, makeListLabelsEndpoint(svc)),
+		CreateLabel:               authenticatedUser(jwtKey, svc, makeCreateLabelEndpoint(svc)),
+		DeleteLabel:               authenticatedUser(jwtKey, svc, makeDeleteLabelEndpoint(svc)),
+		ModifyLabel:               authenticatedUser(jwtKey, svc, makeModifyLabelEndpoint(svc)),
+		ListDecorators:            authenticatedUser(jwtKey, svc, makeListDecoratorsEndpoint(svc)),
+		NewDecorator:              authenticatedUser(jwtKey, svc, makeNewDecoratorEndpoint(svc)),
+		ModifyDecorator:           authenticatedUser(jwtKey, svc, makeModifyDecoratorEndpoint(svc)),
+		DeleteDecorator:           authenticatedUser(jwtKey, svc, makeDeleteDecoratorEndpoint(svc)),
+		SearchTargets:             authenticatedUser(jwtKey, svc, makeSearchTargetsEndpoint(svc)),
+		GetOptions:                authenticatedUser(jwtKey, svc, mustBeAdmin(makeGetOptionsEndpoint(svc))),
+		ModifyOptions:             authenticatedUser(jwtKey, svc, mustBeAdmin(makeModifyOptionsEndpoint(svc))),
+		ResetOptions:              authenticatedUser(jwtKey, svc, mustBeAdmin(makeResetOptionsEndpoint(svc))),
+		ImportConfig:              authenticatedUser(jwtKey, svc, makeImportConfigEndpoint(svc)),
+		GetCertificate:            authenticatedUser(jwtKey, svc, makeCertificateEndpoint(svc)),
+		ChangeEmail:               authenticatedUser(jwtKey, svc, makeChangeEmailEndpoint(svc)),
+		UpdateLicense:             authenticatedUser(jwtKey, svc, mustBeAdmin(makeUpdateLicenseEndpoint(svc))),
+		GetLicense:                authenticatedUser(jwtKey, svc, makeGetLicenseEndpoint(svc)),
 
 		// Osquery endpoints
 		EnrollAgent:                   makeEnrollAgentEndpoint(svc),
@@ -243,12 +231,6 @@ type kolideHandlers struct {
 	NewDecorator                   http.Handler
 	ModifyDecorator                http.Handler
 	DeleteDecorator                http.Handler
-	ListIdentityProvidersNoAuth    http.Handler
-	ListIdentityProviders          http.Handler
-	NewIdentityProvider            http.Handler
-	ModifyIdentityProvider         http.Handler
-	DeleteIdentityProvider         http.Handler
-	GetIdentityProvider            http.Handler
 	GetHost                        http.Handler
 	DeleteHost                     http.Handler
 	ListHosts                      http.Handler
@@ -326,12 +308,6 @@ func makeKolideKitHandlers(e KolideEndpoints, opts []kithttp.ServerOption) *koli
 		NewDecorator:                  newServer(e.NewDecorator, decodeNewDecoratorRequest),
 		ModifyDecorator:               newServer(e.ModifyDecorator, decodeModifyDecoratorRequest),
 		DeleteDecorator:               newServer(e.DeleteDecorator, decodeDeleteDecoratorRequest),
-		ListIdentityProvidersNoAuth:   newServer(e.ListIdentityProvidersNoAuth, decodeNoParamsRequest),
-		ListIdentityProviders:         newServer(e.ListIdentityProviders, decodeNoParamsRequest),
-		NewIdentityProvider:           newServer(e.NewIdentityProvider, decodeNewIdentityProviderRequest),
-		ModifyIdentityProvider:        newServer(e.ModifyIdentityProvider, decodeModifyIdentityProviderRequest),
-		DeleteIdentityProvider:        newServer(e.DeleteIdentityProvider, decodeDeleteIdentityProviderRequest),
-		GetIdentityProvider:           newServer(e.GetIdentityProvider, decodeGetIdentityProviderRequest),
 		GetHost:                       newServer(e.GetHost, decodeGetHostRequest),
 		DeleteHost:                    newServer(e.DeleteHost, decodeDeleteHostRequest),
 		ListHosts:                     newServer(e.ListHosts, decodeListHostsRequest),
@@ -448,13 +424,6 @@ func attachKolideAPIRoutes(r *mux.Router, h *kolideHandlers) {
 	r.Handle("/api/v1/kolide/decorators", h.NewDecorator).Methods("POST").Name("create_decorator")
 	r.Handle("/api/v1/kolide/decorators/{id}", h.ModifyDecorator).Methods("PATCH").Name("modify_decorator")
 	r.Handle("/api/v1/kolide/decorators/{id}", h.DeleteDecorator).Methods("DELETE").Name("delete_decorator")
-
-	r.Handle("/api/v1/kolide/idps", h.ListIdentityProviders).Methods("GET").Name("list_identity_providers")
-	r.Handle("/api/v1/kolide/idps/sso", h.ListIdentityProvidersNoAuth).Methods("GET").Name("list_identity_providers_noauth")
-	r.Handle("/api/v1/kolide/idps", h.NewIdentityProvider).Methods("POST").Name("create_identity_provider")
-	r.Handle("/api/v1/kolide/idps/{id}", h.ModifyIdentityProvider).Methods("PATCH").Name("modify_identity_provider")
-	r.Handle("/api/v1/kolide/idps/{id}", h.DeleteIdentityProvider).Methods("DELETE").Name("delete_identity_provider")
-	r.Handle("/api/v1/kolide/idps/{id}", h.GetIdentityProvider).Methods("GET").Name("get_identity_provider")
 
 	r.Handle("/api/v1/kolide/hosts", h.ListHosts).Methods("GET").Name("list_hosts")
 	r.Handle("/api/v1/kolide/host_summary", h.GetHostSummary).Methods("GET").Name("get_host_summary")

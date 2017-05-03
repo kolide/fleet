@@ -40,10 +40,9 @@ type Auth interface {
 type SessionService interface {
 	// InitiateSSO is used to initiate an SSO session and returns a URL that
 	// can be used in a redirect to the IDP.
-	// Arguments: idpID is the database id of the Identity Provider, relayValue is a token
-	// that is stored in the browser state and is associated with the url that the
-	// user was accessing when prompted to log in.
-	InitiateSSO(ctx context.Context, idpID uint, relayValue string) (string, error)
+	// Arguments: relayValue is the URL of the protected resource that the user
+	// was trying to access when they were promted to log in
+	InitiateSSO(ctx context.Context, relayValue string) (string, error)
 	// CallbackSSO handles the IDP response.  The original URL the viewer attempted
 	// to access is returned from this function so we can redirect back to the front end and
 	// load the page the viewer originally attempted to access when prompted for login.
