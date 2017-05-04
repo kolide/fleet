@@ -211,7 +211,7 @@ the way that the kolide server works.
 				// test that we can load this
 				_, err := ioutil.ReadFile(path)
 				if err != nil {
-					initFatal(err, "loading KOLIDE_TEST_PATH_PATH")
+					initFatal(err, "loading KOLIDE_TEST_PAGE_PATH")
 				}
 				r.HandleFunc("/test", func(rw http.ResponseWriter, req *http.Request) {
 					testPage, err := ioutil.ReadFile(path)
