@@ -21,6 +21,8 @@ export const PERFORM_REQUIRED_PASSWORD_RESET_REQUEST = 'PERFORM_REQUIRED_PASSWOR
 export const PERFORM_REQUIRED_PASSWORD_RESET_SUCCESS = 'PERFORM_REQUIRED_PASSWORD_RESET_SUCCESS';
 export const PERFORM_REQUIRED_PASSWORD_RESET_FAILURE = 'PERFORM_REQUIRED_PASSWORD_RESET_FAILURE';
 
+export const SSOLOGIN_REQUEST = 'SSOLOGIN_REQUEST';
+
 export const licenseFailure = (errors) => {
   return {
     type: LICENSE_FAILURE,
@@ -122,6 +124,8 @@ export const fetchCurrentUser = () => {
       });
   };
 };
+
+
 
 // formData should be { username: <string>, password: <string> }
 export const loginUser = (formData) => {
