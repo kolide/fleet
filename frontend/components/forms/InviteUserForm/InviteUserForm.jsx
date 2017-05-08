@@ -155,7 +155,7 @@ class InviteUserForm extends Component {
           placeholder="Email"
           value={email}
         />
-      <div className={`${baseClass}__radio`}>
+        <div className={`${baseClass}__radio`}>
           <p className={`${baseClass}__role`}>admin</p>
           <Checkbox
             name="admin"
