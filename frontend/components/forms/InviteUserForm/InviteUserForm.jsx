@@ -18,6 +18,7 @@ class InviteUserForm extends Component {
     invitedBy: userInterface,
     onCancel: PropTypes.func,
     onSubmit: PropTypes.func,
+    canUseSSO: PropTypes.bool,
   };
 
   constructor (props) {
@@ -154,7 +155,7 @@ class InviteUserForm extends Component {
           placeholder="Email"
           value={email}
         />
-        <div className={`${baseClass}__radio`}>
+      <div className={`${baseClass}__radio`}>
           <p className={`${baseClass}__role`}>admin</p>
           <Checkbox
             name="admin"
@@ -171,11 +172,13 @@ class InviteUserForm extends Component {
             name="sso_enabled"
             onChange={onCheckboxChange('sso_enabled')}
             value={ssoEnabled}
+            disabled={!this.props.canUseSSO}
             wrapperClassName={`${baseClass}__invite-admin`}
           >
             Enable Single Sign On
           </Checkbox>
         </div>
+
         <div className={`${baseClass}__btn-wrap`}>
           <Button className={`${baseClass}__btn`} type="submit" variant="brand">
             Invite
