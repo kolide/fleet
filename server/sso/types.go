@@ -168,8 +168,7 @@ type SPSSODescriptor struct {
 	ProtocolSupportEnumeration string `xml:"protocolSupportEnumeration,attr"`
 	SigningKeyDescriptor       KeyDescriptor
 	EncryptionKeyDescriptor    KeyDescriptor
-	// SingleLogoutService        SingleLogoutService `xml:"SingleLogoutService"`
-	AssertionConsumerServices []AssertionConsumerService
+	AssertionConsumerServices  []AssertionConsumerService
 }
 
 type EntityAttributes struct {
@@ -181,12 +180,6 @@ type EntityAttributes struct {
 
 type SPSSODescriptors struct {
 }
-
-// type KeyDescriptor struct {
-// 	XMLName xml.Name
-// 	Use     string  `xml:"use,attr"`
-// 	KeyInfo KeyInfo `xml:"KeyInfo"`
-// }
 
 type SingleLogoutService struct {
 	Binding  string `xml:"Binding,attr"`

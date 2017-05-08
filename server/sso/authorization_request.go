@@ -6,7 +6,6 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/xml"
-	"fmt"
 	"net/url"
 	"time"
 
@@ -136,17 +135,11 @@ func deflate(xmlBuffer *bytes.Buffer) (string, error) {
 	return encoded, nil
 }
 
-// UUID per RFC 4122
 func getAuthnRequestID() (string, error) {
-	uuid := make([]byte, 16)
-	_, err := rand.Read(uuid)
+	buff := make([]byte, 16)
+	_, err := rand.Read(buff)
 	if err != nil {
 		return "", err
 	}
-	// Variant field section 4.1.2
-	// Set bit 7 (msb) to 1, bit 6 to 0, leave the rest of the bits alone
-	uuid[8] = uuid[8]&^0xc0 | 0x80
-	// Version 4 psuedo random uuid msb octet = 0100
-	uuid[6] = uuid[6]&^0xf0 | 0x40
-	return fmt.Sprintf("%x-%x-%x-%x-%x", uuid[0:4], uuid[4:6], uuid[6:8], uuid[8:10], uuid[10:]), nil
+	return base64.RawStdEncoding.EncodeToString(buff), nil
 }

@@ -15,7 +15,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (svc service) InitiateSSO(ctx context.Context, relayURL string) (string, error) {
+func (svc service) InitiateSSO(ctx context.Context, redirectURL string) (string, error) {
 	appConfig, err := svc.ds.AppConfig()
 	if err != nil {
 		return "", errors.Wrap(err, "InitiateSSO getting app config")
@@ -31,7 +31,7 @@ func (svc service) InitiateSSO(ctx context.Context, relayURL string) (string, er
 		// Construct call back url to send to idp
 		AssertionConsumerServiceURL: appConfig.KolideServerURL + "/api/v1/kolide/sso/callback",
 		SessionStore:                svc.ssoSessionStore,
-		OriginalURL:                 relayURL,
+		OriginalURL:                 redirectURL,
 	}
 
 	// If issuer is not explicitly set, default to host name.
@@ -77,6 +77,11 @@ func (svc service) CallbackSSO(ctx context.Context, auth kolide.Auth) (*kolide.S
 	sess, err := svc.ssoSessionStore.Get(auth.RequestID())
 	if err != nil {
 		return nil, errors.Wrap(err, "fetching sso session in callback")
+	}
+	// Remove session to so that is can't be reused before it expires.
+	err = svc.ssoSessionStore.Expire(auth.RequestID())
+	if err != nil {
+		return nil, errors.Wrap(err, "expiring sso session in callback")
 	}
 	user, err := svc.userByEmailOrUsername(auth.UserID())
 	if err != nil {

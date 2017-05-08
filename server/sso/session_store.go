@@ -29,6 +29,7 @@ type Session struct {
 type SessionStore interface {
 	create(requestID, originalURL, x509Cert string, lifetimeSecs uint) error
 	Get(requestID string) (*Session, error)
+	Expire(requestID string) error
 }
 
 // NewSessionStore creates a SessionStore
@@ -81,17 +82,9 @@ func (s *store) Get(requestID string) (*Session, error) {
 
 var ErrSessionNotFound = errors.New("session not found")
 
-func (s *store) ExpireSession(ssoHandle string) error {
+func (s *store) Expire(requestID string) error {
 	conn := s.pool.Get()
 	defer conn.Close()
-	_, err := conn.Do("DEL", ssoHandle)
+	_, err := conn.Do("DEL", requestID)
 	return err
-}
-
-func getRemainingLife(expiry time.Time) int {
-	remaining := int(time.Until(expiry).Seconds())
-	if remaining <= 0 {
-		return 1
-	}
-	return remaining
 }
