@@ -11,7 +11,7 @@ export const frontendFormattedConfig = (config) => {
     ...orgInfo,
     ...serverSettings,
     ...smtpSettings,
-    ...ssoSettings, 
+    ...ssoSettings,
   };
 };
 

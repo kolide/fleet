@@ -215,13 +215,12 @@ export class UserManagementPage extends Component {
     const { currentUser, inviteErrors } = this.props;
     const { showInviteUserModal } = this.state;
     const { onInviteCancel, onInviteUserSubmit, toggleInviteUserModal } = this;
+    const ssoEnabledForApp = this.props.config.enable_sso;
 
     if (!showInviteUserModal) {
       return false;
     }
 
-    const ssoEnabledForApp = this.props.config.enable_sso;
-  
     return (
       <Modal
         title="Invite New User"
