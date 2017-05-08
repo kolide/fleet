@@ -129,7 +129,7 @@ class InviteUserForm extends Component {
   }
 
   render () {
-    const { errors, formData: { admin, email, name, sso_enabled } } = this.state;
+    const { errors, formData: { admin, email, name, ssoEnabled } } = this.state;
     const { onCancel, serverErrors } = this.props;
     const { onFormSubmit, onInputChange, onCheckboxChange } = this;
     const baseError = serverErrors.base;
@@ -170,7 +170,7 @@ class InviteUserForm extends Component {
           <Checkbox
             name="sso_enabled"
             onChange={onCheckboxChange('sso_enabled')}
-            value={sso_enabled}
+            value={ssoEnabled}
             wrapperClassName={`${baseClass}__invite-admin`}
           >
             Enable Single Sign On

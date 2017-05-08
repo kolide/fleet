@@ -1,13 +1,11 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { push } from 'react-router-redux';
-
 import AuthenticationFormWrapper from 'components/AuthenticationFormWrapper';
 import ConfirmSSOInviteForm from 'components/forms/ConfirmSSOInviteForm';
 import EnsureUnauthenticated from 'components/EnsureUnauthenticated';
-import paths from 'router/paths';
-import { renderFlash } from 'redux/nodes/notifications/actions';
 import userActions from 'redux/nodes/entities/users/actions';
+import authActions from 'redux/nodes/auth/actions';
+
 
 const baseClass = 'confirm-ssoinvite-page';
 
@@ -34,14 +32,21 @@ class ConfirmSSOInvitePage extends Component {
   }
 
   onSubmit = (formData) => {
+    const window = {};
     const { create } = userActions;
+    const { ssoRedirect } = authActions;
     const { dispatch } = this.props;
-    const { LOGIN } = paths;
+
     formData.sso_invite = true;
     dispatch(create(formData))
       .then(() => {
-        dispatch(push(LOGIN));
-        dispatch(renderFlash('success', 'Registration successful! For security purposes, please log in.'));
+        // set redirect so that we will get redirected to home page after
+        // the user authenticates with the idp
+        dispatch(ssoRedirect('/'))
+          .then((result) => {
+            window.location.href = result.payload.ssoRedirectURL;
+          })
+          .catch(() => false);
       })
       .catch(() => false);
 

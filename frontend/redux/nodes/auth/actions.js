@@ -21,7 +21,9 @@ export const PERFORM_REQUIRED_PASSWORD_RESET_REQUEST = 'PERFORM_REQUIRED_PASSWOR
 export const PERFORM_REQUIRED_PASSWORD_RESET_SUCCESS = 'PERFORM_REQUIRED_PASSWORD_RESET_SUCCESS';
 export const PERFORM_REQUIRED_PASSWORD_RESET_FAILURE = 'PERFORM_REQUIRED_PASSWORD_RESET_FAILURE';
 
-export const SSOLOGIN_REQUEST = 'SSOLOGIN_REQUEST';
+export const SSO_REDIRECT_REQUEST = 'SSO_REDIRECT_REQUEST';
+export const SSO_REDIRECT_SUCCESS = 'SSO_REDIRECT_SUCCESS';
+export const SSO_REDIRECT_FAILURE = 'SSO_REDIRECT_FAILURE';
 
 export const licenseFailure = (errors) => {
   return {
@@ -125,6 +127,36 @@ export const fetchCurrentUser = () => {
   };
 };
 
+export const ssoRedirectRequest = { type: SSO_REDIRECT_REQUEST };
+export const ssoRedirectSuccess = (redirectURL) => {
+  return {
+    type: SSO_REDIRECT_SUCCESS,
+    payload: {
+      ssoRedirectURL: redirectURL,
+    },
+  };
+};
+export const ssoRedirectFailure = ({ errors }) => {
+  return {
+    type: SSO_REDIRECT_FAILURE,
+    payload: {
+      errors,
+    },
+  };
+};
+// formData { relay_url: 'some/url'}
+export const ssoRedirect = (formData) => {
+  return (dispatch) => {
+    dispatch(ssoRedirectRequest);
+    return Kolide.sessions.initializeSSO(formData)
+      .then((response) => {
+        return dispatch(ssoRedirectSuccess(response.url));
+      }).catch((response) => {
+        dispatch(ssoRedirectFailure({ base: 'Unable to authenticate the current user' }));
+        throw response;
+      });
+  };
+};
 
 
 // formData should be { username: <string>, password: <string> }
@@ -257,4 +289,8 @@ export const performRequiredPasswordReset = (resetParams) => {
         throw response;
       });
   };
+};
+
+export default {
+  ssoRedirect,
 };
