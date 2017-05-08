@@ -38,6 +38,14 @@ func (svc service) NewAdminCreatedUser(ctx context.Context, p kolide.UserPayload
 }
 
 func (svc service) newUser(p kolide.UserPayload) (*kolide.User, error) {
+	// if user is SSO generate a fake password
+	if p.SSOInvite != nil && *p.SSOInvite == true {
+		fakePassword, err := generateRandomText(14)
+		if err != nil {
+			return nil, err
+		}
+		p.Password = &fakePassword
+	}
 	user, err := p.User(svc.config.Auth.SaltKeySize, svc.config.Auth.BcryptCost)
 	if err != nil {
 		return nil, err

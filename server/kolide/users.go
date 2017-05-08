@@ -114,11 +114,11 @@ type UserPayload struct {
 	GravatarURL *string `json:"gravatar_url"`
 	Position    *string `json:"position"`
 	InviteToken *string `json:"invite_token"`
+	SSOInvite   *bool   `json:"sso_invite"`
 }
 
 // User creates a user from payload.
 func (p UserPayload) User(keySize, cost int) (*User, error) {
-
 	user := &User{
 		Username: *p.Username,
 		Email:    *p.Email,
