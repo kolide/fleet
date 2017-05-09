@@ -85,7 +85,6 @@ class InviteUserForm extends Component {
     if (valid) {
       const { formData: { admin, email, name, sso_enabled } } = this.state;
       const { invitedBy, onSubmit } = this.props;
-      console.log(this.state);
       return onSubmit({
         admin,
         email,
