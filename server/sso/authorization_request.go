@@ -3,12 +3,12 @@ package sso
 import (
 	"bytes"
 	"compress/flate"
-	"crypto/rand"
 	"encoding/base64"
 	"encoding/xml"
 	"net/url"
 	"time"
 
+	"github.com/kolide/kolide/server/kolide"
 	"github.com/pkg/errors"
 )
 
@@ -39,7 +39,7 @@ func CreateAuthorizationRequest(settings *Settings, issuer string, options ...fu
 	if settings.Metadata == nil {
 		return "", errors.New("missing settings metadata")
 	}
-	requestID, err := getAuthnRequestID()
+	requestID, err := kolide.RandomText(16)
 	if err != nil {
 		return "", errors.Wrap(err, "creating auth request id")
 	}
@@ -133,13 +133,4 @@ func deflate(xmlBuffer *bytes.Buffer) (string, error) {
 	encbuff := deflated.Bytes()
 	encoded := base64.StdEncoding.EncodeToString(encbuff)
 	return encoded, nil
-}
-
-func getAuthnRequestID() (string, error) {
-	buff := make([]byte, 16)
-	_, err := rand.Read(buff)
-	if err != nil {
-		return "", err
-	}
-	return base64.RawStdEncoding.EncodeToString(buff), nil
 }
