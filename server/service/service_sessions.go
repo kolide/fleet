@@ -87,6 +87,10 @@ func (svc service) CallbackSSO(ctx context.Context, auth kolide.Auth) (*kolide.S
 	if err != nil {
 		return nil, errors.Wrap(err, "finding user in sso callback")
 	}
+	// if user is not active they are not authorized to use the application
+	if !user.Enabled || user.Deleted {
+		return nil, errors.New("user authorization failed")
+	}
 	token, err := svc.makeSession(user.ID)
 	if err != nil {
 		return nil, errors.Wrap(err, "making user session in sso callback")

@@ -101,6 +101,8 @@ type User struct {
 	AdminForcedPasswordReset bool   `json:"force_password_reset" db:"admin_forced_password_reset"`
 	GravatarURL              string `json:"gravatar_url" db:"gravatar_url"`
 	Position                 string `json:"position,omitempty"` // job role
+	// SSOEnabled if true, the single siqn on is used to log in
+	SSOEnabled bool `json:"sso_enabled" db:"sso_enabled"`
 }
 
 // UserPayload is used to modify an existing user
