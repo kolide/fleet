@@ -116,6 +116,10 @@ func (svc service) Login(ctx context.Context, username, password string) (*kolid
 	if !user.Enabled {
 		return nil, "", authError{reason: "account disabled", clientReason: "account disabled"}
 	}
+	if user.SSOEnabled {
+		const errMessage = "password login not allowed for single sign on users"
+		return nil, "", authError{reason: errMessage, clientReason: errMessage}
+	}
 	if err = user.ValidatePassword(password); err != nil {
 		return nil, "", authError{reason: "bad password"}
 	}
