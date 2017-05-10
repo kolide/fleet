@@ -15,6 +15,19 @@ import (
 	"github.com/pkg/errors"
 )
 
+func (svc service) SSOSettings(ctx context.Context) (*kolide.SSOSettings, error) {
+	appConfig, err := svc.ds.AppConfig()
+	if err != nil {
+		return nil, errors.Wrap(err, "SSOSettings getting app config")
+	}
+	settings := &kolide.SSOSettings{
+		IDPName:     appConfig.IDPName,
+		IDPImageURL: appConfig.IDPImageURL,
+		SSOEnabled:  appConfig.EnableSSO,
+	}
+	return settings, nil
+}
+
 func (svc service) InitiateSSO(ctx context.Context, redirectURL string) (string, error) {
 	appConfig, err := svc.ds.AppConfig()
 	if err != nil {

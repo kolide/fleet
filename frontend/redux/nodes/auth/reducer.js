@@ -18,6 +18,9 @@ import {
   SSO_REDIRECT_REQUEST,
   SSO_REDIRECT_SUCCESS,
   SSO_REDIRECT_FAILURE,
+  SSO_SETTINGS_REQUEST,
+  SSO_SETTINGS_SUCCESS,
+  SSO_SETTINGS_FAILURE,
 } from './actions';
 
 export const initialState = {
@@ -39,9 +42,16 @@ const reducer = (state = initialState, action) => {
     case LOGOUT_REQUEST:
     case UPDATE_USER_REQUEST:
     case SSO_REDIRECT_REQUEST:
+    case SSO_SETTINGS_REQUEST:
       return {
         ...state,
         loading: true,
+      };
+    case SSO_SETTINGS_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        ssoSettings: action.payload.ssoSettings,
       };
     case LICENSE_SUCCESS:
       return {
@@ -62,6 +72,7 @@ const reducer = (state = initialState, action) => {
         ssoRedirectURL: action.payload.ssoRedirectURL,
       };
     case SSO_REDIRECT_FAILURE:
+    case SSO_SETTINGS_FAILURE:
     case LICENSE_FAILURE:
     case LOGIN_FAILURE:
       return {

@@ -14,6 +14,7 @@ import ResetPasswordPage from 'pages/ResetPasswordPage';
 import paths from 'router/paths';
 import redirectLocationInterface from 'interfaces/redirect_location';
 import userInterface from 'interfaces/user';
+import Button from 'components/buttons/Button';
 
 export class LoginPage extends Component {
   static propTypes = {
@@ -88,8 +89,20 @@ export class LoginPage extends Component {
     );
   }
 
+  showSingleSignOnButton = () => {
+    return (
+      <Button
+        type="button"
+        title="Single Sign On"
+      >
+        Single Sign On
+      </Button>
+    );
+  }
+
   render () {
     const { showLoginForm } = this;
+    const { showSingleSignOnButton } = this;
     const { isForgotPassPage, isResetPassPage, token } = this.props;
 
     return (
@@ -98,6 +111,7 @@ export class LoginPage extends Component {
         {showLoginForm()}
         { isForgotPassPage && <ForgotPasswordPage /> }
         { isResetPassPage && <ResetPasswordPage token={token} /> }
+        {showSingleSignOnButton()}
       </AuthenticationFormWrapper>
     );
   }
