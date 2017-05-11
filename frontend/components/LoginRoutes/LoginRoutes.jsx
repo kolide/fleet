@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 
 import { hideBackgroundImage, showBackgroundImage } from 'redux/nodes/app/actions';
+import { ssoSettings } from 'redux/nodes/auth/actions';
 import LoginPage from 'pages/LoginPage';
 import Footer from 'components/Footer';
 
@@ -17,6 +18,9 @@ export class LoginRoutes extends Component {
 
   componentWillMount () {
     const { dispatch } = this.props;
+
+    dispatch(ssoSettings())
+      .catch(() => false);
 
     dispatch(showBackgroundImage);
   }
@@ -35,7 +39,7 @@ export class LoginRoutes extends Component {
       pathname,
       token,
     } = this.props;
-      console.log(children);
+
     return (
       <div className="login-routes">
         {children ||
@@ -57,7 +61,6 @@ const mapStateToProps = (state, ownProps) => {
 
   const isForgotPassPage = pathname === '/login/forgot';
   const isResetPassPage = pathname === '/login/reset';
-  const { auth } = state;
 
   return {
     isForgotPassPage,

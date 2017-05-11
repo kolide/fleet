@@ -24,11 +24,12 @@ class LoginForm extends Component {
     handleSubmit: PropTypes.func,
     isHidden: PropTypes.bool,
     ssoSettings: ssoSettingsInterface,
+    handleSSOSignOn: PropTypes.func,
   };
 
   showLegendWithImage = (image, idpName) => {
     let legend = 'Single Sign On';
-    if (idpName != '') {
+    if (idpName !== '') {
       legend = `Sign on with ${idpName}`;
     }
     return (
@@ -45,22 +46,23 @@ class LoginForm extends Component {
     const { showLegendWithImage } = this;
 
     let legend = 'Single Sign On';
-    if (idpName != '') {
-      legend = 'Sign On With ' + idpName;
+    if (idpName !== '') {
+      legend = `Sign On With ${idpName}`;
     }
-    if (imageURL != '') {
+    if (imageURL !== '') {
       legend = showLegendWithImage(imageURL, idpName);
     }
 
     return (
-      <Button className={`${baseClass}__sso-btn`}
+      <Button
+        className={`${baseClass}__sso-btn`}
         type="button"
         title="Single Sign On"
         onClick={handleSSOSignOn}
       >
-      <div>
-        {legend}
-      </div>
+        <div>
+          {legend}
+        </div>
       </Button>
     );
   }

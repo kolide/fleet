@@ -39,11 +39,6 @@ class Kolide extends Base {
     this.websockets = websocketMethods(this);
   }
 
-  get (endpoint, overrideHeaders = {}) {
-    const { GET } = Request.REQUEST_METHODS;
-    return Base._request(GET, endpoint, {}, overrideHeaders);
-  }
-
   authenticatedDelete (endpoint, overrideHeaders = {}) {
     const headers = this._authenticatedHeaders(overrideHeaders);
 
