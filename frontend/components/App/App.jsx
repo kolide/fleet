@@ -4,7 +4,7 @@ import { noop } from 'lodash';
 import classnames from 'classnames';
 
 import { authToken } from 'utilities/local';
-import { fetchCurrentUser } from 'redux/nodes/auth/actions';
+import { fetchCurrentUser, ssoSettings } from 'redux/nodes/auth/actions';
 import { getConfig } from 'redux/nodes/app/actions';
 import userInterface from 'interfaces/user';
 
@@ -23,15 +23,26 @@ export class App extends Component {
   componentWillMount () {
     const { dispatch, user } = this.props;
 
+    dispatch(ssoSettings())
+      .catch(() => false);
+    console.log("user ");
+    console.log(user);
+
     if (!user && !!authToken()) {
       dispatch(fetchCurrentUser())
         .catch(() => false);
     }
 
+    console.log("after fetch");
+    console.log(user);
+
     if (user) {
+      console.log("get config")
       dispatch(getConfig())
         .catch(() => false);
     }
+
+
 
     return false;
   }

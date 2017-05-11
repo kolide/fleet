@@ -327,4 +327,5 @@ export const performRequiredPasswordReset = (resetParams) => {
 
 export default {
   ssoRedirect,
+  ssoSettings,
 };

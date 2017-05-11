@@ -35,7 +35,7 @@ export class LoginRoutes extends Component {
       pathname,
       token,
     } = this.props;
-
+      console.log(children);
     return (
       <div className="login-routes">
         {children ||
@@ -57,6 +57,7 @@ const mapStateToProps = (state, ownProps) => {
 
   const isForgotPassPage = pathname === '/login/forgot';
   const isResetPassPage = pathname === '/login/reset';
+  const { auth } = state;
 
   return {
     isForgotPassPage,

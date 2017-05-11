@@ -33,7 +33,7 @@ export default (client) => {
     ssoSettings: () => {
       const { SSO } = endpoints;
       const endpoint = client._endpoint(SSO);
-      return Base.get(endpoint);
+      return client.get(endpoint);
     },
   };
 };

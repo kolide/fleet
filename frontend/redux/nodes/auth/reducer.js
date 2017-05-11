@@ -28,6 +28,8 @@ export const initialState = {
   loading: false,
   errors: {},
   user: null,
+  ssoRedirectURL: '',
+  ssoSettings: {},
 };
 
 const reducer = (state = initialState, action) => {

@@ -14,7 +14,11 @@ import ResetPasswordPage from 'pages/ResetPasswordPage';
 import paths from 'router/paths';
 import redirectLocationInterface from 'interfaces/redirect_location';
 import userInterface from 'interfaces/user';
+import ssoSettingsInterface from 'interfaces/ssoSettings';
 import Button from 'components/buttons/Button';
+import authActions from 'redux/nodes/auth/actions';
+
+
 
 export class LoginPage extends Component {
   static propTypes = {
@@ -28,6 +32,7 @@ export class LoginPage extends Component {
     token: PropTypes.string,
     redirectLocation: redirectLocationInterface,
     user: userInterface,
+    ssoSettings: ssoSettingsInterface,
   };
 
   constructor (props) {
@@ -38,7 +43,7 @@ export class LoginPage extends Component {
   }
 
   componentWillMount () {
-    const { dispatch, pathname, user } = this.props;
+    const { dispatch, pathname, user, ssoSettings } = this.props;
     const { HOME, LOGIN } = paths;
 
     if (user && pathname === LOGIN) {
@@ -74,10 +79,27 @@ export class LoginPage extends Component {
       .catch(() => false);
   })
 
+  ssoSignOn = () => {
+    const { dispatch, redirectLocation } = this.props;
+    const { ssoRedirect } = authActions;
+    const { HOME } = paths;
+    let returnToAfterAuth =  HOME;
+    if (redirectLocation != null) {
+      returnToAfterAuth = redirectLocation.pathname;
+    }
+console.log(returnToAfterAuth);
+    dispatch(ssoRedirect(returnToAfterAuth))
+      .then((result) => {
+        window.location.href = result.payload.ssoRedirectURL;
+      })
+      .catch(() => false);
+  }
+
   showLoginForm = () => {
-    const { errors } = this.props;
+    const { errors, ssoSettings } = this.props;
     const { loginVisible } = this.state;
-    const { onChange, onSubmit } = this;
+    const { onChange, onSubmit, ssoSignOn } = this;
+
 
     return (
       <LoginForm
@@ -85,25 +107,17 @@ export class LoginPage extends Component {
         handleSubmit={onSubmit}
         isHidden={!loginVisible}
         serverErrors={errors}
+        ssoSettings={ssoSettings}
+        handleSSOSignOn={ssoSignOn}
       />
     );
   }
 
-  showSingleSignOnButton = () => {
-    return (
-      <Button
-        type="button"
-        title="Single Sign On"
-      >
-        Single Sign On
-      </Button>
-    );
-  }
+
 
   render () {
     const { showLoginForm } = this;
-    const { showSingleSignOnButton } = this;
-    const { isForgotPassPage, isResetPassPage, token } = this.props;
+    const { isForgotPassPage, isResetPassPage, token, ssoSettings } = this.props;
 
     return (
       <AuthenticationFormWrapper>
@@ -111,21 +125,22 @@ export class LoginPage extends Component {
         {showLoginForm()}
         { isForgotPassPage && <ForgotPasswordPage /> }
         { isResetPassPage && <ResetPasswordPage token={token} /> }
-        {showSingleSignOnButton()}
       </AuthenticationFormWrapper>
     );
   }
 }
 
 const mapStateToProps = (state) => {
-  const { errors, loading, user } = state.auth;
+  const { errors, loading, user, ssoSettings } = state.auth;
   const { redirectLocation } = state;
+
 
   return {
     errors,
     loading,
     redirectLocation,
     user,
+    ssoSettings,
   };
 };
 
