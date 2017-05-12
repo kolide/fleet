@@ -104,6 +104,10 @@ func (svc service) CallbackSSO(ctx context.Context, auth kolide.Auth) (*kolide.S
 	if !user.Enabled || user.Deleted {
 		return nil, errors.New("user authorization failed")
 	}
+	// if the user is not sso enabled they are not authorized
+	if !user.SSOEnabled {
+		return nil, errors.New("user not configured to use sso")
+	}
 	token, err := svc.makeSession(user.ID)
 	if err != nil {
 		return nil, errors.Wrap(err, "making user session in sso callback")
