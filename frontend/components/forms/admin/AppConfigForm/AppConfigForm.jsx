@@ -262,7 +262,7 @@ class AppConfigForm extends Component {
         </div>
 
         <div className={`${baseClass}__section`}>
-          <h2>Single Sign On Options</h2>
+          <h2>SAML Single Sign On Options</h2>
           <div className={`${baseClass}__inputs`}>
             <InputField
               {...fields.idp_name}
