@@ -9,7 +9,7 @@ const DecoratorInfoSidePanel = () => {
   return (
     <SecondarySidePanelContainer className={baseClass}>
       <h3 className={`${baseClass}__title`}>
-        <Icon name="query" />
+        <Icon name="decorator" />
         &nbsp;
         What are Decorators?
       </h3>

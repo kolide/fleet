@@ -100,7 +100,7 @@ export default (admin) => {
       ],
     },
     {
-      icon: 'query',
+      icon: 'decorator',
       name: 'Decorators',
       location: {
         pathname: '/decorators/manage',
@@ -108,7 +108,7 @@ export default (admin) => {
       },
       subItems: [
         {
-          icon: 'query',
+          icon: 'decorator',
           name: 'Manage Decorators',
           location: {
             pathname: '/decorators/manage',
