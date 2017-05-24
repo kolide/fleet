@@ -10,7 +10,7 @@ import (
 // See https://osquery.readthedocs.io/en/stable/deployment/configuration/
 type DecoratorStore interface {
 	// NewDecorator creates a decorator query.
-	NewDecorator(decorator *Decorator) (*Decorator, error)
+	NewDecorator(decorator *Decorator, opts ...OptionalArg) (*Decorator, error)
 	// DeleteDecorator removes a decorator query.
 	DeleteDecorator(id uint) error
 	// Decorator retrieves a decorator query with supplied ID.
@@ -18,7 +18,7 @@ type DecoratorStore interface {
 	// ListDecorators returns all decorator queries.
 	ListDecorators() ([]*Decorator, error)
 	// SaveDecorator updates an existing decorator
-	SaveDecorator(dec *Decorator) error
+	SaveDecorator(dec *Decorator, opts ...OptionalArg) error
 }
 
 // DecoratorService exposes decorators data so it can be manipulated by
