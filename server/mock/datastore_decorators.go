@@ -12,7 +12,7 @@ type DeleteDecoratorFunc func(id uint) error
 
 type DecoratorFunc func(id uint) (*kolide.Decorator, error)
 
-type ListDecoratorsFunc func() ([]*kolide.Decorator, error)
+type ListDecoratorsFunc func(opts ...kolide.OptionalArg) ([]*kolide.Decorator, error)
 
 type SaveDecoratorFunc func(dec *kolide.Decorator, opts ...kolide.OptionalArg) error
 
@@ -48,9 +48,9 @@ func (s *DecoratorStore) Decorator(id uint) (*kolide.Decorator, error) {
 	return s.DecoratorFunc(id)
 }
 
-func (s *DecoratorStore) ListDecorators() ([]*kolide.Decorator, error) {
+func (s *DecoratorStore) ListDecorators(opts ...kolide.OptionalArg) ([]*kolide.Decorator, error) {
 	s.ListDecoratorsFuncInvoked = true
-	return s.ListDecoratorsFunc()
+	return s.ListDecoratorsFunc(opts...)
 }
 
 func (s *DecoratorStore) SaveDecorator(dec *kolide.Decorator, opts ...kolide.OptionalArg) error {

@@ -18,6 +18,9 @@ func (d *Datastore) NewFIMSection(fp *kolide.FIMSection, opts ...kolide.Optional
   `
 	var resp sql.Result
 	resp, err = db.Exec(sqlStatement, fp.SectionName, fp.Description)
+	if isDuplicate(err) {
+		return nil, alreadyExists("fim_section", 0)
+	}
 	if err != nil {
 		return nil, errors.Wrap(err, "creating fim section")
 	}

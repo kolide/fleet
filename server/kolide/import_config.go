@@ -40,6 +40,8 @@ const (
 	OptionReadonly                     = "option_readonly"
 	OptionUnknown                      = "option_unknown"
 	QueryDuplicate                     = "duplicate_query"
+	FIMDuplicate                       = "duplicate_fim"
+	YARADuplicate                      = "duplicate_yara"
 	Unsupported                        = "unsupported"
 )
 

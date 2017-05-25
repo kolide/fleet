@@ -16,7 +16,7 @@ type DecoratorStore interface {
 	// Decorator retrieves a decorator query with supplied ID.
 	Decorator(id uint) (*Decorator, error)
 	// ListDecorators returns all decorator queries.
-	ListDecorators() ([]*Decorator, error)
+	ListDecorators(opts ...OptionalArg) ([]*Decorator, error)
 	// SaveDecorator updates an existing decorator
 	SaveDecorator(dec *Decorator, opts ...OptionalArg) error
 }

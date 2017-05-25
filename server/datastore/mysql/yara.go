@@ -17,6 +17,9 @@ func (d *Datastore) NewYARASignatureGroup(ysg *kolide.YARASignatureGroup, opts .
   `
 	var result sql.Result
 	result, err = dbTx.Exec(sqlStatement, ysg.SignatureName)
+	if isDuplicate(err) {
+		return nil, alreadyExists("yara signature", 0)
+	}
 	if err != nil {
 		return nil, errors.Wrap(err, "inserting new yara signature group")
 	}
@@ -61,6 +64,9 @@ func (d *Datastore) NewYARAFilePath(fileSectionName, sigGroupName string, opts .
     )
   `
 	_, err := dbTx.Exec(sqlStatement, fileSectionName, sigGroupName)
+	if isDuplicate(err) {
+		return alreadyExists("yara file path", 0)
+	}
 	if err != nil {
 		return errors.Wrap(err, "inserting yara file path")
 	}

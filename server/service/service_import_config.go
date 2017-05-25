@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"crypto/md5"
 	"fmt"
 	"strconv"
 	"strings"
@@ -73,6 +74,11 @@ func (svc service) importYARA(cfg *kolide.ImportConfig, resp *kolide.ImportConfi
 				Paths:         paths,
 			}
 			_, err := svc.ds.NewYARASignatureGroup(ysg, kolide.HasTransaction(tx))
+			if _, ok := err.(dbDuplicateError); ok {
+				resp.Status(kolide.YARAFileSection).SkipCount++
+				resp.Status(kolide.YARAFileSection).Warning(kolide.YARADuplicate, "skipped '%s', already exists", sig)
+				continue
+			}
 			if err != nil {
 				return err
 			}
@@ -82,15 +88,24 @@ func (svc service) importYARA(cfg *kolide.ImportConfig, resp *kolide.ImportConfi
 		for section, sigs := range cfg.YARA.FilePaths {
 			for _, sig := range sigs {
 				err := svc.ds.NewYARAFilePath(section, sig, kolide.HasTransaction(tx))
+				if _, ok := err.(dbDuplicateError); ok {
+					resp.Status(kolide.YARAFileSection).SkipCount++
+					resp.Status(kolide.YARAFileSection).Warning(kolide.YARADuplicate, "skipped '%s', already exists", section)
+					continue
+				}
 				if err != nil {
 					return err
 				}
+				resp.Status(kolide.YARAFileSection).ImportCount++
+				resp.Status(kolide.YARAFileSection).Message("imported '%s'", section)
 			}
-			resp.Status(kolide.YARAFileSection).ImportCount++
-			resp.Status(kolide.YARAFileSection).Message("imported '%s'", section)
 		}
 	}
 	return nil
+}
+
+type dbDuplicateError interface {
+	IsExists() bool
 }
 
 func (svc service) importFIMSections(cfg *kolide.ImportConfig, resp *kolide.ImportConfigResponse, tx kolide.Transaction) error {
@@ -102,6 +117,11 @@ func (svc service) importFIMSections(cfg *kolide.ImportConfig, resp *kolide.Impo
 				Paths:       paths,
 			}
 			_, err := svc.ds.NewFIMSection(fp, kolide.HasTransaction(tx))
+			if _, ok := err.(dbDuplicateError); ok {
+				resp.Status(kolide.FilePathsSection).SkipCount++
+				resp.Status(kolide.FilePathsSection).Warning(kolide.FIMDuplicate, "skipped '%s', already exists", sectionName)
+				continue
+			}
 			if err != nil {
 				return err
 			}
@@ -113,9 +133,38 @@ func (svc service) importFIMSections(cfg *kolide.ImportConfig, resp *kolide.Impo
 	return svc.importYARA(cfg, resp, tx)
 }
 
+func (svc service) getExistingDecoratorQueries(tx kolide.Transaction) (map[string]int, error) {
+	decs, err := svc.ds.ListDecorators(kolide.HasTransaction(tx))
+	if err != nil {
+		return nil, err
+	}
+	queryHashes := map[string]int{}
+	for _, dec := range decs {
+		hash := fmt.Sprintf("%x", md5.Sum([]byte(dec.Query)))
+		queryHashes[hash] = 0
+	}
+	return queryHashes, nil
+}
+
+func decoratorExists(query string, queryHashes map[string]int) bool {
+	hash := fmt.Sprintf("%x", md5.Sum([]byte(query)))
+	_, exists := queryHashes[hash]
+	return exists
+}
+
 func (svc service) importDecorators(cfg *kolide.ImportConfig, resp *kolide.ImportConfigResponse, tx kolide.Transaction) error {
 	if cfg.Decorators != nil {
+		queryHashes, err := svc.getExistingDecoratorQueries(tx)
+		if err != nil {
+			return errors.Wrap(err, "getting existing queries")
+		}
+
 		for _, query := range cfg.Decorators.Load {
+			if decoratorExists(query, queryHashes) {
+				resp.Status(kolide.DecoratorsSection).SkipCount++
+				resp.Status(kolide.DecoratorsSection).Warning(kolide.QueryDuplicate, "skipped load '%s'", query)
+				continue
+			}
 			decorator := &kolide.Decorator{
 				Query: query,
 				Type:  kolide.DecoratorLoad,
@@ -125,9 +174,14 @@ func (svc service) importDecorators(cfg *kolide.ImportConfig, resp *kolide.Impor
 				return err
 			}
 			resp.Status(kolide.DecoratorsSection).ImportCount++
-			resp.Status(kolide.DecoratorsSection).Message("imported load '%s'", query)
+			resp.Status(kolide.DecoratorsSection).Warning("imported load '%s'", query)
 		}
 		for _, query := range cfg.Decorators.Always {
+			if decoratorExists(query, queryHashes) {
+				resp.Status(kolide.DecoratorsSection).SkipCount++
+				resp.Status(kolide.DecoratorsSection).Warning(kolide.QueryDuplicate, "skipped always '%s'", query)
+				continue
+			}
 			decorator := &kolide.Decorator{
 				Query: query,
 				Type:  kolide.DecoratorAlways,
@@ -142,6 +196,11 @@ func (svc service) importDecorators(cfg *kolide.ImportConfig, resp *kolide.Impor
 
 		for key, queries := range cfg.Decorators.Interval {
 			for _, query := range queries {
+				if decoratorExists(query, queryHashes) {
+					resp.Status(kolide.DecoratorsSection).SkipCount++
+					resp.Status(kolide.DecoratorsSection).Warning(kolide.QueryDuplicate, "skipped interval '%s'", query)
+					continue
+				}
 				interval, err := strconv.ParseInt(key, 10, 32)
 				if err != nil {
 					return err

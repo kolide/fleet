@@ -39,7 +39,7 @@ func (d *Datastore) Decorator(id uint) (*kolide.Decorator, error) {
 	return nil, notFound("Decorator").WithID(id)
 }
 
-func (d *Datastore) ListDecorators() ([]*kolide.Decorator, error) {
+func (d *Datastore) ListDecorators(opts ...kolide.OptionalArg) ([]*kolide.Decorator, error) {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 	var result []*kolide.Decorator
