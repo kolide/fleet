@@ -42,7 +42,6 @@ export class ManageDecoratorsPage extends Component {
     const { checkedIDs } = this.state;
     const newCheckedIDs = checked ? checkedIDs.concat(id) : pull(checkedIDs, id);
     this.setState({ allChecked: false, checkedIDs: newCheckedIDs });
-    return false;
   }
 
   onCheckAll = (checked) => {
