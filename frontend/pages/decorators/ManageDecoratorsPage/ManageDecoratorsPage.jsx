@@ -54,11 +54,10 @@ export class ManageDecoratorsPage extends Component {
         return decorator.id;
       });
       this.setState({ allChecked: true, checkedIDs: newCheckedIDs });
-      return false;
+      return;
     }
 
     this.setState({ allChecked: false, checkedIDs: [] });
-    return false;
   }
 
   onSelectDecorator = (decorator) => {
@@ -95,7 +94,7 @@ export class ManageDecoratorsPage extends Component {
     return Promise.all(promises)
       .then(() => {
         dispatch(renderFlash('success', 'Successfully deleted selected decorators.'));
-        this.setState({ checkedIDs: [], showDeleteModal: false });
+        this.setState({ checkedIDs: [], showDeleteModal: false, allChecked: false });
       })
       .catch(() => {
         dispatch(renderFlash('error', 'Something went wrong.'));
