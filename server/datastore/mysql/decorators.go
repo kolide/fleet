@@ -40,7 +40,7 @@ func (ds *Datastore) NewDecorator(decorator *kolide.Decorator, opts ...kolide.Op
 			"`type`," +
 			"`interval` ) " +
 			"VALUES (?, ?, ?, ?)"
-	result, err := ds.db.Exec(sqlStatement, decorator.Name, decorator.Query, decorator.Type, decorator.Interval)
+	result, err := db.Exec(sqlStatement, decorator.Name, decorator.Query, decorator.Type, decorator.Interval)
 
 	if err != nil {
 		return nil, errors.Wrap(err, "creating decorator")

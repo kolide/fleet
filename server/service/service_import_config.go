@@ -165,11 +165,16 @@ func (svc service) importDecorators(cfg *kolide.ImportConfig, resp *kolide.Impor
 				resp.Status(kolide.DecoratorsSection).Warning(kolide.QueryDuplicate, "skipped load '%s'", query)
 				continue
 			}
+			decName, err := uniqueImportName()
+			if err != nil {
+				return err
+			}
 			decorator := &kolide.Decorator{
+				Name:  decName,
 				Query: query,
 				Type:  kolide.DecoratorLoad,
 			}
-			_, err := svc.ds.NewDecorator(decorator, kolide.HasTransaction(tx))
+			_, err = svc.ds.NewDecorator(decorator, kolide.HasTransaction(tx))
 			if err != nil {
 				return err
 			}
@@ -182,11 +187,16 @@ func (svc service) importDecorators(cfg *kolide.ImportConfig, resp *kolide.Impor
 				resp.Status(kolide.DecoratorsSection).Warning(kolide.QueryDuplicate, "skipped always '%s'", query)
 				continue
 			}
+			decName, err := uniqueImportName()
+			if err != nil {
+				return err
+			}
 			decorator := &kolide.Decorator{
+				Name:  decName,
 				Query: query,
 				Type:  kolide.DecoratorAlways,
 			}
-			_, err := svc.ds.NewDecorator(decorator, kolide.HasTransaction(tx))
+			_, err = svc.ds.NewDecorator(decorator, kolide.HasTransaction(tx))
 			if err != nil {
 				return err
 			}
@@ -205,7 +215,12 @@ func (svc service) importDecorators(cfg *kolide.ImportConfig, resp *kolide.Impor
 				if err != nil {
 					return err
 				}
+				decName, err := uniqueImportName()
+				if err != nil {
+					return err
+				}
 				decorator := &kolide.Decorator{
+					Name:     decName,
 					Query:    query,
 					Type:     kolide.DecoratorInterval,
 					Interval: uint(interval),
@@ -370,7 +385,7 @@ func hashQuery(platform, query string) string {
 }
 
 func uniqueImportName() (string, error) {
-	random, err := kolide.RandomText(12)
+	random, err := kolide.RandomText(6)
 	if err != nil {
 		return "", err
 	}
