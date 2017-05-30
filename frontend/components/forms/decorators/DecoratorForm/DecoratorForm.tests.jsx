@@ -62,7 +62,7 @@ describe('DecoratorForm - component', () => {
     expect(updateSpy).toNotHaveBeenCalled();
     expect(form.state()).toInclude({
       errors: {
-        interval: 'Interval must be evenly divisble by 60',
+        interval: 'Interval must be evenly divisible by 60',
         description: null,
       },
     });

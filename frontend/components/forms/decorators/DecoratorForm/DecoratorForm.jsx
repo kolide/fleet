@@ -26,7 +26,7 @@ const validate = (formData) => {
   if (formData.type === 'interval') {
     if ((formData.interval % 60) !== 0) {
       errors.interval = 'Interval must be evenly divisible by 60';
-    } else if (formData.interval <= 0 ) {
+    } else if (formData.interval <= 0) {
       errors.interval = 'Interval must be greater than zero';
     }
   }
