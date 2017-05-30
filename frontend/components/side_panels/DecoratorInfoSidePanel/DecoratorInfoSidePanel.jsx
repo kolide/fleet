@@ -26,8 +26,8 @@ const DecoratorInfoSidePanel = () => {
           <strong>always:</strong> run these decorators before each query in the schedule.
         </li>
         <li>
-          <strong>interval:</strong> defines the period in seconds that defines when each query will run.  Each
-            interval must run on minute intervals.  If the interval period is not divisible by 60 validation will fail.
+          <strong>interval:</strong> run the decorator on a defined interval.  The interval must be a multiple of 60.
+          If the interval period is not divisible by 60 validation will fail.
         </li>
       </ul>
       <p>

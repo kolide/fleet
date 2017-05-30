@@ -85,7 +85,6 @@ export class ManageDecoratorsPage extends Component {
 
   onDeleteDecorators = (evt) => {
     evt.preventDefault();
-    console.log('on delete called');
     const { checkedIDs } = this.state;
     const { dispatch } = this.props;
     const { destroy } = decoratorActions;
@@ -106,9 +105,7 @@ export class ManageDecoratorsPage extends Component {
   }
 
   toggleDeleteModal = () => {
-    console.log('toggle delete');
     const { showDeleteModal } = this.state;
-    console.log(`toggle value ${showDeleteModal}`);
     this.setState({ showDeleteModal: !showDeleteModal });
     return false;
   }

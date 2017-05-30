@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
+import { noop } from 'lodash';
 import { push } from 'react-router-redux';
 import debounce from 'utilities/debounce';
 import decoratorActions from 'redux/nodes/entities/decorators/actions';
@@ -54,18 +55,12 @@ export class DecoratorPage extends Component {
     return false;
   }
 
-  onTextEditorInputChange = () => {
-    console.log('texteditorinput');
-    return false;
-  }
-
   render() {
     const {
       onSubmitNew,
       onSubmitUpdate,
       onCancel,
       onOsqueryTableSelect,
-      onTextEditorInputChange,
     } = this;
 
     const {
@@ -90,7 +85,7 @@ export class DecoratorPage extends Component {
         </div>
         <QuerySidePanel
           onOsqueryTableSelect={onOsqueryTableSelect}
-          onTextEditorInputChange={onTextEditorInputChange}
+          onTextEditorInputChange={noop}
           selectedOsqueryTable={selectedOsqueryTable}
         />
       </div>
