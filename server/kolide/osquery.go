@@ -22,10 +22,10 @@ type OsqueryService interface {
 }
 
 // OsqueryDistributedQueryResults represents the format of the results of an
-// osquery distributed query
+// osquery distributed query.
 type OsqueryDistributedQueryResults map[string][]map[string]string
 
-// QueryContent is the format of a query stanza in an osquery configuration
+// QueryContent is the format of a query stanza in an osquery configuration.
 type QueryContent struct {
 	Query       string  `json:"query"`
 	Description string  `json:"description,omitempty"`
@@ -37,10 +37,10 @@ type QueryContent struct {
 	Shard       *uint   `json:"shard,omitempty"`
 }
 
-// Queries is a helper which represents the format of a set of queries in a pack
+// Queries is a helper which represents the format of a set of queries in a pack.
 type Queries map[string]QueryContent
 
-// PackContent is the format of an osquery query pack
+// PackContent is the format of an osquery query pack.
 type PackContent struct {
 	Platform  string   `json:"platform,omitempty"`
 	Version   string   `json:"version,omitempty"`
@@ -49,10 +49,10 @@ type PackContent struct {
 	Queries   Queries  `json:"queries"`
 }
 
-// Packs is a helper which represents the format of a list of osquery query packs
+// Packs is a helper which represents the format of a list of osquery query packs.
 type Packs map[string]PackContent
 
-// Decorators is the format of the decorator configuration in an osquery config
+// Decorators is the format of the decorator configuration in an osquery config.
 type Decorators struct {
 	Load     []string            `json:"load,omitempty"`
 	Always   []string            `json:"always,omitempty"`
@@ -60,7 +60,7 @@ type Decorators struct {
 }
 
 // OsqueryConfig is a struct that can be serialized into a valid osquery config
-// using Go's JSON tooling
+// using Go's JSON tooling.
 type OsqueryConfig struct {
 	Options    map[string]interface{} `json:"options"`
 	Decorators Decorators             `json:"decorators,omitempty"`
@@ -68,7 +68,7 @@ type OsqueryConfig struct {
 }
 
 // OsqueryResultLog is the format of an osquery result log (ie: a differential
-// or snapshot query)
+// or snapshot query).
 type OsqueryResultLog struct {
 	Name           string `json:"name"`
 	HostIdentifier string `json:"hostIdentifier"`
@@ -82,7 +82,7 @@ type OsqueryResultLog struct {
 	Decorations map[string]string   `json:"decorations"`
 }
 
-// OsqueryStatusLog is the format of an osquery status log
+// OsqueryStatusLog is the format of an osquery status log.
 type OsqueryStatusLog struct {
 	Severity    string            `json:"severity"`
 	Filename    string            `json:"filename"`
