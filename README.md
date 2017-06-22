@@ -2,7 +2,7 @@
 
 ### Effective Endpoint Security. At Any Scale.
 
-Kolide is a state of the art host monitoring platform tailored for security experts. Leveraging Facebook's battle-tested osquery project, Kolide delivers fast answers to big questions. To learn more about the Kolide product, visit [https://kolide.co/product](https://kolide.co/product).
+Kolide Fleet is a state of the art host monitoring platform tailored for security experts. Leveraging Facebook's battle-tested osquery project, Kolide delivers fast answers to big questions. To learn more about the Kolide product, visit [https://kolide.co/product](https://kolide.co/product).
 
 Documentation for Kolide can be found at [https://docs.kolide.co](https://docs.kolide.co/kolide/current/).
 
