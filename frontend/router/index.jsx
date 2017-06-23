@@ -27,6 +27,7 @@ import QueryPageWrapper from 'components/queries/QueryPageWrapper';
 import RegistrationPage from 'pages/RegistrationPage';
 import Kolide404 from 'pages/Kolide404';
 import Kolide500 from 'pages/Kolide500';
+import KolideOffline from 'pages/KolideOffline';
 import store from 'redux/store';
 import UserSettingsPage from 'pages/UserSettingsPage';
 import DecoratorPage from 'pages/decorators/DecoratorPage';
@@ -89,6 +90,7 @@ const routes = (
       </Route>
       <Route path="/500" component={Kolide500} />
       <Route path="/404" component={Kolide404} />
+      <Route path="/offline" component={KolideOffline} />
       <Redirect from="*" to="/404" />
     </Router>
   </Provider>

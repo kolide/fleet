@@ -819,6 +819,7 @@ Third-Party Licenses
 | [semver](https://www.npmjs.com/package/semver) | [ISC](https://opensource.org/licenses/ISC) |
 | [send](https://www.npmjs.com/package/send) | [MIT](https://opensource.org/licenses/MIT) |
 | [serve-static](https://www.npmjs.com/package/serve-static) | [MIT](https://opensource.org/licenses/MIT) |
+| [serviceworker-webpack-plugin](https://www.npmjs.com/package/serviceworker-webpack-plugin) | [MIT](https://opensource.org/licenses/MIT) |
 | [set-blocking](https://www.npmjs.com/package/set-blocking) | [ISC](https://opensource.org/licenses/ISC) |
 | [set-immediate-shim](https://www.npmjs.com/package/set-immediate-shim) | [MIT](https://opensource.org/licenses/MIT) |
 | [setimmediate](https://www.npmjs.com/package/setimmediate) | [MIT](https://opensource.org/licenses/MIT) |

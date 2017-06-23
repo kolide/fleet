@@ -6,6 +6,7 @@ var ExtractTextPlugin = require("extract-text-webpack-plugin");
 var bourbon = require('node-bourbon').includePaths;
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var WebpackNotifierPlugin = require('webpack-notifier');
+var ServiceWorkerWebpackPlugin = require('serviceworker-webpack-plugin');
 
 var plugins = [
   new webpack.NoEmitOnErrorsPlugin(),
@@ -18,7 +19,11 @@ var plugins = [
     title: "Kolide",
     contentImage: path.resolve("./assets/images/kolide-logo.svg"),
     excludeWarnings: true
-  })
+  }),
+  new ServiceWorkerWebpackPlugin({
+    entry: path.join(__dirname, 'frontend/service-worker.js'),
+    filename: 'service-worker.js',
+  }),
 ];
 
 if (process.env.NODE_ENV === 'production') {
