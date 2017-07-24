@@ -578,6 +578,7 @@ INSERT INTO `options` VALUES (53,'utc',2,'null',0);
 INSERT INTO `options` VALUES (54,'value_max',1,'null',0);
 INSERT INTO `options` VALUES (55,'verbose',2,'null',0);
 INSERT INTO `options` VALUES (56,'worker_threads',1,'null',0);
+INSERT INTO `options` VALUES (57,'file_events',0,'null',0);
 /*!40000 ALTER TABLE `options` ENABLE KEYS */;
 UNLOCK TABLES;
 
