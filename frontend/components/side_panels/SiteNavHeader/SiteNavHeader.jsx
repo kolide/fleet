@@ -99,7 +99,7 @@ class SiteNavHeader extends Component {
             onNavItemClick={onNavItemClick}
             user={user}
           />
-      </div>
+        </div>
       </header>
     );
   }
