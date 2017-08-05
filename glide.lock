@@ -1,6 +1,10 @@
-hash: a437c9ca450b1cec9e2b7ad815179956279cb459a594d3c6fb80937f11ddede7
-updated: 2017-08-10T12:15:43.00289563-07:00
+hash: a2d6c514b557816dafd5f0a6fa80cf7bffed46f259cdc0326e8e5a842f848932
+updated: 2017-08-05T12:58:18.388403985-05:00
 imports:
+- name: git.apache.org/thrift.git
+  version: 0dd823580c78a79ae9696eb9b3650e400fff140f
+  subpackages:
+  - lib/go/thrift
 - name: github.com/alecthomas/template
   version: a0175ee3bccc567396460bf5acd36800cb10c49c
   subpackages:
@@ -53,6 +57,7 @@ imports:
   version: c3cefd437628a0b7d31b34fe44b3a7a540e98527
   subpackages:
   - proto
+  - ptypes/any
 - name: github.com/gorilla/context
   version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
 - name: github.com/gorilla/mux
@@ -89,6 +94,12 @@ imports:
   repo: git@github.com:kolide/agent-api.git
 - name: github.com/kolide/goose
   version: 4a7848793d4402d338de853019ad72b9a4b3e68e
+- name: github.com/kolide/osquery-go
+  version: 178e77662e89793d8e1406ab7a7bb92439ddcc41
+  subpackages:
+  - gen/osquery
+  - plugin/distributed
+  - plugin/logger
 - name: github.com/kr/logfmt
   version: b84e30acd515aadc4b783ad4ff83aff3299bdfe0
 - name: github.com/magiconair/properties
@@ -168,10 +179,15 @@ imports:
   - bcrypt
   - blowfish
 - name: golang.org/x/net
-  version: 4d38db76854b199960801a1734443fd02870d7e1
+  version: f5079bd7f6f74e23c4d65efa0f4ce14cbd6a3c0f
   subpackages:
   - context
   - context/ctxhttp
+  - http2
+  - http2/hpack
+  - internal/timeseries
+  - lex/httplex
+  - trace
 - name: golang.org/x/sys
   version: a646d33e2ee3172a661fc09bca23bb4889a41bc8
   subpackages:
@@ -181,6 +197,26 @@ imports:
   subpackages:
   - transform
   - unicode/norm
+- name: google.golang.org/genproto
+  version: b0a3dcfcd1a9bd48e63634bd8802960804cf8315
+  subpackages:
+  - googleapis/rpc/status
+- name: google.golang.org/grpc
+  version: b8669c35455183da6d5c474ea6e72fbf55183274
+  subpackages:
+  - codes
+  - credentials
+  - grpclb/grpc_lb_v1
+  - grpclog
+  - internal
+  - keepalive
+  - metadata
+  - naming
+  - peer
+  - stats
+  - status
+  - tap
+  - transport
 - name: gopkg.in/alecthomas/kingpin.v2
   version: 1087e65c9441605df944fb12c33f0fe7072d18ca
 - name: gopkg.in/go-playground/validator.v8
