@@ -49,6 +49,8 @@ import:
 - package: github.com/patrickmn/sortutil
 - package: github.com/stretchr/testify
   version: 05e8a0eda380579888eb53c394909df027f06991
+  subpackages:
+  - mock
 - package: github.com/garyburd/redigo
   version: ^1.0.0
   subpackages:
@@ -78,3 +80,4 @@ import:
 - package: google.golang.org/genproto
   subpackages:
   - googleapis/rpc/status
+- package: github.com/stretchr/objx

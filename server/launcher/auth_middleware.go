@@ -3,12 +3,9 @@ package launcher
 import (
 	pb "github.com/kolide/agent-api"
 	"github.com/kolide/fleet/server/kolide"
+
 	"golang.org/x/net/context"
 )
-
-type contextKey int
-
-const hostKey contextKey = 0
 
 type authMiddleware struct {
 	svc  kolide.OsqueryService
@@ -90,12 +87,12 @@ type auth struct {
 }
 
 func (s authMiddleware) authenticateHost(ctx context.Context, nodeKey string) (context.Context, *auth, error) {
-	host, err := s.svc.AuthenticateHost(ctx, nodeKey)
+	host, err := s.svc.AuthenticateHost(newCtx(ctx), nodeKey)
 	if err != nil {
 		if errEnroll, ok := err.(enrollmentError); ok {
 			return ctx, &auth{nodeInvalid: errEnroll.NodeInvalid(), errorCode: errEnroll.Error()}, nil
 		}
 		return nil, nil, err
 	}
-	return context.WithValue(ctx, hostKey, *host), &auth{host: host}, nil
+	return withHost(ctx, *host), &auth{host: host}, nil
 }

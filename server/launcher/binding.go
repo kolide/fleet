@@ -2,11 +2,10 @@ package launcher
 
 import (
 	"bytes"
-	newcontext "context"
 	"encoding/json"
+	"strconv"
 
 	pb "github.com/kolide/agent-api"
-	"github.com/kolide/fleet/server/contexts/host"
 	"github.com/kolide/fleet/server/kolide"
 	"github.com/pkg/errors"
 	"golang.org/x/net/context"
@@ -72,6 +71,7 @@ func (b *agentBinding) RequestQueries(ctx context.Context, _ *pb.AgentApiRequest
 	return &result, nil
 }
 
+// StatusLog handles osquery logging messages
 type StatusLog struct {
 	Severity string `json:"s"`
 	Filename string `json:"f"`
@@ -98,27 +98,71 @@ func toKolideLog(jsn string) (*kolide.OsqueryStatusLog, error) {
 
 // PublishLogs publish logs from osqueryd
 func (b *agentBinding) PublishLogs(ctx context.Context, coll *pb.LogCollection) (*pb.AgentApiResponse, error) {
-	if coll.LogType == pb.LogCollection_STATUS {
-		var statuses []kolide.OsqueryStatusLog
-		for _, record := range coll.Logs {
-
-			status, err := toKolideLog(record.Data)
-			if err != nil {
-				return nil, errors.Wrap(err, "decoding status log")
-			}
-			statuses = append(statuses, *status)
-		}
-
-		if err := b.service.SubmitStatusLogs(newCtx(ctx), statuses); err != nil {
-			return nil, errors.Wrap(err, "submitting status logs")
-		}
-
+	handler := func(_ context.Context, _ *pb.LogCollection) error { return nil }
+	switch coll.LogType {
+	case pb.LogCollection_RESULT:
+		handler = b.handleResultLogs
+	case pb.LogCollection_STATUS:
+		handler = b.handleStatusLogs
+	}
+	if err := handler(ctx, coll); err != nil {
+		return nil, err
 	}
 	return &pb.AgentApiResponse{}, nil
 }
 
+func (b *agentBinding) handleResultLogs(ctx context.Context, coll *pb.LogCollection) error {
+	var results []kolide.OsqueryResultLog
+	for _, log := range coll.Logs {
+		var result kolide.OsqueryResultLog
+		if err := json.Unmarshal([]byte(log.Data), &result); err != nil {
+			return errors.Wrap(err, "unmarshaling result log")
+		}
+		results = append(results, result)
+	}
+	if err := b.service.SubmitResultLogs(newCtx(ctx), results); err != nil {
+		return errors.Wrap(err, "submitting status logs")
+	}
+	return nil
+}
+
+func (b *agentBinding) handleStatusLogs(ctx context.Context, coll *pb.LogCollection) error {
+	var statuses []kolide.OsqueryStatusLog
+	for _, record := range coll.Logs {
+		status, err := toKolideLog(record.Data)
+		if err != nil {
+			return errors.Wrap(err, "decoding status log")
+		}
+		statuses = append(statuses, *status)
+	}
+	if err := b.service.SubmitStatusLogs(newCtx(ctx), statuses); err != nil {
+		return errors.Wrap(err, "submitting status logs")
+	}
+	return nil
+}
+
 // PublishResults publish distributed query results
 func (b *agentBinding) PublishResults(ctx context.Context, coll *pb.ResultCollection) (*pb.AgentApiResponse, error) {
+	results := kolide.OsqueryDistributedQueryResults{}
+	statuses := map[string]string{}
+	for _, result := range coll.Results {
+		statuses[result.Id] = strconv.Itoa(int(result.Status))
+		rows := []map[string]string{}
+		for _, row := range result.Rows {
+			cols := map[string]string{}
+			for _, colVal := range row.Columns {
+				cols[colVal.Name] = colVal.Value
+			}
+			if len(cols) == 0 {
+				continue
+			}
+			rows = append(rows, cols)
+		}
+		results[result.Id] = rows
+	}
+	if err := b.service.SubmitDistributedQueryResults(newCtx(ctx), results, statuses); err != nil {
+		return nil, errors.Wrap(err, "submitting distributed query results")
+	}
 	return &pb.AgentApiResponse{}, nil
 }
 
@@ -130,14 +174,4 @@ func (b *agentBinding) HotConfigure(in *pb.AgentApiRequest, svr pb.Api_HotConfig
 // HotlineBling this would be live query push to agent
 func (b *agentBinding) HotlineBling(svr pb.Api_HotlineBlingServer) error {
 	return errNotImplmented
-}
-
-// newCtx is used to map the old golang.com/net/context which we are forced to use
-// because our generated gRPC code uses it, to the new stdlib context, which is used
-// by the Fleet application.
-func newCtx(ctx context.Context) newcontext.Context {
-	if h, ok := ctx.Value(hostKey).(kolide.Host); ok {
-		return host.NewContext(newcontext.Background(), h)
-	}
-	return newcontext.Background()
 }
