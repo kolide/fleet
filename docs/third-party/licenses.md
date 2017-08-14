@@ -360,7 +360,6 @@ Third-Party Licenses
 | [get-caller-file](https://www.npmjs.com/package/get-caller-file) | [ISC](https://opensource.org/licenses/ISC) |
 | [get-stdin](https://www.npmjs.com/package/get-stdin) | [MIT](https://opensource.org/licenses/MIT) |
 | [getpass](https://www.npmjs.com/package/getpass) | [MIT](https://opensource.org/licenses/MIT) |
-| [git.apache.org/thrift.git](https://git.apache.org/thrift.git) | [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0) |
 | [github.com/VividCortex/mysqlerr](https://github.com/VividCortex/mysqlerr) | [MIT](https://opensource.org/licenses/MIT) |
 | [github.com/WatchBeam/clock](https://github.com/WatchBeam/clock) | [MIT](https://opensource.org/licenses/MIT) |
 | [github.com/alecthomas/template](https://github.com/alecthomas/template) | [NewBSD](https://opensource.org/licenses/BSD-3-Clause) |
@@ -413,6 +412,7 @@ Third-Party Licenses
 | [github.com/spf13/jwalterweatherman](https://github.com/spf13/jwalterweatherman) | [MIT](https://opensource.org/licenses/MIT) |
 | [github.com/spf13/pflag](https://github.com/spf13/pflag) | [NewBSD](https://opensource.org/licenses/BSD-3-Clause) |
 | [github.com/spf13/viper](https://github.com/spf13/viper) | [MIT](https://opensource.org/licenses/MIT) |
+| [github.com/stretchr/objx](https://github.com/stretchr/objx) | [MIT](https://opensource.org/licenses/MIT) |
 | [github.com/stretchr/testify](https://github.com/stretchr/testify) | [MIT](https://opensource.org/licenses/MIT) |
 | [glob](https://www.npmjs.com/package/glob) | [ISC](https://opensource.org/licenses/ISC) |
 | [glob-base](https://www.npmjs.com/package/glob-base) | [MIT](https://opensource.org/licenses/MIT) |
