@@ -149,7 +149,8 @@ func TestRequestConfigHappyPath(t *testing.T) {
 	).Return(
 		&kolide.OsqueryConfig{
 			Options: map[string]interface{}{
-				"option1": "optionval",
+				"option1":            "optionval",
+				"distributed_plugin": "tls",
 			},
 			Decorators: kolide.Decorators{
 				Load: []string{
@@ -166,6 +167,7 @@ func TestRequestConfigHappyPath(t *testing.T) {
 	resp, err := agent.RequestConfig(oldContext, request)
 	mockSvc.AssertExpectations(t)
 	assert.Nil(t, err)
+	// verify distributed_plugin was removed
 	expectedJSON := "{\"options\":{\"option1\":\"optionval\"},\"decorators\":{\"load\":[\"SELECT * FROM users u JOIN groups g WHERE u.gid = g.gid\"]}}\n"
 	require.NotNil(t, resp)
 	assert.Equal(t, expectedJSON, resp.ConfigJsonBlob)

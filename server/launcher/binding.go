@@ -51,6 +51,11 @@ func (b *agentBinding) RequestConfig(ctx context.Context, req *pb.AgentApiReques
 	if err != nil {
 		return nil, err
 	}
+	// Distributed plugins don't work with launcher managed osquery instances
+	// so it's removed if it exists
+	if _, ok := config.Options["distributed_plugin"]; ok {
+		delete(config.Options, "distributed_plugin")
+	}
 	var writer bytes.Buffer
 	if err = json.NewEncoder(&writer).Encode(config); err != nil {
 		return nil, err
