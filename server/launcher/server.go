@@ -30,12 +30,12 @@ func New(svc kolide.OsqueryService, logger kitlog.Logger, opts ...grpc.ServerOpt
 
 // Handler will route gRPC traffic to the gRPC server, other http traffic
 // will be routed to normal http handler functions.
-func (h *Handler) Handler(mux *http.ServeMux) http.Handler {
+func (hgprc *Handler) Handler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.ProtoMajor == 2 && strings.Contains(r.Header.Get("Content-Type"), "application/grpc") {
-			h.ServeHTTP(w, r)
+			hgprc.ServeHTTP(w, r)
 		} else {
-			mux.ServeHTTP(w, r)
+			h.ServeHTTP(w, r)
 		}
 	})
 }
