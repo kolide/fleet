@@ -983,7 +983,6 @@ func TestUpdateHostIntervals(t *testing.T) {
 		}
 		return sections, nil
 	}
-	//ds.GetClientConfigFunc = func()(*kolide.)
 
 	var testCases = []struct {
 		initHost       kolide.Host
