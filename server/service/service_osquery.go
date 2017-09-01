@@ -4,17 +4,53 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 	"time"
 
+	"cloud.google.com/go/logging"
 	"github.com/go-kit/kit/log"
 	hostctx "github.com/kolide/fleet/server/contexts/host"
 	"github.com/kolide/fleet/server/kolide"
 	"github.com/kolide/fleet/server/pubsub"
 	"github.com/pkg/errors"
 	"github.com/spf13/cast"
+	oldctx "golang.org/x/net/context"
 )
+
+// Global are a crime and all. This will all be removed once
+// I itterate a bit on the logs SubmitX methods.
+var (
+	slogger, rlogger *logging.Logger
+	stackdriver      bool
+)
+
+func init() {
+	if _, ok := os.LookupEnv("GOOGLE_APPLICATION_CREDENTIALS"); !ok {
+		return
+	}
+	ctx := oldctx.Background()
+
+	// Sets your Google Cloud Platform project ID.
+	projectID := "kolide-ose-testing"
+	if id, ok := os.LookupEnv("GOOGLE_PROJECT_ID"); ok {
+		projectID = id
+	}
+
+	// Creates a client.
+	client, err := logging.NewClient(ctx, projectID)
+	if err != nil {
+		fmt.Printf("Failed to create client: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Selects the log to write to.
+	slogger = client.Logger("osquery-status")
+	rlogger = client.Logger("osquery-results")
+	stackdriver = true
+
+}
 
 type osqueryError struct {
 	message     string
@@ -222,6 +258,9 @@ type flusher interface {
 
 func (svc service) SubmitStatusLogs(ctx context.Context, logs []kolide.OsqueryStatusLog) error {
 	for _, log := range logs {
+		if stackdriver {
+			logStackdriver(ctx, slogger, log)
+		}
 		err := json.NewEncoder(svc.osqueryStatusLogWriter).Encode(log)
 		if err != nil {
 			return osqueryError{message: "error writing status log: " + err.Error()}
@@ -238,6 +277,9 @@ func (svc service) SubmitStatusLogs(ctx context.Context, logs []kolide.OsquerySt
 
 func (svc service) SubmitResultLogs(ctx context.Context, logs []kolide.OsqueryResultLog) error {
 	for _, log := range logs {
+		if stackdriver {
+			logStackdriver(ctx, rlogger, log)
+		}
 		err := json.NewEncoder(svc.osqueryResultLogWriter).Encode(log)
 		if err != nil {
 			return osqueryError{message: "error writing result log: " + err.Error()}
@@ -250,6 +292,31 @@ func (svc service) SubmitResultLogs(ctx context.Context, logs []kolide.OsqueryRe
 		}
 	}
 	return nil
+}
+
+func logStackdriver(ctx context.Context, logger *logging.Logger, log interface{}) {
+	host, ok := hostctx.FromContext(ctx)
+	if !ok {
+		// this can only happen if the host authz failed.
+		logger.Log(logging.Entry{
+			Severity: logging.Alert,
+			Payload:  "logging osquery log without host ctx",
+		})
+		return
+	}
+	labels := map[string]string{
+		"osquery_host_hostname": host.HostName,
+		"osquery_host_uuid":     host.UUID,
+	}
+	if l, ok := log.(kolide.OsqueryResultLog); ok {
+		packName := strings.SplitN(l.Name, "/", 3)[1]
+		labels["pack_name"] = packName
+	}
+	entry := logging.Entry{
+		Labels:  labels,
+		Payload: log,
+	}
+	logger.Log(entry)
 }
 
 // hostLabelQueryPrefix is appended before the query name when a query is
