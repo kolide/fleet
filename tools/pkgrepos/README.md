@@ -12,15 +12,17 @@ GPG keys in your keyring.
 # Steps
 
 1. Download the Google Storage bucket locally.
+
 ```
 gsutil cp -r gs://dl.kolide.co/ /Users/$user/kolide_packages/
 ```
 
-2. Import keys to GPG keyring. Run this command by mounting the ~/.gnupg folder into the `kolide/fpm` docker container. The gnupg version on your mac is probably different and the keyring format is not compatible with the one in the container.
+2. Import keys to GPG keyring. Run this command by mounting the `~/.gnupg` folder into the `kolide/fpm` docker container. The gnupg version on your mac is probably different and the keyring format is not compatible with the one in the container. The permissions on .gnupg should be 700 and the files in the .gnupg directory need to be 600.
 
 Note: You only need to do this step once.
 
 Start container
+
 ```
 	docker run --rm -it \
         -v /Users/$(whoami)/.gnupg:/root/.gnupg" \
@@ -45,6 +47,7 @@ You will be prompted for the GPG password several times by the rpm/deb packaging
 4. Copy the artifacts into the appropriate directories in `~/kolide_packages`
 
 Example:
+
 ```
 cp build/kolide-1.0.4-1.x86_64.rpm ~/kolide_packages/yum/
 cp build/kolide_1.0.4_amd64.deb ~/kolide_packages/deb
@@ -59,6 +62,7 @@ NOTE: The script MUST be run from the `pkgrepos` directory as it `cd`s into rela
 
 6. Generate the package metadate file.
 The `https://dl.kolide.co/metadata.json` file holds data about the latest version/old releases. Run the Go `package_metadata.go` to generate an updated version of the metadata file.
+
 ```
 go run package_metadata.go -repo /Users/$me/kolide_packages/ -git-tag=1.0.4
  ```
