@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/go-kit/kit/endpoint"
-	"github.com/kolide/kolide/server/kolide"
+	"github.com/kolide/fleet/server/kolide"
 )
 
 type setupRequest struct {
@@ -34,13 +34,6 @@ func makeSetupEndpoint(svc kolide.Service) endpoint.Endpoint {
 			err           error
 		)
 		req := request.(setupRequest)
-		license, err := svc.License(ctx)
-		if err != nil {
-			return setupResponse{Err: err}, nil
-		}
-		if license.Token == nil {
-			return licensingError{reason: "missing license"}, nil
-		}
 		if req.OrgInfo != nil {
 			configPayload.OrgInfo = req.OrgInfo
 		}

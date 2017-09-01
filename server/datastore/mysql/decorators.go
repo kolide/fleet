@@ -5,18 +5,21 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/kolide/kolide/server/kolide"
+	"github.com/kolide/fleet/server/kolide"
 )
 
-func (ds *Datastore) SaveDecorator(dec *kolide.Decorator) error {
+func (ds *Datastore) SaveDecorator(dec *kolide.Decorator, opts ...kolide.OptionalArg) error {
+	db := ds.getTransaction(opts)
 	sqlStatement :=
 		"UPDATE decorators SET " +
+			"`name` = ?, " +
 			"`query` = ?, " +
 			"`type` = ?, " +
 			"`interval` = ? " +
 			"WHERE id = ?"
-	_, err := ds.db.Exec(
+	_, err := db.Exec(
 		sqlStatement,
+		dec.Name,
 		dec.Query,
 		dec.Type,
 		dec.Interval,
@@ -28,14 +31,17 @@ func (ds *Datastore) SaveDecorator(dec *kolide.Decorator) error {
 	return nil
 }
 
-func (ds *Datastore) NewDecorator(decorator *kolide.Decorator) (*kolide.Decorator, error) {
+func (ds *Datastore) NewDecorator(decorator *kolide.Decorator, opts ...kolide.OptionalArg) (*kolide.Decorator, error) {
+	db := ds.getTransaction(opts)
 	sqlStatement :=
 		"INSERT INTO decorators (" +
+			"`name`," +
 			"`query`," +
 			"`type`," +
 			"`interval` ) " +
-			"VALUES (?, ?, ?)"
-	result, err := ds.db.Exec(sqlStatement, decorator.Query, decorator.Type, decorator.Interval)
+			"VALUES (?, ?, ?, ?)"
+	result, err := db.Exec(sqlStatement, decorator.Name, decorator.Query, decorator.Type, decorator.Interval)
+
 	if err != nil {
 		return nil, errors.Wrap(err, "creating decorator")
 	}
@@ -77,13 +83,15 @@ func (ds *Datastore) Decorator(id uint) (*kolide.Decorator, error) {
 	return &result, nil
 }
 
-func (ds *Datastore) ListDecorators() ([]*kolide.Decorator, error) {
+func (ds *Datastore) ListDecorators(opts ...kolide.OptionalArg) ([]*kolide.Decorator, error) {
+	db := ds.getTransaction(opts)
 	sqlStatement := `
     SELECT *
       FROM decorators
+      ORDER by built_in DESC, name ASC
   `
 	var results []*kolide.Decorator
-	err := ds.db.Select(&results, sqlStatement)
+	err := db.Select(&results, sqlStatement)
 	if err != nil {
 		return nil, errors.Wrap(err, "listing decorators")
 	}

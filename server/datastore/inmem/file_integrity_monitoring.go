@@ -1,10 +1,10 @@
 package inmem
 
 import (
-	"github.com/kolide/kolide/server/kolide"
+	"github.com/kolide/fleet/server/kolide"
 )
 
-func (d *Datastore) NewFIMSection(fp *kolide.FIMSection) (*kolide.FIMSection, error) {
+func (d *Datastore) NewFIMSection(fp *kolide.FIMSection, opts ...kolide.OptionalArg) (*kolide.FIMSection, error) {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 	fp.ID = d.nextID(fp)
@@ -20,4 +20,8 @@ func (d *Datastore) FIMSections() (kolide.FIMSections, error) {
 		result[filePath.SectionName] = append(result[filePath.SectionName], filePath.Paths...)
 	}
 	return result, nil
+}
+
+func (d *Datastore) ClearFIMSections() error {
+	panic("inmem is being deprecated")
 }

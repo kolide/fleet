@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	"github.com/kolide/kolide/server/kolide"
+	"github.com/kolide/fleet/server/kolide"
 )
 
 func (svc service) ListDecorators(ctx context.Context) ([]*kolide.Decorator, error) {
@@ -16,6 +16,9 @@ func (svc service) DeleteDecorator(ctx context.Context, uid uint) error {
 
 func (svc service) NewDecorator(ctx context.Context, payload kolide.DecoratorPayload) (*kolide.Decorator, error) {
 	var dec kolide.Decorator
+	if payload.Name != nil {
+		dec.Name = *payload.Name
+	}
 	dec.Query = *payload.Query
 	dec.Type = *payload.DecoratorType
 	if payload.Interval != nil {
@@ -28,6 +31,9 @@ func (svc service) ModifyDecorator(ctx context.Context, payload kolide.Decorator
 	dec, err := svc.ds.Decorator(payload.ID)
 	if err != nil {
 		return nil, err
+	}
+	if payload.Name != nil {
+		dec.Name = *payload.Name
 	}
 	if payload.DecoratorType != nil {
 		dec.Type = *payload.DecoratorType

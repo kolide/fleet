@@ -5,17 +5,18 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/kolide/kolide/server/kolide"
+	"github.com/kolide/fleet/server/kolide"
 	"github.com/pkg/errors"
 )
 
 // NewLabel creates a new kolide.Label
-func (d *Datastore) NewLabel(label *kolide.Label) (*kolide.Label, error) {
+func (d *Datastore) NewLabel(label *kolide.Label, opts ...kolide.OptionalArg) (*kolide.Label, error) {
+	db := d.getTransaction(opts)
 	var (
 		deletedLabel kolide.Label
 		query        string
 	)
-	err := d.db.Get(&deletedLabel,
+	err := db.Get(&deletedLabel,
 		"SELECT * FROM labels WHERE name = ? AND deleted", label.Name)
 	switch err {
 	case nil:
@@ -41,7 +42,7 @@ func (d *Datastore) NewLabel(label *kolide.Label) (*kolide.Label, error) {
 	default:
 		return nil, errors.Wrap(err, "check for existing label")
 	}
-	result, err := d.db.Exec(query, label.Name, label.Description, label.Query, label.Platform, label.LabelType)
+	result, err := db.Exec(query, label.Name, label.Description, label.Query, label.Platform, label.LabelType)
 	if err != nil {
 		return nil, errors.Wrap(err, "inserting label")
 	}

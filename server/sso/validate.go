@@ -1,13 +1,14 @@
 package sso
 
 import (
+	"crypto/rand"
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/xml"
 	"time"
 
 	"github.com/beevik/etree"
-	"github.com/kolide/kolide/server/kolide"
+	"github.com/kolide/fleet/server/kolide"
 	"github.com/pkg/errors"
 	gosamltypes "github.com/russellhaering/gosaml2/types"
 	dsig "github.com/russellhaering/goxmldsig"
@@ -113,7 +114,7 @@ func (v *validator) ValidateSignature(auth kolide.Auth) (kolide.Auth, error) {
 	// We've verified that the response hasn't been tampered with at this point
 	signedDoc := etree.NewDocument()
 	signedDoc.SetRoot(signed)
-	buffer, err := doc.WriteToBytes()
+	buffer, err := signedDoc.WriteToBytes()
 	if err != nil {
 		return nil, errors.Wrap(err, "creating signed doc buffer")
 	}
@@ -132,7 +133,6 @@ func (v *validator) validateSignature(elt *etree.Element) (*etree.Element, error
 		// If entire doc is signed, success, we're done.
 		return validated, nil
 	}
-
 	if err == dsig.ErrMissingSignature {
 		// If entire document is not signed find signed assertions, remove assertions
 		// that are not signed.
@@ -165,4 +165,24 @@ func (v *validator) validateAssertionSignature(elt *etree.Element) error {
 		return nil
 	}
 	return etreeutils.NSFindIterate(elt, "urn:oasis:names:tc:SAML:2.0:assertion", "Assertion", validateAssertion)
+}
+
+const (
+	idSize     = 16
+	idAlphabet = `1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ`
+)
+
+// There isn't anything in the SAML spec that tells us what is valid inside an ID
+// other than expecting that it has to be unique and valid XML. ADFS blows up on '=' in the ID,
+// so we are using an alphabet that we know works.
+func generateSAMLValidID() (string, error) {
+	randomBytes := make([]byte, idSize)
+	_, err := rand.Read(randomBytes)
+	if err != nil {
+		return "", err
+	}
+	for i := 0; i < idSize; i++ {
+		randomBytes[i] = idAlphabet[randomBytes[i]%byte(len(idAlphabet))]
+	}
+	return string(randomBytes), nil
 }

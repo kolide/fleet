@@ -4,11 +4,11 @@ import (
 	"context"
 
 	"github.com/go-kit/kit/endpoint"
-	"github.com/kolide/kolide/server/kolide"
+	"github.com/kolide/fleet/server/kolide"
 )
 
 type listDecoratorResponse struct {
-	Decorators []*kolide.Decorator `json:"decorators,omitempty"`
+	Decorators []*kolide.Decorator `json:"decorators"`
 	Err        error               `json:"error,omitempty"`
 }
 

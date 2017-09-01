@@ -15,7 +15,6 @@ import ConfirmSSOInvitePage from 'pages/ConfirmSSOInvitePage';
 import CoreLayout from 'layouts/CoreLayout';
 import EditPackPage from 'pages/packs/EditPackPage';
 import EmailTokenRedirect from 'components/EmailTokenRedirect';
-import LicensePage from 'pages/LicensePage';
 import LoginRoutes from 'components/LoginRoutes';
 import LogoutPage from 'pages/LogoutPage';
 import ManageHostsPage from 'pages/hosts/ManageHostsPage';
@@ -29,6 +28,9 @@ import Kolide404 from 'pages/Kolide404';
 import Kolide500 from 'pages/Kolide500';
 import store from 'redux/store';
 import UserSettingsPage from 'pages/UserSettingsPage';
+import DecoratorPage from 'pages/decorators/DecoratorPage';
+import ManageDecoratorsPage from 'pages/decorators/ManageDecoratorsPage';
+import DecoratorsPageWrapper from 'components/decorators/DecoratorsPageWrapper';
 
 const history = syncHistoryWithStore(browserHistory, store);
 
@@ -37,7 +39,6 @@ const routes = (
     <Router history={history}>
       <Route path="/" component={App}>
         <Route path="setup" component={RegistrationPage} />
-        <Route path="license" component={LicensePage} />
         <Route path="login" component={LoginRoutes}>
           <Route path="invites/:invite_token" component={ConfirmInvitePage} />
           <Route path="ssoinvites/:invite_token" component={ConfirmSSOInvitePage} />
@@ -58,6 +59,11 @@ const routes = (
             </Route>
             <Route path="hosts">
               <Route path="manage" component={ManageHostsPage} />
+            </Route>
+            <Route path="decorators" component={DecoratorsPageWrapper}>
+              <Route path="manage" component={ManageDecoratorsPage} />
+              <Route path="new" component={DecoratorPage} />
+              <Route path=":id" component={DecoratorPage} />
             </Route>
             <Route path="packs" component={PackPageWrapper}>
               <Route path="manage" component={AllPacksPage} />

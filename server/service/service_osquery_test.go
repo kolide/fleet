@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"strings"
@@ -12,14 +13,14 @@ import (
 	"time"
 
 	"github.com/WatchBeam/clock"
-	"github.com/kolide/kolide/server/config"
-	hostctx "github.com/kolide/kolide/server/contexts/host"
-	"github.com/kolide/kolide/server/contexts/viewer"
-	"github.com/kolide/kolide/server/datastore/inmem"
-	"github.com/kolide/kolide/server/kolide"
-	"github.com/kolide/kolide/server/mock"
-	"github.com/kolide/kolide/server/pubsub"
-	"github.com/kolide/kolide/server/test"
+	"github.com/kolide/fleet/server/config"
+	hostctx "github.com/kolide/fleet/server/contexts/host"
+	"github.com/kolide/fleet/server/contexts/viewer"
+	"github.com/kolide/fleet/server/datastore/inmem"
+	"github.com/kolide/fleet/server/kolide"
+	"github.com/kolide/fleet/server/mock"
+	"github.com/kolide/fleet/server/pubsub"
+	"github.com/kolide/fleet/server/test"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -435,6 +436,170 @@ func TestGetClientConfig(t *testing.T) {
 	assert.Len(t, config.Packs["monitoring"].Queries, 1)
 }
 
+func TestDetailQueriesWithEmptyStrings(t *testing.T) {
+	ds, svc, mockClock := setupOsqueryTests(t)
+	ctx := context.Background()
+
+	nodeKey, err := svc.EnrollAgent(ctx, "", "host123")
+	assert.Nil(t, err)
+
+	host, err := ds.AuthenticateHost(nodeKey)
+	require.Nil(t, err)
+
+	ctx = hostctx.NewContext(ctx, *host)
+
+	// With a new host, we should get the detail queries (and accelerated
+	// queries)
+	queries, acc, err := svc.GetDistributedQueries(ctx)
+	assert.Nil(t, err)
+	assert.Len(t, queries, len(detailQueries))
+	assert.NotZero(t, acc)
+
+	resultJSON := `
+{
+"kolide_detail_query_network_interface": [
+		{
+				"address": "192.168.0.1",
+				"broadcast": "192.168.0.255",
+				"ibytes": "",
+				"ierrors": "",
+				"interface": "en0",
+				"ipackets": "25698094",
+				"last_change": "1474233476",
+				"mac": "5f:3d:4b:10:25:82",
+				"mask": "255.255.255.0",
+				"metric": "",
+				"mtu": "",
+				"obytes": "",
+				"oerrors": "",
+				"opackets": "",
+				"point_to_point": "",
+				"type": ""
+		}
+],
+"kolide_detail_query_os_version": [
+		{
+				"platform": "darwin",
+				"build": "15G1004",
+				"major": "10",
+				"minor": "10",
+				"name": "Mac OS X",
+				"patch": "6"
+		}
+],
+"kolide_detail_query_osquery_info": [
+		{
+				"build_distro": "10.10",
+				"build_platform": "darwin",
+				"config_hash": "3c6e4537c4d0eb71a7c6dda19d",
+				"config_valid": "1",
+				"extensions": "active",
+				"pid": "38113",
+				"start_time": "1475603155",
+				"version": "1.8.2",
+				"watcher": "38112"
+		}
+],
+"kolide_detail_query_system_info": [
+		{
+				"computer_name": "computer",
+				"cpu_brand": "Intel(R) Core(TM) i7-4770HQ CPU @ 2.20GHz",
+				"cpu_logical_cores": "8",
+				"cpu_physical_cores": "4",
+				"cpu_subtype": "Intel x86-64h Haswell",
+				"cpu_type": "x86_64h",
+				"hardware_model": "MacBookPro11,4",
+				"hardware_serial": "ABCDEFGH",
+				"hardware_vendor": "Apple Inc.",
+				"hardware_version": "1.0",
+				"hostname": "computer.local",
+				"physical_memory": "17179869184",
+				"uuid": "uuid"
+		}
+],
+"kolide_detail_query_uptime": [
+		{
+				"days": "20",
+				"hours": "0",
+				"minutes": "48",
+				"seconds": "13",
+				"total_seconds": "1730893"
+		}
+],
+"kolide_detail_query_osquery_flags": [
+		{
+			"name":"config_tls_refresh",
+			"value":""
+		},
+		{
+			"name":"distributed_interval",
+			"value":""
+		},
+		{
+			"name":"logger_tls_period",
+			"value":""
+		}
+]
+}
+`
+
+	var results kolide.OsqueryDistributedQueryResults
+	err = json.Unmarshal([]byte(resultJSON), &results)
+	require.Nil(t, err)
+
+	// Verify that results are ingested properly
+	svc.SubmitDistributedQueryResults(ctx, results, map[string]string{})
+
+	// Make sure the result saved to the datastore
+	host, err = ds.AuthenticateHost(nodeKey)
+	require.Nil(t, err)
+
+	// osquery_info
+	assert.Equal(t, "darwin", host.Platform)
+	assert.Equal(t, "1.8.2", host.OsqueryVersion)
+
+	// system_info
+	assert.Equal(t, 17179869184, host.PhysicalMemory)
+	assert.Equal(t, "computer.local", host.HostName)
+	assert.Equal(t, "uuid", host.UUID)
+
+	// os_version
+	assert.Equal(t, "Mac OS X 10.10.6", host.OSVersion)
+
+	// uptime
+	assert.Equal(t, 1730893*time.Second, host.Uptime)
+
+	// osquery_flags
+	assert.Equal(t, uint(0), host.ConfigTLSRefresh)
+	assert.Equal(t, uint(0), host.DistributedInterval)
+	assert.Equal(t, uint(0), host.LoggerTLSPeriod)
+
+	mockClock.AddTime(1 * time.Minute)
+
+	// Now no detail queries should be required
+	host, err = ds.AuthenticateHost(nodeKey)
+	require.Nil(t, err)
+	ctx = hostctx.NewContext(ctx, *host)
+	queries, acc, err = svc.GetDistributedQueries(ctx)
+	assert.Nil(t, err)
+	assert.Len(t, queries, 0)
+	assert.Zero(t, acc)
+
+	// Advance clock and queries should exist again
+	mockClock.AddTime(1*time.Hour + 1*time.Minute)
+
+	err = svc.SubmitDistributedQueryResults(ctx, kolide.OsqueryDistributedQueryResults{}, map[string]string{})
+	require.Nil(t, err)
+	host, err = ds.AuthenticateHost(nodeKey)
+	require.Nil(t, err)
+
+	ctx = hostctx.NewContext(ctx, *host)
+	queries, acc, err = svc.GetDistributedQueries(ctx)
+	assert.Nil(t, err)
+	assert.Len(t, queries, len(detailQueries))
+	assert.Zero(t, acc)
+}
+
 func TestDetailQueries(t *testing.T) {
 	ds, svc, mockClock := setupOsqueryTests(t)
 	ctx := context.Background()
@@ -529,6 +694,10 @@ func TestDetailQueries(t *testing.T) {
     {
       "name":"config_tls_refresh",
       "value":"10"
+    },
+    {
+      "name":"config_refresh",
+      "value":"9"
     },
     {
       "name":"distributed_interval",
@@ -794,7 +963,7 @@ func TestUpdateHostIntervals(t *testing.T) {
 	svc, err := newTestService(ds, nil)
 	require.Nil(t, err)
 
-	ds.ListDecoratorsFunc = func() ([]*kolide.Decorator, error) {
+	ds.ListDecoratorsFunc = func(opt ...kolide.OptionalArg) ([]*kolide.Decorator, error) {
 		return []*kolide.Decorator{}, nil
 	}
 	ds.ListPacksFunc = func(opt kolide.ListOptions) ([]*kolide.Pack, error) {
@@ -802,6 +971,17 @@ func TestUpdateHostIntervals(t *testing.T) {
 	}
 	ds.ListLabelsForHostFunc = func(hid uint) ([]kolide.Label, error) {
 		return []kolide.Label{}, nil
+	}
+	ds.AppConfigFunc = func() (*kolide.AppConfig, error) {
+		return &kolide.AppConfig{FIMInterval: 400}, nil
+	}
+	ds.FIMSectionsFunc = func() (kolide.FIMSections, error) {
+		sections := kolide.FIMSections{
+			"etc": []string{
+				"/etc/%%",
+			},
+		}
+		return sections, nil
 	}
 
 	var testCases = []struct {
@@ -898,6 +1078,8 @@ func TestUpdateHostIntervals(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
+		ds.FIMSectionsFuncInvoked = false
+
 		t.Run("", func(t *testing.T) {
 			ctx := hostctx.NewContext(context.Background(), tt.initHost)
 
@@ -912,9 +1094,22 @@ func TestUpdateHostIntervals(t *testing.T) {
 				return nil
 			}
 
-			_, err = svc.GetClientConfig(ctx)
+			cfg, err := svc.GetClientConfig(ctx)
 			require.Nil(t, err)
 			assert.Equal(t, tt.saveHostCalled, saveHostCalled)
+			require.True(t, ds.FIMSectionsFuncInvoked)
+			require.Condition(t, func() bool {
+				_, ok := cfg.Schedule["file_events"]
+				return ok
+			})
+			assert.Equal(t, 400, int(cfg.Schedule["file_events"].Interval))
+			assert.Equal(t, "SELECT * FROM file_events;", cfg.Schedule["file_events"].Query)
+			require.NotNil(t, cfg.FilePaths)
+			require.Condition(t, func() bool {
+				_, ok := cfg.FilePaths["etc"]
+				return ok
+			})
+			assert.Len(t, cfg.FilePaths["etc"], 1)
 		})
 	}
 
@@ -932,4 +1127,53 @@ func setupOsqueryTests(t *testing.T) (kolide.Datastore, kolide.Service, *clock.M
 	require.Nil(t, err)
 
 	return ds, svc, mockClock
+}
+
+type notFoundError struct{}
+
+func (e notFoundError) Error() string {
+	return "not found"
+}
+
+func (e notFoundError) IsNotFound() bool {
+	return true
+}
+
+func TestAuthenticationErrors(t *testing.T) {
+	ms := new(mock.Store)
+	ms.MarkHostSeenFunc = func(*kolide.Host, time.Time) error {
+		return nil
+	}
+	ms.AuthenticateHostFunc = func(nodeKey string) (*kolide.Host, error) {
+		return nil, nil
+	}
+
+	svc, err := newTestService(ms, nil)
+	require.Nil(t, err)
+	ctx := context.Background()
+
+	_, err = svc.AuthenticateHost(ctx, "")
+	require.NotNil(t, err)
+	require.True(t, err.(osqueryError).NodeInvalid())
+
+	_, err = svc.AuthenticateHost(ctx, "foo")
+	require.Nil(t, err)
+
+	// return not found error
+	ms.AuthenticateHostFunc = func(nodeKey string) (*kolide.Host, error) {
+		return nil, notFoundError{}
+	}
+
+	_, err = svc.AuthenticateHost(ctx, "foo")
+	require.NotNil(t, err)
+	require.True(t, err.(osqueryError).NodeInvalid())
+
+	// return other error
+	ms.AuthenticateHostFunc = func(nodeKey string) (*kolide.Host, error) {
+		return nil, errors.New("foo")
+	}
+
+	_, err = svc.AuthenticateHost(ctx, "foo")
+	require.NotNil(t, err)
+	require.False(t, err.(osqueryError).NodeInvalid())
 }

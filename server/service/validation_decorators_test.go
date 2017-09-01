@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/kolide/kolide/server/kolide"
-	"github.com/kolide/kolide/server/mock"
+	"github.com/kolide/fleet/server/kolide"
+	"github.com/kolide/fleet/server/mock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -21,7 +21,7 @@ func TestDecoratorValidation(t *testing.T) {
 			Type:  kolide.DecoratorAlways,
 		}, nil
 	}
-	ds.SaveDecoratorFunc = func(dec *kolide.Decorator) error {
+	ds.SaveDecoratorFunc = func(dec *kolide.Decorator, opts ...kolide.OptionalArg) error {
 		return nil
 	}
 	svc := &service{
@@ -53,7 +53,7 @@ func TestDecoratorValidationIntervalMissing(t *testing.T) {
 			Type:  kolide.DecoratorAlways,
 		}, nil
 	}
-	ds.SaveDecoratorFunc = func(dec *kolide.Decorator) error {
+	ds.SaveDecoratorFunc = func(dec *kolide.Decorator, opts ...kolide.OptionalArg) error {
 		return nil
 	}
 	svc := &service{
@@ -86,7 +86,7 @@ func TestDecoratorValidationIntervalSameType(t *testing.T) {
 			Interval: 600,
 		}, nil
 	}
-	ds.SaveDecoratorFunc = func(dec *kolide.Decorator) error {
+	ds.SaveDecoratorFunc = func(dec *kolide.Decorator, opts ...kolide.OptionalArg) error {
 		return nil
 	}
 	svc := &service{
@@ -118,7 +118,7 @@ func TestDecoratorValidationIntervalInvalid(t *testing.T) {
 			Interval: 600,
 		}, nil
 	}
-	ds.SaveDecoratorFunc = func(dec *kolide.Decorator) error {
+	ds.SaveDecoratorFunc = func(dec *kolide.Decorator, opts ...kolide.OptionalArg) error {
 		return nil
 	}
 	svc := &service{

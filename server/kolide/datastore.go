@@ -18,7 +18,6 @@ type Datastore interface {
 	DecoratorStore
 	FileIntegrityMonitoringStore
 	YARAStore
-	LicenseStore
 	Name() string
 	Drop() error
 	// MigrateTables creates and migrates the table schemas
@@ -28,6 +27,7 @@ type Datastore interface {
 	// MigrationStatus returns nil if migrations are complete, and an error
 	// if migrations need to be run.
 	MigrationStatus() (MigrationStatus, error)
+	Begin() (Transaction, error)
 }
 
 type MigrationStatus int
@@ -50,3 +50,5 @@ type AlreadyExistsError interface {
 	error
 	IsExists() bool
 }
+
+type OptionalArg func() interface{}

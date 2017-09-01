@@ -5,19 +5,19 @@ import (
 
 	"github.com/WatchBeam/clock"
 	kitlog "github.com/go-kit/kit/log"
-	"github.com/kolide/kolide/server/config"
-	"github.com/kolide/kolide/server/kolide"
+	"github.com/kolide/fleet/server/config"
+	"github.com/kolide/fleet/server/kolide"
 	"github.com/stretchr/testify/require"
 )
 
 func newTestService(ds kolide.Datastore, rs kolide.QueryResultStore) (kolide.Service, error) {
 	mailer := &mockMailService{SendEmailFn: func(e kolide.Email) error { return nil }}
-	return NewService(ds, rs, kitlog.NewNopLogger(), config.TestConfig(), mailer, clock.C, nil, nil)
+	return NewService(ds, rs, kitlog.NewNopLogger(), config.TestConfig(), mailer, clock.C, nil)
 }
 
 func newTestServiceWithClock(ds kolide.Datastore, rs kolide.QueryResultStore, c clock.Clock) (kolide.Service, error) {
 	mailer := &mockMailService{SendEmailFn: func(e kolide.Email) error { return nil }}
-	return NewService(ds, rs, kitlog.NewNopLogger(), config.TestConfig(), mailer, c, nil, nil)
+	return NewService(ds, rs, kitlog.NewNopLogger(), config.TestConfig(), mailer, c, nil)
 }
 
 func createTestAppConfig(t *testing.T, ds kolide.Datastore) *kolide.AppConfig {

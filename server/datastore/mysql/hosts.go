@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/kolide/kolide/server/kolide"
+	"github.com/kolide/fleet/server/kolide"
 	"github.com/patrickmn/sortutil"
 	"github.com/pkg/errors"
 )
@@ -470,7 +470,7 @@ func (d *Datastore) AuthenticateHost(nodeKey string) (*kolide.Host, error) {
 	if err := d.db.Get(host, sqlStatement, nodeKey); err != nil {
 		switch err {
 		case sql.ErrNoRows:
-			return nil, errors.Wrap(err, "host not found")
+			return nil, notFound("Host")
 		default:
 			return nil, errors.New("finding host")
 		}

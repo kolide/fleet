@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/kolide/kolide/server/kolide"
+	"github.com/kolide/fleet/server/kolide"
 )
 
 func decodeImportConfigRequest(ctx context.Context, r *http.Request) (interface{}, error) {
@@ -15,6 +15,7 @@ func decodeImportConfigRequest(ctx context.Context, r *http.Request) (interface{
 	}
 	// Unmarshal main config
 	conf := kolide.ImportConfig{
+		DryRun:        req.DryRun,
 		Packs:         make(kolide.PackNameMap),
 		ExternalPacks: make(kolide.PackNameToPackDetails),
 	}

@@ -1,3 +1,21 @@
+* Added FIM support 
+
+* Title on query page correctly reflects new or edit mode. 
+
+* Fixed issue on new query page where last query would be submitted instead of current.
+
+* Fixed issue where user menu did not work on Firefox browser
+
+* Fixed issue cause SSO to fail for ADFS
+
+* Fixed issue validating signatures in nested SAML assertions.
+
+## Kolide 1.0.4 (Jun 1, 2017)
+
+* Added feature that allows users to import existing Osquery configuration files using the [configimporter](https://github.com/kolide/configimporter) utility.
+
+* Added support for Osquery decorators.
+
 * Added SAML single sign on support.
 
 * Improved online status detection.
@@ -11,6 +29,12 @@
 * Fixed bug in which deleted packs were still displayed on the query sidebar.
 
 * Fixed rounding error when showing % of online hosts.
+
+* Removed --app_token_key flag.
+
+* Fixed issue where heavily loaded database caused host authentication failures.
+
+* Fixed issue where osquery sends empty strings for integer values in log results.
 
 ## Kolide 1.0.3 (April 3, 2017)
 

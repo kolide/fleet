@@ -3,6 +3,7 @@ package mysql
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"database/sql"
 	"fmt"
 	"io/ioutil"
 	"time"
@@ -11,10 +12,10 @@ import (
 	"github.com/go-kit/kit/log"
 	"github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
-	"github.com/kolide/kolide/server/config"
-	"github.com/kolide/kolide/server/datastore/mysql/migrations/data"
-	"github.com/kolide/kolide/server/datastore/mysql/migrations/tables"
-	"github.com/kolide/kolide/server/kolide"
+	"github.com/kolide/fleet/server/config"
+	"github.com/kolide/fleet/server/datastore/mysql/migrations/data"
+	"github.com/kolide/fleet/server/datastore/mysql/migrations/tables"
+	"github.com/kolide/fleet/server/kolide"
 	"github.com/pkg/errors"
 )
 
@@ -29,6 +30,24 @@ type Datastore struct {
 	logger log.Logger
 	clock  clock.Clock
 	config config.MysqlConfig
+}
+
+type dbfunctions interface {
+	Exec(query string, args ...interface{}) (sql.Result, error)
+	Get(dest interface{}, query string, args ...interface{}) error
+	Select(dest interface{}, query string, args ...interface{}) error
+}
+
+func (d *Datastore) getTransaction(opts []kolide.OptionalArg) dbfunctions {
+	var result dbfunctions
+	result = d.db
+	for _, opt := range opts {
+		switch t := opt().(type) {
+		case dbfunctions:
+			result = t
+		}
+	}
+	return result
 }
 
 // New creates an MySQL datastore.
@@ -81,6 +100,10 @@ func New(config config.MysqlConfig, c clock.Clock, opts ...DBOption) (*Datastore
 
 	return ds, nil
 
+}
+
+func (d *Datastore) Begin() (kolide.Transaction, error) {
+	return d.db.Beginx()
 }
 
 func (d *Datastore) Name() string {

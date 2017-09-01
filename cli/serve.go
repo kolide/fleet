@@ -16,15 +16,15 @@ import (
 	"github.com/e-dard/netbug"
 	kitlog "github.com/go-kit/kit/log"
 	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
-	"github.com/kolide/kolide/server/config"
-	"github.com/kolide/kolide/server/datastore/mysql"
-	"github.com/kolide/kolide/server/kolide"
-	"github.com/kolide/kolide/server/license"
-	"github.com/kolide/kolide/server/mail"
-	"github.com/kolide/kolide/server/pubsub"
-	"github.com/kolide/kolide/server/service"
-	"github.com/kolide/kolide/server/sso"
-	"github.com/kolide/kolide/server/version"
+	"github.com/kolide/fleet/server/config"
+	"github.com/kolide/fleet/server/datastore/mysql"
+	"github.com/kolide/fleet/server/kolide"
+	"github.com/kolide/fleet/server/launcher"
+	"github.com/kolide/fleet/server/mail"
+	"github.com/kolide/fleet/server/pubsub"
+	"github.com/kolide/fleet/server/service"
+	"github.com/kolide/fleet/server/sso"
+	"github.com/kolide/fleet/server/version"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/cobra"
@@ -124,26 +124,18 @@ the way that the kolide server works.
 				}
 			}
 
-			licenseService := license.NewChecker(
-				ds,
-				"https://kolide.co/api/v0/licenses",
-				license.Logger(logger),
-			)
-
-			err = licenseService.Start()
-			if err != nil {
-				initFatal(err, "initializing license service")
-			}
-
 			var resultStore kolide.QueryResultStore
 			redisPool := pubsub.NewRedisPool(config.Redis.Address, config.Redis.Password)
 			resultStore = pubsub.NewRedisQueryResults(redisPool)
 			ssoSessionStore := sso.NewSessionStore(redisPool)
 
-			svc, err := service.NewService(ds, resultStore, logger, config, mailService, clock.C, licenseService, ssoSessionStore)
+			svc, err := service.NewService(ds, resultStore, logger, config, mailService, clock.C, ssoSessionStore)
 			if err != nil {
 				initFatal(err, "initializing service")
 			}
+			// Instantiate a gRPC service to handle launcher requests.
+			launcher := launcher.New(svc, logger)
+			defer launcher.GracefulStop()
 
 			go func() {
 				ticker := time.NewTicker(1 * time.Hour)
@@ -201,12 +193,14 @@ the way that the kolide server works.
 			}
 
 			r := http.NewServeMux()
+
 			r.Handle("/healthz", prometheus.InstrumentHandler("healthz", healthz(httpLogger, healthCheckers)))
 			r.Handle("/version", prometheus.InstrumentHandler("version", version.Handler()))
 			r.Handle("/assets/", prometheus.InstrumentHandler("static_assets", service.ServeStaticAssets("/assets/")))
 			r.Handle("/metrics", prometheus.InstrumentHandler("metrics", promhttp.Handler()))
 			r.Handle("/api/", apiHandler)
 			r.Handle("/", frontendHandler)
+
 			if path, ok := os.LookupEnv("KOLIDE_TEST_PAGE_PATH"); ok {
 				// test that we can load this
 				_, err := ioutil.ReadFile(path)
@@ -237,7 +231,7 @@ the way that the kolide server works.
 
 			srv := &http.Server{
 				Addr:              config.Server.Address,
-				Handler:           r,
+				Handler:           launcher.Handler(r),
 				ReadTimeout:       25 * time.Second,
 				WriteTimeout:      40 * time.Second,
 				ReadHeaderTimeout: 5 * time.Second,
@@ -268,7 +262,6 @@ the way that the kolide server works.
 			}()
 
 			logger.Log("terminated", <-errs)
-			licenseService.Stop()
 		},
 	}
 
@@ -308,7 +301,9 @@ func healthz(logger kitlog.Logger, deps map[string]interface{}) http.HandlerFunc
 // profile is 'modern'.
 // See https://wiki.mozilla.org/Security/Server_Side_TLS
 func getTLSConfig(profile string) *tls.Config {
-	cfg := tls.Config{PreferServerCipherSuites: true}
+	cfg := tls.Config{
+		PreferServerCipherSuites: true,
+	}
 
 	switch profile {
 	case config.TLSProfileModern:

@@ -7,9 +7,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/kolide/kolide/server/config"
-	"github.com/kolide/kolide/server/datastore/internal/appstate"
-	"github.com/kolide/kolide/server/kolide"
+	"github.com/kolide/fleet/server/config"
+	"github.com/kolide/fleet/server/datastore/internal/appstate"
+	"github.com/kolide/fleet/server/kolide"
 	"github.com/patrickmn/sortutil"
 )
 
@@ -53,6 +53,15 @@ func New(config config.KolideConfig) (*Datastore, error) {
 	}
 
 	return ds, nil
+}
+
+type imemTransactionStub struct{}
+
+func (im *imemTransactionStub) Rollback() error { return nil }
+func (im *imemTransactionStub) Commit() error   { return nil }
+
+func (d *Datastore) Begin() (kolide.Transaction, error) {
+	return &imemTransactionStub{}, nil
 }
 
 func (d *Datastore) Name() string {

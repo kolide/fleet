@@ -4,10 +4,11 @@ MAINTAINER Kolide Developers <engineering@kolide.co>
 RUN apk add --update \
         git \
         nodejs \
-		bash \
-		alpine-sdk \
-		musl-dev \
-		openssl
+	bash \
+	alpine-sdk \
+	musl-dev \
+	openssl \
+	openssh-client
 
 RUN go get -u -v github.com/Masterminds/glide
 
@@ -20,8 +21,8 @@ RUN git config --global http.https://gopkg.in.followRedirects true
 
 COPY rootfs /
 
-VOLUME   /go/src/github.com/kolide/kolide
-WORKDIR  /go/src/github.com/kolide/kolide
+VOLUME   /go/src/github.com/kolide/fleet
+WORKDIR  /go/src/github.com/kolide/fleet
 
 EXPOSE 8080
 

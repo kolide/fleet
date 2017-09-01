@@ -10,15 +10,15 @@ import (
 // See https://osquery.readthedocs.io/en/stable/deployment/configuration/
 type DecoratorStore interface {
 	// NewDecorator creates a decorator query.
-	NewDecorator(decorator *Decorator) (*Decorator, error)
+	NewDecorator(decorator *Decorator, opts ...OptionalArg) (*Decorator, error)
 	// DeleteDecorator removes a decorator query.
 	DeleteDecorator(id uint) error
 	// Decorator retrieves a decorator query with supplied ID.
 	Decorator(id uint) (*Decorator, error)
 	// ListDecorators returns all decorator queries.
-	ListDecorators() ([]*Decorator, error)
+	ListDecorators(opts ...OptionalArg) ([]*Decorator, error)
 	// SaveDecorator updates an existing decorator
-	SaveDecorator(dec *Decorator) error
+	SaveDecorator(dec *Decorator, opts ...OptionalArg) error
 }
 
 // DecoratorService exposes decorators data so it can be manipulated by
@@ -94,7 +94,9 @@ func (dt *DecoratorType) UnmarshalJSON(data []byte) error {
 // Decorator contains information about a decorator query.
 type Decorator struct {
 	UpdateCreateTimestamps
-	ID   uint          `json:"id"`
+	ID uint `json:"id"`
+	// Name is an optional human friendly name for the decorator
+	Name string        `json:"name"`
 	Type DecoratorType `json:"type"`
 	// Interval note this is only pertinent for DecoratorInterval type.
 	Interval uint   `json:"interval"`
@@ -105,7 +107,8 @@ type Decorator struct {
 
 type DecoratorPayload struct {
 	ID            uint           `json:"id"`
-	DecoratorType *DecoratorType `json:"decorator_type"`
+	Name          *string        `json:"name"`
+	DecoratorType *DecoratorType `json:"type"`
 	Interval      *uint          `json:"interval"`
 	Query         *string        `json:"query"`
 }

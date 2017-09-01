@@ -3,24 +3,12 @@ package mysql
 import (
 	"database/sql"
 
-	"github.com/kolide/kolide/server/kolide"
+	"github.com/kolide/fleet/server/kolide"
 	"github.com/pkg/errors"
 )
 
-func (d *Datastore) NewFIMSection(fp *kolide.FIMSection) (result *kolide.FIMSection, err error) {
-	txn, err := d.db.Begin()
-	if err != nil {
-		return nil, errors.Wrap(err, "update options begin transaction")
-	}
-	var success bool
-	defer func() {
-		if success {
-			if err = txn.Commit(); err == nil {
-				return
-			}
-		}
-		txn.Rollback()
-	}()
+func (d *Datastore) NewFIMSection(fp *kolide.FIMSection, opts ...kolide.OptionalArg) (result *kolide.FIMSection, err error) {
+	db := d.getTransaction(opts)
 
 	sqlStatement := `
     INSERT INTO file_integrity_monitorings (
@@ -29,7 +17,10 @@ func (d *Datastore) NewFIMSection(fp *kolide.FIMSection) (result *kolide.FIMSect
     ) VALUES( ?, ?)
   `
 	var resp sql.Result
-	resp, err = txn.Exec(sqlStatement, fp.SectionName, fp.Description)
+	resp, err = db.Exec(sqlStatement, fp.SectionName, fp.Description)
+	if isDuplicate(err) {
+		return nil, alreadyExists("fim_section", 0)
+	}
 	if err != nil {
 		return nil, errors.Wrap(err, "creating fim section")
 	}
@@ -42,13 +33,18 @@ func (d *Datastore) NewFIMSection(fp *kolide.FIMSection) (result *kolide.FIMSect
     ) VALUES( ?, ? )
   `
 	for _, fileName := range fp.Paths {
-		_, err = txn.Exec(sqlStatement, fileName, fp.ID)
+		_, err = db.Exec(sqlStatement, fileName, fp.ID)
 		if err != nil {
 			return nil, errors.Wrap(err, "adding path to fim section")
 		}
 	}
-	success = true
 	return fp, nil
+}
+
+func (d *Datastore) ClearFIMSections() error {
+	sqlStatement := "DELETE FROM file_integrity_monitorings"
+	_, err := d.db.Exec(sqlStatement)
+	return err
 }
 
 func (d *Datastore) FIMSections() (kolide.FIMSections, error) {

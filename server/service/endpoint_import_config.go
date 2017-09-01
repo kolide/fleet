@@ -4,10 +4,11 @@ import (
 	"context"
 
 	"github.com/go-kit/kit/endpoint"
-	"github.com/kolide/kolide/server/kolide"
+	"github.com/kolide/fleet/server/kolide"
 )
 
 type importRequest struct {
+	DryRun bool `json:"dry_run"`
 	// Config contains a JSON osquery config supplied by the end user
 	Config string `json:"config"`
 	// ExternalPackConfigs contains a map of external Pack configs keyed by

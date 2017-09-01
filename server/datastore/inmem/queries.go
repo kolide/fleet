@@ -3,11 +3,11 @@ package inmem
 import (
 	"sort"
 
-	"github.com/kolide/kolide/server/kolide"
+	"github.com/kolide/fleet/server/kolide"
 	"github.com/pkg/errors"
 )
 
-func (d *Datastore) NewQuery(query *kolide.Query) (*kolide.Query, error) {
+func (d *Datastore) NewQuery(query *kolide.Query, opts ...kolide.OptionalArg) (*kolide.Query, error) {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
@@ -26,7 +26,7 @@ func (d *Datastore) NewQuery(query *kolide.Query) (*kolide.Query, error) {
 	return &newQuery, nil
 }
 
-func (d *Datastore) QueryByName(name string) (*kolide.Query, bool, error) {
+func (d *Datastore) QueryByName(name string, opts ...kolide.OptionalArg) (*kolide.Query, bool, error) {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 	for _, q := range d.queries {
