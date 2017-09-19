@@ -1,18 +1,18 @@
 Updating Fleet
 ==============
 
-This guide explains how to update and run new versions of Fleet. For initial installation instructions, see [Installing Kolide](./installing-fleet.md).
+This guide explains how to update and run new versions of Fleet. For initial installation instructions, see [Installing Fleet](./installing-fleet.md).
 
-There are two steps to perform a typical Kolide update. If any other steps are required, they will be noted in the release notes.
+There are two steps to perform a typical Fleet update. If any other steps are required, they will be noted in the release notes.
 
-1. [Update the Kolide binary](#updating-the-kolide-binary)
+1. [Update the Fleet binary](#updating-the-fleet-binary)
 2. [Run database migrations](#running-database-migrations)
 
-As with any enterprise software update, it's a good idea to back up your MySQL data before updating Kolide.
+As with any enterprise software update, it's a good idea to back up your MySQL data before updating Fleet.
 
-## Updating the Kolide binary
+## Updating the Fleet binary
 
-Follow the binary update instructions corresponding to the original installation method used to install Kolide.
+Follow the binary update instructions corresponding to the original installation method used to install Fleet.
 
 #### Kolide quickstart script
 
@@ -68,7 +68,7 @@ unzip kolide_latest.zip 'linux/*' -d kolide
 ./kolide/linux/kolide_linux_amd64 --help
 ```
 
-Replace the existing Kolide binary with the newly unzipped binary.
+Replace the existing Fleet binary with the newly unzipped binary.
 
 ## Running database migrations
 
