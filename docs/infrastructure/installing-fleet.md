@@ -1,5 +1,5 @@
-Installing Kolide
-=================
+Installing Fleet
+================
 
 The Kolide application is distributed as a single static binary. This binary serves:
 
@@ -21,7 +21,7 @@ Because everyone's infrastructure is different, there are a multiple options ava
 
 #### Docker container
 
-Pull the latest Kolide docker image:
+Pull the latest Fleet docker image:
 
 ```
 docker pull kolide/kolide
@@ -39,14 +39,14 @@ sudo add-apt-repository "deb https://dl.kolide.co/apt jessie main"
 sudo apt-get update
 ```
 
-Install Kolide:
+Install Fleet:
 
 ```
 sudo apt-get install kolide
 /usr/bin/kolide --help
 ```
 
-For more information on using Kolide, refer to the [Configuring The Kolide Binary](./configuring-the-kolide-binary.md) documentation.
+For more information on using Fleet, refer to the [Configuring The Kolide Binary](./configuring-the-kolide-binary.md) documentation.
 
 #### Yum Packages (CentOS, RHEL, Amazon Linux)
 
@@ -56,18 +56,18 @@ Install the Kolide Yum Repository:
 sudo rpm -ivh https://dl.kolide.co/yum/kolide-yum-repo-1.0.0-1.noarch.rpm
 ```
 
-Install Kolide:
+Install Fleet:
 
 ```
 sudo yum install kolide
 kolide --help
 ```
 
-For more information on using Kolide, refer to the [Configuring The Kolide Binary](./configuring-the-kolide-binary.md) documentation.
+For more information on using Fleet, refer to the [Configuring The Kolide Binary](./configuring-the-kolide-binary.md) documentation.
 
 #### Raw binaries
 
-Download the latest raw Kolide binaries:
+Download the latest raw Fleet binaries:
 
 ```
 curl -O https://dl.kolide.co/bin/kolide_latest.zip
@@ -85,16 +85,16 @@ unzip kolide_latest.zip 'linux/*' -d kolide
 ./kolide/linux/kolide_linux_amd64 --help
 ```
 
-For more information on using Kolide, refer to the [Configuring The Kolide Binary](./configuring-the-kolide-binary.md) documentation.
+For more information on using Fleet, refer to the [Configuring The Kolide Binary](./configuring-the-kolide-binary.md) documentation.
 
 ## Infrastructure Dependencies
 
-Kolide currently has two infrastructure dependencies in addition to the `kolide` web server itself. Those dependencies are MySQL and Redis.
+Fleet currently has two infrastructure dependencies in addition to the `kolide` web server itself. Those dependencies are MySQL and Redis.
 
 #### MySQL
 
-Kolide uses MySQL extensively as it's main database. Many cloud providers (such as [AWS](https://aws.amazon.com/rds/mysql/) and [GCP](https://cloud.google.com/sql/)) host reliable MySQL services which you may consider for this purpose. A well supported MySQL [Docker container](https://hub.docker.com/_/mysql/) also exists if you would rather run MySQL in a container. For more information on how to configure the `kolide` binary to use the correct MySQL instance, see the [Configuring The Kolide Binary](./configuring-the-kolide-binary.md) document.
+Fleet uses MySQL extensively as it's main database. Many cloud providers (such as [AWS](https://aws.amazon.com/rds/mysql/) and [GCP](https://cloud.google.com/sql/)) host reliable MySQL services which you may consider for this purpose. A well supported MySQL [Docker container](https://hub.docker.com/_/mysql/) also exists if you would rather run MySQL in a container. For more information on how to configure the `kolide` binary to use the correct MySQL instance, see the [Configuring The Kolide Binary](./configuring-the-kolide-binary.md) document.
 
 #### Redis
 
-Kolide uses Redis to ingest and queue the results of distributed queries, cache data, etc. Many cloud providers (such as [AWS](https://aws.amazon.com/elasticache/) and [GCP](https://console.cloud.google.com/launcher/details/click-to-deploy-images/redis)) host reliable Redis services which you may consider for this purpose. A well supported Redis [Docker container](https://hub.docker.com/_/redis/) also exists if you would rather run Redis in a container. For more information on how to configure the `kolide` binary to use the correct Redis instance, see the [Configuring The Kolide Binary](./configuring-the-kolide-binary.md) document.
+Fleet uses Redis to ingest and queue the results of distributed queries, cache data, etc. Many cloud providers (such as [AWS](https://aws.amazon.com/elasticache/) and [GCP](https://console.cloud.google.com/launcher/details/click-to-deploy-images/redis)) host reliable Redis services which you may consider for this purpose. A well supported Redis [Docker container](https://hub.docker.com/_/redis/) also exists if you would rather run Redis in a container. For more information on how to configure the `kolide` binary to use the correct Redis instance, see the [Configuring The Kolide Binary](./configuring-the-kolide-binary.md) document.

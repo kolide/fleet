@@ -1,7 +1,7 @@
-Updating Kolide
-=================
+Updating Fleet
+==============
 
-This guide explains how to update and run new versions of Kolide. For initial installation instructions, see [Installing Kolide](./installing-kolide.md).
+This guide explains how to update and run new versions of Fleet. For initial installation instructions, see [Installing Kolide](./installing-fleet.md).
 
 There are two steps to perform a typical Kolide update. If any other steps are required, they will be noted in the release notes.
 
@@ -16,7 +16,7 @@ Follow the binary update instructions corresponding to the original installation
 
 #### Kolide quickstart script
 
-The quickstart script will automatically update and migrate Kolide when run. In the `kolide-quickstart` directory:
+The quickstart script will automatically update and migrate Fleet when run. In the `kolide-quickstart` directory:
 
 ```
 ./demo.sh up
@@ -26,7 +26,7 @@ Step 2 is performed automatically, so no further action is necessary.
 
 #### Docker container
 
-Pull the latest Kolide docker image:
+Pull the latest Fleet docker image:
 
 ```
 docker pull kolide/kolide
@@ -34,7 +34,7 @@ docker pull kolide/kolide
 
 #### Debian Packages (Ubuntu, Debian)
 
-Update Kolide through the Apt repository (the repository should have been added during initial install):
+Update Fleet through the Apt repository (the repository should have been added during initial install):
 
 ```
 sudo apt-get update && sudo apt-get install kolide
@@ -42,7 +42,7 @@ sudo apt-get update && sudo apt-get install kolide
 
 #### Yum Packages (CentOS, RHEL, Amazon Linux)
 
-Update Kolide through the Yum respository (the repository should have been added during initial install):
+Update Fleet through the Yum respository (the repository should have been added during initial install):
 
 ```
 sudo yum update kolide
@@ -50,7 +50,7 @@ sudo yum update kolide
 
 #### Raw binaries
 
-Download the latest raw Kolide binaries:
+Download the latest raw Fleet binaries:
 
 ```
 curl -O https://dl.kolide.co/bin/kolide_latest.zip
@@ -80,7 +80,7 @@ kolide prepare db
 
 Note, if you would like to run this in a script, you can use the `--no-prompt` option to disable prompting before the migrations.
 
-The updated Kolide server should now be ready to run:
+The updated Fleet server should now be ready to run:
 
 ```
 kolide serve
