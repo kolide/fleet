@@ -17,4 +17,4 @@ The Fleet server has a few dependencies. To learn more about installing the Flee
 
 Running the Fleet server is a relatively simple process. We're prepared a brief guide to help you manage and maintain your Fleet server. Check out the guide for setting up and running [Fleet on Ubuntu](./fleet-on-ubuntu.md) and [Fleet on CentOS](./fleet-on-centos.md).
 
-For more information, you can also read the [Configuring The Kolide Fleet Binary](./configuring-the-kolide-binary.md) guide for information on how to configure and customize Fleet for your organization.
+For more information, you can also read the [Configuring The Fleet Binary](./configuring-the-fleet-binary.md) guide for information on how to configure and customize Fleet for your organization.

@@ -1,23 +1,21 @@
 Installing Fleet
 ================
 
-The Kolide application is distributed as a single static binary. This binary serves:
+The Fleet application is distributed as a single static binary. This binary serves:
 
-- The Kolide web interface
-- The Kolide application API endpoints
+- The Fleet web interface
+- The Fleet application API endpoints
 - The osquery TLS server API endpoints
 
-All of these are served via a built-in HTTP server, so there is no need for complex web server configurations. Once you've installed the `kolide` binary and it's infrastructure dependencies as illustrated below, refer to the [Configuring The Kolide Binary](./configuring-the-kolide-binary.md) documentation for information on how to use and configure the Kolide application.
+All of these are served via a built-in HTTP server, so there is no need for complex web server configurations. Once you've installed the `kolide` binary and it's infrastructure dependencies as illustrated below, refer to the [Configuring The Fleet Binary](./configuring-the-fleet-binary.md) documentation for information on how to use and configure the Fleet application.
 
-## Kolide Quickstart
+## Fleet Quickstart
 
-Kolide provides a [quickstart script](https://github.com/kolide/kolide-quickstart) that is the quickest way to get a demo Kolide instance up and running. For easiest install, see the instructions provided on your [Kolide license page](https://kolide.co/account/product-and-license#quick-start).
+Kolide provides a [quickstart script](https://github.com/kolide/kolide-quickstart) that is the quickest way to get a demo Fleet instance up and running. Note that the quickstart is not intended to be a production deployment. If you would like a production deployment, please choose one of the methods below.
 
-Note that the quickstart is not intended to be a production deployment. If you would like a production deployment, please choose one of the methods below.
+## Installing the Fleet binary
 
-## Installing the Kolide binary
-
-Because everyone's infrastructure is different, there are a multiple options available for installing the Kolide binary.
+Because everyone's infrastructure is different, there are a multiple options available for installing the Fleet binary.
 
 #### Docker container
 
@@ -27,7 +25,7 @@ Pull the latest Fleet docker image:
 docker pull kolide/kolide
 ```
 
-For more information on using Kolide, refer to the [Configuring The Kolide Binary](./configuring-the-kolide-binary.md) documentation.
+For more information on using Fleet, refer to the [Configuring The Fleet Binary](./configuring-the-fleet-binary.md) documentation.
 
 #### Debian Packages (Ubuntu, Debian)
 
@@ -46,7 +44,7 @@ sudo apt-get install kolide
 /usr/bin/kolide --help
 ```
 
-For more information on using Fleet, refer to the [Configuring The Kolide Binary](./configuring-the-kolide-binary.md) documentation.
+For more information on using Fleet, refer to the [Configuring The Fleet Binary](./configuring-the-fleet-binary.md) documentation.
 
 #### Yum Packages (CentOS, RHEL, Amazon Linux)
 
@@ -63,7 +61,7 @@ sudo yum install kolide
 kolide --help
 ```
 
-For more information on using Fleet, refer to the [Configuring The Kolide Binary](./configuring-the-kolide-binary.md) documentation.
+For more information on using Fleet, refer to the [Configuring The Fleet Binary](./configuring-the-fleet-binary.md) documentation.
 
 #### Raw binaries
 
@@ -85,7 +83,7 @@ unzip kolide_latest.zip 'linux/*' -d kolide
 ./kolide/linux/kolide_linux_amd64 --help
 ```
 
-For more information on using Fleet, refer to the [Configuring The Kolide Binary](./configuring-the-kolide-binary.md) documentation.
+For more information on using Fleet, refer to the [Configuring The Fleet Binary](./configuring-the-fleet-binary.md) documentation.
 
 ## Infrastructure Dependencies
 
@@ -93,8 +91,8 @@ Fleet currently has two infrastructure dependencies in addition to the `kolide` 
 
 #### MySQL
 
-Fleet uses MySQL extensively as it's main database. Many cloud providers (such as [AWS](https://aws.amazon.com/rds/mysql/) and [GCP](https://cloud.google.com/sql/)) host reliable MySQL services which you may consider for this purpose. A well supported MySQL [Docker container](https://hub.docker.com/_/mysql/) also exists if you would rather run MySQL in a container. For more information on how to configure the `kolide` binary to use the correct MySQL instance, see the [Configuring The Kolide Binary](./configuring-the-kolide-binary.md) document.
+Fleet uses MySQL extensively as it's main database. Many cloud providers (such as [AWS](https://aws.amazon.com/rds/mysql/) and [GCP](https://cloud.google.com/sql/)) host reliable MySQL services which you may consider for this purpose. A well supported MySQL [Docker container](https://hub.docker.com/_/mysql/) also exists if you would rather run MySQL in a container. For more information on how to configure the `kolide` binary to use the correct MySQL instance, see the [Configuring The Fleet Binary](./configuring-the-fleet-binary.md) document.
 
 #### Redis
 
-Fleet uses Redis to ingest and queue the results of distributed queries, cache data, etc. Many cloud providers (such as [AWS](https://aws.amazon.com/elasticache/) and [GCP](https://console.cloud.google.com/launcher/details/click-to-deploy-images/redis)) host reliable Redis services which you may consider for this purpose. A well supported Redis [Docker container](https://hub.docker.com/_/redis/) also exists if you would rather run Redis in a container. For more information on how to configure the `kolide` binary to use the correct Redis instance, see the [Configuring The Kolide Binary](./configuring-the-kolide-binary.md) document.
+Fleet uses Redis to ingest and queue the results of distributed queries, cache data, etc. Many cloud providers (such as [AWS](https://aws.amazon.com/elasticache/) and [GCP](https://console.cloud.google.com/launcher/details/click-to-deploy-images/redis)) host reliable Redis services which you may consider for this purpose. A well supported Redis [Docker container](https://hub.docker.com/_/redis/) also exists if you would rather run Redis in a container. For more information on how to configure the `kolide` binary to use the correct Redis instance, see the [Configuring The Fleet Binary](./configuring-the-fleet-binary.md) document.
