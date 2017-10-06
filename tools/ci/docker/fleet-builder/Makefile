@@ -1,6 +1,6 @@
 .PHONY: build fleet-builder push
 
-GO_VERSION = 1.8
+GO_VERSION = 1.9
 
 all: clean build
 
