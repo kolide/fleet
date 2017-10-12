@@ -151,7 +151,7 @@ deps:
 		github.com/jteeuwen/go-bindata/... \
 		github.com/golang/dep/cmd/dep \
 		github.com/groob/mockimpl
-	dep ensure -no-vendor
+	dep ensure -vendor-only
 
 distclean:
 ifeq ($(OS), Windows_NT)
