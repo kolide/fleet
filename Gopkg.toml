@@ -43,9 +43,11 @@
 [[constraint]]
   name = "github.com/kolide/agent-api"
   source = "git@github.com:kolide/agent-api.git"
+  branch = "master"
 
 [[constraint]]
   name = "github.com/kolide/goose"
+  branch = "master"
 
 [[constraint]]
   name = "github.com/kolide/kit"
@@ -79,6 +81,7 @@
 
 [[constraint]]
   name = "github.com/stretchr/testify"
+  branch = "master"
 
 [[constraint]]
   name = "golang.org/x/crypto"
