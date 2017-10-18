@@ -26,13 +26,28 @@ func authenticatedHost(svc kolide.Service, next endpoint.Endpoint) endpoint.Endp
 			return nil, err
 		}
 
-		host, err := svc.AuthenticateHost(ctx, nodeKey)
-		if err != nil {
-			return nil, err
-		}
+		return AuthenticatedHost(svc, nodeKey)(next)(ctx, request)
+	}
+}
 
-		ctx = hostctx.NewContext(ctx, *host)
-		return next(ctx, request)
+// HostAuthenticator specifies a service that can authenticate a kolide host using a node key.
+type HostAuthenticator interface {
+	AuthenticateHost(ctx context.Context, nodeKey string) (host *kolide.Host, err error)
+}
+
+// AuthenticateHost returns an endpoint.Middleware which can be used to authenticate a kolide
+// host.
+func AuthenticatedHost(svc HostAuthenticator, nodeKey string) endpoint.Middleware {
+	return func(next endpoint.Endpoint) endpoint.Endpoint {
+		return func(ctx context.Context, request interface{}) (interface{}, error) {
+			host, err := svc.AuthenticateHost(ctx, nodeKey)
+			if err != nil {
+				return nil, err
+			}
+
+			ctx = hostctx.NewContext(ctx, *host)
+			return next(ctx, request)
+		}
 	}
 }
 
