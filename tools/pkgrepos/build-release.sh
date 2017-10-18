@@ -1,6 +1,7 @@
 #!/bin/bash
 
-VERSION="$(git describe --tags --always --dirty)"
+#VERSION="$(git describe --tags --always --dirty)"
+VERSION="1.0.5"
 GPG_PATH="/Users/${USER}/.gnupg"
 
 build_binaries() {
@@ -29,6 +30,8 @@ build_linux_packages() {
 	docker run --rm -it \
         -v ${PWD}/build/pkgroot:/pkgroot \
         -v "${GPG_PATH}:/root/.gnupg" \
+        -v ${PWD}/tools/ci/docker/fpm/build.sh:/build.sh \
+        -v ${PWD}/tools/pkgrepos/.rpmmacros:/root/.rpmmacros \
         -v ${PWD}/build:/out -e KOLIDE_VERSION="${VERSION}" kolide/fpm
 }
 
