@@ -5,10 +5,11 @@ import (
 	"net/http"
 	"strings"
 
-	kitlog "github.com/go-kit/kit/log"
-	pb "github.com/kolide/agent-api"
-	"github.com/kolide/fleet/server/kolide"
+	"github.com/go-kit/kit/log"
+	launcher "github.com/kolide/launcher/service"
 	grpc "google.golang.org/grpc"
+
+	"github.com/kolide/fleet/server/kolide"
 )
 
 // Handler extends the grpc.Server, providing Handler that allows us to serve
@@ -18,14 +19,19 @@ type Handler struct {
 }
 
 // New creates a gRPC server to handler remote requests from launcher.
-func New(svc kolide.OsqueryService, logger kitlog.Logger, opts ...grpc.ServerOption) *Handler {
-	binding := newAgentBinding(svc)
-	binding = newAuthMiddleware(svc)(binding)
-	binding = newLoggingMiddleware(logger)(binding)
+// TODO @groob New should accept an already created grpc server.
+func New(tls kolide.OsqueryService, logger log.Logger, opts ...grpc.ServerOption) *Handler {
+	var svc launcher.KolideService
+	{
+		svc = &launcherWrapper{tls: tls}
+		svc = launcher.LoggingMiddleware(logger)(svc)
+	}
+	endpoints := launcher.MakeServerEndpoints(svc)
+	server := launcher.NewGRPCServer(endpoints, logger)
 
-	server := grpc.NewServer(opts...)
-	pb.RegisterApiServer(server, binding)
-	return &Handler{server}
+	grpcServer := grpc.NewServer(opts...)
+	launcher.RegisterGRPCServer(grpcServer, server)
+	return &Handler{grpcServer}
 }
 
 // Handler will route gRPC traffic to the gRPC server, other http traffic
