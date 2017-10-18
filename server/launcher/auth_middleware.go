@@ -83,7 +83,7 @@ type auth struct {
 func (s authMiddleware) authenticateHost(ctx context.Context, nodeKey string) (context.Context, *auth, error) {
 	host, err := s.svc.AuthenticateHost(newCtx(ctx), nodeKey)
 	if err != nil {
-		if errEnroll, ok := err.(enrollmentError); ok {
+		if errEnroll, ok := err.(nodeInvalidErr); ok {
 			return ctx, &auth{nodeInvalid: errEnroll.NodeInvalid(), errorCode: errEnroll.Error()}, nil
 		}
 		return nil, nil, err

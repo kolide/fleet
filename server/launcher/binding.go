@@ -24,17 +24,12 @@ func newAgentBinding(svc kolide.OsqueryService) pb.ApiServer {
 	}
 }
 
-type enrollmentError interface {
-	NodeInvalid() bool
-	Error() string
-}
-
 // Attempt to enroll a host with kolide/cloud
 func (b *agentBinding) RequestEnrollment(ctx context.Context, req *pb.EnrollmentRequest) (*pb.EnrollmentResponse, error) {
 	var resp pb.EnrollmentResponse
 	nodeKey, err := b.service.EnrollAgent(newCtx(ctx), req.EnrollSecret, req.HostIdentifier)
 	if err != nil {
-		if errEnroll, ok := err.(enrollmentError); ok {
+		if errEnroll, ok := err.(nodeInvalidErr); ok {
 			resp.NodeInvalid = errEnroll.NodeInvalid()
 			resp.ErrorCode = errEnroll.Error()
 			return &resp, nil
@@ -174,4 +169,5 @@ func (b *agentBinding) PublishResults(ctx context.Context, coll *pb.ResultCollec
 
 func (svc *agentBinding) CheckHealth(ctx context.Context, coll *pb.AgentApiRequest) (*pb.HealthCheckResponse, error) {
 	return nil, errNotImplmented
+
 }
