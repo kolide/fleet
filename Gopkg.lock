@@ -152,13 +152,6 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/kolide/agent-api"
-  packages = ["."]
-  revision = "f81f25bd36a2e73a762d4a5192d698bae06a7161"
-  source = "git@github.com:kolide/agent-api.git"
-
-[[projects]]
-  branch = "master"
   name = "github.com/kolide/goose"
   packages = ["."]
   revision = "4a7848793d4402d338de853019ad72b9a4b3e68e"
@@ -305,14 +298,8 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/stretchr/objx"
-  packages = ["."]
-  revision = "1a9d0bb9f541897e62256577b352fdbc1fb4fd94"
-
-[[projects]]
-  branch = "master"
   name = "github.com/stretchr/testify"
-  packages = ["assert","mock","require"]
+  packages = ["assert","require"]
   revision = "890a5c3458b43e6104ff5da8dfa139d013d77544"
 
 [[projects]]
@@ -366,6 +353,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "bf5964a839bb0ec3d720c957d74e87e0dae103c27846ddc2754eac9f955d9f51"
+  inputs-digest = "a0ff338ac7cced9583d0e207f49fee132c121a03ab76a1ee80a52757656b8f85"
   solver-name = "gps-cdcl"
   solver-version = 1
