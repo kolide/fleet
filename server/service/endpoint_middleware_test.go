@@ -206,9 +206,7 @@ func TestAuthenticatedHost(t *testing.T) {
 
 	endpoint := authenticatedHost(
 		svc,
-		func(ctx context.Context, request interface{}) (interface{}, error) {
-			return nil, nil
-		},
+		endpoint.Nop,
 	)
 
 	ctx := context.Background()
