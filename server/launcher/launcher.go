@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"strconv"
 
 	"github.com/kolide/osquery-go/plugin/distributed"
@@ -75,21 +76,54 @@ func (svc *launcherWrapper) RequestQueries(ctx context.Context, nodeKey string) 
 	return result, false, err
 }
 
-// TODO need to implement this method
 func (svc *launcherWrapper) PublishLogs(ctx context.Context, nodeKey string, logType logger.LogType, logs []string) (string, string, bool, error) {
 	newCtx, invalid, err := svc.authenticateHost(ctx, nodeKey)
 	if err != nil {
 		return "", "", invalid, err
 	}
-	_ = newCtx
 
 	switch logType {
 	case logger.LogTypeStatus:
-	case logger.LogTypeSnapshot:
+		var statuses []kolide.OsqueryStatusLog
+		for _, log := range logs {
+			// StatusLog handles osquery logging messages
+			var statusLog = struct {
+				Severity string `json:"s"`
+				Filename string `json:"f"`
+				Line     string `json:"i"`
+				Message  string `json:"m"`
+			}{}
+
+			if err := json.NewDecoder(bytes.NewBufferString(log)).Decode(&statusLog); err != nil {
+				return "", "", false, errors.Wrap(err, "decode status log from launcher")
+			}
+
+			statuses = append(statuses, kolide.OsqueryStatusLog{
+				Severity: statusLog.Severity,
+				Filename: statusLog.Filename,
+				Line:     statusLog.Line,
+				Message:  statusLog.Message,
+			})
+		}
+
+		err = svc.tls.SubmitStatusLogs(newCtx, statuses)
+		return "", "", false, errors.Wrap(err, "submit status logs from launcher")
+	case logger.LogTypeSnapshot, logger.LogTypeString:
+		var results []kolide.OsqueryResultLog
+		for _, log := range logs {
+			var result kolide.OsqueryResultLog
+			if err := json.Unmarshal([]byte(log), &result); err != nil {
+				return "", "", false, errors.Wrap(err, "unmarshaling result log")
+			}
+			results = append(results, result)
+		}
+		err = svc.tls.SubmitResultLogs(newCtx, results)
+		return "", "", false, errors.Wrap(err, "submit result logs from launcher")
 	default:
-		panic("chat with @zwass about what to do with the rest")
+		// We have a logTypeAgent which is not there in the osquery-go enum.
+		// TODO link issue
+		panic(fmt.Sprintf("%s log type not implemented", logType))
 	}
-	panic("todo")
 }
 
 func (svc *launcherWrapper) PublishResults(ctx context.Context, nodeKey string, results []distributed.Result) (string, string, bool, error) {
@@ -106,11 +140,8 @@ func (svc *launcherWrapper) PublishResults(ctx context.Context, nodeKey string, 
 		osqueryResults[result.QueryName] = result.Rows
 	}
 
-	if err := svc.tls.SubmitDistributedQueryResults(newCtx, osqueryResults, statuses); err != nil {
-		return "", "", false, errors.Wrap(err, "submit launcher results")
-	}
-
-	return "", "", false, nil
+	err = svc.tls.SubmitDistributedQueryResults(newCtx, osqueryResults, statuses)
+	return "", "", false, errors.Wrap(err, "submit launcher results")
 }
 
 func (svc *launcherWrapper) CheckHealth(ctx context.Context) (int32, error) {
@@ -122,8 +153,6 @@ func (svc *launcherWrapper) CheckHealth(ctx context.Context) (int32, error) {
 // context which includes the host as a context value.
 // In the kolide.OsqueryService authentication is done via endpoint middleware, but all launcher endpoints require
 // an explicit return for NodeInvalid, so we check in this helper method instead.
-// TODO(@groob) we can probably expose the kolide endpoint middleware to do the validation in the endpoint layer here
-// as well... at least document and come back to this in another PR.
 func (svc *launcherWrapper) authenticateHost(ctx context.Context, nodeKey string) (context.Context, bool, error) {
 	node, err := svc.tls.AuthenticateHost(ctx, nodeKey)
 	if err != nil {
