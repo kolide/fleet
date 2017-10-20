@@ -144,7 +144,6 @@
   name = "github.com/kolide/agent-api"
   packages = ["."]
   revision = "f81f25bd36a2e73a762d4a5192d698bae06a7161"
-  source = "git@github.com:kolide/agent-api.git"
 
 [[projects]]
   branch = "master"
@@ -157,7 +156,6 @@
   name = "github.com/kolide/kit"
   packages = ["version"]
   revision = "19dfff12e00e1d46d30636b9150ca5b9f9f05325"
-  source = "git@github.com:kolide/kit.git"
 
 [[projects]]
   branch = "master"
