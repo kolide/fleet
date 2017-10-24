@@ -33,10 +33,7 @@ func TestLauncherRequestConfig(t *testing.T) {
 	require.Nil(t, err)
 	assert.True(t, tls.AuthenticateHostFuncInvoked)
 	assert.False(t, invalid)
-	assert.Equal(t,
-		`{"options":{"key":"value"},"decorators":{}}
-`,
-		config)
+	assert.Equal(t, `{"options":{"key":"value"},"decorators":{}}`, config)
 }
 
 func TestLauncherRequestQueries(t *testing.T) {

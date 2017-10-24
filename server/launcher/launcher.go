@@ -1,7 +1,6 @@
 package launcher
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -53,12 +52,12 @@ func (svc *launcherWrapper) RequestConfig(ctx context.Context, nodeKey string) (
 		}
 	}
 
-	buf := new(bytes.Buffer)
-	if err = json.NewEncoder(buf).Encode(config); err != nil {
+	configJSON, err := json.Marshal(config)
+	if err != nil {
 		return "", false, errors.Wrap(err, "encoding config for launcher")
 	}
 
-	return buf.String(), false, nil
+	return string(configJSON), false, nil
 }
 
 func (svc *launcherWrapper) RequestQueries(ctx context.Context, nodeKey string) (*distributed.GetQueriesResult, bool, error) {
@@ -98,7 +97,7 @@ func (svc *launcherWrapper) PublishLogs(ctx context.Context, nodeKey string, log
 				Message  string `json:"m"`
 			}{}
 
-			if err := json.NewDecoder(bytes.NewBufferString(log)).Decode(&statusLog); err != nil {
+			if err := json.Unmarshal([]byte(log), &statusLog); err != nil {
 				return "", "", false, errors.Wrap(err, "decode status log from launcher")
 			}
 
@@ -156,7 +155,7 @@ func (svc *launcherWrapper) CheckHealth(ctx context.Context) (int32, error) {
 	return 0, nil
 }
 
-// AuthenticateHost verifies the host node key using the TLS API and returns back a
+// authenticateHost verifies the host node key using the TLS API and returns back a
 // context which includes the host as a context value.
 // In the kolide.OsqueryService authentication is done via endpoint middleware, but all launcher endpoints require
 // an explicit return for NodeInvalid, so we check in this helper method instead.
