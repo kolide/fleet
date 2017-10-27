@@ -28,5 +28,6 @@ func Up_20171027173700(tx *sql.Tx) error {
 }
 
 func Down_20171027173700(tx *sql.Tx) error {
-	return nil
+	_, err := tx.Exec("UPDATE decorators SET name='' WHERE built_in = TRUE")
+	return err
 }
