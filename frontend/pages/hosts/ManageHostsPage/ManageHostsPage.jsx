@@ -68,7 +68,7 @@ export class ManageHostsPage extends Component {
       allHostCount: 0,
       currentPaginationPage: 0,
       hostsLoading: false,
-      hostsPerPage: 5,
+      hostsPerPage: 20,
       isEditLabel: false,
       labelQueryText: '',
       pagedHosts: [],
