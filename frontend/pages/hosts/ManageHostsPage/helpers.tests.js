@@ -1,7 +1,7 @@
 import expect from 'expect';
 import moment from 'moment';
 
-import helpers from 'pages/hosts/ManageHostsPage/helpers';
+import helpers from './helpers';
 import { hostStub, labelStub } from 'test/stubs';
 
 const macHost = { ...hostStub, id: 1, platform: 'darwin', status: 'mia' };
