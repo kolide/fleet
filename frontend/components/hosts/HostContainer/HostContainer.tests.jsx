@@ -8,8 +8,6 @@ import HostContainer from './HostContainer';
 
 const allHostsLabel = { id: 1, display_text: 'All Hosts', slug: 'all-hosts', type: 'all', count: 22 };
 const customLabel = { id: 6, display_text: 'Custom Label', slug: 'custom-label', type: 'custom', count: 3 };
-const offlineHost = { ...hostStub, id: 111, status: 'offline' };
-const offlineHostsLabel = { id: 5, display_text: 'OFFLINE', slug: 'offline', status: 'offline', type: 'status', count: 1 };
 
 describe('HostsContainer - component', () => {
   const props = {
