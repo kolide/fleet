@@ -237,6 +237,7 @@ func (svc service) SubmitStatusLogs(ctx context.Context, logs []kolide.OsquerySt
 }
 
 func (svc service) SubmitResultLogs(ctx context.Context, logs []kolide.OsqueryResultLog) error {
+	logger.Log("msg", "writing result logs")
 	for _, log := range logs {
 		err := json.NewEncoder(svc.osqueryResultLogWriter).Encode(log)
 		if err != nil {
@@ -244,11 +245,13 @@ func (svc service) SubmitResultLogs(ctx context.Context, logs []kolide.OsqueryRe
 		}
 	}
 	if writer, ok := svc.osqueryResultLogWriter.(flusher); ok {
+		logger.Log("msg", "calling flush on result log")
 		err := writer.Flush()
 		if err != nil {
-			return osqueryError{message: "error flushing status log: " + err.Error()}
+			return osqueryError{message: "error flushing result log: " + err.Error()}
 		}
 	}
+	logger.Log("msg", "finished writing result log")
 	return nil
 }
 
