@@ -7,7 +7,7 @@ describe('reduxConfig - hosts helpers', () => {
     it('parses an expected CPU string', () => {
       const host = {
         cpu_brand: 'Intel(R) Xeon(R) CPU E5-2420 0 @ 1.90GHz',
-        cpu_physical_cores: 2
+        cpu_physical_cores: 2,
       };
       expect(parseEntityFunc(host).host_cpu).toEqual('2 x 1.9 GHz');
     });
@@ -15,14 +15,14 @@ describe('reduxConfig - hosts helpers', () => {
     it('parses a host missing clock speed', () => {
       const host = {
         cpu_brand: 'Intel(R) Xeon(R) CPU E5-242',
-        cpu_physical_cores: 2
+        cpu_physical_cores: 2,
       };
       expect(parseEntityFunc(host).host_cpu).toEqual('2 x Unknown GHz');
     });
 
     it('parses a host missing CPU brand', () => {
       const host = {
-        cpu_physical_cores: 2
+        cpu_physical_cores: 2,
       };
       expect(parseEntityFunc(host).host_cpu).toEqual('2 x Unknown GHz');
     });
@@ -35,8 +35,7 @@ describe('reduxConfig - hosts helpers', () => {
     });
 
     it('parses a host missing CPU info entirely', () => {
-      const host = {
-      };
+      const host = {};
       expect(parseEntityFunc(host).host_cpu).toEqual(undefined);
     });
   });
