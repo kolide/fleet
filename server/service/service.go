@@ -13,6 +13,7 @@ import (
 	"github.com/kolide/fleet/server/config"
 	"github.com/kolide/fleet/server/kolide"
 	"github.com/kolide/fleet/server/logwriter"
+	"github.com/kolide/fleet/server/okforward"
 	"github.com/kolide/fleet/server/sso"
 	lumberjack "gopkg.in/natefinch/lumberjack.v2"
 )
@@ -26,7 +27,8 @@ func NewService(ds kolide.Datastore, resultStore kolide.QueryResultStore,
 	if err != nil {
 		return nil, err
 	}
-	resultWriter, err := osqueryLogFile(kolideConfig.Osquery.ResultLogFile, logger, kolideConfig.Osquery.EnableLogRotation)
+	resultWriter, err := okforward.New(logger, []string{"localhost"})
+	// resultWriter, err := osqueryLogFile(kolideConfig.Osquery.ResultLogFile, logger, kolideConfig.Osquery.EnableLogRotation)
 	if err != nil {
 		return nil, err
 	}
