@@ -5,9 +5,12 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"os"
 
+	"github.com/go-kit/kit/log"
 	"github.com/kolide/fleet/server/kolide"
 	"github.com/pkg/errors"
+	uuid "github.com/satori/go.uuid"
 )
 
 func decodeEnrollAgentRequest(ctx context.Context, r *http.Request) (interface{}, error) {
@@ -82,10 +85,15 @@ func decodeSubmitDistributedQueryResultsRequest(ctx context.Context, r *http.Req
 	return req, nil
 }
 
+var logger = log.With(log.NewJSONLogger(os.Stderr), "component", "debug-result-log")
+
 func decodeSubmitLogsRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	id := uuid.NewV4()
+	logger.Log("id", id.String(), "msg", "begin decode request")
 	var err error
 	body := r.Body
 	if r.Header.Get("content-encoding") == "gzip" {
+		logger.Log("id", id.String(), "msg", "decoding gzip log")
 		body, err = gzip.NewReader(body)
 		if err != nil {
 			return nil, errors.Wrap(err, "decoding gzip")
@@ -98,6 +106,7 @@ func decodeSubmitLogsRequest(ctx context.Context, r *http.Request) (interface{},
 		return nil, errors.Wrap(err, "decoding JSON")
 	}
 	defer r.Body.Close()
+	logger.Log("id", id.String(), "msg", "decoded log request", "type", req.LogType)
 
 	return req, nil
 }
