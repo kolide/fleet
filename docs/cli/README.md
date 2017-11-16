@@ -253,16 +253,20 @@ spec:
     labels:
       - all_hosts
   queries:
-    - name: osquery_version
+    - query: osquery_version
+      name: osquery_version_differential
+      interval: 7200
+    - query: osquery_version
+      name: osquery_version_snapshot
       interval: 7200
       snapshot: true
-    - name: osquery_schedule
+    - query: osquery_schedule
       interval: 7200
       removed: false
-    - name: osquery_events
+    - query: osquery_events
       interval: 86400
       removed: false
-    - name: oquery_info
+    - query: oquery_info
       interval: 600
       removed: false
 ```

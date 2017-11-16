@@ -32,7 +32,6 @@ spec:
 apiVersion: k8s.kolide.com/v1alpha1
 kind: OsqueryLabel
 spec:
-  name: pending_updates
   query: pending_updates
   platforms:
     - darwin
@@ -40,5 +39,4 @@ spec:
 apiVersion: k8s.kolide.com/v1alpha1
 kind: OsqueryLabel
 spec:
-  name: slack_not_running
   query: slack_not_running
