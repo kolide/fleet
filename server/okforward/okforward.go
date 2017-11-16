@@ -57,6 +57,7 @@ func (w *Writer) loop(urls []*url.URL) error {
 	}
 
 	backoff := time.Duration(0)
+
 	// Enter the connect and forward loop. We do this forever.
 	for ; ; urls = append(urls[1:], urls[0]) { // rotate thru URLs
 		// We gonna try to connect to this first one.
@@ -75,7 +76,7 @@ func (w *Writer) loop(urls []*url.URL) error {
 			case "dns", "dnsip":
 				ips, err := net.LookupIP(host)
 				if err != nil {
-					level.Warn(w.logger).Log("LookupIP", host, "err", err)
+					level.Info(w.logger).Log("LookupIP", host, "err", err)
 					backoff = exponential(backoff)
 					time.Sleep(backoff)
 					continue
@@ -86,7 +87,7 @@ func (w *Writer) loop(urls []*url.URL) error {
 			case "dnssrv":
 				_, records, err := net.LookupSRV("", proto, host)
 				if err != nil {
-					level.Warn(w.logger).Log("LookupSRV", host, "err", err)
+					level.Info(w.logger).Log("LookupSRV", host, "err", err)
 					backoff = exponential(backoff)
 					time.Sleep(backoff)
 					continue
@@ -97,7 +98,7 @@ func (w *Writer) loop(urls []*url.URL) error {
 			case "dnsaddr":
 				names, err := net.LookupAddr(host)
 				if err != nil {
-					level.Warn(w.logger).Log("LookupAddr", host, "err", err)
+					level.Info(w.logger).Log("LookupAddr", host, "err", err)
 					backoff = exponential(backoff)
 					time.Sleep(backoff)
 					continue
@@ -106,7 +107,7 @@ func (w *Writer) loop(urls []*url.URL) error {
 				target.Scheme, target.Host = proto, net.JoinHostPort(host, port)
 
 			default:
-				level.Warn(w.logger).Log("unsupported_scheme_suffix", suffix, "using", proto)
+				level.Info(w.logger).Log("unsupported_scheme_suffix", suffix, "using", proto)
 				target.Scheme = proto // target.Host stays the same
 			}
 		}
@@ -114,7 +115,7 @@ func (w *Writer) loop(urls []*url.URL) error {
 
 		conn, err := net.Dial(target.Scheme, target.Host)
 		if err != nil {
-			level.Warn(w.logger).Log("Dial", target.String(), "err", err)
+			level.Info(w.logger).Log("Dial", target.String(), "err", err)
 			backoff = exponential(backoff)
 			time.Sleep(backoff)
 			continue
@@ -126,15 +127,15 @@ func (w *Writer) loop(urls []*url.URL) error {
 			continue
 		}
 		if err != nil {
-			level.Warn(w.logger).Log("err", err)
+			level.Info(w.logger).Log("err", err)
 			continue
 		}
 		record := string(bytes.TrimSpace(line))
 		if n, err := fmt.Fprintf(conn, "%s%s\n", prefix, record); err != nil {
-			level.Warn(w.logger).Log("disconnected_from", target.String(), "due_to", err)
+			level.Info(w.logger).Log("disconnected_from", target.String(), "due_to", err)
 			break
 		} else if n < len(record)+1 {
-			level.Warn(w.logger).Log("short_write_to", target.String(), "n", n, "less_than", len(record)+1)
+			level.Info(w.logger).Log("short_write_to", target.String(), "n", n, "less_than", len(record)+1)
 			break // TODO(pb): we should do something more sophisticated here
 		}
 
