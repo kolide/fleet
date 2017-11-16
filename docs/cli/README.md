@@ -113,12 +113,21 @@ The following file describes configuration options passed to the osquery instanc
 apiVersion: k8s.kolide.com/v1alpha1
 kind: OsqueryOptions
 spec:
-  config:
-    - distributed_interval: 3
-    - distributed_tls_max_attempts: 3
-    - logger_plugin: tls
-    - logger_tls_endpoint: /api/v1/osquery/log
-    - logger_tls_period: 10
+  base:
+    distributed_interval: 3
+    distributed_tls_max_attempts: 3
+    logger_plugin: tls
+    logger_tls_endpoint: /api/v1/osquery/log
+    logger_tls_period: 10
+  # Note configs in platforms take precedence over configs in base
+  platforms:
+    darwin:
+      disable_tables: chrome_extensions
+      docker_socket: /var/run/docker.sock
+      logger_tls_period: 60
+    linux:
+      schedule_timeout: 60
+      docker_socket: /etc/run/docker.sock
 ```
 
 ### Osquery Logging Decorators
