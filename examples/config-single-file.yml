@@ -48,20 +48,6 @@ kind: OsqueryDecorator
   type: load
 ---
 apiVersion: k8s.kolide.com/v1alpha1
-kind: OsqueryFIM
-spec:
-  fim:
-    interval: 500
-    groups:
-      - name: etc
-        paths:
-          - /etc/%%
-      - name: users
-        paths:
-          - /Users/%/Library/%%
-          - /Users/%/Documents/%%
----
-apiVersion: k8s.kolide.com/v1alpha1
 kind: OsqueryLabel
 spec:
   name: all_hosts

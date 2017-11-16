@@ -98,7 +98,6 @@ All of these files can be concatenated together into [one file](../../examples/c
 ```
 |-- config.yml
 |-- decorators.yml
-|-- fim.yml
 |-- labels.yml
 |-- packs
 |   `-- osquery-monitoring.yml
@@ -159,26 +158,6 @@ kind: OsqueryQuery
 spec:
   name: hostname
   query: select hostname from system_info;
-```
-
-### File Integrity Monitoring
-
-The following file describes the configuration for osqueryd's file integrity monitoring system. All other FIM configuration will be over-written by the application of this file.
-
-```yaml
-apiVersion: k8s.kolide.com/v1alpha1
-kind: OsqueryFIM
-spec:
-  fim:
-    interval: 500
-    groups:
-      - name: etc
-        paths:
-          - /etc/%%
-      - name: users
-        paths:
-          - /Users/%/Library/%%
-          - /Users/%/Documents/%%
 ```
 
 ### Host Labels
