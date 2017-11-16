@@ -334,9 +334,19 @@ func (man Manager) addConfigString(key, defVal, usage string) {
 // getConfigString retrieves a string from the loaded config
 func (man Manager) getConfigString(key string) string {
 	interfaceVal := man.getInterfaceVal(key)
-	stringVal, err := cast.ToStringE(interfaceVal)
-	if err != nil {
-		panic("Unable to cast to string for key " + key + ": " + err.Error())
+	var stringVal string
+	switch interfaceVal.(type) {
+	case string:
+		sv, err := cast.ToStringE(interfaceVal)
+		if err != nil {
+			panic("Unable to cast to string for key " + key + ": " + err.Error())
+		}
+		stringVal = sv
+
+	// a common case for flags is a CSV row string.
+	case []interface{}:
+		stringSlice := cast.ToStringSlice(interfaceVal)
+		return strings.Join(stringSlice, ",")
 	}
 
 	return stringVal

@@ -48,6 +48,9 @@ func TestConfigRoundtrip(t *testing.T) {
 				key_v.SetInt(int64(conf_index*100 + key_index))
 			case bool:
 				key_v.SetBool(true)
+			case []string:
+				s := []string{"foo", "bar"}
+				key_v.Set(reflect.ValueOf(s))
 			case time.Duration:
 				d := time.Duration(conf_index*100 + key_index)
 				key_v.Set(reflect.ValueOf(d))
