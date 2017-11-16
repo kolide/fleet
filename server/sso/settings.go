@@ -69,7 +69,7 @@ func ParseMetadata(metadata string) (*Metadata, error) {
 // IDP via a remote URL. metadataURL is the location where the metadata is located
 // and timeout defines how long to wait to get a response form the metadata
 // server.
-func GetMetadata(metadataURL string, client http.Client) (*Metadata, error) {
+func GetMetadata(metadataURL string, client *http.Client) (*Metadata, error) {
 	request, err := http.NewRequest(http.MethodGet, metadataURL, nil)
 	if err != nil {
 		return nil, err

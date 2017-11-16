@@ -62,7 +62,7 @@ func TestGetMetadata(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(metadata))
 	}))
-	client := http.Client{
+	client := &http.Client{
 		Timeout: 2 * time.Second,
 	}
 	settings, err := GetMetadata(ts.URL, client)

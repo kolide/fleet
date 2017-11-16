@@ -68,7 +68,7 @@
 
 [[projects]]
   name = "github.com/go-kit/kit"
-  packages = ["endpoint","log","log/level","metrics","metrics/internal/lv","metrics/prometheus","transport/grpc","transport/http"]
+  packages = ["endpoint","log","metrics","metrics/internal/lv","metrics/prometheus","transport/grpc","transport/http"]
   revision = "4dc7be5d2d12881735283bcab7352178e190fc71"
   version = "v0.6.0"
 
