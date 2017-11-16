@@ -23,12 +23,12 @@ func NewService(ds kolide.Datastore, resultStore kolide.QueryResultStore,
 	logger kitlog.Logger, kolideConfig config.KolideConfig, mailService kolide.MailService,
 	c clock.Clock, sso sso.SessionStore) (kolide.Service, error) {
 	var svc kolide.Service
-	statusWriter, err := osqueryLogFile(kolideConfig.Osquery.StatusLogFile, logger, kolideConfig.Osquery.EnableLogRotation)
+	statusWriter, err := osqueryLogWriter(logTypeStatus, kolideConfig, logger)
 	if err != nil {
 		return nil, err
 	}
-	resultWriter, err := okforward.New(logger, []string{"localhost"})
-	// resultWriter, err := osqueryLogFile(kolideConfig.Osquery.ResultLogFile, logger, kolideConfig.Osquery.EnableLogRotation)
+
+	resultWriter, err := osqueryLogWriter(logTypeResult, kolideConfig, logger)
 	if err != nil {
 		return nil, err
 	}
@@ -47,6 +47,61 @@ func NewService(ds kolide.Datastore, resultStore kolide.QueryResultStore,
 	}
 	svc = validationMiddleware{svc, ds, sso}
 	return svc, nil
+}
+
+type osqueryLogType int
+
+const (
+	logTypeStatus osqueryLogType = iota
+	logTypeResult
+)
+
+// osqueryLogWriter returns a writer for status/result logs based on the config specified by the operator.
+func osqueryLogWriter(logType osqueryLogType, kolideConfig config.KolideConfig, logger kitlog.Logger) (io.Writer, error) {
+	var writers []io.Writer
+	switch logType {
+	case logTypeStatus:
+		if hasFlag(kolideConfig.Osquery.StatusLogWriters, "filesystem") {
+			statusWriter, err := osqueryLogFile(kolideConfig.Osquery.StatusLogFile, logger, kolideConfig.Osquery.EnableLogRotation)
+			if err != nil {
+				return nil, err
+			}
+			writers = append(writers, statusWriter)
+		}
+		if hasFlag(kolideConfig.Osquery.StatusLogWriters, "oklog") {
+			statusWriter, err := okforward.New(logger, kolideConfig.Osquery.OkLogIngesters)
+			if err != nil {
+				return nil, err
+			}
+			writers = append(writers, statusWriter)
+		}
+
+	case logTypeResult:
+		if hasFlag(kolideConfig.Osquery.ResultLogWriters, "filesystem") {
+			resultWriter, err := osqueryLogFile(kolideConfig.Osquery.ResultLogFile, logger, kolideConfig.Osquery.EnableLogRotation)
+			if err != nil {
+				return nil, err
+			}
+			writers = append(writers, resultWriter)
+		}
+		if hasFlag(kolideConfig.Osquery.ResultLogWriters, "oklog") {
+			resultWriter, err := okforward.New(logger, kolideConfig.Osquery.OkLogIngesters)
+			if err != nil {
+				return nil, err
+			}
+			writers = append(writers, resultWriter)
+		}
+	}
+	return io.MultiWriter(writers...), nil
+}
+
+func hasFlag(flags []string, item string) bool {
+	for _, f := range flags {
+		if f == item {
+			return true
+		}
+	}
+	return false
 }
 
 // osqueryLogFile creates a log file for osquery status/result logs
