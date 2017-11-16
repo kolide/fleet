@@ -1,9 +1,8 @@
 ---
 apiVersion: k8s.kolide.com/v1alpha1
 kind: OsqueryPack
-metadata:
-  name: osquery_monitoring
 spec:
+  name: osquery_monitoring
   targets:
     labels:
       - all_hosts
