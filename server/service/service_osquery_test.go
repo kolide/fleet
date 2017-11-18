@@ -162,7 +162,7 @@ func TestSubmitResultLogs(t *testing.T) {
 	}
 	logJSON := fmt.Sprintf("[%s]", strings.Join(logs, ","))
 
-	var results []kolide.OsqueryResultLog
+	var results []json.RawMessage
 	err = json.Unmarshal([]byte(logJSON), &results)
 	require.Nil(t, err)
 

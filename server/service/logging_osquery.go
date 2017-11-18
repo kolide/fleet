@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 
 	"github.com/kolide/fleet/server/kolide"
@@ -114,7 +115,7 @@ func (mw loggingMiddleware) SubmitStatusLogs(ctx context.Context, logs []kolide.
 	return err
 }
 
-func (mw loggingMiddleware) SubmitResultLogs(ctx context.Context, logs []kolide.OsqueryResultLog) error {
+func (mw loggingMiddleware) SubmitResultLogs(ctx context.Context, logs []json.RawMessage) error {
 	var (
 		err error
 	)
