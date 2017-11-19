@@ -40,6 +40,7 @@ func emptyToZero(val string) string {
 }
 
 func (svc service) AuthenticateHost(ctx context.Context, nodeKey string) (*kolide.Host, error) {
+	panic("this should be used in tlsremote")
 	if nodeKey == "" {
 		return nil, osqueryError{
 			message:     "authentication error: missing node key",

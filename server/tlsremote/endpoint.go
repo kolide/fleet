@@ -7,6 +7,7 @@ import (
 	"reflect"
 
 	"github.com/go-kit/kit/endpoint"
+
 	hostctx "github.com/kolide/fleet/server/contexts/host"
 	"github.com/kolide/fleet/server/kolide"
 )

@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/WatchBeam/clock"
 	"github.com/go-kit/kit/log"
-	"github.com/mixer/clock"
 	"github.com/pkg/errors"
 	"github.com/spf13/cast"
 
@@ -22,7 +22,7 @@ import (
 
 // OsqueryService implements the Osquery TLS Service API.
 type OsqueryService struct {
-	ds          kolide.Datastore
+	ds          Datastore
 	resultStore kolide.QueryResultStore
 	clock       clock.Clock
 	logger      log.Logger
@@ -37,12 +37,12 @@ type OsqueryService struct {
 	osqueryResultLogWriter io.Writer
 }
 
-func New(opts ...Option) (*OsqueryService, error) {
+func New(ds Datastore, fim FIMService, packs PackService, results kolide.QueryResultStore, opts ...Option) (*OsqueryService, error) {
 	svc := &OsqueryService{
-		ds:                     nil,
-		resultStore:            nil,
-		fim:                    nil,
-		packs:                  nil,
+		ds:                     ds,
+		resultStore:            results,
+		fim:                    fim,
+		packs:                  packs,
 		clock:                  clock.C,
 		logger:                 log.NewNopLogger(),
 		osqueryStatusLogWriter: ioutil.Discard,
@@ -58,6 +58,57 @@ func New(opts ...Option) (*OsqueryService, error) {
 	}
 
 	return svc, nil
+}
+
+// Datastore represents the minimum set of DB methods required by the OsqueryService.
+type Datastore interface {
+	// LabelQueriesForHost returns the label queries that should be executed
+	// for the given host. The cutoff is the minimum timestamp a query
+	// execution should have to be considered "fresh". Executions that are
+	// not fresh will be repeated. Results are returned in a map of label
+	// id -> query
+	LabelQueriesForHost(host *kolide.Host, cutoff time.Time) (map[string]string, error)
+
+	// DistributedQueriesForHost retrieves the distributed queries that the
+	// given host should run. The result map is a mapping from campaign ID
+	// to query text.
+	DistributedQueriesForHost(host *kolide.Host) (map[uint]string, error)
+
+	// DistributedQueryCampaign loads a distributed query campaign by ID
+	DistributedQueryCampaign(id uint) (*kolide.DistributedQueryCampaign, error)
+
+	// SaveDistributedQueryCampaign updates an existing distributed query
+	// campaign
+	SaveDistributedQueryCampaign(camp *kolide.DistributedQueryCampaign) error
+
+	AuthenticateHost(nodeKey string) (*kolide.Host, error)
+
+	MarkHostSeen(host *kolide.Host, t time.Time) error
+
+	AppConfig() (*kolide.AppConfig, error)
+
+	EnrollHost(osqueryHostId string, nodeKeySize int) (*kolide.Host, error)
+
+	SaveHost(host *kolide.Host) error
+
+	// RecordLabelQueryExecutions saves the results of label queries. The
+	// results map is a map of label id -> whether or not the label
+	// matches. The time parameter is the timestamp to save with the query
+	// execution.
+	RecordLabelQueryExecutions(host *kolide.Host, results map[uint]bool, t time.Time) error
+
+	// NewDistributedQueryCampaignExecution records a new execution for a
+	// distributed query campaign
+	NewDistributedQueryExecution(exec *kolide.DistributedQueryExecution) (*kolide.DistributedQueryExecution, error)
+
+	// GetOsqueryConfigOptions returns options in a format that will be the options
+	// section of osquery configuration
+	GetOsqueryConfigOptions() (map[string]interface{}, error)
+
+	// ListDecorators returns all decorator queries.
+	ListDecorators(opts ...kolide.OptionalArg) ([]*kolide.Decorator, error)
+
+	ListScheduledQueriesInPack(id uint, opts kolide.ListOptions) ([]*kolide.ScheduledQuery, error)
 }
 
 // FIMService is a dependency of the Service that returns a FIM configuration.

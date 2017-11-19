@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/mixer/clock"
+	"github.com/WatchBeam/clock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -128,11 +128,12 @@ func TestAuthenticatedHost(t *testing.T) {
 }
 
 func newTestService(t *testing.T, ds kolide.Datastore, rs kolide.QueryResultStore) *OsqueryService {
+	cfg := config.TestConfig()
 	svc := &OsqueryService{
 		ds:          ds,
 		resultStore: rs,
-		config:      config.TestConfig(),
 		clock:       clock.C,
+		nodeKeySize: cfg.Osquery.NodeKeySize,
 	}
 	return svc
 }

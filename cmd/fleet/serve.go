@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -21,15 +22,18 @@ import (
 	"github.com/kolide/fleet/server/health"
 	"github.com/kolide/fleet/server/kolide"
 	"github.com/kolide/fleet/server/launcher"
+	"github.com/kolide/fleet/server/logwriter"
 	"github.com/kolide/fleet/server/mail"
 	"github.com/kolide/fleet/server/pubsub"
 	"github.com/kolide/fleet/server/service"
 	"github.com/kolide/fleet/server/sso"
+	"github.com/kolide/fleet/server/tlsremote"
 	"github.com/kolide/kit/version"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
+	lumberjack "gopkg.in/natefinch/lumberjack.v2"
 )
 
 type initializer interface {
@@ -136,6 +140,44 @@ the way that the Fleet server works.
 				initFatal(err, "initializing service")
 			}
 
+			statusWriter, err := osqueryLogFile(
+				config.Osquery.StatusLogFile,
+				logger,
+				config.Osquery.EnableLogRotation,
+			)
+			if err != nil {
+				initFatal(err, "create statusWriter")
+			}
+
+			resultWriter, err := osqueryLogFile(
+				config.Osquery.ResultLogFile,
+				logger,
+				config.Osquery.EnableLogRotation,
+			)
+			if err != nil {
+				initFatal(err, "create resultWriter")
+			}
+
+			var tlsService kolide.OsqueryService
+			{
+				svc, err := tlsremote.New(
+					ds,
+					svc,
+					svc,
+					resultStore,
+					tlsremote.WithLogger(logger),
+					tlsremote.WithLableUpdateInterval(config.Osquery.LabelUpdateInterval),
+					tlsremote.WithNodeKeySize(config.Osquery.NodeKeySize),
+					tlsremote.WithStatusLogWriters(statusWriter),
+					tlsremote.WithResultLogWriters(resultWriter),
+				)
+				if err != nil {
+					initFatal(err, "initializing tls service")
+				}
+				tlsService = svc
+				tlsService = tlsremote.LoggingMiddleware(logger)(svc)
+			}
+
 			go func() {
 				ticker := time.NewTicker(1 * time.Hour)
 				for {
@@ -185,6 +227,12 @@ the way that the Fleet server works.
 
 			}
 
+			var tlsAPIHandler http.Handler
+			{
+				endpoints := tlsremote.MakeServerEndpoints(tlsService)
+				tlsAPIHandler = tlsremote.NewHTTPHandler(endpoints, httpLogger)
+			}
+
 			healthCheckers := make(map[string]health.Checker)
 			{
 				// a list of dependencies which could affect the status of the app if unavailable.
@@ -211,6 +259,7 @@ the way that the Fleet server works.
 			r.Handle("/version", prometheus.InstrumentHandler("version", version.Handler()))
 			r.Handle("/assets/", prometheus.InstrumentHandler("static_assets", service.ServeStaticAssets("/assets/")))
 			r.Handle("/metrics", prometheus.InstrumentHandler("metrics", promhttp.Handler()))
+			r.Handle("/api/v1/osquery/", prometheus.InstrumentHandler("osquery_tls_api", tlsAPIHandler))
 			r.Handle("/api/", apiHandler)
 			r.Handle("/", frontendHandler)
 
@@ -365,4 +414,34 @@ func getTLSConfig(profile string) *tls.Config {
 	}
 
 	return &cfg
+}
+
+// TODO(@groob) move to logwriter package
+// see https://github.com/kolide/fleet/issues/1618
+// osqueryLogFile creates a log file for osquery status/result logs
+// the logFile can be rotated by sending a `SIGHUP` signal to kolide if
+// enableRotation is true
+func osqueryLogFile(path string, appLogger kitlog.Logger, enableRotation bool) (io.Writer, error) {
+	if enableRotation {
+		osquerydLogger := &lumberjack.Logger{
+			Filename:   path,
+			MaxSize:    500, // megabytes
+			MaxBackups: 3,
+			MaxAge:     28, //days
+		}
+		appLogger = kitlog.With(appLogger, "component", "osqueryd-logger")
+		sig := make(chan os.Signal)
+		signal.Notify(sig, syscall.SIGHUP)
+		go func() {
+			for {
+				<-sig //block on signal
+				if err := osquerydLogger.Rotate(); err != nil {
+					appLogger.Log("err", err)
+				}
+			}
+		}()
+		return osquerydLogger, nil
+	}
+	// no log rotation
+	return logwriter.New(path)
 }

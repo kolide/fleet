@@ -51,4 +51,5 @@ type AlreadyExistsError interface {
 	IsExists() bool
 }
 
+// TODO(@groob) clean up this empty interface usage.
 type OptionalArg func() interface{}
