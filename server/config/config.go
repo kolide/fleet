@@ -75,6 +75,9 @@ type OsqueryConfig struct {
 	ResultLogFile       string        `yaml:"result_log_file"`
 	EnableLogRotation   bool          `yaml:"enable_log_rotation"`
 	LabelUpdateInterval time.Duration `yaml:"label_update_interval"`
+	StatusLogWriters    []string      `yaml:"status_log_writers"`
+	ResultLogWriters    []string      `yaml:"result_log_writers"`
+	OkLogIngesters      []string      `yaml:"oklog_ingesters"`
 }
 
 // LoggingConfig defines configs related to logging
@@ -174,6 +177,12 @@ func (man Manager) addConfigs() {
 		"Interval to update host label membership (i.e. 1h)")
 	man.addConfigBool("osquery.enable_log_rotation", false,
 		"Osquery log files will be automatically rotated")
+	man.addConfigString("osquery.status_log_writers", "filesystem",
+		"Comma separated list of status log writers. Valid values filesystem,oklog")
+	man.addConfigString("osquery.result_log_writers", "filesystem",
+		"Comma separated list of status log writers. Valid values filesystem,oklog")
+	man.addConfigString("osquery.oklog_ingesters", "localhost",
+		"Comma separated list of oklog ingesters. Only used if oklog is specified in the list of writers.")
 
 	// Logging
 	man.addConfigBool("logging.debug", false,
@@ -231,6 +240,9 @@ func (man Manager) LoadConfig() KolideConfig {
 			ResultLogFile:       man.getConfigString("osquery.result_log_file"),
 			LabelUpdateInterval: man.getConfigDuration("osquery.label_update_interval"),
 			EnableLogRotation:   man.getConfigBool("osquery.enable_log_rotation"),
+			StatusLogWriters:    strings.Split(man.getConfigString("osquery.status_log_writers"), ","),
+			ResultLogWriters:    strings.Split(man.getConfigString("osquery.result_log_writers"), ","),
+			OkLogIngesters:      strings.Split(man.getConfigString("osquery.oklog_ingesters"), ","),
 		},
 		Logging: LoggingConfig{
 			Debug:         man.getConfigBool("logging.debug"),
@@ -322,9 +334,19 @@ func (man Manager) addConfigString(key, defVal, usage string) {
 // getConfigString retrieves a string from the loaded config
 func (man Manager) getConfigString(key string) string {
 	interfaceVal := man.getInterfaceVal(key)
-	stringVal, err := cast.ToStringE(interfaceVal)
-	if err != nil {
-		panic("Unable to cast to string for key " + key + ": " + err.Error())
+	var stringVal string
+	switch interfaceVal.(type) {
+	case string:
+		sv, err := cast.ToStringE(interfaceVal)
+		if err != nil {
+			panic("Unable to cast to string for key " + key + ": " + err.Error())
+		}
+		stringVal = sv
+
+	// a common case for flags is a CSV row string.
+	case []interface{}:
+		stringSlice := cast.ToStringSlice(interfaceVal)
+		return strings.Join(stringSlice, ",")
 	}
 
 	return stringVal
