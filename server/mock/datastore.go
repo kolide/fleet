@@ -22,6 +22,7 @@ type Store struct {
 	kolide.ScheduledQueryStore
 	kolide.YARAStore
 	kolide.TargetStore
+	kolide.OsqueryOptionsStore
 	FileIntegrityMonitoringStore
 	AppConfigStore
 	DecoratorStore
