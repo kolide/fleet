@@ -81,15 +81,7 @@ type Datastore interface {
 	// campaign
 	SaveDistributedQueryCampaign(camp *kolide.DistributedQueryCampaign) error
 
-	AuthenticateHost(nodeKey string) (*kolide.Host, error)
-
-	MarkHostSeen(host *kolide.Host, t time.Time) error
-
 	AppConfig() (*kolide.AppConfig, error)
-
-	EnrollHost(osqueryHostId string, nodeKeySize int) (*kolide.Host, error)
-
-	SaveHost(host *kolide.Host) error
 
 	// RecordLabelQueryExecutions saves the results of label queries. The
 	// results map is a map of label id -> whether or not the label
@@ -109,6 +101,15 @@ type Datastore interface {
 	ListDecorators(opts ...kolide.OptionalArg) ([]*kolide.Decorator, error)
 
 	ListScheduledQueriesInPack(id uint, opts kolide.ListOptions) ([]*kolide.ScheduledQuery, error)
+
+	HostStore
+}
+
+type HostStore interface {
+	AuthenticateHost(nodeKey string) (*kolide.Host, error)
+	MarkHostSeen(host *kolide.Host, t time.Time) error
+	EnrollHost(osqueryHostId string, nodeKeySize int) (*kolide.Host, error)
+	SaveHost(host *kolide.Host) error
 }
 
 // FIMService is a dependency of the Service that returns a FIM configuration.

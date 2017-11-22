@@ -56,11 +56,6 @@ type KolideEndpoints struct {
 	GetScheduledQuery              endpoint.Endpoint
 	ModifyScheduledQuery           endpoint.Endpoint
 	DeleteScheduledQuery           endpoint.Endpoint
-	EnrollAgent                    endpoint.Endpoint
-	GetClientConfig                endpoint.Endpoint
-	GetDistributedQueries          endpoint.Endpoint
-	SubmitDistributedQueryResults  endpoint.Endpoint
-	SubmitLogs                     endpoint.Endpoint
 	GetLabel                       endpoint.Endpoint
 	ListLabels                     endpoint.Endpoint
 	CreateLabel                    endpoint.Endpoint
@@ -167,13 +162,6 @@ func MakeKolideServerEndpoints(svc kolide.Service, jwtKey string) KolideEndpoint
 		ChangeEmail:               authenticatedUser(jwtKey, svc, makeChangeEmailEndpoint(svc)),
 		GetFIM:                    authenticatedUser(jwtKey, svc, makeGetFIMEndpoint(svc)),
 		ModifyFIM:                 authenticatedUser(jwtKey, svc, makeModifyFIMEndpoint(svc)),
-
-		// Osquery endpoints
-		EnrollAgent:                   makeEnrollAgentEndpoint(svc),
-		GetClientConfig:               authenticatedHost(svc, makeGetClientConfigEndpoint(svc)),
-		GetDistributedQueries:         authenticatedHost(svc, makeGetDistributedQueriesEndpoint(svc)),
-		SubmitDistributedQueryResults: authenticatedHost(svc, makeSubmitDistributedQueryResultsEndpoint(svc)),
-		SubmitLogs:                    authenticatedHost(svc, makeSubmitLogsEndpoint(svc)),
 	}
 }
 
@@ -287,46 +275,41 @@ func makeKolideKitHandlers(e KolideEndpoints, opts []kithttp.ServerOption) *koli
 		DeleteQuery:                    newServer(e.DeleteQuery, decodeDeleteQueryRequest),
 		DeleteQueries:                  newServer(e.DeleteQueries, decodeDeleteQueriesRequest),
 		CreateDistributedQueryCampaign: newServer(e.CreateDistributedQueryCampaign, decodeCreateDistributedQueryCampaignRequest),
-		GetPack:                       newServer(e.GetPack, decodeGetPackRequest),
-		ListPacks:                     newServer(e.ListPacks, decodeListPacksRequest),
-		CreatePack:                    newServer(e.CreatePack, decodeCreatePackRequest),
-		ModifyPack:                    newServer(e.ModifyPack, decodeModifyPackRequest),
-		DeletePack:                    newServer(e.DeletePack, decodeDeletePackRequest),
-		ScheduleQuery:                 newServer(e.ScheduleQuery, decodeScheduleQueryRequest),
-		GetScheduledQueriesInPack:     newServer(e.GetScheduledQueriesInPack, decodeGetScheduledQueriesInPackRequest),
-		GetScheduledQuery:             newServer(e.GetScheduledQuery, decodeGetScheduledQueryRequest),
-		ModifyScheduledQuery:          newServer(e.ModifyScheduledQuery, decodeModifyScheduledQueryRequest),
-		DeleteScheduledQuery:          newServer(e.DeleteScheduledQuery, decodeDeleteScheduledQueryRequest),
-		EnrollAgent:                   newServer(e.EnrollAgent, decodeEnrollAgentRequest),
-		GetClientConfig:               newServer(e.GetClientConfig, decodeGetClientConfigRequest),
-		GetDistributedQueries:         newServer(e.GetDistributedQueries, decodeGetDistributedQueriesRequest),
-		SubmitDistributedQueryResults: newServer(e.SubmitDistributedQueryResults, decodeSubmitDistributedQueryResultsRequest),
-		SubmitLogs:                    newServer(e.SubmitLogs, decodeSubmitLogsRequest),
-		GetLabel:                      newServer(e.GetLabel, decodeGetLabelRequest),
-		ListLabels:                    newServer(e.ListLabels, decodeListLabelsRequest),
-		CreateLabel:                   newServer(e.CreateLabel, decodeCreateLabelRequest),
-		DeleteLabel:                   newServer(e.DeleteLabel, decodeDeleteLabelRequest),
-		ModifyLabel:                   newServer(e.ModifyLabel, decodeModifyLabelRequest),
-		ListDecorators:                newServer(e.ListDecorators, decodeNoParamsRequest),
-		NewDecorator:                  newServer(e.NewDecorator, decodeNewDecoratorRequest),
-		ModifyDecorator:               newServer(e.ModifyDecorator, decodeModifyDecoratorRequest),
-		DeleteDecorator:               newServer(e.DeleteDecorator, decodeDeleteDecoratorRequest),
-		GetHost:                       newServer(e.GetHost, decodeGetHostRequest),
-		DeleteHost:                    newServer(e.DeleteHost, decodeDeleteHostRequest),
-		ListHosts:                     newServer(e.ListHosts, decodeListHostsRequest),
-		GetHostSummary:                newServer(e.GetHostSummary, decodeNoParamsRequest),
-		SearchTargets:                 newServer(e.SearchTargets, decodeSearchTargetsRequest),
-		GetOptions:                    newServer(e.GetOptions, decodeNoParamsRequest),
-		ModifyOptions:                 newServer(e.ModifyOptions, decodeModifyOptionsRequest),
-		ResetOptions:                  newServer(e.ResetOptions, decodeNoParamsRequest),
-		ImportConfig:                  newServer(e.ImportConfig, decodeImportConfigRequest),
-		GetCertificate:                newServer(e.GetCertificate, decodeNoParamsRequest),
-		ChangeEmail:                   newServer(e.ChangeEmail, decodeChangeEmailRequest),
-		InitiateSSO:                   newServer(e.InitiateSSO, decodeInitiateSSORequest),
-		CallbackSSO:                   newServer(e.CallbackSSO, decodeCallbackSSORequest),
-		SettingsSSO:                   newServer(e.SSOSettings, decodeNoParamsRequest),
-		ModifyFIM:                     newServer(e.ModifyFIM, decodeModifyFIMRequest),
-		GetFIM:                        newServer(e.GetFIM, decodeNoParamsRequest),
+		GetPack:                   newServer(e.GetPack, decodeGetPackRequest),
+		ListPacks:                 newServer(e.ListPacks, decodeListPacksRequest),
+		CreatePack:                newServer(e.CreatePack, decodeCreatePackRequest),
+		ModifyPack:                newServer(e.ModifyPack, decodeModifyPackRequest),
+		DeletePack:                newServer(e.DeletePack, decodeDeletePackRequest),
+		ScheduleQuery:             newServer(e.ScheduleQuery, decodeScheduleQueryRequest),
+		GetScheduledQueriesInPack: newServer(e.GetScheduledQueriesInPack, decodeGetScheduledQueriesInPackRequest),
+		GetScheduledQuery:         newServer(e.GetScheduledQuery, decodeGetScheduledQueryRequest),
+		ModifyScheduledQuery:      newServer(e.ModifyScheduledQuery, decodeModifyScheduledQueryRequest),
+		DeleteScheduledQuery:      newServer(e.DeleteScheduledQuery, decodeDeleteScheduledQueryRequest),
+		GetLabel:                  newServer(e.GetLabel, decodeGetLabelRequest),
+		ListLabels:                newServer(e.ListLabels, decodeListLabelsRequest),
+		CreateLabel:               newServer(e.CreateLabel, decodeCreateLabelRequest),
+		DeleteLabel:               newServer(e.DeleteLabel, decodeDeleteLabelRequest),
+		ModifyLabel:               newServer(e.ModifyLabel, decodeModifyLabelRequest),
+		ListDecorators:            newServer(e.ListDecorators, decodeNoParamsRequest),
+		NewDecorator:              newServer(e.NewDecorator, decodeNewDecoratorRequest),
+		ModifyDecorator:           newServer(e.ModifyDecorator, decodeModifyDecoratorRequest),
+		DeleteDecorator:           newServer(e.DeleteDecorator, decodeDeleteDecoratorRequest),
+		GetHost:                   newServer(e.GetHost, decodeGetHostRequest),
+		DeleteHost:                newServer(e.DeleteHost, decodeDeleteHostRequest),
+		ListHosts:                 newServer(e.ListHosts, decodeListHostsRequest),
+		GetHostSummary:            newServer(e.GetHostSummary, decodeNoParamsRequest),
+		SearchTargets:             newServer(e.SearchTargets, decodeSearchTargetsRequest),
+		GetOptions:                newServer(e.GetOptions, decodeNoParamsRequest),
+		ModifyOptions:             newServer(e.ModifyOptions, decodeModifyOptionsRequest),
+		ResetOptions:              newServer(e.ResetOptions, decodeNoParamsRequest),
+		ImportConfig:              newServer(e.ImportConfig, decodeImportConfigRequest),
+		GetCertificate:            newServer(e.GetCertificate, decodeNoParamsRequest),
+		ChangeEmail:               newServer(e.ChangeEmail, decodeChangeEmailRequest),
+		InitiateSSO:               newServer(e.InitiateSSO, decodeInitiateSSORequest),
+		CallbackSSO:               newServer(e.CallbackSSO, decodeCallbackSSORequest),
+		SettingsSSO:               newServer(e.SSOSettings, decodeNoParamsRequest),
+		ModifyFIM:                 newServer(e.ModifyFIM, decodeModifyFIMRequest),
+		GetFIM:                    newServer(e.GetFIM, decodeNoParamsRequest),
 	}
 }
 

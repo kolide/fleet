@@ -3,13 +3,13 @@ package tlsremote
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/WatchBeam/clock"
+	"github.com/go-kit/kit/endpoint"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
-	"github.com/kolide/fleet/server/config"
-	"github.com/kolide/fleet/server/datastore/inmem"
 	"github.com/kolide/fleet/server/kolide"
 )
 
@@ -74,16 +74,54 @@ func TestGetNodeKey(t *testing.T) {
 	}
 }
 
-func TestAuthenticatedHost(t *testing.T) {
-	ds, err := inmem.New(config.TestConfig())
-	require.Nil(t, err)
+// helpers for the TestAuthenticatedHostMiddleware test.
+type (
+	authenticationTestService struct {
+		ds *authenticationTestDatastore
+		kolide.OsqueryService
+	}
 
-	_, err = ds.NewAppConfig(&kolide.AppConfig{EnrollSecret: "foobarbaz"})
-	require.Nil(t, err)
+	authenticationTestDatastore struct {
+		AuthenticateHostInvoked bool
+		clock                   clock.Clock
+		nodeKey                 string
+		Datastore
+	}
+)
 
-	svc := newTestService(t, ds, nil)
-	require.Nil(t, err)
+func (ds *authenticationTestDatastore) AuthenticateHost(nodeKey string) (*kolide.Host, error) {
+	ds.AuthenticateHostInvoked = true
+	if nodeKey == ds.nodeKey {
+		return &kolide.Host{NodeKey: ds.nodeKey}, nil
+	}
+	return nil, errors.New("test: bad node key")
+}
 
+func (ds *authenticationTestDatastore) MarkHostSeen(host *kolide.Host, t time.Time) error {
+	host.SeenTime = ds.clock.Now()
+	return nil
+}
+
+func setupAuthenticatedHostTest(t *testing.T) (*authenticationTestService, endpoint.Endpoint) {
+	goodNodeKey := "good-node-key"
+	clock := clock.NewMockClock()
+
+	// create db with with all the necessary dependencies
+	ds := &authenticationTestDatastore{
+		nodeKey: goodNodeKey,
+		clock:   clock,
+	}
+
+	// create service using teh datastore
+	svc := &authenticationTestService{
+		ds: ds,
+		OsqueryService: &OsqueryService{
+			ds:    ds,
+			clock: clock,
+		},
+	}
+
+	// setup endpoint with authenticateHost middleware
 	endpoint := authenticatedHost(
 		svc,
 		func(ctx context.Context, request interface{}) (interface{}, error) {
@@ -91,10 +129,11 @@ func TestAuthenticatedHost(t *testing.T) {
 		},
 	)
 
-	ctx := context.Background()
-	goodNodeKey, err := svc.EnrollAgent(ctx, "foobarbaz", "host123")
-	require.Nil(t, err)
-	require.NotEmpty(t, goodNodeKey)
+	return svc, endpoint
+}
+
+func TestAuthenticatedHostMiddleware(t *testing.T) {
+	svc, endpoint := setupAuthenticatedHostTest(t)
 
 	var authenticatedHostTests = []struct {
 		nodeKey   string
@@ -109,7 +148,7 @@ func TestAuthenticatedHost(t *testing.T) {
 			shouldErr: true,
 		},
 		{
-			nodeKey:   goodNodeKey,
+			nodeKey:   svc.ds.nodeKey,
 			shouldErr: false,
 		},
 	}
@@ -117,23 +156,13 @@ func TestAuthenticatedHost(t *testing.T) {
 	for _, tt := range authenticatedHostTests {
 		t.Run("", func(t *testing.T) {
 			var r = struct{ NodeKey string }{NodeKey: tt.nodeKey}
-			_, err = endpoint(context.Background(), r)
+			_, err := endpoint(context.Background(), r)
 			if tt.shouldErr {
 				assert.IsType(t, osqueryError{}, err)
 			} else {
 				assert.Nil(t, err)
 			}
+			assert.True(t, svc.ds.AuthenticateHostInvoked)
 		})
 	}
-}
-
-func newTestService(t *testing.T, ds kolide.Datastore, rs kolide.QueryResultStore) *OsqueryService {
-	cfg := config.TestConfig()
-	svc := &OsqueryService{
-		ds:          ds,
-		resultStore: rs,
-		clock:       clock.C,
-		nodeKeySize: cfg.Osquery.NodeKeySize,
-	}
-	return svc
 }

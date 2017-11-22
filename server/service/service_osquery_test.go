@@ -1115,7 +1115,6 @@ func TestUpdateHostIntervals(t *testing.T) {
 			assert.Len(t, cfg.FilePaths["etc"], 1)
 		})
 	}
-
 }
 
 func setupOsqueryTests(t *testing.T) (kolide.Datastore, kolide.Service, *clock.MockClock) {

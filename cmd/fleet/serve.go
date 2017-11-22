@@ -251,7 +251,7 @@ the way that the Fleet server works.
 			}
 
 			// Instantiate a gRPC service to handle launcher requests.
-			launcher := launcher.New(svc, logger, grpc.NewServer(), healthCheckers)
+			launcher := launcher.New(tlsService, logger, grpc.NewServer(), healthCheckers)
 
 			r := http.NewServeMux()
 

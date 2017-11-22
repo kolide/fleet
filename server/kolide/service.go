@@ -8,7 +8,6 @@ type Service interface {
 	LabelService
 	QueryService
 	CampaignService
-	OsqueryService
 	HostService
 	AppConfigService
 	InviteService
