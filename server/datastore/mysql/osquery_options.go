@@ -10,6 +10,13 @@ import (
 	"github.com/pkg/errors"
 )
 
+type optionsRow struct {
+	ID                 int                       `db:"id"`
+	OverrideType       kolide.OptionOverrideType `db:"override_type"`
+	OverrideIdentifier string                    `db:"override_identifier"`
+	Options            string                    `db:"options"`
+}
+
 func (d *Datastore) ApplyOptions(spec *kolide.OptionsSpec) (err error) {
 	tx, err := d.db.Begin()
 	if err != nil {
@@ -67,7 +74,7 @@ func (d *Datastore) ApplyOptions(spec *kolide.OptionsSpec) (err error) {
 }
 
 func (d *Datastore) GetOptions() (*kolide.OptionsSpec, error) {
-	var rows []kolide.OptionsRow
+	var rows []optionsRow
 	if err := d.db.Select(&rows, "SELECT * FROM osquery_options"); err != nil {
 		return nil, errors.Wrap(err, "selecting options")
 	}
@@ -108,7 +115,7 @@ func (d *Datastore) OptionsForHost(host *kolide.Host) (json.RawMessage, error) {
 		ORDER BY FIELD(override_type, ?, ?)
 		LIMIT 1
 		`
-	var row kolide.OptionsRow
+	var row optionsRow
 	err := d.db.Get(
 		&row, sql,
 		kolide.OptionOverrideTypeDefault,

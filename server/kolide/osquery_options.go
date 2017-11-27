@@ -18,18 +18,11 @@ type OptionsYaml struct {
 
 type OptionsSpec struct {
 	Config    json.RawMessage  `json:"config"`
-	Overrides OptionsOverrides `json:"overrides"`
+	Overrides OptionsOverrides `json:"overrides,omitempty"`
 }
 
 type OptionsOverrides struct {
-	Platforms map[string]json.RawMessage `json:"platforms"`
-}
-
-type OptionsRow struct {
-	ID                 int                `db:"id"`
-	OverrideType       OptionOverrideType `db:"override_type"`
-	OverrideIdentifier string             `db:"override_identifier"`
-	Options            string             `db:"options"`
+	Platforms map[string]json.RawMessage `json:"platforms,omitempty"`
 }
 
 // OptionOverrideType is used to designate which override type a given set of
