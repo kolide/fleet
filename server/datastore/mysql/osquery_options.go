@@ -93,7 +93,7 @@ func (d *Datastore) GetOptions() (*kolide.OptionsSpec, error) {
 			spec.Overrides.Platforms[row.OverrideIdentifier] = json.RawMessage(row.Options)
 
 		default:
-			level.Error(d.logger).Log(
+			level.Info(d.logger).Log(
 				"err", "ignoring unkown override type",
 				"type", row.OverrideType,
 			)

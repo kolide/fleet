@@ -3,7 +3,7 @@ package kolide
 import "encoding/json"
 
 type OsqueryOptionsStore interface {
-	ApplyOptions(spec *OptionsSpec) error
+	ApplyOptions(options *OptionsSpec) error
 	GetOptions() (*OptionsSpec, error)
 	OptionsForHost(host *Host) (json.RawMessage, error)
 }
