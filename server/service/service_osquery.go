@@ -237,12 +237,15 @@ func (svc service) SubmitStatusLogs(ctx context.Context, logs []kolide.OsquerySt
 }
 
 func (svc service) SubmitResultLogs(ctx context.Context, logs []json.RawMessage) error {
+	fmt.Printf("DEBUG_LOG_WRITER writing raw json logs  to writer %v\n", logs)
 	for _, log := range logs {
 		if _, err := svc.osqueryResultLogWriter.Write(append(log, '\n')); err != nil {
+			fmt.Printf("DEBUG_LOG_WRITER writing raw json log line  to writer %v\n", log)
 			return osqueryError{message: "error writing result log: " + err.Error()}
 		}
 	}
 	if writer, ok := svc.osqueryResultLogWriter.(flusher); ok {
+		fmt.Printf("DEBUG_LOG_WRITER calling flush method on writer")
 		err := writer.Flush()
 		if err != nil {
 			return osqueryError{message: "error flushing status log: " + err.Error()}

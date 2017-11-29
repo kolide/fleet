@@ -1,9 +1,12 @@
 package service
 
 import (
+	"bytes"
 	"compress/gzip"
 	"context"
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/kolide/fleet/server/kolide"
@@ -83,6 +86,9 @@ func decodeSubmitDistributedQueryResultsRequest(ctx context.Context, r *http.Req
 }
 
 func decodeSubmitLogsRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	fmt.Printf("DEBUG_LOG_WRITER decoding raw submit log request")
+	defer fmt.Printf("DEBUG_LOG_WRITER finished decoding raw submit log request")
+
 	var err error
 	body := r.Body
 	if r.Header.Get("content-encoding") == "gzip" {
@@ -94,7 +100,12 @@ func decodeSubmitLogsRequest(ctx context.Context, r *http.Request) (interface{},
 	}
 
 	var req submitLogsRequest
-	if err = json.NewDecoder(body).Decode(&req); err != nil {
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to readall body")
+	}
+	fmt.Println(string(data))
+	if err = json.NewDecoder(bytes.NewReader(data)).Decode(&req); err != nil {
 		return nil, errors.Wrap(err, "decoding JSON")
 	}
 	defer r.Body.Close()

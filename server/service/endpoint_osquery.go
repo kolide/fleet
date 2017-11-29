@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"github.com/go-kit/kit/endpoint"
 	"github.com/kolide/fleet/server/kolide"
@@ -148,6 +149,7 @@ func makeSubmitLogsEndpoint(svc kolide.Service) endpoint.Endpoint {
 			}
 
 		case "result":
+			fmt.Printf("DEBUG_LOG_WRITER endpoint rawmessage: %v", req.Data)
 			var results []json.RawMessage
 			if err := json.Unmarshal(req.Data, &results); err != nil {
 				err = osqueryError{message: "unmarshalling result logs: " + err.Error()}
