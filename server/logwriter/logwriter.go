@@ -3,6 +3,7 @@ package logwriter
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"os"
 	"sync"
@@ -41,6 +42,7 @@ func (l *logWriter) Write(b []byte) (int, error) {
 		l.file = f
 		l.buff = bufio.NewWriter(f)
 	}
+	fmt.Printf("DEBUG_LOG_WRITER writing %s\n to file", string(b))
 	return l.buff.Write(b)
 }
 
