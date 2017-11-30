@@ -14,10 +14,8 @@ func Up_20171116163618(tx *sql.Tx) error {
 		"`options` JSON NOT NULL," +
 		"PRIMARY KEY (`id`)" +
 		") ENGINE=InnoDB DEFAULT CHARSET=utf8;"
-	if _, err := tx.Exec(sqlStatement); err != nil {
-		return err
-	}
-	return nil
+	_, err := tx.Exec(sqlStatement)
+	return err
 }
 
 func Down_20171116163618(tx *sql.Tx) error {
