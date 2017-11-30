@@ -4,60 +4,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"reflect"
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/go-kit/kit/endpoint"
-	hostctx "github.com/kolide/fleet/server/contexts/host"
 	"github.com/kolide/fleet/server/contexts/token"
 	"github.com/kolide/fleet/server/contexts/viewer"
 	"github.com/kolide/fleet/server/kolide"
 )
 
 var errNoContext = errors.New("context key not set")
-
-// authenticatedHost wraps an endpoint, checks the validity of the node_key
-// provided in the request, and attaches the corresponding osquery host to the
-// context for the request
-func authenticatedHost(svc kolide.Service, next endpoint.Endpoint) endpoint.Endpoint {
-	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		nodeKey, err := getNodeKey(request)
-		if err != nil {
-			return nil, err
-		}
-
-		host, err := svc.AuthenticateHost(ctx, nodeKey)
-		if err != nil {
-			return nil, err
-		}
-
-		ctx = hostctx.NewContext(ctx, *host)
-		return next(ctx, request)
-	}
-}
-
-func getNodeKey(r interface{}) (string, error) {
-	// Retrieve node key by reflection (note that our options here
-	// are limited by the fact that request is an interface{})
-	v := reflect.ValueOf(r)
-	if v.Kind() != reflect.Struct {
-		return "", osqueryError{
-			message: "request type is not struct. This is likely a Kolide programmer error.",
-		}
-	}
-	nodeKeyField := v.FieldByName("NodeKey")
-	if !nodeKeyField.IsValid() {
-		return "", osqueryError{
-			message: "request struct missing NodeKey. This is likely a Kolide programmer error.",
-		}
-	}
-	if nodeKeyField.Kind() != reflect.String {
-		return "", osqueryError{
-			message: "NodeKey is not a string. This is likely a Kolide programmer error.",
-		}
-	}
-	return nodeKeyField.String(), nil
-}
 
 // authenticatedUser wraps an endpoint, requires that the Kolide user is
 // authenticated, and populates the context with a Viewer struct for that user.

@@ -1,45 +1,130 @@
-package service
+package tlsremote
 
 import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	"io/ioutil"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/WatchBeam/clock"
 	"github.com/go-kit/kit/log"
+	"github.com/pkg/errors"
+	"github.com/spf13/cast"
+
 	hostctx "github.com/kolide/fleet/server/contexts/host"
 	"github.com/kolide/fleet/server/kolide"
 	"github.com/kolide/fleet/server/pubsub"
-	"github.com/pkg/errors"
-	"github.com/spf13/cast"
 )
 
-type osqueryError struct {
-	message     string
-	nodeInvalid bool
+// OsqueryService implements the Osquery TLS Service API.
+type OsqueryService struct {
+	ds          Datastore
+	resultStore kolide.QueryResultStore
+	clock       clock.Clock
+	logger      log.Logger
+
+	fim   FIMService
+	packs PackService
+
+	labelUpdateInterval time.Duration
+	nodeKeySize         int
+
+	osqueryStatusLogWriter io.Writer
+	osqueryResultLogWriter io.Writer
 }
 
-func (e osqueryError) Error() string {
-	return e.message
-}
+func New(ds Datastore, fim FIMService, packs PackService, results kolide.QueryResultStore, opts ...Option) (*OsqueryService, error) {
+	svc := &OsqueryService{
+		ds:                     ds,
+		resultStore:            results,
+		fim:                    fim,
+		packs:                  packs,
+		clock:                  clock.C,
+		logger:                 log.NewNopLogger(),
+		osqueryStatusLogWriter: ioutil.Discard,
+		osqueryResultLogWriter: ioutil.Discard,
 
-func (e osqueryError) NodeInvalid() bool {
-	return e.nodeInvalid
-}
-
-// Sometimes osquery gives us empty string where we expect an integer.
-// We change the to "0" so it can be handled by the appropriate string to
-// integer conversion function, as these will err on ""
-func emptyToZero(val string) string {
-	if val == "" {
-		return "0"
+		// configuration options
+		labelUpdateInterval: 1 * time.Hour,
+		nodeKeySize:         24,
 	}
-	return val
+
+	for _, opt := range opts {
+		opt(svc)
+	}
+
+	return svc, nil
 }
 
-func (svc service) AuthenticateHost(ctx context.Context, nodeKey string) (*kolide.Host, error) {
+// Datastore represents the minimum set of DB methods required by the OsqueryService.
+type Datastore interface {
+	// LabelQueriesForHost returns the label queries that should be executed
+	// for the given host. The cutoff is the minimum timestamp a query
+	// execution should have to be considered "fresh". Executions that are
+	// not fresh will be repeated. Results are returned in a map of label
+	// id -> query
+	LabelQueriesForHost(host *kolide.Host, cutoff time.Time) (map[string]string, error)
+
+	// DistributedQueriesForHost retrieves the distributed queries that the
+	// given host should run. The result map is a mapping from campaign ID
+	// to query text.
+	DistributedQueriesForHost(host *kolide.Host) (map[uint]string, error)
+
+	// DistributedQueryCampaign loads a distributed query campaign by ID
+	DistributedQueryCampaign(id uint) (*kolide.DistributedQueryCampaign, error)
+
+	// SaveDistributedQueryCampaign updates an existing distributed query
+	// campaign
+	SaveDistributedQueryCampaign(camp *kolide.DistributedQueryCampaign) error
+
+	AppConfig() (*kolide.AppConfig, error)
+
+	// RecordLabelQueryExecutions saves the results of label queries. The
+	// results map is a map of label id -> whether or not the label
+	// matches. The time parameter is the timestamp to save with the query
+	// execution.
+	RecordLabelQueryExecutions(host *kolide.Host, results map[uint]bool, t time.Time) error
+
+	// NewDistributedQueryCampaignExecution records a new execution for a
+	// distributed query campaign
+	NewDistributedQueryExecution(exec *kolide.DistributedQueryExecution) (*kolide.DistributedQueryExecution, error)
+
+	// GetOsqueryConfigOptions returns options in a format that will be the options
+	// section of osquery configuration
+	GetOsqueryConfigOptions() (map[string]interface{}, error)
+
+	// ListDecorators returns all decorator queries.
+	ListDecorators(opts ...kolide.OptionalArg) ([]*kolide.Decorator, error)
+
+	ListScheduledQueriesInPack(id uint, opts kolide.ListOptions) ([]*kolide.ScheduledQuery, error)
+
+	HostStore
+}
+
+type HostStore interface {
+	AuthenticateHost(nodeKey string) (*kolide.Host, error)
+	MarkHostSeen(host *kolide.Host, t time.Time) error
+	EnrollHost(osqueryHostId string, nodeKeySize int) (*kolide.Host, error)
+	SaveHost(host *kolide.Host) error
+}
+
+// FIMService is a dependency of the Service that returns a FIM configuration.
+type FIMService interface {
+	// GetFIM returns the FIM config
+	GetFIM(ctx context.Context) (*kolide.FIMConfig, error)
+}
+
+// PackService is a dependency of the Service which returns the packs for a given host.
+type PackService interface {
+	// ListPacksForHost lists the packs that a host should execute.
+	ListPacksForHost(ctx context.Context, hid uint) (packs []*kolide.Pack, err error)
+}
+
+func (svc *OsqueryService) AuthenticateHost(ctx context.Context, nodeKey string) (*kolide.Host, error) {
 	if nodeKey == "" {
 		return nil, osqueryError{
 			message:     "authentication error: missing node key",
@@ -71,7 +156,7 @@ func (svc service) AuthenticateHost(ctx context.Context, nodeKey string) (*kolid
 	return host, nil
 }
 
-func (svc service) EnrollAgent(ctx context.Context, enrollSecret, hostIdentifier string) (string, error) {
+func (svc *OsqueryService) EnrollAgent(ctx context.Context, enrollSecret, hostIdentifier string) (string, error) {
 	config, err := svc.ds.AppConfig()
 	if err != nil {
 		return "", osqueryError{message: "getting enroll secret: " + err.Error(), nodeInvalid: true}
@@ -81,7 +166,7 @@ func (svc service) EnrollAgent(ctx context.Context, enrollSecret, hostIdentifier
 		return "", osqueryError{message: "invalid enroll secret", nodeInvalid: true}
 	}
 
-	host, err := svc.ds.EnrollHost(hostIdentifier, svc.config.Osquery.NodeKeySize)
+	host, err := svc.ds.EnrollHost(hostIdentifier, svc.nodeKeySize)
 	if err != nil {
 		return "", osqueryError{message: "enrollment failed: " + err.Error(), nodeInvalid: true}
 	}
@@ -89,8 +174,8 @@ func (svc service) EnrollAgent(ctx context.Context, enrollSecret, hostIdentifier
 	return host.NodeKey, nil
 }
 
-func (svc service) getFIMConfig(ctx context.Context, cfg *kolide.OsqueryConfig) (*kolide.OsqueryConfig, error) {
-	fimConfig, err := svc.GetFIM(ctx)
+func (svc *OsqueryService) getFIMConfig(ctx context.Context, cfg *kolide.OsqueryConfig) (*kolide.OsqueryConfig, error) {
+	fimConfig, err := svc.fim.GetFIM(ctx)
 	if err != nil {
 		return nil, osqueryError{message: "internal error: unable to fetch FIM configuration"}
 	}
@@ -108,7 +193,7 @@ func (svc service) getFIMConfig(ctx context.Context, cfg *kolide.OsqueryConfig) 
 	return cfg, nil
 }
 
-func (svc service) GetClientConfig(ctx context.Context) (*kolide.OsqueryConfig, error) {
+func (svc *OsqueryService) GetClientConfig(ctx context.Context) (*kolide.OsqueryConfig, error) {
 	host, ok := hostctx.FromContext(ctx)
 	if !ok {
 		return nil, osqueryError{message: "internal error: missing host from request context"}
@@ -147,7 +232,7 @@ func (svc service) GetClientConfig(ctx context.Context) (*kolide.OsqueryConfig, 
 		Packs:      kolide.Packs{},
 	}
 
-	packs, err := svc.ListPacksForHost(ctx, host.ID)
+	packs, err := svc.packs.ListPacksForHost(ctx, host.ID)
 	if err != nil {
 		return nil, osqueryError{message: "database error: " + err.Error()}
 	}
@@ -220,7 +305,7 @@ type flusher interface {
 	Flush() error
 }
 
-func (svc service) SubmitStatusLogs(ctx context.Context, logs []kolide.OsqueryStatusLog) error {
+func (svc *OsqueryService) SubmitStatusLogs(ctx context.Context, logs []kolide.OsqueryStatusLog) error {
 	for _, log := range logs {
 		err := json.NewEncoder(svc.osqueryStatusLogWriter).Encode(log)
 		if err != nil {
@@ -236,7 +321,7 @@ func (svc service) SubmitStatusLogs(ctx context.Context, logs []kolide.OsquerySt
 	return nil
 }
 
-func (svc service) SubmitResultLogs(ctx context.Context, logs []json.RawMessage) error {
+func (svc *OsqueryService) SubmitResultLogs(ctx context.Context, logs []json.RawMessage) error {
 	for _, log := range logs {
 		if _, err := svc.osqueryResultLogWriter.Write(append(log, '\n')); err != nil {
 			return osqueryError{message: "error writing result log: " + err.Error()}
@@ -502,7 +587,7 @@ const detailUpdateInterval = 1 * time.Hour
 
 // hostDetailQueries returns the map of queries that should be executed by
 // osqueryd to fill in the host details
-func (svc service) hostDetailQueries(host kolide.Host) map[string]string {
+func (svc *OsqueryService) hostDetailQueries(host kolide.Host) map[string]string {
 	queries := make(map[string]string)
 	if host.DetailUpdateTime.After(svc.clock.Now().Add(-detailUpdateInterval)) {
 		// No need to update already fresh details
@@ -515,7 +600,7 @@ func (svc service) hostDetailQueries(host kolide.Host) map[string]string {
 	return queries
 }
 
-func (svc service) GetDistributedQueries(ctx context.Context) (map[string]string, uint, error) {
+func (svc *OsqueryService) GetDistributedQueries(ctx context.Context) (map[string]string, uint, error) {
 	host, ok := hostctx.FromContext(ctx)
 	if !ok {
 		return nil, 0, osqueryError{message: "internal error: missing host from request context"}
@@ -524,7 +609,7 @@ func (svc service) GetDistributedQueries(ctx context.Context) (map[string]string
 	queries := svc.hostDetailQueries(host)
 
 	// Retrieve the label queries that should be updated
-	cutoff := svc.clock.Now().Add(-svc.config.Osquery.LabelUpdateInterval)
+	cutoff := svc.clock.Now().Add(-svc.labelUpdateInterval)
 	labelQueries, err := svc.ds.LabelQueriesForHost(&host, cutoff)
 	if err != nil {
 		return nil, 0, osqueryError{message: "retrieving label queries: " + err.Error()}
@@ -556,7 +641,7 @@ func (svc service) GetDistributedQueries(ctx context.Context) (map[string]string
 
 // ingestDetailQuery takes the results of a detail query and modifies the
 // provided kolide.Host appropriately.
-func (svc service) ingestDetailQuery(host *kolide.Host, name string, rows []map[string]string) error {
+func (svc *OsqueryService) ingestDetailQuery(host *kolide.Host, name string, rows []map[string]string) error {
 	trimmedQuery := strings.TrimPrefix(name, hostDetailQueryPrefix)
 	query, ok := detailQueries[trimmedQuery]
 	if !ok {
@@ -574,7 +659,7 @@ func (svc service) ingestDetailQuery(host *kolide.Host, name string, rows []map[
 }
 
 // ingestLabelQuery records the results of label queries run by a host
-func (svc service) ingestLabelQuery(host kolide.Host, query string, rows []map[string]string, results map[uint]bool) error {
+func (svc *OsqueryService) ingestLabelQuery(host kolide.Host, query string, rows []map[string]string, results map[uint]bool) error {
 	trimmedQuery := strings.TrimPrefix(query, hostLabelQueryPrefix)
 	trimmedQueryNum, err := strconv.Atoi(emptyToZero(trimmedQuery))
 	if err != nil {
@@ -588,7 +673,7 @@ func (svc service) ingestLabelQuery(host kolide.Host, query string, rows []map[s
 
 // ingestDistributedQuery takes the results of a distributed query and modifies the
 // provided kolide.Host appropriately.
-func (svc service) ingestDistributedQuery(host kolide.Host, name string, rows []map[string]string, failed bool) error {
+func (svc *OsqueryService) ingestDistributedQuery(host kolide.Host, name string, rows []map[string]string, failed bool) error {
 	trimmedQuery := strings.TrimPrefix(name, hostDistributedQueryPrefix)
 
 	campaignID, err := strconv.Atoi(emptyToZero(trimmedQuery))
@@ -649,7 +734,7 @@ func (svc service) ingestDistributedQuery(host kolide.Host, name string, rows []
 	return nil
 }
 
-func (svc service) SubmitDistributedQueryResults(ctx context.Context, results kolide.OsqueryDistributedQueryResults, statuses map[string]string) error {
+func (svc *OsqueryService) SubmitDistributedQueryResults(ctx context.Context, results kolide.OsqueryDistributedQueryResults, statuses map[string]string) error {
 	host, ok := hostctx.FromContext(ctx)
 
 	if !ok {
@@ -701,4 +786,27 @@ func (svc service) SubmitDistributedQueryResults(ctx context.Context, results ko
 	}
 
 	return nil
+}
+
+// Sometimes osquery gives us empty string where we expect an integer.
+// We change the to "0" so it can be handled by the appropriate string to
+// integer conversion function, as these will err on ""
+func emptyToZero(val string) string {
+	if val == "" {
+		return "0"
+	}
+	return val
+}
+
+type osqueryError struct {
+	message     string
+	nodeInvalid bool
+}
+
+func (e osqueryError) Error() string {
+	return e.message
+}
+
+func (e osqueryError) NodeInvalid() bool {
+	return e.nodeInvalid
 }

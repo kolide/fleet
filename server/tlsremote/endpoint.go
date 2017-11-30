@@ -1,12 +1,80 @@
-package service
+// Package tlsremote implements the osquery TLS Remote service.
+package tlsremote
 
 import (
 	"context"
 	"encoding/json"
+	"reflect"
 
 	"github.com/go-kit/kit/endpoint"
+
+	hostctx "github.com/kolide/fleet/server/contexts/host"
 	"github.com/kolide/fleet/server/kolide"
 )
+
+// Endpoints collects all of the endpoints that compose an TLS service. It's meant to
+// be used as a helper struct, to collect all of the endpoints into a single
+// parameter.
+type Endpoints struct {
+	EnrollAgentEndpoint                   endpoint.Endpoint
+	GetClientConfigEndpoint               endpoint.Endpoint
+	GetDistributedQueriesEndpoint         endpoint.Endpoint
+	SubmitDistributedQueryResultsEndpoint endpoint.Endpoint
+	SubmitLogsEndpoint                    endpoint.Endpoint
+}
+
+func MakeServerEndpoints(svc kolide.OsqueryService) Endpoints {
+	return Endpoints{
+		EnrollAgentEndpoint:                   makeEnrollAgentEndpoint(svc),
+		GetClientConfigEndpoint:               authenticatedHost(svc, makeGetClientConfigEndpoint(svc)),
+		GetDistributedQueriesEndpoint:         authenticatedHost(svc, makeGetDistributedQueriesEndpoint(svc)),
+		SubmitDistributedQueryResultsEndpoint: authenticatedHost(svc, makeSubmitDistributedQueryResultsEndpoint(svc)),
+		SubmitLogsEndpoint:                    authenticatedHost(svc, makeSubmitLogsEndpoint(svc)),
+	}
+}
+
+// authenticatedHost wraps an endpoint, checks the validity of the node_key
+// provided in the request, and attaches the corresponding osquery host to the
+// context for the request
+func authenticatedHost(svc kolide.OsqueryService, next endpoint.Endpoint) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		nodeKey, err := getNodeKey(request)
+		if err != nil {
+			return nil, err
+		}
+
+		host, err := svc.AuthenticateHost(ctx, nodeKey)
+		if err != nil {
+			return nil, err
+		}
+
+		ctx = hostctx.NewContext(ctx, *host)
+		return next(ctx, request)
+	}
+}
+
+func getNodeKey(r interface{}) (string, error) {
+	// Retrieve node key by reflection (note that our options here
+	// are limited by the fact that request is an interface{})
+	v := reflect.ValueOf(r)
+	if v.Kind() != reflect.Struct {
+		return "", osqueryError{
+			message: "request type is not struct. This is likely a Kolide programmer error.",
+		}
+	}
+	nodeKeyField := v.FieldByName("NodeKey")
+	if !nodeKeyField.IsValid() {
+		return "", osqueryError{
+			message: "request struct missing NodeKey. This is likely a Kolide programmer error.",
+		}
+	}
+	if nodeKeyField.Kind() != reflect.String {
+		return "", osqueryError{
+			message: "NodeKey is not a string. This is likely a Kolide programmer error.",
+		}
+	}
+	return nodeKeyField.String(), nil
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Enroll Agent
@@ -24,7 +92,7 @@ type enrollAgentResponse struct {
 
 func (r enrollAgentResponse) error() error { return r.Err }
 
-func makeEnrollAgentEndpoint(svc kolide.Service) endpoint.Endpoint {
+func makeEnrollAgentEndpoint(svc kolide.OsqueryService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(enrollAgentRequest)
 		nodeKey, err := svc.EnrollAgent(ctx, req.EnrollSecret, req.HostIdentifier)
@@ -50,7 +118,7 @@ type getClientConfigResponse struct {
 
 func (r getClientConfigResponse) error() error { return r.Err }
 
-func makeGetClientConfigEndpoint(svc kolide.Service) endpoint.Endpoint {
+func makeGetClientConfigEndpoint(svc kolide.OsqueryService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		config, err := svc.GetClientConfig(ctx)
 		if err != nil {
@@ -76,7 +144,7 @@ type getDistributedQueriesResponse struct {
 
 func (r getDistributedQueriesResponse) error() error { return r.Err }
 
-func makeGetDistributedQueriesEndpoint(svc kolide.Service) endpoint.Endpoint {
+func makeGetDistributedQueriesEndpoint(svc kolide.OsqueryService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		queries, accelerate, err := svc.GetDistributedQueries(ctx)
 		if err != nil {
@@ -102,7 +170,7 @@ type submitDistributedQueryResultsResponse struct {
 
 func (r submitDistributedQueryResultsResponse) error() error { return r.Err }
 
-func makeSubmitDistributedQueryResultsEndpoint(svc kolide.Service) endpoint.Endpoint {
+func makeSubmitDistributedQueryResultsEndpoint(svc kolide.OsqueryService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(submitDistributedQueryResultsRequest)
 		err := svc.SubmitDistributedQueryResults(ctx, req.Results, req.Statuses)
@@ -129,7 +197,7 @@ type submitLogsResponse struct {
 
 func (r submitLogsResponse) error() error { return r.Err }
 
-func makeSubmitLogsEndpoint(svc kolide.Service) endpoint.Endpoint {
+func makeSubmitLogsEndpoint(svc kolide.OsqueryService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(submitLogsRequest)
 
