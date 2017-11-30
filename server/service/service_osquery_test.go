@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -21,43 +20,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
-
-func TestHostDetailQueries(t *testing.T) {
-	mockClock := clock.NewMockClock()
-	host := kolide.Host{
-		ID: 1,
-		UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
-			UpdateTimestamp: kolide.UpdateTimestamp{
-				UpdatedAt: mockClock.Now(),
-			},
-			CreateTimestamp: kolide.CreateTimestamp{
-				CreatedAt: mockClock.Now(),
-			},
-		},
-
-		DetailUpdateTime: mockClock.Now(),
-		NodeKey:          "test_key",
-		HostName:         "test_hostname",
-		UUID:             "test_uuid",
-	}
-
-	svc := service{clock: mockClock}
-
-	queries := svc.hostDetailQueries(host)
-	assert.Empty(t, queries)
-
-	// Advance the time
-	mockClock.AddTime(1*time.Hour + 1*time.Minute)
-
-	queries = svc.hostDetailQueries(host)
-	assert.Len(t, queries, len(detailQueries))
-	for name, _ := range queries {
-		assert.True(t,
-			strings.HasPrefix(name, hostDetailQueryPrefix),
-			fmt.Sprintf("%s not prefixed with %s", name, hostDetailQueryPrefix),
-		)
-	}
-}
 
 func TestLabelQueries(t *testing.T) {
 	ds, svc, mockClock := setupOsqueryTests(t)

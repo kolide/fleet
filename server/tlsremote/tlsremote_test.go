@@ -257,6 +257,43 @@ func TestGetClientConfig(t *testing.T) {
 	assert.Len(t, config.Packs["monitoring"].Queries, 1)
 }
 
+func TestHostDetailQueries(t *testing.T) {
+	mockClock := clock.NewMockClock()
+	host := kolide.Host{
+		ID: 1,
+		UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
+			UpdateTimestamp: kolide.UpdateTimestamp{
+				UpdatedAt: mockClock.Now(),
+			},
+			CreateTimestamp: kolide.CreateTimestamp{
+				CreatedAt: mockClock.Now(),
+			},
+		},
+
+		DetailUpdateTime: mockClock.Now(),
+		NodeKey:          "test_key",
+		HostName:         "test_hostname",
+		UUID:             "test_uuid",
+	}
+
+	svc := &OsqueryService{clock: mockClock}
+
+	queries := svc.hostDetailQueries(host)
+	assert.Empty(t, queries)
+
+	// Advance the time
+	mockClock.AddTime(1*time.Hour + 1*time.Minute)
+
+	queries = svc.hostDetailQueries(host)
+	assert.Len(t, queries, len(detailQueries))
+	for name, _ := range queries {
+		assert.True(t,
+			strings.HasPrefix(name, hostDetailQueryPrefix),
+			fmt.Sprintf("%s not prefixed with %s", name, hostDetailQueryPrefix),
+		)
+	}
+}
+
 func newTestService(t *testing.T, ds kolide.Datastore, rs kolide.QueryResultStore) *OsqueryService {
 	cfg := config.TestConfig()
 	svc := &OsqueryService{
