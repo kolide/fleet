@@ -173,9 +173,13 @@ func TestSubmitResultLogs(t *testing.T) {
 }
 
 type packService struct {
+	packs []*kolide.Pack
 }
 
 func (svc *packService) ListPacksForHost(ctx context.Context, hid uint) (packs []*kolide.Pack, err error) {
+	if len(svc.packs) != 0 {
+		return svc.packs, nil
+	}
 	return
 }
 
@@ -186,7 +190,7 @@ func (svc *fimService) GetFIM(ctx context.Context) (*kolide.FIMConfig, error) {
 }
 
 func TestGetClientConfig(t *testing.T) {
-	ds, svc, mockClock := setupOsqueryTests(t)
+	ds, svc, _ := setupOsqueryTests(t)
 	svc.packs = new(packService)
 	svc.fim = new(fimService)
 
@@ -211,16 +215,6 @@ func TestGetClientConfig(t *testing.T) {
 	config, err := svc.GetClientConfig(ctx)
 	require.Nil(t, err)
 	assert.NotNil(t, config)
-	val, ok := config.Options["disable_distributed"]
-	require.True(t, ok)
-	disabled, ok := val.(bool)
-	require.True(t, ok)
-	assert.False(t, disabled)
-	val, ok = config.Options["pack_delimiter"]
-	require.True(t, ok)
-	delim, ok := val.(string)
-	require.True(t, ok)
-	assert.Equal(t, "/", delim)
 
 	// this will be greater than 0 if we ever start inserting an administration
 	// pack
@@ -254,15 +248,9 @@ func TestGetClientConfig(t *testing.T) {
 	err = ds.AddLabelToPack(mysqlLabel.ID, monitoringPack.ID)
 	assert.Nil(t, err)
 
-	err = ds.RecordLabelQueryExecutions(
-		host,
-		map[uint]bool{mysqlLabel.ID: true},
-		mockClock.Now(),
-	)
-	assert.Nil(t, err)
-
 	// with a minimal setup of packs, labels, and queries, will our host get the
 	// pack
+	svc.packs = &packService{packs: []*kolide.Pack{monitoringPack}}
 	config, err = svc.GetClientConfig(ctx)
 	require.Nil(t, err)
 	assert.Len(t, config.Packs, 1)
