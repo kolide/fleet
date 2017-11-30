@@ -358,16 +358,97 @@ func TestGetClientConfig(t *testing.T) {
 		return []*kolide.Pack{}, nil
 	}
 	ds.ListLabelsForHostFunc = func(hid uint) ([]kolide.Label, error) {
-		return []kolide.Label{}, nil
+		return []kolide.Label{
+			{ID: 1, Name: "foo_label"},
+		}, nil
+	}
+	ds.ListLabelsForPackFunc = func(pid uint) ([]*kolide.Label, error) {
+		switch pid {
+		case 1, 2:
+			return []*kolide.Label{
+				{ID: 1, Name: "foo_label"},
+			}, nil
+		default:
+			return []*kolide.Label{}, nil
+		}
+	}
+	ds.ListExplicitHostsInPackFunc = func(pid uint, opt kolide.ListOptions) ([]uint, error) {
+		switch pid {
+		case 4:
+			return []uint{1}, nil
+		default:
+			return []uint{}, nil
+		}
+	}
+	ds.ListScheduledQueriesInPackFunc = func(pid uint, opt kolide.ListOptions) ([]*kolide.ScheduledQuery, error) {
+		tru := true
+		switch pid {
+		case 1:
+			return []*kolide.ScheduledQuery{
+				{Name: "time", Query: "select * from time", Interval: 30},
+			}, nil
+		case 4:
+			return []*kolide.ScheduledQuery{
+				{Name: "foobar", Query: "select 3", Interval: 20},
+				{Name: "froobing", Query: "select 'guacamole'", Interval: 60, Snapshot: &tru},
+			}, nil
+		default:
+			return []*kolide.ScheduledQuery{}, nil
+		}
 	}
 	ds.OptionsForHostFunc = func(host *kolide.Host) (json.RawMessage, error) {
-		return nil, nil
+		return json.RawMessage(`{"options":{
+				"distributed_interval": 11,
+				"logger_tls_period":    33
+			}}`), nil
+	}
+	ds.SaveHostFunc = func(host *kolide.Host) error {
+		return nil
 	}
 
 	svc, err := newTestService(ds, nil)
 	require.Nil(t, err)
-	_ = svc
 
+	ctx := hostctx.NewContext(context.Background(), kolide.Host{ID: 1})
+
+	expectedOptions := map[string]interface{}{
+		"distributed_interval": float64(11),
+		"logger_tls_period":    float64(33),
+	}
+
+	// No packs loaded yet
+	conf, err := svc.GetClientConfig(ctx)
+	require.Nil(t, err)
+	assert.Equal(t, map[string]interface{}{"options": expectedOptions}, conf)
+
+	// Now add packs
+	ds.ListPacksFunc = func(opt kolide.ListOptions) ([]*kolide.Pack, error) {
+		return []*kolide.Pack{
+			{ID: 1, Name: "pack_by_label"},
+			{ID: 2, Name: "disabled_pack", Disabled: true},
+			{ID: 3, Name: "not_matching_pack"},
+			{ID: 4, Name: "pack_by_explicit_host"},
+		}, nil
+	}
+
+	conf, err = svc.GetClientConfig(ctx)
+	require.Nil(t, err)
+	assert.Equal(t, expectedOptions, conf["options"])
+	assert.JSONEq(t, `{
+		"pack_by_explicit_host": {
+			"queries": {
+				"foobar":{"query":"select 3","interval":20},
+				"froobing":{"query":"select 'guacamole'","interval":60,"snapshot":true}
+			}
+		},
+		"pack_by_label": {
+			"queries":{
+				"time":{"query":"select * from time","interval":30}
+			}
+		}
+	}`,
+		string(conf["packs"].(json.RawMessage)),
+	)
 }
 
 func TestDetailQueriesWithEmptyStrings(t *testing.T) {

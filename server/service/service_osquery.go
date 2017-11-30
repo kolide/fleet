@@ -128,18 +128,20 @@ func (svc service) GetClientConfig(ctx context.Context) (map[string]interface{},
 		}
 	}
 
-	decJSON, err := json.Marshal(decConfig)
-	if err != nil {
-		return nil, osqueryError{message: "internal error: marshal decorator JSON: " + err.Error()}
+	if len(decConfig.Interval) > 0 || len(decConfig.Always) > 0 || len(decConfig.Load) > 0 {
+		decJSON, err := json.Marshal(decConfig)
+		if err != nil {
+			return nil, osqueryError{message: "internal error: marshal decorator JSON: " + err.Error()}
+		}
+		config["decorators"] = json.RawMessage(decJSON)
 	}
-	config["decorators"] = json.RawMessage(decJSON)
 
 	packs, err := svc.ListPacksForHost(ctx, host.ID)
 	if err != nil {
 		return nil, osqueryError{message: "database error: " + err.Error()}
 	}
 
-	var packConfig kolide.Packs
+	packConfig := kolide.Packs{}
 	for _, pack := range packs {
 		// first, we must figure out what queries are in this pack
 		queries, err := svc.ds.ListScheduledQueriesInPack(pack.ID, kolide.ListOptions{})
@@ -166,18 +168,20 @@ func (svc service) GetClientConfig(ctx context.Context) (map[string]interface{},
 		}
 
 		// finally, we add the pack to the client config struct with all of
-		// the packs queries
+		// the pack's queries
 		packConfig[pack.Name] = kolide.PackContent{
 			Platform: pack.Platform,
 			Queries:  configQueries,
 		}
 	}
 
-	packJSON, err := json.Marshal(packConfig)
-	if err != nil {
-		return nil, osqueryError{message: "internal error: marshal pack JSON: " + err.Error()}
+	if len(packConfig) > 0 {
+		packJSON, err := json.Marshal(packConfig)
+		if err != nil {
+			return nil, osqueryError{message: "internal error: marshal pack JSON: " + err.Error()}
+		}
+		config["packs"] = json.RawMessage(packJSON)
 	}
-	config["packs"] = json.RawMessage(packJSON)
 
 	// Save interval values if they have been updated. Note
 	// config_tls_refresh can only be set in the osquery flags so is
