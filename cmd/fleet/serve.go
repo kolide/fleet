@@ -16,6 +16,7 @@ import (
 	"github.com/e-dard/netbug"
 	kitlog "github.com/go-kit/kit/log"
 	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
+	"github.com/kolide/fleet/server/api"
 	"github.com/kolide/fleet/server/config"
 	"github.com/kolide/fleet/server/datastore/mysql"
 	"github.com/kolide/fleet/server/health"
@@ -135,6 +136,11 @@ the way that the Fleet server works.
 			if err != nil {
 				initFatal(err, "initializing service")
 			}
+			apiLogger := kitlog.With(logger, "component", "api")
+			apiSvc, err := api.NewService(ds, apiLogger, config.Auth.JwtKey, clock.C)
+			if err != nil {
+				initFatal(err, "initializing api")
+			}
 
 			go func() {
 				ticker := time.NewTicker(1 * time.Hour)
@@ -164,10 +170,11 @@ the way that the Fleet server works.
 
 			httpLogger := kitlog.With(logger, "component", "http")
 
-			var apiHandler, frontendHandler http.Handler
+			var apiV1Handler, apiV2Handler, frontendHandler http.Handler
 			{
 				frontendHandler = prometheus.InstrumentHandler("get_frontend", service.ServeFrontend(httpLogger))
-				apiHandler = service.MakeHandler(svc, config.Auth.JwtKey, httpLogger)
+				apiV1Handler = service.MakeHandler(svc, config.Auth.JwtKey, httpLogger)
+				apiV2Handler = api.MakeHandler(apiSvc)
 
 				setupRequired, err := service.RequireSetup(svc)
 				if err != nil {
@@ -177,7 +184,7 @@ the way that the Fleet server works.
 				// By performing the same check inside main, we can make server startups
 				// more efficient after the first startup.
 				if setupRequired {
-					apiHandler = service.WithSetup(svc, logger, apiHandler)
+					apiV1Handler = service.WithSetup(svc, logger, apiV1Handler)
 					frontendHandler = service.RedirectLoginToSetup(svc, logger, frontendHandler)
 				} else {
 					frontendHandler = service.RedirectSetupToLogin(svc, logger, frontendHandler)
@@ -211,7 +218,8 @@ the way that the Fleet server works.
 			r.Handle("/version", prometheus.InstrumentHandler("version", version.Handler()))
 			r.Handle("/assets/", prometheus.InstrumentHandler("static_assets", service.ServeStaticAssets("/assets/")))
 			r.Handle("/metrics", prometheus.InstrumentHandler("metrics", promhttp.Handler()))
-			r.Handle("/api/", apiHandler)
+			r.Handle("/api/v1/", apiV1Handler)
+			r.Handle("/api/v2/", apiV2Handler)
 			r.Handle("/", frontendHandler)
 
 			if path, ok := os.LookupEnv("KOLIDE_TEST_PAGE_PATH"); ok {
