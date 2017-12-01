@@ -57,6 +57,8 @@ func (svc *launcherWrapper) RequestConfig(ctx context.Context, nodeKey string) (
 		return "", false, errors.Wrap(err, "encoding config for launcher")
 	}
 
+	return "{}", false, nil
+
 	return string(configJSON), false, nil
 }
 
@@ -75,6 +77,13 @@ func (svc *launcherWrapper) RequestQueries(ctx context.Context, nodeKey string) 
 		Queries:           queryMap,
 		AccelerateSeconds: int(accelerate),
 	}
+
+	// return &distributed.GetQueriesResult{
+	// 	Queries: map[string]string{
+	// 		"kolide_detail_query_os_version": "select * from os_version limit 1",
+	// 	},
+	// 	AccelerateSeconds: int(accelerate),
+	// }, false, nil
 
 	return result, false, nil
 }
