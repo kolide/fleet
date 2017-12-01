@@ -16,7 +16,8 @@ import (
 // Handler extends the grpc.Server, providing Handler that allows us to serve
 // both gRPC and http traffic.
 type Handler struct {
-	*grpc.Server
+	grpc *grpc.Server
+	http http.Handler
 }
 
 // New creates a gRPC server to handle remote requests from launcher.
@@ -37,8 +38,9 @@ func New(
 	}
 	endpoints := launcher.MakeServerEndpoints(svc)
 	server := launcher.NewGRPCServer(endpoints, logger)
+	httpServer := launcher.NewHTTPHandler(endpoints, logger)
 	launcher.RegisterGRPCServer(grpcServer, server)
-	return &Handler{grpcServer}
+	return &Handler{grpc: grpcServer, http: httpServer}
 }
 
 // Handler will route gRPC traffic to the gRPC server, other http traffic
@@ -46,9 +48,18 @@ func New(
 func (hgprc *Handler) Handler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.ProtoMajor == 2 && strings.Contains(r.Header.Get("Content-Type"), "application/grpc") {
-			hgprc.ServeHTTP(w, r)
+			hgprc.grpc.ServeHTTP(w, r)
+		} else if strings.Contains(r.URL.Path, "/api/v1/launcher") {
+			// use the HTTP implementation of the launcher server.
+			hgprc.http.ServeHTTP(w, r)
 		} else {
+			// use the next handler.
 			next.ServeHTTP(w, r)
 		}
 	})
+}
+
+func (hgrpc *Handler) GracefulStop() {
+	hgrpc.grpc.GracefulStop()
+	return
 }

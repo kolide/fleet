@@ -97,4 +97,5 @@
 
 [[constraint]]
   name = "github.com/kolide/launcher"
-  branch = "master"
+  source = "github.com/groob/launcher"
+  branch = "transport_http"
