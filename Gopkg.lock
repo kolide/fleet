@@ -163,10 +163,11 @@
   revision = "566c8f56a6ff7daba204818fbab0f2cb854b3310"
 
 [[projects]]
-  branch = "master"
+  branch = "transport_http"
   name = "github.com/kolide/launcher"
   packages = ["service","service/internal/launcherproto","service/uuid"]
-  revision = "e883d8ec777ddc1f85b535e5a2c97841253f4bd1"
+  revision = "31b84a8d3ada66331b7d70b98ce3f6d32d472bad"
+  source = "github.com/groob/launcher"
 
 [[projects]]
   branch = "master"
@@ -351,6 +352,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "a5afa2e01ce23562070c247d37726984a051bf4f3ebc6337a5409c66b4d8da98"
+  inputs-digest = "bbcd439c3f18e4ec27164b5582ad975936baac0e86e7cbf99f2206b1f6ed1965"
   solver-name = "gps-cdcl"
   solver-version = 1
