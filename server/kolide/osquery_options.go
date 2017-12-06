@@ -5,7 +5,7 @@ import "encoding/json"
 type OsqueryOptionsStore interface {
 	ApplyOptions(options *OptionsSpec) error
 	GetOptions() (*OptionsSpec, error)
-	OptionsForHost(host *Host) (json.RawMessage, error)
+	OptionsForPlatform(platform string) (json.RawMessage, error)
 }
 
 type OsqueryOptionsService interface{}

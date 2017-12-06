@@ -87,7 +87,7 @@ func testOsqueryOptionsForHost(t *testing.T, ds kolide.Datastore) {
 
 	for _, tt := range testCases {
 		t.Run("", func(t *testing.T) {
-			opts, err := ds.OptionsForHost(&tt.host)
+			opts, err := ds.OptionsForPlatform(tt.host.Platform)
 			require.Nil(t, err)
 			assert.Equal(t, tt.expectedOpts, opts)
 		})

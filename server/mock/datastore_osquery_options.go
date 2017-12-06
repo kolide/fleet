@@ -14,7 +14,7 @@ type ApplyOptionsFunc func(options *kolide.OptionsSpec) error
 
 type GetOptionsFunc func() (*kolide.OptionsSpec, error)
 
-type OptionsForHostFunc func(host *kolide.Host) (json.RawMessage, error)
+type OptionsForPlatformFunc func(platform string) (json.RawMessage, error)
 
 type OsqueryOptionsStore struct {
 	ApplyOptionsFunc        ApplyOptionsFunc
@@ -23,8 +23,8 @@ type OsqueryOptionsStore struct {
 	GetOptionsFunc        GetOptionsFunc
 	GetOptionsFuncInvoked bool
 
-	OptionsForHostFunc        OptionsForHostFunc
-	OptionsForHostFuncInvoked bool
+	OptionsForPlatformFunc        OptionsForPlatformFunc
+	OptionsForPlatformFuncInvoked bool
 }
 
 func (s *OsqueryOptionsStore) ApplyOptions(options *kolide.OptionsSpec) error {
@@ -37,7 +37,7 @@ func (s *OsqueryOptionsStore) GetOptions() (*kolide.OptionsSpec, error) {
 	return s.GetOptionsFunc()
 }
 
-func (s *OsqueryOptionsStore) OptionsForHost(host *kolide.Host) (json.RawMessage, error) {
-	s.OptionsForHostFuncInvoked = true
-	return s.OptionsForHostFunc(host)
+func (s *OsqueryOptionsStore) OptionsForPlatform(platform string) (json.RawMessage, error) {
+	s.OptionsForPlatformFuncInvoked = true
+	return s.OptionsForPlatformFunc(platform)
 }

@@ -103,7 +103,7 @@ func (d *Datastore) GetOptions() (*kolide.OptionsSpec, error) {
 	return spec, nil
 }
 
-func (d *Datastore) OptionsForHost(host *kolide.Host) (json.RawMessage, error) {
+func (d *Datastore) OptionsForPlatform(platform string) (json.RawMessage, error) {
 	// SQL uses a custom ordering function to return the single correct
 	// config with the highest precedence override (the FIELD function
 	// defines this ordering). If there is no override, it returns the
@@ -119,13 +119,13 @@ func (d *Datastore) OptionsForHost(host *kolide.Host) (json.RawMessage, error) {
 	err := d.db.Get(
 		&row, sql,
 		kolide.OptionOverrideTypeDefault,
-		kolide.OptionOverrideTypePlatform, host.Platform,
+		kolide.OptionOverrideTypePlatform, platform,
 		// Order of the following arguments defines precedence of
 		// overrides.
 		kolide.OptionOverrideTypePlatform, kolide.OptionOverrideTypeDefault,
 	)
 	if err != nil {
-		return nil, errors.Wrapf(err, "retrieving osquery options for host %#v", host)
+		return nil, errors.Wrapf(err, "retrieving osquery options for platform '%s'", platform)
 	}
 
 	return json.RawMessage(row.Options), nil

@@ -396,7 +396,7 @@ func TestGetClientConfig(t *testing.T) {
 			return []*kolide.ScheduledQuery{}, nil
 		}
 	}
-	ds.OptionsForHostFunc = func(host *kolide.Host) (json.RawMessage, error) {
+	ds.OptionsForPlatformFunc = func(platform string) (json.RawMessage, error) {
 		return json.RawMessage(`{"options":{
 				"distributed_interval": 11,
 				"logger_tls_period":    33
@@ -1085,7 +1085,7 @@ func TestUpdateHostIntervals(t *testing.T) {
 		t.Run("", func(t *testing.T) {
 			ctx := hostctx.NewContext(context.Background(), tt.initHost)
 
-			ds.OptionsForHostFunc = func(*kolide.Host) (json.RawMessage, error) {
+			ds.OptionsForPlatformFunc = func(platform string) (json.RawMessage, error) {
 				return tt.configOptions, nil
 			}
 
