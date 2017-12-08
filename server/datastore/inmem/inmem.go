@@ -39,8 +39,12 @@ type Datastore struct {
 	yaraSignatureGroups             map[uint]*kolide.YARASignatureGroup
 	appConfig                       *kolide.AppConfig
 	config                          *config.KolideConfig
+
+	// Embedded interfaces to avoid implementing new methods for (now
+	// deprecated) inmem.
 	kolide.TargetStore
 	kolide.OsqueryOptionsStore
+	kolide.QueryStore
 }
 
 func New(config config.KolideConfig) (*Datastore, error) {

@@ -5,7 +5,37 @@ import (
 
 	"github.com/kolide/fleet/server/contexts/viewer"
 	"github.com/kolide/fleet/server/kolide"
+	"github.com/pkg/errors"
 )
+
+func (svc service) ApplyQueryYaml(ctx context.Context, yml string) error {
+	vc, ok := viewer.FromContext(ctx)
+	if !ok {
+		return errors.New("user must be authenticated to apply queries")
+	}
+
+	queries, err := kolide.LoadQueriesFromYaml(yml)
+	if err != nil {
+		return errors.Wrap(err, "loading query yaml")
+	}
+
+	err = svc.ds.ApplyQueries(vc.UserID(), queries)
+	return errors.Wrap(err, "applying queries")
+}
+
+func (svc service) GetQueryYaml(ctx context.Context) (string, error) {
+	queries, err := svc.ds.ListQueries(kolide.ListOptions{})
+	if err != nil {
+		return "", errors.Wrap(err, "getting queries")
+	}
+
+	yml, err := kolide.WriteQueriesToYaml(queries)
+	if err != nil {
+		return "", errors.Wrap(err, "writing query yaml")
+	}
+
+	return yml, nil
+}
 
 func (svc service) ListQueries(ctx context.Context, opt kolide.ListOptions) ([]*kolide.Query, error) {
 	return svc.ds.ListQueries(opt)

@@ -2,11 +2,64 @@ package mysql
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/kolide/fleet/server/kolide"
 	"github.com/pkg/errors"
 )
+
+func (d *Datastore) ApplyQueries(authorID uint, queries []*kolide.Query) error {
+	tx, err := d.db.Begin()
+	if err != nil {
+		return errors.Wrap(err, "begin ApplyQueries transaction")
+	}
+
+	defer func() {
+		if err != nil {
+			rbErr := tx.Rollback()
+			// It seems possible that there might be a case in
+			// which the error we are dealing with here was thrown
+			// by the call to tx.Commit(), and the docs suggest
+			// this call would then result in sql.ErrTxDone.
+			if rbErr != nil && rbErr != sql.ErrTxDone {
+				panic(fmt.Sprintf("got err '%s' rolling back after err '%s'", rbErr, err))
+			}
+		}
+	}()
+
+	sql := `
+		INSERT INTO queries (
+			name,
+			description,
+			query,
+			author_id,
+			saved,
+			deleted
+		) VALUES ( ?, ?, ?, ?, true, false )
+		ON DUPLICATE KEY UPDATE
+			name = VALUES(name),
+			description = VALUES(description),
+			query = VALUES(query),
+			author_id = VALUES(author_id),
+			saved = VALUES(saved),
+			deleted = VALUES(deleted)
+	`
+	stmt, err := tx.Prepare(sql)
+	if err != nil {
+		return errors.Wrap(err, "prepare ApplyQueries insert")
+	}
+
+	for _, q := range queries {
+		_, err := stmt.Exec(q.Name, q.Description, q.Query, authorID)
+		if err != nil {
+			return errors.Wrap(err, "exec ApplyQueries insert")
+		}
+	}
+
+	err = tx.Commit()
+	return errors.Wrap(err, "commit ApplyQueries transaction")
+}
 
 func (d *Datastore) QueryByName(name string, opts ...kolide.OptionalArg) (*kolide.Query, bool, error) {
 	db := d.getTransaction(opts)
@@ -175,7 +228,6 @@ func (d *Datastore) ListQueries(opt kolide.ListOptions) ([]*kolide.Query, error)
 	}
 
 	return results, nil
-
 }
 
 // loadPacksForQueries loads the packs associated with the provided queries

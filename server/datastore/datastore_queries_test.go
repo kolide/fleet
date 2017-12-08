@@ -11,6 +11,67 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func testApplyQueries(t *testing.T, ds kolide.Datastore) {
+	zwass := test.NewUser(t, ds, "Zach", "zwass", "zwass@kolide.co", true)
+	groob := test.NewUser(t, ds, "Victor", "groob", "victor@kolide.co", true)
+	expectedQueries := []kolide.Query{
+		{Name: "foo", Description: "get the foos", Query: "select * from foo"},
+		{Name: "bar", Description: "do some bars", Query: "select baz from bar"},
+	}
+
+	// Zach creates some queries
+	err := ds.ApplyQueries(zwass.ID, expectedQueries)
+	require.Nil(t, err)
+
+	queries, err := ds.ListQueries(kolide.ListOptions{})
+	require.Nil(t, err)
+	require.Len(t, queries, len(expectedQueries))
+	for i, q := range queries {
+		comp := expectedQueries[i]
+		assert.Equal(t, comp.Name, q.Name)
+		assert.Equal(t, comp.Description, q.Description)
+		assert.Equal(t, comp.Query, q.Query)
+		assert.Equal(t, zwass.ID, q.AuthorID)
+	}
+
+	// Victor modifies a query (but also pushes the same version of the
+	// first query)
+	expectedQueries[1].Query = "not really a valid query ;)"
+	err = ds.ApplyQueries(groob.ID, expectedQueries)
+	require.Nil(t, err)
+
+	queries, err = ds.ListQueries(kolide.ListOptions{})
+	require.Nil(t, err)
+	require.Len(t, queries, len(expectedQueries))
+	for i, q := range queries {
+		comp := expectedQueries[i]
+		assert.Equal(t, comp.Name, q.Name)
+		assert.Equal(t, comp.Description, q.Description)
+		assert.Equal(t, comp.Query, q.Query)
+		assert.Equal(t, groob.ID, q.AuthorID)
+	}
+
+	// Zach adds a third query (but does not re-apply the others)
+	expectedQueries = append(expectedQueries,
+		kolide.Query{Name: "trouble", Description: "Look out!", Query: "select * from time"},
+	)
+	err = ds.ApplyQueries(zwass.ID, []kolide.Query{expectedQueries[2]})
+	require.Nil(t, err)
+
+	queries, err = ds.ListQueries(kolide.ListOptions{})
+	require.Nil(t, err)
+	require.Len(t, queries, len(expectedQueries))
+	for i, q := range queries {
+		comp := expectedQueries[i]
+		assert.Equal(t, comp.Name, q.Name)
+		assert.Equal(t, comp.Description, q.Description)
+		assert.Equal(t, comp.Query, q.Query)
+	}
+	assert.Equal(t, groob.ID, queries[0].AuthorID)
+	assert.Equal(t, groob.ID, queries[1].AuthorID)
+	assert.Equal(t, zwass.ID, queries[2].AuthorID)
+}
+
 func testDeleteQuery(t *testing.T, ds kolide.Datastore) {
 	user := test.NewUser(t, ds, "Zach", "zwass", "zwass@kolide.co", true)
 
