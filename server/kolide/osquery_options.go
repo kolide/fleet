@@ -8,7 +8,10 @@ type OsqueryOptionsStore interface {
 	OptionsForPlatform(platform string) (json.RawMessage, error)
 }
 
-type OsqueryOptionsService interface{}
+type OsqueryOptionsService interface {
+	ApplyOptionsYaml(yml string) error
+	GetOptionsYaml() (string, error)
+}
 
 type OptionsYaml struct {
 	ApiVersion string      `json:"apiVersion"`
@@ -24,6 +27,10 @@ type OptionsSpec struct {
 type OptionsOverrides struct {
 	Platforms map[string]json.RawMessage `json:"platforms,omitempty"`
 }
+
+const (
+	OptionsSpecKind = "OsqueryOptions"
+)
 
 // OptionOverrideType is used to designate which override type a given set of
 // options is used for. Currently the only supported override type is by
