@@ -1,17 +1,25 @@
 package service
 
 import (
+	"bytes"
 	"context"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
 	"github.com/WatchBeam/clock"
+	"github.com/gorilla/mux"
 	"github.com/kolide/fleet/server/config"
 	"github.com/kolide/fleet/server/kolide"
 	"github.com/kolide/fleet/server/mock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+////////////////////////////////////////////////////////////////////////////////
+// Service
+////////////////////////////////////////////////////////////////////////////////
 
 func TestInviteNewUserMock(t *testing.T) {
 	svc, mockStore, mailer := setupInviteTest(t)
@@ -124,4 +132,66 @@ var expiredInvite = &kolide.Invite{
 			CreatedAt: time.Now().AddDate(-1, 0, 0),
 		},
 	},
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Transport
+////////////////////////////////////////////////////////////////////////////////
+
+func TestDecodeCreateInviteRequest(t *testing.T) {
+	router := mux.NewRouter()
+	router.HandleFunc("/api/v1/kolide/invites", func(writer http.ResponseWriter, request *http.Request) {
+		r, err := decodeCreateInviteRequest(context.Background(), request)
+		assert.Nil(t, err)
+
+		params := r.(createInviteRequest)
+		assert.Equal(t, uint(1), *params.payload.InvitedBy)
+	}).Methods("POST")
+
+	t.Run("lowercase email", func(t *testing.T) {
+		var body bytes.Buffer
+		body.Write([]byte(`{
+        "name": "foo",
+        "email": "foo@kolide.co",
+        "invited_by": 1
+    }`))
+
+		router.ServeHTTP(
+			httptest.NewRecorder(),
+			httptest.NewRequest("POST", "/api/v1/kolide/invites", &body),
+		)
+	})
+
+	t.Run("uppercase email", func(t *testing.T) {
+		// email string should be lowerased after decode.
+		var body bytes.Buffer
+		body.Write([]byte(`{
+        "name": "foo",
+        "email": "Foo@Kolide.co",
+        "invited_by": 1
+    }`))
+
+		router.ServeHTTP(
+			httptest.NewRecorder(),
+			httptest.NewRequest("POST", "/api/v1/kolide/invites", &body),
+		)
+	})
+
+}
+
+func TestDecodeVerifyInviteRequest(t *testing.T) {
+	router := mux.NewRouter()
+	router.HandleFunc("/api/v1/kolide/invites/{token}", func(writer http.ResponseWriter, request *http.Request) {
+		r, err := decodeCreateInviteRequest(context.Background(), request)
+		assert.Nil(t, err)
+
+		params := r.(verifyInviteRequest)
+		assert.Equal(t, "test_token", params.Token)
+	}).Methods("GET")
+
+	router.ServeHTTP(
+		httptest.NewRecorder(),
+		httptest.NewRequest("GET", "/api/v1/kolide/tokens/test_token", nil),
+	)
+
 }

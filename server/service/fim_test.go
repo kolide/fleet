@@ -10,6 +10,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+////////////////////////////////////////////////////////////////////////////////
+// Service
+////////////////////////////////////////////////////////////////////////////////
+
 func TestGetFIMService(t *testing.T) {
 	ds := &mock.Store{
 		AppConfigStore: mock.AppConfigStore{
@@ -85,5 +89,4 @@ func TestUpdateFIM(t *testing.T) {
 	assert.True(t, ds.ClearFIMSectionsFuncInvoked)
 	assert.True(t, ds.AppConfigFuncInvoked)
 	assert.True(t, ds.SaveAppConfigFuncInvoked)
-
 }
