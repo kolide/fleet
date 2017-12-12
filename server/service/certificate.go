@@ -10,8 +10,14 @@ import (
 	"net"
 	"net/url"
 
+	"github.com/go-kit/kit/endpoint"
+	"github.com/kolide/fleet/server/kolide"
 	"github.com/pkg/errors"
 )
+
+////////////////////////////////////////////////////////////////////////////////
+// Service
+////////////////////////////////////////////////////////////////////////////////
 
 // Certificate returns the PEM encoded certificate chain for osqueryd TLS termination.
 func (svc service) CertificateChain(ctx context.Context) ([]byte, error) {
@@ -111,4 +117,25 @@ func encodePEMCertificate(buf io.Writer, cert *x509.Certificate) error {
 		Bytes: cert.Raw,
 	}
 	return pem.Encode(buf, block)
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Endpoints
+////////////////////////////////////////////////////////////////////////////////
+
+type certificateResponse struct {
+	CertificateChain []byte `json:"certificate_chain"`
+	Err              error  `json:"error,omitempty"`
+}
+
+func (r certificateResponse) error() error { return r.Err }
+
+func makeCertificateEndpoint(svc kolide.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		chain, err := svc.CertificateChain(ctx)
+		if err != nil {
+			return certificateResponse{Err: err}, nil
+		}
+		return certificateResponse{CertificateChain: chain}, nil
+	}
 }
