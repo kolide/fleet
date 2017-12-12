@@ -1,20 +1,28 @@
 package service
 
 import (
+	"compress/gzip"
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/go-kit/kit/endpoint"
 	"github.com/go-kit/kit/log"
+	kithttp "github.com/go-kit/kit/transport/http"
 	hostctx "github.com/kolide/fleet/server/contexts/host"
 	"github.com/kolide/fleet/server/kolide"
 	"github.com/kolide/fleet/server/pubsub"
 	"github.com/pkg/errors"
 	"github.com/spf13/cast"
 )
+
+////////////////////////////////////////////////////////////////////////////////
+// Service
+////////////////////////////////////////////////////////////////////////////////
 
 type osqueryError struct {
 	message     string
@@ -701,4 +709,377 @@ func (svc service) SubmitDistributedQueryResults(ctx context.Context, results ko
 	}
 
 	return nil
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Transport
+////////////////////////////////////////////////////////////////////////////////
+
+func decodeEnrollAgentRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	var req enrollAgentRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+	defer r.Body.Close()
+
+	return req, nil
+}
+
+func decodeGetClientConfigRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	var req getClientConfigRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+	defer r.Body.Close()
+
+	return req, nil
+}
+
+func decodeGetDistributedQueriesRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	var req getDistributedQueriesRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+	defer r.Body.Close()
+
+	return req, nil
+}
+
+func decodeSubmitDistributedQueryResultsRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	// When a distributed query has no results, the JSON schema is
+	// inconsistent, so we use this shim and massage into a consistent
+	// schema. For example (simplified from actual osqueryd 1.8.2 output):
+	// {
+	// "queries": {
+	//   "query_with_no_results": "", // <- Note string instead of array
+	//   "query_with_results": [{"foo":"bar","baz":"bang"}]
+	//  },
+	// "node_key":"IGXCXknWQ1baTa8TZ6rF3kAPZ4\/aTsui"
+	// }
+	type distributedQueryResultsShim struct {
+		NodeKey  string                     `json:"node_key"`
+		Results  map[string]json.RawMessage `json:"queries"`
+		Statuses map[string]string          `json:"statuses"`
+	}
+
+	var shim distributedQueryResultsShim
+	if err := json.NewDecoder(r.Body).Decode(&shim); err != nil {
+		return nil, err
+	}
+	defer r.Body.Close()
+
+	results := kolide.OsqueryDistributedQueryResults{}
+	for query, raw := range shim.Results {
+		queryResults := []map[string]string{}
+		// No need to handle error because the empty array is what we
+		// want if there was an error parsing the JSON (the error
+		// indicates that osquery sent us incosistently schemaed JSON)
+		_ = json.Unmarshal(raw, &queryResults)
+		results[query] = queryResults
+	}
+
+	req := submitDistributedQueryResultsRequest{
+		NodeKey:  shim.NodeKey,
+		Results:  results,
+		Statuses: shim.Statuses,
+	}
+
+	return req, nil
+}
+
+func decodeSubmitLogsRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	var err error
+	body := r.Body
+	if r.Header.Get("content-encoding") == "gzip" {
+		body, err = gzip.NewReader(body)
+		if err != nil {
+			return nil, errors.Wrap(err, "decoding gzip")
+		}
+		defer body.Close()
+	}
+
+	var req submitLogsRequest
+	if err = json.NewDecoder(body).Decode(&req); err != nil {
+		return nil, errors.Wrap(err, "decoding JSON")
+	}
+	defer r.Body.Close()
+
+	return req, nil
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Endpoints
+////////////////////////////////////////////////////////////////////////////////
+
+type enrollAgentRequest struct {
+	EnrollSecret   string `json:"enroll_secret"`
+	HostIdentifier string `json:"host_identifier"`
+}
+
+type enrollAgentResponse struct {
+	NodeKey string `json:"node_key,omitempty"`
+	Err     error  `json:"error,omitempty"`
+}
+
+func (r enrollAgentResponse) error() error { return r.Err }
+
+func makeEnrollAgentEndpoint(svc kolide.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(enrollAgentRequest)
+		nodeKey, err := svc.EnrollAgent(ctx, req.EnrollSecret, req.HostIdentifier)
+		if err != nil {
+			return enrollAgentResponse{Err: err}, nil
+		}
+		return enrollAgentResponse{NodeKey: nodeKey}, nil
+	}
+}
+
+type getClientConfigRequest struct {
+	NodeKey string `json:"node_key"`
+}
+
+type getClientConfigResponse struct {
+	kolide.OsqueryConfig
+	Err error `json:"error,omitempty"`
+}
+
+func (r getClientConfigResponse) error() error { return r.Err }
+
+func makeGetClientConfigEndpoint(svc kolide.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		config, err := svc.GetClientConfig(ctx)
+		if err != nil {
+			return getClientConfigResponse{Err: err}, nil
+		}
+		return getClientConfigResponse{OsqueryConfig: *config}, nil
+	}
+}
+
+type getDistributedQueriesRequest struct {
+	NodeKey string `json:"node_key"`
+}
+
+type getDistributedQueriesResponse struct {
+	Queries    map[string]string `json:"queries"`
+	Accelerate uint              `json:"accelerate,omitempty"`
+	Err        error             `json:"error,omitempty"`
+}
+
+func (r getDistributedQueriesResponse) error() error { return r.Err }
+
+func makeGetDistributedQueriesEndpoint(svc kolide.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		queries, accelerate, err := svc.GetDistributedQueries(ctx)
+		if err != nil {
+			return getDistributedQueriesResponse{Err: err}, nil
+		}
+		return getDistributedQueriesResponse{Queries: queries, Accelerate: accelerate}, nil
+	}
+}
+
+type submitDistributedQueryResultsRequest struct {
+	NodeKey  string                                `json:"node_key"`
+	Results  kolide.OsqueryDistributedQueryResults `json:"queries"`
+	Statuses map[string]string                     `json:"statuses"`
+}
+
+type submitDistributedQueryResultsResponse struct {
+	Err error `json:"error,omitempty"`
+}
+
+func (r submitDistributedQueryResultsResponse) error() error { return r.Err }
+
+func makeSubmitDistributedQueryResultsEndpoint(svc kolide.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(submitDistributedQueryResultsRequest)
+		err := svc.SubmitDistributedQueryResults(ctx, req.Results, req.Statuses)
+		if err != nil {
+			return submitDistributedQueryResultsResponse{Err: err}, nil
+		}
+		return submitDistributedQueryResultsResponse{}, nil
+	}
+}
+
+type submitLogsRequest struct {
+	NodeKey string          `json:"node_key"`
+	LogType string          `json:"log_type"`
+	Data    json.RawMessage `json:"data"`
+}
+
+type submitLogsResponse struct {
+	Err error `json:"error,omitempty"`
+}
+
+func (r submitLogsResponse) error() error { return r.Err }
+
+func makeSubmitLogsEndpoint(svc kolide.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(submitLogsRequest)
+
+		var err error
+		switch req.LogType {
+		case "status":
+			var statuses []kolide.OsqueryStatusLog
+			if err := json.Unmarshal(req.Data, &statuses); err != nil {
+				err = osqueryError{message: "unmarshalling status logs: " + err.Error()}
+				break
+			}
+
+			err = svc.SubmitStatusLogs(ctx, statuses)
+			if err != nil {
+				break
+			}
+
+		case "result":
+			var results []json.RawMessage
+			if err := json.Unmarshal(req.Data, &results); err != nil {
+				err = osqueryError{message: "unmarshalling result logs: " + err.Error()}
+				break
+			}
+			err = svc.SubmitResultLogs(ctx, results)
+			if err != nil {
+				break
+			}
+
+		default:
+			err = osqueryError{message: "unknown log type: " + req.LogType}
+		}
+
+		return submitLogsResponse{Err: err}, nil
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Logging
+////////////////////////////////////////////////////////////////////////////////
+
+func (mw loggingMiddleware) EnrollAgent(ctx context.Context, enrollSecret string, hostIdentifier string) (string, error) {
+	var (
+		nodeKey string
+		err     error
+	)
+
+	defer func(begin time.Time) {
+		_ = mw.logger.Log(
+			"method", "EnrollAgent",
+			"ip_addr", ctx.Value(kithttp.ContextKeyRequestRemoteAddr).(string),
+			"err", err,
+			"took", time.Since(begin),
+		)
+	}(time.Now())
+
+	nodeKey, err = mw.Service.EnrollAgent(ctx, enrollSecret, hostIdentifier)
+	return nodeKey, err
+}
+
+func (mw loggingMiddleware) AuthenticateHost(ctx context.Context, nodeKey string) (*kolide.Host, error) {
+	var (
+		host *kolide.Host
+		err  error
+	)
+
+	defer func(begin time.Time) {
+		_ = mw.logger.Log(
+			"method", "AuthenticateHost",
+			"ip_addr", ctx.Value(kithttp.ContextKeyRequestRemoteAddr).(string),
+			"err", err,
+			"took", time.Since(begin),
+		)
+	}(time.Now())
+
+	host, err = mw.Service.AuthenticateHost(ctx, nodeKey)
+	return host, err
+}
+
+func (mw loggingMiddleware) GetClientConfig(ctx context.Context) (*kolide.OsqueryConfig, error) {
+	var (
+		config *kolide.OsqueryConfig
+		err    error
+	)
+
+	defer func(begin time.Time) {
+		_ = mw.logger.Log(
+			"method", "GetClientConfig",
+			"ip_addr", ctx.Value(kithttp.ContextKeyRequestRemoteAddr).(string),
+			"err", err,
+			"took", time.Since(begin),
+		)
+	}(time.Now())
+
+	config, err = mw.Service.GetClientConfig(ctx)
+	return config, err
+}
+
+func (mw loggingMiddleware) GetDistributedQueries(ctx context.Context) (map[string]string, uint, error) {
+	var (
+		queries    map[string]string
+		err        error
+		accelerate uint
+	)
+
+	defer func(begin time.Time) {
+		_ = mw.logger.Log(
+			"method", "GetDistributedQueries",
+			"ip_addr", ctx.Value(kithttp.ContextKeyRequestRemoteAddr).(string),
+			"err", err,
+			"took", time.Since(begin),
+		)
+	}(time.Now())
+
+	queries, accelerate, err = mw.Service.GetDistributedQueries(ctx)
+	return queries, accelerate, err
+}
+
+func (mw loggingMiddleware) SubmitDistributedQueryResults(ctx context.Context, results kolide.OsqueryDistributedQueryResults, statuses map[string]string) error {
+	var (
+		err error
+	)
+
+	defer func(begin time.Time) {
+		_ = mw.logger.Log(
+			"method", "SubmitDistributedQueryResults",
+			"ip_addr", ctx.Value(kithttp.ContextKeyRequestRemoteAddr).(string),
+			"err", err,
+			"took", time.Since(begin),
+		)
+	}(time.Now())
+
+	err = mw.Service.SubmitDistributedQueryResults(ctx, results, statuses)
+	return err
+}
+
+func (mw loggingMiddleware) SubmitStatusLogs(ctx context.Context, logs []kolide.OsqueryStatusLog) error {
+	var (
+		err error
+	)
+
+	defer func(begin time.Time) {
+		_ = mw.logger.Log(
+			"method", "SubmitStatusLogs",
+			"ip_addr", ctx.Value(kithttp.ContextKeyRequestRemoteAddr).(string),
+			"err", err,
+			"took", time.Since(begin),
+		)
+	}(time.Now())
+
+	err = mw.Service.SubmitStatusLogs(ctx, logs)
+	return err
+}
+
+func (mw loggingMiddleware) SubmitResultLogs(ctx context.Context, logs []json.RawMessage) error {
+	var (
+		err error
+	)
+
+	defer func(begin time.Time) {
+		_ = mw.logger.Log(
+			"method", "SubmitResultLogs",
+			"ip_addr", ctx.Value(kithttp.ContextKeyRequestRemoteAddr).(string),
+			"err", err,
+			"took", time.Since(begin),
+		)
+	}(time.Now())
+
+	err = mw.Service.SubmitResultLogs(ctx, logs)
+	return err
 }
