@@ -2,15 +2,81 @@ package service
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"testing"
 
+	"github.com/kolide/fleet/server/config"
+	"github.com/kolide/fleet/server/datastore/inmem"
 	"github.com/kolide/fleet/server/kolide"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+////////////////////////////////////////////////////////////////////////////////
+// Service
+////////////////////////////////////////////////////////////////////////////////
+
+func TestCleanupURL(t *testing.T) {
+	tests := []struct {
+		in       string
+		expected string
+		name     string
+	}{
+		{"  http://foo.bar.com  ", "http://foo.bar.com", "leading and trailing whitespace"},
+		{"\n http://foo.com \t", "http://foo.com", "whitespace"},
+		{"http://foo.com", "http://foo.com", "noop"},
+		{"http://foo.com/", "http://foo.com", "trailing slash"},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(tt *testing.T) {
+			actual := cleanupURL(test.in)
+			assert.Equal(tt, test.expected, actual)
+		})
+	}
+
+}
+
+func TestCreateAppConfig(t *testing.T) {
+	ds, err := inmem.New(config.TestConfig())
+	require.Nil(t, err)
+	require.Nil(t, ds.MigrateData())
+
+	svc, err := newTestService(ds, nil)
+	require.Nil(t, err)
+	var appConfigTests = []struct {
+		configPayload kolide.AppConfigPayload
+	}{
+		{
+			configPayload: kolide.AppConfigPayload{
+				OrgInfo: &kolide.OrgInfo{
+					OrgLogoURL: stringPtr("acme.co/images/logo.png"),
+					OrgName:    stringPtr("Acme"),
+				},
+				ServerSettings: &kolide.ServerSettings{
+					KolideServerURL: stringPtr("https://acme.co:8080/"),
+				},
+			},
+		},
+	}
+
+	for _, tt := range appConfigTests {
+		result, err := svc.NewAppConfig(context.Background(), tt.configPayload)
+		require.Nil(t, err)
+
+		payload := tt.configPayload
+		assert.NotEmpty(t, result.ID)
+		assert.Equal(t, *payload.OrgInfo.OrgLogoURL, result.OrgLogoURL)
+		assert.Equal(t, *payload.OrgInfo.OrgName, result.OrgName)
+		assert.Equal(t, "https://acme.co:8080", result.KolideServerURL)
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Endpoints
+////////////////////////////////////////////////////////////////////////////////
 
 type mockValidationItem struct {
 	Name   string `json:"name"`
@@ -135,4 +201,46 @@ func appConfigPayloadFromAppConfig(config *kolide.AppConfig) *kolide.AppConfigPa
 			EntityID:    &config.EntityID,
 		},
 	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Validation
+////////////////////////////////////////////////////////////////////////////////
+
+func TestSSONotPresent(t *testing.T) {
+	invalid := &invalidArgumentError{}
+	var p kolide.AppConfigPayload
+	validateSSOSettings(p, &kolide.AppConfig{}, invalid)
+	assert.False(t, invalid.HasErrors())
+
+}
+
+func TestNeedFieldsPresent(t *testing.T) {
+	invalid := &invalidArgumentError{}
+	config := kolide.AppConfig{
+		EnableSSO:   true,
+		EntityID:    "kolide",
+		IssuerURI:   "http://issuer.idp.com",
+		MetadataURL: "http://isser.metadata.com",
+		IDPName:     "onelogin",
+	}
+	p := appConfigPayloadFromAppConfig(&config)
+	validateSSOSettings(*p, &kolide.AppConfig{}, invalid)
+	assert.False(t, invalid.HasErrors())
+}
+
+func TestMissingMetadata(t *testing.T) {
+	invalid := invalidArgumentError{}
+	config := kolide.AppConfig{
+		EnableSSO: true,
+		EntityID:  "kolide",
+		IssuerURI: "http://issuer.idp.com",
+		IDPName:   "onelogin",
+	}
+	p := appConfigPayloadFromAppConfig(&config)
+	validateSSOSettings(*p, &kolide.AppConfig{}, &invalid)
+	require.True(t, invalid.HasErrors())
+	require.Len(t, invalid, 1)
+	assert.Equal(t, "metadata", invalid[0].name)
+	assert.Equal(t, "either metadata or metadata_url must be defined", invalid[0].reason)
 }
