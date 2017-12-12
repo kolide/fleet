@@ -3,14 +3,22 @@ package service
 import (
 	"context"
 	"crypto/md5"
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
+	"github.com/go-kit/kit/endpoint"
 	"github.com/kolide/fleet/server/contexts/viewer"
 	"github.com/kolide/fleet/server/kolide"
 	"github.com/pkg/errors"
 )
+
+////////////////////////////////////////////////////////////////////////////////
+// Service
+////////////////////////////////////////////////////////////////////////////////
 
 func (svc service) ImportConfig(ctx context.Context, cfg *kolide.ImportConfig) (*kolide.ImportConfigResponse, error) {
 	resp := &kolide.ImportConfigResponse{
@@ -530,4 +538,237 @@ func configInt2Ptr(ci *kolide.OsQueryConfigInt) *uint {
 	}
 	ui := uint(*ci)
 	return &ui
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Transport
+////////////////////////////////////////////////////////////////////////////////
+
+func decodeImportConfigRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	var req importRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+	// Unmarshal main config
+	conf := kolide.ImportConfig{
+		DryRun:        req.DryRun,
+		Packs:         make(kolide.PackNameMap),
+		ExternalPacks: make(kolide.PackNameToPackDetails),
+	}
+	if err := json.Unmarshal([]byte(req.Config), &conf); err != nil {
+		return nil, err
+	}
+	// Unmarshal external packs
+	for packName, packConfig := range req.ExternalPackConfigs {
+		var pack kolide.PackDetails
+		if err := json.Unmarshal([]byte(packConfig), &pack); err != nil {
+			return nil, err
+		}
+		conf.ExternalPacks[packName] = pack
+	}
+	conf.GlobPackNames = req.GlobPackNames
+	return conf, nil
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Endpoints
+////////////////////////////////////////////////////////////////////////////////
+
+type importRequest struct {
+	DryRun bool `json:"dry_run"`
+	// Config contains a JSON osquery config supplied by the end user
+	Config string `json:"config"`
+	// ExternalPackConfigs contains a map of external Pack configs keyed by
+	// Pack name, this includes external packs referenced by the globbing
+	// feature.  Not in the case of globbed packs, we expect the user to
+	// generate unique pack names since we don't know what they are, these
+	// names must be included in the GlobPackNames field so that we can
+	// validate that they've been accounted for.
+	ExternalPackConfigs map[string]string `json:"external_pack_configs"`
+	// GlobPackNames list of user generated names for external packs
+	// referenced by the glob feature, the JSON for the globbed packs
+	// is stored in ExternalPackConfigs keyed by the GlobPackName
+	GlobPackNames []string `json:"glob_pack_names"`
+}
+
+type importResponse struct {
+	Response *kolide.ImportConfigResponse `json:"response,omitempty"`
+	Err      error                        `json:"error,omitempty"`
+}
+
+func (ir importResponse) error() error { return ir.Err }
+
+func makeImportConfigEndpoint(svc kolide.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		config := request.(kolide.ImportConfig)
+		resp, err := svc.ImportConfig(ctx, &config)
+		if err != nil {
+			return importResponse{Err: err}, nil
+		}
+		return importResponse{Response: resp}, nil
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Metrics
+////////////////////////////////////////////////////////////////////////////////
+
+func (mw metricsMiddleware) ImportConfig(ctx context.Context, cfg *kolide.ImportConfig) (*kolide.ImportConfigResponse, error) {
+	var (
+		resp *kolide.ImportConfigResponse
+		err  error
+	)
+	defer func(begin time.Time) {
+		lvs := []string{"method", "ImportConfig", "error", fmt.Sprint(err != nil)}
+		mw.requestCount.With(lvs...).Add(1)
+		mw.requestLatency.With(lvs...).Observe(time.Since(begin).Seconds())
+	}(time.Now())
+	resp, err = mw.Service.ImportConfig(ctx, cfg)
+	return resp, err
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Logging
+////////////////////////////////////////////////////////////////////////////////
+
+func (mw loggingMiddleware) ImportConfig(ctx context.Context, cfg *kolide.ImportConfig) (*kolide.ImportConfigResponse, error) {
+	var (
+		resp *kolide.ImportConfigResponse
+		err  error
+	)
+
+	defer func(begin time.Time) {
+		_ = mw.logger.Log(
+			"method", "ImportConfig",
+			"err", err,
+			"took", time.Since(begin),
+		)
+	}(time.Now())
+
+	resp, err = mw.Service.ImportConfig(ctx, cfg)
+	return resp, err
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Validation
+////////////////////////////////////////////////////////////////////////////////
+
+func (vm validationMiddleware) ImportConfig(ctx context.Context, cfg *kolide.ImportConfig) (*kolide.ImportConfigResponse, error) {
+	var invalid invalidArgumentError
+	vm.validateConfigOptions(cfg, &invalid)
+	vm.validatePacks(cfg, &invalid)
+	vm.validateDecorator(cfg, &invalid)
+	vm.validateYARA(cfg, &invalid)
+	if invalid.HasErrors() {
+		return nil, invalid
+	}
+	return vm.Service.ImportConfig(ctx, cfg)
+}
+
+func (vm validationMiddleware) validateYARA(cfg *kolide.ImportConfig, argErrs *invalidArgumentError) {
+	if cfg.YARA != nil {
+		if cfg.YARA.FilePaths == nil {
+			argErrs.Append("yara", "missing file_paths")
+			return
+		}
+		if cfg.YARA.Signatures == nil {
+			argErrs.Append("yara", "missing signatures")
+		}
+		for fileSection, sigs := range cfg.YARA.FilePaths {
+			if cfg.FileIntegrityMonitoring == nil {
+				argErrs.Append("yara", "missing file paths section")
+				return
+			}
+			if _, ok := cfg.FileIntegrityMonitoring[fileSection]; !ok {
+				argErrs.Appendf("yara", "missing referenced file_paths section '%s'", fileSection)
+			}
+			for _, sig := range sigs {
+				if _, ok := cfg.YARA.Signatures[sig]; !ok {
+					argErrs.Appendf(
+						"yara",
+						"missing signature '%s' referenced in '%s'",
+						sig,
+						fileSection,
+					)
+				}
+			}
+		}
+	}
+}
+
+func (vm validationMiddleware) validateDecorator(cfg *kolide.ImportConfig, argErrs *invalidArgumentError) {
+	if cfg.Decorators != nil {
+		for str := range cfg.Decorators.Interval {
+			val, err := strconv.ParseInt(str, 10, 32)
+			if err != nil {
+				argErrs.Appendf("decorators", "interval '%s' must be an integer", str)
+				continue
+			}
+			if val%60 != 0 {
+
+				argErrs.Appendf("decorators", "interval '%d' must be divisible by 60", val)
+			}
+		}
+	}
+}
+
+func (vm validationMiddleware) validateConfigOptions(cfg *kolide.ImportConfig, argErrs *invalidArgumentError) {
+	if cfg.Options != nil {
+		for optName, optValue := range cfg.Options {
+			opt, err := vm.ds.OptionByName(string(optName))
+			if err != nil {
+				// skip validation for an option we don't know about, this will generate
+				// a warning in the service layer
+				continue
+			}
+			if !opt.SameType(optValue) {
+				argErrs.Appendf("options", "invalid type for '%s'", optName)
+			}
+		}
+	}
+}
+
+func (vm validationMiddleware) validatePacks(cfg *kolide.ImportConfig, argErrs *invalidArgumentError) {
+	if cfg.Packs != nil {
+		for packName, pack := range cfg.Packs {
+			// if glob packs is defined we expect at least one external pack
+			if packName == kolide.GlobPacks {
+				if len(cfg.GlobPackNames) == 0 {
+					argErrs.Append("external_packs", "missing glob packs")
+					continue
+				}
+				// make sure that each glob pack has JSON content
+				for _, p := range cfg.GlobPackNames {
+					if pd, ok := cfg.ExternalPacks[p]; !ok {
+						argErrs.Appendf("external_packs", "missing content for '%s'", p)
+					} else {
+						vm.validatePackContents(p, pd, argErrs)
+					}
+				}
+				continue
+			}
+			// if value is a string we expect a file path, in this case, the user has to supply the
+			// contents of said file which we store in ExternalPacks, if it's not there we need to
+			// raise an error
+			switch val := pack.(type) {
+			case string:
+				if pd, ok := cfg.ExternalPacks[packName]; !ok {
+					argErrs.Appendf("external_packs", "missing content for '%s'", packName)
+				} else {
+					vm.validatePackContents(packName, pd, argErrs)
+				}
+			case kolide.PackDetails:
+				vm.validatePackContents(packName, val, argErrs)
+			}
+		}
+	}
+}
+
+func (vm validationMiddleware) validatePackContents(packName string, pack kolide.PackDetails, argErrs *invalidArgumentError) {
+	switch pack.Platform {
+	case "", "darwin", "freebsd", "windows", "linux", "any", "all":
+	default:
+		argErrs.Appendf("pack", "'%s' is not a valid platform", pack.Platform)
+	}
 }
