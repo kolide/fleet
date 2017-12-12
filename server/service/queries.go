@@ -2,13 +2,152 @@ package service
 
 import (
 	"context"
+	"encoding/json"
+	"net/http"
 
 	"github.com/go-kit/kit/endpoint"
+	"github.com/kolide/fleet/server/contexts/viewer"
 	"github.com/kolide/fleet/server/kolide"
 )
 
 ////////////////////////////////////////////////////////////////////////////////
-// Get Query
+// Service
+////////////////////////////////////////////////////////////////////////////////
+
+func (svc service) ListQueries(ctx context.Context, opt kolide.ListOptions) ([]*kolide.Query, error) {
+	return svc.ds.ListQueries(opt)
+}
+
+func (svc service) GetQuery(ctx context.Context, id uint) (*kolide.Query, error) {
+	return svc.ds.Query(id)
+}
+
+func (svc service) NewQuery(ctx context.Context, p kolide.QueryPayload) (*kolide.Query, error) {
+	query := &kolide.Query{Saved: true}
+
+	if p.Name != nil {
+		query.Name = *p.Name
+	}
+
+	if p.Description != nil {
+		query.Description = *p.Description
+	}
+
+	if p.Query != nil {
+		query.Query = *p.Query
+	}
+
+	vc, ok := viewer.FromContext(ctx)
+	if ok {
+		query.AuthorID = vc.UserID()
+		query.AuthorName = vc.FullName()
+	}
+
+	query, err := svc.ds.NewQuery(query)
+	if err != nil {
+		return nil, err
+	}
+
+	return query, nil
+}
+
+func (svc service) ModifyQuery(ctx context.Context, id uint, p kolide.QueryPayload) (*kolide.Query, error) {
+	query, err := svc.ds.Query(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if p.Name != nil {
+		query.Name = *p.Name
+	}
+
+	if p.Description != nil {
+		query.Description = *p.Description
+	}
+
+	if p.Query != nil {
+		query.Query = *p.Query
+	}
+
+	err = svc.ds.SaveQuery(query)
+	if err != nil {
+		return nil, err
+	}
+
+	return query, nil
+}
+
+func (svc service) DeleteQuery(ctx context.Context, id uint) error {
+	return svc.ds.DeleteQuery(id)
+}
+
+func (svc service) DeleteQueries(ctx context.Context, ids []uint) (uint, error) {
+	return svc.ds.DeleteQueries(ids)
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Transport
+////////////////////////////////////////////////////////////////////////////////
+
+func decodeCreateQueryRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	var req createQueryRequest
+	if err := json.NewDecoder(r.Body).Decode(&req.payload); err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
+func decodeModifyQueryRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	id, err := idFromRequest(r, "id")
+	if err != nil {
+		return nil, err
+	}
+	var req modifyQueryRequest
+	if err := json.NewDecoder(r.Body).Decode(&req.payload); err != nil {
+		return nil, err
+	}
+	req.ID = id
+	return req, nil
+}
+
+func decodeDeleteQueryRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	id, err := idFromRequest(r, "id")
+	if err != nil {
+		return nil, err
+	}
+	var req deleteQueryRequest
+	req.ID = id
+	return req, nil
+}
+
+func decodeDeleteQueriesRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	var req deleteQueriesRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
+func decodeGetQueryRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	id, err := idFromRequest(r, "id")
+	if err != nil {
+		return nil, err
+	}
+	var req getQueryRequest
+	req.ID = id
+	return req, nil
+}
+
+func decodeListQueriesRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	opt, err := listOptionsFromRequest(r)
+	if err != nil {
+		return nil, err
+	}
+	return listQueriesRequest{ListOptions: opt}, nil
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Endpoints
 ////////////////////////////////////////////////////////////////////////////////
 
 type getQueryRequest struct {
@@ -33,9 +172,6 @@ func makeGetQueryEndpoint(svc kolide.Service) endpoint.Endpoint {
 	}
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// List Queries
-////////////////////////////////////////////////////////////////////////////////
 type listQueriesRequest struct {
 	ListOptions kolide.ListOptions
 }
@@ -63,10 +199,6 @@ func makeListQueriesEndpoint(svc kolide.Service) endpoint.Endpoint {
 	}
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Create Query
-////////////////////////////////////////////////////////////////////////////////
-
 type createQueryRequest struct {
 	payload kolide.QueryPayload
 }
@@ -88,10 +220,6 @@ func makeCreateQueryEndpoint(svc kolide.Service) endpoint.Endpoint {
 		return createQueryResponse{query, nil}, nil
 	}
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// Modify Query
-////////////////////////////////////////////////////////////////////////////////
 
 type modifyQueryRequest struct {
 	ID      uint
@@ -116,10 +244,6 @@ func makeModifyQueryEndpoint(svc kolide.Service) endpoint.Endpoint {
 	}
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Delete Query
-////////////////////////////////////////////////////////////////////////////////
-
 type deleteQueryRequest struct {
 	ID uint
 }
@@ -140,10 +264,6 @@ func makeDeleteQueryEndpoint(svc kolide.Service) endpoint.Endpoint {
 		return deleteQueryResponse{}, nil
 	}
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// Delete Queries
-////////////////////////////////////////////////////////////////////////////////
 
 type deleteQueriesRequest struct {
 	IDs []uint `json:"ids"`
