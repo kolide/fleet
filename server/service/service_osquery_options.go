@@ -14,7 +14,7 @@ func (svc service) ApplyOptionsYaml(yml string) error {
 	}
 
 	if conf.Kind != kolide.OptionsSpecKind {
-		return errors.Errorf("expected kind '%', got '%s'", kolide.OptionsSpecKind, conf.Kind)
+		return errors.Errorf("expected kind '%s', got '%s'", kolide.OptionsSpecKind, conf.Kind)
 	}
 
 	err = svc.ds.ApplyOptions(&conf.Spec)
