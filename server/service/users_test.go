@@ -1,11 +1,17 @@
 package service
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
+	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
+	"github.com/gorilla/mux"
 	"github.com/kolide/fleet/server/config"
 	"github.com/kolide/fleet/server/contexts/viewer"
 	"github.com/kolide/fleet/server/datastore/inmem"
@@ -17,6 +23,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+////////////////////////////////////////////////////////////////////////////////
+// Service
+////////////////////////////////////////////////////////////////////////////////
 
 func TestAuthenticatedUser(t *testing.T) {
 	ds, err := inmem.New(config.TestConfig())
@@ -703,4 +713,215 @@ func TestUserPasswordRequirements(t *testing.T) {
 			}
 		})
 	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Transport
+////////////////////////////////////////////////////////////////////////////////
+
+func TestDecodeCreateUserRequest(t *testing.T) {
+	router := mux.NewRouter()
+	router.HandleFunc("/api/v1/kolide/users", func(writer http.ResponseWriter, request *http.Request) {
+		r, err := decodeCreateUserRequest(context.Background(), request)
+		assert.Nil(t, err)
+
+		params := r.(createUserRequest)
+		assert.Equal(t, "foo", *params.payload.Name)
+		assert.Equal(t, "foo@kolide.co", *params.payload.Email)
+	}).Methods("POST")
+
+	var body bytes.Buffer
+	body.Write([]byte(`{
+        "name": "foo",
+        "email": "foo@kolide.co"
+    }`))
+
+	router.ServeHTTP(
+		httptest.NewRecorder(),
+		httptest.NewRequest("POST", "/api/v1/kolide/users", &body),
+	)
+}
+
+func TestDecodeGetUserRequest(t *testing.T) {
+	router := mux.NewRouter()
+	router.HandleFunc("/api/v1/kolide/users/{id}", func(writer http.ResponseWriter, request *http.Request) {
+		r, err := decodeGetUserRequest(context.Background(), request)
+		assert.Nil(t, err)
+
+		params := r.(getUserRequest)
+		assert.Equal(t, uint(1), params.ID)
+	}).Methods("GET")
+
+	router.ServeHTTP(
+		httptest.NewRecorder(),
+		httptest.NewRequest("GET", "/api/v1/kolide/users/1", nil),
+	)
+}
+
+func TestDecodeChangePasswordRequest(t *testing.T) {
+	router := mux.NewRouter()
+	router.HandleFunc("/api/v1/kolide/change_password", func(writer http.ResponseWriter, request *http.Request) {
+		r, err := decodeChangePasswordRequest(context.Background(), request)
+		assert.Nil(t, err)
+
+		params := r.(changePasswordRequest)
+		assert.Equal(t, "foo", params.OldPassword)
+		assert.Equal(t, "bar", params.NewPassword)
+	}).Methods("POST")
+
+	var body bytes.Buffer
+	body.Write([]byte(`{
+        "old_password": "foo",
+        "new_password": "bar"
+    }`))
+
+	router.ServeHTTP(
+		httptest.NewRecorder(),
+		httptest.NewRequest("POST", "/api/v1/kolide/change_password", &body),
+	)
+}
+
+func TestDecodeResetPasswordRequest(t *testing.T) {
+	router := mux.NewRouter()
+	router.HandleFunc("/api/v1/kolide/users/{id}/password", func(writer http.ResponseWriter, request *http.Request) {
+		r, err := decodeResetPasswordRequest(context.Background(), request)
+		assert.Nil(t, err)
+
+		params := r.(resetPasswordRequest)
+		assert.Equal(t, "bar", params.NewPassword)
+		assert.Equal(t, "baz", params.PasswordResetToken)
+	}).Methods("POST")
+
+	var body bytes.Buffer
+	body.Write([]byte(`{
+        "new_password": "bar",
+        "password_reset_token": "baz"
+    }`))
+
+	router.ServeHTTP(
+		httptest.NewRecorder(),
+		httptest.NewRequest("POST", "/api/v1/kolide/users/1/password", &body),
+	)
+}
+
+func TestDecodeModifyUserRequest(t *testing.T) {
+	router := mux.NewRouter()
+	router.HandleFunc("/api/v1/kolide/users/{id}", func(writer http.ResponseWriter, request *http.Request) {
+		r, err := decodeModifyUserRequest(context.Background(), request)
+		assert.Nil(t, err)
+
+		params := r.(modifyUserRequest)
+		assert.Equal(t, "foo", *params.payload.Name)
+		assert.Equal(t, "foo@kolide.co", *params.payload.Email)
+		assert.Equal(t, uint(1), params.ID)
+	}).Methods("PATCH")
+
+	var body bytes.Buffer
+	body.Write([]byte(`{
+        "name": "foo",
+        "email": "foo@kolide.co"
+    }`))
+
+	request := httptest.NewRequest("PATCH", "/api/v1/kolide/users/1", &body)
+	router.ServeHTTP(
+		httptest.NewRecorder(),
+		request,
+	)
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Endpoints
+////////////////////////////////////////////////////////////////////////////////
+
+func testAdminUserSetAdmin(t *testing.T, r *testResource) {
+	user, err := r.ds.User("user1")
+	require.Nil(t, err)
+	assert.False(t, user.Admin)
+	inJson := `{"admin":true}`
+	buff := bytes.NewBufferString(inJson)
+	path := fmt.Sprintf("/api/v1/kolide/users/%d/admin", user.ID)
+	req, err := http.NewRequest("POST", r.server.URL+path, buff)
+	require.Nil(t, err)
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", r.adminToken))
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	require.Nil(t, err)
+	var actual adminUserResponse
+	err = json.NewDecoder(resp.Body).Decode(&actual)
+	require.Nil(t, err)
+	assert.Nil(t, actual.Err)
+	require.NotNil(t, actual.User)
+	assert.True(t, actual.User.Admin)
+	user, err = r.ds.User("user1")
+	require.Nil(t, err)
+	assert.True(t, user.Admin)
+}
+
+func testNonAdminUserSetAdmin(t *testing.T, r *testResource) {
+	user, err := r.ds.User("user1")
+	require.Nil(t, err)
+	assert.False(t, user.Admin)
+
+	inJson := `{"admin":true}`
+	buff := bytes.NewBufferString(inJson)
+	path := fmt.Sprintf("/api/v1/kolide/users/%d/admin", user.ID)
+	req, err := http.NewRequest("POST", r.server.URL+path, buff)
+	require.Nil(t, err)
+	// user NOT admin
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", r.userToken))
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	require.Nil(t, err)
+	assert.Equal(t, http.StatusForbidden, resp.StatusCode)
+
+	user, err = r.ds.User("user1")
+	require.Nil(t, err)
+	assert.False(t, user.Admin)
+}
+
+func testAdminUserSetEnabled(t *testing.T, r *testResource) {
+	user, err := r.ds.User("user1")
+	require.Nil(t, err)
+	assert.True(t, user.Enabled)
+	inJson := `{"enabled":false}`
+	buff := bytes.NewBufferString(inJson)
+	path := fmt.Sprintf("/api/v1/kolide/users/%d/enable", user.ID)
+	req, err := http.NewRequest("POST", r.server.URL+path, buff)
+	require.Nil(t, err)
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", r.adminToken))
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	require.Nil(t, err)
+	var actual adminUserResponse
+	err = json.NewDecoder(resp.Body).Decode(&actual)
+	require.Nil(t, err)
+	assert.Nil(t, actual.Err)
+	require.NotNil(t, actual.User)
+	assert.False(t, actual.User.Enabled)
+	user, err = r.ds.User("user1")
+	require.Nil(t, err)
+	assert.False(t, user.Enabled)
+}
+
+func testNonAdminUserSetEnabled(t *testing.T, r *testResource) {
+	user, err := r.ds.User("user1")
+	require.Nil(t, err)
+	assert.True(t, user.Enabled)
+
+	inJson := `{"enabled":false}`
+	buff := bytes.NewBufferString(inJson)
+	path := fmt.Sprintf("/api/v1/kolide/users/%d/enable", user.ID)
+	req, err := http.NewRequest("POST", r.server.URL+path, buff)
+	require.Nil(t, err)
+	// user NOT admin
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", r.userToken))
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	require.Nil(t, err)
+	assert.Equal(t, http.StatusForbidden, resp.StatusCode)
+
+	user, err = r.ds.User("user1")
+	require.Nil(t, err)
+	// shouldn't change
+	assert.True(t, user.Enabled)
 }

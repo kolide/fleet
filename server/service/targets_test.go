@@ -1,17 +1,25 @@
 package service
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
+	"github.com/gorilla/mux"
 	"github.com/kolide/fleet/server/config"
 	"github.com/kolide/fleet/server/datastore/inmem"
 	"github.com/kolide/fleet/server/kolide"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+////////////////////////////////////////////////////////////////////////////////
+// Service
+////////////////////////////////////////////////////////////////////////////////
 
 func TestSearchTargets(t *testing.T) {
 	ds, err := inmem.New(config.TestConfig())
@@ -162,4 +170,42 @@ func TestSearchResultsLimit(t *testing.T) {
 	targets, err := svc.SearchTargets(ctx, "foo", nil, nil)
 	require.Nil(t, err)
 	assert.Len(t, targets.Hosts, 10)
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Transport
+////////////////////////////////////////////////////////////////////////////////
+
+func TestDecodeSearchTargetsRequest(t *testing.T) {
+	router := mux.NewRouter()
+	router.HandleFunc("/api/v1/kolide/targets", func(writer http.ResponseWriter, request *http.Request) {
+		r, err := decodeSearchTargetsRequest(context.Background(), request)
+		assert.Nil(t, err)
+
+		params := r.(searchTargetsRequest)
+		assert.Equal(t, "bar", params.Query)
+		assert.Len(t, params.Selected.Hosts, 3)
+		assert.Len(t, params.Selected.Labels, 2)
+	}).Methods("POST")
+	var body bytes.Buffer
+
+	body.Write([]byte(`{
+        "query": "bar",
+		"selected": {
+			"hosts": [
+				1,
+				2,
+				3
+			],
+			"labels": [
+				1,
+				2
+			]
+		}
+    }`))
+
+	router.ServeHTTP(
+		httptest.NewRecorder(),
+		httptest.NewRequest("POST", "/api/v1/kolide/targets", &body),
+	)
 }

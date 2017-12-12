@@ -1,9 +1,13 @@
 package service
 
 import (
+	"bytes"
 	"context"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
+	"github.com/gorilla/mux"
 	"github.com/kolide/fleet/server/config"
 	"github.com/kolide/fleet/server/contexts/viewer"
 	"github.com/kolide/fleet/server/datastore/inmem"
@@ -11,6 +15,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+////////////////////////////////////////////////////////////////////////////////
+// Service
+////////////////////////////////////////////////////////////////////////////////
 
 func TestListQueries(t *testing.T) {
 	ds, err := inmem.New(config.TestConfig())
@@ -141,4 +149,85 @@ func TestDeleteQuery(t *testing.T) {
 	queries, err := ds.ListQueries(kolide.ListOptions{})
 	assert.Nil(t, err)
 	assert.Len(t, queries, 0)
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Transport
+////////////////////////////////////////////////////////////////////////////////
+
+func TestDecodeCreateQueryRequest(t *testing.T) {
+	router := mux.NewRouter()
+	router.HandleFunc("/api/v1/kolide/queries", func(writer http.ResponseWriter, request *http.Request) {
+		r, err := decodeCreateQueryRequest(context.Background(), request)
+		assert.Nil(t, err)
+
+		params := r.(createQueryRequest)
+		assert.Equal(t, "foo", *params.payload.Name)
+		assert.Equal(t, "select * from time;", *params.payload.Query)
+	}).Methods("POST")
+
+	var body bytes.Buffer
+	body.Write([]byte(`{
+        "name": "foo",
+        "query": "select * from time;"
+    }`))
+
+	router.ServeHTTP(
+		httptest.NewRecorder(),
+		httptest.NewRequest("POST", "/api/v1/kolide/queries", &body),
+	)
+}
+
+func TestDecodeModifyQueryRequest(t *testing.T) {
+	router := mux.NewRouter()
+	router.HandleFunc("/api/v1/kolide/queries/{id}", func(writer http.ResponseWriter, request *http.Request) {
+		r, err := decodeModifyQueryRequest(context.Background(), request)
+		assert.Nil(t, err)
+
+		params := r.(modifyQueryRequest)
+		assert.Equal(t, "foo", *params.payload.Name)
+		assert.Equal(t, uint(1), params.ID)
+	}).Methods("PATCH")
+
+	var body bytes.Buffer
+	body.Write([]byte(`{
+        "name": "foo"
+    }`))
+
+	router.ServeHTTP(
+		httptest.NewRecorder(),
+		httptest.NewRequest("PATCH", "/api/v1/kolide/queries/1", &body),
+	)
+}
+
+func TestDecodeDeleteQueryRequest(t *testing.T) {
+	router := mux.NewRouter()
+	router.HandleFunc("/api/v1/kolide/queries/{id}", func(writer http.ResponseWriter, request *http.Request) {
+		r, err := decodeDeleteQueryRequest(context.Background(), request)
+		assert.Nil(t, err)
+
+		params := r.(deleteQueryRequest)
+		assert.Equal(t, uint(1), params.ID)
+	}).Methods("DELETE")
+
+	router.ServeHTTP(
+		httptest.NewRecorder(),
+		httptest.NewRequest("DELETE", "/api/v1/kolide/queries/1", nil),
+	)
+}
+
+func TestDecodeGetQueryRequest(t *testing.T) {
+	router := mux.NewRouter()
+	router.HandleFunc("/api/v1/kolide/queries/{id}", func(writer http.ResponseWriter, request *http.Request) {
+		r, err := decodeGetQueryRequest(context.Background(), request)
+		assert.Nil(t, err)
+
+		params := r.(getQueryRequest)
+		assert.Equal(t, uint(1), params.ID)
+	}).Methods("GET")
+
+	router.ServeHTTP(
+		httptest.NewRecorder(),
+		httptest.NewRequest("GET", "/api/v1/kolide/queries/1", nil),
+	)
 }
