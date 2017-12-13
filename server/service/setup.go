@@ -2,10 +2,30 @@ package service
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"net/url"
 
 	"github.com/go-kit/kit/endpoint"
 	"github.com/kolide/fleet/server/kolide"
 )
+
+////////////////////////////////////////////////////////////////////////////////
+// Transport
+////////////////////////////////////////////////////////////////////////////////
+
+func decodeSetupRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	var req setupRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Endpoints
+////////////////////////////////////////////////////////////////////////////////
 
 type setupRequest struct {
 	Admin           *kolide.UserPayload `json:"admin"`
@@ -76,4 +96,36 @@ func makeSetupEndpoint(svc kolide.Service) endpoint.Endpoint {
 			Token:           token,
 		}, nil
 	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Validation
+////////////////////////////////////////////////////////////////////////////////
+
+func (mw validationMiddleware) NewAppConfig(ctx context.Context, payload kolide.AppConfigPayload) (*kolide.AppConfig, error) {
+	invalid := &invalidArgumentError{}
+	var serverURLString string
+	if payload.ServerSettings == nil {
+		invalid.Append("kolide_server_url", "missing required argument")
+	} else {
+		serverURLString = cleanupURL(*payload.ServerSettings.KolideServerURL)
+	}
+	if err := validateKolideServerURL(serverURLString); err != nil {
+		invalid.Append("kolide_server_url", err.Error())
+	}
+	if invalid.HasErrors() {
+		return nil, invalid
+	}
+	return mw.Service.NewAppConfig(ctx, payload)
+}
+
+func validateKolideServerURL(urlString string) error {
+	serverURL, err := url.Parse(urlString)
+	if err != nil {
+		return err
+	}
+	if serverURL.Scheme != "https" {
+		return fmt.Errorf("url scheme must be https")
+	}
+	return nil
 }
