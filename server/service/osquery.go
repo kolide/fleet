@@ -918,7 +918,7 @@ func makeSubmitLogsEndpoint(svc kolide.Service) endpoint.Endpoint {
 		var err error
 		switch req.LogType {
 		case "status":
-			var statuses []kolide.OsqueryStatusLog
+			var statuses []json.RawMessage
 			if err := json.Unmarshal(req.Data, &statuses); err != nil {
 				err = osqueryError{message: "unmarshalling status logs: " + err.Error()}
 				break
@@ -1047,7 +1047,7 @@ func (mw loggingMiddleware) SubmitDistributedQueryResults(ctx context.Context, r
 	return err
 }
 
-func (mw loggingMiddleware) SubmitStatusLogs(ctx context.Context, logs []kolide.OsqueryStatusLog) error {
+func (mw loggingMiddleware) SubmitStatusLogs(ctx context.Context, logs []json.RawMessage) error {
 	var (
 		err error
 	)
