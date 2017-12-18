@@ -25,6 +25,8 @@ type MysqlConfig struct {
 	TLSCA         string `yaml:"tls_ca"`
 	TLSServerName string `yaml:"tls_server_name"`
 	TLSConfig     string `yaml:"tls_config"` //tls=customValue in DSN
+	MaxOpenConns  string
+	MaxIdleConns  string
 }
 
 // RedisConfig defines configs related to Redis
@@ -121,6 +123,8 @@ func (man Manager) addConfigs() {
 		"MySQL TLS server name")
 	man.addConfigString("mysql.tls_config", "",
 		"MySQL TLS config value. Use skip-verify, true, false or custom key.")
+	man.addConfigString("mysql.max_open_conns", "50", "MySQL maximum open connection handles.")
+	man.addConfigString("mysql.max_idle_conns", "50", "MySQL maximum idle connection handles.")
 
 	// Redis
 	man.addConfigString("redis.address", "localhost:6379",
