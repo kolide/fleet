@@ -10,12 +10,12 @@ import (
 func TestLoadQueriesFromYamlStrings(t *testing.T) {
 	var testCases = []struct {
 		yaml      string
-		queries   []Query
+		queries   []*Query
 		shouldErr bool
 	}{
-		{"notyaml", []Query{}, true},
-		{"", []Query{}, false},
-		{"---", []Query{}, false},
+		{"notyaml", []*Query{}, true},
+		{"", []*Query{}, false},
+		{"---", []*Query{}, false},
 		{
 			`
 ---
@@ -45,18 +45,18 @@ spec:
   query: select fizz from frog
 
 `,
-			[]Query{
-				{
+			[]*Query{
+				&Query{
 					Name:        "osquery_version",
 					Description: "The version of the Launcher and Osquery process",
 					Query:       "select launcher.version, osquery.version from kolide_launcher_info",
 				},
-				{
+				&Query{
 					Name:        "osquery_schedule",
 					Description: "Report performance stats for each file in the query schedule.",
 					Query:       "select name, interval, executions, output_size, wall_time, (user_time",
 				},
-				{
+				&Query{
 					Name:        "foobar",
 					Description: "froobing",
 					Query:       "select fizz from frog",
@@ -80,10 +80,10 @@ spec:
 }
 
 func TestRoundtripQueriesYaml(t *testing.T) {
-	var testCases = []struct{ queries []Query }{
-		{[]Query{{Name: "froob", Description: "bing", Query: "blong"}}},
+	var testCases = []struct{ queries []*Query }{
+		{[]*Query{{Name: "froob", Description: "bing", Query: "blong"}}},
 		{
-			[]Query{
+			[]*Query{
 				{Name: "froob", Description: "bing", Query: "blong"},
 				{Name: "mant", Description: "smump", Query: "tmit"},
 				{Name: "gorm", Description: "", Query: "blirz"},

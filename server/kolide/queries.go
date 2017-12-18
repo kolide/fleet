@@ -84,19 +84,13 @@ const (
 	QuerySpecKind = "OsqueryQuery"
 )
 
-type queryYaml struct {
-	ApiVersion string    `json:"apiVersion"`
-	Kind       string    `json:"kind"`
-	Spec       querySpec `json:"spec"`
-}
-
 type querySpec struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Query       string `json:"query"`
 }
 
-func LoadQueriesFromYaml(yml string) ([]*Query, error) {
+func LoadQueriesFromSpec(yml string) ([]*Query, error) {
 	queries := []*Query{}
 	for _, s := range strings.Split(yml, "---") {
 		s = strings.TrimSpace(s)
@@ -104,14 +98,13 @@ func LoadQueriesFromYaml(yml string) ([]*Query, error) {
 			continue
 		}
 
-		var q queryYaml
+		var q querySpec
 		err := yaml.Unmarshal([]byte(s), &q)
 		if err != nil {
 			return nil, errors.Wrap(err, "unmarshal yaml")
 		}
-		spec := q.Spec
 		queries = append(queries,
-			&Query{Name: spec.Name, Description: spec.Description, Query: spec.Query},
+			&Query{Name: q.Name, Description: q.Description, Query: q.Query},
 		)
 	}
 

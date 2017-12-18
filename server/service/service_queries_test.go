@@ -64,13 +64,13 @@ spec:
 	)
 	require.Nil(t, err)
 	assert.Equal(t, uint(1), gotAuthorID)
-	assert.Equal(t, []kolide.Query{
-		{
+	assert.Equal(t, []*kolide.Query{
+		&kolide.Query{
 			Name:        "osquery_version",
 			Description: "The version of the Launcher and Osquery process",
 			Query:       "select launcher.version, osquery.version from kolide_launcher_info launcher, osquery_info osquery;",
 		},
-		{
+		&kolide.Query{
 			Name:        "osquery_schedule",
 			Description: "Report performance stats",
 			Query:       "select name, interval, executions, output_size",
