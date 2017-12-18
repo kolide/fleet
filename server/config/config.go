@@ -204,6 +204,8 @@ func (man Manager) LoadConfig() KolideConfig {
 			TLSCA:         man.getConfigString("mysql.tls_ca"),
 			TLSServerName: man.getConfigString("mysql.tls_server_name"),
 			TLSConfig:     man.getConfigString("mysql.tls_config"),
+			MaxOpenConns:  man.getConfigString("mysql.max_open_conns"),
+			MaxIdleConns:  man.getConfigString("mysql.max_idle_conns"),
 		},
 		Redis: RedisConfig{
 			Address:  man.getConfigString("redis.address"),
