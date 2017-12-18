@@ -21,7 +21,7 @@ import (
 
 const (
 	defaultSelectLimit = 100000
-	mysqlThreadCount   = 100
+	mySqlThreadCount   = 100
 )
 
 // Datastore is an implementation of kolide.Datastore interface backed by
