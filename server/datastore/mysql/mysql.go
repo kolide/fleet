@@ -73,7 +73,7 @@ func New(config config.MysqlConfig, c clock.Clock, opts ...DBOption) (*Datastore
 		return nil, err
 	}
 
-	db.SetMaxIdleConns(config.MaxIdlenConns)
+	db.SetMaxIdleConns(config.MaxIdleConns)
 	db.SetMaxOpenConns(config.MaxOpenConns)
 
 	var dbError error
