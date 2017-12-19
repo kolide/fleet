@@ -8,33 +8,48 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (svc service) ApplyQueryYaml(ctx context.Context, yml string) error {
+func queryFromSpec(spec *kolide.QuerySpec) *kolide.Query {
+	return &kolide.Query{
+		Name:        spec.Name,
+		Description: spec.Description,
+		Query:       spec.Query,
+	}
+}
+
+func specFromQuery(query *kolide.Query) *kolide.QuerySpec {
+	return &kolide.QuerySpec{
+		Name:        query.Name,
+		Description: query.Description,
+		Query:       query.Query,
+	}
+}
+
+func (svc service) ApplyQuerySpecs(ctx context.Context, specs []*kolide.QuerySpec) error {
 	vc, ok := viewer.FromContext(ctx)
 	if !ok {
 		return errors.New("user must be authenticated to apply queries")
 	}
 
-	queries, err := kolide.LoadQueriesFromYaml(yml)
-	if err != nil {
-		return errors.Wrap(err, "loading query yaml")
+	queries := []*kolide.Query{}
+	for _, spec := range specs {
+		queries = append(queries, queryFromSpec(spec))
 	}
 
-	err = svc.ds.ApplyQueries(vc.UserID(), queries)
+	err := svc.ds.ApplyQueries(vc.UserID(), queries)
 	return errors.Wrap(err, "applying queries")
 }
 
-func (svc service) GetQueryYaml(ctx context.Context) (string, error) {
+func (svc service) GetQuerySpecs(ctx context.Context) ([]*kolide.QuerySpec, error) {
 	queries, err := svc.ds.ListQueries(kolide.ListOptions{})
 	if err != nil {
-		return "", errors.Wrap(err, "getting queries")
+		return nil, errors.Wrap(err, "getting queries")
 	}
 
-	yml, err := kolide.WriteQueriesToYaml(queries)
-	if err != nil {
-		return "", errors.Wrap(err, "writing query yaml")
+	specs := []*kolide.QuerySpec{}
+	for _, query := range queries {
+		specs = append(specs, specFromQuery(query))
 	}
-
-	return yml, nil
+	return specs, nil
 }
 
 func (svc service) ListQueries(ctx context.Context, opt kolide.ListOptions) ([]*kolide.Query, error) {

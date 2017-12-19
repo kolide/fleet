@@ -38,10 +38,11 @@ type QueryStore interface {
 }
 
 type QueryService interface {
-	// ApplyQueryYaml applies a list of queries from a YAML definition.
-	ApplyQueryYaml(ctx context.Context, yml string) error
-	// GetQueryYaml gets the YAML file representing all the stored queries.
-	GetQueryYaml(ctx context.Context) (string, error)
+	// ApplyQuerySpecs applies a list of queries (creating or updating
+	// them as necessary)
+	ApplyQuerySpecs(ctx context.Context, specs []*QuerySpec) error
+	// GetQuerySpecs gets the YAML file representing all the stored queries.
+	GetQuerySpecs(ctx context.Context) ([]*QuerySpec, error)
 
 	// ListQueries returns a list of saved queries. Note only saved queries
 	// should be returned (those that are created for distributed queries
@@ -81,16 +82,21 @@ type Query struct {
 }
 
 const (
-	QuerySpecKind = "OsqueryQuery"
+	QueryKind = "Query"
 )
 
-type querySpec struct {
+type QueryObject struct {
+	ObjectMetadata
+	Spec QuerySpec `json:"spec"`
+}
+
+type QuerySpec struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Query       string `json:"query"`
 }
 
-func LoadQueriesFromSpec(yml string) ([]*Query, error) {
+func LoadQueriesFromYaml(yml string) ([]*Query, error) {
 	queries := []*Query{}
 	for _, s := range strings.Split(yml, "---") {
 		s = strings.TrimSpace(s)
@@ -98,13 +104,13 @@ func LoadQueriesFromSpec(yml string) ([]*Query, error) {
 			continue
 		}
 
-		var q querySpec
+		var q QueryObject
 		err := yaml.Unmarshal([]byte(s), &q)
 		if err != nil {
 			return nil, errors.Wrap(err, "unmarshal yaml")
 		}
 		queries = append(queries,
-			&Query{Name: q.Name, Description: q.Description, Query: q.Query},
+			&Query{Name: q.Spec.Name, Description: q.Spec.Description, Query: q.Spec.Query},
 		)
 	}
 
@@ -114,10 +120,12 @@ func LoadQueriesFromSpec(yml string) ([]*Query, error) {
 func WriteQueriesToYaml(queries []*Query) (string, error) {
 	ymlStrings := []string{}
 	for _, q := range queries {
-		qYaml := queryYaml{
-			ApiVersion: ApiVersion,
-			Kind:       QuerySpecKind,
-			Spec: querySpec{
+		qYaml := QueryObject{
+			ObjectMetadata: ObjectMetadata{
+				ApiVersion: ApiVersion,
+				Kind:       QueryKind,
+			},
+			Spec: QuerySpec{
 				Name:        q.Name,
 				Description: q.Description,
 				Query:       q.Query,
