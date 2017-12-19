@@ -123,8 +123,8 @@ func (man Manager) addConfigs() {
 		"MySQL TLS server name")
 	man.addConfigString("mysql.tls_config", "",
 		"MySQL TLS config value. Use skip-verify, true, false or custom key.")
-	man.addConfigInt("mysql.max_open_conns", 50, "MySQL maximum open connection handles.")
-	man.addConfigInt("mysql.max_idle_conns", 50, "MySQL maximum idle connection handles.")
+	man.addConfigInt("mysql.max_open_conns", 9, "MySQL maximum open connection handles.")
+	man.addConfigInt("mysql.max_idle_conns", 10, "MySQL maximum idle connection handles.")
 
 	// Redis
 	man.addConfigString("redis.address", "localhost:6379",
