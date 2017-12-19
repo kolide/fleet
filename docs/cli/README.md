@@ -154,7 +154,7 @@ spec:
   interval: 10
 ---
 apiVersion: k8s.kolide.com/v1/alpha1
-kind: OsqueryDecorator
+kind: OsqueryQuery
 spec:
   name: hostname
   query: select hostname from system_info;
@@ -173,7 +173,7 @@ spec:
   query: slack_not_running
 ---
 apiVersion: k8s.kolide.com/v1/alpha1
-kind: OsqueryLabel
+kind: OsqueryQuery
 spec:
   name: slack_not_running
   query: >
