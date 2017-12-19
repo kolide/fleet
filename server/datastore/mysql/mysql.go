@@ -21,7 +21,6 @@ import (
 
 const (
 	defaultSelectLimit = 100000
-	mySqlThreadCount   = 100
 )
 
 // Datastore is an implementation of kolide.Datastore interface backed by
@@ -74,8 +73,8 @@ func New(config config.MysqlConfig, c clock.Clock, opts ...DBOption) (*Datastore
 		return nil, err
 	}
 
-	db.SetMaxIdleConns(config.MaxOpenConns)
-	db.SetMaxOpenConns(config.MaxIdleConns)
+	db.SetMaxIdleConns(config.MaxIdlenConns)
+	db.SetMaxOpenConns(config.MaxOpenConns)
 
 	var dbError error
 	for attempt := 0; attempt < options.maxAttempts; attempt++ {

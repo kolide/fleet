@@ -25,8 +25,8 @@ type MysqlConfig struct {
 	TLSCA         string `yaml:"tls_ca"`
 	TLSServerName string `yaml:"tls_server_name"`
 	TLSConfig     string `yaml:"tls_config"` //tls=customValue in DSN
-	MaxOpenConns  string
-	MaxIdleConns  string
+	MaxOpenConns  int
+	MaxIdleConns  int
 }
 
 // RedisConfig defines configs related to Redis
@@ -123,8 +123,8 @@ func (man Manager) addConfigs() {
 		"MySQL TLS server name")
 	man.addConfigString("mysql.tls_config", "",
 		"MySQL TLS config value. Use skip-verify, true, false or custom key.")
-	man.addConfigString("mysql.max_open_conns", "50", "MySQL maximum open connection handles.")
-	man.addConfigString("mysql.max_idle_conns", "50", "MySQL maximum idle connection handles.")
+	man.addConfigInt("mysql.max_open_conns", "50", "MySQL maximum open connection handles.")
+	man.addConfigInt("mysql.max_idle_conns", "50", "MySQL maximum idle connection handles.")
 
 	// Redis
 	man.addConfigString("redis.address", "localhost:6379",
@@ -204,8 +204,8 @@ func (man Manager) LoadConfig() KolideConfig {
 			TLSCA:         man.getConfigString("mysql.tls_ca"),
 			TLSServerName: man.getConfigString("mysql.tls_server_name"),
 			TLSConfig:     man.getConfigString("mysql.tls_config"),
-			MaxOpenConns:  man.getConfigString("mysql.max_open_conns"),
-			MaxIdleConns:  man.getConfigString("mysql.max_idle_conns"),
+			MaxOpenConns:  man.getConfigInt("mysql.max_open_conns"),
+			MaxIdleConns:  man.getConfigInt("mysql.max_idle_conns"),
 		},
 		Redis: RedisConfig{
 			Address:  man.getConfigString("redis.address"),
