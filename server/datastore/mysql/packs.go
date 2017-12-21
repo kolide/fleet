@@ -8,8 +8,97 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (d *Datastore) ApplyPackSpec(spec *kolide.PackSpec) error {
-	return nil
+func (d *Datastore) ApplyPackSpec(spec *kolide.PackSpec) (err error) {
+	tx, err := d.db.Beginx()
+	if err != nil {
+		return errors.Wrap(err, "begin ApplyQueries transaction")
+	}
+
+	defer func() {
+		if err != nil {
+			rbErr := tx.Rollback()
+			// It seems possible that there might be a case in
+			// which the error we are dealing with here was thrown
+			// by the call to tx.Commit(), and the docs suggest
+			// this call would then result in sql.ErrTxDone.
+			if rbErr != nil && rbErr != sql.ErrTxDone {
+				panic(fmt.Sprintf("got err '%s' rolling back after err '%s'", rbErr, err))
+			}
+		}
+	}()
+
+	// Insert/update pack
+	query := `
+		INSERT INTO packs (name, description, platform)
+		VALUES (?, ?, ?)
+		ON DUPLICATE KEY UPDATE
+			name = VALUES(name),
+			description = VALUES(description),
+			platform = VALUES(platform),
+			deleted = false
+	`
+	if _, err := tx.Exec(query, spec.Name, spec.Description, spec.Platform); err != nil {
+		return errors.Wrap(err, "insert/update pack")
+	}
+
+	// Get Pack ID
+	// This is necessary because MySQL last_insert_id does not return a value
+	// if no update was made.
+	var packID uint
+	query = "SELECT id FROM packs WHERE name = ?"
+	if err := tx.Get(&packID, query, spec.Name); err != nil {
+		return errors.Wrap(err, "getting pack ID")
+	}
+
+	// Delete existing scheduled queries for pack
+	query = "DELETE FROM scheduled_queries WHERE pack_id = ?"
+	if _, err := tx.Exec(query, packID); err != nil {
+		return errors.Wrap(err, "delete existing scheduled queries")
+	}
+
+	// Insert new scheduled queries for pack
+	for _, q := range spec.Queries {
+		query = `
+			INSERT INTO scheduled_queries (
+				pack_id, query_name, name, description, ` + "`interval`" + `,
+				snapshot, removed, shard, platform, version
+			)
+			VALUES (
+				?, ?, ?, ?, ?,
+				?, ?, ?, ?, ?
+			)
+		`
+		if _, err := tx.Exec(query,
+			packID, q.QueryName, q.Name, q.Description, q.Interval,
+			q.Snapshot, q.Removed, q.Shard, q.Platform, q.Version,
+		); err != nil {
+			return errors.Wrapf(err, "adding query %s referencing %s", q.Name, q.QueryName)
+		}
+	}
+
+	// Delete existing targets
+	query = "DELETE FROM pack_targets where pack_id = ?"
+	if _, err := tx.Exec(query, packID); err != nil {
+		return errors.Wrap(err, "delete existing targets")
+	}
+
+	// Insert targets
+	for _, l := range spec.Targets.Labels {
+		query = `
+			INSERT INTO pack_targets (pack_id, type, target_id)
+			VALUES (?, ?, (SELECT id FROM labels WHERE name = ?))
+		`
+		if _, err := tx.Exec(query, packID, kolide.TargetLabel, l); err != nil {
+			return errors.Wrap(err, "adding label to pack")
+		}
+	}
+
+	err = tx.Commit()
+	return errors.Wrap(err, "commit transaction")
+}
+
+func (d *Datastore) GetPackSpecs() ([]*kolide.PackSpec, error) {
+	return nil, nil
 }
 
 func (d *Datastore) PackByName(name string, opts ...kolide.OptionalArg) (*kolide.Pack, bool, error) {

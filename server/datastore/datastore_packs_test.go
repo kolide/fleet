@@ -153,6 +153,17 @@ func testAddLabelToPackTwice(t *testing.T, ds kolide.Datastore) {
 }
 
 func testApplyPackSpec(t *testing.T, ds kolide.Datastore) {
+	zwass := test.NewUser(t, ds, "Zach", "zwass", "zwass@kolide.co", true)
+	expectedQueries := []*kolide.Query{
+		{Name: "foo", Description: "get the foos", Query: "select * from foo"},
+		{Name: "bar", Description: "do some bars", Query: "select baz from bar"},
+	}
+	// Zach creates some queries
+	err := ds.ApplyQueries(zwass.ID, expectedQueries)
+	require.Nil(t, err)
+
+	tru := true
+	fals := false
 	spec := &kolide.PackSpec{
 		Name: "test_pack",
 		Targets: kolide.PackSpecTargets{
@@ -164,9 +175,29 @@ func testApplyPackSpec(t *testing.T, ds kolide.Datastore) {
 		},
 		Queries: []kolide.PackSpecQuery{
 			kolide.PackSpecQuery{
-				QueryName:   q1.Name,
-				Description: "test",
+				QueryName:   "foo",
+				Description: "test_foo",
+				Interval:    42,
+			},
+			kolide.PackSpecQuery{
+				QueryName: "foo",
+				Name:      "foo_snapshot",
+				Interval:  600,
+				Snapshot:  &tru,
+			},
+			kolide.PackSpecQuery{
+				QueryName: "bar",
+				Interval:  600,
+				Removed:   &fals,
 			},
 		},
 	}
+
+	err = ds.ApplyPackSpec(spec)
+	require.Nil(t, err)
+
+	gotSpec, err := ds.GetPackSpecs()
+
+	require.Nil(t, err)
+	require.NotNil(t, gotSpec)
 }

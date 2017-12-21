@@ -7,6 +7,7 @@ import (
 // PackStore is the datastore interface for managing query packs.
 type PackStore interface {
 	ApplyPackSpec(spec *PackSpec) error
+	GetPackSpecs() ([]*PackSpec, error)
 
 	// NewPack creates a new pack in the datastore.
 	NewPack(pack *Pack, opts ...OptionalArg) (*Pack, error)
@@ -121,9 +122,11 @@ type PackPayload struct {
 }
 
 type PackSpec struct {
-	Name    string          `json:"name"`
-	Targets PackSpecTargets `json:"targets"`
-	Queries []PackSpecQuery `json:"queries"`
+	Name        string          `json:"name"`
+	Description string          `json:"description"`
+	Platform    string          `json:"platform"`
+	Targets     PackSpecTargets `json:"targets"`
+	Queries     []PackSpecQuery `json:"queries"`
 }
 
 type PackSpecTargets struct {
@@ -135,11 +138,11 @@ type PackSpecQuery struct {
 	Name        string  `json:"name"`
 	Description string  `json:"description"`
 	Interval    uint    `json:"interval"`
+	Snapshot    *bool   `json:"snapshot,omitempty"`
+	Removed     *bool   `json:"removed,omitempty"`
 	Shard       *uint   `json:"shard,omitempty"`
 	Platform    *string `json:"platform,omitempty"`
 	Version     *string `json:"version,omitempty"`
-	Snapshot    *bool   `json:"snapshot,omitempty"`
-	Removed     *bool   `json:"removed,omitempty"`
 }
 
 // PackTarget associates a pack with either a host or a label

@@ -47,6 +47,17 @@ func Up_20171219164727(tx *sql.Tx) error {
 		return errors.Wrap(err, "adding foreign key to query_name column")
 	}
 
+	// Add `name` column to scheduled_queries
+
+	query = `
+ALTER TABLE scheduled_queries
+ADD COLUMN name varchar(255),
+ADD COLUMN description varchar(255)
+`
+	if _, err := tx.Exec(query); err != nil {
+		return errors.Wrap(err, "adding name to scheduled_queries")
+	}
+
 	return nil
 }
 
