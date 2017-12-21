@@ -9,7 +9,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (d *Datastore) ApplyQueries(authorID uint, queries []*kolide.Query) error {
+func (d *Datastore) ApplyQueries(authorID uint, queries []*kolide.Query) (err error) {
 	tx, err := d.db.Begin()
 	if err != nil {
 		return errors.Wrap(err, "begin ApplyQueries transaction")
