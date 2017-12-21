@@ -151,3 +151,22 @@ func testAddLabelToPackTwice(t *testing.T, ds kolide.Datastore) {
 	assert.Nil(t, err)
 	assert.Len(t, labels, 1)
 }
+
+func testApplyPackSpec(t *testing.T, ds kolide.Datastore) {
+	spec := &kolide.PackSpec{
+		Name: "test_pack",
+		Targets: kolide.PackSpecTargets{
+			Labels: []string{
+				"foo",
+				"bar",
+				"bing",
+			},
+		},
+		Queries: []kolide.PackSpecQuery{
+			kolide.PackSpecQuery{
+				QueryName:   q1.Name,
+				Description: "test",
+			},
+		},
+	}
+}

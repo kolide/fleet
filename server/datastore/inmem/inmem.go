@@ -45,6 +45,7 @@ type Datastore struct {
 	kolide.TargetStore
 	kolide.OsqueryOptionsStore
 	kolide.QueryStore
+	kolide.PackStore
 }
 
 func New(config config.KolideConfig) (*Datastore, error) {

@@ -8,6 +8,10 @@ import (
 	"github.com/pkg/errors"
 )
 
+func (d *Datastore) ApplyPackSpec(spec *kolide.PackSpec) error {
+	return nil
+}
+
 func (d *Datastore) PackByName(name string, opts ...kolide.OptionalArg) (*kolide.Pack, bool, error) {
 	db := d.getTransaction(opts)
 	sqlStatement := `
