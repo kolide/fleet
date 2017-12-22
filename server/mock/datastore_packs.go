@@ -6,7 +6,7 @@ import "github.com/kolide/fleet/server/kolide"
 
 var _ kolide.PackStore = (*PackStore)(nil)
 
-type ApplyPackSpecFunc func(spec *kolide.PackSpec) error
+type ApplyPackSpecsFunc func(specs []*kolide.PackSpec) error
 
 type GetPackSpecsFunc func() ([]*kolide.PackSpec, error)
 
@@ -37,8 +37,8 @@ type ListHostsInPackFunc func(pid uint, opt kolide.ListOptions) ([]uint, error)
 type ListExplicitHostsInPackFunc func(pid uint, opt kolide.ListOptions) ([]uint, error)
 
 type PackStore struct {
-	ApplyPackSpecFunc        ApplyPackSpecFunc
-	ApplyPackSpecFuncInvoked bool
+	ApplyPackSpecsFunc        ApplyPackSpecsFunc
+	ApplyPackSpecsFuncInvoked bool
 
 	GetPackSpecsFunc        GetPackSpecsFunc
 	GetPackSpecsFuncInvoked bool
@@ -83,9 +83,9 @@ type PackStore struct {
 	ListExplicitHostsInPackFuncInvoked bool
 }
 
-func (s *PackStore) ApplyPackSpec(spec *kolide.PackSpec) error {
-	s.ApplyPackSpecFuncInvoked = true
-	return s.ApplyPackSpecFunc(spec)
+func (s *PackStore) ApplyPackSpecs(specs []*kolide.PackSpec) error {
+	s.ApplyPackSpecsFuncInvoked = true
+	return s.ApplyPackSpecsFunc(specs)
 }
 
 func (s *PackStore) GetPackSpecs() ([]*kolide.PackSpec, error) {

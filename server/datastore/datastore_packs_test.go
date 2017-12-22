@@ -152,7 +152,7 @@ func testAddLabelToPackTwice(t *testing.T, ds kolide.Datastore) {
 	assert.Len(t, labels, 1)
 }
 
-func testApplyPackSpec(t *testing.T, ds kolide.Datastore) {
+func testApplyPackSpecRoundtrip(t *testing.T, ds kolide.Datastore) {
 	zwass := test.NewUser(t, ds, "Zach", "zwass", "zwass@kolide.co", true)
 	expectedQueries := []*kolide.Query{
 		{Name: "foo", Description: "get the foos", Query: "select * from foo"},
@@ -162,42 +162,79 @@ func testApplyPackSpec(t *testing.T, ds kolide.Datastore) {
 	err := ds.ApplyQueries(zwass.ID, expectedQueries)
 	require.Nil(t, err)
 
-	tru := true
-	fals := false
-	spec := &kolide.PackSpec{
-		Name: "test_pack",
-		Targets: kolide.PackSpecTargets{
-			Labels: []string{
-				"foo",
-				"bar",
-				"bing",
+	test.NewLabel(t, ds, "foo", "select * from foo")
+	test.NewLabel(t, ds, "bar", "select * from bar")
+	test.NewLabel(t, ds, "bing", "select * from bing")
+
+	boolPtr := func(b bool) *bool { return &b }
+	uintPtr := func(x uint) *uint { return &x }
+	stringPtr := func(s string) *string { return &s }
+	specs := []*kolide.PackSpec{
+		&kolide.PackSpec{
+			ID:   1,
+			Name: "test_pack",
+			Targets: kolide.PackSpecTargets{
+				Labels: []string{
+					"foo",
+					"bar",
+					"bing",
+				},
 			},
-		},
-		Queries: []kolide.PackSpecQuery{
-			kolide.PackSpecQuery{
-				QueryName:   "foo",
-				Description: "test_foo",
-				Interval:    42,
-			},
-			kolide.PackSpecQuery{
-				QueryName: "foo",
-				Name:      "foo_snapshot",
-				Interval:  600,
-				Snapshot:  &tru,
-			},
-			kolide.PackSpecQuery{
-				QueryName: "bar",
-				Interval:  600,
-				Removed:   &fals,
+			Queries: []kolide.PackSpecQuery{
+				kolide.PackSpecQuery{
+					QueryName:   "foo",
+					Description: "test_foo",
+					Interval:    42,
+				},
+				kolide.PackSpecQuery{
+					QueryName: "foo",
+					Name:      "foo_snapshot",
+					Interval:  600,
+					Snapshot:  boolPtr(true),
+				},
+				kolide.PackSpecQuery{
+					QueryName: "bar",
+					Interval:  600,
+					Removed:   boolPtr(false),
+					Shard:     uintPtr(73),
+					Platform:  stringPtr("foobar"),
+					Version:   stringPtr("0.0.0.0.0.1"),
+				},
 			},
 		},
 	}
 
-	err = ds.ApplyPackSpec(spec)
+	err = ds.ApplyPackSpecs(specs)
 	require.Nil(t, err)
 
 	gotSpec, err := ds.GetPackSpecs()
 
 	require.Nil(t, err)
-	require.NotNil(t, gotSpec)
+	assert.Equal(t, specs, gotSpec)
+}
+
+func testApplyPackSpecMissingQueries(t *testing.T, ds kolide.Datastore) {
+	// Do not define queries mentioned in spec
+
+	specs := []*kolide.PackSpec{
+		&kolide.PackSpec{
+			ID:   1,
+			Name: "test_pack",
+			Targets: kolide.PackSpecTargets{
+				Labels: []string{},
+			},
+			Queries: []kolide.PackSpecQuery{
+				kolide.PackSpecQuery{
+					QueryName: "bar",
+					Interval:  600,
+				},
+			},
+		},
+	}
+
+	// Should error due to unkown query
+	err := ds.ApplyPackSpecs(specs)
+	if assert.NotNil(t, err) {
+		assert.Contains(t, err.Error(), "unknown query 'bar'")
+	}
 }

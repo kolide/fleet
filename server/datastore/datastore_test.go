@@ -83,5 +83,6 @@ var testFunctions = [...]func(*testing.T, kolide.Datastore){
 	testApplyOsqueryOptionsNoOverrides,
 	testOsqueryOptionsForHost,
 	testApplyQueries,
-	testApplyPackSpec,
+	testApplyPackSpecRoundtrip,
+	testApplyPackSpecMissingQueries,
 }

@@ -4,14 +4,15 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/kolide/fleet/server/kolide"
 	"github.com/pkg/errors"
 )
 
-func (d *Datastore) ApplyPackSpec(spec *kolide.PackSpec) (err error) {
+func (d *Datastore) ApplyPackSpecs(specs []*kolide.PackSpec) (err error) {
 	tx, err := d.db.Beginx()
 	if err != nil {
-		return errors.Wrap(err, "begin ApplyQueries transaction")
+		return errors.Wrap(err, "begin ApplyPackSpec transaction")
 	}
 
 	defer func() {
@@ -27,6 +28,18 @@ func (d *Datastore) ApplyPackSpec(spec *kolide.PackSpec) (err error) {
 		}
 	}()
 
+	for _, spec := range specs {
+		err = applyPackSpec(tx, spec)
+		if err != nil {
+			return errors.Wrapf(err, "applying pack '%s'", spec.Name)
+		}
+	}
+
+	err = tx.Commit()
+	return errors.Wrap(err, "commit transaction")
+}
+
+func applyPackSpec(tx *sqlx.Tx, spec *kolide.PackSpec) error {
 	// Insert/update pack
 	query := `
 		INSERT INTO packs (name, description, platform)
@@ -68,16 +81,20 @@ func (d *Datastore) ApplyPackSpec(spec *kolide.PackSpec) (err error) {
 				?, ?, ?, ?, ?
 			)
 		`
-		if _, err := tx.Exec(query,
+		_, err := tx.Exec(query,
 			packID, q.QueryName, q.Name, q.Description, q.Interval,
 			q.Snapshot, q.Removed, q.Shard, q.Platform, q.Version,
-		); err != nil {
+		)
+		switch {
+		case isChildForeignKeyError(err):
+			return errors.Errorf("cannot schedule unknown query '%s'", q.QueryName)
+		case err != nil:
 			return errors.Wrapf(err, "adding query %s referencing %s", q.Name, q.QueryName)
 		}
 	}
 
 	// Delete existing targets
-	query = "DELETE FROM pack_targets where pack_id = ?"
+	query = "DELETE FROM pack_targets WHERE pack_id = ?"
 	if _, err := tx.Exec(query, packID); err != nil {
 		return errors.Wrap(err, "delete existing targets")
 	}
@@ -93,12 +110,78 @@ func (d *Datastore) ApplyPackSpec(spec *kolide.PackSpec) (err error) {
 		}
 	}
 
-	err = tx.Commit()
-	return errors.Wrap(err, "commit transaction")
+	return nil
 }
 
-func (d *Datastore) GetPackSpecs() ([]*kolide.PackSpec, error) {
-	return nil, nil
+func (d *Datastore) GetPackSpecs() (specs []*kolide.PackSpec, err error) {
+	tx, err := d.db.Beginx()
+	if err != nil {
+		return nil, errors.Wrap(err, "begin GetPackSpecs transaction")
+	}
+
+	defer func() {
+		if err != nil {
+			rbErr := tx.Rollback()
+			// It seems possible that there might be a case in
+			// which the error we are dealing with here was thrown
+			// by the call to tx.Commit(), and the docs suggest
+			// this call would then result in sql.ErrTxDone.
+			if rbErr != nil && rbErr != sql.ErrTxDone {
+				panic(fmt.Sprintf("got err '%s' rolling back after err '%s'", rbErr, err))
+			}
+		}
+	}()
+
+	// Get basic specs
+	query := "SELECT id, name, description, platform FROM packs"
+	if err := tx.Select(&specs, query); err != nil {
+		fmt.Println(err)
+		return nil, errors.Wrap(err, "get packs")
+	}
+
+	// Load targets
+	for _, spec := range specs {
+		query = `
+SELECT l.name
+FROM labels l JOIN pack_targets pt
+WHERE pack_id = ? AND pt.type = ? AND pt.target_id = l.id
+`
+		if err := tx.Select(&spec.Targets.Labels, query, spec.ID, kolide.TargetLabel); err != nil {
+			return nil, errors.Wrap(err, "get pack targets")
+		}
+	}
+
+	// query = `
+	// 	INSERT INTO scheduled_queries (
+	// 		pack_id, query_name, name, description, ` + "`interval`" + `,
+	// 		snapshot, removed, shard, platform, version
+	// 	)
+	// 	VALUES (
+	// 		?, ?, ?, ?, ?,
+	// 		?, ?, ?, ?, ?
+	// 	)
+	// `
+
+	// Load queries
+	for _, spec := range specs {
+		query = `
+SELECT
+query_name, name, description, ` + "`interval`" + `,
+snapshot, removed, shard, platform, version
+FROM scheduled_queries
+WHERE pack_id = ?
+`
+		if err := tx.Select(&spec.Queries, query, spec.ID); err != nil {
+			return nil, errors.Wrap(err, "get pack queries")
+		}
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, errors.Wrap(err, "commit transaction")
+	}
+
+	return specs, nil
 }
 
 func (d *Datastore) PackByName(name string, opts ...kolide.OptionalArg) (*kolide.Pack, bool, error) {
