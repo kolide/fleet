@@ -205,44 +205,44 @@ func checkPacks(t *testing.T, expected []kolide.Pack, actual []kolide.Pack) {
 }
 
 func testLoadPacksForQueries(t *testing.T, ds kolide.Datastore) {
-	user := test.NewUser(t, ds, "Zach", "zwass", "zwass@kolide.co", true)
+	// 	user := test.NewUser(t, ds, "Zach", "zwass", "zwass@kolide.co", true)
 
-	q1 := test.NewQuery(t, ds, "q1", "select * from time", user.ID, true)
-	q2 := test.NewQuery(t, ds, "q2", "select * from osquery_info", user.ID, true)
+	// 	q1 := test.NewQuery(t, ds, "q1", "select * from time", user.ID, true)
+	// 	q2 := test.NewQuery(t, ds, "q2", "select * from osquery_info", user.ID, true)
 
-	p1 := test.NewPack(t, ds, "p1")
-	p2 := test.NewPack(t, ds, "p2")
-	p3 := test.NewPack(t, ds, "p3")
+	// 	p1 := test.NewPack(t, ds, "p1")
+	// 	p2 := test.NewPack(t, ds, "p2")
+	// 	p3 := test.NewPack(t, ds, "p3")
 
-	var err error
+	// 	var err error
 
-	test.NewScheduledQuery(t, ds, p2.ID, q1.ID, 60, false, false)
+	// 	test.NewScheduledQuery(t, ds, p2.ID, q1.ID, 60, false, false)
 
-	q1, err = ds.Query(q1.ID)
-	require.Nil(t, err)
-	q2, err = ds.Query(q2.ID)
-	require.Nil(t, err)
-	checkPacks(t, []kolide.Pack{*p2}, q1.Packs)
-	checkPacks(t, []kolide.Pack{}, q2.Packs)
+	// 	q1, err = ds.Query(q1.ID)
+	// 	require.Nil(t, err)
+	// 	q2, err = ds.Query(q2.ID)
+	// 	require.Nil(t, err)
+	// 	checkPacks(t, []kolide.Pack{*p2}, q1.Packs)
+	// 	checkPacks(t, []kolide.Pack{}, q2.Packs)
 
-	test.NewScheduledQuery(t, ds, p1.ID, q2.ID, 60, false, false)
-	test.NewScheduledQuery(t, ds, p3.ID, q2.ID, 60, false, false)
+	// 	test.NewScheduledQuery(t, ds, p1.ID, q2.ID, 60, false, false)
+	// 	test.NewScheduledQuery(t, ds, p3.ID, q2.ID, 60, false, false)
 
-	q1, err = ds.Query(q1.ID)
-	require.Nil(t, err)
-	q2, err = ds.Query(q2.ID)
-	require.Nil(t, err)
-	checkPacks(t, []kolide.Pack{*p2}, q1.Packs)
-	checkPacks(t, []kolide.Pack{*p1, *p3}, q2.Packs)
+	// 	q1, err = ds.Query(q1.ID)
+	// 	require.Nil(t, err)
+	// 	q2, err = ds.Query(q2.ID)
+	// 	require.Nil(t, err)
+	// 	checkPacks(t, []kolide.Pack{*p2}, q1.Packs)
+	// 	checkPacks(t, []kolide.Pack{*p1, *p3}, q2.Packs)
 
-	test.NewScheduledQuery(t, ds, p3.ID, q1.ID, 60, false, false)
+	// 	test.NewScheduledQuery(t, ds, p3.ID, q1.ID, 60, false, false)
 
-	q1, err = ds.Query(q1.ID)
-	require.Nil(t, err)
-	q2, err = ds.Query(q2.ID)
-	require.Nil(t, err)
-	checkPacks(t, []kolide.Pack{*p2, *p3}, q1.Packs)
-	checkPacks(t, []kolide.Pack{*p1, *p3}, q2.Packs)
+	// 	q1, err = ds.Query(q1.ID)
+	// 	require.Nil(t, err)
+	// 	q2, err = ds.Query(q2.ID)
+	// 	require.Nil(t, err)
+	// 	checkPacks(t, []kolide.Pack{*p2, *p3}, q1.Packs)
+	// 	checkPacks(t, []kolide.Pack{*p1, *p3}, q2.Packs)
 }
 
 func testDuplicateNewQuery(t *testing.T, ds kolide.Datastore) {
