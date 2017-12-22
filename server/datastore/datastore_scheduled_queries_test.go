@@ -4,25 +4,74 @@ import (
 	"testing"
 
 	"github.com/kolide/fleet/server/kolide"
+	"github.com/kolide/fleet/server/test"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func testListScheduledQueriesInPack(t *testing.T, ds kolide.Datastore) {
-	// 	u1 := test.NewUser(t, ds, "Admin", "admin", "admin@kolide.co", true)
-	// 	q1 := test.NewQuery(t, ds, "foo", "select * from time;", u1.ID, true)
-	// 	q2 := test.NewQuery(t, ds, "bar", "select * from time;", u1.ID, true)
-	// 	p1 := test.NewPack(t, ds, "baz")
+	zwass := test.NewUser(t, ds, "Zach", "zwass", "zwass@kolide.co", true)
+	queries := []*kolide.Query{
+		{Name: "foo", Description: "get the foos", Query: "select * from foo"},
+		{Name: "bar", Description: "do some bars", Query: "select baz from bar"},
+	}
+	err := ds.ApplyQueries(zwass.ID, queries)
+	require.Nil(t, err)
 
-	// 	test.NewScheduledQuery(t, ds, p1.ID, q1.ID, 60, false, false)
+	specs := []*kolide.PackSpec{
+		&kolide.PackSpec{
+			Name:    "baz",
+			Targets: kolide.PackSpecTargets{Labels: []string{}},
+			Queries: []kolide.PackSpecQuery{
+				kolide.PackSpecQuery{
+					QueryName:   queries[0].Name,
+					Description: "test_foo",
+					Interval:    60,
+				},
+			},
+		},
+	}
+	err = ds.ApplyPackSpecs(specs)
+	require.Nil(t, err)
 
-	// 	queries, err := ds.ListScheduledQueriesInPack(p1.ID, kolide.ListOptions{})
-	// 	require.Nil(t, err)
-	// 	require.Len(t, queries, 1)
-	// 	assert.Equal(t, uint(60), queries[0].Interval)
+	gotQueries, err := ds.ListScheduledQueriesInPack(1, kolide.ListOptions{})
+	require.Nil(t, err)
+	require.Len(t, gotQueries, 1)
+	assert.Equal(t, uint(60), gotQueries[0].Interval)
+	assert.Equal(t, "test_foo", gotQueries[0].Description)
+	assert.Equal(t, "select * from foo", gotQueries[0].Query)
 
-	// 	test.NewScheduledQuery(t, ds, p1.ID, q2.ID, 60, false, false)
-	// 	test.NewScheduledQuery(t, ds, p1.ID, q2.ID, 60, true, false)
+	boolPtr := func(b bool) *bool { return &b }
+	specs = []*kolide.PackSpec{
+		&kolide.PackSpec{
+			Name:    "baz",
+			Targets: kolide.PackSpecTargets{Labels: []string{}},
+			Queries: []kolide.PackSpecQuery{
+				kolide.PackSpecQuery{
+					QueryName:   queries[0].Name,
+					Description: "test_foo",
+					Interval:    60,
+				},
+				kolide.PackSpecQuery{
+					QueryName:   queries[1].Name,
+					Name:        "test bar",
+					Description: "test_bar",
+					Interval:    60,
+				},
+				kolide.PackSpecQuery{
+					QueryName:   queries[1].Name,
+					Name:        "test bar snapshot",
+					Description: "test_bar",
+					Interval:    60,
+					Snapshot:    boolPtr(true),
+				},
+			},
+		},
+	}
+	err = ds.ApplyPackSpecs(specs)
+	require.Nil(t, err)
 
-	// 	queries, err = ds.ListScheduledQueriesInPack(p1.ID, kolide.ListOptions{})
-	// 	require.Nil(t, err)
-	// 	require.Len(t, queries, 3)
+	gotQueries, err = ds.ListScheduledQueriesInPack(1, kolide.ListOptions{})
+	require.Nil(t, err)
+	require.Len(t, gotQueries, 3)
 }

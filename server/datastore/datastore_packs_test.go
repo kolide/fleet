@@ -135,12 +135,12 @@ func testAddLabelToPackTwice(t *testing.T, ds kolide.Datastore) {
 
 func testApplyPackSpecRoundtrip(t *testing.T, ds kolide.Datastore) {
 	zwass := test.NewUser(t, ds, "Zach", "zwass", "zwass@kolide.co", true)
-	expectedQueries := []*kolide.Query{
+	queries := []*kolide.Query{
 		{Name: "foo", Description: "get the foos", Query: "select * from foo"},
 		{Name: "bar", Description: "do some bars", Query: "select baz from bar"},
 	}
 	// Zach creates some queries
-	err := ds.ApplyQueries(zwass.ID, expectedQueries)
+	err := ds.ApplyQueries(zwass.ID, queries)
 	require.Nil(t, err)
 
 	test.NewLabel(t, ds, "foo", "select * from foo")
@@ -163,18 +163,18 @@ func testApplyPackSpecRoundtrip(t *testing.T, ds kolide.Datastore) {
 			},
 			Queries: []kolide.PackSpecQuery{
 				kolide.PackSpecQuery{
-					QueryName:   "foo",
+					QueryName:   queries[0].Name,
 					Description: "test_foo",
 					Interval:    42,
 				},
 				kolide.PackSpecQuery{
-					QueryName: "foo",
+					QueryName: queries[0].Name,
 					Name:      "foo_snapshot",
 					Interval:  600,
 					Snapshot:  boolPtr(true),
 				},
 				kolide.PackSpecQuery{
-					QueryName: "bar",
+					QueryName: queries[1].Name,
 					Interval:  600,
 					Removed:   boolPtr(false),
 					Shard:     uintPtr(73),

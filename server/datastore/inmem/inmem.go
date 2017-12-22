@@ -46,6 +46,7 @@ type Datastore struct {
 	kolide.OsqueryOptionsStore
 	kolide.QueryStore
 	kolide.PackStore
+	kolide.ScheduledQueryStore
 }
 
 func New(config config.KolideConfig) (*Datastore, error) {
@@ -248,31 +249,6 @@ func (d *Datastore) createDevPacksAndQueries() error {
 		return err
 	}
 
-	_, err = d.NewScheduledQuery(&kolide.ScheduledQuery{
-		QueryID:  query1.ID,
-		PackID:   pack1.ID,
-		Interval: 60,
-	})
-	if err != nil {
-		return err
-	}
-
-	t := true
-	_, err = d.NewScheduledQuery(&kolide.ScheduledQuery{
-		QueryID:  query3.ID,
-		PackID:   pack1.ID,
-		Interval: 60,
-		Snapshot: &t,
-	})
-	if err != nil {
-		return err
-	}
-
-	_, err = d.NewScheduledQuery(&kolide.ScheduledQuery{
-		QueryID:  query2.ID,
-		PackID:   pack2.ID,
-		Interval: 60,
-	})
 	return err
 }
 

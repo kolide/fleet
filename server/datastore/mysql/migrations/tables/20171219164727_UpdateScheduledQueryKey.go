@@ -58,6 +58,14 @@ ADD COLUMN description varchar(255)
 		return errors.Wrap(err, "adding name to scheduled_queries")
 	}
 
+	query = `
+ALTER TABLE packs
+DROP COLUMN created_by
+`
+	if _, err := tx.Exec(query); err != nil {
+		return errors.Wrap(err, "removing created_by from packs")
+	}
+
 	return nil
 }
 

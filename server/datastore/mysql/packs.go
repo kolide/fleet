@@ -216,21 +216,21 @@ func (d *Datastore) NewPack(pack *kolide.Pack, opts ...kolide.OptionalArg) (*kol
 	case nil:
 		query = `
 		REPLACE INTO packs
-			( name, description, platform, created_by, disabled, deleted)
-			VALUES ( ?, ?, ?, ?, ?, ?)
+			( name, description, platform, disabled, deleted)
+			VALUES ( ?, ?, ?, ?, ?)
 		`
 	case sql.ErrNoRows:
 		query = `
 		INSERT INTO packs
-			( name, description, platform, created_by, disabled, deleted)
-			VALUES ( ?, ?, ?, ?, ?, ?)
+			( name, description, platform, disabled, deleted)
+			VALUES ( ?, ?, ?, ?, ?)
 		`
 	default:
 		return nil, errors.Wrap(err, "check for existing pack")
 	}
 
 	deleted := false
-	result, err := db.Exec(query, pack.Name, pack.Description, pack.Platform, pack.CreatedBy, pack.Disabled, deleted)
+	result, err := db.Exec(query, pack.Name, pack.Description, pack.Platform, pack.Disabled, deleted)
 	if err != nil && isDuplicate(err) {
 		return nil, alreadyExists("Pack", deletedPack.ID)
 	} else if err != nil {

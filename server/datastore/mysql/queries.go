@@ -76,6 +76,11 @@ func (d *Datastore) QueryByName(name string, opts ...kolide.OptionalArg) (*kolid
 		}
 		return nil, false, errors.Wrap(err, "selecting query by name")
 	}
+
+	if err := d.loadPacksForQueries([]*kolide.Query{&query}); err != nil {
+		return nil, false, errors.Wrap(err, "loading packs for query")
+	}
+
 	return &query, true, nil
 }
 
@@ -237,31 +242,31 @@ func (d *Datastore) loadPacksForQueries(queries []*kolide.Query) error {
 	}
 
 	sql := `
-		SELECT p.*, sq.query_id AS query_id
+		SELECT p.*, sq.query_name AS query_name
 		FROM packs p
 		JOIN scheduled_queries sq
 			ON p.id = sq.pack_id
-		WHERE query_id IN (?)
+		WHERE query_name IN (?)
 		AND NOT p.deleted
 	`
 
 	// Used to map the results
-	id_queries := map[uint]*kolide.Query{}
+	name_queries := map[string]*kolide.Query{}
 	// Used for the IN clause
-	ids := []uint{}
+	names := []string{}
 	for _, q := range queries {
 		q.Packs = make([]kolide.Pack, 0)
-		ids = append(ids, q.ID)
-		id_queries[q.ID] = q
+		names = append(names, q.Name)
+		name_queries[q.Name] = q
 	}
 
-	query, args, err := sqlx.In(sql, ids)
+	query, args, err := sqlx.In(sql, names)
 	if err != nil {
 		return errors.Wrap(err, "building query in load packs for queries")
 	}
 
 	rows := []struct {
-		QueryID uint `db:"query_id"`
+		QueryName string `db:"query_name"`
 		kolide.Pack
 	}{}
 
@@ -271,7 +276,7 @@ func (d *Datastore) loadPacksForQueries(queries []*kolide.Query) error {
 	}
 
 	for _, row := range rows {
-		q := id_queries[row.QueryID]
+		q := name_queries[row.QueryName]
 		q.Packs = append(q.Packs, row.Pack)
 	}
 
