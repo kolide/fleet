@@ -49,6 +49,7 @@ var testFunctions = [...]func(*testing.T, kolide.Datastore){
 	testListHost,
 	testListHostsInPack,
 	testListPacksForHost,
+	testListPacks,
 	testDistributedQueryCampaign,
 	testCleanupDistributedQueryCampaigns,
 	testBuiltInLabels,

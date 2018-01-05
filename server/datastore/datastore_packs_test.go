@@ -1,6 +1,7 @@
 package datastore
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/WatchBeam/clock"
@@ -40,6 +41,32 @@ func testGetPackByName(t *testing.T, ds kolide.Datastore) {
 	assert.False(t, ok)
 	assert.Nil(t, pack)
 
+}
+
+func testListPacks(t *testing.T, ds kolide.Datastore) {
+	p1 := &kolide.PackSpec{
+		ID:   1,
+		Name: "foo_pack",
+	}
+	p2 := &kolide.PackSpec{
+		ID:   2,
+		Name: "bar_pack",
+	}
+	err := ds.ApplyPackSpecs([]*kolide.PackSpec{p1})
+	require.Nil(t, err)
+
+	packs, err := ds.ListPacks(kolide.ListOptions{})
+	require.Nil(t, err)
+	assert.Len(t, packs, 1)
+
+	err = ds.ApplyPackSpecs([]*kolide.PackSpec{p1, p2})
+	require.Nil(t, err)
+
+	packs, err = ds.ListPacks(kolide.ListOptions{})
+	require.Nil(t, err)
+	assert.Len(t, packs, 2)
+
+	fmt.Println(packs[0], packs[1])
 }
 
 func testListHostsInPack(t *testing.T, ds kolide.Datastore) {
