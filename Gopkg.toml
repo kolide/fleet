@@ -1,3 +1,14 @@
+# TODO remove
+[[override]]
+  name = "github.com/go-kit/kit"
+  source = "github.com/austinylin/kit"
+  branch = "twirp"
+  
+[[override]]
+  name = "github.com/kolide/launcher"
+  source = "github.com/austinylin/launcher"
+  branch = "twirp"
+    
 [[constraint]]
   branch = "master"
   name = "github.com/VividCortex/mysqlerr"
@@ -46,7 +57,7 @@
 
 [[constraint]]
   name = "github.com/kolide/kit"
-  
+
 [[constraint]]
   name = "github.com/patrickmn/sortutil"
 
@@ -93,7 +104,6 @@
 
 [[constraint]]
   name = "gopkg.in/yaml.v2"
-
 
 [[constraint]]
   name = "github.com/kolide/launcher"
