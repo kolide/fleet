@@ -83,7 +83,7 @@
     "transport/http",
     "transport/twirp"
   ]
-  revision = "bf0efd940670e10927665090e183b1aa65103cea"
+  revision = "3d612bdbb67f3bebde657a3204be9a7acd814c96"
   source = "github.com/austinylin/kit"
 
 [[projects]]
@@ -208,7 +208,7 @@
     "service/internal/launcherproto",
     "service/uuid"
   ]
-  revision = "bb752b3dc616ce8a51f8ae80251147803d683421"
+  revision = "3c3923be159f0f281aa3ea321892bd21bb7aca5e"
   source = "github.com/austinylin/launcher"
 
 [[projects]]
@@ -477,6 +477,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "079946a4f70d34322be19d280034f053df19959d5be3d90b4f194855ae122e61"
+  inputs-digest = "af1efe491486764170a6a79f0c90d7893f037e31cb673b64bd88cd0dafa92a65"
   solver-name = "gps-cdcl"
   solver-version = 1
