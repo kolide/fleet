@@ -6,8 +6,8 @@
 
 ### Create a temp directory, download and place the `node` and `golang` bins 
 
-`mkdir tmp`
-`cd tmp`
+```mkdir tmp
+cd tmp```
 
 #### install `node` and `yarn`
 
