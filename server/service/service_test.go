@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"io/ioutil"
 	"os"
 	"os/signal"
@@ -9,7 +10,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-kit/kit/log"
+	"github.com/kolide/fleet/server/config"
+	"github.com/kolide/fleet/server/logwriter"
+
+	kitlog "github.com/go-kit/kit/log"
 	"github.com/stretchr/testify/require"
 )
 
@@ -21,11 +25,16 @@ func TestRotateLoggerSIGHUP(t *testing.T) {
 	require.Nil(t, err)
 	defer f.Close()
 
-	logFile, err := osqueryLogFile(f.Name(), log.NewNopLogger(), false)
+	lw, err := logwriter.New(config.OsqueryLog{
+		File: config.OsqueryLogFile{
+			Path:              f.Name(),
+			EnableLogRotation: true,
+		},
+	}, kitlog.NewNopLogger())
 	require.Nil(t, err)
 
 	// write a log line
-	logFile.Write([]byte("msg1"))
+	lw.Write(context.Background(), []byte("msg1"))
 
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, syscall.SIGHUP)
@@ -42,7 +51,7 @@ func TestRotateLoggerSIGHUP(t *testing.T) {
 
 	// write a new log line and verify that the original file includes
 	// the new log line but not any of the old ones.
-	logFile.Write([]byte("msg2"))
+	lw.Write(context.Background(), []byte("msg2"))
 	logMsg, err := ioutil.ReadFile(f.Name())
 	require.Nil(t, err)
 

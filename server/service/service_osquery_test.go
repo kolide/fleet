@@ -1,23 +1,26 @@
 package service
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
+	"path"
 	"strings"
 	"sync"
 	"testing"
 	"time"
 
 	"github.com/WatchBeam/clock"
+	kitlog "github.com/go-kit/kit/log"
 	"github.com/kolide/fleet/server/config"
 	hostctx "github.com/kolide/fleet/server/contexts/host"
 	"github.com/kolide/fleet/server/contexts/viewer"
 	"github.com/kolide/fleet/server/datastore/inmem"
 	"github.com/kolide/fleet/server/kolide"
+	"github.com/kolide/fleet/server/logwriter"
 	"github.com/kolide/fleet/server/mock"
 	"github.com/kolide/fleet/server/pubsub"
 	"github.com/kolide/fleet/server/test"
@@ -109,8 +112,16 @@ func TestSubmitStatusLogs(t *testing.T) {
 	// Hack to get at the service internals and modify the writer
 	serv := ((svc.(validationMiddleware)).Service).(service)
 
-	var statusBuf bytes.Buffer
-	serv.osqueryStatusLogWriter = &nopCloserWriter{&statusBuf}
+	// XXX(thorduri)
+	tempPath, err := ioutil.TempDir("", "test")
+	require.Nil(t, err)
+	fileName := path.Join(tempPath, "statuslog")
+	serv.osqueryStatusLog, err = logwriter.New(config.OsqueryLog{
+		File: config.OsqueryLogFile{
+			Path: fileName,
+		},
+	}, kitlog.NewNopLogger())
+	require.Nil(t, err)
 
 	logs := []string{
 		`{"severity":"0","filename":"tls.cpp","line":"216","message":"some message","version":"1.8.2","decorations":{"host_uuid":"uuid_foobar","username":"zwass"}}`,
@@ -125,7 +136,10 @@ func TestSubmitStatusLogs(t *testing.T) {
 	err = serv.SubmitStatusLogs(ctx, status)
 	assert.Nil(t, err)
 
-	statusJSON := statusBuf.String()
+	buf, err := ioutil.ReadFile(fileName)
+	require.Nil(t, err)
+
+	statusJSON := string(buf)
 	statusJSON = strings.TrimRight(statusJSON, "\n")
 	statusLines := strings.Split(statusJSON, "\n")
 
@@ -152,8 +166,15 @@ func TestSubmitResultLogs(t *testing.T) {
 	// Hack to get at the service internals and modify the writer
 	serv := ((svc.(validationMiddleware)).Service).(service)
 
-	var resultBuf bytes.Buffer
-	serv.osqueryResultLogWriter = &nopCloserWriter{&resultBuf}
+	tempPath, err := ioutil.TempDir("", "test")
+	require.Nil(t, err)
+	fileName := path.Join(tempPath, "resultlog")
+	serv.osqueryResultLog, err = logwriter.New(config.OsqueryLog{
+		File: config.OsqueryLogFile{
+			Path: fileName,
+		},
+	}, kitlog.NewNopLogger())
+	require.Nil(t, err)
 
 	logs := []string{
 		`{"name":"system_info","hostIdentifier":"some_uuid","calendarTime":"Fri Sep 30 17:55:15 2016 UTC","unixTime":"1475258115","decorations":{"host_uuid":"some_uuid","username":"zwass"},"columns":{"cpu_brand":"Intel(R) Core(TM) i7-4770HQ CPU @ 2.20GHz","hostname":"hostimus","physical_memory":"17179869184"},"action":"added"}`,
@@ -172,7 +193,10 @@ func TestSubmitResultLogs(t *testing.T) {
 	err = serv.SubmitResultLogs(ctx, results)
 	assert.Nil(t, err)
 
-	resultJSON := resultBuf.String()
+	buf, err := ioutil.ReadFile(fileName)
+	require.Nil(t, err)
+
+	resultJSON := string(buf)
 	resultJSON = strings.TrimRight(resultJSON, "\n")
 	resultLines := strings.Split(resultJSON, "\n")
 

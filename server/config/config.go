@@ -70,11 +70,34 @@ type SessionConfig struct {
 	Duration time.Duration
 }
 
+type OsqueryLogFile struct {
+	Path              string `yaml:"path"`
+	EnableLogRotation bool   `yaml:"enable_log_rotation"`
+}
+
+type OsqueryLogSumo struct {
+	Collector string `yaml:"collector"`
+}
+
+type OsqueryLogStackDriver struct {
+	ProjectID              string `yaml:"project_id"`
+	ApplicationCredentials string `yaml:"application_credentials"`
+}
+
+// OsqueryLog defines config related to osquery status/result log writing
+type OsqueryLog struct {
+	File        OsqueryLogFile        `yaml:"file"`
+	Sumo        OsqueryLogSumo        `yaml:"sumo"`
+	StackDriver OsqueryLogStackDriver `yaml:"stackdriver"`
+}
+
 // OsqueryConfig defines configs related to osquery
 type OsqueryConfig struct {
 	NodeKeySize         int           `yaml:"node_key_size"`
 	StatusLogFile       string        `yaml:"status_log_file"`
+	StatusLog           OsqueryLog    `yaml:"status_log"`
 	ResultLogFile       string        `yaml:"result_log_file"`
+	ResultLog           OsqueryLog    `yaml:"result_log"`
 	EnableLogRotation   bool          `yaml:"enable_log_rotation"`
 	LabelUpdateInterval time.Duration `yaml:"label_update_interval"`
 }
@@ -172,8 +195,28 @@ func (man Manager) addConfigs() {
 		"Size of generated osqueryd node keys")
 	man.addConfigString("osquery.status_log_file", "/tmp/osquery_status",
 		"Path for osqueryd status logs")
+	man.addConfigString("osquery.status_log.file.path", "/tmp/osquery_status",
+		"Path for osqueryd status logs")
+	man.addConfigBool("osquery.status_log.file.enable_log_rotation", false,
+		"Automatically rotate the status log file")
+	man.addConfigString("osquery.status_log.sumo.collector", "",
+		"SumoLogic collector for osquery status logs")
+	man.addConfigString("osquery.status_log.stackdriver.project_id", "",
+		"GCP Project ID for stackdriver status logging")
+	man.addConfigString("osquery.status_log.stackdriver.application_credentials", "",
+		"Google Application Credentials for stackdriver logging")
 	man.addConfigString("osquery.result_log_file", "/tmp/osquery_result",
 		"Path for osqueryd result logs")
+	man.addConfigString("osquery.result_log.file.path", "/tmp/osquery_result",
+		"Path for osqueryd result logs")
+	man.addConfigBool("osquery.result_log.file.enable_log_rotation", false,
+		"Automatically rotate the result log file")
+	man.addConfigString("osquery.result_log.sumo.collector", "",
+		"SumoLogic collector for osquery result logs")
+	man.addConfigString("osquery.result_log.stackdriver.project_id", "",
+		"GCP Project ID for stackdriver result logging")
+	man.addConfigString("osquery.result_log.stackdriver.application_credentials", "",
+		"Google Application Credentials for stackdriver logging")
 	man.addConfigDuration("osquery.label_update_interval", 1*time.Hour,
 		"Interval to update host label membership (i.e. 1h)")
 	man.addConfigBool("osquery.enable_log_rotation", false,
@@ -232,9 +275,35 @@ func (man Manager) LoadConfig() KolideConfig {
 			Duration: man.getConfigDuration("session.duration"),
 		},
 		Osquery: OsqueryConfig{
-			NodeKeySize:         man.getConfigInt("osquery.node_key_size"),
-			StatusLogFile:       man.getConfigString("osquery.status_log_file"),
-			ResultLogFile:       man.getConfigString("osquery.result_log_file"),
+			NodeKeySize:   man.getConfigInt("osquery.node_key_size"),
+			StatusLogFile: man.getConfigString("osquery.status_log_file"),
+			StatusLog: OsqueryLog{
+				File: OsqueryLogFile{
+					Path:              man.getConfigString("osquery.status_log.file.path"),
+					EnableLogRotation: man.getConfigBool("osquery.status_log.file.enable_log_rotation"),
+				},
+				Sumo: OsqueryLogSumo{
+					Collector: man.getConfigString("osquery.status_log.sumo.collector"),
+				},
+				StackDriver: OsqueryLogStackDriver{
+					ProjectID:              man.getConfigString("osquery.status_log.stackdriver.project_id"),
+					ApplicationCredentials: man.getConfigString("osquery.status_log.stackdriver.application_credentials"),
+				},
+			},
+			ResultLogFile: man.getConfigString("osquery.result_log_file"),
+			ResultLog: OsqueryLog{
+				File: OsqueryLogFile{
+					Path:              man.getConfigString("osquery.result_log.file.path"),
+					EnableLogRotation: man.getConfigBool("osquery.result_log.file.enable_log_rotation"),
+				},
+				Sumo: OsqueryLogSumo{
+					Collector: man.getConfigString("osquery.result_log.sumo.collector"),
+				},
+				StackDriver: OsqueryLogStackDriver{
+					ProjectID:              man.getConfigString("osquery.result_log.stackdriver.project_id"),
+					ApplicationCredentials: man.getConfigString("osquery.result_log.stackdriver.application_credentials"),
+				},
+			},
 			LabelUpdateInterval: man.getConfigDuration("osquery.label_update_interval"),
 			EnableLogRotation:   man.getConfigBool("osquery.enable_log_rotation"),
 		},
