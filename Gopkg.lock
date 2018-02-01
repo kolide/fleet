@@ -62,15 +62,29 @@
 
 [[projects]]
   name = "github.com/garyburd/redigo"
-  packages = ["internal","redis"]
+  packages = [
+    "internal",
+    "redis"
+  ]
   revision = "47dc60e71eed504e3ef8e77ee3c6fe720f3be57f"
   version = "v1.3.0"
 
 [[projects]]
+  branch = "twirp"
   name = "github.com/go-kit/kit"
-  packages = ["endpoint","log","log/level","metrics","metrics/internal/lv","metrics/prometheus","transport/grpc","transport/http"]
-  revision = "4dc7be5d2d12881735283bcab7352178e190fc71"
-  version = "v0.6.0"
+  packages = [
+    "endpoint",
+    "log",
+    "log/level",
+    "metrics",
+    "metrics/internal/lv",
+    "metrics/prometheus",
+    "transport/grpc",
+    "transport/http",
+    "transport/twirp"
+  ]
+  revision = "3d612bdbb67f3bebde657a3204be9a7acd814c96"
+  source = "github.com/austinylin/kit"
 
 [[projects]]
   name = "github.com/go-logfmt/logfmt"
@@ -93,7 +107,15 @@
 [[projects]]
   branch = "master"
   name = "github.com/golang/protobuf"
-  packages = ["proto","ptypes","ptypes/any","ptypes/duration","ptypes/timestamp"]
+  packages = [
+    "jsonpb",
+    "proto",
+    "ptypes",
+    "ptypes/any",
+    "ptypes/duration",
+    "ptypes/struct",
+    "ptypes/timestamp"
+  ]
   revision = "1e59b77b52bf8e4b449a57e6f79f21226d571845"
 
 [[projects]]
@@ -123,7 +145,17 @@
 [[projects]]
   branch = "master"
   name = "github.com/hashicorp/hcl"
-  packages = [".","hcl/ast","hcl/parser","hcl/scanner","hcl/strconv","hcl/token","json/parser","json/scanner","json/token"]
+  packages = [
+    ".",
+    "hcl/ast",
+    "hcl/parser",
+    "hcl/scanner",
+    "hcl/strconv",
+    "hcl/token",
+    "json/parser",
+    "json/scanner",
+    "json/token"
+  ]
   revision = "23c074d0eceb2b8a5bfdbb271ab780cde70f05a8"
 
 [[projects]]
@@ -141,7 +173,10 @@
 [[projects]]
   branch = "master"
   name = "github.com/jmoiron/sqlx"
-  packages = [".","reflectx"]
+  packages = [
+    ".",
+    "reflectx"
+  ]
   revision = "99f3ad6d85ae53d0fecf788ab62d0e9734b3c117"
 
 [[projects]]
@@ -159,19 +194,31 @@
 [[projects]]
   branch = "master"
   name = "github.com/kolide/kit"
-  packages = ["logutil","version"]
+  packages = [
+    "logutil",
+    "version"
+  ]
   revision = "566c8f56a6ff7daba204818fbab0f2cb854b3310"
 
 [[projects]]
-  branch = "master"
+  branch = "twirp"
   name = "github.com/kolide/launcher"
-  packages = ["service","service/internal/launcherproto","service/uuid"]
-  revision = "4b93ec1bd7ab0eaa302ddcfa8ed554950de8f38e"
+  packages = [
+    "service",
+    "service/internal/launcherproto",
+    "service/uuid"
+  ]
+  revision = "3c3923be159f0f281aa3ea321892bd21bb7aca5e"
+  source = "github.com/austinylin/launcher"
 
 [[projects]]
   branch = "master"
   name = "github.com/kolide/osquery-go"
-  packages = ["gen/osquery","plugin/distributed","plugin/logger"]
+  packages = [
+    "gen/osquery",
+    "plugin/distributed",
+    "plugin/logger"
+  ]
   revision = "77394894ef63b4ea25e1c0c4f8a8b3d1919e1aa6"
 
 [[projects]]
@@ -224,7 +271,10 @@
 
 [[projects]]
   name = "github.com/prometheus/client_golang"
-  packages = ["prometheus","prometheus/promhttp"]
+  packages = [
+    "prometheus",
+    "prometheus/promhttp"
+  ]
   revision = "c5b7fccd204277076155f10851dad72b76a49317"
   version = "v0.8.0"
 
@@ -237,13 +287,20 @@
 [[projects]]
   branch = "master"
   name = "github.com/prometheus/common"
-  packages = ["expfmt","internal/bitbucket.org/ww/goautoneg","model"]
+  packages = [
+    "expfmt",
+    "internal/bitbucket.org/ww/goautoneg",
+    "model"
+  ]
   revision = "2e54d0b93cba2fd133edc32211dcc32c06ef72ca"
 
 [[projects]]
   branch = "master"
   name = "github.com/prometheus/procfs"
-  packages = [".","xfs"]
+  packages = [
+    ".",
+    "xfs"
+  ]
   revision = "a6e9df898b1336106c743392c48ee0b71f5c4efa"
 
 [[projects]]
@@ -255,12 +312,19 @@
 [[projects]]
   branch = "master"
   name = "github.com/russellhaering/goxmldsig"
-  packages = [".","etreeutils","types"]
+  packages = [
+    ".",
+    "etreeutils",
+    "types"
+  ]
   revision = "b7efc6231e45b10bfd779852831c8bb59b350ec5"
 
 [[projects]]
   name = "github.com/spf13/afero"
-  packages = [".","mem"]
+  packages = [
+    ".",
+    "mem"
+  ]
   revision = "8d919cbe7e2627e417f3e45c3c0e489a5b7e2536"
   version = "v1.0.0"
 
@@ -297,19 +361,43 @@
 [[projects]]
   branch = "master"
   name = "github.com/stretchr/testify"
-  packages = ["assert","require"]
+  packages = [
+    "assert",
+    "require"
+  ]
   revision = "2aa2c176b9dab406a6970f6a55f513e8a8c8b18f"
+
+[[projects]]
+  name = "github.com/twitchtv/twirp"
+  packages = [
+    ".",
+    "ctxsetters",
+    "internal/contextkeys"
+  ]
+  revision = "dff337b186d4ea1ada1d1e54ef422fdbcfa3113d"
+  version = "v5.1.0"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
-  packages = ["bcrypt","blowfish"]
+  packages = [
+    "bcrypt",
+    "blowfish"
+  ]
   revision = "94eea52f7b742c7cbe0b03b22f0c4c8631ece122"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/net"
-  packages = ["context","http2","http2/hpack","idna","internal/timeseries","lex/httplex","trace"]
+  packages = [
+    "context",
+    "http2",
+    "http2/hpack",
+    "idna",
+    "internal/timeseries",
+    "lex/httplex",
+    "trace"
+  ]
   revision = "a8b9294777976932365dabb6640cf1468d95c70f"
 
 [[projects]]
@@ -321,7 +409,22 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/text"
-  packages = ["collate","collate/build","internal/colltab","internal/gen","internal/tag","internal/triegen","internal/ucd","language","secure/bidirule","transform","unicode/bidi","unicode/cldr","unicode/norm","unicode/rangetable"]
+  packages = [
+    "collate",
+    "collate/build",
+    "internal/colltab",
+    "internal/gen",
+    "internal/tag",
+    "internal/triegen",
+    "internal/ucd",
+    "language",
+    "secure/bidirule",
+    "transform",
+    "unicode/bidi",
+    "unicode/cldr",
+    "unicode/norm",
+    "unicode/rangetable"
+  ]
   revision = "75cc3cad82b5f47d3fb229ddda8c5167da14f294"
 
 [[projects]]
@@ -333,7 +436,30 @@
 [[projects]]
   branch = "master"
   name = "google.golang.org/grpc"
-  packages = [".","balancer","balancer/roundrobin","codes","connectivity","credentials","encoding","grpclb/grpc_lb_v1/messages","grpclog","internal","keepalive","metadata","naming","peer","resolver","resolver/dns","resolver/manual","resolver/passthrough","stats","status","tap","transport"]
+  packages = [
+    ".",
+    "balancer",
+    "balancer/roundrobin",
+    "codes",
+    "connectivity",
+    "credentials",
+    "encoding",
+    "grpclb/grpc_lb_v1/messages",
+    "grpclog",
+    "internal",
+    "keepalive",
+    "metadata",
+    "naming",
+    "peer",
+    "resolver",
+    "resolver/dns",
+    "resolver/manual",
+    "resolver/passthrough",
+    "stats",
+    "status",
+    "tap",
+    "transport"
+  ]
   revision = "a4bf341022f076582fc2e9a802ce170a8938f81d"
 
 [[projects]]
@@ -351,6 +477,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "8bca5e6fdea71d7fa8f4251ba35e18142490728a17e4aa5de66cf8fd23d9c798"
+  inputs-digest = "af1efe491486764170a6a79f0c90d7893f037e31cb673b64bd88cd0dafa92a65"
   solver-name = "gps-cdcl"
   solver-version = 1
