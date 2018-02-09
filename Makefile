@@ -44,7 +44,7 @@ ifndef MYSQL_PORT_3306_TCP_ADDR
 	MYSQL_PORT_3306_TCP_ADDR = 127.0.0.1
 endif
 
-KIT_VERSION = "\
+KIT_VERSION = "-w -s \
 	-X github.com/kolide/fleet/vendor/github.com/kolide/kit/version.appName=${APP_NAME} \
 	-X github.com/kolide/fleet/vendor/github.com/kolide/kit/version.version=${VERSION} \
 	-X github.com/kolide/fleet/vendor/github.com/kolide/kit/version.branch=${BRANCH} \
