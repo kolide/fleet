@@ -83,7 +83,7 @@
     "transport/http",
     "transport/twirp"
   ]
-  revision = "3d612bdbb67f3bebde657a3204be9a7acd814c96"
+  revision = "36868d3b32a694d9c109080f843b9a8c8426c4db"
   source = "github.com/austinylin/kit"
 
 [[projects]]
@@ -208,7 +208,7 @@
     "service/internal/launcherproto",
     "service/uuid"
   ]
-  revision = "3c3923be159f0f281aa3ea321892bd21bb7aca5e"
+  revision = "0fb740f1d69f48b5f9f83ce0a257069717db4199"
   source = "github.com/austinylin/launcher"
 
 [[projects]]
