@@ -129,6 +129,9 @@ type AppConfig struct {
 	EnableSSO bool `db:"enable_sso"`
 	// FIMInterval defines the interval when file integrity checks will occur
 	FIMInterval int `db:"fim_interval"`
+	// FimeFileAccess defines the FIMSections which will be monitored for file access events as a JSON formatted array
+	FIMFileAccesses string `db:"fim_file_accesses"`
+
 }
 
 // ModifyAppConfigRequest contains application configuration information
