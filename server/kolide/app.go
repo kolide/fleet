@@ -131,7 +131,6 @@ type AppConfig struct {
 	FIMInterval int `db:"fim_interval"`
 	// FimeFileAccess defines the FIMSections which will be monitored for file access events as a JSON formatted array
 	FIMFileAccesses string `db:"fim_file_accesses"`
-
 }
 
 // ModifyAppConfigRequest contains application configuration information

@@ -53,7 +53,7 @@ func (d *Datastore) SaveAppConfig(info *kolide.AppConfig) error {
       metadata_url,
       idp_name,
       enable_sso,
-	  fim_interval,
+      fim_interval,
       fim_file_accesses
     )
     VALUES( 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
