@@ -41,6 +41,6 @@ type FIMConfig struct {
 	// See https://osquery.readthedocs.io/en/stable/deployment/file-integrity-monitoring/
 	FilePaths FIMSections `json:"file_paths,omitempty"`
 	// FileAccesses defines those name groups of FIMSections which will be monitored for file accesses
-	FileAccesses []string `json:"file_accesses,omitempty""`
+	FileAccesses []string `json:"file_accesses,omitempty"`
 
 }
