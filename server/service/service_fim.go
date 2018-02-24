@@ -19,7 +19,7 @@ func (svc service) GetFIM(ctx context.Context) (*kolide.FIMConfig, error) {
 	}
 
 	var arr []string
-	if(config.FIMFileAccesses != "") {
+	if len(config.FIMFileAccesses) > 0 {
 		if err = json.Unmarshal([]byte(config.FIMFileAccesses), &arr); err != nil {
 			return nil, errors.Wrap(err, "Error reading fim section, fileaccesses must be formatted as an array [\"cassandra\",\"etc\",\"homes\"]")
 		}
@@ -45,14 +45,12 @@ func (svc service) ModifyFIM(ctx context.Context, fim kolide.FIMConfig) error {
 
 	config.FIMInterval = int(fim.Interval)
 
-	if fim.FileAccesses != nil && len(fim.FileAccesses) > 0 {
+	if len(fim.FileAccesses) > 0 {
 		fileAccesses, err := json.Marshal(fim.FileAccesses)
 		if err != nil {
 			return errors.Wrap(err, "Error creating fim section, fileaccesses must be formatted as an array [\"cassandra\",\"etc\",\"homes\"]")
 		}
 		config.FIMFileAccesses = string(fileAccesses)
-	} else {
-		config.FIMFileAccesses = ""
 	}
 
 	for sectionName, paths := range fim.FilePaths {
