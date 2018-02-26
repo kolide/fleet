@@ -12,7 +12,7 @@ import (
 
 func TestGetFIMService(t *testing.T) {
 	fileAccessesString := "[\"etc\", \"home\", \"cassandra\"]"
-	fileAccessStringValue := []string([]string{"etc", "home", "cassandra"})
+	fileAccessStringValue := []string{"etc", "home", "cassandra"}
 	fimIntervalTestValue := 500 //300 is the default value
 
 	ds := &mock.Store{
@@ -52,7 +52,7 @@ func TestGetFIMService(t *testing.T) {
 
 func TestUpdateFIM(t *testing.T) {
 	fileAccessesString := "[\"etc\", \"home\", \"cassandra\"]"
-	fileAccessStringValue := []string([]string{"etc", "home", "cassandra"})
+	fileAccessStringValue := []string{"etc", "home", "cassandra"}
 	fimIntervalTestValue := 500 //300 is the default value
 
 	ds := &mock.Store{
