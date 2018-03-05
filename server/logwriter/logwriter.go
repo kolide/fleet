@@ -2,73 +2,104 @@
 package logwriter
 
 import (
-	"bufio"
-	"io"
-	"os"
-	"sync"
+	"context"
 
+	"github.com/kolide/fleet/server/config"
+
+	kitlog "github.com/go-kit/kit/log"
 	"github.com/pkg/errors"
 )
 
-type logWriter struct {
-	file *os.File
-	buff *bufio.Writer
-	mtx  sync.Mutex
+type writers interface {
+	Write(context.Context, []byte) error
+	Flush(context.Context) error
+	Close(context.Context) error
 }
 
-// New creates a logwriter, path refers to file that will receive log content
-func New(path string) (io.WriteCloser, error) {
-	file, err := os.OpenFile(path, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0644)
+type Log struct {
+	writers []writers
+	logger  kitlog.Logger
+}
+
+func New(conf config.OsqueryLog, logger kitlog.Logger) (*Log, error) {
+	l := new(Log)
+
+	logger = kitlog.With(logger, "component", "logwriter")
+
+	fw, err := newFile(conf.File, logger)
 	if err != nil {
 		return nil, err
+	} else if fw != nil {
+		l.writers = append(l.writers, fw)
 	}
-	buff := bufio.NewWriter(file)
-	return &logWriter{file: file, buff: buff}, nil
+
+	sw, err := newSumo(conf.Sumo, logger)
+	if err != nil {
+		return nil, err
+	} else if sw != nil {
+		l.writers = append(l.writers, sw)
+	}
+
+	sdw, err := newStackDriver(conf.StackDriver, logger)
+	if err != nil {
+		return nil, err
+	} else if sdw != nil {
+		l.writers = append(l.writers, sdw)
+	}
+
+	l.logger = logger
+	return l, nil
 }
 
-// Write bytes to file
-func (l *logWriter) Write(b []byte) (int, error) {
-	l.mtx.Lock()
-	defer l.mtx.Unlock()
-	if l.buff == nil || l.file == nil {
-		return 0, errors.New("logwriter: can't write to closed file")
-	}
-	if _, statErr := os.Stat(l.file.Name()); os.IsNotExist(statErr) {
-		f, err := os.OpenFile(l.file.Name(), os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0644)
-		if err != nil {
-			return 0, errors.Wrapf(err, "create file for logWriter %s", l.file.Name())
+func (l *Log) Write(ctx context.Context, b []byte) error {
+	nerr := 0
+
+	for _, w := range l.writers {
+		if err := w.Write(ctx, b); err != nil {
+			l.logger.Log("err", err)
+			nerr++
 		}
-		l.file = f
-		l.buff = bufio.NewWriter(f)
 	}
-	return l.buff.Write(b)
+
+	// Only report errors if all writers failed.
+	if nerr == len(l.writers) {
+		return errors.New("logwriter: all writers failed writing")
+	}
+
+	return nil
 }
 
-// Flush write all buffered bytes to log file
-func (l *logWriter) Flush() error {
-	l.mtx.Lock()
-	defer l.mtx.Unlock()
-	if l.buff == nil {
-		return errors.New("can't write to a closed file")
+func (l *Log) Flush(ctx context.Context) error {
+	nerr := 0
+
+	for _, w := range l.writers {
+		if err := w.Flush(ctx); err != nil {
+			l.logger.Log("err", err)
+			nerr++
+		}
 	}
-	return l.buff.Flush()
+
+	// Only report errors if all writers failed.
+	if nerr == len(l.writers) {
+		return errors.New("logwriter: all writers failed flushing")
+	}
+
+	return nil
 }
 
-// Close log file
-func (l *logWriter) Close() error {
-	l.mtx.Lock()
-	defer l.mtx.Unlock()
-	if l.buff != nil {
-		if err := l.buff.Flush(); err != nil {
-			return err
+func (l *Log) Close(ctx context.Context) error {
+	nerr := 0
+
+	for _, w := range l.writers {
+		if err := w.Close(ctx); err != nil {
+			l.logger.Log("err", err)
+			nerr++
 		}
-		l.buff = nil
 	}
-	if l.file != nil {
-		if err := l.file.Close(); err != nil {
-			return err
-		}
-		l.file = nil
+
+	// Only report errors if all writers failed.
+	if nerr == len(l.writers) {
+		return errors.New("logwriter: all writers failed flushing")
 	}
 
 	return nil

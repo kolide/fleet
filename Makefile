@@ -163,7 +163,8 @@ deps:
 	go get -u \
 		github.com/kolide/go-bindata/... \
 		github.com/golang/dep/cmd/dep \
-		github.com/groob/mockimpl
+		github.com/groob/mockimpl \
+		cloud.google.com/go/logging
 	dep ensure -vendor-only
 
 distclean:

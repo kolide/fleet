@@ -220,38 +220,26 @@ func (svc service) GetClientConfig(ctx context.Context) (*kolide.OsqueryConfig, 
 	return svc.getFIMConfig(ctx, config)
 }
 
-// If osqueryWriters are based on bufio we want to flush after a batch of
-// writes so log entry gets completely written to the logfile.
-type flusher interface {
-	Flush() error
-}
-
 func (svc service) SubmitStatusLogs(ctx context.Context, logs []json.RawMessage) error {
 	for _, log := range logs {
-		if _, err := svc.osqueryStatusLogWriter.Write(append(log, '\n')); err != nil {
+		if err := svc.osqueryStatusLog.Write(ctx, append(log, '\n')); err != nil {
 			return osqueryError{message: "error writing status log: " + err.Error()}
 		}
 	}
-	if writer, ok := svc.osqueryStatusLogWriter.(flusher); ok {
-		err := writer.Flush()
-		if err != nil {
-			return osqueryError{message: "error flushing status log: " + err.Error()}
-		}
+	if err := svc.osqueryStatusLog.Flush(ctx); err != nil {
+		return osqueryError{message: "error flushing status log: " + err.Error()}
 	}
 	return nil
 }
 
 func (svc service) SubmitResultLogs(ctx context.Context, logs []json.RawMessage) error {
 	for _, log := range logs {
-		if _, err := svc.osqueryResultLogWriter.Write(append(log, '\n')); err != nil {
+		if err := svc.osqueryResultLog.Write(ctx, append(log, '\n')); err != nil {
 			return osqueryError{message: "error writing result log: " + err.Error()}
 		}
 	}
-	if writer, ok := svc.osqueryResultLogWriter.(flusher); ok {
-		err := writer.Flush()
-		if err != nil {
-			return osqueryError{message: "error flushing status log: " + err.Error()}
-		}
+	if err := svc.osqueryResultLog.Flush(ctx); err != nil {
+		return osqueryError{message: "error flushing status log: " + err.Error()}
 	}
 	return nil
 }
