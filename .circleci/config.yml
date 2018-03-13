@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  build-go1.9:
+  build-go1.10:
     docker:
         - image: kolide/fleet-builder:1.10
     working_directory: /go/src/github.com/kolide/fleet
