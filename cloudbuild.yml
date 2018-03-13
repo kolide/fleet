@@ -1,0 +1,20 @@
+steps:
+    - name: 'gcr.io/kolide-private-containers/go'
+      dir: '$_REPO'
+      entrypoint: 'sh'
+      args: ['-c', '/workspace/$_REPO/tools/cloudbuild/build.sh']
+      env: ['PROJECT_ROOT=github.com/$_OWNER/$_REPO']
+      volumes:
+      - name: 'ssh'
+        path: /root/.ssh
+
+    - name: 'gcr.io/cloud-builders/docker'
+      dir: '$_REPO'
+      args: [
+                'build', 
+                '--tag=gcr.io/$PROJECT_ID/$_REPO:$SHORT_SHA', 
+                '.'
+            ]
+
+images:
+    - 'gcr.io/$PROJECT_ID/$_REPO:$SHORT_SHA'
