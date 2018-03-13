@@ -2,7 +2,7 @@ version: 2
 jobs:
   build-go1.9:
     docker:
-        - image: kolide/fleet-builder:1.9
+        - image: kolide/fleet-builder:1.10
     working_directory: /go/src/github.com/kolide/fleet
     steps: &steps
       - checkout
@@ -40,4 +40,4 @@ workflows:
   version: 2
   build:
     jobs:
-      - build-go1.9
+      - build-go1.10
