@@ -77,13 +77,17 @@ func decodeSubmitDistributedQueryResultsRequest(ctx context.Context, r *http.Req
 	// Statuses were represented by strings in osquery < 3.0 and now
 	// integers in osquery > 3.0. Massage to string for compatibility with
 	// the service definition.
-	statuses := map[string]string{}
+	statuses := map[string]kolide.OsqueryStatus{}
 	for query, status := range shim.Statuses {
 		switch s := status.(type) {
 		case string:
-			statuses[query] = s
+			sint, err := strconv.Atoi(s)
+			if err != nil {
+				return nil, errors.Wrap(err, "parse status to int")
+			}
+			statuses[query] = kolide.OsqueryStatus(sint)
 		case float64:
-			statuses[query] = strconv.Itoa(int(s))
+			statuses[query] = kolide.OsqueryStatus(s)
 		default:
 			return nil, errors.Errorf("query status should be string or number, got %T", s)
 		}
