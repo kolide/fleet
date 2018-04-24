@@ -115,7 +115,7 @@ func TestDecodeSubmitDistributedQueryResultsRequest(t *testing.T) {
           ],
           "id3": ""
         },
-        "statuses": {"id1": "0", "id3": "1"}
+        "statuses": {"id1": 0, "id3": "1"}
     }`))
 
 	router.ServeHTTP(

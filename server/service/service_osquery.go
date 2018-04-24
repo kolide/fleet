@@ -678,7 +678,7 @@ func (svc service) SubmitDistributedQueryResults(ctx context.Context, results ko
 			// osquery docs say any nonzero (string) value for
 			// status indicates a query error
 			status, ok := statuses[query]
-			failed := ok && status != "0"
+			failed := (ok && status != "0")
 			err = svc.ingestDistributedQuery(host, query, rows, failed)
 		default:
 			err = osqueryError{message: "unknown query prefix: " + query}
