@@ -30,6 +30,8 @@ type specForExport struct {
 }
 
 func Up_20171212182458(tx *sql.Tx) error {
+	// Migrate pre fleetctl osquery options to the new osquery options
+	// formats.
 	txx := sqlx.Tx{Tx: tx, Mapper: reflectx.NewMapperFunc("db", sqlx.NameMapper)}
 
 	// Get basic osquery options
