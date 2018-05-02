@@ -7,14 +7,14 @@ import (
 	"github.com/kolide/fleet/server/kolide"
 )
 
-type setupRequest struct {
+type SetupRequest struct {
 	Admin           *kolide.UserPayload `json:"admin"`
 	OrgInfo         *kolide.OrgInfo     `json:"org_info"`
-	KolideServerURL *string             `json:"kolide_server_url"`
-	EnrollSecret    *string             `json:"osquery_enroll_secret"`
+	KolideServerURL *string             `json:"kolide_server_url,omitempty"`
+	EnrollSecret    *string             `json:"osquery_enroll_secret,omitempty"`
 }
 
-type setupResponse struct {
+type SetupResponse struct {
 	Admin           *kolide.User    `json:"admin,omitempty"`
 	OrgInfo         *kolide.OrgInfo `json:"org_info,omitempty"`
 	KolideServerURL *string         `json:"kolide_server_url"`
@@ -23,7 +23,7 @@ type setupResponse struct {
 	Err             error           `json:"error,omitempty"`
 }
 
-func (r setupResponse) error() error { return r.Err }
+func (r SetupResponse) error() error { return r.Err }
 
 func makeSetupEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
@@ -33,7 +33,7 @@ func makeSetupEndpoint(svc kolide.Service) endpoint.Endpoint {
 			configPayload kolide.AppConfigPayload
 			err           error
 		)
-		req := request.(setupRequest)
+		req := request.(SetupRequest)
 		if req.OrgInfo != nil {
 			configPayload.OrgInfo = req.OrgInfo
 		}
@@ -46,14 +46,14 @@ func makeSetupEndpoint(svc kolide.Service) endpoint.Endpoint {
 		}
 		config, err = svc.NewAppConfig(ctx, configPayload)
 		if err != nil {
-			return setupResponse{Err: err}, nil
+			return SetupResponse{Err: err}, nil
 		}
 		// creating the user should be the last action. If there's a user
 		// present and other errors occur, the setup endpoint closes.
 		if req.Admin != nil {
 			admin, err = svc.NewAdminCreatedUser(ctx, *req.Admin)
 			if err != nil {
-				return setupResponse{Err: err}, nil
+				return SetupResponse{Err: err}, nil
 			}
 		}
 
@@ -65,7 +65,7 @@ func makeSetupEndpoint(svc kolide.Service) endpoint.Endpoint {
 		if err != nil {
 			token = nil
 		}
-		return setupResponse{
+		return SetupResponse{
 			Admin: admin,
 			OrgInfo: &kolide.OrgInfo{
 				OrgName:    &config.OrgName,

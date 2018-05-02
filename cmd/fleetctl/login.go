@@ -8,30 +8,6 @@ import (
 	"github.com/urfave/cli"
 )
 
-func setupCommand() cli.Command {
-	var (
-		flAddress string
-	)
-	return cli.Command{
-		Name:      "setup",
-		Usage:     "Setup a Kolide Fleet instance",
-		UsageText: `fleetctl config login [options]`,
-		Flags: []cli.Flag{
-			cli.StringFlag{
-				Name:        "address",
-				Value:       "",
-				Destination: &flAddress,
-				Usage:       "The address of the Kolide Fleet instance",
-			},
-		},
-		Action: func(cliCtx *cli.Context) error {
-			logger := log.NewLogfmtLogger(os.Stdout)
-			level.Info(logger).Log("msg", "setting up fleet")
-			return nil
-		},
-	}
-}
-
 func loginCommand() cli.Command {
 	var (
 		flAddress string
