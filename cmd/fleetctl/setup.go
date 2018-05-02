@@ -67,7 +67,16 @@ func setupCommand() cli.Command {
 				return errors.Wrap(err, "error creating Fleet API client")
 			}
 
-			return fleet.Setup(flEmail, flPassword, flOrgName)
+			err = fleet.Setup(flEmail, flPassword, flOrgName)
+			if err != nil {
+				// the Kolide Fleet instance has already been setup
+				if setupErr, ok := err.(client.SetupAlreadyErr); ok {
+					return setupErr
+				}
+				return errors.Wrap(err, "error setting up Fleet")
+			}
+
+			return nil
 		},
 	}
 }

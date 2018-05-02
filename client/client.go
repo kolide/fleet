@@ -71,7 +71,7 @@ func (c *Client) Setup(email, password, org string) error {
 	// If setup has already been completed, Kolide Fleet will not serve the
 	// setup route, which will cause the request to 404
 	if response.StatusCode == http.StatusNotFound {
-		return errors.New("Kolide Fleet has already been setup")
+		return setupAlready()
 	}
 
 	if response.StatusCode != http.StatusOK {
