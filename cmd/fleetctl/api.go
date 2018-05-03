@@ -23,5 +23,9 @@ func clientFromCLI(c *cli.Context) (*service.Client, error) {
 		return nil, fmt.Errorf("context %q is not found", c.String("context"))
 	}
 
+	if cc.Address == "" {
+		return nil, errors.New("set the Fleet API address with: fleetctl config set --address=locaalhost:8080")
+	}
+
 	return service.NewClient(cc.Address, cc.IgnoreTLS)
 }

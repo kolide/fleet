@@ -37,7 +37,7 @@ func loginCommand() cli.Command {
 		Action: func(c *cli.Context) error {
 			fleet, err := clientFromCLI(c)
 			if err != nil {
-				return errors.Wrap(err, "error creating Fleet API client")
+				return err
 			}
 
 			token, err := fleet.Login(flEmail, flPassword)
