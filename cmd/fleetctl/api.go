@@ -27,5 +27,17 @@ func clientFromCLI(c *cli.Context) (*service.Client, error) {
 		return nil, errors.New("set the Fleet API address with: fleetctl config set --address=locaalhost:8080")
 	}
 
-	return service.NewClient(cc.Address, cc.IgnoreTLS)
+	fleet, err := service.NewClient(cc.Address, cc.IgnoreTLS)
+	if err != nil {
+		return nil, errors.Wrap(err, "error creating Fleet API client handler")
+	}
+
+	token, err := getConfigValue(c, "token")
+	if err != nil {
+		return nil, errors.Wrap(err, "error getting token from the config")
+	}
+
+	fleet.SetToken(token)
+
+	return fleet, nil
 }

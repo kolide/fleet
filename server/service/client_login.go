@@ -9,7 +9,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Login attempts to login to the current Fleet instance. If setup is successful,
+// Login attempts to login to the current Fleet instance. If login is successful,
 // an auth token is returned.
 func (c *Client) Login(email, password string) (string, error) {
 	params := loginRequest{

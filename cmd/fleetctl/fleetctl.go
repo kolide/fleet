@@ -24,6 +24,7 @@ func main() {
 	app.Commands = []cli.Command{
 		setupCommand(),
 		loginCommand(),
+		logoutCommand(),
 		cli.Command{
 			Name:  "config",
 			Usage: "Modify how and which Fleet server to connect to",
