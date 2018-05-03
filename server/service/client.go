@@ -10,8 +10,9 @@ import (
 )
 
 type Client struct {
-	addr string
-	http *http.Client
+	addr  string
+	token string
+	http  *http.Client
 }
 
 func NewClient(addr string, insecureSkipVerify bool) (*Client, error) {
@@ -45,4 +46,8 @@ func (c *Client) Do(verb, path string, params interface{}) (*http.Response, erro
 	request.Header.Set("accept", "application/json")
 
 	return c.http.Do(request)
+}
+
+func (c *Client) SetToken(t string) {
+	c.token = t
 }
