@@ -110,7 +110,11 @@ func getConfigValue(c *cli.Context, key string) (string, error) {
 	case "token":
 		return currentContext.Token, nil
 	case "ignore_tls":
-		return fmt.Sprintf("%b", currentContext.IgnoreTLS), nil
+		if currentContext.IgnoreTLS {
+			return "true", nil
+		} else {
+			return "false", nil
+		}
 	default:
 		return "", fmt.Errorf("%q is an invalid key", key)
 	}
@@ -154,7 +158,7 @@ func setConfigValue(c *cli.Context, key, value string) error {
 		}
 		currentContext.IgnoreTLS = boolValue
 	default:
-		return fmt.Errorf("%q is an invalid option")
+		return fmt.Errorf("%q is an invalid option", key)
 	}
 
 	config.Contexts[flContext] = currentContext
