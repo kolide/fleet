@@ -1,4 +1,4 @@
-package client
+package service
 
 type SetupAlreadyErr interface {
 	SetupAlready() bool

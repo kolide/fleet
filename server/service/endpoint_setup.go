@@ -7,14 +7,14 @@ import (
 	"github.com/kolide/fleet/server/kolide"
 )
 
-type SetupRequest struct {
+type setupRequest struct {
 	Admin           *kolide.UserPayload `json:"admin"`
 	OrgInfo         *kolide.OrgInfo     `json:"org_info"`
 	KolideServerURL *string             `json:"kolide_server_url,omitempty"`
 	EnrollSecret    *string             `json:"osquery_enroll_secret,omitempty"`
 }
 
-type SetupResponse struct {
+type setupResponse struct {
 	Admin           *kolide.User    `json:"admin,omitempty"`
 	OrgInfo         *kolide.OrgInfo `json:"org_info,omitempty"`
 	KolideServerURL *string         `json:"kolide_server_url"`
@@ -23,7 +23,7 @@ type SetupResponse struct {
 	Err             error           `json:"error,omitempty"`
 }
 
-func (r SetupResponse) error() error { return r.Err }
+func (r setupResponse) error() error { return r.Err }
 
 func makeSetupEndpoint(svc kolide.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
@@ -33,7 +33,7 @@ func makeSetupEndpoint(svc kolide.Service) endpoint.Endpoint {
 			configPayload kolide.AppConfigPayload
 			err           error
 		)
-		req := request.(SetupRequest)
+		req := request.(setupRequest)
 		if req.OrgInfo != nil {
 			configPayload.OrgInfo = req.OrgInfo
 		}
@@ -46,14 +46,14 @@ func makeSetupEndpoint(svc kolide.Service) endpoint.Endpoint {
 		}
 		config, err = svc.NewAppConfig(ctx, configPayload)
 		if err != nil {
-			return SetupResponse{Err: err}, nil
+			return setupResponse{Err: err}, nil
 		}
 		// creating the user should be the last action. If there's a user
 		// present and other errors occur, the setup endpoint closes.
 		if req.Admin != nil {
 			admin, err = svc.NewAdminCreatedUser(ctx, *req.Admin)
 			if err != nil {
-				return SetupResponse{Err: err}, nil
+				return setupResponse{Err: err}, nil
 			}
 		}
 
@@ -65,7 +65,7 @@ func makeSetupEndpoint(svc kolide.Service) endpoint.Endpoint {
 		if err != nil {
 			token = nil
 		}
-		return SetupResponse{
+		return setupResponse{
 			Admin: admin,
 			OrgInfo: &kolide.OrgInfo{
 				OrgName:    &config.OrgName,

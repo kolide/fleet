@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 
-	"github.com/kolide/fleet/client"
+	"github.com/kolide/fleet/server/service"
 	"github.com/urfave/cli"
 )
 
-func clientFromCLI(c *cli.Context) (*client.Client, error) {
+func clientFromCLI(c *cli.Context) (*service.Client, error) {
 	config, err := readConfig(c.String("config"))
 	if err != nil {
 		return nil, err
@@ -18,5 +18,5 @@ func clientFromCLI(c *cli.Context) (*client.Client, error) {
 		return nil, fmt.Errorf("context %q is not found", c.String("context"))
 	}
 
-	return client.New(cc.Address, cc.IgnoreTLS)
+	return service.NewClient(cc.Address, cc.IgnoreTLS)
 }
