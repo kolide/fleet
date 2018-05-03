@@ -24,6 +24,24 @@ type Context struct {
 	IgnoreTLS bool   `json:"ignore_tls"`
 }
 
+func configFlag() cli.Flag {
+	return cli.StringFlag{
+		Name:   "config",
+		Value:  fmt.Sprintf("%s/.fleet/config", env.String("HOME", "~/")),
+		EnvVar: "CONFIG",
+		Usage:  "The path to the Fleet config file",
+	}
+}
+
+func contextFlag() cli.Flag {
+	return cli.StringFlag{
+		Name:   "context",
+		Value:  "default",
+		EnvVar: "CONTEXT",
+		Usage:  "The Fleet config context",
+	}
+}
+
 func makeConfigIfNotExists(fp string) error {
 	if _, err := os.Stat(filepath.Dir(fp)); os.IsNotExist(err) {
 		if err := os.Mkdir(filepath.Dir(fp), 0700); err != nil {
@@ -60,24 +78,107 @@ func writeConfig(fp string, c configFile) error {
 	return ioutil.WriteFile(fp, b, 0400)
 }
 
-func configSetCommand() cli.Command {
+func getConfigValue(c *cli.Context, key string) (string, error) {
 	var (
 		flContext string
 		flConfig  string
 	)
 
+	flConfig = c.String("config")
+	flContext = c.String("context")
+
+	if err := makeConfigIfNotExists(flConfig); err != nil {
+		return "", errors.Wrapf(err, "error verifying that config exists at %s", flConfig)
+	}
+
+	config, err := readConfig(flConfig)
+	if err != nil {
+		return "", errors.Wrapf(err, "error reading config at %s", flConfig)
+	}
+
+	currentContext, ok := config.Contexts[flContext]
+	if !ok {
+		fmt.Printf("[+] Context %q not found, creating it with default values\n", flContext)
+		currentContext = Context{}
+	}
+
+	switch key {
+	case "address":
+		return currentContext.Address, nil
+	case "email":
+		return currentContext.Email, nil
+	case "token":
+		return currentContext.Token, nil
+	case "ignore_tls":
+		return fmt.Sprintf("%b", currentContext.IgnoreTLS), nil
+	default:
+		return "", fmt.Errorf("%q is an invalid key", key)
+	}
+}
+
+func setConfigValue(c *cli.Context, key, value string) error {
+	var (
+		flContext string
+		flConfig  string
+	)
+
+	flConfig = c.String("config")
+	flContext = c.String("context")
+
+	if err := makeConfigIfNotExists(flConfig); err != nil {
+		return errors.Wrapf(err, "error verifying that config exists at %s", flConfig)
+	}
+
+	config, err := readConfig(flConfig)
+	if err != nil {
+		return errors.Wrapf(err, "error reading config at %s", flConfig)
+	}
+
+	currentContext, ok := config.Contexts[flContext]
+	if !ok {
+		fmt.Printf("[+] Context %q not found, creating it with default values\n", flContext)
+		currentContext = Context{}
+	}
+
+	switch key {
+	case "address":
+		currentContext.Address = value
+	case "email":
+		currentContext.Email = value
+	case "token":
+		currentContext.Token = value
+	case "ignore_tls":
+		boolValue, err := strconv.ParseBool(value)
+		if err != nil {
+			return errors.Wrapf(err, "error parsing %q as bool", value)
+		}
+		currentContext.IgnoreTLS = boolValue
+	default:
+		return fmt.Errorf("%q is an invalid option")
+	}
+
+	config.Contexts[flContext] = currentContext
+
+	if err := writeConfig(flConfig, config); err != nil {
+		return errors.Wrap(err, "error saving config file")
+	}
+
+	return nil
+}
+
+func configSetCommand() cli.Command {
 	return cli.Command{
 		Name:      "set",
 		Usage:     "Set a config option",
 		UsageText: `fleetctl config set [options]`,
-		Flags:     []cli.Flag{},
+		Flags: []cli.Flag{
+			configFlag(),
+			contextFlag(),
+		},
 		Action: func(c *cli.Context) error {
 			if len(c.Args()) != 2 {
 				return cli.ShowCommandHelp(c, "set")
 			}
-
-			flConfig = c.String("config")
-			flContext = c.String("context")
 
 			key, value := c.Args()[0], c.Args()[1]
 
@@ -88,74 +189,19 @@ func configSetCommand() cli.Command {
 				return cli.ShowCommandHelp(c, "set")
 			}
 
-			if err := makeConfigIfNotExists(flConfig); err != nil {
-				return errors.Wrapf(err, "error verifying that config exists at %s", flConfig)
-			}
-
-			config, err := readConfig(flConfig)
-			if err != nil {
-				return errors.Wrapf(err, "error reading config at %s", flConfig)
-			}
-
-			currentContext, ok := config.Contexts[flContext]
-			if !ok {
-				fmt.Printf("[+] Context %q not found, creating it with default values\n", flContext)
-				currentContext = Context{}
-			}
-			switch key {
-			case "address":
-				currentContext.Address = value
-			case "email":
-				currentContext.Email = value
-			case "token":
-				currentContext.Token = value
-			case "ignore_tls":
-				boolValue, err := strconv.ParseBool(value)
-				if err != nil {
-					return errors.Wrapf(err, "error parsing %q as bool", value)
-				}
-				currentContext.IgnoreTLS = boolValue
-			default:
-				return cli.ShowCommandHelp(c, "set")
-			}
-
-			config.Contexts[flContext] = currentContext
-
-			if err := writeConfig(flConfig, config); err != nil {
-				return errors.Wrap(err, "error saving config file")
-			}
-
-			fmt.Printf("[+] Set the %q config key to %q in the %q context\n", key, value, flContext)
-			return nil
+			return setConfigValue(c, key, value)
 		},
 	}
 }
 
 func configGetCommand() cli.Command {
-	var (
-		flContext string
-		flConfig  string
-	)
-
 	return cli.Command{
 		Name:      "get",
 		Usage:     "Get a config option",
 		UsageText: `fleetctl config get [options]`,
 		Flags: []cli.Flag{
-			cli.StringFlag{
-				Name:        "context",
-				Value:       "default",
-				EnvVar:      "CONTEXT",
-				Usage:       "The Fleet config context",
-				Destination: &flContext,
-			},
-			cli.StringFlag{
-				Name:        "config",
-				Value:       fmt.Sprintf("%s/.fleet/config", env.String("HOME", "~/")),
-				EnvVar:      "CONFIG",
-				Usage:       "The path to the Fleet config file",
-				Destination: &flConfig,
-			},
+			configFlag(),
+			contextFlag(),
 		},
 		Action: func(c *cli.Context) error {
 			if len(c.Args()) != 1 {
@@ -171,33 +217,12 @@ func configGetCommand() cli.Command {
 				return cli.ShowCommandHelp(c, "get")
 			}
 
-			if err := makeConfigIfNotExists(flConfig); err != nil {
-				return errors.Wrapf(err, "error verifying that config exists at %s", flConfig)
-			}
-
-			config, err := readConfig(flConfig)
+			value, err := getConfigValue(c, key)
 			if err != nil {
-				return errors.Wrapf(err, "error reading config at %s", flConfig)
+				return errors.Wrap(err, "error getting config value")
 			}
 
-			currentContext, ok := config.Contexts[flContext]
-			if !ok {
-				fmt.Printf("[+] Context %q not found, creating it with default values\n", flContext)
-				currentContext = Context{}
-			}
-
-			switch key {
-			case "address":
-				fmt.Printf("  %s.%s => %s\n", flContext, key, currentContext.Address)
-			case "email":
-				fmt.Printf("  %s.%s => %s\n", flContext, key, currentContext.Email)
-			case "token":
-				fmt.Printf("  %s.%s => %s\n", flContext, key, currentContext.Token)
-			case "ignore_tls":
-				fmt.Printf("  %s.%s => %s\n", flContext, key, currentContext.IgnoreTLS)
-			default:
-				return cli.ShowCommandHelp(c, "set")
-			}
+			fmt.Printf("  %s.%s => %s\n", c.String("context"), key, value)
 
 			return nil
 		},

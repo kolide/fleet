@@ -19,6 +19,8 @@ func setupCommand() cli.Command {
 		Usage:     "Setup a Kolide Fleet instance",
 		UsageText: `fleetctl config login [options]`,
 		Flags: []cli.Flag{
+			configFlag(),
+			contextFlag(),
 			cli.StringFlag{
 				Name:        "email",
 				EnvVar:      "EMAIL",
@@ -56,7 +58,11 @@ func setupCommand() cli.Command {
 				return errors.Wrap(err, "error setting up Fleet")
 			}
 
-			fmt.Println("Token:", token)
+			if err := setConfigValue(c, "token", token); err != nil {
+				return errors.Wrap(err, "error setting token for the current context")
+			}
+
+			fmt.Printf("[+] Fleet setup successful and context configured!\n")
 
 			return nil
 		},
