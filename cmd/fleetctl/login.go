@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/kolide/fleet/server/service"
 	"github.com/pkg/errors"
 	"github.com/urfave/cli"
 )
@@ -15,7 +16,7 @@ func loginCommand() cli.Command {
 	return cli.Command{
 		Name:      "login",
 		Usage:     "Login to Kolide Fleet",
-		UsageText: `fleetctl config login [options]`,
+		UsageText: `fleetctl login [options]`,
 		Flags: []cli.Flag{
 			configFlag(),
 			contextFlag(),
@@ -42,6 +43,12 @@ func loginCommand() cli.Command {
 
 			token, err := fleet.Login(flEmail, flPassword)
 			if err != nil {
+				switch err.(type) {
+				case service.InvalidLoginErr:
+					return err
+				case service.NotSetupErr:
+					return err
+				}
 				return errors.Wrap(err, "error logging in")
 			}
 

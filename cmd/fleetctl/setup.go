@@ -51,9 +51,9 @@ func setupCommand() cli.Command {
 
 			token, err := fleet.Setup(flEmail, flPassword, flOrgName)
 			if err != nil {
-				// the Kolide Fleet instance has already been setup
-				if setupErr, ok := err.(service.SetupAlreadyErr); ok {
-					return setupErr
+				switch err.(type) {
+				case service.SetupAlreadyErr:
+					return err
 				}
 				return errors.Wrap(err, "error setting up Fleet")
 			}

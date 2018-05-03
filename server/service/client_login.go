@@ -23,6 +23,13 @@ func (c *Client) Login(email, password string) (string, error) {
 	}
 	defer response.Body.Close()
 
+	switch response.StatusCode {
+	case http.StatusNotFound:
+		return "", notSetup()
+	case http.StatusUnauthorized:
+		return "", invalidLogin()
+	}
+
 	if response.StatusCode != http.StatusOK {
 		return "", fmt.Errorf("Received HTTP %d instead of HTTP 200", response.StatusCode)
 	}
