@@ -22,26 +22,11 @@ func main() {
 	}
 
 	app.Commands = []cli.Command{
-		cli.Command{
-			Name:        "query",
-			Usage:       "run a query across your fleet",
-			Subcommands: []cli.Command{},
-		},
-		cli.Command{
-			Name:        "apply",
-			Usage:       "apply a set of osquery configurations",
-			Subcommands: []cli.Command{},
-		},
-		cli.Command{
-			Name:        "edit",
-			Usage:       "edit your complete configuration in an ephemeral editor",
-			Subcommands: []cli.Command{},
-		},
 		setupCommand(),
 		loginCommand(),
 		cli.Command{
 			Name:  "config",
-			Usage: "modify how and which Fleet server to connect to",
+			Usage: "Modify how and which Fleet server to connect to",
 			Subcommands: []cli.Command{
 				configSetCommand(),
 				configGetCommand(),
