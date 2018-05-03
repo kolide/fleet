@@ -171,33 +171,86 @@ func setConfigValue(c *cli.Context, key, value string) error {
 }
 
 func configSetCommand() cli.Command {
+	var (
+		flAddress   string
+		flEmail     string
+		flToken     string
+		flIgnoreTLS bool
+	)
 	return cli.Command{
 		Name:      "set",
-		Usage:     "Set a config option",
+		Usage:     "Set config options",
 		UsageText: `fleetctl config set [options]`,
 		Flags: []cli.Flag{
 			configFlag(),
 			contextFlag(),
+			cli.StringFlag{
+				Name:        "address",
+				EnvVar:      "ADDRESS",
+				Value:       "",
+				Destination: &flAddress,
+				Usage:       "The address of the Fleet API",
+			},
+			cli.StringFlag{
+				Name:        "email",
+				EnvVar:      "EMAIL",
+				Value:       "",
+				Destination: &flEmail,
+				Usage:       "The email to use when connecting to the Fleet API",
+			},
+			cli.StringFlag{
+				Name:        "token",
+				EnvVar:      "TOKEN",
+				Value:       "",
+				Destination: &flToken,
+				Usage:       "The Fleet API token",
+			},
+			cli.BoolFlag{
+				Name:        "ignore-tls",
+				EnvVar:      "IGNORE_TLS",
+				Destination: &flIgnoreTLS,
+				Usage:       "Whether or not to ignore the validity of the Fleet TLS certificate",
+			},
 		},
 		Action: func(c *cli.Context) error {
-			if len(c.Args()) != 2 {
+			set := false
+
+			if flAddress != "" {
+				set = true
+				if err := setConfigValue(c, "address", flAddress); err != nil {
+					return errors.Wrap(err, "error setting address")
+				}
+				fmt.Printf("[+] Set the address config key to %q in the %q context\n", flAddress, c.String("context"))
+			}
+
+			if flEmail != "" {
+				set = true
+				if err := setConfigValue(c, "email", flEmail); err != nil {
+					return errors.Wrap(err, "error setting email")
+				}
+				fmt.Printf("[+] Set the email config key to %q in the %q context\n", flEmail, c.String("context"))
+			}
+
+			if flToken != "" {
+				set = true
+				if err := setConfigValue(c, "token", flToken); err != nil {
+					return errors.Wrap(err, "error setting token")
+				}
+				fmt.Printf("[+] Set the token config key to %q in the %q context\n", flToken, c.String("context"))
+			}
+
+			if flIgnoreTLS {
+				set = true
+				if err := setConfigValue(c, "ignore_tls", "true"); err != nil {
+					return errors.Wrap(err, "error setting ignore_tls")
+				}
+				fmt.Printf("[+] Set the ignore_tls config key to \"true\" in the %q context\n", c.String("context"))
+			}
+
+			if !set {
 				return cli.ShowCommandHelp(c, "set")
 			}
 
-			key, value := c.Args()[0], c.Args()[1]
-
-			// validate key
-			switch key {
-			case "address", "email", "token", "ignore_tls":
-			default:
-				return cli.ShowCommandHelp(c, "set")
-			}
-
-			if err := setConfigValue(c, key, value); err != nil {
-				return errors.Wrap(err, "error setting config value")
-			}
-
-			fmt.Printf("[+] Set the %q config key to %q in the %q context\n", key, value, c.String("context"))
 			return nil
 		},
 	}
