@@ -193,7 +193,12 @@ func configSetCommand() cli.Command {
 				return cli.ShowCommandHelp(c, "set")
 			}
 
-			return setConfigValue(c, key, value)
+			if err := setConfigValue(c, key, value); err != nil {
+				return errors.Wrap(err, "error setting config value")
+			}
+
+			fmt.Printf("[+] Set the %q config key to %q in the %q context\n", key, value, c.String("context"))
+			return nil
 		},
 	}
 }

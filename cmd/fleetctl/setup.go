@@ -58,6 +58,10 @@ func setupCommand() cli.Command {
 				return errors.Wrap(err, "error setting up Fleet")
 			}
 
+			if err := setConfigValue(c, "email", flEmail); err != nil {
+				return errors.Wrap(err, "error setting email for the current context")
+			}
+
 			if err := setConfigValue(c, "token", token); err != nil {
 				return errors.Wrap(err, "error setting token for the current context")
 			}
