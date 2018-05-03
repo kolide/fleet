@@ -37,12 +37,14 @@ func main() {
 			Usage:       "edit your complete configuration in an ephemeral editor",
 			Subcommands: []cli.Command{},
 		},
+		setupCommand(),
+		loginCommand(),
 		cli.Command{
 			Name:  "config",
 			Usage: "modify how and which Fleet server to connect to",
 			Subcommands: []cli.Command{
-				loginCommand(),
-				setupCommand(),
+				configSetCommand(),
+				configGetCommand(),
 			},
 		},
 	}

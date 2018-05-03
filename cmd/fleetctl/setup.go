@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/kolide/fleet/client"
 	"github.com/pkg/errors"
 	"github.com/urfave/cli"
@@ -67,7 +69,7 @@ func setupCommand() cli.Command {
 				return errors.Wrap(err, "error creating Fleet API client")
 			}
 
-			err = fleet.Setup(flEmail, flPassword, flOrgName)
+			token, err := fleet.Setup(flEmail, flPassword, flOrgName)
 			if err != nil {
 				// the Kolide Fleet instance has already been setup
 				if setupErr, ok := err.(client.SetupAlreadyErr); ok {
@@ -75,6 +77,8 @@ func setupCommand() cli.Command {
 				}
 				return errors.Wrap(err, "error setting up Fleet")
 			}
+
+			fmt.Println("Token:", token)
 
 			return nil
 		},
