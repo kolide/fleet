@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"math/rand"
 	"time"
 
+	"github.com/kolide/kit/env"
 	"github.com/kolide/kit/version"
 	"github.com/urfave/cli"
 )
@@ -19,6 +21,21 @@ func main() {
 	app.Version = version.Version().Version
 	cli.VersionPrinter = func(c *cli.Context) {
 		version.PrintFull()
+	}
+
+	app.Flags = []cli.Flag{
+		cli.StringFlag{
+			Name:   "config",
+			Value:  fmt.Sprintf("%s/.fleet/config", env.String("HOME", "~/")),
+			EnvVar: "CONFIG",
+			Usage:  "The path to the Fleet config file",
+		},
+		cli.StringFlag{
+			Name:   "context",
+			Value:  "default",
+			EnvVar: "CONTEXT",
+			Usage:  "The Fleet config context",
+		},
 	}
 
 	app.Commands = []cli.Command{

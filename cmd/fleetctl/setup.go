@@ -10,37 +10,15 @@ import (
 
 func setupCommand() cli.Command {
 	var (
-		flAddress            string
-		flEmail              string
-		flPassword           string
-		flOrgName            string
-		flInsecureSkipVerify bool
-		flDebug              bool
+		flEmail    string
+		flPassword string
+		flOrgName  string
 	)
 	return cli.Command{
 		Name:      "setup",
 		Usage:     "Setup a Kolide Fleet instance",
 		UsageText: `fleetctl config login [options]`,
 		Flags: []cli.Flag{
-			cli.StringFlag{
-				Name:        "address",
-				EnvVar:      "ADDRESS",
-				Value:       "",
-				Destination: &flAddress,
-				Usage:       "The address of the Kolide Fleet instance",
-			},
-			cli.BoolFlag{
-				Name:        "insecure-skip-verify",
-				EnvVar:      "INSECURE_SKIP_VERIFY",
-				Destination: &flInsecureSkipVerify,
-				Usage:       "Whether or not to validate the remote TLS certificate",
-			},
-			cli.BoolFlag{
-				Name:        "debug",
-				EnvVar:      "DEBUG",
-				Destination: &flDebug,
-				Usage:       "Whether or not to enable debug logging",
-			},
 			cli.StringFlag{
 				Name:        "email",
 				EnvVar:      "EMAIL",
@@ -63,8 +41,8 @@ func setupCommand() cli.Command {
 				Usage:       "The name of the organization",
 			},
 		},
-		Action: func(cliCtx *cli.Context) error {
-			fleet, err := client.New(flAddress, flInsecureSkipVerify)
+		Action: func(c *cli.Context) error {
+			fleet, err := clientFromCLI(c)
 			if err != nil {
 				return errors.Wrap(err, "error creating Fleet API client")
 			}

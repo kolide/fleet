@@ -70,26 +70,14 @@ func configSetCommand() cli.Command {
 		Name:      "set",
 		Usage:     "Set a config option",
 		UsageText: `fleetctl config set [options]`,
-		Flags: []cli.Flag{
-			cli.StringFlag{
-				Name:        "context",
-				Value:       "default",
-				EnvVar:      "CONTEXT",
-				Usage:       "The Fleet config context",
-				Destination: &flContext,
-			},
-			cli.StringFlag{
-				Name:        "config",
-				Value:       fmt.Sprintf("%s/.fleet/config", env.String("HOME", "~/")),
-				EnvVar:      "CONFIG",
-				Usage:       "The path to the Fleet config file",
-				Destination: &flConfig,
-			},
-		},
+		Flags:     []cli.Flag{},
 		Action: func(c *cli.Context) error {
 			if len(c.Args()) != 2 {
 				return cli.ShowCommandHelp(c, "set")
 			}
+
+			flConfig = c.String("config")
+			flContext = c.String("context")
 
 			key, value := c.Args()[0], c.Args()[1]
 
