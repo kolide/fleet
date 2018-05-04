@@ -24,7 +24,7 @@ func clientFromCLI(c *cli.Context) (*service.Client, error) {
 	}
 
 	if cc.Address == "" {
-		return nil, errors.New("set the Fleet API address with: fleetctl config set --address=locaalhost:8080")
+		return nil, errors.New("set the Fleet API address with: fleetctl config set --address https://localhost:8080")
 	}
 
 	fleet, err := service.NewClient(cc.Address, cc.IgnoreTLS)

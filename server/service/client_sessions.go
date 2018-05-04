@@ -33,13 +33,8 @@ func (c *Client) Login(email, password string) (string, error) {
 		return "", errors.Errorf("Received HTTP %d instead of HTTP 200", response.StatusCode)
 	}
 
-	responeBytes, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return "", errors.Wrap(err, "error reading response body")
-	}
-
 	var responseBody loginResponse
-	err = json.Unmarshal(responeBytes, &responseBody)
+	err = json.NewDecoder(response.Body).Decode(&responseBody)
 	if err != nil {
 		return "", errors.Wrap(err, "error decoding HTTP response body")
 	}

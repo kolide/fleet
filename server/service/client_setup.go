@@ -2,7 +2,6 @@ package service
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/kolide/fleet/server/kolide"
@@ -42,13 +41,8 @@ func (c *Client) Setup(email, password, org string) (string, error) {
 		return "", errors.Errorf("Received HTTP %d instead of HTTP 200", response.StatusCode)
 	}
 
-	responeBytes, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return "", errors.Wrap(err, "error reading response body")
-	}
-
 	var responseBody setupResponse
-	err = json.Unmarshal(responeBytes, &responseBody)
+	err = json.NewDecoder(response.Body).Decode(&responseBody)
 	if err != nil {
 		return "", errors.Wrap(err, "error decoding HTTP response body")
 	}
