@@ -401,7 +401,7 @@ func attachKolideAPIRoutes(r *mux.Router, h *kolideHandlers) {
 
 	r.Handle("/api/v1/kolide/labels/{id}", h.GetLabel).Methods("GET").Name("get_label")
 	r.Handle("/api/v1/kolide/labels", h.ListLabels).Methods("GET").Name("list_labels")
-	r.Handle("/api/v1/kolide/labels/{id}", h.DeleteLabel).Methods("DELETE").Name("delete_label")
+	r.Handle("/api/v1/kolide/labels/{name}", h.DeleteLabel).Methods("DELETE").Name("delete_label")
 	r.Handle("/api/v1/kolide/labels/spec", h.ApplyLabelSpecs).Methods("POST").Name("apply_label_specs")
 	r.Handle("/api/v1/kolide/labels/spec", h.GetLabelSpecs).Methods("GET").Name("get_label_specs")
 
