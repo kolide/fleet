@@ -78,7 +78,7 @@ func writeConfig(fp string, c configFile) error {
 	return ioutil.WriteFile(fp, b, 0400)
 }
 
-func getConfigValue(c *cli.Context, key string) (string, error) {
+func getConfigValue(c *cli.Context, key string) (interface{}, error) {
 	var (
 		flContext string
 		flConfig  string
@@ -88,12 +88,12 @@ func getConfigValue(c *cli.Context, key string) (string, error) {
 	flContext = c.String("context")
 
 	if err := makeConfigIfNotExists(flConfig); err != nil {
-		return "", errors.Wrapf(err, "error verifying that config exists at %s", flConfig)
+		return nil, errors.Wrapf(err, "error verifying that config exists at %s", flConfig)
 	}
 
 	config, err := readConfig(flConfig)
 	if err != nil {
-		return "", errors.Wrapf(err, "error reading config at %s", flConfig)
+		return nil, errors.Wrapf(err, "error reading config at %s", flConfig)
 	}
 
 	currentContext, ok := config.Contexts[flContext]
@@ -111,12 +111,12 @@ func getConfigValue(c *cli.Context, key string) (string, error) {
 		return currentContext.Token, nil
 	case "ignore_tls":
 		if currentContext.IgnoreTLS {
-			return "true", nil
+			return true, nil
 		} else {
-			return "false", nil
+			return false, nil
 		}
 	default:
-		return "", fmt.Errorf("%q is an invalid key", key)
+		return nil, fmt.Errorf("%q is an invalid key", key)
 	}
 }
 

@@ -32,12 +32,16 @@ func clientFromCLI(c *cli.Context) (*service.Client, error) {
 		return nil, errors.Wrap(err, "error creating Fleet API client handler")
 	}
 
-	token, err := getConfigValue(c, "token")
+	t, err := getConfigValue(c, "token")
 	if err != nil {
 		return nil, errors.Wrap(err, "error getting token from the config")
 	}
 
-	fleet.SetToken(token)
+	if token, ok := t.(string); ok {
+		fleet.SetToken(token)
+	} else {
+		return nil, errors.Errorf("token config value was not a string: %+v", t)
+	}
 
 	return fleet, nil
 }
