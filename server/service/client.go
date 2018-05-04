@@ -6,17 +6,29 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
+	"strings"
 
 	"github.com/pkg/errors"
 )
 
 type Client struct {
-	addr  string
-	token string
-	http  *http.Client
+	addr    string
+	baseURL *url.URL
+	token   string
+	http    *http.Client
 }
 
 func NewClient(addr string, insecureSkipVerify bool) (*Client, error) {
+	if !strings.HasPrefix(addr, "https://") {
+		return nil, errors.New("Addrress must start with https://")
+	}
+
+	baseURL, err := url.Parse(addr)
+	if err != nil {
+		return nil, errors.Wrap(err, "error parsing URL")
+	}
+
 	httpClient := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: insecureSkipVerify},
@@ -24,8 +36,9 @@ func NewClient(addr string, insecureSkipVerify bool) (*Client, error) {
 	}
 
 	return &Client{
-		addr: addr,
-		http: httpClient,
+		addr:    addr,
+		baseURL: baseURL,
+		http:    httpClient,
 	}, nil
 }
 
@@ -37,7 +50,7 @@ func (c *Client) DoWithHeaders(verb, path string, params interface{}, headers ma
 
 	request, err := http.NewRequest(
 		verb,
-		c.addr+path,
+		copyURL(c.baseURL, path).String(),
 		bytes.NewBuffer(b),
 	)
 	if err != nil {
@@ -75,4 +88,10 @@ func (c *Client) AuthenticatedDo(verb, path string, params interface{}) (*http.R
 
 func (c *Client) SetToken(t string) {
 	c.token = t
+}
+
+func copyURL(base *url.URL, path string) *url.URL {
+	next := *base
+	next.Path = path
+	return &next
 }
