@@ -43,15 +43,19 @@ func NewClient(addr string, insecureSkipVerify bool) (*Client, error) {
 }
 
 func (c *Client) doWithHeaders(verb, path string, params interface{}, headers map[string]string) (*http.Response, error) {
-	b, err := json.Marshal(params)
-	if err != nil {
-		return nil, errors.Wrap(err, "error marshaling json")
+	var bodyBytes []byte
+	var err error
+	if params != nil {
+		bodyBytes, err = json.Marshal(params)
+		if err != nil {
+			return nil, errors.Wrap(err, "error marshaling json")
+		}
 	}
 
 	request, err := http.NewRequest(
 		verb,
 		c.url(path).String(),
-		bytes.NewBuffer(b),
+		bytes.NewBuffer(bodyBytes),
 	)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating request object")
