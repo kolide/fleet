@@ -42,7 +42,7 @@ func NewClient(addr string, insecureSkipVerify bool) (*Client, error) {
 	}, nil
 }
 
-func (c *Client) DoWithHeaders(verb, path string, params interface{}, headers map[string]string) (*http.Response, error) {
+func (c *Client) doWithHeaders(verb, path string, params interface{}, headers map[string]string) (*http.Response, error) {
 	b, err := json.Marshal(params)
 	if err != nil {
 		return nil, errors.Wrap(err, "error marshaling json")
@@ -50,7 +50,7 @@ func (c *Client) DoWithHeaders(verb, path string, params interface{}, headers ma
 
 	request, err := http.NewRequest(
 		verb,
-		copyURL(c.baseURL, path).String(),
+		c.url(path).String(),
 		bytes.NewBuffer(b),
 	)
 	if err != nil {
@@ -69,7 +69,7 @@ func (c *Client) Do(verb, path string, params interface{}) (*http.Response, erro
 		"Accept":       "application/json",
 	}
 
-	return c.DoWithHeaders(verb, path, params, headers)
+	return c.doWithHeaders(verb, path, params, headers)
 }
 
 func (c *Client) AuthenticatedDo(verb, path string, params interface{}) (*http.Response, error) {
@@ -83,15 +83,15 @@ func (c *Client) AuthenticatedDo(verb, path string, params interface{}) (*http.R
 		"Authorization": fmt.Sprintf("Bearer %s", c.token),
 	}
 
-	return c.DoWithHeaders(verb, path, params, headers)
+	return c.doWithHeaders(verb, path, params, headers)
 }
 
 func (c *Client) SetToken(t string) {
 	c.token = t
 }
 
-func copyURL(base *url.URL, path string) *url.URL {
-	next := *base
-	next.Path = path
-	return &next
+func (c *Client) url(path string) *url.URL {
+	u := *c.baseURL
+	u.Path = path
+	return &u
 }
