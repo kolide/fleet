@@ -2,7 +2,6 @@ package service
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -40,7 +39,7 @@ func (c *Client) Setup(email, password, org string) (string, error) {
 	}
 
 	if response.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("Received HTTP %d instead of HTTP 200", response.StatusCode)
+		return "", errors.Errorf("Received HTTP %d instead of HTTP 200", response.StatusCode)
 	}
 
 	responeBytes, err := ioutil.ReadAll(response.Body)
