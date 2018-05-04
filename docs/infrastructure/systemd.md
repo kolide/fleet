@@ -35,7 +35,7 @@ sudo systemctl status fleet.service
 sudo journalctl -u fleet.service -f
 ```
 
-## Makin changes
+## Making changes
 
 Sometimes you'll need to update the systemd unit file defining the service. To do that, first open /etc/systemd/system/fleet.service in a text editor, and make your modifications.
 
