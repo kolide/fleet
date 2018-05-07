@@ -36,12 +36,12 @@ func (c *Client) ApplyQuerySpecs(specs []*kolide.QuerySpec) error {
 	return nil
 }
 
-// GetQuerySpecs retrieves the list of all Queries.
-func (c *Client) GetQuerySpecs(specs []*kolide.QuerySpec) ([]*kolide.QuerySpec, error) {
-	req := applyQuerySpecsRequest{Specs: specs}
-	response, err := c.AuthenticatedDo("GET", "/api/v1/kolide/spec/queries", req)
+// ListQueries retrieves the list of all Queries.
+func (c *Client) ListQueries() ([]kolide.Query, error) {
+	req := listQueriesRequest{}
+	response, err := c.AuthenticatedDo("GET", "/api/v1/kolide/queries", req)
 	if err != nil {
-		return nil, errors.Wrap(err, "GET /api/v1/kolide/spec/queries")
+		return nil, errors.Wrap(err, "GET /api/v1/kolide/queries")
 	}
 	defer response.Body.Close()
 
@@ -49,17 +49,17 @@ func (c *Client) GetQuerySpecs(specs []*kolide.QuerySpec) ([]*kolide.QuerySpec, 
 		return nil, errors.Errorf("get query spec got HTTP %d, expected 200", response.StatusCode)
 	}
 
-	var responseBody getQuerySpecsResponse
+	var responseBody listQueriesResponse
 	err = json.NewDecoder(response.Body).Decode(&responseBody)
 	if err != nil {
-		return nil, errors.Wrap(err, "decode get query spec response")
+		return nil, errors.Wrap(err, "decode list queries response")
 	}
 
 	if responseBody.Err != nil {
 		return nil, errors.Errorf("get query spec: %s", responseBody.Err)
 	}
 
-	return responseBody.Specs, nil
+	return responseBody.Queries, nil
 }
 
 // DeleteQuery deletes the query with the matching name.
