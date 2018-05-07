@@ -37,9 +37,8 @@ func (c *Client) ApplyPackSpecs(specs []*kolide.PackSpec) error {
 }
 
 // GetPackSpecs retrieves the list of all Packs.
-func (c *Client) GetPackSpecs(specs []*kolide.PackSpec) ([]*kolide.PackSpec, error) {
-	req := applyPackSpecsRequest{Specs: specs}
-	response, err := c.AuthenticatedDo("GET", "/api/v1/kolide/spec/packs", req)
+func (c *Client) GetPackSpecs() ([]*kolide.PackSpec, error) {
+	response, err := c.AuthenticatedDo("GET", "/api/v1/kolide/spec/packs", nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "GET /api/v1/kolide/spec/packs")
 	}

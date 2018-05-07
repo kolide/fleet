@@ -37,9 +37,8 @@ func (c *Client) ApplyLabelSpecs(specs []*kolide.LabelSpec) error {
 }
 
 // GetLabelSpecs retrieves the list of all Labels.
-func (c *Client) GetLabelSpecs(specs []*kolide.LabelSpec) ([]*kolide.LabelSpec, error) {
-	req := applyLabelSpecsRequest{Specs: specs}
-	response, err := c.AuthenticatedDo("GET", "/api/v1/kolide/spec/labels", req)
+func (c *Client) GetLabelSpecs() ([]*kolide.LabelSpec, error) {
+	response, err := c.AuthenticatedDo("GET", "/api/v1/kolide/spec/labels", nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "GET /api/v1/kolide/spec/labels")
 	}
