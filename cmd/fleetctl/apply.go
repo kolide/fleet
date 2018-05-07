@@ -93,7 +93,7 @@ func applyCommand() cli.Command {
 					return errors.Errorf("error marshaling spec for %q kind", s.Kind)
 				}
 
-				switch s.Kind {
+				switch strings.ToLower(s.Kind) {
 				case "query":
 					var querySpec *kolide.QuerySpec
 					if err := yaml.Unmarshal(specBytes, &querySpec); err != nil {
