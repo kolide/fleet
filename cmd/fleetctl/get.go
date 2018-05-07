@@ -28,7 +28,7 @@ func getQueriesCommand() cli.Command {
 
 			// if name wasn't provided, list all queries
 			if name == "" {
-				queries, err := fleet.ListQueries()
+				queries, err := fleet.GetQuerySpecs()
 				if err != nil {
 					return errors.Wrap(err, "could not list queries")
 				}
