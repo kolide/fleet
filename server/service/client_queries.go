@@ -40,7 +40,7 @@ func (c *Client) ApplyQuerySpecs(specs []*kolide.QuerySpec) error {
 func (c *Client) GetQuerySpecs() ([]*kolide.QuerySpec, error) {
 	response, err := c.AuthenticatedDo("GET", "/api/v1/kolide/spec/queries", nil)
 	if err != nil {
-		return nil, errors.Wrap(err, "GET /api/v1/kolide/queries")
+		return nil, errors.Wrap(err, "GET /api/v1/kolide/spec/queries")
 	}
 	defer response.Body.Close()
 
@@ -51,7 +51,7 @@ func (c *Client) GetQuerySpecs() ([]*kolide.QuerySpec, error) {
 	var responseBody getQuerySpecsResponse
 	err = json.NewDecoder(response.Body).Decode(&responseBody)
 	if err != nil {
-		return nil, errors.Wrap(err, "decode list queries response")
+		return nil, errors.Wrap(err, "decode get query spec response")
 	}
 
 	if responseBody.Err != nil {
