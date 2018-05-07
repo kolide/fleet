@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"strings"
@@ -12,9 +13,9 @@ import (
 )
 
 type specMetadata struct {
-	Kind    string      `json:"kind"`
-	Version string      `json:"apiVersion"`
-	Spec    interface{} `json:"spec"`
+	Kind    string          `json:"kind"`
+	Version string          `json:"apiVersion"`
+	Spec    json.RawMessage `json:"spec"`
 }
 
 type specGroup struct {
@@ -45,29 +46,24 @@ func specGroupFromBytes(b []byte) (*specGroup, error) {
 			return nil, errors.Errorf("no spec field on %q document", s.Kind)
 		}
 
-		specBytes, err := yaml.Marshal(s.Spec)
-		if err != nil {
-			return nil, errors.Errorf("error marshaling spec for %q kind", s.Kind)
-		}
-
 		switch strings.ToLower(s.Kind) {
 		case "query":
 			var querySpec *kolide.QuerySpec
-			if err := yaml.Unmarshal(specBytes, &querySpec); err != nil {
+			if err := yaml.Unmarshal(s.Spec, &querySpec); err != nil {
 				return nil, errors.Wrap(err, "error unmarshaling query spec")
 			}
 			specs.Queries = append(specs.Queries, querySpec)
 
 		case "pack":
 			var packSpec *kolide.PackSpec
-			if err := yaml.Unmarshal(specBytes, &packSpec); err != nil {
+			if err := yaml.Unmarshal(s.Spec, &packSpec); err != nil {
 				return nil, errors.Wrap(err, "error unmarshaling pack spec")
 			}
 			specs.Packs = append(specs.Packs, packSpec)
 
 		case "label":
 			var labelSpec *kolide.LabelSpec
-			if err := yaml.Unmarshal(specBytes, &labelSpec); err != nil {
+			if err := yaml.Unmarshal(s.Spec, &labelSpec); err != nil {
 				return nil, errors.Wrap(err, "error unmarshaling label spec")
 			}
 			specs.Labels = append(specs.Labels, labelSpec)
@@ -78,7 +74,7 @@ func specGroupFromBytes(b []byte) (*specGroup, error) {
 			}
 
 			var optionSpec *kolide.OptionsSpec
-			if err := yaml.Unmarshal(specBytes, &optionSpec); err != nil {
+			if err := yaml.Unmarshal(s.Spec, &optionSpec); err != nil {
 				return nil, errors.Wrap(err, "error unmarshaling option spec")
 			}
 			specs.Options = optionSpec
