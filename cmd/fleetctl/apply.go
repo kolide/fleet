@@ -65,7 +65,7 @@ func applyCommand() cli.Command {
 				return err
 			}
 
-			allSpecs := &specContainer{
+			specs := &specContainer{
 				Queries: []*kolide.QuerySpec{},
 				Packs:   []*kolide.PackSpec{},
 				Labels:  []*kolide.LabelSpec{},
@@ -83,9 +83,6 @@ func applyCommand() cli.Command {
 				if err := yaml.Unmarshal([]byte(specYaml), &s); err != nil {
 					return errors.Wrap(err, "error unmarshaling spec")
 				}
-				if flDebug {
-					fmt.Printf("[+] found spec of kind %q version %q\n", s.Kind, s.Version)
-				}
 
 				if s.Spec == nil {
 					return errors.Errorf("no spec field on %q document", s.Kind)
@@ -102,24 +99,24 @@ func applyCommand() cli.Command {
 					if err := yaml.Unmarshal(specBytes, &querySpec); err != nil {
 						return errors.Wrap(err, "error unmarshaling query spec")
 					}
-					allSpecs.Queries = append(allSpecs.Queries, querySpec)
+					specs.Queries = append(specs.Queries, querySpec)
 
 				case "pack":
 					var packSpec *kolide.PackSpec
 					if err := yaml.Unmarshal(specBytes, &packSpec); err != nil {
 						return errors.Wrap(err, "error unmarshaling pack spec")
 					}
-					allSpecs.Packs = append(allSpecs.Packs, packSpec)
+					specs.Packs = append(specs.Packs, packSpec)
 
 				case "label":
 					var labelSpec *kolide.LabelSpec
 					if err := yaml.Unmarshal(specBytes, &labelSpec); err != nil {
 						return errors.Wrap(err, "error unmarshaling label spec")
 					}
-					allSpecs.Labels = append(allSpecs.Labels, labelSpec)
+					specs.Labels = append(specs.Labels, labelSpec)
 
 				case "options":
-					if allSpecs.Options != nil {
+					if specs.Options != nil {
 						return errors.New("options defined twice in the same file")
 					}
 
@@ -127,23 +124,32 @@ func applyCommand() cli.Command {
 					if err := yaml.Unmarshal(specBytes, &optionSpec); err != nil {
 						return errors.Wrap(err, "error unmarshaling option spec")
 					}
-					allSpecs.Options = optionSpec
+					specs.Options = optionSpec
 
 				default:
 					return errors.Errorf("unknown kind %q", s.Kind)
 				}
 			}
 
-			if err := fleet.ApplyQuerySpecs(allSpecs.Queries); err != nil {
+			if err := fleet.ApplyQuerySpecs(specs.Queries); err != nil {
 				return errors.Wrap(err, "error applying queries")
 			}
-
-			if err := fleet.ApplyPackSpecs(allSpecs.Packs); err != nil {
-				return errors.Wrap(err, "error applying packs")
+			if flDebug {
+				fmt.Printf("[+] applied %d queries\n", len(specs.Queries))
 			}
 
-			if err := fleet.ApplyLabelSpecs(allSpecs.Labels); err != nil {
+			if err := fleet.ApplyLabelSpecs(specs.Labels); err != nil {
 				return errors.Wrap(err, "error applying labels")
+			}
+			if flDebug {
+				fmt.Printf("[+] applied %d labels\n", len(specs.Labels))
+			}
+
+			if err := fleet.ApplyPackSpecs(specs.Packs); err != nil {
+				return errors.Wrap(err, "error applying packs")
+			}
+			if flDebug {
+				fmt.Printf("[+] applied %d packs\n", len(specs.Packs))
 			}
 
 			return nil
