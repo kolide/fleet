@@ -11,17 +11,84 @@ import (
 	"github.com/urfave/cli"
 )
 
-type genericSpec struct {
+type specMetadata struct {
 	Kind    string      `json:"kind"`
 	Version string      `json:"apiVersion"`
 	Spec    interface{} `json:"spec"`
 }
 
-type specContainer struct {
+type specGroup struct {
 	Queries []*kolide.QuerySpec
 	Packs   []*kolide.PackSpec
 	Labels  []*kolide.LabelSpec
 	Options *kolide.OptionsSpec
+}
+
+func specGroupFromBytes(b []byte) (*specGroup, error) {
+	specs := &specGroup{
+		Queries: []*kolide.QuerySpec{},
+		Packs:   []*kolide.PackSpec{},
+		Labels:  []*kolide.LabelSpec{},
+	}
+
+	for _, spec := range strings.Split(string(b), "---") {
+		if strings.TrimSpace(spec) == "" {
+			continue
+		}
+
+		var s specMetadata
+		if err := yaml.Unmarshal([]byte(spec), &s); err != nil {
+			return nil, errors.Wrap(err, "error unmarshaling spec")
+		}
+
+		if s.Spec == nil {
+			return nil, errors.Errorf("no spec field on %q document", s.Kind)
+		}
+
+		specBytes, err := yaml.Marshal(s.Spec)
+		if err != nil {
+			return nil, errors.Errorf("error marshaling spec for %q kind", s.Kind)
+		}
+
+		switch strings.ToLower(s.Kind) {
+		case "query":
+			var querySpec *kolide.QuerySpec
+			if err := yaml.Unmarshal(specBytes, &querySpec); err != nil {
+				return nil, errors.Wrap(err, "error unmarshaling query spec")
+			}
+			specs.Queries = append(specs.Queries, querySpec)
+
+		case "pack":
+			var packSpec *kolide.PackSpec
+			if err := yaml.Unmarshal(specBytes, &packSpec); err != nil {
+				return nil, errors.Wrap(err, "error unmarshaling pack spec")
+			}
+			specs.Packs = append(specs.Packs, packSpec)
+
+		case "label":
+			var labelSpec *kolide.LabelSpec
+			if err := yaml.Unmarshal(specBytes, &labelSpec); err != nil {
+				return nil, errors.Wrap(err, "error unmarshaling label spec")
+			}
+			specs.Labels = append(specs.Labels, labelSpec)
+
+		case "options":
+			if specs.Options != nil {
+				return nil, errors.New("options defined twice in the same file")
+			}
+
+			var optionSpec *kolide.OptionsSpec
+			if err := yaml.Unmarshal(specBytes, &optionSpec); err != nil {
+				return nil, errors.Wrap(err, "error unmarshaling option spec")
+			}
+			specs.Options = optionSpec
+
+		default:
+			return nil, errors.Errorf("unknown kind %q", s.Kind)
+		}
+	}
+
+	return specs, nil
 }
 
 func applyCommand() cli.Command {
@@ -57,7 +124,7 @@ func applyCommand() cli.Command {
 
 			b, err := ioutil.ReadFile(flFilename)
 			if err != nil {
-				return errors.Wrap(err, "error reading file")
+				return err
 			}
 
 			fleet, err := clientFromCLI(c)
@@ -65,70 +132,9 @@ func applyCommand() cli.Command {
 				return err
 			}
 
-			specs := &specContainer{
-				Queries: []*kolide.QuerySpec{},
-				Packs:   []*kolide.PackSpec{},
-				Labels:  []*kolide.LabelSpec{},
-			}
-
-			for _, specYaml := range strings.Split(string(b), "---") {
-				if strings.TrimSpace(specYaml) == "" {
-					if flDebug {
-						fmt.Println("[!] Skipping empty spec in file")
-					}
-					continue
-				}
-
-				var s genericSpec
-				if err := yaml.Unmarshal([]byte(specYaml), &s); err != nil {
-					return errors.Wrap(err, "error unmarshaling spec")
-				}
-
-				if s.Spec == nil {
-					return errors.Errorf("no spec field on %q document", s.Kind)
-				}
-
-				specBytes, err := yaml.Marshal(s.Spec)
-				if err != nil {
-					return errors.Errorf("error marshaling spec for %q kind", s.Kind)
-				}
-
-				switch strings.ToLower(s.Kind) {
-				case "query":
-					var querySpec *kolide.QuerySpec
-					if err := yaml.Unmarshal(specBytes, &querySpec); err != nil {
-						return errors.Wrap(err, "error unmarshaling query spec")
-					}
-					specs.Queries = append(specs.Queries, querySpec)
-
-				case "pack":
-					var packSpec *kolide.PackSpec
-					if err := yaml.Unmarshal(specBytes, &packSpec); err != nil {
-						return errors.Wrap(err, "error unmarshaling pack spec")
-					}
-					specs.Packs = append(specs.Packs, packSpec)
-
-				case "label":
-					var labelSpec *kolide.LabelSpec
-					if err := yaml.Unmarshal(specBytes, &labelSpec); err != nil {
-						return errors.Wrap(err, "error unmarshaling label spec")
-					}
-					specs.Labels = append(specs.Labels, labelSpec)
-
-				case "options":
-					if specs.Options != nil {
-						return errors.New("options defined twice in the same file")
-					}
-
-					var optionSpec *kolide.OptionsSpec
-					if err := yaml.Unmarshal(specBytes, &optionSpec); err != nil {
-						return errors.Wrap(err, "error unmarshaling option spec")
-					}
-					specs.Options = optionSpec
-
-				default:
-					return errors.Errorf("unknown kind %q", s.Kind)
-				}
+			specs, err := specGroupFromBytes(b)
+			if err != nil {
+				return err
 			}
 
 			if len(specs.Queries) > 0 {
