@@ -39,7 +39,7 @@ func specGroupFromBytes(b []byte) (*specGroup, error) {
 
 		var s specMetadata
 		if err := yaml.Unmarshal([]byte(spec), &s); err != nil {
-			return nil, errors.Wrap(err, "error unmarshaling spec")
+			return nil, err
 		}
 
 		if s.Spec == nil {
@@ -50,21 +50,21 @@ func specGroupFromBytes(b []byte) (*specGroup, error) {
 		case "query":
 			var querySpec *kolide.QuerySpec
 			if err := yaml.Unmarshal(s.Spec, &querySpec); err != nil {
-				return nil, errors.Wrap(err, "error unmarshaling query spec")
+				return nil, errors.Wrap(err, "unmarshaling query spec")
 			}
 			specs.Queries = append(specs.Queries, querySpec)
 
 		case "pack":
 			var packSpec *kolide.PackSpec
 			if err := yaml.Unmarshal(s.Spec, &packSpec); err != nil {
-				return nil, errors.Wrap(err, "error unmarshaling pack spec")
+				return nil, errors.Wrap(err, "unmarshaling pack spec")
 			}
 			specs.Packs = append(specs.Packs, packSpec)
 
 		case "label":
 			var labelSpec *kolide.LabelSpec
 			if err := yaml.Unmarshal(s.Spec, &labelSpec); err != nil {
-				return nil, errors.Wrap(err, "error unmarshaling label spec")
+				return nil, errors.Wrap(err, "unmarshaling label spec")
 			}
 			specs.Labels = append(specs.Labels, labelSpec)
 
@@ -75,7 +75,7 @@ func specGroupFromBytes(b []byte) (*specGroup, error) {
 
 			var optionSpec *kolide.OptionsSpec
 			if err := yaml.Unmarshal(s.Spec, &optionSpec); err != nil {
-				return nil, errors.Wrap(err, "error unmarshaling option spec")
+				return nil, errors.Wrap(err, "unmarshaling option spec")
 			}
 			specs.Options = optionSpec
 
@@ -135,21 +135,21 @@ func applyCommand() cli.Command {
 
 			if len(specs.Queries) > 0 {
 				if err := fleet.ApplyQuerySpecs(specs.Queries); err != nil {
-					return errors.Wrap(err, "error applying queries")
+					return errors.Wrap(err, "applying queries")
 				}
 				fmt.Printf("[+] applied %d queries\n", len(specs.Queries))
 			}
 
 			if len(specs.Labels) > 0 {
 				if err := fleet.ApplyLabelSpecs(specs.Labels); err != nil {
-					return errors.Wrap(err, "error applying labels")
+					return errors.Wrap(err, "applying labels")
 				}
 				fmt.Printf("[+] applied %d labels\n", len(specs.Labels))
 			}
 
 			if len(specs.Packs) > 0 {
 				if err := fleet.ApplyPackSpecs(specs.Packs); err != nil {
-					return errors.Wrap(err, "error applying packs")
+					return errors.Wrap(err, "applying packs")
 				}
 				fmt.Printf("[+] applied %d packs\n", len(specs.Packs))
 			}
