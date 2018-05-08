@@ -9,7 +9,6 @@ import AllPacksPage from 'pages/packs/AllPacksPage';
 import App from 'components/App';
 import AuthenticatedAdminRoutes from 'components/AuthenticatedAdminRoutes';
 import AuthenticatedRoutes from 'components/AuthenticatedRoutes';
-import ConfigOptionsPage from 'pages/config/ConfigOptionsPage';
 import ConfirmInvitePage from 'pages/ConfirmInvitePage';
 import ConfirmSSOInvitePage from 'pages/ConfirmSSOInvitePage';
 import CoreLayout from 'layouts/CoreLayout';
@@ -53,9 +52,6 @@ const routes = (
             <Route path="admin" component={AuthenticatedAdminRoutes}>
               <Route path="users" component={AdminUserManagementPage} />
               <Route path="settings" component={AdminAppSettingsPage} />
-            </Route>
-            <Route path="config">
-              <Route path="options" component={ConfigOptionsPage} />
             </Route>
             <Route path="hosts">
               <Route path="manage" component={ManageHostsPage} />
