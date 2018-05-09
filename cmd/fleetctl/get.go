@@ -85,7 +85,7 @@ func getQueriesCommand() cli.Command {
 					return err
 				}
 
-				fmt.Printf(string(b))
+				fmt.Print(string(b))
 				return nil
 			}
 		},
@@ -154,7 +154,7 @@ func getPacksCommand() cli.Command {
 					return err
 				}
 
-				fmt.Printf(string(b))
+				fmt.Print(string(b))
 				return nil
 			}
 		},
@@ -224,7 +224,7 @@ func getLabelsCommand() cli.Command {
 					return err
 				}
 
-				fmt.Printf(string(b))
+				fmt.Print(string(b))
 
 				return nil
 			}
