@@ -162,10 +162,10 @@
   revision = "ef8a98b0bbce4a65b5aa4c368430a80ddc533168"
 
 [[projects]]
+  branch = "master"
   name = "github.com/igm/sockjs-go"
   packages = ["sockjs"]
-  revision = "d276e9ffe5cc5c271b81198cc77a2adf6c4482d2"
-  version = "v2.0.0"
+  revision = "c8a8c6429d10e3b6865960ad8cb43779b8a834ef"
 
 [[projects]]
   name = "github.com/inconshreveable/mousetrap"
@@ -494,6 +494,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "e61dcd8fb2f8ecad4fe6728754c2e73e3f52d59029f49598087978f4a8092a25"
+  inputs-digest = "3f86f5eb5bd1faa7bea4752e90b44ea23577820803dfad92c077d5c8551de02a"
   solver-name = "gps-cdcl"
   solver-version = 1

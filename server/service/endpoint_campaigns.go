@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/go-kit/kit/endpoint"
@@ -18,11 +19,13 @@ import (
 ////////////////////////////////////////////////////////////////////////////////
 
 type createDistributedQueryCampaignRequest struct {
-	Query    string `json:"query"`
-	Selected struct {
-		Labels []uint `json:"labels"`
-		Hosts  []uint `json:"hosts"`
-	} `json:"selected"`
+	Query    string                          `json:"query"`
+	Selected distributedQueryCampaignTargets `json:"selected"`
+}
+
+type distributedQueryCampaignTargets struct {
+	Labels []uint `json:"labels"`
+	Hosts  []uint `json:"hosts"`
 }
 
 type createDistributedQueryCampaignResponse struct {
@@ -50,6 +53,7 @@ func makeCreateDistributedQueryCampaignEndpoint(svc kolide.Service) endpoint.End
 func makeStreamDistributedQueryCampaignResultsHandler(svc kolide.Service, jwtKey string, logger kitlog.Logger) http.Handler {
 	opt := sockjs.DefaultOptions
 	opt.Websocket = true
+	opt.RawWebsocket = true
 	return sockjs.NewHandler("/api/v1/kolide/results", opt, func(session sockjs.Session) {
 		defer session.Close(0, "none")
 
@@ -64,6 +68,7 @@ func makeStreamDistributedQueryCampaignResultsHandler(svc kolide.Service, jwtKey
 
 		// Authenticate with the token
 		vc, err := authViewer(context.Background(), jwtKey, token, svc)
+		fmt.Println(token, vc)
 		if err != nil || !vc.CanPerformActions() {
 			logger.Log("err", err, "msg", "unauthorized viewer")
 			conn.WriteJSONError("unauthorized")
