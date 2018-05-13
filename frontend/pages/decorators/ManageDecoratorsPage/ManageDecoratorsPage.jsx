@@ -87,7 +87,7 @@ export class ManageDecoratorsPage extends Component {
     const { dispatch } = this.props;
     const { destroy } = decoratorActions;
 
-    const promises = checkedIDs.map((id: number) => {
+    const promises = checkedIDs.map((id) => {
       return dispatch(destroy({ id }));
     });
     return Promise.all(promises)
