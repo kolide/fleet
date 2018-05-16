@@ -94,8 +94,6 @@ func queryCommand() cli.Command {
 					s.Suffix = fmt.Sprintf("  %.f%% responded (%.f%% online) | %d/%d targeted hosts (%d/%d online)", percentTotal, percentOnline, responded, total, responded, online)
 				}
 			}
-
-			return nil
 		},
 	}
 }
