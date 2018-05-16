@@ -121,8 +121,8 @@ func (svc service) StreamCampaignResults(ctx context.Context, conn *websocket.Co
 	status := campaignStatus{
 		Status: campaignStatusPending,
 	}
-
-	lastStatus := status.Status
+	lastStatus := status
+	lastTotals := targetTotals{}
 
 	// to improve performance of the frontend rendering the results table, we
 	// add the "host_hostname" field to every row.
@@ -157,8 +157,11 @@ func (svc service) StreamCampaignResults(ctx context.Context, conn *websocket.Co
 			Offline:         metrics.OfflineHosts,
 			MissingInAction: metrics.MissingInActionHosts,
 		}
-		if err = conn.WriteJSONMessage("totals", totals); err != nil {
-			return
+		if lastTotals != totals {
+			lastTotals = totals
+			if err = conn.WriteJSONMessage("totals", totals); err != nil {
+				return
+			}
 		}
 
 		status.ExpectedResults = totals.Online
@@ -166,8 +169,8 @@ func (svc service) StreamCampaignResults(ctx context.Context, conn *websocket.Co
 			status.Status = campaignStatusFinished
 		}
 		// only write status message if status has changed
-		if lastStatus != status.Status {
-			lastStatus = status.Status
+		if lastStatus != status {
+			lastStatus = status
 			if err = conn.WriteJSONMessage("status", status); err != nil {
 				return
 			}

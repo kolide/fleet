@@ -3,28 +3,71 @@ package service
 import (
 	"crypto/tls"
 	"encoding/json"
-	"fmt"
 	"net/http"
+	"sync/atomic"
 	"time"
+
+	"github.com/kolide/fleet/server/kolide"
+	ws "github.com/kolide/fleet/server/websocket"
 
 	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
 )
 
+// LiveQueryResultsHandler provides access to all of the information about an
+// incoming stream of live query results.
+type LiveQueryResultsHandler struct {
+	errors  chan error
+	results chan kolide.DistributedQueryResult
+	totals  atomic.Value // real type: targetTotals
+	status  atomic.Value // real type: campaignStatus
+}
+
+func NewLiveQueryResultsHandler() *LiveQueryResultsHandler {
+	return &LiveQueryResultsHandler{
+		errors:  make(chan error),
+		results: make(chan kolide.DistributedQueryResult),
+	}
+}
+
+// Errors returns a read channel that includes any errors returned by the
+// server or receiving the results.
+func (h *LiveQueryResultsHandler) Errors() <-chan error {
+	return h.errors
+}
+
+// Results returns a read channel including any received results
+func (h *LiveQueryResultsHandler) Results() <-chan kolide.DistributedQueryResult {
+	return h.results
+}
+
+// Totals returns the current metadata of hosts targeted by the query
+func (h *LiveQueryResultsHandler) Totals() *targetTotals {
+	return h.totals.Load().(*targetTotals)
+}
+
+func (h *LiveQueryResultsHandler) Status() *campaignStatus {
+	s := h.status.Load()
+	if s != nil {
+		return s.(*campaignStatus)
+	}
+	return nil
+}
+
 // LiveQuery creates a new live query and begins streaming results.
-func (c *Client) LiveQuery(query string, labels []uint, hosts []uint) error {
+func (c *Client) LiveQuery(query string, labels []uint, hosts []uint) (*LiveQueryResultsHandler, error) {
 	req := createDistributedQueryCampaignRequest{
 		Query:    query,
 		Selected: distributedQueryCampaignTargets{Labels: labels, Hosts: hosts},
 	}
 	response, err := c.AuthenticatedDo("POST", "/api/v1/kolide/queries/run", req)
 	if err != nil {
-		return errors.Wrap(err, "POST /api/v1/kolide/queries/run")
+		return nil, errors.Wrap(err, "POST /api/v1/kolide/queries/run")
 	}
 	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
-		return errors.Errorf(
+		return nil, errors.Errorf(
 			"create live query received status %d %s",
 			response.StatusCode,
 			extractServerErrorText(response.Body),
@@ -34,10 +77,10 @@ func (c *Client) LiveQuery(query string, labels []uint, hosts []uint) error {
 	var responseBody createDistributedQueryCampaignResponse
 	err = json.NewDecoder(response.Body).Decode(&responseBody)
 	if err != nil {
-		return errors.Wrap(err, "decode create live query response")
+		return nil, errors.Wrap(err, "decode create live query response")
 	}
 	if responseBody.Err != nil {
-		return errors.Errorf("create live query: %s", responseBody.Err)
+		return nil, errors.Errorf("create live query: %s", responseBody.Err)
 	}
 
 	// Copy default dialer but skip cert verification if set.
@@ -52,27 +95,65 @@ func (c *Client) LiveQuery(query string, labels []uint, hosts []uint) error {
 	wssURL.Path = "/api/v1/kolide/results/websocket"
 	conn, _, err := dialer.Dial(wssURL.String(), nil)
 	if err != nil {
-		return errors.Wrap(err, "upgrade live query result websocket")
+		return nil, errors.Wrap(err, "upgrade live query result websocket")
 	}
-	defer conn.Close()
 
-	err = conn.WriteMessage(websocket.TextMessage, []byte(`{"type":"auth","data":{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2tleSI6Ik5JMzFyZitjQVk0RUFPWTlvVFU5L1NSK2g1cGlWcFZ4bVpMbTNUeEFET2hoME00d0liaWR3OHRyM1JWbHovVU5SeWMveEZKZStqVHo3TzNQYUFxMWt3PT0ifQ.7tb_fIjq94EybEmtwvO_n_54ii_YLvZIRriYmVQGPc0"}}`))
+	err = conn.WriteJSON(ws.JSONMessage{
+		Type: "auth",
+		Data: map[string]interface{}{"token": c.token},
+	})
 	if err != nil {
-		return errors.Wrap(err, "auth for results")
+		return nil, errors.Wrap(err, "auth for results")
 	}
 
-	err = conn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf(`{"type":"select_campaign","data":{"campaign_id":%d}}`, responseBody.Campaign.ID)))
+	err = conn.WriteJSON(ws.JSONMessage{
+		Type: "select_campaign",
+		Data: map[string]interface{}{"campaign_id": responseBody.Campaign.ID},
+	})
 	if err != nil {
-		return errors.Wrap(err, "auth for results")
+		return nil, errors.Wrap(err, "auth for results")
 	}
 
-	for {
-		_, message, err := conn.ReadMessage()
-		if err != nil {
-			return errors.Wrap(err, "receive ws message")
+	resHandler := NewLiveQueryResultsHandler()
+	go func() {
+		defer conn.Close()
+		for {
+			msg := struct {
+				Type string          `json:"type"`
+				Data json.RawMessage `json:"data"`
+			}{}
+			err := conn.ReadJSON(&msg)
+			if err != nil {
+				resHandler.errors <- errors.Wrap(err, "receive ws message")
+			}
+
+			switch msg.Type {
+			case "result":
+				var res kolide.DistributedQueryResult
+				if err := json.Unmarshal(msg.Data, &res); err != nil {
+					resHandler.errors <- errors.Wrap(err, "unmarshal results")
+				}
+				resHandler.results <- res
+
+			case "totals":
+				var totals targetTotals
+				if err := json.Unmarshal(msg.Data, &totals); err != nil {
+					resHandler.errors <- errors.Wrap(err, "unmarshal totals")
+				}
+				resHandler.totals.Store(&totals)
+
+			case "status":
+				var status campaignStatus
+				if err := json.Unmarshal(msg.Data, &status); err != nil {
+					resHandler.errors <- errors.Wrap(err, "unmarshal status")
+				}
+				resHandler.status.Store(&status)
+
+			default:
+				resHandler.errors <- errors.Errorf("unknown msg type %s", msg.Type)
+			}
 		}
-		fmt.Println(string(message))
-	}
+	}()
 
-	return nil
+	return resHandler, nil
 }

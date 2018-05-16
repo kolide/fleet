@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/go-kit/kit/endpoint"
@@ -68,7 +67,6 @@ func makeStreamDistributedQueryCampaignResultsHandler(svc kolide.Service, jwtKey
 
 		// Authenticate with the token
 		vc, err := authViewer(context.Background(), jwtKey, token, svc)
-		fmt.Println(token, vc)
 		if err != nil || !vc.CanPerformActions() {
 			logger.Log("err", err, "msg", "unauthorized viewer")
 			conn.WriteJSONError("unauthorized")
