@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/ghodss/yaml"
 	"github.com/kolide/fleet/server/kolide"
@@ -104,7 +105,7 @@ func convertCommand() cli.Command {
 			packErr := json.Unmarshal(b, &pack)
 			if packErr == nil {
 				base := filepath.Base(flFilename)
-				specs, err = specGroupFromPack(base, pack)
+				specs, err = specGroupFromPack(strings.TrimSuffix(base, filepath.Ext(base)), pack)
 				if err != nil {
 					return err
 				}
