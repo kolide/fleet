@@ -55,14 +55,14 @@ func (h *LiveQueryResultsHandler) Status() *campaignStatus {
 }
 
 // LiveQuery creates a new live query and begins streaming results.
-func (c *Client) LiveQuery(query string, labels []uint, hosts []uint) (*LiveQueryResultsHandler, error) {
-	req := createDistributedQueryCampaignRequest{
+func (c *Client) LiveQuery(query string, labels []string, hosts []string) (*LiveQueryResultsHandler, error) {
+	req := createDistributedQueryCampaignByNamesRequest{
 		Query:    query,
-		Selected: distributedQueryCampaignTargets{Labels: labels, Hosts: hosts},
+		Selected: distributedQueryCampaignTargetsByNames{Labels: labels, Hosts: hosts},
 	}
-	response, err := c.AuthenticatedDo("POST", "/api/v1/kolide/queries/run", req)
+	response, err := c.AuthenticatedDo("POST", "/api/v1/kolide/queries/run_by_names", req)
 	if err != nil {
-		return nil, errors.Wrap(err, "POST /api/v1/kolide/queries/run")
+		return nil, errors.Wrap(err, "POST /api/v1/kolide/queries/run_by_names")
 	}
 	defer response.Body.Close()
 

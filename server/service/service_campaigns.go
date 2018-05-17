@@ -11,6 +11,20 @@ import (
 	"github.com/pkg/errors"
 )
 
+func (svc service) NewDistributedQueryCampaignByNames(ctx context.Context, queryString string, hosts []string, labels []string) (*kolide.DistributedQueryCampaign, error) {
+	hostIDs, err := svc.ds.HostIDsByName(hosts)
+	if err != nil {
+		return nil, errors.Wrap(err, "finding host IDs")
+	}
+
+	labelIDs, err := svc.ds.LabelIDsByName(labels)
+	if err != nil {
+		return nil, errors.Wrap(err, "finding label IDs")
+	}
+
+	return svc.NewDistributedQueryCampaign(ctx, queryString, hostIDs, labelIDs)
+}
+
 func (svc service) NewDistributedQueryCampaign(ctx context.Context, queryString string, hosts []uint, labels []uint) (*kolide.DistributedQueryCampaign, error) {
 	vc, ok := viewer.FromContext(ctx)
 	if !ok {

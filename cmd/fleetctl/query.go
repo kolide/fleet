@@ -2,8 +2,10 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/briandowns/spinner"
@@ -17,8 +19,8 @@ type resultOutput struct {
 
 func queryCommand() cli.Command {
 	var (
-		flFilename string
-		flDebug    bool
+		flFilename, flHosts, flLabels, flQuery string
+		flDebug                                bool
 	)
 	return cli.Command{
 		Name:      "query",
@@ -34,6 +36,27 @@ func queryCommand() cli.Command {
 				Destination: &flFilename,
 				Usage:       "A file to apply",
 			},
+			cli.StringFlag{
+				Name:        "hosts",
+				EnvVar:      "HOSTS",
+				Value:       "",
+				Destination: &flHosts,
+				Usage:       "Comma separated hostnames to target",
+			},
+			cli.StringFlag{
+				Name:        "labels",
+				EnvVar:      "LABELS",
+				Value:       "",
+				Destination: &flLabels,
+				Usage:       "Comma separated label names to target",
+			},
+			cli.StringFlag{
+				Name:        "query",
+				EnvVar:      "QUERY",
+				Value:       "",
+				Destination: &flQuery,
+				Usage:       "Query to run",
+			},
 			cli.BoolFlag{
 				Name:        "debug",
 				EnvVar:      "DEBUG",
@@ -47,9 +70,18 @@ func queryCommand() cli.Command {
 				return err
 			}
 
-			// TODO better handling of query and allow setting targets
-			query := os.Args[len(os.Args)-1]
-			res, err := fleet.LiveQuery(query, []uint{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, []uint{1, 2, 3, 4, 5, 6, 7, 8, 9, 10})
+			if flHosts == "" && flLabels == "" {
+				return errors.New("No hosts or labels targeted")
+			}
+
+			if flQuery == "" {
+				return errors.New("No query specified")
+			}
+
+			hosts := strings.Split(flHosts, ",")
+			labels := strings.Split(flLabels, ",")
+
+			res, err := fleet.LiveQuery(flQuery, labels, hosts)
 			if err != nil {
 				return err
 			}
