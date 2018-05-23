@@ -1,8 +1,10 @@
 package service
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"html/template"
 	"strings"
 
 	"github.com/kolide/fleet/server/contexts/viewer"
@@ -10,6 +12,60 @@ import (
 	"github.com/kolide/fleet/server/mail"
 	"github.com/pkg/errors"
 )
+
+// SMTPTestMailer is used to build an email message that will be used as
+// a test message when testing SMTP configuration
+type SMTPTestMailer struct {
+	KolideServerURL string
+}
+
+func (m *SMTPTestMailer) Message() ([]byte, error) {
+	t, err := getTemplate("server/mail/templates/smtp_setup.html")
+	if err != nil {
+		return nil, err
+	}
+
+	var msg bytes.Buffer
+	if err = t.Execute(&msg, m); err != nil {
+		return nil, err
+	}
+
+	return msg.Bytes(), nil
+}
+
+type PasswordResetMailer struct {
+	// URL for the Kolide application
+	KolideServerURL template.URL
+	// Token password reset token
+	Token string
+}
+
+func (r PasswordResetMailer) Message() ([]byte, error) {
+	t, err := getTemplate("server/mail/templates/password_reset.html")
+	if err != nil {
+		return nil, err
+	}
+
+	var msg bytes.Buffer
+	if err = t.Execute(&msg, r); err != nil {
+		return nil, err
+	}
+	return msg.Bytes(), nil
+}
+
+func getTemplate(templatePath string) (*template.Template, error) {
+	templateData, err := Asset(templatePath)
+	if err != nil {
+		return nil, err
+	}
+
+	t, err := template.New("email_template").Parse(string(templateData))
+	if err != nil {
+		return nil, err
+	}
+
+	return t, nil
+}
 
 // mailError is set when an error performing mail operations
 type mailError struct {
@@ -63,7 +119,7 @@ func (svc service) SendTestEmail(ctx context.Context, config *kolide.AppConfig) 
 	testMail := kolide.Email{
 		Subject: "Hello from Kolide",
 		To:      []string{vc.User.Email},
-		Mailer: &kolide.SMTPTestMailer{
+		Mailer: &SMTPTestMailer{
 			KolideServerURL: config.KolideServerURL,
 		},
 		Config: config,
