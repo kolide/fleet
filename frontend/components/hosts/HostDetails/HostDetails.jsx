@@ -47,22 +47,8 @@ const lastSeenTime = (status, seenTime) => {
 };
 
 const HostDetails = ({ host, onDestroyHost, onQueryHost, isLoading }) => {
-  const {
-    host_cpu: hostCpu,
-    host_ip_address: hostIpAddress,
-    host_mac: hostMac,
-    hostname,
-    memory,
-    os_version: osVersion,
-    osquery_version: osqueryVersion,
-    platform,
-    seen_time: seenTime,
-    status,
-    uptime,
-  } = host;
-
   return (
-    <div className={`${baseClass} ${baseClass}--${status}`}>
+    <div className={`${baseClass} ${baseClass}--${host.status}`}>
       <header className={`${baseClass}__header`}>
         {!isLoading && (
           <span className={`${baseClass}__cta-host`}>
@@ -76,9 +62,9 @@ const HostDetails = ({ host, onDestroyHost, onQueryHost, isLoading }) => {
 
         <p
           className={`${baseClass}__hostname`}
-          title={lastSeenTime(status, seenTime)}
+          title={lastSeenTime(host.status, host.seen_time)}
         >
-          {hostname || 'incoming host'}
+          {host.hostname || 'incoming host'}
         </p>
       </header>
 
@@ -91,12 +77,12 @@ const HostDetails = ({ host, onDestroyHost, onQueryHost, isLoading }) => {
         <ul className={`${baseClass}__details-list`}>
           <li className={` ${baseClass}__detail ${baseClass}__detail--os`}>
             <PlatformIcon
-              name={platform}
+              name={host.platform}
               className={`${baseClass}__icon`}
               title="Operating System & Version"
             />
             <span className={`${baseClass}__host-content`}>
-              {osVersion || '--'}
+              {host.os_version || '--'}
             </span>
           </li>
 
@@ -107,7 +93,7 @@ const HostDetails = ({ host, onDestroyHost, onQueryHost, isLoading }) => {
               title="Osquery Version"
             />
             <span className={`${baseClass}__host-content`}>
-              {osqueryVersion || '--'}
+              {host.osquery_version || '--'}
             </span>
           </li>
 
@@ -118,7 +104,7 @@ const HostDetails = ({ host, onDestroyHost, onQueryHost, isLoading }) => {
               title="CPU Cores and Speed"
             />
             <span className={`${baseClass}__host-content`}>
-              {hostCpu || '--'}
+              {host.host_cpu || '--'}
             </span>
           </li>
 
@@ -129,7 +115,7 @@ const HostDetails = ({ host, onDestroyHost, onQueryHost, isLoading }) => {
               title="Memory / RAM"
             />
             <span className={`${baseClass}__host-content`}>
-              {humanMemory(memory) || '--'}
+              {humanMemory(host.memory) || '--'}
             </span>
           </li>
 
@@ -140,7 +126,7 @@ const HostDetails = ({ host, onDestroyHost, onQueryHost, isLoading }) => {
               title="Uptime"
             />
             <span className={`${baseClass}__host-content`}>
-              {humanUptime(uptime) || '--'}
+              {humanUptime(host.uptime) || '--'}
             </span>
           </li>
 
@@ -153,7 +139,7 @@ const HostDetails = ({ host, onDestroyHost, onQueryHost, isLoading }) => {
             <span
               className={`${baseClass}__host-content ${baseClass}__host-content--mono`}
             >
-              {hostMac ? hostMac.toUpperCase() : '--'}
+              {host.host_mac ? host.host_mac.toUpperCase() : '--'}
             </span>
           </li>
 
@@ -166,7 +152,7 @@ const HostDetails = ({ host, onDestroyHost, onQueryHost, isLoading }) => {
             <span
               className={`${baseClass}__host-content ${baseClass}__host-content--mono`}
             >
-              {hostIpAddress || '--'}
+              {host.host_ip_address || '--'}
             </span>
           </li>
         </ul>
