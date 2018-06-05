@@ -44,11 +44,9 @@ func (svc *launcherWrapper) RequestConfig(ctx context.Context, nodeKey string) (
 		return "", false, errors.Wrap(err, "get config for launcher")
 	}
 
-	if options, ok := config["options"].(map[string]interface{}); ok {
-		// Launcher manages plugins so remove them from configuration if they exist.
-		for _, optionName := range []string{"distributed_plugin", "logger_plugin"} {
-			delete(options, optionName)
-		}
+	// Launcher manages plugins so remove them from configuration if they exist.
+	for _, optionName := range []string{"distributed_plugin", "logger_plugin"} {
+		delete(config.Options, optionName)
 	}
 
 	configJSON, err := json.Marshal(config)

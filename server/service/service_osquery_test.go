@@ -434,7 +434,10 @@ func TestGetClientConfig(t *testing.T) {
 
 	conf, err = svc.GetClientConfig(ctx1)
 	require.Nil(t, err)
-	assert.Equal(t, expectedOptions, conf["options"])
+	assert.Equal(t, expectedOptions, conf.Options)
+
+	packBytes, err := json.Marshal(conf.Packs)
+	require.Nil(t, err)
 	assert.JSONEq(t, `{
 		"pack_by_other_label": {
 			"queries": {
@@ -448,12 +451,15 @@ func TestGetClientConfig(t *testing.T) {
 			}
 		}
 	}`,
-		string(conf["packs"].(json.RawMessage)),
+		string(packBytes),
 	)
 
 	conf, err = svc.GetClientConfig(ctx2)
 	require.Nil(t, err)
-	assert.Equal(t, expectedOptions, conf["options"])
+	assert.Equal(t, expectedOptions, conf.Options)
+
+	packBytes, err = json.Marshal(conf.Packs)
+	require.Nil(t, err)
 	assert.JSONEq(t, `{
 		"pack_by_label": {
 			"queries":{
@@ -461,7 +467,7 @@ func TestGetClientConfig(t *testing.T) {
 			}
 		}
 	}`,
-		string(conf["packs"].(json.RawMessage)),
+		string(packBytes),
 	)
 }
 

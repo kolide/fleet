@@ -122,13 +122,13 @@ func newTLSService(t *testing.T) *mock.TLSService {
 		},
 		GetClientConfigFunc: func(
 			ctx context.Context,
-		) (config map[string]interface{}, err error) {
-			return map[string]interface{}{
-				"options": map[string]interface{}{
+		) (config kolide.OsqueryConfig, err error) {
+			return kolide.OsqueryConfig{
+				Options: map[string]interface{}{
 					"key": "value",
 				},
-				"decorators": map[string]interface{}{
-					"deco": "foobar",
+				Decorators: kolide.Decorators{
+					Load: []string{"select 1;"},
 				},
 			}, nil
 		},

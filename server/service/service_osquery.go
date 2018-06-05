@@ -89,34 +89,35 @@ func (svc service) EnrollAgent(ctx context.Context, enrollSecret, hostIdentifier
 	return host.NodeKey, nil
 }
 
-func (svc service) GetClientConfig(ctx context.Context) (map[string]interface{}, error) {
+func (svc service) GetClientConfig(ctx context.Context) (kolide.OsqueryConfig, error) {
+	var config kolide.OsqueryConfig
+
 	host, ok := hostctx.FromContext(ctx)
 	if !ok {
-		return nil, osqueryError{message: "internal error: missing host from request context"}
+		return config, osqueryError{message: "internal error: missing host from request context"}
 	}
 
-	baseConfig, err := svc.ds.OptionsForPlatform(host.Platform)
+	optionsJson, err := svc.ds.OptionsForPlatform(host.Platform)
 	if err != nil {
-		return nil, osqueryError{message: "internal error: fetching base config: " + err.Error()}
+		return config, osqueryError{message: "internal error: fetching options for platform: " + err.Error()}
 	}
 
-	var config map[string]interface{}
-	err = json.Unmarshal(baseConfig, &config)
+	var options map[string]interface{}
+	err = json.Unmarshal(optionsJson, &options)
 	if err != nil {
-		return nil, osqueryError{message: "internal error: parsing base configuration: " + err.Error()}
+		return config, osqueryError{message: "internal error: parsing options json: " + err.Error()}
 	}
 
 	packs, err := svc.ds.ListPacksForHost(host.ID)
 	if err != nil {
-		return nil, osqueryError{message: "database error: " + err.Error()}
+		return config, osqueryError{message: "database error: " + err.Error()}
 	}
 
-	packConfig := kolide.Packs{}
 	for _, pack := range packs {
 		// first, we must figure out what queries are in this pack
 		queries, err := svc.ds.ListScheduledQueriesInPack(pack.ID, kolide.ListOptions{})
 		if err != nil {
-			return nil, osqueryError{message: "database error: " + err.Error()}
+			return config, osqueryError{message: "database error: " + err.Error()}
 		}
 
 		// the serializable osquery config struct expects content in a
@@ -145,18 +146,10 @@ func (svc service) GetClientConfig(ctx context.Context) (map[string]interface{},
 
 		// finally, we add the pack to the client config struct with all of
 		// the pack's queries
-		packConfig[pack.Name] = kolide.PackContent{
+		config.Packs[pack.Name] = kolide.PackContent{
 			Platform: pack.Platform,
 			Queries:  configQueries,
 		}
-	}
-
-	if len(packConfig) > 0 {
-		packJSON, err := json.Marshal(packConfig)
-		if err != nil {
-			return nil, osqueryError{message: "internal error: marshal pack JSON: " + err.Error()}
-		}
-		config["packs"] = json.RawMessage(packJSON)
 	}
 
 	// Save interval values if they have been updated. Note
@@ -164,26 +157,24 @@ func (svc service) GetClientConfig(ctx context.Context) (map[string]interface{},
 	// ignored here.
 	saveHost := false
 
-	if options, ok := config["options"].(map[string]interface{}); ok {
-		distributedIntervalVal, ok := options["distributed_interval"]
-		distributedInterval, err := cast.ToUintE(distributedIntervalVal)
-		if ok && err == nil && host.DistributedInterval != distributedInterval {
-			host.DistributedInterval = distributedInterval
-			saveHost = true
-		}
+	distributedIntervalVal, ok := config.Options["distributed_interval"]
+	distributedInterval, err := cast.ToUintE(distributedIntervalVal)
+	if ok && err == nil && host.DistributedInterval != distributedInterval {
+		host.DistributedInterval = distributedInterval
+		saveHost = true
+	}
 
-		loggerTLSPeriodVal, ok := options["logger_tls_period"]
-		loggerTLSPeriod, err := cast.ToUintE(loggerTLSPeriodVal)
-		if ok && err == nil && host.LoggerTLSPeriod != loggerTLSPeriod {
-			host.LoggerTLSPeriod = loggerTLSPeriod
-			saveHost = true
-		}
+	loggerTLSPeriodVal, ok := config.Options["logger_tls_period"]
+	loggerTLSPeriod, err := cast.ToUintE(loggerTLSPeriodVal)
+	if ok && err == nil && host.LoggerTLSPeriod != loggerTLSPeriod {
+		host.LoggerTLSPeriod = loggerTLSPeriod
+		saveHost = true
 	}
 
 	if saveHost {
 		err := svc.ds.SaveHost(&host)
 		if err != nil {
-			return nil, err
+			return config, err
 		}
 	}
 
