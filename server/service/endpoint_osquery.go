@@ -44,8 +44,8 @@ type getClientConfigRequest struct {
 }
 
 type getClientConfigResponse struct {
-	Config map[string]interface{}
-	Err    error `json:"error,omitempty"`
+	Config map[string]interface{} `json:"config,omitempty"`
+	Err    error                  `json:"error,omitempty"`
 }
 
 func (r getClientConfigResponse) error() error { return r.Err }
