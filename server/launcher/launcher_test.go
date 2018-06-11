@@ -34,7 +34,7 @@ func TestLauncherRequestConfig(t *testing.T) {
 	require.Nil(t, err)
 	assert.True(t, tls.AuthenticateHostFuncInvoked)
 	assert.False(t, invalid)
-	assert.JSONEq(t, `{"options":{"key":"value"},"decorators":{"deco":"foobar"}}`, config)
+	assert.JSONEq(t, `{"options":{"key":"value"},"decorators":{"load":["select 1;"]}}`, config)
 }
 
 func TestLauncherRequestQueries(t *testing.T) {
