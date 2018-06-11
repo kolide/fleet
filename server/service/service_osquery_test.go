@@ -367,8 +367,7 @@ func TestGetClientConfig(t *testing.T) {
         "SELECT total_seconds AS uptime FROM uptime;"
       ]
     }
-  },
-  "foo": "bar"
+  }
 }
 `), nil
 	}
@@ -386,24 +385,25 @@ func TestGetClientConfig(t *testing.T) {
 		"distributed_interval": float64(11),
 		"logger_tls_period":    float64(33),
 	}
-
-	expectedDecorators := map[string]interface{}{
-		"load": []interface{}{
+	expectedDecorators := kolide.Decorators{
+		Load: []string{
 			"SELECT version FROM osquery_info;",
 			"SELECT uuid AS host_uuid FROM system_info;",
 		},
-		"always": []interface{}{
+		Always: []string{
 			"SELECT user AS username FROM logged_in_users WHERE user <> '' ORDER BY time LIMIT 1;",
 		},
-		"interval": map[string]interface{}{
-			"3600": []interface{}{"SELECT total_seconds AS uptime FROM uptime;"},
+		Interval: map[string][]string{
+			"3600": []string{
+				"SELECT total_seconds AS uptime FROM uptime;",
+			},
 		},
 	}
 
-	expectedConfig := map[string]interface{}{
-		"options":    expectedOptions,
-		"decorators": expectedDecorators,
-		"foo":        "bar",
+	expectedConfig := kolide.OsqueryConfig{
+		Options:    expectedOptions,
+		Decorators: expectedDecorators,
+		Packs:      kolide.Packs{},
 	}
 
 	// No packs loaded yet

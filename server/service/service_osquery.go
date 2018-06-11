@@ -90,7 +90,9 @@ func (svc service) EnrollAgent(ctx context.Context, enrollSecret, hostIdentifier
 }
 
 func (svc service) GetClientConfig(ctx context.Context) (kolide.OsqueryConfig, error) {
-	var config kolide.OsqueryConfig
+	config := kolide.OsqueryConfig{
+		Packs: kolide.Packs{},
+	}
 
 	host, ok := hostctx.FromContext(ctx)
 	if !ok {
@@ -102,8 +104,7 @@ func (svc service) GetClientConfig(ctx context.Context) (kolide.OsqueryConfig, e
 		return config, osqueryError{message: "internal error: fetching options for platform: " + err.Error()}
 	}
 
-	var options map[string]interface{}
-	err = json.Unmarshal(optionsJson, &options)
+	err = json.Unmarshal(optionsJson, &config)
 	if err != nil {
 		return config, osqueryError{message: "internal error: parsing options json: " + err.Error()}
 	}
