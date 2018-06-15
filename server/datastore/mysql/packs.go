@@ -354,7 +354,7 @@ func (d *Datastore) AddLabelToPack(lid uint, pid uint, opts ...kolide.OptionalAr
 	db := d.getTransaction(opts)
 
 	query := `
-		INSERT INTO pack_targets ( pack_id,	type, target_id )
+		INSERT INTO pack_targets ( pack_id, type, target_id )
 			VALUES ( ?, ?, ? )
 			ON DUPLICATE KEY UPDATE id=id
 	`
