@@ -116,7 +116,22 @@ func (d *Datastore) DeleteScheduledQuery(id uint) error {
 
 func (d *Datastore) ScheduledQuery(id uint) (*kolide.ScheduledQuery, error) {
 	query := `
-		SELECT sq.id, sq.created_at, sq.updated_at, sq.pack_id, sq.interval, sq.snapshot, sq.removed, sq.platform, sq.version, sq.shard, sq.query_name, sq.name, sq.description, q.query, q.name, q.id AS query_id
+		SELECT
+			sq.id,
+			sq.created_at,
+			sq.updated_at,
+			sq.pack_id,
+			sq.interval,
+			sq.snapshot,
+			sq.removed,
+			sq.platform,
+			sq.version,
+			sq.shard,
+			sq.query_name,
+			COALESCE(sq.description, '') AS description,
+			q.query,
+			q.name,
+			q.id AS query_id
 		FROM scheduled_queries sq
 		JOIN queries q
 		ON sq.query_name = q.name
