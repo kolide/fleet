@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { goBack } from 'react-router-redux';
 import moment from 'moment';
+import local from 'utilities/local';
 
 import Avatar from 'components/Avatar';
 import Button from 'components/buttons/Button';
@@ -9,6 +10,7 @@ import ChangeEmailForm from 'components/forms/ChangeEmailForm';
 import ChangePasswordForm from 'components/forms/ChangePasswordForm';
 import deepDifference from 'utilities/deep_difference';
 import Icon from 'components/icons/Icon';
+import InputField from 'components/forms/fields/InputField';
 import { logoutUser, updateUser } from 'redux/nodes/auth/actions';
 import Modal from 'components/modals/Modal';
 import { renderFlash } from 'redux/nodes/notifications/actions';
@@ -72,6 +74,14 @@ export class UserSettingsPage extends Component {
     return false;
   }
 
+  onShowApiTokenModal = (evt) => {
+    evt.preventDefault();
+
+    this.setState({ showApiTokenModal: true });
+
+    return false;
+  }
+
   onToggleEmailModal = (updatedUser = {}) => {
     const { showEmailModal } = this.state;
 
@@ -89,6 +99,16 @@ export class UserSettingsPage extends Component {
     const { showPasswordModal } = this.state;
 
     this.setState({ showPasswordModal: !showPasswordModal });
+
+    return false;
+  }
+
+  onToggleApiTokenModal = (evt) => {
+    evt.preventDefault();
+
+    const { showApiTokenModal } = this.state;
+
+    this.setState({ showApiTokenModal: !showApiTokenModal });
 
     return false;
   }
@@ -180,14 +200,76 @@ export class UserSettingsPage extends Component {
     );
   }
 
+  toggleSecret = (evt) => {
+    const { revealSecret } = this.state;
+    evt.preventDefault();
+
+    this.setState({ revealSecret: !revealSecret });
+    return false;
+  }
+
+  onCopySecret = (elementClass) => {
+    return (evt) => {
+      evt.preventDefault();
+
+      const { dispatch } = this.props;
+
+      if (copyText(elementClass)) {
+        dispatch(renderFlash('success', 'Text copied to clipboard'));
+      } else {
+        this.setState({ revealSecret: true });
+        dispatch(renderFlash('error', 'Text not copied. Please copy manually.'));
+      }
+    };
+  }
+
+  renderApiTokenModal = () => {
+    const { showApiTokenModal, revealSecret } = this.state;
+    const { onToggleApiTokenModal, onCopySecret, toggleSecret } = this;
+
+    if (!showApiTokenModal) {
+      return false;
+    }
+
+    return (
+      <Modal
+        title="Get API Token"
+        onExit={onToggleApiTokenModal}
+      >
+          The following is your API Token:
+          <a href="#revealSecret" onClick={toggleSecret} className={`${baseClass}__reveal-secret`}>{revealSecret ? 'Hide' : 'Reveal'} Secret</a>
+              <div className={`${baseClass}__secret-wrapper`}>
+                <InputField
+                  disabled
+                  inputWrapperClass={`${baseClass}__secret-input`}
+                  name="osqueryd-secret"
+                  type={revealSecret ? 'text' : 'password'}
+                  value={local.getItem('auth_token')}
+                />
+                <Button variant="unstyled" className={`${baseClass}__secret-copy-icon`} onClick={onCopySecret(`.${baseClass}__secret-input`)}>
+                  <Icon name="clipboard" />
+                </Button>
+              </div>
+
+        <div className={`${baseClass}__button-wrap`}>
+          <Button onClick={onToggleApiTokenModal} variant="success">
+            Return To App
+          </Button>
+        </div>
+      </Modal>
+    );
+  }
+
   render () {
     const {
       handleSubmit,
       onCancel,
       onLogout,
       onShowModal,
+      onShowApiTokenModal,
       renderEmailModal,
       renderPasswordModal,
+      renderApiTokenModal,
     } = this;
     const { errors, user } = this.props;
     const { pendingEmail } = this.state;
@@ -220,6 +302,10 @@ export class UserSettingsPage extends Component {
             <a href="http://en.gravatar.com/emails/">Change Photo at Gravatar</a>
           </div>
 
+          <Button onClick={onShowApiTokenModal} variant="brand" className={`${baseClass}__button`}>
+            GET API TOKEN
+          </Button>
+
           <div className={`${baseClass}__more-info-detail`}>
             <Icon name="username" />
             <strong>Role</strong> - {roleText}
@@ -238,6 +324,7 @@ export class UserSettingsPage extends Component {
         </div>
         {renderEmailModal()}
         {renderPasswordModal()}
+        {renderApiTokenModal()}
       </div>
     );
   }
