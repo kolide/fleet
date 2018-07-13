@@ -26,5 +26,3 @@ export const copyText = (elementSelector) => {
   removeSelectedText();
   return true;
 };
-
-export default { copyText };

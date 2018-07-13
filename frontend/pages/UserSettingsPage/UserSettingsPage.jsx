@@ -2,7 +2,8 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { goBack } from 'react-router-redux';
 import moment from 'moment';
-import local from 'utilities/local';
+import { authToken } from 'utilities/local';
+import { copyText } from 'utilities/copy_text';
 
 import Avatar from 'components/Avatar';
 import Button from 'components/buttons/Button';
@@ -237,14 +238,14 @@ export class UserSettingsPage extends Component {
         onExit={onToggleApiTokenModal}
       >
           The following is your API Token:
-          <a href="#revealSecret" onClick={toggleSecret} className={`${baseClass}__reveal-secret`}>{revealSecret ? 'Hide' : 'Reveal'} Secret</a>
+          <a href="#revealSecret" onClick={toggleSecret} className={`${baseClass}__reveal-secret`}>{revealSecret ? 'Hide' : 'Reveal'} Token</a>
               <div className={`${baseClass}__secret-wrapper`}>
                 <InputField
                   disabled
                   inputWrapperClass={`${baseClass}__secret-input`}
                   name="osqueryd-secret"
                   type={revealSecret ? 'text' : 'password'}
-                  value={local.getItem('auth_token')}
+                  value={authToken()}
                 />
                 <Button variant="unstyled" className={`${baseClass}__secret-copy-icon`} onClick={onCopySecret(`.${baseClass}__secret-input`)}>
                   <Icon name="clipboard" />
