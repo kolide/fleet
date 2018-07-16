@@ -4,7 +4,7 @@ const removeSelectedText = () => {
   return global.window.getSelection().removeAllRanges();
 };
 
-export const copyText = (elementSelector) => {
+const copyText = (elementSelector) => {
   const { document } = global;
 
   const element = document.querySelector(elementSelector);
@@ -26,3 +26,5 @@ export const copyText = (elementSelector) => {
   removeSelectedText();
   return true;
 };
+
+export default copyText;

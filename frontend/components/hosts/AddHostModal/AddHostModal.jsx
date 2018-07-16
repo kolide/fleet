@@ -4,7 +4,7 @@ import Button from 'components/buttons/Button';
 import Icon from 'components/icons/Icon';
 import InputField from 'components/forms/fields/InputField';
 import { renderFlash } from 'redux/nodes/notifications/actions';
-import { copyText } from 'utilities/copy_text';
+import copyText from 'utilities/copy_text';
 import certificate from '../../../../assets/images/osquery-certificate.svg';
 
 const baseClass = 'add-host-modal';

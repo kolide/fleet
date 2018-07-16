@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { goBack } from 'react-router-redux';
 import moment from 'moment';
 import { authToken } from 'utilities/local';
-import { copyText } from 'utilities/copy_text';
+import copyText from 'utilities/copy_text';
 
 import Avatar from 'components/Avatar';
 import Button from 'components/buttons/Button';
@@ -114,6 +114,30 @@ export class UserSettingsPage extends Component {
     return false;
   }
 
+  onToggleSecret = (evt) => {
+    evt.preventDefault();
+
+    const { revealSecret } = this.state;
+
+    this.setState({ revealSecret: !revealSecret });
+    return false;
+  }
+
+  onCopySecret = (elementClass) => {
+    return (evt) => {
+      evt.preventDefault();
+
+      const { dispatch } = this.props;
+
+      if (copyText(elementClass)) {
+        dispatch(renderFlash('success', 'Text copied to clipboard'));
+      } else {
+        this.setState({ revealSecret: true });
+        dispatch(renderFlash('error', 'Text not copied. Please copy manually.'));
+      }
+    };
+  }
+
   handleSubmit = (formData) => {
     const { dispatch, user } = this.props;
     const updatedUser = deepDifference(formData, user);
@@ -201,32 +225,9 @@ export class UserSettingsPage extends Component {
     );
   }
 
-  toggleSecret = (evt) => {
-    const { revealSecret } = this.state;
-    evt.preventDefault();
-
-    this.setState({ revealSecret: !revealSecret });
-    return false;
-  }
-
-  onCopySecret = (elementClass) => {
-    return (evt) => {
-      evt.preventDefault();
-
-      const { dispatch } = this.props;
-
-      if (copyText(elementClass)) {
-        dispatch(renderFlash('success', 'Text copied to clipboard'));
-      } else {
-        this.setState({ revealSecret: true });
-        dispatch(renderFlash('error', 'Text not copied. Please copy manually.'));
-      }
-    };
-  }
-
   renderApiTokenModal = () => {
     const { showApiTokenModal, revealSecret } = this.state;
-    const { onToggleApiTokenModal, onCopySecret, toggleSecret } = this;
+    const { onToggleApiTokenModal, onCopySecret, onToggleSecret } = this;
 
     if (!showApiTokenModal) {
       return false;
@@ -237,20 +238,20 @@ export class UserSettingsPage extends Component {
         title="Get API Token"
         onExit={onToggleApiTokenModal}
       >
-          The following is your API Token:
-          <a href="#revealSecret" onClick={toggleSecret} className={`${baseClass}__reveal-secret`}>{revealSecret ? 'Hide' : 'Reveal'} Token</a>
-              <div className={`${baseClass}__secret-wrapper`}>
-                <InputField
-                  disabled
-                  inputWrapperClass={`${baseClass}__secret-input`}
-                  name="osqueryd-secret"
-                  type={revealSecret ? 'text' : 'password'}
-                  value={authToken()}
-                />
-                <Button variant="unstyled" className={`${baseClass}__secret-copy-icon`} onClick={onCopySecret(`.${baseClass}__secret-input`)}>
-                  <Icon name="clipboard" />
-                </Button>
-              </div>
+        The following is your API Token:
+        <a href="#revealSecret" onClick={onToggleSecret} className={`${baseClass}__reveal-secret`}>{revealSecret ? 'Hide' : 'Reveal'} Token</a>
+        <div className={`${baseClass}__secret-wrapper`}>
+          <InputField
+            disabled
+            inputWrapperClass={`${baseClass}__secret-input`}
+            name="osqueryd-secret"
+            type={revealSecret ? 'text' : 'password'}
+            value={authToken()}
+          />
+          <Button variant="unstyled" className={`${baseClass}__secret-copy-icon`} onClick={onCopySecret(`.${baseClass}__secret-input`)}>
+            <Icon name="clipboard" />
+          </Button>
+        </div>
 
         <div className={`${baseClass}__button-wrap`}>
           <Button onClick={onToggleApiTokenModal} variant="success">
