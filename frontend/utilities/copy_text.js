@@ -4,7 +4,7 @@ const removeSelectedText = () => {
   return global.window.getSelection().removeAllRanges();
 };
 
-const copyText = (elementSelector) => {
+export const copyText = (elementSelector) => {
   const { document } = global;
 
   const element = document.querySelector(elementSelector);
@@ -26,5 +26,8 @@ const copyText = (elementSelector) => {
   removeSelectedText();
   return true;
 };
+
+export const COPY_TEXT_SUCCESS = 'Text copied to clipboard';
+export const COPY_TEXT_ERROR = 'Text not copied. Please copy manually.';
 
 export default copyText;
