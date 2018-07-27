@@ -154,7 +154,7 @@ export class ManageHostsPage extends Component {
         this.toggleDeleteHostModal(null)();
 
         dispatch(getStatusLabelCounts);
-        dispatch(renderFlash('success', `Host "${selectedHost.hostname}" was successfully deleted`));
+        dispatch(renderFlash('success', `Device "${selectedHost.hostname}" was successfully deleted`));
       });
 
     return false;
@@ -377,7 +377,7 @@ export class ManageHostsPage extends Component {
 
     return (
       <Modal
-        title="Add New Host"
+        title="Add New Device"
         onExit={toggleAddHostModal}
         className={`${baseClass}__invite-modal`}
       >
@@ -401,12 +401,12 @@ export class ManageHostsPage extends Component {
 
     return (
       <Modal
-        title="Delete Host"
+        title="Delete Device"
         onExit={toggleDeleteHostModal(null)}
         className={`${baseClass}__modal`}
       >
-        <p>This action will delete the host from your Kolide instance.</p>
-        <p>If the host comes back online it will automatically re-enroll. To prevent the host from auto re-enrolling please disable or uninstall osquery on the host.</p>
+        <p>This action will delete the device from your Kolide instance.</p>
+        <p>If the device comes back online it will automatically re-enroll. To prevent the device from auto re-enrolling please disable or uninstall osquery on the device.</p>
         <div className={`${baseClass}__modal-buttons`}>
           <Button onClick={onDestroyHost} variant="alert">Delete</Button>
           <Button onClick={toggleDeleteHostModal(null)} variant="inverse">Cancel</Button>
@@ -503,13 +503,13 @@ export class ManageHostsPage extends Component {
     const { onToggleDisplay } = this;
     const buttonOptions = {
       rightIcon: 'grid-select',
-      rightText: 'Grid',
+      rightText: '',
       leftIcon: 'list-select',
-      leftText: 'List',
+      leftText: '',
     };
 
     const hostCount = type === 'status' ? statusLabels[`${statusLabelKey}`] : count;
-    const hostsTotalDisplay = hostCount === 1 ? '1 Host Total' : `${hostCount} Hosts Total`;
+    const hostsTotalDisplay = hostCount === 1 ? '1 Device Total' : `${hostCount} Devices Total`;
     const defaultDescription = 'No description available.';
 
     return (

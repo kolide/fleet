@@ -62,7 +62,7 @@ class AddHostModal extends Component {
     return (
       <div className={baseClass}>
         <p>
-          Follow the instructions below to add hosts to your Kolide Instance.
+          Follow the instructions below to add devices to your Kolide Instance.
         </p>
 
         <div className={`${baseClass}__manual-install-header`}>

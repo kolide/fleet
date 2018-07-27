@@ -60,7 +60,7 @@ class HostPagination extends PureComponent {
             onChange={onPerPageChange}
             className={`${baseClass}__count-select`}
             clearable={false}
-          /> <span>Hosts per page</span>
+          /> <span>Devices per page</span>
         </div>
       </div>
     );

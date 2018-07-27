@@ -31,7 +31,7 @@ export default (admin) => {
   const userNavItems = [
     {
       icon: 'hosts',
-      name: 'Hosts',
+      name: 'Devices',
       location: {
         regex: /^\/hosts/,
         pathname: '/hosts/manage',

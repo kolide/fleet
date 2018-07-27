@@ -27,12 +27,12 @@ class HostContainer extends Component {
 
     return (
       <div className={`${baseClass}  ${baseClass}--no-hosts`}>
-        <h1>No matching hosts found.</h1>
-        <h2>Where are the missing hosts?</h2>
+        <h1>No matching devices found.</h1>
+        <h2>Where are the missing devices?</h2>
         <ul>
           {isCustom && <li>Check your SQL query above to confirm there are no mistakes.</li>}
-          <li>Check to confirm that your hosts are online.</li>
-          <li>Confirm that your expected hosts have osqueryd installed and configured.</li>
+          <li>Check to confirm that your devices are online.</li>
+          <li>Confirm that your expected devices have osqueryd installed and configured.</li>
         </ul>
 
         <div className={`${baseClass}__no-hosts-contact`}>

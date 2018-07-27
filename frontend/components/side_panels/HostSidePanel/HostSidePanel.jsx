@@ -59,7 +59,7 @@ class HostSidePanel extends Component {
 
         <Button variant="unstyled" onClick={onAddHostClick} className={`${baseClass}__add-hosts`}>
           <Icon name="laptop-plus" className={`${baseClass}__add-hosts-icon`} />
-          <span>Add New Host</span>
+          <span>Add New Device</span>
         </Button>
 
         <hr className={`${baseClass}__hr`} />
