@@ -93,7 +93,7 @@ describe('ManageHostsPage - component', () => {
       const oneHostLabel = { ...allHostsLabel, count: 1 };
       const page = mount(<ManageHostsPage {...props} selectedLabel={oneHostLabel} />);
 
-      expect(page.text()).toInclude('1 Host Total');
+      expect(page.text()).toInclude('1 Device Total');
     });
 
     it('displays "#{count} Devices Total" when there are more than 1 host', () => {
