@@ -35,6 +35,15 @@ type RedisConfig struct {
 	Password string
 }
 
+// NatsConfig defines configs related to NATS
+type NatsConfig struct {
+	Enabled  bool
+	URL      string
+	Username string
+	Password string
+	Token    string
+}
+
 const (
 	TLSProfileKey          = "server.tls_compatibility"
 	TLSProfileModern       = "modern"
@@ -93,6 +102,7 @@ type LoggingConfig struct {
 type KolideConfig struct {
 	Mysql   MysqlConfig
 	Redis   RedisConfig
+	Nats    NatsConfig
 	Server  ServerConfig
 	Auth    AuthConfig
 	App     AppConfig
@@ -131,6 +141,17 @@ func (man Manager) addConfigs() {
 		"Redis server address (host:port)")
 	man.addConfigString("redis.password", "",
 		"Redis server password (prefer env variable for security)")
+
+	// NATS
+	man.addConfigBool("nats.enabled", false, "Enable NATS output.")
+	man.addConfigString("nats.url", "nats://localhost:4222",
+		"NATS Connect URL")
+	man.addConfigString("nats.username", "",
+		"Username to be used when connecting to the server.")
+	man.addConfigString("nats.password", "",
+		"Password to be used when connecting to the server.")
+	man.addConfigString("nats.token", "",
+		"Token to be used when connecting to the server.")
 
 	// Server
 	man.addConfigString("server.address", "0.0.0.0:8080",
@@ -210,6 +231,13 @@ func (man Manager) LoadConfig() KolideConfig {
 		Redis: RedisConfig{
 			Address:  man.getConfigString("redis.address"),
 			Password: man.getConfigString("redis.password"),
+		},
+		Nats: NatsConfig{
+			Enabled:  man.getConfigBool("nats.enabled"),
+			URL:      man.getConfigString("nats.url"),
+			Username: man.getConfigString("nats.username"),
+			Password: man.getConfigString("nats.password"),
+			Token:    man.getConfigString("nats.token"),
 		},
 		Server: ServerConfig{
 			Address:    man.getConfigString("server.address"),
