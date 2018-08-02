@@ -106,9 +106,11 @@ func queryCommand() cli.Command {
 				select {
 				case hostResult := <-res.Results():
 					out := resultOutput{hostResult.Host.HostName, hostResult.Rows}
+					s.Stop()
 					if err := json.NewEncoder(os.Stdout).Encode(out); err != nil {
 						fmt.Fprintf(os.Stderr, "Error writing output: %s\n", err)
 					}
+					s.Start()
 
 				case err := <-res.Errors():
 					fmt.Fprintf(os.Stderr, "Error talking to server: %s\n", err.Error())
