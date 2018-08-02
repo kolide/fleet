@@ -137,13 +137,16 @@ func queryCommand() cli.Command {
 						return nil
 					}
 
+					msg := fmt.Sprintf(" %.f%% responded (%.f%% online) | %d/%d targeted hosts (%d/%d online)", percentTotal, percentOnline, responded, total, responded, online)
 					if !flQuiet {
-						s.Suffix = fmt.Sprintf(
-							"  %.f%% responded (%.f%% online) | %d/%d targeted hosts (%d/%d online)",
-							percentTotal, percentOnline,
-							responded, total,
-							responded, online,
-						)
+						s.Suffix = msg
+					}
+					if total == responded {
+						s.Stop()
+						if !flQuiet {
+							fmt.Fprintf(os.Stderr, msg+"\n")
+						}
+						return nil
 					}
 				}
 			}
