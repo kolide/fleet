@@ -90,6 +90,7 @@ type service struct {
 	osqueryStatusLogWriter io.Writer
 	osqueryResultLogWriter io.Writer
 
+	queueService    kolide.QueueService
 	mailService     kolide.MailService
 	ssoSessionStore sso.SessionStore
 	metaDataClient  *http.Client
