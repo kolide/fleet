@@ -31,6 +31,13 @@ services:
       - "8025:8025"
       - "1025:1025"
 
+  nats:
+    image: nats:1.2.0
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+      - "6222:6222"
+
   redis:
     image: redis:3.2.4
     ports:
