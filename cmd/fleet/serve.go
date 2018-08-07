@@ -21,10 +21,7 @@ import (
 	"github.com/kolide/fleet/server/health"
 	"github.com/kolide/fleet/server/kolide"
 	"github.com/kolide/fleet/server/launcher"
-	"github.com/kolide/fleet/server/mail"
-	"github.com/kolide/fleet/server/pubsub"
 	"github.com/kolide/fleet/server/service"
-	"github.com/kolide/fleet/server/sso"
 	"github.com/kolide/kit/version"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -69,7 +66,6 @@ the way that the Fleet server works.
 
 			var ds kolide.Datastore
 			var err error
-			mailService := mail.NewService()
 
 			ds, err = mysql.New(config.Mysql, clock.C, mysql.Logger(logger))
 			if err != nil {
@@ -126,12 +122,10 @@ the way that the Fleet server works.
 				}
 			}
 
-			var resultStore kolide.QueryResultStore
-			redisPool := pubsub.NewRedisPool(config.Redis.Address, config.Redis.Password)
-			resultStore = pubsub.NewRedisQueryResults(redisPool)
-			ssoSessionStore := sso.NewSessionStore(redisPool)
 
-			svc, err := service.NewService(ds, resultStore, logger, config, mailService, clock.C, ssoSessionStore)
+
+
+			svc, err := service.NewService(ds, logger, config, clock.C)
 			if err != nil {
 				initFatal(err, "initializing service")
 			}
@@ -188,10 +182,7 @@ the way that the Fleet server works.
 			healthCheckers := make(map[string]health.Checker)
 			{
 				// a list of dependencies which could affect the status of the app if unavailable.
-				deps := map[string]interface{}{
-					"datastore":          ds,
-					"query_result_store": resultStore,
-				}
+				deps := svc.HealthCheckers()
 
 				// convert all dependencies to health.Checker if they implement the healthz methods.
 				for name, dep := range deps {

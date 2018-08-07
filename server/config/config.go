@@ -31,6 +31,7 @@ type MysqlConfig struct {
 
 // RedisConfig defines configs related to Redis
 type RedisConfig struct {
+	Enabled  bool
 	Address  string
 	Password string
 }
@@ -86,6 +87,38 @@ type OsqueryConfig struct {
 	ResultLogFile       string        `yaml:"result_log_file"`
 	EnableLogRotation   bool          `yaml:"enable_log_rotation"`
 	LabelUpdateInterval time.Duration `yaml:"label_update_interval"`
+	Status              StatusConfig  `yaml:"status"`
+	Results             ResultsConfig `yaml:"results"`
+}
+
+type StatusConfig struct {
+	Destination         string `yaml:"destinations"`
+	File                FileStatusConfig `yaml:"file"`
+	Nats                NatsStatusConfig `yaml:"nats"`
+}
+
+type FileStatusConfig struct {
+	LogFile   string `yaml:"log_file"`
+	EnableLogRotation bool `yaml:"rotation"`
+}
+
+type NatsStatusConfig struct {
+	Topic string  `yaml:"topic"`
+}
+
+type ResultsConfig struct {
+	Destination         string `yaml:"destinations"`
+	File                FileResultsConfig `yaml:"file"`
+	Nats                NatsResultsConfig `yaml:"nats"`
+}
+
+type FileResultsConfig struct {
+	LogFile   string `yaml:"log_file"`
+	EnableLogRotation bool `yaml:"rotation"`
+
+}
+type NatsResultsConfig struct {
+	Topic string  `yaml:"topic"`
 }
 
 // LoggingConfig defines configs related to logging
@@ -137,6 +170,7 @@ func (man Manager) addConfigs() {
 	man.addConfigInt("mysql.max_idle_conns", 50, "MySQL maximum idle connection handles.")
 
 	// Redis
+	man.addConfigBool("redis.enabled", true, "Enable NATS output.")
 	man.addConfigString("redis.address", "localhost:6379",
 		"Redis server address (host:port)")
 	man.addConfigString("redis.password", "",
@@ -200,6 +234,27 @@ func (man Manager) addConfigs() {
 	man.addConfigBool("osquery.enable_log_rotation", false,
 		"Osquery log files will be automatically rotated")
 
+	man.addConfigString("osquery.results.destinations", "file",
+		"Services to send osquery results to. can be a comma separated lists [nats,file] Defaults:file",
+	)
+	man.addConfigString("osquery.results.file.log_file", "/tmp/osquery_results",
+		"Path for osqueryd status logs")
+	man.addConfigBool("osquery.results.file.rotation", false,
+		"Osquery log files will be automatically rotated")
+	man.addConfigString("osquery.results.nats.topic", "fleet.results.{uuid}",
+		"Nats TOPIC to publish results too.")
+
+	man.addConfigString("osquery.status.destinations", "file",
+		"Services to send osquery status to. can be a comma separated lists [nats,file] Defaults:file",
+	)
+	man.addConfigString("osquery.status.file.log_file", "/tmp/osquery_status",
+		"Path for osqueryd status logs")
+	man.addConfigBool("osquery.status.file.rotation", false,
+		"Osquery log files will be automatically rotated")
+	man.addConfigString("osquery.status.nats.topic", "fleet.status.{uuid}",
+		"Nats TOPIC to publish status too.")
+
+
 	// Logging
 	man.addConfigBool("logging.debug", false,
 		"Enable debug logging")
@@ -229,6 +284,7 @@ func (man Manager) LoadConfig() KolideConfig {
 			MaxIdleConns:  man.getConfigInt("mysql.max_idle_conns"),
 		},
 		Redis: RedisConfig{
+			Enabled:  man.getConfigBool("redis.enabled"),
 			Address:  man.getConfigString("redis.address"),
 			Password: man.getConfigString("redis.password"),
 		},
@@ -265,6 +321,26 @@ func (man Manager) LoadConfig() KolideConfig {
 			ResultLogFile:       man.getConfigString("osquery.result_log_file"),
 			LabelUpdateInterval: man.getConfigDuration("osquery.label_update_interval"),
 			EnableLogRotation:   man.getConfigBool("osquery.enable_log_rotation"),
+			Status: StatusConfig{
+				Destination: man.getConfigString("osquery.status.destinations"),
+				File: FileStatusConfig{
+					LogFile:       man.getConfigString("osquery.status.file.log_file"),
+					EnableLogRotation: man.getConfigBool("osquery.status.file.rotation"),
+				},
+				Nats: NatsStatusConfig{
+					Topic:     man.getConfigString("osquery.status.nats.topic"),
+				},
+			},
+			Results: ResultsConfig {
+				Destination: man.getConfigString("osquery.results.destinations"),
+				File: FileResultsConfig{
+					LogFile:       man.getConfigString("osquery.results.file.log_file"),
+					EnableLogRotation: man.getConfigBool("osquery.results.file.rotation"),
+				},
+				Nats: NatsResultsConfig{
+					Topic:     man.getConfigString("osquery.results.nats.topic"),
+				},
+			},
 		},
 		Logging: LoggingConfig{
 			Debug:         man.getConfigBool("logging.debug"),
@@ -442,6 +518,10 @@ func (man Manager) getConfigDuration(key string) time.Duration {
 	}
 
 	return durationVal
+}
+
+func (man Manager) addConfigList(key string, defVal []string, usage string) {
+	man.command.PersistentFlags()
 }
 
 // loadConfigFile handles the loading of the config file.

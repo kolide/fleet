@@ -11,7 +11,6 @@ import (
 	"github.com/kolide/fleet/server/config"
 	"github.com/kolide/fleet/server/datastore/mysql"
 	"github.com/kolide/fleet/server/kolide"
-	"github.com/kolide/fleet/server/pubsub"
 	"github.com/kolide/fleet/server/service"
 	"github.com/spf13/cobra"
 )
@@ -110,7 +109,7 @@ To setup Fleet infrastructure, use one of the available commands.
 				Enabled:  &enabled,
 				Admin:    &isAdmin,
 			}
-			svc, err := service.NewService(ds, pubsub.NewInmemQueryResults(), kitlog.NewNopLogger(), config, nil, clock.C, nil)
+			svc, err := service.NewService(ds, kitlog.NewNopLogger(), config,  clock.C)
 			if err != nil {
 				initFatal(err, "creating service")
 			}

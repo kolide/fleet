@@ -16,13 +16,26 @@ import (
 	"github.com/kolide/fleet/server/kolide"
 	"github.com/kolide/fleet/server/logwriter"
 	"github.com/kolide/fleet/server/sso"
+	"github.com/kolide/fleet/server/pubsub"
+	"github.com/kolide/fleet/server/mail"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
+
+
+
 // NewService creates a new service from the config struct
-func NewService(ds kolide.Datastore, resultStore kolide.QueryResultStore,
-	logger kitlog.Logger, kolideConfig config.KolideConfig, mailService kolide.MailService,
-	c clock.Clock, sso sso.SessionStore) (kolide.Service, error) {
+func NewService(ds kolide.Datastore, logger kitlog.Logger, kolideConfig config.KolideConfig, c clock.Clock) (kolide.Service, error) {
+
+	var resultStore kolide.QueryResultStore
+	var ssoSessionStore sso.SessionStore 
+
+	mailService := mail.NewService()
+
+	redisPool := pubsub.NewRedisPool(kolideConfig.Redis.Address, kolideConfig.Redis.Password)
+	resultStore = pubsub.NewRedisQueryResults(redisPool)
+	ssoSessionStore = sso.NewSessionStore(redisPool)
+
 	var svc kolide.Service
 	statusWriter, err := osqueryLogFile(kolideConfig.Osquery.StatusLogFile, logger, kolideConfig.Osquery.EnableLogRotation)
 	if err != nil {
@@ -40,15 +53,16 @@ func NewService(ds kolide.Datastore, resultStore kolide.QueryResultStore,
 		config:      kolideConfig,
 		clock:       c,
 
+
 		osqueryStatusLogWriter: statusWriter,
 		osqueryResultLogWriter: resultWriter,
 		mailService:            mailService,
-		ssoSessionStore:        sso,
+		ssoSessionStore:        ssoSessionStore,
 		metaDataClient: &http.Client{
 			Timeout: 5 * time.Second,
 		},
 	}
-	svc = validationMiddleware{svc, ds, sso}
+	svc = validationMiddleware{svc, ds, ssoSessionStore}
 	return svc, nil
 }
 
@@ -94,6 +108,14 @@ type service struct {
 	mailService     kolide.MailService
 	ssoSessionStore sso.SessionStore
 	metaDataClient  *http.Client
+}
+
+func (s service) HealthCheckers() (map[string]interface{}) {
+	deps := map[string]interface{}{
+		"datastore":          s.ds,
+		"query_result_store": s.resultStore,
+	}
+	return deps
 }
 
 func (s service) SendEmail(mail kolide.Email) error {
