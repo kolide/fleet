@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"strings"
 	"crypto/tls"
 	"fmt"
 	"io/ioutil"
@@ -12,6 +13,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/nats-io/go-nats"
+	"github.com/gomodule/redigo/redis"
 	"github.com/WatchBeam/clock"
 	"github.com/e-dard/netbug"
 	kitlog "github.com/go-kit/kit/log"
@@ -22,12 +25,25 @@ import (
 	"github.com/kolide/fleet/server/kolide"
 	"github.com/kolide/fleet/server/launcher"
 	"github.com/kolide/fleet/server/service"
+	"github.com/kolide/fleet/server/queue"
+	"github.com/kolide/fleet/server/pubsub"
+	"github.com/kolide/fleet/server/mail"
+	"github.com/kolide/fleet/server/sso"
 	"github.com/kolide/kit/version"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 )
+
+func contains(s []string, e string) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
+}
 
 type initializer interface {
 	// Initialize is used to populate a datastore with
@@ -122,10 +138,95 @@ the way that the Fleet server works.
 				}
 			}
 
+			mailService := mail.NewService()
+			var redisConn *redis.Pool
+			var natsConn  *nats.Conn
+			var resultStore kolide.QueryResultStore 
+			var ssoSessionStore sso.SessionStore
+
+			if !config.Redis.Enabled && !config.Nats.Enabled {
+				initFatal(nil, "Redis nor Nats enabled")
+				fmt.Printf("################################################################################\n"+
+					"# ERROR:\n"+
+					"#   Redis and/or Nats is required for fleet to function"+
+					"#\n"+
+					"################################################################################\n",
+					)
+				os.Exit(1)
+			}
+
+			if config.Redis.Enabled {
+				redisConn = pubsub.NewRedisPool(config.Redis.Address, config.Redis.Password) // XXX Blah :) 
+			}
+
+			if config.Nats.Enabled {
+				natsConn, err = nats.Connect(config.Nats.URL)
+				if err != nil {
+					initFatal(err, "initializing nats")
+				}
+			}
+
+			switch config.Session.CampaignEngine {
+			case "redis":
+				if !config.Redis.Enabled {
+					initFatal(fmt.Errorf("redis not enabled, but required for sessions campaign_engine"), "initializing Sessions")
+				}
+				resultStore = pubsub.NewRedisQueryResults(redisConn)
+			case "nats":
+				if !config.Nats.Enabled {
+					initFatal(fmt.Errorf("nats not enabled, but required for sessions capaign_engine"), "initializing Sessions")
+				}
+				resultStore = pubsub.NewNatsQueryResults(natsConn,"fleet.campaign")
+			default:
+			}
 
 
+			switch config.Session.StorageEngine {
+			case "redis":
+				if !config.Redis.Enabled {
+					initFatal(fmt.Errorf("redis not enabled, but required for sessions campaign_engine"), "initializing Sessions")
+				}
+				ssoSessionStore = sso.NewSessionStore(redisConn)
+			default:
+			}
 
-			svc, err := service.NewService(ds, logger, config, clock.C)
+			resultsQ := []kolide.QueueService{}
+			statusQ := []kolide.QueueService{}
+
+			if config.Nats.Enabled && contains(strings.Split(config.Osquery.Results.Destination, ","), "nats") {
+				f, err := queue.NewNatsQueue(logger, natsConn, config.Osquery.Results.Nats)
+				if err != nil {
+					initFatal(err, "initializing NatsQueue service")
+				}
+				resultsQ = append(resultsQ, f)
+			}
+			if config.Nats.Enabled && contains(strings.Split(config.Osquery.Status.Destination, ","), "nats") {
+				f, err := queue.NewNatsQueue(logger, natsConn, config.Osquery.Status.Nats)
+				if err != nil {
+					initFatal(err, "initializing NatsQueue service")
+				}
+				statusQ = append(statusQ, f)
+			}
+
+			// Results File is enabled
+			if contains(strings.Split(config.Osquery.Results.Destination, ","), "file") {
+				f, err := queue.NewFileQueue(logger, config.Osquery.Results.File)
+				if err != nil {
+					initFatal(err, "initializing Queue service")
+				}
+				resultsQ = append(resultsQ, f)
+			}
+			// Status File is enabled
+			if contains(strings.Split(config.Osquery.Status.Destination, ","), "file") {
+				f, err := queue.NewFileQueue(logger, config.Osquery.Status.File)
+				if err != nil {
+					initFatal(err, "initializing Queue service")
+				}
+				statusQ = append(statusQ, f)
+			}
+
+
+			svc, err := service.NewService(ds, resultStore, logger, config, mailService, clock.C, ssoSessionStore, resultsQ, statusQ)
 			if err != nil {
 				initFatal(err, "initializing service")
 			}

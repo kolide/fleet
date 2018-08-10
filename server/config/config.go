@@ -76,50 +76,38 @@ type AppConfig struct {
 
 // SessionConfig defines configs related to user sessions
 type SessionConfig struct {
-	KeySize  int `yaml:"key_size"`
-	Duration time.Duration
+	KeySize        int `yaml:"key_size"`
+	Duration       time.Duration
+	StorageEngine  string `yaml:"storage_engine"`
+	CampaignEngine string `yaml:"campaign_engine"`
 }
 
 // OsqueryConfig defines configs related to osquery
 type OsqueryConfig struct {
 	NodeKeySize         int           `yaml:"node_key_size"`
-	StatusLogFile       string        `yaml:"status_log_file"`
-	ResultLogFile       string        `yaml:"result_log_file"`
+	StatusLogFile       string        `yaml:"status_log_file"`    // How to deprecate 
+	ResultLogFile       string        `yaml:"result_log_file"`    // How to Deprecate 
 	EnableLogRotation   bool          `yaml:"enable_log_rotation"`
 	LabelUpdateInterval time.Duration `yaml:"label_update_interval"`
-	Status              StatusConfig  `yaml:"status"`
-	Results             ResultsConfig `yaml:"results"`
+	Status              QueueConfig   `yaml:"status"`
+	Results             QueueConfig   `yaml:"results"`
 }
 
-type StatusConfig struct {
+type QueueConfig struct {
 	Destination         string `yaml:"destinations"`
-	File                FileStatusConfig `yaml:"file"`
-	Nats                NatsStatusConfig `yaml:"nats"`
+	File                FileQueueConfig `yaml:"file"`
+	Nats                NatsQueueConfig `yaml:"nats"`
 }
 
-type FileStatusConfig struct {
+type FileQueueConfig struct {
 	LogFile   string `yaml:"log_file"`
 	EnableLogRotation bool `yaml:"rotation"`
 }
 
-type NatsStatusConfig struct {
+type NatsQueueConfig struct {
 	Topic string  `yaml:"topic"`
 }
 
-type ResultsConfig struct {
-	Destination         string `yaml:"destinations"`
-	File                FileResultsConfig `yaml:"file"`
-	Nats                NatsResultsConfig `yaml:"nats"`
-}
-
-type FileResultsConfig struct {
-	LogFile   string `yaml:"log_file"`
-	EnableLogRotation bool `yaml:"rotation"`
-
-}
-type NatsResultsConfig struct {
-	Topic string  `yaml:"topic"`
-}
 
 // LoggingConfig defines configs related to logging
 type LoggingConfig struct {
@@ -221,6 +209,10 @@ func (man Manager) addConfigs() {
 		"Size of generated session keys")
 	man.addConfigDuration("session.duration", 24*90*time.Hour,
 		"Duration session keys remain valid (i.e. 24h)")
+	man.addConfigString("sessions.storage_engine", "redis",
+	    "Storage engine used record sessions")
+	man.addConfigString("sessions.campaign_engine", "redis",
+	    "Campaign engine used record sessions")
 
 	// Osquery
 	man.addConfigInt("osquery.node_key_size", 24,
@@ -314,6 +306,8 @@ func (man Manager) LoadConfig() KolideConfig {
 		Session: SessionConfig{
 			KeySize:  man.getConfigInt("session.key_size"),
 			Duration: man.getConfigDuration("session.duration"),
+			StorageEngine: man.getConfigString("sessions.storage_engine"),
+			CampaignEngine: man.getConfigString("sessions.campaign_engine"),
 		},
 		Osquery: OsqueryConfig{
 			NodeKeySize:         man.getConfigInt("osquery.node_key_size"),
@@ -321,23 +315,23 @@ func (man Manager) LoadConfig() KolideConfig {
 			ResultLogFile:       man.getConfigString("osquery.result_log_file"),
 			LabelUpdateInterval: man.getConfigDuration("osquery.label_update_interval"),
 			EnableLogRotation:   man.getConfigBool("osquery.enable_log_rotation"),
-			Status: StatusConfig{
+			Status: QueueConfig{
 				Destination: man.getConfigString("osquery.status.destinations"),
-				File: FileStatusConfig{
+				File: FileQueueConfig{
 					LogFile:       man.getConfigString("osquery.status.file.log_file"),
 					EnableLogRotation: man.getConfigBool("osquery.status.file.rotation"),
 				},
-				Nats: NatsStatusConfig{
+				Nats: NatsQueueConfig{
 					Topic:     man.getConfigString("osquery.status.nats.topic"),
 				},
 			},
-			Results: ResultsConfig {
+			Results: QueueConfig{
 				Destination: man.getConfigString("osquery.results.destinations"),
-				File: FileResultsConfig{
+				File: FileQueueConfig{
 					LogFile:       man.getConfigString("osquery.results.file.log_file"),
 					EnableLogRotation: man.getConfigBool("osquery.results.file.rotation"),
 				},
-				Nats: NatsResultsConfig{
+				Nats: NatsQueueConfig{
 					Topic:     man.getConfigString("osquery.results.nats.topic"),
 				},
 			},

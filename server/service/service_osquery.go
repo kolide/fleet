@@ -197,31 +197,15 @@ type flusher interface {
 }
 
 func (svc service) SubmitStatusLogs(ctx context.Context, logs []json.RawMessage) error {
-	for _, log := range logs {
-		if _, err := svc.osqueryStatusLogWriter.Write(append(log, '\n')); err != nil {
-			return osqueryError{message: "error writing status log: " + err.Error()}
-		}
-	}
-	if writer, ok := svc.osqueryStatusLogWriter.(flusher); ok {
-		err := writer.Flush()
-		if err != nil {
-			return osqueryError{message: "error flushing status log: " + err.Error()}
-		}
+	for _, q := range svc.statusQueues {
+		q.Messages(ctx, logs)
 	}
 	return nil
 }
 
 func (svc service) SubmitResultLogs(ctx context.Context, logs []json.RawMessage) error {
-	for _, log := range logs {
-		if _, err := svc.osqueryResultLogWriter.Write(append(log, '\n')); err != nil {
-			return osqueryError{message: "error writing result log: " + err.Error()}
-		}
-	}
-	if writer, ok := svc.osqueryResultLogWriter.(flusher); ok {
-		err := writer.Flush()
-		if err != nil {
-			return osqueryError{message: "error flushing status log: " + err.Error()}
-		}
+	for _, q := range svc.statusQueues {
+		q.Messages(ctx, logs)
 	}
 	return nil
 }
