@@ -7,7 +7,8 @@ import (
 	"time"
 
 	"github.com/gomodule/redigo/redis"
-	"github.com/kolide/fleet/server/pubsub"
+	"github.com/kolide/fleet/server/connector"
+	"github.com/kolide/fleet/server/config"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -22,8 +23,10 @@ func newPool(t *testing.T) *redis.Pool {
 			addr = fmt.Sprintf("%s:6379", a)
 		}
 
-		p := pubsub.NewRedisPool(addr, password)
-		_, err := p.Get().Do("PING")
+		conf := config.RedisConfig{Enabled: true, Address: addr, Password: password}
+		p, err := connector.NewRedisConn(conf)
+		require.Nil(t, err)
+		_, err = p.Get().Do("PING")
 		require.Nil(t, err)
 		return p
 	}

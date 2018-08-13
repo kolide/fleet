@@ -27,6 +27,7 @@ import (
 	"github.com/kolide/fleet/server/service"
 	"github.com/kolide/fleet/server/queue"
 	"github.com/kolide/fleet/server/pubsub"
+	"github.com/kolide/fleet/server/connector"
 	"github.com/kolide/fleet/server/mail"
 	"github.com/kolide/fleet/server/sso"
 	"github.com/kolide/kit/version"
@@ -82,11 +83,13 @@ the way that the Fleet server works.
 
 			var ds kolide.Datastore
 			var err error
+			healthCheckers := make(map[string]health.Checker)
 
 			ds, err = mysql.New(config.Mysql, clock.C, mysql.Logger(logger))
 			if err != nil {
 				initFatal(err, "initializing datastore")
 			}
+			healthCheckers["datastore"] = ds.(health.Checker)
 
 			migrationStatus, err := ds.MigrationStatus()
 			if err != nil {
@@ -143,6 +146,8 @@ the way that the Fleet server works.
 			var natsConn  *nats.Conn
 			var resultStore kolide.QueryResultStore 
 			var ssoSessionStore sso.SessionStore
+			resultsQ := []kolide.QueueService{}
+			statusQ := []kolide.QueueService{}
 
 			if !config.Redis.Enabled && !config.Nats.Enabled {
 				initFatal(nil, "Redis nor Nats enabled")
@@ -156,14 +161,28 @@ the way that the Fleet server works.
 			}
 
 			if config.Redis.Enabled {
-				redisConn = pubsub.NewRedisPool(config.Redis.Address, config.Redis.Password) // XXX Blah :) 
+				redisConn, err = connector.NewRedisConn(config.Redis)
+				if err != nil {
+					initFatal(err, "initializing redis")
+				}
+				hc, err := connector.NewRedisHealthChecker(redisConn)
+				if err != nil {
+					initFatal(err, "initializing redis health checker")
+				}
+				healthCheckers["redis_connection"] = hc
 			}
 
 			if config.Nats.Enabled {
-				natsConn, err = nats.Connect(config.Nats.URL)
+				natsConn, err = connector.NewNatsConn(config.Nats)
 				if err != nil {
 					initFatal(err, "initializing nats")
 				}
+				hc, err := connector.NewNatsHealthChecker(natsConn)
+				if err != nil {
+					initFatal(err, "initializing nats health checker")
+				}
+				healthCheckers["nats_connection"] = hc
+
 			}
 
 			switch config.Session.CampaignEngine {
@@ -190,8 +209,6 @@ the way that the Fleet server works.
 			default:
 			}
 
-			resultsQ := []kolide.QueueService{}
-			statusQ := []kolide.QueueService{}
 
 			if config.Nats.Enabled && contains(strings.Split(config.Osquery.Results.Destination, ","), "nats") {
 				f, err := queue.NewNatsQueue(logger, natsConn, config.Osquery.Results.Nats)
@@ -276,20 +293,6 @@ the way that the Fleet server works.
 					frontendHandler = service.RedirectLoginToSetup(svc, logger, frontendHandler)
 				} else {
 					frontendHandler = service.RedirectSetupToLogin(svc, logger, frontendHandler)
-				}
-
-			}
-
-			healthCheckers := make(map[string]health.Checker)
-			{
-				// a list of dependencies which could affect the status of the app if unavailable.
-				deps := svc.HealthCheckers()
-
-				// convert all dependencies to health.Checker if they implement the healthz methods.
-				for name, dep := range deps {
-					if hc, ok := dep.(health.Checker); ok {
-						healthCheckers[name] = hc
-					}
 				}
 
 			}

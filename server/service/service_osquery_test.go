@@ -20,6 +20,7 @@ import (
 	"github.com/kolide/fleet/server/kolide"
 	"github.com/kolide/fleet/server/mock"
 	"github.com/kolide/fleet/server/pubsub"
+	"github.com/kolide/fleet/server/queue"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -109,7 +110,8 @@ func TestSubmitStatusLogs(t *testing.T) {
 	serv := ((svc.(validationMiddleware)).Service).(service)
 
 	var statusBuf bytes.Buffer
-	serv.osqueryStatusLogWriter = &nopCloserWriter{&statusBuf}
+	q, _ := queue.NewInmemQueue()
+	serv.statusQueues = []kolide.QueueService{q}
 
 	logs := []string{
 		`{"severity":"0","filename":"tls.cpp","line":"216","message":"some message","version":"1.8.2","decorations":{"host_uuid":"uuid_foobar","username":"zwass"}}`,

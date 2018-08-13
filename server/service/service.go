@@ -21,7 +21,8 @@ import (
 // NewService creates a new service from the config struct
 func NewService(ds kolide.Datastore, resultStore kolide.QueryResultStore, logger kitlog.Logger,
 	kolideConfig config.KolideConfig, mailService kolide.MailService, c clock.Clock,
-	sso sso.SessionStore, resultsQueues []kolide.QueueService, statusQueues []kolide.QueueService) (kolide.Service, error) {
+	sso sso.SessionStore, resultsQueues []kolide.QueueService,
+	statusQueues []kolide.QueueService) (kolide.Service, error) {
 
 	var svc kolide.Service
 
@@ -57,14 +58,6 @@ type service struct {
 	mailService     kolide.MailService
 	ssoSessionStore sso.SessionStore
 	metaDataClient  *http.Client
-}
-
-func (s service) HealthCheckers() (map[string]interface{}) {
-	deps := map[string]interface{}{
-		"datastore":          s.ds,
-		"query_result_store": s.resultStore,
-	}
-	return deps
 }
 
 func (s service) SendEmail(mail kolide.Email) error {

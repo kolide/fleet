@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"time"
 
 	"github.com/gomodule/redigo/redis"
 	"github.com/kolide/fleet/server/kolide"
@@ -18,34 +17,6 @@ type redisQueryResults struct {
 
 var _ kolide.QueryResultStore = &redisQueryResults{}
 
-// NewRedisPool creates a Redis connection pool using the provided server
-// address and password.
-func NewRedisPool(server, password string) *redis.Pool {
-	return &redis.Pool{
-		MaxIdle:     3,
-		IdleTimeout: 240 * time.Second,
-		Dial: func() (redis.Conn, error) {
-			c, err := redis.Dial("tcp", server)
-			if err != nil {
-				return nil, err
-			}
-			if password != "" {
-				if _, err := c.Do("AUTH", password); err != nil {
-					c.Close()
-					return nil, err
-				}
-			}
-			return c, err
-		},
-		TestOnBorrow: func(c redis.Conn, t time.Time) error {
-			if time.Since(t) < time.Minute {
-				return nil
-			}
-			_, err := c.Do("PING")
-			return err
-		},
-	}
-}
 
 // NewRedisQueryResults creats a new Redis implementation of the
 // QueryResultStore interface using the provided Redis connection pool.
@@ -154,12 +125,3 @@ func (r *redisQueryResults) ReadChannel(ctx context.Context, query kolide.Distri
 	return outChannel, nil
 }
 
-// HealthCheck verifies that the redis backend can be pinged, returning an error
-// otherwise.
-func (r *redisQueryResults) HealthCheck() error {
-	conn := r.pool.Get()
-	defer conn.Close()
-
-	_, err := conn.Do("PING")
-	return err
-}

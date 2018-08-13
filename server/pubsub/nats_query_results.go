@@ -84,12 +84,3 @@ func (nqr *natsQueryResults) ReadChannel(ctx context.Context, query kolide.Distr
 	return outChannel, nil
 }
 
-// HealthCheck verifies that the NATS  backend connected or connecting,  returning an error
-// otherwise.
-func (nqr *natsQueryResults) HealthCheck() error {
-	s := nqr.conn.Status()
-	if s == nats.CONNECTED || s == nats.CONNECTING {
-		return nil
-	}
-	return errors.New("Nats is not connected or connecting")
-}
