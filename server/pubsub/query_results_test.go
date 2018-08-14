@@ -2,7 +2,6 @@ package pubsub
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"reflect"
 	"runtime"
@@ -12,7 +11,6 @@ import (
 	"time"
 
 	"github.com/kolide/fleet/server/kolide"
-	"github.com/kolide/fleet/server/config"
 	"github.com/kolide/fleet/server/connector"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -71,20 +69,10 @@ func TestInmem(t *testing.T) {
 }
 
 func setupRedis(t *testing.T) (store *redisQueryResults, teardown func()) {
-	var (
-		addr     = "127.0.0.1:6379"
-		password = ""
-	)
-
-	if a, ok := os.LookupEnv("REDIS_PORT_6379_TCP_ADDR"); ok {
-		addr = fmt.Sprintf("%s:6379", a)
-	}
-
-	conf := config.RedisConfig{Enabled: true, Address: addr, Password: password}
-	conn, err := connector.NewRedisConn(conf)
+	conn := connector.NewRedisTestConn()
 	store = NewRedisQueryResults(conn)
 
-	_, err = store.pool.Get().Do("PING")
+	_, err := store.pool.Get().Do("PING")
 	require.Nil(t, err)
 
 	teardown = func() {

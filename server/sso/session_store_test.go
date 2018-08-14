@@ -1,32 +1,20 @@
 package sso
 
 import (
-	"fmt"
 	"os"
 	"testing"
 	"time"
 
 	"github.com/gomodule/redigo/redis"
 	"github.com/kolide/fleet/server/connector"
-	"github.com/kolide/fleet/server/config"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func newPool(t *testing.T) *redis.Pool {
 	if _, ok := os.LookupEnv("REDIS_TEST"); ok {
-		var (
-			addr     = "127.0.0.1:6379"
-			password = ""
-		)
-		if a, ok := os.LookupEnv("REDIS_PORT_6379_TCP_ADDR"); ok {
-			addr = fmt.Sprintf("%s:6379", a)
-		}
-
-		conf := config.RedisConfig{Enabled: true, Address: addr, Password: password}
-		p, err := connector.NewRedisConn(conf)
-		require.Nil(t, err)
-		_, err = p.Get().Do("PING")
+		p := connector.NewRedisTestConn()
+		_, err := p.Get().Do("PING")
 		require.Nil(t, err)
 		return p
 	}

@@ -5,6 +5,9 @@ import (
 	//"github.com/kolide/fleet/server/health"
 	"github.com/kolide/fleet/server/config"
 	"time"
+
+	"os"
+	"fmt"
 )
 
 // NewRedisPool creates a Redis connection pool using the provided server
@@ -33,7 +36,22 @@ func NewRedisConn(conf config.RedisConfig) (*redis.Pool, error) {
 			_, err := c.Do("PING")
 			return err
 		},
-	}, nil 
+	}, nil
+}
+
+// NewRedisTestConn
+func NewRedisTestConn() (*redis.Pool) {
+	var (
+		addr     = "127.0.0.1:6379"
+		password = ""
+	)
+	if a, ok := os.LookupEnv("REDIS_PORT_6379_TCP_ADDR"); ok {
+		addr = fmt.Sprintf("%s:6379", a)
+	}
+
+	conf := config.RedisConfig{Enabled: true, Address: addr, Password: password}
+	c, _ := NewRedisConn(conf)
+	return c
 }
 
 type redisHealthChecker struct {
