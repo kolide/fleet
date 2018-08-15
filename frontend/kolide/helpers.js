@@ -78,6 +78,7 @@ export const formatConfigDataForServer = (config) => {
   const smtpSettingsAttrs = pick(config, [
     'authentication_method', 'authentication_type', 'domain', 'email_enabled', 'enable_ssl_tls',
     'enable_start_tls', 'password', 'port', 'sender_address', 'server', 'user_name', 'verify_ssl_certs',
+    'enable_smtp',
   ]);
   const ssoSettingsAttrs = pick(config, ['entity_id', 'issuer_uri', 'idp_image_url', 'metadata',
     'metadata_url', 'idp_name', 'enable_sso',
@@ -85,7 +86,7 @@ export const formatConfigDataForServer = (config) => {
 
   const orgInfo = size(orgInfoAttrs) && { org_info: orgInfoAttrs };
   const serverSettings = size(serverSettingsAttrs) && { server_settings: serverSettingsAttrs };
-  const smtpSettings = size(smtpSettingsAttrs) && { smtp_settings: smtpSettingsAttrs };
+  const smtpSettings = size(smtpSettingsAttrs) && config.enable_smtp && { smtp_settings: smtpSettingsAttrs };
   const ssoSettings = size(ssoSettingsAttrs) && { sso_settings: ssoSettingsAttrs };
 
   return {
