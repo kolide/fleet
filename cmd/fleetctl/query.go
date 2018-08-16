@@ -47,13 +47,13 @@ func queryCommand() cli.Command {
 				Name:        "quiet",
 				EnvVar:      "QUIET",
 				Destination: &flQuiet,
-				Usage:       "Quiet and don't show anything other the results",
+				Usage:       "Only print results (no status information)",
 			},
 			cli.BoolFlag{
 				Name:        "exit",
 				EnvVar:      "EXIT",
 				Destination: &flExit,
-				Usage:       "Only print results (no status information)",
+				Usage:       "Exit when 100% of online hosts have results returned", 
 			},
 			cli.StringFlag{
 				Name:        "query",
