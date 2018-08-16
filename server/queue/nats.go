@@ -36,12 +36,13 @@ func NewNatsQueue(appLogger kitlog.Logger, conn *nats.Conn, conf config.NatsQueu
 }
 
 func (nq *NatsQueue) Messages(ctx context.Context, logs []json.RawMessage) error {
-	var b bytes.Buffer // A Buffer needs no initialization.
-	writer := bufio.NewWriter(&b)
 	host, ok := hostctx.FromContext(ctx)
 	if !ok {
 		return fmt.Errorf("Context was not able to decode the host infomation")
 	}
+
+	var b bytes.Buffer // A Buffer needs no initialization.
+	writer := bufio.NewWriter(&b)
 	err := nq.topicTemplate.Execute(writer, host)
 	if err != nil {
 		return err 
