@@ -20,6 +20,7 @@ import (
 	"github.com/kolide/fleet/server/kolide"
 	"github.com/kolide/fleet/server/mock"
 	"github.com/kolide/fleet/server/pubsub"
+	"github.com/kolide/fleet/server/queue"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -109,7 +110,8 @@ func TestSubmitStatusLogs(t *testing.T) {
 	serv := ((svc.(validationMiddleware)).Service).(service)
 
 	var statusBuf bytes.Buffer
-	serv.osqueryStatusLogWriter = &nopCloserWriter{&statusBuf}
+	q, _ := queue.NewInmemQueue()
+	serv.statusQueues = []kolide.QueueService{q}
 
 	logs := []string{
 		`{"severity":"0","filename":"tls.cpp","line":"216","message":"some message","version":"1.8.2","decorations":{"host_uuid":"uuid_foobar","username":"zwass"}}`,
@@ -136,7 +138,11 @@ func TestSubmitStatusLogs(t *testing.T) {
 }
 
 func TestSubmitResultLogs(t *testing.T) {
-	ds, svc, _ := setupOsqueryTests(t)
+	r, _ := queue.NewInmemQueue()
+	rq := []kolide.QueueService{r}
+	s, _ := queue.NewInmemQueue()
+	sq := []kolide.QueueService{s}
+	ds, svc, _ := setupOsqueryWithQueusTests(t, rq, sq)
 	ctx := context.Background()
 
 	_, err := svc.EnrollAgent(ctx, "", "host123")
@@ -151,8 +157,6 @@ func TestSubmitResultLogs(t *testing.T) {
 	// Hack to get at the service internals and modify the writer
 	serv := ((svc.(validationMiddleware)).Service).(service)
 
-	var resultBuf bytes.Buffer
-	serv.osqueryResultLogWriter = &nopCloserWriter{&resultBuf}
 
 	logs := []string{
 		`{"name":"system_info","hostIdentifier":"some_uuid","calendarTime":"Fri Sep 30 17:55:15 2016 UTC","unixTime":"1475258115","decorations":{"host_uuid":"some_uuid","username":"zwass"},"columns":{"cpu_brand":"Intel(R) Core(TM) i7-4770HQ CPU @ 2.20GHz","hostname":"hostimus","physical_memory":"17179869184"},"action":"added"}`,
@@ -168,16 +172,20 @@ func TestSubmitResultLogs(t *testing.T) {
 	err = json.Unmarshal([]byte(logJSON), &results)
 	require.Nil(t, err)
 
+
 	err = serv.SubmitResultLogs(ctx, results)
 	assert.Nil(t, err)
 
+	/*
 	resultJSON := resultBuf.String()
 	resultJSON = strings.TrimRight(resultJSON, "\n")
 	resultLines := strings.Split(resultJSON, "\n")
+    */
 
-	if assert.Equal(t, len(logs), len(resultLines)) {
-		for i, line := range resultLines {
-			assert.JSONEq(t, logs[i], line)
+	if assert.Equal(t, len(logs), len(r.Memory)) {
+		for i, line := range r.Memory {
+			newLine, _ := json.Marshal(&line)
+			assert.JSONEq(t, logs[i], string(newLine))
 		}
 	}
 }
@@ -231,7 +239,7 @@ func TestGetDistributedQueriesMissingHost(t *testing.T) {
 func TestLabelQueries(t *testing.T) {
 	mockClock := clock.NewMockClock()
 	ds := new(mock.Store)
-	svc, err := newTestServiceWithClock(ds, nil, mockClock)
+	svc, err := newTestServiceWithClock(ds, nil, mockClock, nil, nil)
 	require.Nil(t, err)
 
 	ds.LabelQueriesForHostFunc = func(host *kolide.Host, cutoff time.Time) (map[string]string, error) {
@@ -800,7 +808,7 @@ func TestDetailQueries(t *testing.T) {
 func TestNewDistributedQueryCampaign(t *testing.T) {
 	mockClock := clock.NewMockClock()
 	ds := new(mock.Store)
-	svc, err := newTestServiceWithClock(ds, nil, mockClock)
+	svc, err := newTestServiceWithClock(ds, nil, mockClock, nil, nil)
 	require.Nil(t, err)
 
 	ds.LabelQueriesForHostFunc = func(host *kolide.Host, cutoff time.Time) (map[string]string, error) {
@@ -858,7 +866,7 @@ func TestDistributedQueryResults(t *testing.T) {
 	mockClock := clock.NewMockClock()
 	ds := new(mock.Store)
 	rs := pubsub.NewInmemQueryResults()
-	svc, err := newTestServiceWithClock(ds, rs, mockClock)
+	svc, err := newTestServiceWithClock(ds, rs, mockClock, nil, nil)
 	require.Nil(t, err)
 
 	campaign := &kolide.DistributedQueryCampaign{ID: 42}
@@ -1132,7 +1140,7 @@ func TestUpdateHostIntervals(t *testing.T) {
 
 }
 
-func setupOsqueryTests(t *testing.T) (kolide.Datastore, kolide.Service, *clock.MockClock) {
+func setupOsqueryWithQueusTests(t *testing.T, rq []kolide.QueueService, sq []kolide.QueueService) (kolide.Datastore, kolide.Service, *clock.MockClock) {
 	ds, err := inmem.New(config.TestConfig())
 	require.Nil(t, err)
 
@@ -1140,10 +1148,14 @@ func setupOsqueryTests(t *testing.T) (kolide.Datastore, kolide.Service, *clock.M
 	require.Nil(t, err)
 
 	mockClock := clock.NewMockClock()
-	svc, err := newTestServiceWithClock(ds, nil, mockClock)
+	svc, err := newTestServiceWithClock(ds, nil, mockClock,  nil, nil)
 	require.Nil(t, err)
 
 	return ds, svc, mockClock
+}
+
+func setupOsqueryTests(t *testing.T) (kolide.Datastore, kolide.Service, *clock.MockClock) {
+	return setupOsqueryWithQueusTests(t, nil, nil)
 }
 
 type notFoundError struct{}

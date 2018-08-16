@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"strings"
 	"crypto/tls"
 	"fmt"
 	"io/ioutil"
@@ -12,6 +13,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/nats-io/go-nats"
+	"github.com/gomodule/redigo/redis"
 	"github.com/WatchBeam/clock"
 	"github.com/e-dard/netbug"
 	kitlog "github.com/go-kit/kit/log"
@@ -21,9 +24,11 @@ import (
 	"github.com/kolide/fleet/server/health"
 	"github.com/kolide/fleet/server/kolide"
 	"github.com/kolide/fleet/server/launcher"
-	"github.com/kolide/fleet/server/mail"
-	"github.com/kolide/fleet/server/pubsub"
 	"github.com/kolide/fleet/server/service"
+	"github.com/kolide/fleet/server/queue"
+	"github.com/kolide/fleet/server/pubsub"
+	"github.com/kolide/fleet/server/connector"
+	"github.com/kolide/fleet/server/mail"
 	"github.com/kolide/fleet/server/sso"
 	"github.com/kolide/kit/version"
 	"github.com/prometheus/client_golang/prometheus"
@@ -31,6 +36,15 @@ import (
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 )
+
+func contains(s []string, e string) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
+}
 
 type initializer interface {
 	// Initialize is used to populate a datastore with
@@ -69,12 +83,13 @@ the way that the Fleet server works.
 
 			var ds kolide.Datastore
 			var err error
-			mailService := mail.NewService()
+			healthCheckers := make(map[string]health.Checker)
 
 			ds, err = mysql.New(config.Mysql, clock.C, mysql.Logger(logger))
 			if err != nil {
 				initFatal(err, "initializing datastore")
 			}
+			healthCheckers["datastore"] = ds.(health.Checker)
 
 			migrationStatus, err := ds.MigrationStatus()
 			if err != nil {
@@ -126,12 +141,109 @@ the way that the Fleet server works.
 				}
 			}
 
-			var resultStore kolide.QueryResultStore
-			redisPool := pubsub.NewRedisPool(config.Redis.Address, config.Redis.Password)
-			resultStore = pubsub.NewRedisQueryResults(redisPool)
-			ssoSessionStore := sso.NewSessionStore(redisPool)
+			mailService := mail.NewService()
+			var redisConn *redis.Pool
+			var natsConn  *nats.Conn
+			var resultStore kolide.QueryResultStore 
+			var ssoSessionStore sso.SessionStore
+			resultsQ := []kolide.QueueService{}
+			statusQ := []kolide.QueueService{}
 
-			svc, err := service.NewService(ds, resultStore, logger, config, mailService, clock.C, ssoSessionStore)
+			if !config.Redis.Enabled && !config.Nats.Enabled {
+				initFatal(nil, "Redis nor Nats enabled")
+				fmt.Printf("################################################################################\n"+
+					"# ERROR:\n"+
+					"#   Redis and/or Nats is required for fleet to function"+
+					"#\n"+
+					"################################################################################\n",
+					)
+				os.Exit(1)
+			}
+
+			if config.Redis.Enabled {
+				redisConn, err = connector.NewRedisConn(config.Redis)
+				if err != nil {
+					initFatal(err, "initializing redis")
+				}
+				hc, err := connector.NewRedisHealthChecker(redisConn)
+				if err != nil {
+					initFatal(err, "initializing redis health checker")
+				}
+				healthCheckers["redis_connection"] = hc
+			}
+
+			if config.Nats.Enabled {
+				natsConn, err = connector.NewNatsConn(config.Nats)
+				if err != nil {
+					initFatal(err, "initializing nats")
+				}
+				hc, err := connector.NewNatsHealthChecker(natsConn)
+				if err != nil {
+					initFatal(err, "initializing nats health checker")
+				}
+				healthCheckers["nats_connection"] = hc
+
+			}
+
+			switch config.Session.CampaignEngine {
+			case "redis":
+				if !config.Redis.Enabled {
+					initFatal(fmt.Errorf("redis not enabled, but required for sessions campaign_engine"), "initializing Sessions")
+				}
+				resultStore = pubsub.NewRedisQueryResults(redisConn)
+			case "nats":
+				if !config.Nats.Enabled {
+					initFatal(fmt.Errorf("nats not enabled, but required for sessions capaign_engine"), "initializing Sessions")
+				}
+				resultStore = pubsub.NewNatsQueryResults(natsConn,"fleet.campaign")
+			default:
+			}
+
+
+			switch config.Session.StorageEngine {
+			case "redis":
+				if !config.Redis.Enabled {
+					initFatal(fmt.Errorf("redis not enabled, but required for sessions campaign_engine"), "initializing Sessions")
+				}
+				ssoSessionStore = sso.NewSessionStore(redisConn)
+			default:
+			}
+
+
+			if config.Nats.Enabled && contains(strings.Split(config.Osquery.Results.Destination, ","), "nats") {
+				f, err := queue.NewNatsQueue(logger, natsConn, config.Osquery.Results.Nats)
+				if err != nil {
+					initFatal(err, "initializing NatsQueue service")
+				}
+				resultsQ = append(resultsQ, f)
+			}
+			if config.Nats.Enabled && contains(strings.Split(config.Osquery.Status.Destination, ","), "nats") {
+				f, err := queue.NewNatsQueue(logger, natsConn, config.Osquery.Status.Nats)
+				if err != nil {
+					initFatal(err, "initializing NatsQueue service")
+				}
+				statusQ = append(statusQ, f)
+			}
+
+			// Results File is enabled
+			if contains(strings.Split(config.Osquery.Results.Destination, ","), "file") {
+				f, err := queue.NewFileQueue(logger, config.Osquery.Results.File)
+				if err != nil {
+					initFatal(err, "initializing Queue service")
+				}
+				resultsQ = append(resultsQ, f)
+			}
+			// Status File is enabled
+			if contains(strings.Split(config.Osquery.Status.Destination, ","), "file") {
+				f, err := queue.NewFileQueue(logger, config.Osquery.Status.File)
+				if err != nil {
+					initFatal(err, "initializing Queue service")
+				}
+				statusQ = append(statusQ, f)
+			}
+
+
+			svc, err := service.NewService(ds, resultStore, logger, config, mailService, clock.C, ssoSessionStore, resultsQ, statusQ)
 			if err != nil {
 				initFatal(err, "initializing service")
 			}
@@ -181,23 +293,6 @@ the way that the Fleet server works.
 					frontendHandler = service.RedirectLoginToSetup(svc, logger, frontendHandler)
 				} else {
 					frontendHandler = service.RedirectSetupToLogin(svc, logger, frontendHandler)
-				}
-
-			}
-
-			healthCheckers := make(map[string]health.Checker)
-			{
-				// a list of dependencies which could affect the status of the app if unavailable.
-				deps := map[string]interface{}{
-					"datastore":          ds,
-					"query_result_store": resultStore,
-				}
-
-				// convert all dependencies to health.Checker if they implement the healthz methods.
-				for name, dep := range deps {
-					if hc, ok := dep.(health.Checker); ok {
-						healthCheckers[name] = hc
-					}
 				}
 
 			}

@@ -12,12 +12,12 @@ import (
 
 func newTestService(ds kolide.Datastore, rs kolide.QueryResultStore) (kolide.Service, error) {
 	mailer := &mockMailService{SendEmailFn: func(e kolide.Email) error { return nil }}
-	return NewService(ds, rs, kitlog.NewNopLogger(), config.TestConfig(), mailer, clock.C, nil)
+	return NewService(ds, rs, kitlog.NewNopLogger(), config.TestConfig(), mailer, clock.C, nil, nil, nil)
 }
 
-func newTestServiceWithClock(ds kolide.Datastore, rs kolide.QueryResultStore, c clock.Clock) (kolide.Service, error) {
+func newTestServiceWithClock(ds kolide.Datastore, rs kolide.QueryResultStore, c clock.Clock, rq []kolide.QueueService, sq []kolide.QueueService) (kolide.Service, error) {
 	mailer := &mockMailService{SendEmailFn: func(e kolide.Email) error { return nil }}
-	return NewService(ds, rs, kitlog.NewNopLogger(), config.TestConfig(), mailer, c, nil)
+	return NewService(ds, rs, kitlog.NewNopLogger(), config.TestConfig(), mailer, c, nil, rq, sq)
 }
 
 func createTestAppConfig(t *testing.T, ds kolide.Datastore) *kolide.AppConfig {

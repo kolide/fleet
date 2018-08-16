@@ -31,8 +31,18 @@ type MysqlConfig struct {
 
 // RedisConfig defines configs related to Redis
 type RedisConfig struct {
+	Enabled  bool
 	Address  string
 	Password string
+}
+
+// NatsConfig defines configs related to NATS
+type NatsConfig struct {
+	Enabled  bool
+	URL      string
+	Username string
+	Password string
+	Token    string
 }
 
 const (
@@ -66,18 +76,38 @@ type AppConfig struct {
 
 // SessionConfig defines configs related to user sessions
 type SessionConfig struct {
-	KeySize  int `yaml:"key_size"`
-	Duration time.Duration
+	KeySize        int `yaml:"key_size"`
+	Duration       time.Duration
+	StorageEngine  string `yaml:"storage_engine"`
+	CampaignEngine string `yaml:"campaign_engine"`
 }
 
 // OsqueryConfig defines configs related to osquery
 type OsqueryConfig struct {
 	NodeKeySize         int           `yaml:"node_key_size"`
-	StatusLogFile       string        `yaml:"status_log_file"`
-	ResultLogFile       string        `yaml:"result_log_file"`
+	StatusLogFile       string        `yaml:"status_log_file"`    // How to deprecate 
+	ResultLogFile       string        `yaml:"result_log_file"`    // How to Deprecate 
 	EnableLogRotation   bool          `yaml:"enable_log_rotation"`
 	LabelUpdateInterval time.Duration `yaml:"label_update_interval"`
+	Status              QueueConfig   `yaml:"status"`
+	Results             QueueConfig   `yaml:"results"`
 }
+
+type QueueConfig struct {
+	Destination         string `yaml:"destinations"`
+	File                FileQueueConfig `yaml:"file"`
+	Nats                NatsQueueConfig `yaml:"nats"`
+}
+
+type FileQueueConfig struct {
+	LogFile   string `yaml:"log_file"`
+	EnableLogRotation bool `yaml:"rotation"`
+}
+
+type NatsQueueConfig struct {
+	Topic string  `yaml:"topic"`
+}
+
 
 // LoggingConfig defines configs related to logging
 type LoggingConfig struct {
@@ -93,6 +123,7 @@ type LoggingConfig struct {
 type KolideConfig struct {
 	Mysql   MysqlConfig
 	Redis   RedisConfig
+	Nats    NatsConfig
 	Server  ServerConfig
 	Auth    AuthConfig
 	App     AppConfig
@@ -127,10 +158,22 @@ func (man Manager) addConfigs() {
 	man.addConfigInt("mysql.max_idle_conns", 50, "MySQL maximum idle connection handles.")
 
 	// Redis
+	man.addConfigBool("redis.enabled", true, "Enable NATS output.")
 	man.addConfigString("redis.address", "localhost:6379",
 		"Redis server address (host:port)")
 	man.addConfigString("redis.password", "",
 		"Redis server password (prefer env variable for security)")
+
+	// NATS
+	man.addConfigBool("nats.enabled", false, "Enable NATS output.")
+	man.addConfigString("nats.url", "nats://localhost:4222",
+		"NATS Connect URL")
+	man.addConfigString("nats.username", "",
+		"Username to be used when connecting to the server.")
+	man.addConfigString("nats.password", "",
+		"Password to be used when connecting to the server.")
+	man.addConfigString("nats.token", "",
+		"Token to be used when connecting to the server.")
 
 	// Server
 	man.addConfigString("server.address", "0.0.0.0:8080",
@@ -166,6 +209,10 @@ func (man Manager) addConfigs() {
 		"Size of generated session keys")
 	man.addConfigDuration("session.duration", 24*90*time.Hour,
 		"Duration session keys remain valid (i.e. 24h)")
+	man.addConfigString("sessions.storage_engine", "redis",
+	    "Storage engine used record sessions")
+	man.addConfigString("sessions.campaign_engine", "redis",
+	    "Campaign engine used record sessions")
 
 	// Osquery
 	man.addConfigInt("osquery.node_key_size", 24,
@@ -178,6 +225,27 @@ func (man Manager) addConfigs() {
 		"Interval to update host label membership (i.e. 1h)")
 	man.addConfigBool("osquery.enable_log_rotation", false,
 		"Osquery log files will be automatically rotated")
+
+	man.addConfigString("osquery.results.destinations", "file",
+		"Services to send osquery results to. can be a comma separated lists [nats,file] Defaults:file",
+	)
+	man.addConfigString("osquery.results.file.log_file", "/tmp/osquery_results",
+		"Path for osqueryd status logs")
+	man.addConfigBool("osquery.results.file.rotation", false,
+		"Osquery log files will be automatically rotated")
+	man.addConfigString("osquery.results.nats.topic", "fleet.results.{uuid}",
+		"Nats TOPIC to publish results too.")
+
+	man.addConfigString("osquery.status.destinations", "file",
+		"Services to send osquery status to. can be a comma separated lists [nats,file] Defaults:file",
+	)
+	man.addConfigString("osquery.status.file.log_file", "/tmp/osquery_status",
+		"Path for osqueryd status logs")
+	man.addConfigBool("osquery.status.file.rotation", false,
+		"Osquery log files will be automatically rotated")
+	man.addConfigString("osquery.status.nats.topic", "fleet.status.{uuid}",
+		"Nats TOPIC to publish status too.")
+
 
 	// Logging
 	man.addConfigBool("logging.debug", false,
@@ -208,8 +276,16 @@ func (man Manager) LoadConfig() KolideConfig {
 			MaxIdleConns:  man.getConfigInt("mysql.max_idle_conns"),
 		},
 		Redis: RedisConfig{
+			Enabled:  man.getConfigBool("redis.enabled"),
 			Address:  man.getConfigString("redis.address"),
 			Password: man.getConfigString("redis.password"),
+		},
+		Nats: NatsConfig{
+			Enabled:  man.getConfigBool("nats.enabled"),
+			URL:      man.getConfigString("nats.url"),
+			Username: man.getConfigString("nats.username"),
+			Password: man.getConfigString("nats.password"),
+			Token:    man.getConfigString("nats.token"),
 		},
 		Server: ServerConfig{
 			Address:    man.getConfigString("server.address"),
@@ -230,6 +306,8 @@ func (man Manager) LoadConfig() KolideConfig {
 		Session: SessionConfig{
 			KeySize:  man.getConfigInt("session.key_size"),
 			Duration: man.getConfigDuration("session.duration"),
+			StorageEngine: man.getConfigString("sessions.storage_engine"),
+			CampaignEngine: man.getConfigString("sessions.campaign_engine"),
 		},
 		Osquery: OsqueryConfig{
 			NodeKeySize:         man.getConfigInt("osquery.node_key_size"),
@@ -237,6 +315,26 @@ func (man Manager) LoadConfig() KolideConfig {
 			ResultLogFile:       man.getConfigString("osquery.result_log_file"),
 			LabelUpdateInterval: man.getConfigDuration("osquery.label_update_interval"),
 			EnableLogRotation:   man.getConfigBool("osquery.enable_log_rotation"),
+			Status: QueueConfig{
+				Destination: man.getConfigString("osquery.status.destinations"),
+				File: FileQueueConfig{
+					LogFile:       man.getConfigString("osquery.status.file.log_file"),
+					EnableLogRotation: man.getConfigBool("osquery.status.file.rotation"),
+				},
+				Nats: NatsQueueConfig{
+					Topic:     man.getConfigString("osquery.status.nats.topic"),
+				},
+			},
+			Results: QueueConfig{
+				Destination: man.getConfigString("osquery.results.destinations"),
+				File: FileQueueConfig{
+					LogFile:       man.getConfigString("osquery.results.file.log_file"),
+					EnableLogRotation: man.getConfigBool("osquery.results.file.rotation"),
+				},
+				Nats: NatsQueueConfig{
+					Topic:     man.getConfigString("osquery.results.nats.topic"),
+				},
+			},
 		},
 		Logging: LoggingConfig{
 			Debug:         man.getConfigBool("logging.debug"),
@@ -414,6 +512,10 @@ func (man Manager) getConfigDuration(key string) time.Duration {
 	}
 
 	return durationVal
+}
+
+func (man Manager) addConfigList(key string, defVal []string, usage string) {
+	man.command.PersistentFlags()
 }
 
 // loadConfigFile handles the loading of the config file.

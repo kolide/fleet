@@ -2,14 +2,19 @@ package service
 
 import (
 	"io/ioutil"
+	"encoding/json"
 	"os"
 	"os/signal"
 	"strings"
 	"syscall"
 	"testing"
 	"time"
+	"context"
 
-	"github.com/go-kit/kit/log"
+	kitlog "github.com/go-kit/kit/log"
+
+	"github.com/kolide/fleet/server/config"
+	"github.com/kolide/fleet/server/queue"
 	"github.com/stretchr/testify/require"
 )
 
@@ -21,11 +26,13 @@ func TestRotateLoggerSIGHUP(t *testing.T) {
 	require.Nil(t, err)
 	defer f.Close()
 
-	logFile, err := osqueryLogFile(f.Name(), log.NewNopLogger(), false)
+	conf := config.FileQueueConfig{LogFile: f.Name(), EnableLogRotation: false}
+	logFile, err := queue.NewFileQueue(kitlog.NewNopLogger(), conf)
 	require.Nil(t, err)
 
 	// write a log line
-	logFile.Write([]byte("msg1"))
+	s1 := []json.RawMessage{json.RawMessage(`["msg1"]`)}
+	logFile.Messages(context.Background(), s1)
 
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, syscall.SIGHUP)
@@ -42,7 +49,8 @@ func TestRotateLoggerSIGHUP(t *testing.T) {
 
 	// write a new log line and verify that the original file includes
 	// the new log line but not any of the old ones.
-	logFile.Write([]byte("msg2"))
+	s2 := []json.RawMessage{json.RawMessage(`["msg1"]`)}
+	logFile.Messages(context.Background(), s2)
 	logMsg, err := ioutil.ReadFile(f.Name())
 	require.Nil(t, err)
 

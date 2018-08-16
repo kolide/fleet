@@ -11,8 +11,8 @@ import (
 	"github.com/kolide/fleet/server/config"
 	"github.com/kolide/fleet/server/datastore/mysql"
 	"github.com/kolide/fleet/server/kolide"
-	"github.com/kolide/fleet/server/pubsub"
 	"github.com/kolide/fleet/server/service"
+	"github.com/kolide/fleet/server/sso"
 	"github.com/spf13/cobra"
 )
 
@@ -88,6 +88,10 @@ To setup Fleet infrastructure, use one of the available commands.
 		Short: "Generate test data",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, arg []string) {
+			var resultStore kolide.QueryResultStore 
+			var ssoSessionStore sso.SessionStore
+			resultsQ := []kolide.QueueService{}
+			statusQ := []kolide.QueueService{}
 			config := configManager.LoadConfig()
 			ds, err := mysql.New(config.Mysql, clock.C)
 			if err != nil {
@@ -110,7 +114,7 @@ To setup Fleet infrastructure, use one of the available commands.
 				Enabled:  &enabled,
 				Admin:    &isAdmin,
 			}
-			svc, err := service.NewService(ds, pubsub.NewInmemQueryResults(), kitlog.NewNopLogger(), config, nil, clock.C, nil)
+			svc, err := service.NewService(ds, resultStore, kitlog.NewNopLogger(), config, nil, clock.C, ssoSessionStore, resultsQ, statusQ)
 			if err != nil {
 				initFatal(err, "creating service")
 			}
