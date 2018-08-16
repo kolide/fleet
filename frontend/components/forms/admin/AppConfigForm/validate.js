@@ -1,8 +1,4 @@
-import { size, some } from 'lodash';
-
-import APP_CONSTANTS from 'app_constants';
-
-const { APP_SETTINGS } = APP_CONSTANTS;
+import { size } from 'lodash';
 
 export default (formData) => {
   const errors = {};
