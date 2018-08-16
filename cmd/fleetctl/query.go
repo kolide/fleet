@@ -53,7 +53,7 @@ func queryCommand() cli.Command {
 				Name:        "exit",
 				EnvVar:      "EXIT",
 				Destination: &flExit,
-				Usage:       "Exit at 100% results returned",
+				Usage:       "Only print results (no status information)",
 			},
 			cli.StringFlag{
 				Name:        "query",
@@ -131,7 +131,7 @@ func queryCommand() cli.Command {
 						}
 					}
 
-					if percentTotal >= 100 && flExit {
+					if responded >= online && flExit {
 						return nil
 					}
 
