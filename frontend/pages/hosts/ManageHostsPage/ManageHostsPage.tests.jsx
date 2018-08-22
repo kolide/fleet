@@ -10,7 +10,7 @@ import { connectedComponent, createAceSpy, reduxMockStore, stubbedOsqueryTable }
 import { hostStub } from 'test/stubs';
 import * as manageHostsPageActions from 'redux/nodes/components/ManageHostsPage/actions';
 
-const allHostsLabel = { id: 1, display_text: 'All Hosts', slug: 'all-hosts', type: 'all', count: 22 };
+const allHostsLabel = { id: 1, display_text: 'All Devices', slug: 'all-hosts', type: 'all', count: 22 };
 const windowsLabel = { id: 2, display_text: 'Windows', slug: 'windows', type: 'platform', count: 22 };
 const offlineHost = { ...hostStub, id: 111, status: 'offline' };
 const offlineHostsLabel = { id: 5, display_text: 'OFFLINE', slug: 'offline', status: 'offline', type: 'status', count: 1 };
@@ -20,7 +20,7 @@ const mockStore = reduxMockStore({
   components: {
     ManageHostsPage: {
       display: 'Grid',
-      selectedLabel: { id: 100, display_text: 'All Hosts', type: 'all', count: 22 },
+      selectedLabel: { id: 100, display_text: 'All Devices', type: 'all', count: 22 },
       status_labels: {},
     },
     QueryPages: {
@@ -89,18 +89,18 @@ describe('ManageHostsPage - component', () => {
   });
 
   describe('header', () => {
-    it('displays "1 Host Total" when there is 1 host', () => {
+    it('displays "1 Device Total" when there is 1 host', () => {
       const oneHostLabel = { ...allHostsLabel, count: 1 };
       const page = mount(<ManageHostsPage {...props} selectedLabel={oneHostLabel} />);
 
-      expect(page.text()).toInclude('1 Host Total');
+      expect(page.text()).toInclude('1 Device Total');
     });
 
-    it('displays "#{count} Hosts Total" when there are more than 1 host', () => {
+    it('displays "#{count} Devices Total" when there are more than 1 host', () => {
       const oneHostLabel = { ...allHostsLabel, count: 2 };
       const page = mount(<ManageHostsPage {...props} selectedLabel={oneHostLabel} />);
 
-      expect(page.text()).toInclude('2 Hosts Total');
+      expect(page.text()).toInclude('2 Devices Total');
     });
   });
 

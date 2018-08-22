@@ -53,7 +53,7 @@
   &__switch {
     @include user-select(none);
     @include position(absolute, auto auto auto auto);
-    font-family: 'Oxygen', $helvetica;
+    font-family: 'Lato', $helvetica;
     font-weight: 600;
     font-style: normal;
     box-sizing: border-box;

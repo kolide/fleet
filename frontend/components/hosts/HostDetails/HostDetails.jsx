@@ -20,7 +20,7 @@ const ActionButton = ({ host, onDestroyHost, onQueryHost }) => {
       <Button
         onClick={onQueryHost(host)}
         variant="unstyled"
-        title="Query this host"
+        title="Query this device"
       >
         <Icon name="query" className={`${baseClass}__cta-host-icon`} />
       </Button>
@@ -31,7 +31,7 @@ const ActionButton = ({ host, onDestroyHost, onQueryHost }) => {
     <Button
       onClick={onDestroyHost(host)}
       variant="unstyled"
-      title="Delete this host"
+      title="Delete this device"
     >
       <Icon name="trash" className={`${baseClass}__cta-host-icon`} />
     </Button>
