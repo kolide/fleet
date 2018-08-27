@@ -1,5 +1,5 @@
-$gradient-start: #7166d9;
-$gradient-end: #c86dd7;
+$gradient-start: $brand-dark;
+$gradient-end: $brand;
 $inverse-hover: #fafbff;
 $base-class: 'button';
 
@@ -13,7 +13,6 @@ $base-class: 'button';
   }
 
   background-color: $color;
-  box-shadow: 0 2px 0 $shadow, 0 3px 5px 0 rgba($black, 0.15);
 
   &.#{$base-class}--disabled {
     &:hover {
@@ -38,7 +37,7 @@ $base-class: 'button';
   text-decoration: none;
   text-transform: uppercase;
   letter-spacing: 1px;
-  border-radius: 2px;
+  border-radius: 0;
   font-size: $medium;
   font-family: 'Oxygen', $helvetica;
   font-weight: $bold;
@@ -136,10 +135,9 @@ $base-class: 'button';
     padding: $medium;
     width: 100%;
     height: auto;
-    box-shadow: inset 0 -3px 0 0 rgba(0, 0, 0, 0.25), 0 -2px 3px 0 rgba(0, 0, 0, 0.15);
 
     &:active {
-      box-shadow: 0 1px 0 #734893, 0 -2px 0 #d1d9e9;
+      box-shadow: none;
     }
   }
 
