@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 
-import { hideBackgroundImage} from 'redux/nodes/app/actions';
+import { hideBackgroundImage } from 'redux/nodes/app/actions';
 import { ssoSettings } from 'redux/nodes/auth/actions';
 import LoginPage from 'pages/LoginPage';
 import Footer from 'components/Footer';
