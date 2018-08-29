@@ -135,10 +135,6 @@ $base-class: 'button';
     padding: $medium;
     width: 100%;
     height: auto;
-
-    &:active {
-      box-shadow: none;
-    }
   }
 
   &--unstyled {

@@ -1,7 +1,6 @@
 .input-field {
   @include transition(border 150ms ease-in-out, box-shadow 150ms ease-in-out);
   line-height: 34px;
-  border-radius: 0;
   background-color: $white;
   border: solid 1px $accent-medium;
   font-size: 16px;

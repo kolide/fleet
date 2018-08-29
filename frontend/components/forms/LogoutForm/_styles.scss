@@ -7,8 +7,6 @@
     @include align-items(center);
     @include flex-direction(column);
     background-color: $white;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
     box-sizing: border-box;
     padding: 30px;
     width: 460px;
