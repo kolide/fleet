@@ -36,7 +36,7 @@ func makeGetAppConfigEndpoint(svc kolide.Service) endpoint.Endpoint {
 		var smtpSettings *kolide.SMTPSettingsPayload
 		var ssoSettings *kolide.SSOSettingsPayload
 		// only admin can see smtp settings
-		if vc.IsAdmin() {
+		if vc.CanPerformAdminActions() {
 			smtpSettings = smtpSettingsFromAppConfig(config)
 			if smtpSettings.SMTPPassword != nil {
 				*smtpSettings.SMTPPassword = "********"
@@ -105,6 +105,7 @@ func smtpSettingsFromAppConfig(config *kolide.AppConfig) *kolide.SMTPSettingsPay
 	authType := config.SMTPAuthenticationType.String()
 	authMethod := config.SMTPAuthenticationMethod.String()
 	return &kolide.SMTPSettingsPayload{
+		SMTPEnabled:              &config.SMTPConfigured,
 		SMTPConfigured:           &config.SMTPConfigured,
 		SMTPSenderAddress:        &config.SMTPSenderAddress,
 		SMTPServer:               &config.SMTPServer,

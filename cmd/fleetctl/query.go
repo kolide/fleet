@@ -20,7 +20,7 @@ type resultOutput struct {
 func queryCommand() cli.Command {
 	var (
 		flHosts, flLabels, flQuery string
-		flDebug                    bool
+		flDebug, flQuiet, flExit   bool
 	)
 	return cli.Command{
 		Name:      "query",
@@ -42,6 +42,18 @@ func queryCommand() cli.Command {
 				Value:       "",
 				Destination: &flLabels,
 				Usage:       "Comma separated label names to target",
+			},
+			cli.BoolFlag{
+				Name:        "quiet",
+				EnvVar:      "QUIET",
+				Destination: &flQuiet,
+				Usage:       "Only print results (no status information)",
+			},
+			cli.BoolFlag{
+				Name:        "exit",
+				EnvVar:      "EXIT",
+				Destination: &flExit,
+				Usage:       "Exit when 100% of online hosts have results returned", 
 			},
 			cli.StringFlag{
 				Name:        "query",
@@ -86,15 +98,19 @@ func queryCommand() cli.Command {
 			// https://godoc.org/github.com/briandowns/spinner#pkg-variables
 			s := spinner.New(spinner.CharSets[24], 200*time.Millisecond)
 			s.Writer = os.Stderr
-			s.Start()
+			if !flQuiet {
+				s.Start()
+			}
 
 			for {
 				select {
 				case hostResult := <-res.Results():
 					out := resultOutput{hostResult.Host.HostName, hostResult.Rows}
+					s.Stop()
 					if err := json.NewEncoder(os.Stdout).Encode(out); err != nil {
 						fmt.Fprintf(os.Stderr, "Error writing output: %s\n", err)
 					}
+					s.Start()
 
 				case err := <-res.Errors():
 					fmt.Fprintf(os.Stderr, "Error talking to server: %s\n", err.Error())
@@ -116,7 +132,22 @@ func queryCommand() cli.Command {
 							percentOnline = 100 * float64(responded) / float64(online)
 						}
 					}
-					s.Suffix = fmt.Sprintf("  %.f%% responded (%.f%% online) | %d/%d targeted hosts (%d/%d online)", percentTotal, percentOnline, responded, total, responded, online)
+
+					if responded >= online && flExit {
+						return nil
+					}
+
+					msg := fmt.Sprintf(" %.f%% responded (%.f%% online) | %d/%d targeted hosts (%d/%d online)", percentTotal, percentOnline, responded, total, responded, online)
+					if !flQuiet {
+						s.Suffix = msg
+					}
+					if total == responded {
+						s.Stop()
+						if !flQuiet {
+							fmt.Fprintf(os.Stderr, msg+"\n")
+						}
+						return nil
+					}
 				}
 			}
 		},
