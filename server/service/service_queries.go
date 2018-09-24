@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 
+	"github.com/guregu/null"
 	"github.com/kolide/fleet/server/contexts/viewer"
 	"github.com/kolide/fleet/server/kolide"
 	"github.com/pkg/errors"
@@ -85,7 +86,7 @@ func (svc service) NewQuery(ctx context.Context, p kolide.QueryPayload) (*kolide
 
 	vc, ok := viewer.FromContext(ctx)
 	if ok {
-		query.AuthorID = vc.UserID()
+		query.AuthorID = null.IntFrom(int64(vc.UserID()))
 		query.AuthorName = vc.FullName()
 	}
 

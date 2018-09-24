@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/guregu/null"
 	"github.com/kolide/fleet/server/contexts/viewer"
 	"github.com/kolide/fleet/server/kolide"
 	"github.com/kolide/fleet/server/websocket"
@@ -35,7 +36,7 @@ func (svc service) NewDistributedQueryCampaign(ctx context.Context, queryString 
 		Name:     fmt.Sprintf("distributed_%s_%d", vc.Username(), time.Now().Unix()),
 		Query:    queryString,
 		Saved:    false,
-		AuthorID: vc.UserID(),
+		AuthorID: null.IntFrom(int64(vc.UserID())),
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "new query")
