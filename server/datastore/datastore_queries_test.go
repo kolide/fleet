@@ -5,6 +5,7 @@ import (
 	"sort"
 	"testing"
 
+	"github.com/guregu/null"
 	"github.com/kolide/fleet/server/kolide"
 	"github.com/kolide/fleet/server/test"
 	"github.com/stretchr/testify/assert"
@@ -78,7 +79,7 @@ func testDeleteQuery(t *testing.T, ds kolide.Datastore) {
 	query := &kolide.Query{
 		Name:     "foo",
 		Query:    "bar",
-		AuthorID: user.ID,
+		AuthorID: null.IntFrom(int64(user.ID)),
 	}
 	query, err := ds.NewQuery(query)
 	require.Nil(t, err)
@@ -150,7 +151,7 @@ func testSaveQuery(t *testing.T, ds kolide.Datastore) {
 	query := &kolide.Query{
 		Name:     "foo",
 		Query:    "bar",
-		AuthorID: user.ID,
+		AuthorID: null.IntFrom(int64(user.ID)),
 	}
 	query, err := ds.NewQuery(query)
 	require.Nil(t, err)
@@ -177,7 +178,7 @@ func testListQuery(t *testing.T, ds kolide.Datastore) {
 			Name:     fmt.Sprintf("name%02d", i),
 			Query:    fmt.Sprintf("query%02d", i),
 			Saved:    true,
-			AuthorID: user.ID,
+			AuthorID: null.IntFrom(int64(user.ID)),
 		})
 		require.Nil(t, err)
 	}
@@ -187,7 +188,7 @@ func testListQuery(t *testing.T, ds kolide.Datastore) {
 		Name:     "unsaved",
 		Query:    "select * from time",
 		Saved:    false,
-		AuthorID: user.ID,
+		AuthorID: null.IntFrom(int64(user.ID)),
 	})
 	require.Nil(t, err)
 
@@ -326,7 +327,7 @@ func testDuplicateNewQuery(t *testing.T, ds kolide.Datastore) {
 	q1, err := ds.NewQuery(&kolide.Query{
 		Name:     "foo",
 		Query:    "select * from time;",
-		AuthorID: user.ID,
+		AuthorID: null.IntFrom(int64(user.ID)),
 	})
 	require.Nil(t, err)
 	assert.NotZero(t, q1.ID)

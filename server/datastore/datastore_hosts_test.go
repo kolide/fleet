@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/WatchBeam/clock"
+	"github.com/guregu/null"
 	"github.com/kolide/fleet/server/kolide"
 	"github.com/kolide/fleet/server/test"
 	"github.com/stretchr/testify/assert"
@@ -430,7 +431,7 @@ func testDistributedQueriesForHost(t *testing.T, ds kolide.Datastore) {
 	q1 := &kolide.Query{
 		Name:     "bar",
 		Query:    "select * from bar",
-		AuthorID: user.ID,
+		AuthorID: null.IntFrom(int64(user.ID)),
 	}
 	q1, err = ds.NewQuery(q1)
 	require.Nil(t, err)
@@ -475,7 +476,7 @@ func testDistributedQueriesForHost(t *testing.T, ds kolide.Datastore) {
 	q2 := &kolide.Query{
 		Name:     "foo",
 		Query:    "select * from foo",
-		AuthorID: user.ID,
+		AuthorID: null.IntFrom(int64(user.ID)),
 	}
 	q2, err = ds.NewQuery(q2)
 	require.Nil(t, err)
