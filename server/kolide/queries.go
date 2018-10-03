@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/ghodss/yaml"
-	"github.com/guregu/null"
 	"github.com/pkg/errors"
 )
 
@@ -70,12 +69,12 @@ type QueryPayload struct {
 type Query struct {
 	UpdateCreateTimestamps
 	DeleteFields
-	ID          uint     `json:"id"`
-	Name        string   `json:"name"`
-	Description string   `json:"description"`
-	Query       string   `json:"query"`
-	Saved       bool     `json:"saved"`
-	AuthorID    null.Int `json:"author_id" db:"author_id"`
+	ID          uint   `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Query       string `json:"query"`
+	Saved       bool   `json:"saved"`
+	AuthorID    *uint  `json:"author_id" db:"author_id"`
 	// AuthorName is retrieved with a join to the users table in the MySQL
 	// backend (using AuthorID)
 	AuthorName string `json:"author_name" db:"author_name"`
