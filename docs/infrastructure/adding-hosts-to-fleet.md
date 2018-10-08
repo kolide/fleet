@@ -137,6 +137,8 @@ Next, you'll have to edit the `config.mk` file. You'll find all of the necessary
 
 Note that osqueryd requires a full certificate chain, even for certificates which might be trusted by your keychain. The "Fetch Kolide Certificate" button in the Add New Host screen will attempt to fetch the full chain for you.
 
+If your server certificate is not named kolide.crt, change the certificate name variable in --tls_server_certs to match your server certificate.
+
 Once you've configured the `config.mk` file with the correct variables, you can run `make` in the `tools/mac` directory. Running `make` will create a new `kolide-enroll.pkg` file which you can import into your software repository and deploy to your mac fleet.
 
 The enrollment package must installed after the osqueryd package, and will install a LaunchDaemon to keep the osqueryd process running.
