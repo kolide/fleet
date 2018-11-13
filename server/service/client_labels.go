@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/url"
+	"path"
 
 	"github.com/kolide/fleet/server/kolide"
 	"github.com/pkg/errors"
@@ -42,8 +43,9 @@ func (c *Client) ApplyLabels(specs []*kolide.LabelSpec) error {
 
 // GetLabel retrieves information about a label by name
 func (c *Client) GetLabel(name string) (*kolide.LabelSpec, error) {
-	verb, path := "GET", "/api/v1/kolide/spec/labels/"+url.QueryEscape(name)
-	response, err := c.AuthenticatedDo(verb, path, nil)
+	u := &url.URL{Path: name}
+	verb, encodedPath := "GET", path.Join("/api/v1/kolide/spec/labels/", u.String())
+	response, err := c.AuthenticatedDo(verb, encodedPath, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "GET /api/v1/kolide/spec/labels")
 	}
@@ -105,10 +107,11 @@ func (c *Client) GetLabels() ([]*kolide.LabelSpec, error) {
 
 // DeleteLabel deletes the label with the matching name.
 func (c *Client) DeleteLabel(name string) error {
-	verb, path := "DELETE", "/api/v1/kolide/labels/"+url.QueryEscape(name)
-	response, err := c.AuthenticatedDo(verb, path, nil)
+	u := &url.URL{Path: name}
+	verb, encodedPath := "DELETE", path.Join("/api/v1/kolide/labels/", u.String())
+	response, err := c.AuthenticatedDo(verb, encodedPath, nil)
 	if err != nil {
-		return errors.Wrapf(err, "%s %s", verb, path)
+		return errors.Wrapf(err, "%s %s", verb, encodedPath)
 	}
 	defer response.Body.Close()
 

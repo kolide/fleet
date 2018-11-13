@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/url"
+	"path"
 
 	"github.com/kolide/fleet/server/kolide"
 	"github.com/pkg/errors"
@@ -42,10 +43,11 @@ func (c *Client) ApplyQueries(specs []*kolide.QuerySpec) error {
 
 // GetQuery retrieves the list of all Queries.
 func (c *Client) GetQuery(name string) (*kolide.QuerySpec, error) {
-	verb, path := "GET", "/api/v1/kolide/spec/queries/"+url.QueryEscape(name)
-	response, err := c.AuthenticatedDo(verb, path, nil)
+	u := &url.URL{Path: name}
+	verb, encodedPath := "GET", path.Join("/api/v1/kolide/spec/queries/", u.String())
+	response, err := c.AuthenticatedDo(verb, encodedPath, nil)
 	if err != nil {
-		return nil, errors.Wrapf(err, "%s %s", verb, path)
+		return nil, errors.Wrapf(err, "%s %s", verb, encodedPath)
 	}
 	defer response.Body.Close()
 
@@ -105,10 +107,11 @@ func (c *Client) GetQueries() ([]*kolide.QuerySpec, error) {
 
 // DeleteQuery deletes the query with the matching name.
 func (c *Client) DeleteQuery(name string) error {
-	verb, path := "DELETE", "/api/v1/kolide/queries/"+url.QueryEscape(name)
-	response, err := c.AuthenticatedDo(verb, path, nil)
+	u := &url.URL{Path: name}
+	verb, encodedPath := "DELETE", path.Join("/api/v1/kolide/queries/", u.String())
+	response, err := c.AuthenticatedDo(verb, encodedPath, nil)
 	if err != nil {
-		return errors.Wrapf(err, "%s %s", verb, path)
+		return errors.Wrapf(err, "%s %s", verb, encodedPath)
 	}
 	defer response.Body.Close()
 
