@@ -199,8 +199,8 @@ func (svc service) StreamCampaignResults(ctx context.Context, conn *websocket.Co
 	}
 
 	// Push status updates every 5 seconds at most
-	tick := time.NewTicker(5 * time.Second)
-	defer tick.Stop()
+	ticker := time.NewTicker(5 * time.Second)
+	defer ticker.Stop()
 	// Loop, pushing updates to results and expected totals
 	for {
 		// Update the expected hosts total (Should happen before
@@ -219,7 +219,7 @@ func (svc service) StreamCampaignResults(ctx context.Context, conn *websocket.Co
 				status.ActualResults++
 			}
 
-		case <-tick.C:
+		case <-ticker.C:
 			// Update status
 			if err := updateStatus(); err != nil {
 				svc.logger.Log("msg", "error updating status", "err", err)
