@@ -193,7 +193,8 @@ export class QueryPage extends Component {
     return false;
   }
 
-  onRunQuery = debounce((queryText) => {
+  onRunQuery = debounce(() => {
+    const { queryText } = this.state;
     const { dispatch, selectedTargets } = this.props;
     const { error } = validateQuery(queryText);
 
@@ -474,7 +475,6 @@ export class QueryPage extends Component {
           onRunQuery={onRunQuery}
           onStopQuery={onStopQuery}
           onTargetSelect={onTargetSelect}
-          query={queryText}
           queryIsRunning={queryIsRunning}
           queryTimerMilliseconds={runQueryMilliseconds}
         />
@@ -495,7 +495,6 @@ export class QueryPage extends Component {
         onRunQuery={onRunQuery}
         onStopQuery={onStopQuery}
         onTargetSelect={onTargetSelect}
-        query={queryText}
         queryIsRunning={queryIsRunning}
         selectedTargets={selectedTargets}
         targetsCount={targetsCount}

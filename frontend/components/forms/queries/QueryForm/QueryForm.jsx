@@ -137,7 +137,7 @@ class QueryForm extends Component {
   }
 
   render () {
-    const { baseError, fields, handleSubmit, queryIsRunning, title } = this.props;
+    const { baseError, fields, handleSubmit, onRunQuery, queryIsRunning, title } = this.props;
     const { errors } = this.state;
     const { onLoad, renderButtons } = this;
 
@@ -158,6 +158,7 @@ class QueryForm extends Component {
           onLoad={onLoad}
           readOnly={queryIsRunning}
           wrapperClassName={`${baseClass}__text-editor-wrapper`}
+          handleSubmit={onRunQuery}
         />
         <InputField
           {...fields.description}
