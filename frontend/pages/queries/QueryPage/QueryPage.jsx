@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import classnames from 'classnames';
 import { connect } from 'react-redux';
 import FileSaver from 'file-saver';
-import { clone, concat, filter, includes, isArray, isEqual, merge, uniq } from 'lodash';
+import { clone, filter, includes, isEqual, merge } from 'lodash';
 import moment from 'moment';
 import { push } from 'react-router-redux';
 
@@ -579,7 +579,7 @@ const mapStateToProps = (state, ownProps) => {
     const { entities: hosts } = stateEntities.get('hosts');
     // hostIDs are URL params so they are strings and comparison with ints may
     // need conversion.
-    const hostFilter = h => includes(hostIDsArr, String(h.id)) || includes(hostUUIDsArr, String(h.uuid))
+    const hostFilter = h => includes(hostIDsArr, String(h.id)) || includes(hostUUIDsArr, String(h.uuid));
     selectedHosts = filter(hosts, hostFilter);
   }
 
