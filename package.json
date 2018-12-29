@@ -114,5 +114,11 @@
     "webpack-dev-middleware": "1.12.2",
     "webpack-hot-middleware": "2.22.2",
     "webpack-notifier": "1.6.0"
-  }
+  },
+  "browserslist": [
+    "last 1 version",
+    "> 1%",
+    "maintained node versions",
+    "not dead"
+  ]
 }
