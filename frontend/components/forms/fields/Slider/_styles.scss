@@ -32,9 +32,9 @@
   }
 
   &__dot {
-    transition: left 150ms ease-in-out;
     @include size(14px);
     @include position(absolute, 0 null null 5px);
+    transition: left 150ms ease-in-out;
     margin-top: 3px;
     border-radius: 50%;
     background-color: $white;

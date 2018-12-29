@@ -279,12 +279,14 @@
   position: relative;
 
   @at-root .site-nav--small & {
-    linear-gradient: to bottom, $brand 18%, $brand 82%;
+    background-color: $brand 18%;
+    background-image: linear-gradient(to bottom, $brand 18%, $brand 82%);
     box-shadow: none;
   }
 
   @include breakpoint(smalldesk) {
-    linear-gradient: to bottom, $brand 18%, $brand 82%;
+    background-color: $brand 18%;
+    background-image: linear-gradient(to bottom, $brand 18%, $brand 82%);
     box-shadow: none;
   }
 

@@ -2846,12 +2846,14 @@ fresh@0.5.2:
 front-matter@2.1.2:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/front-matter/-/front-matter-2.1.2.tgz#f75983b9f2f413be658c93dfd7bd8ce4078f5cdb"
+  integrity sha1-91mDufL0E75ljJPf172M5AePXNs=
   dependencies:
     js-yaml "^3.4.6"
 
 fs-extra@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-3.0.1.tgz#3794f378c58b342ea7dbbb23095109c4b3b62291"
+  integrity sha1-N5TzeMWLNC6n27sjCVEJxLO2IpE=
   dependencies:
     graceful-fs "^4.1.2"
     jsonfile "^3.0.0"
@@ -3024,6 +3026,7 @@ globule@^1.0.0:
 gonzales-pe-sl@^4.2.3:
   version "4.2.3"
   resolved "https://registry.yarnpkg.com/gonzales-pe-sl/-/gonzales-pe-sl-4.2.3.tgz#6a868bc380645f141feeb042c6f97fcc71b59fe6"
+  integrity sha1-aoaLw4BkXxQf7rBCxvl/zHG1n+Y=
   dependencies:
     minimist "1.1.x"
 
@@ -3730,17 +3733,17 @@ js-tokens@^3.0.0, js-tokens@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-3.0.2.tgz#9866df395102130e38f7f996bceb65443209c25b"
 
-js-yaml@^3.4.6, js-yaml@^3.5.1, js-yaml@^3.5.4, js-yaml@^3.7.0:
-  version "3.11.0"
-  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.11.0.tgz#597c1a8bd57152f26d622ce4117851a51f5ebaef"
+js-yaml@^3.4.6, js-yaml@^3.9.0:
+  version "3.12.0"
+  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.12.0.tgz#eaed656ec8344f10f527c6bfa1b6e2244de167d1"
+  integrity sha512-PIt2cnwmPfL4hKNwqeiuz4bKfnzHTBv6HyVgjahA6mPLwPDzjDWrplJBMjHUFxku/N3FlmrbyPclad+I+4mJ3A==
   dependencies:
     argparse "^1.0.7"
     esprima "^4.0.0"
 
-js-yaml@^3.9.0:
-  version "3.12.0"
-  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.12.0.tgz#eaed656ec8344f10f527c6bfa1b6e2244de167d1"
-  integrity sha512-PIt2cnwmPfL4hKNwqeiuz4bKfnzHTBv6HyVgjahA6mPLwPDzjDWrplJBMjHUFxku/N3FlmrbyPclad+I+4mJ3A==
+js-yaml@^3.5.1, js-yaml@^3.5.4, js-yaml@^3.7.0:
+  version "3.11.0"
+  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.11.0.tgz#597c1a8bd57152f26d622ce4117851a51f5ebaef"
   dependencies:
     argparse "^1.0.7"
     esprima "^4.0.0"
@@ -3846,6 +3849,7 @@ json5@^0.5.0, json5@^0.5.1:
 jsonfile@^3.0.0:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/jsonfile/-/jsonfile-3.0.1.tgz#a5ecc6f65f53f662c4415c7675a0331d0992ec66"
+  integrity sha1-pezG9l9T9mLEQVx2daAzHQmS7GY=
   optionalDependencies:
     graceful-fs "^4.1.6"
 
@@ -3893,6 +3897,7 @@ kind-of@^6.0.0, kind-of@^6.0.2:
 known-css-properties@^0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/known-css-properties/-/known-css-properties-0.3.0.tgz#a3d135bbfc60ee8c6eacf2f7e7e6f2d4755e49a4"
+  integrity sha512-QMQcnKAiQccfQTqtBh/qwquGZ2XK/DXND1jrcN9M8gMMy99Gwla7GQjndVUsEqIaRyP6bsFRuhwRj5poafBGJQ==
 
 lazy-cache@^1.0.3:
   version "1.0.4"
@@ -5808,6 +5813,7 @@ sass-graph@^2.2.4:
 sass-lint@1.12.1:
   version "1.12.1"
   resolved "https://registry.yarnpkg.com/sass-lint/-/sass-lint-1.12.1.tgz#630f69c216aa206b8232fb2aa907bdf3336b6d83"
+  integrity sha1-Yw9pwhaqIGuCMvsqqQe98zNrbYM=
   dependencies:
     commander "^2.8.1"
     eslint "^2.7.0"
@@ -6616,8 +6622,9 @@ uniqs@^2.0.0:
   resolved "https://registry.yarnpkg.com/uniqs/-/uniqs-2.0.0.tgz#ffede4b36b25290696e6e165d4a59edb998e6b02"
 
 universalify@^0.1.0:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/universalify/-/universalify-0.1.1.tgz#fa71badd4437af4c148841e3b3b165f9e9e590b7"
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/universalify/-/universalify-0.1.2.tgz#b646f69be3942dabcecc9d6639c80dc105efaa66"
+  integrity sha512-rBJeI5CXAlmy1pV+617WB9J63U6XcazHHF2f2dbJix4XzpUF0RS3Zbj0FGIOCAva5P/d/GBOYaACQ1w+0azUkg==
 
 unpipe@1.0.0, unpipe@~1.0.0:
   version "1.0.0"
