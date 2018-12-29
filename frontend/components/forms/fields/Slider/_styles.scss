@@ -1,5 +1,5 @@
 .kolide-slider {
-  @include transition(background-color 150ms ease-in-out);
+  transition: background-color 150ms ease-in-out;
   background-color: $text-medium;
   border-radius: 12px;
   border: 1px solid #eaeaea;
@@ -26,13 +26,13 @@
   }
 
   &__wrapper {
-    @include display(flex);
-    @include align-items(center);
+    display: flex;
+    align-items: center;
     height: 40px;
   }
 
   &__dot {
-    @include transition(left 150ms ease-in-out);
+    transition: left 150ms ease-in-out;
     @include size(14px);
     @include position(absolute, 0 null null 5px);
     margin-top: 3px;
