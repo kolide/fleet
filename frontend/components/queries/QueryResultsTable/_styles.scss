@@ -118,7 +118,7 @@
   }
 }
 
-@keyframes: growFullScreen {
+@keyframes growFullScreen {
   100% {
     top: $pad-half;
     right: $pad-half;
@@ -129,7 +129,7 @@
   }
 }
 
-@keyframes: shrinkFullScreen {
+@keyframes shrinkFullScreen {
   0% {
     top: $pad-half;
     right: auto;
