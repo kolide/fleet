@@ -3,7 +3,7 @@
   opacity: 1;
 
   &.login-form-animation-leave-active {
-    transition: all 300ms ease-in;
+    transition: opacity 300ms ease-in, transform 300ms ease-in;
     transform: scale(1.3);
     opacity: 0;
   }

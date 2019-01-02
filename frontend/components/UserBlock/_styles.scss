@@ -1,5 +1,5 @@
 .user-block {
-  transition: all 300ms ease-in-out;
+  transition: border 300ms ease-in-out, background-color 300ms ease-in-out;
   background-color: $white;
   display: inline-block;
   height: 440px;
@@ -20,7 +20,7 @@
   }
 
   &__header {
-    transition: all 300ms ease-in-out;
+  transition: color 300ms ease-in-out, background-color 300ms ease-in-out;
     background-color: $bg-light;
     border-bottom: 1px solid $accent-light;
     color: $text-ultradark;
@@ -73,7 +73,7 @@
 
   &__avatar {
     @include size(100px);
-    transition: all 300ms ease-in-out;
+    transition: border 300ms ease-in-out;
     border: 1px solid $text-medium;
     filter: none;
     display: block;
@@ -154,7 +154,7 @@
   }
 
   &__email {
-    transition: all 300ms ease-in-out;
+    transition: color 300ms ease-in-out;
     color: $link;
     font-size: $small;
     line-height: $larger;
