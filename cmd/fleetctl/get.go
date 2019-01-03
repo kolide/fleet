@@ -296,3 +296,49 @@ func getEnrollSecretCommand() cli.Command {
 		},
 	}
 }
+
+func getHostsCommand() cli.Command {
+	return cli.Command{
+		Name:    "hosts",
+		Aliases: []string{"host", "h"},
+		Usage:   "List information about one or more hosts",
+		Flags: []cli.Flag{
+			configFlag(),
+			contextFlag(),
+		},
+		Action: func(c *cli.Context) error {
+			fleet, err := clientFromCLI(c)
+			if err != nil {
+				return err
+			}
+
+			hosts, err := fleet.GetHosts()
+			if err != nil {
+				return errors.Wrap(err, "could not list hosts")
+			}
+
+			if len(hosts) == 0 {
+				fmt.Println("no hosts found")
+				return nil
+			}
+
+			data := [][]string{}
+
+			for _, host := range hosts {
+				data = append(data, []string{
+					host.Host.UUID, // not sure if this is the most appropriate value to display as the 'id'
+					host.DisplayText,
+					host.Host.Platform,
+					host.Status,
+				})
+			}
+
+			table := defaultTable()
+			table.SetHeader([]string{"id", "hostname", "platform", "status"})
+			table.AppendBulk(data)
+			table.Render()
+
+			return nil
+		},
+	}
+}
