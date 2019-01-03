@@ -326,7 +326,7 @@ func getHostsCommand() cli.Command {
 
 			for _, host := range hosts {
 				data = append(data, []string{
-					host.Host.UUID, // not sure if this is the most appropriate value to display as the 'id'
+					host.Host.UUID,
 					host.DisplayText,
 					host.Host.Platform,
 					host.Status,
@@ -334,7 +334,7 @@ func getHostsCommand() cli.Command {
 			}
 
 			table := defaultTable()
-			table.SetHeader([]string{"id", "hostname", "platform", "status"})
+			table.SetHeader([]string{"uuid", "hostname", "platform", "status"})
 			table.AppendBulk(data)
 			table.Render()
 
