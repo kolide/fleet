@@ -86,7 +86,7 @@ export class QueryPage extends Component {
   componentWillMount () {
     const { dispatch, hostIDs, hostUUIDs, selectedHosts, selectedTargets } = this.props;
 
-    if (hostIDs || hostUUIDs) {
+    if (((hostIDs && hostIDs.length) || (hostUUIDs && hostUUIDs.length)) > 0) {
       dispatch(hostActions.loadAll());
     }
 
@@ -573,7 +573,7 @@ const mapStateToProps = (state, ownProps) => {
   const title = queryID ? 'Edit Query' : 'New Query';
   let selectedHosts = [];
 
-  if (!queryID && (hostIDs || hostUUIDs)) {
+  if (!queryID && ((hostIDs && hostIDs.length) || (hostUUIDs && hostUUIDs.length)) > 0) {
     const hostIDsArr = Array.isArray(hostIDs) ? hostIDs : [hostIDs];
     const hostUUIDsArr = Array.isArray(hostUUIDs) ? hostUUIDs : [hostUUIDs];
     const { entities: hosts } = stateEntities.get('hosts');
