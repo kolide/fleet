@@ -76,7 +76,7 @@ type loginauth struct {
 	password string
 }
 
-func LOGINAuth(username, password string) smtp.Auth {
+func LoginAuth(username, password string) smtp.Auth {
 	return &loginauth{username: username, password: password}
 }
 
@@ -107,7 +107,7 @@ func smtpAuth(e kolide.Email) (smtp.Auth, error) {
 	case kolide.AuthMethodPlain:
 		auth = smtp.PlainAuth("", e.Config.SMTPUserName, e.Config.SMTPPassword, e.Config.SMTPServer)
 	case kolide.AuthMethodLogin:
-		auth = LOGINAuth(e.Config.SMTPUserName, e.Config.SMTPPassword)
+		auth = LoginAuth(e.Config.SMTPUserName, e.Config.SMTPPassword)
 	default:
 		return nil, fmt.Errorf("unknown SMTP auth type '%d'", e.Config.SMTPAuthenticationMethod)
 	}
