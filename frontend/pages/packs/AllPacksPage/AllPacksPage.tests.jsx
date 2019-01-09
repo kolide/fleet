@@ -66,11 +66,11 @@ describe('AllPacksPage - component', () => {
     const page = mount(Component).find('AllPacksPage');
     const packsFilterInput = page.find({ name: 'pack-filter' }).find('input');
 
-    expect(page.node.getPacks().length).toEqual(2);
+    expect(page.instance().getPacks().length).toEqual(2);
 
     fillInFormInput(packsFilterInput, 'My unique pack name');
 
-    expect(page.node.getPacks().length).toEqual(1);
+    expect(page.instance().getPacks().length).toEqual(1);
   });
 
   it('updates checkedPackIDs in state when the select all packs Checkbox is toggled', () => {
@@ -79,7 +79,7 @@ describe('AllPacksPage - component', () => {
 
     expect(page.state('checkedPackIDs')).toEqual([]);
 
-    selectAllPacks.simulate('change');
+    selectAllPacks.hostNodes().simulate('change');
 
     expect(page.state('checkedPackIDs')).toEqual([packStub.id]);
 
@@ -94,7 +94,7 @@ describe('AllPacksPage - component', () => {
 
     expect(page.state('checkedPackIDs')).toEqual([]);
 
-    selectPack.simulate('change');
+    selectPack.hostNodes().simulate('change');
 
     expect(page.state('checkedPackIDs')).toEqual([packStub.id]);
 
@@ -110,7 +110,7 @@ describe('AllPacksPage - component', () => {
       const page = mount(<AllPacksPage packs={packs} />);
       const selectAllPacks = page.find({ name: 'select-all-packs' });
 
-      selectAllPacks.simulate('change');
+      selectAllPacks.hostNodes().simulate('change');
 
       expect(page.state('checkedPackIDs')).toEqual([packStub.id, 101]);
       expect(page.find('.all-packs-page__bulk-action-btn--disable').length).toEqual(1);
@@ -124,7 +124,7 @@ describe('AllPacksPage - component', () => {
       const page = mount(Component).find('AllPacksPage');
       const selectAllPacks = page.find({ name: 'select-all-packs' });
 
-      selectAllPacks.simulate('change');
+      selectAllPacks.hostNodes().simulate('change');
 
       const disableBtn = page.find('.all-packs-page__bulk-action-btn--disable');
 
@@ -141,7 +141,7 @@ describe('AllPacksPage - component', () => {
       const page = mount(Component).find('AllPacksPage');
       const selectAllPacks = page.find({ name: 'select-all-packs' });
 
-      selectAllPacks.simulate('change');
+      selectAllPacks.hostNodes().simulate('change');
 
       const enableBtn = page.find('.all-packs-page__bulk-action-btn--enable');
 
@@ -160,7 +160,7 @@ describe('AllPacksPage - component', () => {
 
       expect(page.find('Modal').length).toEqual(0);
 
-      selectAllPacks.simulate('change');
+      selectAllPacks.hostNodes().simulate('change');
 
       const deleteBtn = page.find('.all-packs-page__bulk-action-btn--delete');
 
@@ -177,7 +177,7 @@ describe('AllPacksPage - component', () => {
 
       expect(page.find('Modal').length).toEqual(0);
 
-      selectAllPacks.simulate('change');
+      selectAllPacks.hostNodes().simulate('change');
 
       const deleteBtn = page.find('.all-packs-page__bulk-action-btn--delete');
 
@@ -200,7 +200,7 @@ describe('AllPacksPage - component', () => {
 
       expect(page.find('Modal').length).toEqual(0);
 
-      selectAllPacks.simulate('change');
+      selectAllPacks.hostNodes().simulate('change');
 
       const deleteBtn = page.find('.all-packs-page__bulk-action-btn--delete');
 
@@ -255,7 +255,7 @@ describe('AllPacksPage - component', () => {
       const page = mount(Component).find('AllPacksPage');
       const tableRow = page.find('PacksList').find('.packs-list-row--selected');
 
-      tableRow.simulate('doubleclick');
+      tableRow.hostNodes().simulate('doubleclick');
 
       const routerChangeAction = find(mockStore.getActions(), { type: '@@router/CALL_HISTORY_METHOD' });
 

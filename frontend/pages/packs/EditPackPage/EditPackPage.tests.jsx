@@ -121,7 +121,7 @@ describe('EditPackPage - component', () => {
         scheduledQueries: [],
       };
 
-      const pageNode = mount(<EditPackPage {...props} pack={packStub} />).node;
+      const pageNode = mount(<EditPackPage {...props} pack={packStub} />).instance();
 
       pageNode.handlePackFormSubmit(updatedPack);
 
@@ -151,11 +151,11 @@ describe('EditPackPage - component', () => {
         .find('ScheduledQueriesList')
         .find('ClickableTableRow');
 
-      expect(Page.node.state.selectedScheduledQuery).toNotExist();
+      expect(Page.instance().state.selectedScheduledQuery).toNotExist();
 
       QueryRow.simulate('click');
 
-      expect(Page.node.state.selectedScheduledQuery)
+      expect(Page.instance().state.selectedScheduledQuery)
         .toEqual(scheduledQuery, 'Expected clicking a scheduled query row to set the scheduled query in component state');
 
       const PageForm = Form(Page);

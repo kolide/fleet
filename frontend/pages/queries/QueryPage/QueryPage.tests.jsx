@@ -142,7 +142,7 @@ describe('QueryPage - component', () => {
 
     expect(QueryPageSelectTargets.prop('error')).toNotExist();
 
-    runQueryBtn.simulate('click');
+    runQueryBtn.hostNodes().simulate('click');
 
     expect(QueryPageSelectTargets.prop('error')).toEqual('You must select at least one target to run a query');
   });
@@ -202,7 +202,7 @@ describe('QueryPage - component', () => {
         selectedTargets: [hostStub],
       };
       const Page = mount(<QueryPage {...props} />);
-      const PageNode = Page.node;
+      const PageNode = Page.instance();
 
       spyOn(PageNode, 'destroyCampaign');
       spyOn(PageNode, 'removeSocket');
@@ -236,11 +236,11 @@ describe('QueryPage - component', () => {
       const fileStub = new global.window.File([queryResultsCSV], filename, { type: 'text/csv' });
 
       Page.setState({ campaign });
-      Page.node.socket = {};
+      Page.instance().socket = {};
 
       const QueryResultsTable = Page.find('QueryResultsTable');
 
-      QueryResultsTable.find('.query-results-table__export-btn').simulate('click');
+      QueryResultsTable.find('.query-results-table__export-btn').hostNodes().simulate('click');
 
       expect(fileSaveSpy).toHaveBeenCalledWith(fileStub);
     });
@@ -263,7 +263,7 @@ describe('QueryPage - component', () => {
 
       const QueryResultsTable = Page.find('QueryResultsTable');
 
-      QueryResultsTable.find('.query-results-table__fullscreen-btn').simulate('click');
+      QueryResultsTable.find('.query-results-table__fullscreen-btn').hostNodes().simulate('click');
 
       expect(QueryResultsTable.find('.query-results-table__fullscreen-btn--active').length).toEqual(1);
       expect(QueryResultsTable.find('.query-results-table--full-screen').length).toEqual(1);
