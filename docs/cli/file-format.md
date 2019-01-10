@@ -34,7 +34,7 @@ apiVersion: v1
 kind: query
 spec:
   name: docker_processes
-  descriptions: The docker containers processes that are running on a system.
+  description: The docker containers processes that are running on a system.
   query: select * from docker_container_processes;
   support:
     osquery: 2.9.0
