@@ -211,7 +211,6 @@ describe('ManageQueriesPage - component', () => {
     });
 
     it('does not call the API if the Modal is not accepted', () => {
-      debugger;
       const mockStore = reduxMockStore(store);
       const Component = connectedComponent(ConnectedManageQueriesPage, { mockStore });
       const page = mount(Component);

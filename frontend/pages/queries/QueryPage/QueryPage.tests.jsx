@@ -139,7 +139,7 @@ describe('QueryPage - component', () => {
     const page = mount(connectedComponent(ConnectedQueryPage, { mockStore, props: locationProp }));
     const runQueryBtn = page.find('.query-progress-details__run-btn');
     let QueryPageSelectTargets = page.find('QueryPageSelectTargets');
-;
+
     expect(QueryPageSelectTargets.prop('error')).toNotExist();
 
     runQueryBtn.hostNodes().simulate('click');

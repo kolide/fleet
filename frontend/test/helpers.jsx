@@ -34,8 +34,6 @@ export const itBehavesLikeAFormDropdownElement = (form, inputName) => {
 
   expect(dropdownField.length).toEqual(1);
 
-  const inputNode = dropdownField.find('input');
-
   const options = dropdownField.prop('options');
 
   // Arrow down, then enter to select the first item
