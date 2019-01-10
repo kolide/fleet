@@ -90,8 +90,8 @@ class KolideAce extends Component {
           wrapEnabled={wrapEnabled}
           commands={[{
             name: 'commandName',
-            bindKey: {win: 'Ctrl-Enter', mac: 'Ctrl-Enter'},
-            exec: () => { handleSubmit && handleSubmit() }
+            bindKey: { win: 'Ctrl-Enter', mac: 'Ctrl-Enter' },
+            exec: () => { handleSubmit && handleSubmit(); },
           }]}
         />
       </div>

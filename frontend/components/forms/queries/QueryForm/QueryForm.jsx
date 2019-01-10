@@ -44,6 +44,7 @@ class QueryForm extends Component {
     handleSubmit: PropTypes.func,
     formData: queryInterface,
     onOsqueryTableSelect: PropTypes.func,
+    onRunQuery: PropTypes.func,
     onUpdate: PropTypes.func,
     queryIsRunning: PropTypes.bool,
     title: PropTypes.string,

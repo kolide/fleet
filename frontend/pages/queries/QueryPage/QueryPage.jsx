@@ -448,7 +448,6 @@ export class QueryPage extends Component {
       campaign,
       queryIsRunning,
       queryResultsToggle,
-      queryText,
       runQueryMilliseconds,
     } = this.state;
     const { onExportQueryResults, onToggleQueryFullScreen, onRunQuery, onStopQuery, onTargetSelect } = this;
@@ -484,7 +483,7 @@ export class QueryPage extends Component {
 
   renderTargetsInput = () => {
     const { onFetchTargets, onRunQuery, onStopQuery, onTargetSelect } = this;
-    const { campaign, queryIsRunning, queryText, targetsCount, targetsError, runQueryMilliseconds } = this.state;
+    const { campaign, queryIsRunning, targetsCount, targetsError, runQueryMilliseconds } = this.state;
     const { selectedTargets } = this.props;
 
     return (
