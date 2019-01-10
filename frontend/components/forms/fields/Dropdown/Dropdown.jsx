@@ -79,7 +79,6 @@ class Dropdown extends Component {
     return (
       <FormField {...formFieldProps} type="dropdown" className={wrapperClassName}>
         <Select
-          classNamePrefix='select'
           className={selectClasses}
           clearable={clearable}
           disabled={disabled}

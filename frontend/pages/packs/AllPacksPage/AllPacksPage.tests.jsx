@@ -75,14 +75,15 @@ describe('AllPacksPage - component', () => {
 
   it('updates checkedPackIDs in state when the select all packs Checkbox is toggled', () => {
     const page = mount(<AllPacksPage packs={[packStub]} />);
-    const selectAllPacks = page.find({ name: 'select-all-packs' });
+    let selectAllPacks = page.find({ name: 'select-all-packs' }).hostNodes();
 
     expect(page.state('checkedPackIDs')).toEqual([]);
 
-    selectAllPacks.hostNodes().simulate('change');
+    selectAllPacks.simulate('change');
 
     expect(page.state('checkedPackIDs')).toEqual([packStub.id]);
 
+    selectAllPacks = page.find({ name: 'select-all-packs' }).hostNodes();
     selectAllPacks.simulate('change');
 
     expect(page.state('checkedPackIDs')).toEqual([]);
@@ -90,14 +91,15 @@ describe('AllPacksPage - component', () => {
 
   it('updates checkedPackIDs in state when a pack row Checkbox is toggled', () => {
     const page = mount(<AllPacksPage packs={[packStub]} />);
-    const selectPack = page.find({ name: `select-pack-${packStub.id}` });
+    let selectPack = page.find({ name: `select-pack-${packStub.id}` }).hostNodes();
 
     expect(page.state('checkedPackIDs')).toEqual([]);
 
-    selectPack.hostNodes().simulate('change');
+    selectPack.simulate('change');
 
     expect(page.state('checkedPackIDs')).toEqual([packStub.id]);
 
+    selectPack = page.find({ name: `select-pack-${packStub.id}` }).hostNodes();
     selectPack.simulate('change');
 
     expect(page.state('checkedPackIDs')).toEqual([]);
@@ -113,20 +115,20 @@ describe('AllPacksPage - component', () => {
       selectAllPacks.hostNodes().simulate('change');
 
       expect(page.state('checkedPackIDs')).toEqual([packStub.id, 101]);
-      expect(page.find('.all-packs-page__bulk-action-btn--disable').length).toEqual(1);
-      expect(page.find('.all-packs-page__bulk-action-btn--enable').length).toEqual(1);
-      expect(page.find('.all-packs-page__bulk-action-btn--delete').length).toEqual(1);
+      expect(page.find('.all-packs-page__bulk-action-btn--disable').length).toBeGreaterThan(0);
+      expect(page.find('.all-packs-page__bulk-action-btn--enable').length).toBeGreaterThan(0);
+      expect(page.find('.all-packs-page__bulk-action-btn--delete').length).toBeGreaterThan(0);
     });
 
     it('dispatches the pack update function when disable is clicked', () => {
       const mockStore = reduxMockStore(store);
       const Component = connectedComponent(ConnectedAllPacksPage, { mockStore });
-      const page = mount(Component).find('AllPacksPage');
+      const page = mount(Component);
       const selectAllPacks = page.find({ name: 'select-all-packs' });
 
       selectAllPacks.hostNodes().simulate('change');
 
-      const disableBtn = page.find('.all-packs-page__bulk-action-btn--disable');
+      const disableBtn = page.find('.all-packs-page__bulk-action-btn--disable').hostNodes();
 
       disableBtn.simulate('click');
 
@@ -138,12 +140,12 @@ describe('AllPacksPage - component', () => {
     it('dispatches the pack update function when enable is clicked', () => {
       const mockStore = reduxMockStore(store);
       const Component = connectedComponent(ConnectedAllPacksPage, { mockStore });
-      const page = mount(Component).find('AllPacksPage');
+      const page = mount(Component);
       const selectAllPacks = page.find({ name: 'select-all-packs' });
 
       selectAllPacks.hostNodes().simulate('change');
 
-      const enableBtn = page.find('.all-packs-page__bulk-action-btn--enable');
+      const enableBtn = page.find('.all-packs-page__bulk-action-btn--enable').hostNodes();
 
       enableBtn.simulate('click');
 
@@ -155,14 +157,14 @@ describe('AllPacksPage - component', () => {
     it('loads a modal when delete is clicked', () => {
       const mockStore = reduxMockStore(store);
       const Component = connectedComponent(ConnectedAllPacksPage, { mockStore });
-      const page = mount(Component).find('AllPacksPage');
+      const page = mount(Component);
       const selectAllPacks = page.find({ name: 'select-all-packs' });
 
       expect(page.find('Modal').length).toEqual(0);
 
       selectAllPacks.hostNodes().simulate('change');
 
-      const deleteBtn = page.find('.all-packs-page__bulk-action-btn--delete');
+      const deleteBtn = page.find('.all-packs-page__bulk-action-btn--delete').hostNodes();
 
       deleteBtn.simulate('click');
 
@@ -172,14 +174,14 @@ describe('AllPacksPage - component', () => {
     it('dispatches the pack destroy action when the modal is confirmed', () => {
       const mockStore = reduxMockStore(store);
       const Component = connectedComponent(ConnectedAllPacksPage, { mockStore });
-      const page = mount(Component).find('AllPacksPage');
+      const page = mount(Component);
       const selectAllPacks = page.find({ name: 'select-all-packs' });
 
       expect(page.find('Modal').length).toEqual(0);
 
       selectAllPacks.hostNodes().simulate('change');
 
-      const deleteBtn = page.find('.all-packs-page__bulk-action-btn--delete');
+      const deleteBtn = page.find('.all-packs-page__bulk-action-btn--delete').hostNodes();
 
       deleteBtn.simulate('click');
 
@@ -195,14 +197,14 @@ describe('AllPacksPage - component', () => {
     it('does not dispatch the pack destroy action when the modal is canceled', () => {
       const mockStore = reduxMockStore(store);
       const Component = connectedComponent(ConnectedAllPacksPage, { mockStore });
-      const page = mount(Component).find('AllPacksPage');
+      const page = mount(Component);
       const selectAllPacks = page.find({ name: 'select-all-packs' });
 
       expect(page.find('Modal').length).toEqual(0);
 
       selectAllPacks.hostNodes().simulate('change');
 
-      const deleteBtn = page.find('.all-packs-page__bulk-action-btn--delete');
+      const deleteBtn = page.find('.all-packs-page__bulk-action-btn--delete').hostNodes();
 
       deleteBtn.simulate('click');
 

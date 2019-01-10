@@ -190,14 +190,14 @@ describe('ManageQueriesPage - component', () => {
     it('calls the API to delete once the Modal has been accepted', () => {
       const mockStore = reduxMockStore(store);
       const Component = connectedComponent(ConnectedManageQueriesPage, { mockStore });
-      const page = mount(Component).find('ManageQueriesPage');
+      const page = mount(Component);
       const checkAllQueries = page.find({ name: 'check-all-queries' });
 
       expect(page.find('Modal').length).toEqual(0);
 
       checkAllQueries.hostNodes().simulate('change');
 
-      const deleteBtn = page.find('.manage-queries-page__delete-queries-btn');
+      const deleteBtn = page.find('.manage-queries-page__delete-queries-btn').hostNodes();
 
       deleteBtn.simulate('click');
 
@@ -214,14 +214,14 @@ describe('ManageQueriesPage - component', () => {
       debugger;
       const mockStore = reduxMockStore(store);
       const Component = connectedComponent(ConnectedManageQueriesPage, { mockStore });
-      const page = mount(Component).find('ManageQueriesPage');
+      const page = mount(Component);
       const checkAllQueries = page.find({ name: 'check-all-queries' });
 
       expect(page.find('Modal').length).toEqual(0);
 
       checkAllQueries.hostNodes().simulate('change');
 
-      const deleteBtn = page.find('.manage-queries-page__delete-queries-btn');
+      const deleteBtn = page.find('.manage-queries-page__delete-queries-btn').hostNodes();
 
       deleteBtn.simulate('click');
 

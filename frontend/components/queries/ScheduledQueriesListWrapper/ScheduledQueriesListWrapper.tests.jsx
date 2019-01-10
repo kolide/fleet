@@ -55,12 +55,13 @@ describe('ScheduledQueriesListWrapper - component', () => {
     const component = mount(<ScheduledQueriesListWrapper {...defaultProps} />);
 
     const searchQueriesInput = component.find({ name: 'search-queries' });
-    const QueriesList = component.find('ScheduledQueriesList');
+    let QueriesList = component.find('ScheduledQueriesList');
 
     expect(QueriesList.prop('scheduledQueries')).toEqual(scheduledQueries);
 
     fillInFormInput(searchQueriesInput, 'something that does not match');
 
+    QueriesList = component.find('ScheduledQueriesList');
     expect(QueriesList.prop('scheduledQueries')).toEqual([]);
   });
 
