@@ -85,6 +85,10 @@ func (l *loginauth) Start(serverInfo *smtp.ServerInfo) (proto string, toServer [
 }
 
 func (l *loginauth) Next(fromServer []byte, more bool) (toServer []byte, err error) {
+	if !more {
+		return nil, nil
+	}
+
 	prompt := strings.TrimSpace(string(fromServer))
 	switch prompt {
 	case "Username:":
