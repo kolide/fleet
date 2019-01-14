@@ -15,11 +15,11 @@ class KolideAce extends Component {
   static propTypes = {
     error: PropTypes.string,
     fontSize: PropTypes.number,
-    handleSubmit: PropTypes.func,
+    handleSubmit: PropTypes.func.isRequired,
     label: PropTypes.string,
     name: PropTypes.string,
-    onChange: PropTypes.func,
-    onLoad: PropTypes.func,
+    onChange: PropTypes.func.isRequired,
+    onLoad: PropTypes.func.isRequired,
     value: PropTypes.string,
     readOnly: PropTypes.bool,
     showGutter: PropTypes.bool,
@@ -91,7 +91,7 @@ class KolideAce extends Component {
           commands={[{
             name: 'commandName',
             bindKey: { win: 'Ctrl-Enter', mac: 'Ctrl-Enter' },
-            exec: () => { handleSubmit && handleSubmit(); },
+            exec: handleSubmit,
           }]}
         />
       </div>
