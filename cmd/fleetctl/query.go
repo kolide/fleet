@@ -161,13 +161,17 @@ func queryCommand() cli.Command {
 					if total == responded {
 						s.Stop()
 						if !flQuiet {
-							fmt.Fprintf(os.Stderr, msg+"\n")
+							fmt.Fprintln(os.Stderr, msg)
 						}
 						return nil
 					}
 
 				// Check for timeout expiring
 				case <-timeoutChan:
+					s.Stop()
+					if !flQuiet {
+						fmt.Fprintln(os.Stderr, s.Suffix+"\nStopped by timeout")
+					}
 					return nil
 				}
 			}
