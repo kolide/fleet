@@ -54,9 +54,9 @@ Osquery requires that all communication between the agent and Fleet are over a s
 
 This error usually indicates that the Fleet server has run out of file descriptors. Fix this by increasing the `ulimit` on the Fleet process. See the `LimitNOFILE` setting in the [example systemd unit file](./systemd.md) for an example of how to do this with systemd.
 
-## The UI constantly logs me out with 500 errors, or logs indicate "too many connections". How do I fix this?
+## I upgraded my database, but Fleet is still running slowly. What could be going on?
 
-This usually results from a mismatched connection limit between the Fleet server and the MySQL server. First [determine how many open connections your MySQL server supports](https://dev.mysql.com/doc/refman/8.0/en/too-many-connections.html). Now set the [`--mysql_max_open_conns`](./configuring-the-fleet-binary.md#mysql_max_open_conns) and [`--mysql_max_idle_conns`](./configuring-the-fleet-binary.md#mysql_max_idle_conns) flags appropriately.
+This could be caused by a mismatched connection limit between the Fleet server and the MySQL server that prevents Fleet from fully utilizing the database. First [determine how many open connections your MySQL server supports](https://dev.mysql.com/doc/refman/8.0/en/too-many-connections.html). Now set the [`--mysql_max_open_conns`](./configuring-the-fleet-binary.md#mysql_max_open_conns) and [`--mysql_max_idle_conns`](./configuring-the-fleet-binary.md#mysql_max_idle_conns) flags appropriately.
 
 ## How do I monitor a Fleet server?
 
