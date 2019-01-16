@@ -1,5 +1,11 @@
 # FAQ for using/operating Fleet
 
+## Can multiple instances of the Fleet server be run behind a load-balancer?
+
+Yes. Fleet scales horizontally out of the box as long as all of the Fleet servers are connected to the same MySQL and Redis instances.
+
+Note that osquery logs will be distributed across the Fleet servers.
+
 ## Where are my query results?
 
 ### Live Queries
@@ -44,8 +50,32 @@ Osquery requires that all communication between the agent and Fleet are over a s
 - Is Fleet behind a load-balancer? Ensure that if the load-balancer is terminating TLS that this is the certificate provided to osquery.
 - Does the certificate verify with `curl`? Try `curl -v -X POST https://kolideserver:port/api/v1/osquery/enroll`.
 
+## What do I do about "too many open files" errors?
+
+This error usually indicates that the Fleet server has run out of file descriptors. Fix this by increasing the `ulimit` on the Fleet process. See the `LimitNOFILE` setting in the [example systemd unit file](./systemd.md) for an example of how to do this with systemd.
+
+## The UI constantly logs me out with 500 errors, or logs indicate "too many connections". How do I fix this?
+
+This usually results in a mismatched connection limit between the Fleet server and the MySQL server. First [determine how many open connections your MySQL server supports](https://dev.mysql.com/doc/refman/8.0/en/too-many-connections.html). Now set the [`--mysql_max_open_conns`](./configuring-the-fleet-binary.md#mysql_max_open_conns) and [`--mysql_max_idle_conns`](./configuring-the-fleet-binary.md#mysql_max_idle_conns) flags appropriately.
+
+## How do I monitor a Fleet server?
+
+Fleet provides a `/healthz` endpoint. If you query it with `curl` it will return an HTTP Status code. `200 OK` means everything is alright. `500 Internal Server Error` means Fleet is having trouble communicating with mysql or redis. Check the Fleet logs for additional details.
+
+The `/metrics` endpoint exposes data ready to be ingested by Prometheus.
+
 ## Why is the "Add User" button disabled?
 
 The "Add User" button is disabled if SMTP (email) has not been configured for the Fleet server. Currently, there is no way to add new users without email capabilities.
 
 One way to hack around this is to use a simulated mailserver like [Mailhog](https://github.com/mailhog/MailHog). You can retrieve the email that was "sent" in the Mailhog UI, and provide users with the invite URL manually.
+
+## Is Fleet available as a SaaS product?
+
+Kolide does not host a SaaS version of Fleet. We offer [Kolide Cloud](https://kolide.com) which is a separate product providing the capabilities of Fleet along with alerting and insights, all hosted in a secure SaaS platform.
+
+## How do I get support for working with Fleet?
+
+For bug reports, please use the [Github issue tracker](https://github.com/kolide/fleet/issues).
+
+For questions and discussion, please join us in the #kolide channel of [osquery Slack](https://osquery-slack.herokuapp.com/).
