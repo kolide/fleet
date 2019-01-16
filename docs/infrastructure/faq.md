@@ -56,11 +56,11 @@ This error usually indicates that the Fleet server has run out of file descripto
 
 ## The UI constantly logs me out with 500 errors, or logs indicate "too many connections". How do I fix this?
 
-This usually results in a mismatched connection limit between the Fleet server and the MySQL server. First [determine how many open connections your MySQL server supports](https://dev.mysql.com/doc/refman/8.0/en/too-many-connections.html). Now set the [`--mysql_max_open_conns`](./configuring-the-fleet-binary.md#mysql_max_open_conns) and [`--mysql_max_idle_conns`](./configuring-the-fleet-binary.md#mysql_max_idle_conns) flags appropriately.
+This usually results from a mismatched connection limit between the Fleet server and the MySQL server. First [determine how many open connections your MySQL server supports](https://dev.mysql.com/doc/refman/8.0/en/too-many-connections.html). Now set the [`--mysql_max_open_conns`](./configuring-the-fleet-binary.md#mysql_max_open_conns) and [`--mysql_max_idle_conns`](./configuring-the-fleet-binary.md#mysql_max_idle_conns) flags appropriately.
 
 ## How do I monitor a Fleet server?
 
-Fleet provides a `/healthz` endpoint. If you query it with `curl` it will return an HTTP Status code. `200 OK` means everything is alright. `500 Internal Server Error` means Fleet is having trouble communicating with mysql or redis. Check the Fleet logs for additional details.
+Fleet provides a `/healthz` endpoint. If you query it with `curl` it will return an HTTP Status code. `200 OK` means everything is alright. `500 Internal Server Error` means Fleet is having trouble communicating with MySQL or Redis. Check the Fleet logs for additional details.
 
 The `/metrics` endpoint exposes data ready to be ingested by Prometheus.
 
