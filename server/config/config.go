@@ -86,6 +86,13 @@ type LoggingConfig struct {
 	DisableBanner bool `yaml:"disable_banner"`
 }
 
+// AwsConfig defines configs related to AWS services
+type AwsConfig struct {
+	Region          string
+	AccessKeyID     string `yaml:"access_key_id"`
+	SecretAccessKey string `yaml:"secret_access_key"`
+}
+
 // KolideConfig stores the application configuration. Each subcategory is
 // broken up into it's own struct, defined above. When editing any of these
 // structs, Manager.addConfigs and Manager.LoadConfig should be
@@ -99,6 +106,7 @@ type KolideConfig struct {
 	Session SessionConfig
 	Osquery OsqueryConfig
 	Logging LoggingConfig
+	Aws     AwsConfig
 }
 
 // addConfigs adds the configuration keys and default values that will be
@@ -186,6 +194,11 @@ func (man Manager) addConfigs() {
 		"Log in JSON format")
 	man.addConfigBool("logging.disable_banner", false,
 		"Disable startup banner")
+
+	// AWS
+	man.addConfigString("aws.region", "", "AWS Region to use")
+	man.addConfigString("aws.access_key_id", "", "Access Key ID for AWS authentication")
+	man.addConfigString("aws.secret_access_key", "", "Secret Access Key for AWS authentication")
 }
 
 // LoadConfig will load the config variables into a fully initialized
@@ -242,6 +255,11 @@ func (man Manager) LoadConfig() KolideConfig {
 			Debug:         man.getConfigBool("logging.debug"),
 			JSON:          man.getConfigBool("logging.json"),
 			DisableBanner: man.getConfigBool("logging.disable_banner"),
+		},
+		Aws: AwsConfig{
+			Region:          man.getConfigString("aws.region"),
+			AccessKeyID:     man.getConfigString("aws.access_key_id"),
+			SecretAccessKey: man.getConfigString("aws.secret_access_key"),
 		},
 	}
 }
