@@ -14,7 +14,7 @@ import (
 	kitlog "github.com/go-kit/kit/log"
 	"github.com/kolide/fleet/server/config"
 	"github.com/kolide/fleet/server/kolide"
-	"github.com/kolide/fleet/server/logwriter"
+	"github.com/kolide/fleet/server/logging"
 	"github.com/kolide/fleet/server/sso"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
@@ -77,7 +77,7 @@ func osqueryLogFile(path string, appLogger kitlog.Logger, enableRotation bool) (
 		return osquerydLogger, nil
 	}
 	// no log rotation
-	return logwriter.New(path)
+	return logging.NewFilesystemLogWriter(path)
 }
 
 type service struct {

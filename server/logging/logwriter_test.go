@@ -1,4 +1,4 @@
-package logwriter
+package logging
 
 import (
 	"crypto/rand"
@@ -15,8 +15,8 @@ import (
 func TestLogger(t *testing.T) {
 	tempPath, err := ioutil.TempDir("", "test")
 	require.Nil(t, err)
-	fileName := path.Join(tempPath, "logwriter")
-	lgr, err := New(fileName)
+	fileName := path.Join(tempPath, "filesystemLogWriter")
+	lgr, err := NewFilesystemLogWriter(fileName)
 	require.Nil(t, err)
 	defer os.Remove(fileName)
 
@@ -51,8 +51,8 @@ func BenchmarkLogger(b *testing.B) {
 	if err != nil {
 		b.Fatal("temp dir failed", err)
 	}
-	fileName := path.Join(tempPath, "logwriter")
-	lgr, err := New(fileName)
+	fileName := path.Join(tempPath, "filesystemLogWriter")
+	lgr, err := NewFilesystemLogWriter(fileName)
 	if err != nil {
 		b.Fatal("new failed ", err)
 	}

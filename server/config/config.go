@@ -73,8 +73,12 @@ type SessionConfig struct {
 // OsqueryConfig defines configs related to osquery
 type OsqueryConfig struct {
 	NodeKeySize         int           `yaml:"node_key_size"`
+	StatusLogPlugin     string        `yaml:"status_log_plugin"`
+	ResultLogPlugin     string        `yaml:"result_log_plugin"`
 	StatusLogFile       string        `yaml:"status_log_file"`
 	ResultLogFile       string        `yaml:"result_log_file"`
+	StatusLogStream     string        `yaml:"status_log_stream"`
+	ResultLogStream     string        `yaml:"result_log_stream"`
 	EnableLogRotation   bool          `yaml:"enable_log_rotation"`
 	LabelUpdateInterval time.Duration `yaml:"label_update_interval"`
 }
@@ -178,10 +182,18 @@ func (man Manager) addConfigs() {
 	// Osquery
 	man.addConfigInt("osquery.node_key_size", 24,
 		"Size of generated osqueryd node keys")
+	man.addConfigString("osquery.status_log_plugin", "filesystem",
+		"Log plugin to use for status logs")
+	man.addConfigString("osquery.result_log_plugin", "filesystem",
+		"Log plugin to use for result logs")
 	man.addConfigString("osquery.status_log_file", "/tmp/osquery_status",
 		"Path for osqueryd status logs")
 	man.addConfigString("osquery.result_log_file", "/tmp/osquery_result",
 		"Path for osqueryd result logs")
+	man.addConfigString("osquery.status_log_stream", "",
+		"Kinesis stream name for status logs")
+	man.addConfigString("osquery.result_log_stream", "",
+		"Kinesis stream name for result logs")
 	man.addConfigDuration("osquery.label_update_interval", 1*time.Hour,
 		"Interval to update host label membership (i.e. 1h)")
 	man.addConfigBool("osquery.enable_log_rotation", false,
@@ -246,8 +258,12 @@ func (man Manager) LoadConfig() KolideConfig {
 		},
 		Osquery: OsqueryConfig{
 			NodeKeySize:         man.getConfigInt("osquery.node_key_size"),
+			StatusLogPlugin:     man.getConfigString("osquery.status_log_plugin"),
+			ResultLogPlugin:     man.getConfigString("osquery.result_log_plugin"),
 			StatusLogFile:       man.getConfigString("osquery.status_log_file"),
 			ResultLogFile:       man.getConfigString("osquery.result_log_file"),
+			StatusLogStream:     man.getConfigString("osquery.status_log_stream"),
+			ResultLogStream:     man.getConfigString("osquery.result_log_stream"),
 			LabelUpdateInterval: man.getConfigDuration("osquery.label_update_interval"),
 			EnableLogRotation:   man.getConfigBool("osquery.enable_log_rotation"),
 		},

@@ -203,9 +203,8 @@ func (svc service) SubmitStatusLogs(ctx context.Context, logs []json.RawMessage)
 		}
 	}
 	if writer, ok := svc.osqueryStatusLogWriter.(flusher); ok {
-		err := writer.Flush()
-		if err != nil {
-			return osqueryError{message: "error flushing status log: " + err.Error()}
+		if err := writer.Flush(); err != nil {
+			return osqueryError{message: "error flushing status logs: " + err.Error()}
 		}
 	}
 	return nil
@@ -218,9 +217,8 @@ func (svc service) SubmitResultLogs(ctx context.Context, logs []json.RawMessage)
 		}
 	}
 	if writer, ok := svc.osqueryResultLogWriter.(flusher); ok {
-		err := writer.Flush()
-		if err != nil {
-			return osqueryError{message: "error flushing status log: " + err.Error()}
+		if err := writer.Flush(); err != nil {
+			return osqueryError{message: "error flushing result logs: " + err.Error()}
 		}
 	}
 	return nil
