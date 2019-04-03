@@ -37,10 +37,32 @@ func NewFirehoseLogWriter(region, id, secret, stream string) (*firehoseLogWriter
 		Region:      &region,
 	})
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "create Firehose client")
 	}
 	client := firehose.New(sess)
-	return &firehoseLogWriter{client, stream}, nil
+
+	f := &firehoseLogWriter{client, stream}
+	if err := f.validateStream(); err != nil {
+		return nil, errors.Wrap(err, "create Firehose writer")
+	}
+	return f, nil
+}
+
+func (f *firehoseLogWriter) validateStream() error {
+	out, err := f.client.DescribeDeliveryStream(
+		&firehose.DescribeDeliveryStreamInput{
+			DeliveryStreamName: &f.stream,
+		},
+	)
+	if err != nil {
+		return errors.Wrapf(err, "describe stream %s", f.stream)
+	}
+
+	if (*(*out.DeliveryStreamDescription).DeliveryStreamStatus) != firehose.DeliveryStreamStatusActive {
+		return errors.Errorf("delivery stream %s not active", f.stream)
+	}
+
+	return nil
 }
 
 func (f *firehoseLogWriter) Write(logs []json.RawMessage) error {

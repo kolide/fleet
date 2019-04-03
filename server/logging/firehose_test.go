@@ -223,3 +223,47 @@ func TestFirehoseSplitBatchByCount(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, 4, callCount)
 }
+
+func TestFirehoseValidateStreamActive(t *testing.T) {
+	describeFunc := func(input *firehose.DescribeDeliveryStreamInput) (*firehose.DescribeDeliveryStreamOutput, error) {
+		assert.Equal(t, "test", *input.DeliveryStreamName)
+		return &firehose.DescribeDeliveryStreamOutput{
+			DeliveryStreamDescription: &firehose.DeliveryStreamDescription{
+				DeliveryStreamStatus: aws.String(firehose.DeliveryStreamStatusActive),
+			},
+		}, nil
+	}
+	f := &mock.FirehoseMock{DescribeDeliveryStreamFunc: describeFunc}
+	writer := makeFirehoseWriterWithMock(f, "test")
+	err := writer.validateStream()
+	assert.NoError(t, err)
+	assert.True(t, f.DescribeDeliveryStreamFuncInvoked)
+}
+
+func TestFirehoseValidateStreamNotActive(t *testing.T) {
+	describeFunc := func(input *firehose.DescribeDeliveryStreamInput) (*firehose.DescribeDeliveryStreamOutput, error) {
+		assert.Equal(t, "test", *input.DeliveryStreamName)
+		return &firehose.DescribeDeliveryStreamOutput{
+			DeliveryStreamDescription: &firehose.DeliveryStreamDescription{
+				DeliveryStreamStatus: aws.String(firehose.DeliveryStreamStatusCreating),
+			},
+		}, nil
+	}
+	f := &mock.FirehoseMock{DescribeDeliveryStreamFunc: describeFunc}
+	writer := makeFirehoseWriterWithMock(f, "test")
+	err := writer.validateStream()
+	assert.Error(t, err)
+	assert.True(t, f.DescribeDeliveryStreamFuncInvoked)
+}
+
+func TestFirehoseValidateStreamError(t *testing.T) {
+	describeFunc := func(input *firehose.DescribeDeliveryStreamInput) (*firehose.DescribeDeliveryStreamOutput, error) {
+		assert.Equal(t, "test", *input.DeliveryStreamName)
+		return nil, errors.New("boom!")
+	}
+	f := &mock.FirehoseMock{DescribeDeliveryStreamFunc: describeFunc}
+	writer := makeFirehoseWriterWithMock(f, "test")
+	err := writer.validateStream()
+	assert.Error(t, err)
+	assert.True(t, f.DescribeDeliveryStreamFuncInvoked)
+}
