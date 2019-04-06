@@ -75,6 +75,11 @@ func (f *firehoseLogWriter) Write(logs []json.RawMessage) error {
 	var records []*firehose.Record
 	totalBytes := 0
 	for _, log := range logs {
+		// We don't really have a good option for what to do with logs
+		// that are too big for Firehose. This behavior is consistent
+		// with osquery's behavior in the Firehose logger plugin, and
+		// the beginning bytes of the log should help the Fleet admin
+		// diagnose the query generating huge results.
 		if len(log) > firehoseMaxSizeOfRecord {
 			level.Info(f.logger).Log(
 				"msg", "dropping log over 1MB Firehose limit",
@@ -84,6 +89,10 @@ func (f *firehoseLogWriter) Write(logs []json.RawMessage) error {
 			continue
 		}
 
+		// If adding this log will exceed the limit on number of
+		// records in the batch, or the limit on total size of the
+		// records in the batch, we need to push this batch before
+		// adding any more.
 		if len(records) >= firehoseMaxRecordsInBatch ||
 			totalBytes+len(log) >= firehoseMaxSizeOfBatch {
 			if err := f.putRecordBatch(0, records); err != nil {
@@ -92,9 +101,12 @@ func (f *firehoseLogWriter) Write(logs []json.RawMessage) error {
 			totalBytes = 0
 			records = nil
 		}
+
 		records = append(records, &firehose.Record{Data: []byte(log)})
 		totalBytes += len(log)
 	}
+
+	// Push the final batch
 	if len(records) > 0 {
 		if err := f.putRecordBatch(0, records); err != nil {
 			return errors.Wrap(err, "put records")
