@@ -39,6 +39,7 @@ func New(config config.KolideConfig, logger log.Logger) (*OsqueryLogger, error) 
 			config.Aws.AccessKeyID,
 			config.Aws.SecretAccessKey,
 			config.Firehose.StatusStream,
+			logger,
 		)
 		if err != nil {
 			return nil, errors.Wrap(err, "create firehose status logger")
@@ -69,6 +70,7 @@ func New(config config.KolideConfig, logger log.Logger) (*OsqueryLogger, error) 
 			config.Aws.AccessKeyID,
 			config.Aws.SecretAccessKey,
 			config.Firehose.ResultStream,
+			logger,
 		)
 		if err != nil {
 			return nil, errors.Wrap(err, "create firehose result logger")

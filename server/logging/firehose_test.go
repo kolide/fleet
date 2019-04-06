@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/firehose"
 	"github.com/aws/aws-sdk-go/service/firehose/firehoseiface"
+	"github.com/go-kit/kit/log"
 	"github.com/kolide/fleet/server/logging/mock"
 	"github.com/stretchr/testify/assert"
 )
@@ -25,6 +26,7 @@ func makeFirehoseWriterWithMock(client firehoseiface.FirehoseAPI, stream string)
 	return &firehoseLogWriter{
 		client: client,
 		stream: stream,
+		logger: log.NewNopLogger(),
 	}
 }
 
@@ -55,13 +57,19 @@ func TestFirehoseRetryableFailure(t *testing.T) {
 		callCount += 1
 		assert.Equal(t, logs, getLogsFromInput(input))
 		assert.Equal(t, "foobar", *input.DeliveryStreamName)
-		return nil, awserr.New(firehose.ErrCodeServiceUnavailableException, "", nil)
+		if callCount < 3 {
+			return nil, awserr.New(firehose.ErrCodeServiceUnavailableException, "", nil)
+		} else {
+			// Returning a non-retryable error earlier helps keep
+			// this test faster
+			return nil, errors.New("generic error")
+		}
 	}
 	f := &mock.FirehoseMock{PutRecordBatchFunc: putFunc}
 	writer := makeFirehoseWriterWithMock(f, "foobar")
 	err := writer.Write(logs)
 	assert.Error(t, err)
-	assert.Equal(t, 4, callCount)
+	assert.Equal(t, 3, callCount)
 }
 
 func TestFirehoseNormalPut(t *testing.T) {
@@ -144,26 +152,32 @@ func TestFirehoseFailAllRecords(t *testing.T) {
 	f.PutRecordBatchFunc = func(input *firehose.PutRecordBatchInput) (*firehose.PutRecordBatchOutput, error) {
 		callCount += 1
 		assert.Equal(t, logs, getLogsFromInput(input))
-		return &firehose.PutRecordBatchOutput{
-			FailedPutCount: aws.Int64(1),
-			RequestResponses: []*firehose.PutRecordBatchResponseEntry{
-				&firehose.PutRecordBatchResponseEntry{
-					ErrorCode: aws.String("error"),
+		if callCount < 3 {
+			return &firehose.PutRecordBatchOutput{
+				FailedPutCount: aws.Int64(1),
+				RequestResponses: []*firehose.PutRecordBatchResponseEntry{
+					&firehose.PutRecordBatchResponseEntry{
+						ErrorCode: aws.String("error"),
+					},
+					&firehose.PutRecordBatchResponseEntry{
+						ErrorCode: aws.String("error"),
+					},
+					&firehose.PutRecordBatchResponseEntry{
+						ErrorCode: aws.String("error"),
+					},
 				},
-				&firehose.PutRecordBatchResponseEntry{
-					ErrorCode: aws.String("error"),
-				},
-				&firehose.PutRecordBatchResponseEntry{
-					ErrorCode: aws.String("error"),
-				},
-			},
-		}, nil
+			}, nil
+		} else {
+			// Make test quicker by returning non-retryable error
+			// before all retries are exhausted.
+			return nil, errors.New("generic error")
+		}
 	}
 
 	writer := makeFirehoseWriterWithMock(f, "foobar")
 	err := writer.Write(logs)
 	assert.Error(t, err)
-	assert.Equal(t, 4, callCount)
+	assert.Equal(t, 3, callCount)
 }
 
 func TestFirehoseRecordTooBig(t *testing.T) {

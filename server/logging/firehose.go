@@ -2,7 +2,6 @@ package logging
 
 import (
 	"encoding/json"
-	"fmt"
 	"math"
 	"time"
 
@@ -12,6 +11,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/firehose"
 	"github.com/aws/aws-sdk-go/service/firehose/firehoseiface"
+	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/log/level"
 	"github.com/pkg/errors"
 )
 
@@ -29,9 +30,10 @@ const (
 type firehoseLogWriter struct {
 	client firehoseiface.FirehoseAPI
 	stream string
+	logger log.Logger
 }
 
-func NewFirehoseLogWriter(region, id, secret, stream string) (*firehoseLogWriter, error) {
+func NewFirehoseLogWriter(region, id, secret, stream string, logger log.Logger) (*firehoseLogWriter, error) {
 	sess, err := session.NewSession(&aws.Config{
 		Credentials: credentials.NewStaticCredentials(id, secret, ""),
 		Region:      &region,
@@ -41,7 +43,11 @@ func NewFirehoseLogWriter(region, id, secret, stream string) (*firehoseLogWriter
 	}
 	client := firehose.New(sess)
 
-	f := &firehoseLogWriter{client, stream}
+	f := &firehoseLogWriter{
+		client: client,
+		stream: stream,
+		logger: logger,
+	}
 	if err := f.validateStream(); err != nil {
 		return nil, errors.Wrap(err, "create Firehose writer")
 	}
@@ -70,8 +76,11 @@ func (f *firehoseLogWriter) Write(logs []json.RawMessage) error {
 	totalBytes := 0
 	for _, log := range logs {
 		if len(log) > firehoseMaxSizeOfRecord {
-			// TODO zwass: better logging
-			fmt.Println("too big!")
+			level.Info(f.logger).Log(
+				"msg", "dropping log over 1MB Firehose limit",
+				"size", len(log),
+				"log", string(log[:100])+"...",
+			)
 			continue
 		}
 
