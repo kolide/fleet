@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	firehoseMaxRetries = 3
+	firehoseMaxRetries = 8
 
 	// See
 	// https://docs.aws.amazon.com/sdk-for-go/api/service/firehose/#Firehose.PutRecordBatch

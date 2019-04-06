@@ -75,12 +75,10 @@ type OsqueryConfig struct {
 	NodeKeySize         int           `yaml:"node_key_size"`
 	StatusLogPlugin     string        `yaml:"status_log_plugin"`
 	ResultLogPlugin     string        `yaml:"result_log_plugin"`
+	LabelUpdateInterval time.Duration `yaml:"label_update_interval"`
 	StatusLogFile       string        `yaml:"status_log_file"`
 	ResultLogFile       string        `yaml:"result_log_file"`
-	StatusLogStream     string        `yaml:"status_log_stream"`
-	ResultLogStream     string        `yaml:"result_log_stream"`
 	EnableLogRotation   bool          `yaml:"enable_log_rotation"`
-	LabelUpdateInterval time.Duration `yaml:"label_update_interval"`
 }
 
 // LoggingConfig defines configs related to logging
@@ -97,20 +95,35 @@ type AwsConfig struct {
 	SecretAccessKey string `yaml:"secret_access_key"`
 }
 
+// FirehoseConfig defines configs for the Firehose logging plugin
+type FirehoseConfig struct {
+	StatusStream string `yaml:"status_stream"`
+	ResultStream string `yaml:"result_stream"`
+}
+
+// FilesystemConfig defines configs for the Filesystem logging plugin
+type FilesystemConfig struct {
+	StatusLogFile     string `yaml:"status_log_file"`
+	ResultLogFile     string `yaml:"result_log_file"`
+	EnableLogRotation bool   `yaml:"enable_log_rotation"`
+}
+
 // KolideConfig stores the application configuration. Each subcategory is
 // broken up into it's own struct, defined above. When editing any of these
 // structs, Manager.addConfigs and Manager.LoadConfig should be
 // updated to set and retrieve the configurations as appropriate.
 type KolideConfig struct {
-	Mysql   MysqlConfig
-	Redis   RedisConfig
-	Server  ServerConfig
-	Auth    AuthConfig
-	App     AppConfig
-	Session SessionConfig
-	Osquery OsqueryConfig
-	Logging LoggingConfig
-	Aws     AwsConfig
+	Mysql      MysqlConfig
+	Redis      RedisConfig
+	Server     ServerConfig
+	Auth       AuthConfig
+	App        AppConfig
+	Session    SessionConfig
+	Osquery    OsqueryConfig
+	Logging    LoggingConfig
+	Aws        AwsConfig
+	Firehose   FirehoseConfig
+	Filesystem FilesystemConfig
 }
 
 // addConfigs adds the configuration keys and default values that will be
@@ -186,18 +199,14 @@ func (man Manager) addConfigs() {
 		"Log plugin to use for status logs")
 	man.addConfigString("osquery.result_log_plugin", "filesystem",
 		"Log plugin to use for result logs")
-	man.addConfigString("osquery.status_log_file", "/tmp/osquery_status",
-		"Path for osqueryd status logs")
-	man.addConfigString("osquery.result_log_file", "/tmp/osquery_result",
-		"Path for osqueryd result logs")
-	man.addConfigString("osquery.status_log_stream", "",
-		"Kinesis stream name for status logs")
-	man.addConfigString("osquery.result_log_stream", "",
-		"Kinesis stream name for result logs")
 	man.addConfigDuration("osquery.label_update_interval", 1*time.Hour,
 		"Interval to update host label membership (i.e. 1h)")
+	man.addConfigString("osquery.status_log_file", "",
+		"(DEPRECATED -- Use filesystem.status_log_file) Path for osqueryd status logs")
+	man.addConfigString("osquery.result_log_file", "",
+		"(DEPRECATED -- Use filesystem.result_log_file) Path for osqueryd result logs")
 	man.addConfigBool("osquery.enable_log_rotation", false,
-		"Osquery log files will be automatically rotated")
+		"(DEPRECATED -- Use filesystem.enable_log_rotation) Enable automatic rotation for osquery log files")
 
 	// Logging
 	man.addConfigBool("logging.debug", false,
@@ -211,6 +220,20 @@ func (man Manager) addConfigs() {
 	man.addConfigString("aws.region", "", "AWS Region to use")
 	man.addConfigString("aws.access_key_id", "", "Access Key ID for AWS authentication")
 	man.addConfigString("aws.secret_access_key", "", "Secret Access Key for AWS authentication")
+
+	// Firehose
+	man.addConfigString("firehose.status_stream", "",
+		"Firehose stream name for status logs")
+	man.addConfigString("firehose.result_stream", "",
+		"Firehose stream name for result logs")
+
+	// Filesystem
+	man.addConfigString("filesystem.status_log_file", "/tmp/osquery_status",
+		"Log file path to use for status logs")
+	man.addConfigString("filesystem.result_log_file", "/tmp/osquery_result",
+		"Log file path to use for result logs")
+	man.addConfigBool("filesystem.enable_log_rotation", false,
+		"Enable automatic rotation for osquery log files")
 }
 
 // LoadConfig will load the config variables into a fully initialized
@@ -262,8 +285,6 @@ func (man Manager) LoadConfig() KolideConfig {
 			ResultLogPlugin:     man.getConfigString("osquery.result_log_plugin"),
 			StatusLogFile:       man.getConfigString("osquery.status_log_file"),
 			ResultLogFile:       man.getConfigString("osquery.result_log_file"),
-			StatusLogStream:     man.getConfigString("osquery.status_log_stream"),
-			ResultLogStream:     man.getConfigString("osquery.result_log_stream"),
 			LabelUpdateInterval: man.getConfigDuration("osquery.label_update_interval"),
 			EnableLogRotation:   man.getConfigBool("osquery.enable_log_rotation"),
 		},
@@ -276,6 +297,15 @@ func (man Manager) LoadConfig() KolideConfig {
 			Region:          man.getConfigString("aws.region"),
 			AccessKeyID:     man.getConfigString("aws.access_key_id"),
 			SecretAccessKey: man.getConfigString("aws.secret_access_key"),
+		},
+		Firehose: FirehoseConfig{
+			StatusStream: man.getConfigString("firehose.status_stream"),
+			ResultStream: man.getConfigString("firehose.result_stream"),
+		},
+		Filesystem: FilesystemConfig{
+			StatusLogFile:     man.getConfigString("filesystem.status_log_file"),
+			ResultLogFile:     man.getConfigString("filesystem.result_log_file"),
+			EnableLogRotation: man.getConfigBool("filesystem.enable_log_rotation"),
 		},
 	}
 }
@@ -491,13 +521,17 @@ func TestConfig() KolideConfig {
 		},
 		Osquery: OsqueryConfig{
 			NodeKeySize:         24,
-			StatusLogFile:       "/dev/null",
-			ResultLogFile:       "/dev/null",
+			StatusLogPlugin:     "filesystem",
+			ResultLogPlugin:     "filesystem",
 			LabelUpdateInterval: 1 * time.Hour,
 		},
 		Logging: LoggingConfig{
 			Debug:         true,
 			DisableBanner: true,
+		},
+		Filesystem: FilesystemConfig{
+			StatusLogFile: "/dev/null",
+			ResultLogFile: "/dev/null",
 		},
 	}
 }

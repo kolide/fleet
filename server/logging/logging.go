@@ -26,9 +26,9 @@ func New(config config.KolideConfig, logger log.Logger) (*OsqueryLogger, error) 
 		fallthrough
 	case "filesystem":
 		status, err = NewFilesystemLogWriter(
-			config.Osquery.StatusLogFile,
+			config.Filesystem.StatusLogFile,
 			logger,
-			config.Osquery.EnableLogRotation,
+			config.Filesystem.EnableLogRotation,
 		)
 		if err != nil {
 			return nil, errors.Wrap(err, "create filesystem status logger")
@@ -38,7 +38,7 @@ func New(config config.KolideConfig, logger log.Logger) (*OsqueryLogger, error) 
 			config.Aws.Region,
 			config.Aws.AccessKeyID,
 			config.Aws.SecretAccessKey,
-			config.Osquery.StatusLogStream,
+			config.Firehose.StatusStream,
 		)
 		if err != nil {
 			return nil, errors.Wrap(err, "create firehose status logger")
@@ -56,9 +56,9 @@ func New(config config.KolideConfig, logger log.Logger) (*OsqueryLogger, error) 
 		fallthrough
 	case "filesystem":
 		result, err = NewFilesystemLogWriter(
-			config.Osquery.ResultLogFile,
+			config.Filesystem.ResultLogFile,
 			logger,
-			config.Osquery.EnableLogRotation,
+			config.Filesystem.EnableLogRotation,
 		)
 		if err != nil {
 			return nil, errors.Wrap(err, "create filesystem result logger")
@@ -68,7 +68,7 @@ func New(config config.KolideConfig, logger log.Logger) (*OsqueryLogger, error) 
 			config.Aws.Region,
 			config.Aws.AccessKeyID,
 			config.Aws.SecretAccessKey,
-			config.Osquery.ResultLogStream,
+			config.Firehose.ResultStream,
 		)
 		if err != nil {
 			return nil, errors.Wrap(err, "create firehose result logger")
