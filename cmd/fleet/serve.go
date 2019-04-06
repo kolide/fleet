@@ -70,21 +70,21 @@ the way that the Fleet server works.
 
 			if config.Osquery.StatusLogFile != "" {
 				level.Info(logger).Log(
-					"DEPRECATED", "osquery.status_log_file has been deprecated. Please migrate configurations to use filesystem.status_log_file.",
+					"DEPRECATED", "use filesystem.status_log_file.",
 					"msg", "using osquery.status_log_file value for filesystem.status_log_file",
 				)
 				config.Filesystem.StatusLogFile = config.Osquery.StatusLogFile
 			}
 			if config.Osquery.ResultLogFile != "" {
 				level.Info(logger).Log(
-					"DEPRECATED", "osquery.result_log_file has been deprecated. Please migrate configurations to use filesystem.result_log_file.",
+					"DEPRECATED", "use filesystem.result_log_file.",
 					"msg", "using osquery.result_log_file value for filesystem.result_log_file",
 				)
 				config.Filesystem.ResultLogFile = config.Osquery.ResultLogFile
 			}
 			if config.Osquery.EnableLogRotation != false {
 				level.Info(logger).Log(
-					"DEPRECATED", "osquery.enable_log_rotation has been deprecated. Please migrate configurations to use filesystem.enable_log_rotation.",
+					"DEPRECATED", "use filesystem.enable_log_rotation.",
 					"msg", "using osquery.enable_log_rotation value for filesystem.result_log_file",
 				)
 				config.Filesystem.EnableLogRotation = config.Osquery.EnableLogRotation

@@ -202,11 +202,11 @@ func (man Manager) addConfigs() {
 	man.addConfigDuration("osquery.label_update_interval", 1*time.Hour,
 		"Interval to update host label membership (i.e. 1h)")
 	man.addConfigString("osquery.status_log_file", "",
-		"(DEPRECATED -- Use filesystem.status_log_file) Path for osqueryd status logs")
+		"(DEPRECATED: Use filesystem.status_log_file) Path for osqueryd status logs")
 	man.addConfigString("osquery.result_log_file", "",
-		"(DEPRECATED -- Use filesystem.result_log_file) Path for osqueryd result logs")
+		"(DEPRECATED: Use filesystem.result_log_file) Path for osqueryd result logs")
 	man.addConfigBool("osquery.enable_log_rotation", false,
-		"(DEPRECATED -- Use filesystem.enable_log_rotation) Enable automatic rotation for osquery log files")
+		"(DEPRECATED: Use filesystem.enable_log_rotation) Enable automatic rotation for osquery log files")
 
 	// Logging
 	man.addConfigBool("logging.debug", false,
