@@ -35,9 +35,9 @@ func New(config config.KolideConfig, logger log.Logger) (*OsqueryLogger, error) 
 		}
 	case "firehose":
 		status, err = NewFirehoseLogWriter(
-			config.Aws.Region,
-			config.Aws.AccessKeyID,
-			config.Aws.SecretAccessKey,
+			config.Firehose.Region,
+			config.Firehose.AccessKeyID,
+			config.Firehose.SecretAccessKey,
 			config.Firehose.StatusStream,
 			logger,
 		)
@@ -66,9 +66,9 @@ func New(config config.KolideConfig, logger log.Logger) (*OsqueryLogger, error) 
 		}
 	case "firehose":
 		result, err = NewFirehoseLogWriter(
-			config.Aws.Region,
-			config.Aws.AccessKeyID,
-			config.Aws.SecretAccessKey,
+			config.Firehose.Region,
+			config.Firehose.AccessKeyID,
+			config.Firehose.SecretAccessKey,
 			config.Firehose.ResultStream,
 			logger,
 		)

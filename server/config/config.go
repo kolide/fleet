@@ -88,17 +88,13 @@ type LoggingConfig struct {
 	DisableBanner bool `yaml:"disable_banner"`
 }
 
-// AwsConfig defines configs related to AWS services
-type AwsConfig struct {
+// FirehoseConfig defines configs for the AWS Firehose logging plugin
+type FirehoseConfig struct {
 	Region          string
 	AccessKeyID     string `yaml:"access_key_id"`
 	SecretAccessKey string `yaml:"secret_access_key"`
-}
-
-// FirehoseConfig defines configs for the Firehose logging plugin
-type FirehoseConfig struct {
-	StatusStream string `yaml:"status_stream"`
-	ResultStream string `yaml:"result_stream"`
+	StatusStream    string `yaml:"status_stream"`
+	ResultStream    string `yaml:"result_stream"`
 }
 
 // FilesystemConfig defines configs for the Filesystem logging plugin
@@ -121,7 +117,6 @@ type KolideConfig struct {
 	Session    SessionConfig
 	Osquery    OsqueryConfig
 	Logging    LoggingConfig
-	Aws        AwsConfig
 	Firehose   FirehoseConfig
 	Filesystem FilesystemConfig
 }
@@ -216,12 +211,10 @@ func (man Manager) addConfigs() {
 	man.addConfigBool("logging.disable_banner", false,
 		"Disable startup banner")
 
-	// AWS
-	man.addConfigString("aws.region", "", "AWS Region to use")
-	man.addConfigString("aws.access_key_id", "", "Access Key ID for AWS authentication")
-	man.addConfigString("aws.secret_access_key", "", "Secret Access Key for AWS authentication")
-
 	// Firehose
+	man.addConfigString("firehose.region", "", "AWS Region to use")
+	man.addConfigString("firehose.access_key_id", "", "Access Key ID for AWS authentication")
+	man.addConfigString("firehose.secret_access_key", "", "Secret Access Key for AWS authentication")
 	man.addConfigString("firehose.status_stream", "",
 		"Firehose stream name for status logs")
 	man.addConfigString("firehose.result_stream", "",
@@ -293,14 +286,12 @@ func (man Manager) LoadConfig() KolideConfig {
 			JSON:          man.getConfigBool("logging.json"),
 			DisableBanner: man.getConfigBool("logging.disable_banner"),
 		},
-		Aws: AwsConfig{
-			Region:          man.getConfigString("aws.region"),
-			AccessKeyID:     man.getConfigString("aws.access_key_id"),
-			SecretAccessKey: man.getConfigString("aws.secret_access_key"),
-		},
 		Firehose: FirehoseConfig{
-			StatusStream: man.getConfigString("firehose.status_stream"),
-			ResultStream: man.getConfigString("firehose.result_stream"),
+			Region:          man.getConfigString("firehose.region"),
+			AccessKeyID:     man.getConfigString("firehose.access_key_id"),
+			SecretAccessKey: man.getConfigString("firehose.secret_access_key"),
+			StatusStream:    man.getConfigString("firehose.status_stream"),
+			ResultStream:    man.getConfigString("firehose.result_stream"),
 		},
 		Filesystem: FilesystemConfig{
 			StatusLogFile:     man.getConfigString("filesystem.status_log_file"),

@@ -94,7 +94,7 @@ func (f *firehoseLogWriter) Write(logs []json.RawMessage) error {
 		// records in the batch, we need to push this batch before
 		// adding any more.
 		if len(records) >= firehoseMaxRecordsInBatch ||
-			totalBytes+len(log) >= firehoseMaxSizeOfBatch {
+			totalBytes+len(log) > firehoseMaxSizeOfBatch {
 			if err := f.putRecordBatch(0, records); err != nil {
 				return errors.Wrap(err, "put records")
 			}
@@ -141,9 +141,20 @@ func (f *firehoseLogWriter) putRecordBatch(try int, records []*firehose.Record) 
 	// Check errors on individual records
 	if output.FailedPutCount != nil && *output.FailedPutCount > 0 {
 		if try >= firehoseMaxRetries {
+			// Retrieve first error message to provide to user.
+			// There could be up to firehoseMaxRecordsInBatch
+			// errors here and we don't want to flood that.
+			var errMsg string
+			for _, record := range output.RequestResponses {
+				if record.ErrorCode != nil && record.ErrorMessage != nil {
+					errMsg = *record.ErrorMessage
+					break
+				}
+			}
+
 			return errors.Errorf(
-				"failed to put %d records, retries exhausted",
-				output.FailedPutCount,
+				"failed to put %d records, retries exhausted. First error: %s",
+				output.FailedPutCount, errMsg,
 			)
 		}
 

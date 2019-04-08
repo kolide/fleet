@@ -645,6 +645,52 @@ rotated when files reach a size of 500 Mb or an age of 28 days.
 
 #### Firehose
 
+##### `firehose_region`
+
+This flag only has effect if `osquery_status_log_plugin` is set to `firehose`.
+
+AWS region to use for Firehose connection
+
+- Default value: none
+- Environment variable: `KOLIDE_FIREHOSE_REGION`
+- Config file format:
+
+	```
+	firehose:
+		region: aws-east-2
+	```
+
+##### `firehose_access_key_id`
+
+This flag only has effect if `osquery_status_log_plugin` is set to `firehose`.
+
+AWS access key ID to use for Firehose authentication.
+
+- Default value: none
+- Environment variable: `KOLIDE_FIREHOSE_ACCESS_KEY_ID`
+- Config file format:
+
+	```
+	firehose:
+		access_key_id: aws-east-2
+	```
+
+##### `firehose_secret_access_key`
+
+This flag only has effect if `osquery_status_log_plugin` is set to `firehose`.
+
+AWS secret access key to use for Firehose authentication.
+
+- Default value: none
+- Environment variable: `KOLIDE_FIREHOSE_SECRET_ACCESS_KEY`
+- Config file format:
+
+	```
+	firehose:
+		secret_access_key: aws-east-2
+	```
+
+
 ##### `firehose_status_stream`
 
 This flag only has effect if `osquery_status_log_plugin` is set to `firehose`.
