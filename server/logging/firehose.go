@@ -34,10 +34,18 @@ type firehoseLogWriter struct {
 }
 
 func NewFirehoseLogWriter(region, id, secret, stream string, logger log.Logger) (*firehoseLogWriter, error) {
-	sess, err := session.NewSession(&aws.Config{
-		Credentials: credentials.NewStaticCredentials(id, secret, ""),
-		Region:      &region,
-	})
+	conf := &aws.Config{
+		Region: &region,
+	}
+
+	// Only provide static credentials if we have them
+	// otherwise use the default credentials provider chain
+	if id != "" && secret != "" {
+		conf.Credentials = credentials.NewStaticCredentials(id, secret, "")
+		fmt.Printf("Configuring static credentials %s/%s", id, secret)
+	}
+
+	sess, err := session.NewSession(conf)
 	if err != nil {
 		return nil, errors.Wrap(err, "create Firehose client")
 	}
@@ -58,8 +66,7 @@ func (f *firehoseLogWriter) validateStream() error {
 	out, err := f.client.DescribeDeliveryStream(
 		&firehose.DescribeDeliveryStreamInput{
 			DeliveryStreamName: &f.stream,
-		},
-	)
+		})
 	if err != nil {
 		return errors.Wrapf(err, "describe stream %s", f.stream)
 	}
