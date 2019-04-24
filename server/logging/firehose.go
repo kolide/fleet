@@ -42,7 +42,6 @@ func NewFirehoseLogWriter(region, id, secret, stream string, logger log.Logger) 
 	// otherwise use the default credentials provider chain
 	if id != "" && secret != "" {
 		conf.Credentials = credentials.NewStaticCredentials(id, secret, "")
-		fmt.Printf("Configuring static credentials %s/%s", id, secret)
 	}
 
 	sess, err := session.NewSession(conf)
