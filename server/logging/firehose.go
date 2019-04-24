@@ -65,7 +65,8 @@ func (f *firehoseLogWriter) validateStream() error {
 	out, err := f.client.DescribeDeliveryStream(
 		&firehose.DescribeDeliveryStreamInput{
 			DeliveryStreamName: &f.stream,
-		})
+		},
+	)
 	if err != nil {
 		return errors.Wrapf(err, "describe stream %s", f.stream)
 	}
