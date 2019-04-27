@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -151,7 +152,9 @@ the way that the Fleet server works.
 
 			var resultStore kolide.QueryResultStore
 			// TODO(el): what to do about the interface change
-			redisCluster := pubsub.NewRedisCluster([]string{config.Redis.Address}, config.Redis.Password)
+			redisCluster := pubsub.NewRedisCluster(
+				strings.Split(config.Redis.Address, ","),
+				config.Redis.Password)
 			resultStore = pubsub.NewRedisQueryResults(redisCluster)
 			ssoSessionStore := sso.NewSessionStore(redisCluster)
 

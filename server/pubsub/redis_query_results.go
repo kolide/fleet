@@ -24,19 +24,19 @@ func NewRedisCluster(nodes []string, password string) *redisc.Cluster {
 	return &redisc.Cluster{
 		StartupNodes: nodes,
 		CreatePool: func(server string, options ...redis.DialOption) (*redis.Pool, error) {
-			return NewRedisPool(server, password), nil
+			return NewRedisPool(server, password, options...), nil
 		},
 	}
 }
 
 // NewRedisPool creates a Redis connection pool using the provided server
 // address and password.
-func NewRedisPool(server, password string) *redis.Pool {
+func NewRedisPool(server, password string, options ...redis.DialOption) *redis.Pool {
 	return &redis.Pool{
 		MaxIdle:     3,
 		IdleTimeout: 240 * time.Second,
 		Dial: func() (redis.Conn, error) {
-			c, err := redis.Dial("tcp", server)
+			c, err := redis.Dial("tcp", server, options...)
 			if err != nil {
 				return nil, err
 			}
