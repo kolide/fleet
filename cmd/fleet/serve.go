@@ -155,6 +155,11 @@ the way that the Fleet server works.
 			redisCluster := pubsub.NewRedisCluster(
 				strings.Split(config.Redis.Address, ","),
 				config.Redis.Password)
+
+			err = redisCluster.Refresh()
+			if err != nil {
+				initFatal(err, "initializing service")
+			}
 			resultStore = pubsub.NewRedisQueryResults(redisCluster)
 			ssoSessionStore := sso.NewSessionStore(redisCluster)
 
