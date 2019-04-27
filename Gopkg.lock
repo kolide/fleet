@@ -405,6 +405,14 @@
   revision = "00c29f56e2386353d58c599509e8dc3801b0d716"
 
 [[projects]]
+  digest = "1:9532ae72b59692036273a17fd152e8a88b07048e82959a1c48d20340bb7a478f"
+  name = "github.com/mna/redisc"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "ceb9ca86e194bfc06333a0c03cca10eebb6a5953"
+  version = "v1.1.5"
+
+[[projects]]
   branch = "master"
   digest = "1:4daa045e1e1f3e23f4b07db6880cdf9f259dab65312dfe244a878e6070faaf77"
   name = "github.com/olekukonko/tablewriter"
@@ -741,6 +749,7 @@
     "github.com/kolide/launcher/service",
     "github.com/kolide/osquery-go/plugin/distributed",
     "github.com/kolide/osquery-go/plugin/logger",
+    "github.com/mna/redisc",
     "github.com/olekukonko/tablewriter",
     "github.com/patrickmn/sortutil",
     "github.com/pkg/errors",

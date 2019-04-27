@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gomodule/redigo/redis"
+	"github.com/mna/redisc"
 	"github.com/pkg/errors"
 )
 
@@ -33,19 +34,19 @@ type SessionStore interface {
 }
 
 // NewSessionStore creates a SessionStore
-func NewSessionStore(pool *redis.Pool) SessionStore {
-	return &store{pool}
+func NewSessionStore(cluster *redisc.Cluster) SessionStore {
+	return &store{cluster}
 }
 
 type store struct {
-	pool *redis.Pool
+	cluster *redisc.Cluster
 }
 
 func (s *store) create(requestID, originalURL, metadata string, lifetimeSecs uint) error {
 	if len(requestID) < 8 {
 		return errors.New("request id must be 8 or more characters in length")
 	}
-	conn := s.pool.Get()
+	conn := s.cluster.Get()
 	defer conn.Close()
 	sess := Session{OriginalURL: originalURL, Metadata: metadata}
 	var writer bytes.Buffer
@@ -58,7 +59,7 @@ func (s *store) create(requestID, originalURL, metadata string, lifetimeSecs uin
 }
 
 func (s *store) Get(requestID string) (*Session, error) {
-	conn := s.pool.Get()
+	conn := s.cluster.Get()
 	defer conn.Close()
 	val, err := redis.String(conn.Do("GET", requestID))
 	if err != nil {
@@ -80,7 +81,7 @@ func (s *store) Get(requestID string) (*Session, error) {
 var ErrSessionNotFound = errors.New("session not found")
 
 func (s *store) Expire(requestID string) error {
-	conn := s.pool.Get()
+	conn := s.cluster.Get()
 	defer conn.Close()
 	_, err := conn.Do("DEL", requestID)
 	return err

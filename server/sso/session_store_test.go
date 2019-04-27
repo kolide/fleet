@@ -6,13 +6,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gomodule/redigo/redis"
 	"github.com/kolide/fleet/server/pubsub"
+	"github.com/mna/redisc"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func newPool(t *testing.T) *redis.Pool {
+func newCluster(t *testing.T) *redisc.Cluster {
 	if _, ok := os.LookupEnv("REDIS_TEST"); ok {
 		var (
 			addr     = "127.0.0.1:6379"
@@ -22,10 +22,10 @@ func newPool(t *testing.T) *redis.Pool {
 			addr = fmt.Sprintf("%s:6379", a)
 		}
 
-		p := pubsub.NewRedisPool(addr, password)
-		_, err := p.Get().Do("PING")
+		c := pubsub.NewRedisCluster([]string{addr}, password)
+		_, err := c.Get().Do("PING")
 		require.Nil(t, err)
-		return p
+		return c
 	}
 	return nil
 }
@@ -34,10 +34,10 @@ func TestSessionStore(t *testing.T) {
 	if _, ok := os.LookupEnv("REDIS_TEST"); !ok {
 		t.Skip("skipping sso session store tests")
 	}
-	p := newPool(t)
-	require.NotNil(t, p)
-	defer p.Close()
-	store := NewSessionStore(p)
+	c := newCluster(t)
+	require.NotNil(t, c)
+	defer c.Close()
+	store := NewSessionStore(c)
 	require.NotNil(t, store)
 	// Create session that lives for 1 second.
 	err := store.create("request123", "https://originalurl.com", "some metadata", 1)

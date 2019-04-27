@@ -78,13 +78,13 @@ func setupRedis(t *testing.T) (store *redisQueryResults, teardown func()) {
 		addr = fmt.Sprintf("%s:6379", a)
 	}
 
-	store = NewRedisQueryResults(NewRedisPool(addr, password))
+	store = NewRedisQueryResults(NewRedisCluster([]string{addr}, password))
 
-	_, err := store.pool.Get().Do("PING")
+	_, err := store.cluster.Get().Do("PING")
 	require.Nil(t, err)
 
 	teardown = func() {
-		store.pool.Close()
+		store.cluster.Close()
 	}
 
 	return store, teardown
@@ -95,7 +95,7 @@ func testQueryResultsStoreErrors(t *testing.T, store kolide.QueryResultStore) {
 	err := store.WriteResult(
 		kolide.DistributedQueryResult{
 			DistributedQueryCampaignID: 9999,
-			Rows: []map[string]string{{"bing": "fds"}},
+			Rows:                       []map[string]string{{"bing": "fds"}},
 			Host: kolide.Host{
 				ID: 4,
 				UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
@@ -125,7 +125,7 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 	expected1 := []kolide.DistributedQueryResult{
 		kolide.DistributedQueryResult{
 			DistributedQueryCampaignID: 1,
-			Rows: []map[string]string{{"foo": "bar"}},
+			Rows:                       []map[string]string{{"foo": "bar"}},
 			Host: kolide.Host{
 				ID: 1,
 				// Note these times need to be set to avoid
@@ -146,7 +146,7 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 		},
 		kolide.DistributedQueryResult{
 			DistributedQueryCampaignID: 1,
-			Rows: []map[string]string{{"whoo": "wahh"}},
+			Rows:                       []map[string]string{{"whoo": "wahh"}},
 			Host: kolide.Host{
 				ID: 3,
 				UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
@@ -164,7 +164,7 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 		},
 		kolide.DistributedQueryResult{
 			DistributedQueryCampaignID: 1,
-			Rows: []map[string]string{{"bing": "fds"}},
+			Rows:                       []map[string]string{{"bing": "fds"}},
 			Host: kolide.Host{
 				ID: 4,
 				UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
@@ -191,7 +191,7 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 	expected2 := []kolide.DistributedQueryResult{
 		kolide.DistributedQueryResult{
 			DistributedQueryCampaignID: 2,
-			Rows: []map[string]string{{"tim": "tom"}},
+			Rows:                       []map[string]string{{"tim": "tom"}},
 			Host: kolide.Host{
 				ID: 1,
 				UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{
@@ -209,7 +209,7 @@ func testQueryResultsStore(t *testing.T, store kolide.QueryResultStore) {
 		},
 		kolide.DistributedQueryResult{
 			DistributedQueryCampaignID: 2,
-			Rows: []map[string]string{{"slim": "slam"}},
+			Rows:                       []map[string]string{{"slim": "slam"}},
 			Host: kolide.Host{
 				ID: 3,
 				UpdateCreateTimestamps: kolide.UpdateCreateTimestamps{

@@ -150,9 +150,10 @@ the way that the Fleet server works.
 			}
 
 			var resultStore kolide.QueryResultStore
-			redisPool := pubsub.NewRedisPool(config.Redis.Address, config.Redis.Password)
-			resultStore = pubsub.NewRedisQueryResults(redisPool)
-			ssoSessionStore := sso.NewSessionStore(redisPool)
+			// TODO(el): what to do about the interface change
+			redisCluster := pubsub.NewRedisCluster([]string{config.Redis.Address}, config.Redis.Password)
+			resultStore = pubsub.NewRedisQueryResults(redisCluster)
+			ssoSessionStore := sso.NewSessionStore(redisCluster)
 
 			svc, err := service.NewService(ds, resultStore, logger, config, mailService, clock.C, ssoSessionStore)
 			if err != nil {

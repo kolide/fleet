@@ -8,15 +8,26 @@ import (
 
 	"github.com/gomodule/redigo/redis"
 	"github.com/kolide/fleet/server/kolide"
+	"github.com/mna/redisc"
 	"github.com/pkg/errors"
 )
 
 type redisQueryResults struct {
-	// connection pool
-	pool *redis.Pool
+	// connection cluster
+	cluster *redisc.Cluster
 }
 
 var _ kolide.QueryResultStore = &redisQueryResults{}
+
+// NewRedisCluster creates a RedisCluster connection pool
+func NewRedisCluster(nodes []string, password string) *redisc.Cluster {
+	return &redisc.Cluster{
+		StartupNodes: nodes,
+		CreatePool: func(server string, options ...redis.DialOption) (*redis.Pool, error) {
+			return NewRedisPool(server, password), nil
+		},
+	}
+}
 
 // NewRedisPool creates a Redis connection pool using the provided server
 // address and password.
@@ -49,8 +60,8 @@ func NewRedisPool(server, password string) *redis.Pool {
 
 // NewRedisQueryResults creats a new Redis implementation of the
 // QueryResultStore interface using the provided Redis connection pool.
-func NewRedisQueryResults(pool *redis.Pool) *redisQueryResults {
-	return &redisQueryResults{pool: pool}
+func NewRedisQueryResults(cluster *redisc.Cluster) *redisQueryResults {
+	return &redisQueryResults{cluster: cluster}
 }
 
 func pubSubForID(id uint) string {
@@ -58,7 +69,7 @@ func pubSubForID(id uint) string {
 }
 
 func (r *redisQueryResults) WriteResult(result kolide.DistributedQueryResult) error {
-	conn := r.pool.Get()
+	conn := r.cluster.Get()
 	defer conn.Close()
 
 	channelName := pubSubForID(result.DistributedQueryCampaignID)
@@ -110,7 +121,7 @@ func receiveMessages(conn *redis.PubSubConn, outChan chan<- interface{}) {
 func (r *redisQueryResults) ReadChannel(ctx context.Context, query kolide.DistributedQueryCampaign) (<-chan interface{}, error) {
 	outChannel := make(chan interface{})
 
-	conn := redis.PubSubConn{Conn: r.pool.Get()}
+	conn := redis.PubSubConn{Conn: r.cluster.Get()}
 
 	pubSubName := pubSubForID(query.ID)
 	conn.Subscribe(pubSubName)
@@ -157,7 +168,7 @@ func (r *redisQueryResults) ReadChannel(ctx context.Context, query kolide.Distri
 // HealthCheck verifies that the redis backend can be pinged, returning an error
 // otherwise.
 func (r *redisQueryResults) HealthCheck() error {
-	conn := r.pool.Get()
+	conn := r.cluster.Get()
 	defer conn.Close()
 
 	_, err := conn.Do("PING")
