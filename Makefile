@@ -160,11 +160,10 @@ generate-dev: .prefix
 
 deps:
 	yarn
-	go get -u \
+	GO111MODULE=off go get -u \
 		github.com/kolide/go-bindata/... \
-		github.com/golang/dep/cmd/dep \
 		github.com/groob/mockimpl
-	dep ensure -vendor-only
+	go mod download
 
 distclean:
 ifeq ($(OS), Windows_NT)
