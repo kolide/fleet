@@ -8,6 +8,8 @@ REVSHORT = $(shell git rev-parse --short HEAD)
 USER = $(shell whoami)
 DOCKER_IMAGE_NAME = kolide/fleet
 
+export GO111MODULE=on
+
 ifneq ($(OS), Windows_NT)
 	# If on macOS, set the shell to bash explicitly
 	ifeq ($(shell uname), Darwin)
