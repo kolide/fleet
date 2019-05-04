@@ -1,5 +1,27 @@
 version: 2
 jobs:
+  build-go1.11:
+    docker:
+      - image: kolide/fleet-builder:1.11
+    working_directory: /go/src/github.com/kolide/fleet
+    environment:
+      GO111MODULE: "ON"
+    steps: &steps
+      - checkout
+      - restore_cache:
+          keys:
+            - go-mod-v1-{{ checksum "go.sum" }}
+
+      - run: make deps
+      - save_cache:
+          key: go-mod-v1-{{ checksum "go.sum" }}
+          paths:
+            - "/go/pkg/mod"
+
+      - run: make generate
+      - run: make test
+      - run: make build
+
   build-go1.9:
     docker:
         - image: kolide/fleet-builder:1.9
@@ -35,3 +57,4 @@ workflows:
   build:
     jobs:
       - build-go1.9
+      - build-go1.11
