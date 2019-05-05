@@ -120,7 +120,14 @@ lint-scss:
 	sass-lint --verbose
 
 lint-go:
-	go vet ./...
+ifeq (go1.12, $(findstring go1.12, $(GOVERSION)))
+	@echo ""
+	@echo "Disabling \`go vet\` due to a regression in handling json tags for embedded fields"
+	@echo "in Go 1.12. See https://github.com/golang/go/issues/30465"
+	@echo ""
+else
+	 go vet ./...
+endif
 
 lint: lint-go lint-js lint-scss lint-ts
 
