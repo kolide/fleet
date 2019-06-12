@@ -84,26 +84,9 @@ export class ManageHostsPage extends PureComponent {
   componentDidMount () {
     const { getEntities } = this;
     const { hosts } = this.props;
+    const silent = hosts.length > 0;
 
-    this.interval = global.window.setInterval(getEntities, 5000);
-
-    if (hosts.length > 0) {
-      // Silently update if we already have hosts loaded.
-      return getEntities(true);
-    }
-
-    return getEntities(false);
-  }
-
-  componentDidUpdate () {
-    const { hosts } = this.props;
-    if (hosts.length > hostCountNoReload) {
-      // Disable automatic updates to the hosts if there are over 100 hosts
-      // loaded (for browser/server perf reasons). The hosts will be reloaded
-      // when this component is mounted again (at a page reload or when the
-      // page is changed and reopened in the UI).
-      this.clearHostUpdates();
-    }
+    return getEntities(silent);
   }
 
   componentWillUnmount () {
@@ -292,17 +275,19 @@ export class ManageHostsPage extends PureComponent {
       dispatch(getStatusLabelCounts),
     ];
 
-    Promise.all(promises)
-      .catch(() => false);
+    const after = () => {
+      if (this.props.hosts.length < hostCountNoReload) {
+        this.timeout = setTimeout(this.getEntities, 5000);
+      }
+    };
 
-    return false;
+    return Promise.all(promises).then(after).catch(after);
   }
 
   clearHostUpdates () {
-    if (this.interval) {
-      global.window.clearInterval(this.interval);
-
-      this.interval = null;
+    if (this.timeout) {
+      global.window.clearTimeout(this.timeout);
+      this.timeout = null;
     }
   }
 
