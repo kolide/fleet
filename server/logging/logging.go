@@ -85,7 +85,7 @@ func New(config config.KolideConfig, logger log.Logger) (*OsqueryLogger, error) 
 			return nil, errors.Wrap(err, "create firehose result logger")
 		}
 	case "pubsub":
-		status, err = NewPubSubLogWriter(
+		result, err = NewPubSubLogWriter(
 			config.PubSub.Project,
 			config.PubSub.ResultTopic,
 			logger,

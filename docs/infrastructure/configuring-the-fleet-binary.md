@@ -482,7 +482,7 @@ The interval at which Fleet will ask osquery agents to update their results for 
 
 Which log output plugin should be used for osquery status logs received from clients.
 
-Options are `filesystem` and `firehose`.
+Options are `filesystem`, `firehose`, and 'pubsub'.
 
 - Default value: `filesystem`
 - Environment variable: `KOLIDE_OSQUERY_STATUS_LOG_PLUGIN`
@@ -497,7 +497,7 @@ Options are `filesystem` and `firehose`.
 
 Which log output plugin should be used for osquery result logs received from clients.
 
-Options are `filesystem` and `firehose`.
+Options are `filesystem`, `firehose`, and 'pubsub'.
 
 - Default value: `filesystem`
 - Environment variable: `KOLIDE_OSQUERY_RESULT_LOG_PLUGIN`
