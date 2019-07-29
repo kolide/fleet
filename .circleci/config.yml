@@ -29,9 +29,10 @@ jobs:
       - run: make lint-go
       - run: make test-go
       - run: make build
+
   build-js:
     docker:
-      - image: circleci/node:4.8.2
+      - image: node:10.16.0
     steps: &stepsjs
       - checkout
       - run: make deps-js
