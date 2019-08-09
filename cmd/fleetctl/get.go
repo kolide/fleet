@@ -31,6 +31,10 @@ func getQueriesCommand() cli.Command {
 		Flags: []cli.Flag{
 			configFlag(),
 			contextFlag(),
+			cli.BoolFlag{
+				Name:  "dump",
+				Usage: "Dump queries in yaml format",
+			},
 		},
 		Action: func(c *cli.Context) error {
 			fleet, err := clientFromCLI(c)
@@ -45,6 +49,24 @@ func getQueriesCommand() cli.Command {
 				queries, err := fleet.GetQueries()
 				if err != nil {
 					return errors.Wrap(err, "could not list queries")
+				}
+
+				if c.Bool("dump") {
+					for _, query := range queries {
+						spec := specGeneric{
+							Kind:    "query",
+							Version: kolide.ApiVersion,
+							Spec:    query,
+						}
+
+						b, err := yaml.Marshal(spec)
+						if err != nil {
+							return err
+						}
+
+						fmt.Printf("---\n%s", string(b))
+					}
+					return nil
 				}
 
 				if len(queries) == 0 {
@@ -100,6 +122,10 @@ func getPacksCommand() cli.Command {
 		Flags: []cli.Flag{
 			configFlag(),
 			contextFlag(),
+			cli.BoolFlag{
+				Name:  "dump",
+				Usage: "Dump packs in yaml format",
+			},
 		},
 		Action: func(c *cli.Context) error {
 			fleet, err := clientFromCLI(c)
@@ -114,6 +140,24 @@ func getPacksCommand() cli.Command {
 				packs, err := fleet.GetPacks()
 				if err != nil {
 					return errors.Wrap(err, "could not list packs")
+				}
+
+				if c.Bool("dump") {
+					for _, pack := range packs {
+						spec := specGeneric{
+							Kind:    "pack",
+							Version: kolide.ApiVersion,
+							Spec:    pack,
+						}
+
+						b, err := yaml.Marshal(spec)
+						if err != nil {
+							return err
+						}
+
+						fmt.Printf("---\n%s", string(b))
+					}
+					return nil
 				}
 
 				if len(packs) == 0 {
