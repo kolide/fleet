@@ -1,3 +1,5 @@
+import './public-path';
+
 import ReactDOM from 'react-dom';
 
 import routes from './router';

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="<%= htmlWebpackPlugin.files.css[0] %>">
+    <link rel="stylesheet" type="text/css" href="/fleet/assets/<%= htmlWebpackPlugin.files.css[0] %>">
 
     <!-- Icons & Platform Specific Settings - Favicon generator used to generate the icons below http://realfavicongenerator.net -->
     <!-- shortcut icon - This file contains the following sizes 16x16, 32x32 and 48x48. -->
@@ -61,10 +61,13 @@
         http://www.buildmypinnedsite.com and regenerate the browserconfig.xml file. You will then have a cool live tile! -->
     <meta name="msapplication-config" content="/assets/favicons/browserconfig.xml">
     <title>Kolide Fleet</title>
+    <script type="text/javascript">
+        var appPath = "/fleet/";
+    </script>
   </head>
   <body>
     <div id="app"></div>
-    <script async defer src="<%= htmlWebpackPlugin.files.js[0] %>" onload="this.parentElement.removeChild(this)"></script>
+    <script async defer src="/fleet/assets/<%= htmlWebpackPlugin.files.js[0] %>" onload="this.parentElement.removeChild(this)"></script>
     <!-- Because iOS hates interactive stuff, we have to kill it with fire -->
     <script>document.addEventListener("touchstart", function() {},false);</script>
     <!-- End Apple Hate -->
