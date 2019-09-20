@@ -1,19 +1,29 @@
+import URL_PREFIX from 'router/url_prefix';
+
 export default {
-  ADMIN_DASHBOARD: urlPrefix + '/admin',
-  ADMIN_SETTINGS: urlPrefix + '/admin/settings',
-  ALL_PACKS: urlPrefix + '/packs/all',
-  EDIT_QUERY: (query) => {
-    return `${urlPrefix}/queries/${query.id}`;
+  ADMIN_USERS: `${URL_PREFIX}/admin/users`,
+  ADMIN_SETTINGS: `${URL_PREFIX}/admin/settings`,
+  ALL_PACKS: `${URL_PREFIX}/packs/all`,
+  EDIT_PACK: (pack) => {
+    return `${URL_PREFIX}/packs/${pack.id}/edit`;
   },
-  FORGOT_PASSWORD: urlPrefix + '/login/forgot',
-  HOME: urlPrefix + '/',
-  KOLIDE_500: urlPrefix + '/500',
-  LOGIN: urlPrefix + '/login',
-  LOGOUT: urlPrefix + '/logout',
-  MANAGE_HOSTS: urlPrefix + '/hosts/manage',
-  NEW_PACK: urlPrefix + '/packs/new',
-  NEW_QUERY: urlPrefix + '/queries/new',
-  RESET_PASSWORD: urlPrefix + '/login/reset',
-  SETUP: urlPrefix + '/setup',
-  USER_SETTINGS: urlPrefix + '/settings',
+  PACK: (pack) => {
+    return `${URL_PREFIX}/packs/${pack.id}`;
+  },
+  EDIT_QUERY: (query) => {
+    return `${URL_PREFIX}/queries/${query.id}`;
+  },
+  FORGOT_PASSWORD: `${URL_PREFIX}/login/forgot`,
+  HOME: `${URL_PREFIX}/`,
+  KOLIDE_500: `${URL_PREFIX}/500`,
+  LOGIN: `${URL_PREFIX}/login`,
+  LOGOUT: `${URL_PREFIX}/logout`,
+  MANAGE_HOSTS: `${URL_PREFIX}/hosts/manage`,
+  MANAGE_PACKS: `${URL_PREFIX}/packs/manage`,
+  NEW_PACK: `${URL_PREFIX}/packs/new`,
+  MANAGE_QUERIES: `${URL_PREFIX}/queries/manage`,
+  NEW_QUERY: `${URL_PREFIX}/queries/new`,
+  RESET_PASSWORD: `${URL_PREFIX}/login/reset`,
+  SETUP: `${URL_PREFIX}/setup`,
+  USER_SETTINGS: `${URL_PREFIX}/settings`,
 };

@@ -27,13 +27,15 @@ import Kolide404 from 'pages/Kolide404';
 import Kolide500 from 'pages/Kolide500';
 import store from 'redux/store';
 import UserSettingsPage from 'pages/UserSettingsPage';
+import PATHS from 'router/paths';
+import URL_PREFIX from 'router/url_prefix';
 
 const history = syncHistoryWithStore(browserHistory, store);
 
 const routes = (
   <Provider store={store}>
     <Router history={history}>
-      <Route path="/" component={App}>
+      <Route path={URL_PREFIX} component={App}>
         <Route path="setup" component={RegistrationPage} />
         <Route path="login" component={LoginRoutes}>
           <Route path="invites/:invite_token" component={ConfirmInvitePage} />
@@ -45,7 +47,7 @@ const routes = (
           <Route path="email/change/:token" component={EmailTokenRedirect} />
           <Route path="logout" component={LogoutPage} />
           <Route component={CoreLayout}>
-            <IndexRedirect to="/hosts/manage" />
+            <IndexRedirect to={PATHS.MANAGE_HOSTS} />
             <Route path="admin" component={AuthenticatedAdminRoutes}>
               <Route path="users" component={AdminUserManagementPage} />
               <Route path="settings" component={AdminAppSettingsPage} />
@@ -75,7 +77,7 @@ const routes = (
       </Route>
       <Route path="/500" component={Kolide500} />
       <Route path="/404" component={Kolide404} />
-      <Redirect from="*" to="/404" />
+      <Route component={Kolide404} />
     </Router>
   </Provider>
 );

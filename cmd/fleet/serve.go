@@ -190,7 +190,7 @@ the way that the Fleet server works.
 
 			var apiHandler, frontendHandler http.Handler
 			{
-				frontendHandler = prometheus.InstrumentHandler("get_frontend", service.ServeFrontend(httpLogger))
+				frontendHandler = prometheus.InstrumentHandler("get_frontend", service.ServeFrontend(config.Server.URLPrefix, httpLogger))
 				apiHandler = service.MakeHandler(svc, config.Auth.JwtKey, httpLogger)
 
 				setupRequired, err := service.RequireSetup(svc)
@@ -233,7 +233,7 @@ the way that the Fleet server works.
 
 			r.Handle("/healthz", prometheus.InstrumentHandler("healthz", health.Handler(httpLogger, healthCheckers)))
 			r.Handle("/version", prometheus.InstrumentHandler("version", version.Handler()))
-			r.Handle("/fleet/assets/", prometheus.InstrumentHandler("static_assets", service.ServeStaticAssets("/fleet/assets/")))
+			r.Handle(config.Server.URLPrefix+"/assets/", prometheus.InstrumentHandler("static_assets", service.ServeStaticAssets(config.Server.URLPrefix+"/assets/")))
 			r.Handle("/metrics", prometheus.InstrumentHandler("metrics", promhttp.Handler()))
 			r.Handle("/api/", apiHandler)
 			r.Handle("/", frontendHandler)
