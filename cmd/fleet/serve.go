@@ -214,9 +214,9 @@ the way that the Fleet server works.
 				// more efficient after the first startup.
 				if setupRequired {
 					apiHandler = service.WithSetup(svc, logger, apiHandler)
-					frontendHandler = service.RedirectLoginToSetup(svc, logger, frontendHandler)
+					frontendHandler = service.RedirectLoginToSetup(svc, logger, frontendHandler, config.Server.URLPrefix)
 				} else {
-					frontendHandler = service.RedirectSetupToLogin(svc, logger, frontendHandler)
+					frontendHandler = service.RedirectSetupToLogin(svc, logger, frontendHandler, config.Server.URLPrefix)
 				}
 
 			}

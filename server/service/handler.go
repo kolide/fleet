@@ -543,7 +543,7 @@ func WithSetup(svc kolide.Service, logger kitlog.Logger, next http.Handler) http
 
 // RedirectLoginToSetup detects if the setup endpoint should be used. If setup is required it redirect all
 // frontend urls to /setup, otherwise the frontend router is used.
-func RedirectLoginToSetup(svc kolide.Service, logger kitlog.Logger, next http.Handler) http.HandlerFunc {
+func RedirectLoginToSetup(svc kolide.Service, logger kitlog.Logger, next http.Handler, urlPrefix string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		redirect := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if r.URL.Path == "/setup" {
@@ -551,7 +551,7 @@ func RedirectLoginToSetup(svc kolide.Service, logger kitlog.Logger, next http.Ha
 				return
 			}
 			newURL := r.URL
-			newURL.Path = "/setup"
+			newURL.Path = urlPrefix + "/setup"
 			http.Redirect(w, r, newURL.String(), http.StatusTemporaryRedirect)
 		})
 
@@ -565,7 +565,7 @@ func RedirectLoginToSetup(svc kolide.Service, logger kitlog.Logger, next http.Ha
 			redirect.ServeHTTP(w, r)
 			return
 		}
-		RedirectSetupToLogin(svc, logger, next).ServeHTTP(w, r)
+		RedirectSetupToLogin(svc, logger, next, urlPrefix).ServeHTTP(w, r)
 	}
 }
 
@@ -584,11 +584,11 @@ func RequireSetup(svc kolide.Service) (bool, error) {
 
 // RedirectSetupToLogin forces the /setup path to be redirected to login. This middleware is used after
 // the app has been setup.
-func RedirectSetupToLogin(svc kolide.Service, logger kitlog.Logger, next http.Handler) http.HandlerFunc {
+func RedirectSetupToLogin(svc kolide.Service, logger kitlog.Logger, next http.Handler, urlPrefix string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/setup" {
 			newURL := r.URL
-			newURL.Path = "/login"
+			newURL.Path = urlPrefix + "/login"
 			http.Redirect(w, r, newURL.String(), http.StatusTemporaryRedirect)
 			return
 		}
