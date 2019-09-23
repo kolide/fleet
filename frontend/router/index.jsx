@@ -35,7 +35,7 @@ const history = syncHistoryWithStore(browserHistory, store);
 const routes = (
   <Provider store={store}>
     <Router history={history}>
-      <Route path={URL_PREFIX} component={App}>
+      <Route path={`${URL_PREFIX}/`} component={App}>
         <Route path="setup" component={RegistrationPage} />
         <Route path="login" component={LoginRoutes}>
           <Route path="invites/:invite_token" component={ConfirmInvitePage} />

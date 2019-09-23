@@ -4,7 +4,6 @@ import (
 	"html/template"
 	"io/ioutil"
 	"net/http"
-	"path"
 
 	assetfs "github.com/elazarl/go-bindata-assetfs"
 	"github.com/go-kit/kit/log"
@@ -41,7 +40,7 @@ func ServeFrontend(urlPrefix string, logger log.Logger) http.Handler {
 			herr(w, "create react template: "+err.Error())
 			return
 		}
-		if err := t.Execute(w, struct{ URLPrefix string }{path.Clean(urlPrefix)}); err != nil {
+		if err := t.Execute(w, struct{ URLPrefix string }{urlPrefix}); err != nil {
 			herr(w, "execute react template: "+err.Error())
 			return
 		}
