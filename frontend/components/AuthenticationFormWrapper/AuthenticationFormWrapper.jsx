@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import logoVertical from '../../../assets/images/kolide-logo-vertical.svg';
+
 const baseClass = 'auth-form-wrapper';
 
 class AuthenticationFormWrapper extends Component {

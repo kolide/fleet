@@ -111,7 +111,7 @@ export class EditPackPage extends Component {
       return false;
     }
 
-    return dispatch(push(PATHS.PACK({id: packID})));
+    return dispatch(push(PATHS.PACK({ id: packID })));
   }
 
   onFetchTargets = (query, targetsResponse) => {
@@ -146,17 +146,17 @@ export class EditPackPage extends Component {
   onDblClickScheduledQuery = (scheduledQueryId) => {
     const { dispatch } = this.props;
 
-    return dispatch(push(PATHS.EDIT_QUERY({id: scheduledQueryId})));
+    return dispatch(push(PATHS.EDIT_QUERY({ id: scheduledQueryId })));
   }
 
   onToggleEdit = () => {
     const { dispatch, isEdit, packID } = this.props;
 
     if (isEdit) {
-      return dispatch(push(PATHS.PACK({id: packID})));
+      return dispatch(push(PATHS.PACK({ id: packID })));
     }
 
-    return dispatch(push(PATHS.EDIT_PACK({id: packID})));
+    return dispatch(push(PATHS.EDIT_PACK({ id: packID })));
   }
 
   onUpdateScheduledQuery = (formData) => {

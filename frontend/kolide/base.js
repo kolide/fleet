@@ -1,6 +1,6 @@
 import local from 'utilities/local';
 import Request from 'kolide/request';
-import URL_PREFIX from 'router/url_prefix'
+import URL_PREFIX from 'router/url_prefix';
 
 
 class Base {

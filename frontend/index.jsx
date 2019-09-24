@@ -1,7 +1,6 @@
-import './public-path';
-
 import ReactDOM from 'react-dom';
 
+import './public-path';
 import routes from './router';
 import './index.scss';
 

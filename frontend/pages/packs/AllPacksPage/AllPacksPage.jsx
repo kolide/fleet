@@ -15,7 +15,6 @@ import PackDetailsSidePanel from 'components/side_panels/PackDetailsSidePanel';
 import PackInfoSidePanel from 'components/side_panels/PackInfoSidePanel';
 import packInterface from 'interfaces/pack';
 import PacksList from 'components/packs/PacksList';
-import paths from 'router/paths';
 import { renderFlash } from 'redux/nodes/notifications/actions';
 import scheduledQueryActions from 'redux/nodes/entities/scheduled_queries/actions';
 import scheduledQueryInterface from 'interfaces/scheduled_query';
@@ -207,9 +206,8 @@ export class AllPacksPage extends Component {
 
   goToNewPackPage = () => {
     const { dispatch } = this.props;
-    const { NEW_PACK } = paths;
 
-    dispatch(push(NEW_PACK));
+    dispatch(push(PATHS.NEW_PACK));
 
     return false;
   }

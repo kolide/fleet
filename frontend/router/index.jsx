@@ -1,5 +1,5 @@
 import React from 'react';
-import { browserHistory, IndexRedirect, IndexRoute, Redirect, Route, Router } from 'react-router';
+import { browserHistory, IndexRedirect, IndexRoute, Route, Router } from 'react-router';
 import { Provider } from 'react-redux';
 import { syncHistoryWithStore } from 'react-router-redux';
 
