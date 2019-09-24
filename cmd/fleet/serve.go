@@ -203,7 +203,7 @@ the way that the Fleet server works.
 			var apiHandler, frontendHandler http.Handler
 			{
 				frontendHandler = prometheus.InstrumentHandler("get_frontend", service.ServeFrontend(config.Server.URLPrefix, httpLogger))
-				apiHandler = service.MakeHandler(svc, config.Auth.JwtKey, httpLogger)
+				apiHandler = service.MakeHandler(svc, config, httpLogger)
 
 				setupRequired, err := service.RequireSetup(svc)
 				if err != nil {

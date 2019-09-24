@@ -60,9 +60,7 @@ export class ResetPasswordPage extends Component {
     };
 
     return dispatch(resetPassword(resetPasswordData))
-      .then(() => {
-        return dispatch(PATHS.LOGIN);
-      })
+      .then(() => { return dispatch(push(PATHS.LOGIN)); })
       .catch(() => false);
   })
 

@@ -9,6 +9,7 @@ import (
 	kitlog "github.com/go-kit/kit/log"
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
+	"github.com/kolide/fleet/server/config"
 	"github.com/kolide/fleet/server/kolide"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -100,7 +101,7 @@ type KolideEndpoints struct {
 }
 
 // MakeKolideServerEndpoints creates the Kolide API endpoints.
-func MakeKolideServerEndpoints(svc kolide.Service, jwtKey string) KolideEndpoints {
+func MakeKolideServerEndpoints(svc kolide.Service, jwtKey, urlPrefix string) KolideEndpoints {
 	return KolideEndpoints{
 		Login:          makeLoginEndpoint(svc),
 		Logout:         makeLogoutEndpoint(svc),
@@ -109,7 +110,7 @@ func MakeKolideServerEndpoints(svc kolide.Service, jwtKey string) KolideEndpoint
 		CreateUser:     makeCreateUserEndpoint(svc),
 		VerifyInvite:   makeVerifyInviteEndpoint(svc),
 		InitiateSSO:    makeInitiateSSOEndpoint(svc),
-		CallbackSSO:    makeCallbackSSOEndpoint(svc),
+		CallbackSSO:    makeCallbackSSOEndpoint(svc, urlPrefix),
 		SSOSettings:    makeSSOSettingsEndpoint(svc),
 
 		// Authenticated user endpoints
@@ -377,11 +378,11 @@ func makeKolideKitHandlers(e KolideEndpoints, opts []kithttp.ServerOption) *koli
 }
 
 // MakeHandler creates an HTTP handler for the Fleet server endpoints.
-func MakeHandler(svc kolide.Service, jwtKey string, logger kitlog.Logger) http.Handler {
+func MakeHandler(svc kolide.Service, config config.KolideConfig, logger kitlog.Logger) http.Handler {
 	kolideAPIOptions := []kithttp.ServerOption{
 		kithttp.ServerBefore(
 			kithttp.PopulateRequestContext, // populate the request context with common fields
-			setRequestsContexts(svc, jwtKey),
+			setRequestsContexts(svc, config.Auth.JwtKey),
 		),
 		kithttp.ServerErrorLogger(logger),
 		kithttp.ServerErrorEncoder(encodeError),
@@ -390,7 +391,7 @@ func MakeHandler(svc kolide.Service, jwtKey string, logger kitlog.Logger) http.H
 		),
 	}
 
-	kolideEndpoints := MakeKolideServerEndpoints(svc, jwtKey)
+	kolideEndpoints := MakeKolideServerEndpoints(svc, config.Auth.JwtKey, config.Server.URLPrefix)
 	kolideHandlers := makeKolideKitHandlers(kolideEndpoints, kolideAPIOptions)
 
 	r := mux.NewRouter()
@@ -398,7 +399,7 @@ func MakeHandler(svc kolide.Service, jwtKey string, logger kitlog.Logger) http.H
 	addMetrics(r)
 
 	r.PathPrefix("/api/v1/kolide/results/").
-		Handler(makeStreamDistributedQueryCampaignResultsHandler(svc, jwtKey, logger)).
+		Handler(makeStreamDistributedQueryCampaignResultsHandler(svc, config.Auth.JwtKey, logger)).
 		Name("distributed_query_results")
 
 	return r
