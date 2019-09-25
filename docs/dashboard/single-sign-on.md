@@ -26,7 +26,11 @@ Entity ID that you define in the Fleet SSO configuration.
 
   #### Example Salesforce IDP Configuration
 
-  ![Example Salesforce IDP Configuration](../images/idp-setup.png)
+  ![Example Salesforce IDP Configuration](../images/salesforce-idp-setup.png)
+
+  #### Example Okta IDP Configuration
+
+  ![Example Okta IDP Configuration](../images/okta-idp-setup.png)
 
 The IDP will generate an issuer URI and a metadata URL that will be used to configure
 Fleet as a service provider.
