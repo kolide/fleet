@@ -38,7 +38,7 @@ Fleet as a service provider.
 ## Fleet SSO Configuration
 
 A user must be an admin to configure Fleet for SSO.  The SSO configuration is
-found in App Settings. If your IDP supports dynamic configuration, like Okta, you only need to provide an _Identity Provider Name_ and paste a link in the metadata URL field. Otherwise, the following values are required.
+found in App Settings. If your IDP supports dynamic configuration, like Okta, you only need to provide an _Identity Provider Name_ and _Entity ID_, then paste a link in the metadata URL field. Otherwise, the following values are required.
 
 * _Identity Provider Name_ - A human friendly name of the IDP.
 
