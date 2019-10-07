@@ -28,14 +28,13 @@ import Kolide500 from 'pages/Kolide500';
 import store from 'redux/store';
 import UserSettingsPage from 'pages/UserSettingsPage';
 import PATHS from 'router/paths';
-import URL_PREFIX from 'router/url_prefix';
 
 const history = syncHistoryWithStore(browserHistory, store);
 
 const routes = (
   <Provider store={store}>
     <Router history={history}>
-      <Route path={`${URL_PREFIX}/`} component={App}>
+      <Route path={PATHS.HOME} component={App}>
         <Route path="setup" component={RegistrationPage} />
         <Route path="login" component={LoginRoutes}>
           <Route path="invites/:invite_token" component={ConfirmInvitePage} />

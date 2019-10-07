@@ -35,7 +35,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-var urlPrefixRegexp = regexp.MustCompile("^(/[a-zA-Z0-9-_.~]+)+$")
+var allowedURLPrefixRegexp = regexp.MustCompile("^(?:/[a-zA-Z0-9_.~-]+)+$")
 
 type initializer interface {
 	// Initialize is used to populate a datastore with
@@ -95,9 +95,9 @@ the way that the Fleet server works.
 				config.Filesystem.EnableLogRotation = config.Osquery.EnableLogRotation
 			}
 
-			if len(config.Server.URLPrefix) > 0 && !urlPrefixRegexp.MatchString(config.Server.URLPrefix) {
+			if len(config.Server.URLPrefix) > 0 && !allowedURLPrefixRegexp.MatchString(config.Server.URLPrefix) {
 				initFatal(
-					errors.Errorf("prefix must match regexp \"%s\"", urlPrefixRegexp.String()),
+					errors.Errorf("prefix must match regexp \"%s\"", allowedURLPrefixRegexp.String()),
 					"setting server URL prefix",
 				)
 			}
