@@ -1,8 +1,14 @@
 package mysql
 
 import (
+	"fmt"
+
 	"github.com/kolide/fleet/server/kolide"
 	"github.com/pkg/errors"
+)
+
+const (
+	HostExpiryEvent = "host_expiry"
 )
 
 func (d *Datastore) NewAppConfig(info *kolide.AppConfig) (*kolide.AppConfig, error) {
@@ -21,6 +27,32 @@ func (d *Datastore) AppConfig() (*kolide.AppConfig, error) {
 		return nil, errors.Wrap(err, "selecting app config")
 	}
 	return info, nil
+}
+
+func (d *Datastore) ManageHostExpiryEvent(hostExpiryEnabled bool, hostExpiryWindow int) error {
+	rows, err := d.db.Query("SELECT @@event_scheduler")
+	if err != nil {
+		return err
+	}
+	if !rows.Next() {
+		return errors.New("Error detecting event scheduler status.")
+	}
+	var value string
+	if err := rows.Scan(&value); err != nil {
+		return err
+	}
+	if value != "ON" {
+		return errors.New("Event Scheduler must be enabled for configuring Host Expiry.")
+	}
+
+	if !hostExpiryEnabled {
+		_, err := d.db.Exec(fmt.Sprintf("DROP EVENT IF EXISTS %s", HostExpiryEvent))
+		return err
+	}
+
+	_, err = d.db.Exec(
+		fmt.Sprintf("CREATE EVENT IF NOT EXISTS %s ON SCHEDULE EVERY 1 HOUR ON COMPLETION PRESERVE DO DELETE FROM HOSTS WHERE DATE_ADD(day, -%d, NOW()) < updated_at", HostExpiryEvent, hostExpiryWindow))
+	return err
 }
 
 func (d *Datastore) SaveAppConfig(info *kolide.AppConfig) error {
@@ -54,9 +86,11 @@ func (d *Datastore) SaveAppConfig(info *kolide.AppConfig) error {
       idp_name,
       enable_sso,
       fim_interval,
-      fim_file_accesses
+      fim_file_accesses,
+      host_expiry_enabled,
+      host_expiry_window
     )
-    VALUES( 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
+    VALUES( 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
     ON DUPLICATE KEY UPDATE
       org_name = VALUES(org_name),
       org_logo_url = VALUES(org_logo_url),
@@ -82,7 +116,9 @@ func (d *Datastore) SaveAppConfig(info *kolide.AppConfig) error {
       idp_name = VALUES(idp_name),
       enable_sso = VALUES(enable_sso),
       fim_interval = VALUES(fim_interval),
-      fim_file_accesses = VALUES(fim_file_accesses)
+      fim_file_accesses = VALUES(fim_file_accesses),
+      host_expiry_enabled = VALUES(host_expiry_enabled),
+      host_expiry_window = VALUES(host_expiry_window)
     `
 
 	_, err := d.db.Exec(insertStatement,
@@ -111,7 +147,13 @@ func (d *Datastore) SaveAppConfig(info *kolide.AppConfig) error {
 		info.EnableSSO,
 		info.FIMInterval,
 		info.FIMFileAccesses,
+		info.HostExpiryEnabled,
+		info.HostExpiryWindow,
 	)
 
-	return err
+	if err != nil {
+		return err
+	}
+
+	return d.ManageHostExpiryEvent(info.HostExpiryEnabled, info.HostExpiryWindow)
 }
