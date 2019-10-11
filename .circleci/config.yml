@@ -5,6 +5,7 @@ jobs:
       - image: golang:1.12
       - image: redis:5.0
       - image: mysql:5.7
+        command: --event-scheduler=ON
         environment:
           MYSQL_ROOT_PASSWORD: toor
           MYSQL_DATABASE: kolide
