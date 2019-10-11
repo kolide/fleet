@@ -97,7 +97,7 @@ describe('AppConfigForm - form', () => {
     });
 
     it('enables host expiry window', () => {
-      form.find({ name: 'host_expiry_enabled' }).find('button').simulate('click')
+      form.find({ name: 'host_expiry_enabled' }).find('button').simulate('click');
       const InputField = form.find({ name: 'host_expiry_window' });
       const inputElement = InputField.find('input');
       expect(inputElement.hasClass('input-field--disabled')).toBe(false);

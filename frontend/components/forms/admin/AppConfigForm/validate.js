@@ -67,7 +67,7 @@ export default (formData) => {
 
   if (hostExpiryEnabled) {
     if (isNaN(hostExpiryWindow) || Number(hostExpiryWindow) <= 0) {
-      errors.host_expiry_window = 'Host Expiry Window must be a positive number'
+      errors.host_expiry_window = 'Host Expiry Window must be a positive number';
     }
   }
 

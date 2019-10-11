@@ -201,5 +201,5 @@ describe('AppConfigForm - validations', () => {
       };
       expect(validate(formData)).toEqual({ valid: false, errors: { host_expiry_window: 'Host Expiry Window must be a positive number' } });
     });
-  })
+  });
 });
