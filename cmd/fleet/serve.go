@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/signal"
 	"regexp"
+	"strings"
 	"syscall"
 	"time"
 
@@ -95,11 +96,19 @@ the way that the Fleet server works.
 				config.Filesystem.EnableLogRotation = config.Osquery.EnableLogRotation
 			}
 
-			if len(config.Server.URLPrefix) > 0 && !allowedURLPrefixRegexp.MatchString(config.Server.URLPrefix) {
-				initFatal(
-					errors.Errorf("prefix must match regexp \"%s\"", allowedURLPrefixRegexp.String()),
-					"setting server URL prefix",
-				)
+			if len(config.Server.URLPrefix) > 0 {
+				// Massage provided prefix to match expected format
+				config.Server.URLPrefix = strings.TrimSuffix(config.Server.URLPrefix, "/")
+				if len(config.Server.URLPrefix) > 0 && !strings.HasPrefix(config.Server.URLPrefix, "/") {
+					config.Server.URLPrefix = "/" + config.Server.URLPrefix
+				}
+
+				if !allowedURLPrefixRegexp.MatchString(config.Server.URLPrefix) {
+					initFatal(
+						errors.Errorf("prefix must match regexp \"%s\"", allowedURLPrefixRegexp.String()),
+						"setting server URL prefix",
+					)
+				}
 			}
 
 			var ds kolide.Datastore
@@ -278,6 +287,7 @@ the way that the Fleet server works.
 			}
 
 			if len(config.Server.URLPrefix) > 0 {
+
 				prefixMux := http.NewServeMux()
 				prefixMux.Handle(config.Server.URLPrefix+"/", http.StripPrefix(config.Server.URLPrefix, rootMux))
 				rootMux = prefixMux
