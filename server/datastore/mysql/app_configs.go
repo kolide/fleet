@@ -7,10 +7,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-const (
-	HostExpiryEvent = "host_expiry"
-)
-
 func (d *Datastore) NewAppConfig(info *kolide.AppConfig) (*kolide.AppConfig, error) {
 	if err := d.SaveAppConfig(info); err != nil {
 		return nil, errors.Wrap(err, "new app config")
@@ -30,6 +26,11 @@ func (d *Datastore) AppConfig() (*kolide.AppConfig, error) {
 }
 
 func (d *Datastore) ManageHostExpiryEvent(hostExpiryEnabled bool, hostExpiryWindow int) error {
+	if !hostExpiryEnabled {
+		_, err := d.db.Exec("DROP EVENT IF EXISTS host_expiry")
+		return err
+	}
+
 	rows, err := d.db.Query("SELECT @@event_scheduler")
 	if err != nil {
 		return err
@@ -45,13 +46,7 @@ func (d *Datastore) ManageHostExpiryEvent(hostExpiryEnabled bool, hostExpiryWind
 		return errors.New("Event Scheduler must be enabled for configuring Host Expiry.")
 	}
 
-	if !hostExpiryEnabled {
-		_, err := d.db.Exec(fmt.Sprintf("DROP EVENT IF EXISTS %s", HostExpiryEvent))
-		return err
-	}
-
-	_, err = d.db.Exec(
-		fmt.Sprintf("CREATE EVENT IF NOT EXISTS %s ON SCHEDULE EVERY 1 HOUR ON COMPLETION PRESERVE DO DELETE FROM HOSTS WHERE DATE_ADD(day, -%d, NOW()) < updated_at", HostExpiryEvent, hostExpiryWindow))
+	_, err = d.db.Exec(fmt.Sprintf("CREATE EVENT IF NOT EXISTS host_expiry ON SCHEDULE EVERY 1 HOUR ON COMPLETION PRESERVE DO DELETE FROM hosts WHERE seen_time < DATE_SUB(NOW(), INTERVAL %d DAY)", hostExpiryWindow))
 	return err
 }
 
