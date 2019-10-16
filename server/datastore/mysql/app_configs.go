@@ -31,7 +31,7 @@ func (d *Datastore) isEventSchedulerEnabled() (bool, error) {
 		return false, err
 	}
 	if !rows.Next() {
-		return false, errors.New("Error detecting event scheduler status.")
+		return false, errors.New("Error detecting MySQL event scheduler status.")
 	}
 	var value string
 	if err := rows.Scan(&value); err != nil {
@@ -58,7 +58,7 @@ func (d *Datastore) SaveAppConfig(info *kolide.AppConfig) error {
 	}
 
 	if !eventSchedulerEnabled && info.HostExpiryEnabled {
-		return errors.New("Event Scheduler must be enabled for configuring Host Expiry.")
+		return errors.New("MySQL Event Scheduler must be enabled to configure Host Expiry.")
 	}
 
 	if err := d.ManageHostExpiryEvent(info.HostExpiryEnabled, info.HostExpiryWindow); err != nil {
