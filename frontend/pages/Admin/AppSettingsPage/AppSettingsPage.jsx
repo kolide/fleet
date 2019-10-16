@@ -34,6 +34,7 @@ class AppSettingsPage extends Component {
   onFormSubmit = (formData) => {
     const { appConfig, dispatch } = this.props;
     const diff = deepDifference(formData, appConfig);
+
     dispatch(updateConfig(diff))
       .then(() => {
         dispatch(renderFlash('success', 'Settings updated!'));
