@@ -222,6 +222,57 @@ func makeModifyUserEndpoint(svc kolide.Service) endpoint.Endpoint {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Delete User By ID
+////////////////////////////////////////////////////////////////////////////////
+
+type deleteUserByIDRequest struct {
+	ID uint
+}
+
+type deleteUserByIDResponse struct {
+	Err error `json:"error,omitempty"`
+}
+
+func (r deleteUserByIDResponse) error() error { return r.Err }
+
+func makeDeleteUserByIDEndpoint(svc kolide.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(deleteUserByIDRequest)
+		err := svc.DeleteUserByID(ctx, req.ID)
+		if err != nil {
+			return deleteUserByIDResponse{Err: err}, nil
+		}
+		return deleteUserByIDResponse{}, nil
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Delete Users
+////////////////////////////////////////////////////////////////////////////////
+
+type deleteUsersRequest struct {
+	IDs []uint `json:"ids"`
+}
+
+type deleteUsersResponse struct {
+	Deleted uint  `json:"deleted"`
+	Err     error `json:"error,omitempty"`
+}
+
+func (r deleteUsersResponse) error() error { return r.Err }
+
+func makeDeleteUsersEndpoint(svc kolide.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(deleteUsersRequest)
+		deleted, err := svc.DeleteUsers(ctx, req.IDs)
+		if err != nil {
+			return deleteUsersResponse{Err: err}, nil
+		}
+		return deleteUsersResponse{Deleted: deleted}, nil
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Perform Required Password Reset
 ////////////////////////////////////////////////////////////////////////////////
 

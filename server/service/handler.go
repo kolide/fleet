@@ -26,6 +26,8 @@ type KolideEndpoints struct {
 	GetUser                               endpoint.Endpoint
 	ListUsers                             endpoint.Endpoint
 	ModifyUser                            endpoint.Endpoint
+	DeleteUserByID                        endpoint.Endpoint
+	DeleteUsers                           endpoint.Endpoint
 	AdminUser                             endpoint.Endpoint
 	EnableUser                            endpoint.Endpoint
 	RequirePasswordReset                  endpoint.Endpoint
@@ -125,6 +127,8 @@ func MakeKolideServerEndpoints(svc kolide.Service, jwtKey, urlPrefix string) Kol
 		GetUser:              authenticatedUser(jwtKey, svc, canReadUser(makeGetUserEndpoint(svc))),
 		ListUsers:            authenticatedUser(jwtKey, svc, canPerformActions(makeListUsersEndpoint(svc))),
 		ModifyUser:           authenticatedUser(jwtKey, svc, canModifyUser(makeModifyUserEndpoint(svc))),
+		DeleteUserByID:       authenticatedUser(jwtKey, svc, mustBeAdmin(makeDeleteUserByIDEndpoint(svc))),
+		DeleteUsers:          authenticatedUser(jwtKey, svc, mustBeAdmin(makeDeleteUsersEndpoint(svc))),
 		AdminUser:            authenticatedUser(jwtKey, svc, mustBeAdmin(makeAdminUserEndpoint(svc))),
 		EnableUser:           authenticatedUser(jwtKey, svc, mustBeAdmin(makeEnableUserEndpoint(svc))),
 		RequirePasswordReset: authenticatedUser(jwtKey, svc, mustBeAdmin(makeRequirePasswordResetEndpoint(svc))),
@@ -213,6 +217,8 @@ type kolideHandlers struct {
 	GetUser                               http.Handler
 	ListUsers                             http.Handler
 	ModifyUser                            http.Handler
+	DeleteUserByID                        http.Handler
+	DeleteUsers                           http.Handler
 	AdminUser                             http.Handler
 	EnableUser                            http.Handler
 	RequirePasswordReset                  http.Handler
@@ -302,6 +308,8 @@ func makeKolideKitHandlers(e KolideEndpoints, opts []kithttp.ServerOption) *koli
 		GetUser:                               newServer(e.GetUser, decodeGetUserRequest),
 		ListUsers:                             newServer(e.ListUsers, decodeListUsersRequest),
 		ModifyUser:                            newServer(e.ModifyUser, decodeModifyUserRequest),
+		DeleteUserByID:                        newServer(e.DeleteUserByID, decodeDeleteUserByIDRequest),
+		DeleteUsers:                           newServer(e.DeleteUsers, decodeDeleteUsersRequest),
 		RequirePasswordReset:                  newServer(e.RequirePasswordReset, decodeRequirePasswordResetRequest),
 		PerformRequiredPasswordReset:          newServer(e.PerformRequiredPasswordReset, decodePerformRequiredPasswordResetRequest),
 		EnableUser:                            newServer(e.EnableUser, decodeEnableUserRequest),
@@ -430,11 +438,13 @@ func attachKolideAPIRoutes(r *mux.Router, h *kolideHandlers) {
 	r.Handle("/api/v1/kolide/users", h.CreateUser).Methods("POST").Name("create_user")
 	r.Handle("/api/v1/kolide/users/{id}", h.GetUser).Methods("GET").Name("get_user")
 	r.Handle("/api/v1/kolide/users/{id}", h.ModifyUser).Methods("PATCH").Name("modify_user")
+	r.Handle("/api/v1/kolide/users/{id}", h.DeleteUserByID).Methods("DELETE").Name("delete_user")
 	r.Handle("/api/v1/kolide/users/{id}/enable", h.EnableUser).Methods("POST").Name("enable_user")
 	r.Handle("/api/v1/kolide/users/{id}/admin", h.AdminUser).Methods("POST").Name("admin_user")
 	r.Handle("/api/v1/kolide/users/{id}/require_password_reset", h.RequirePasswordReset).Methods("POST").Name("require_password_reset")
 	r.Handle("/api/v1/kolide/users/{id}/sessions", h.GetSessionsForUserInfo).Methods("GET").Name("get_session_for_user")
 	r.Handle("/api/v1/kolide/users/{id}/sessions", h.DeleteSessionsForUser).Methods("DELETE").Name("delete_session_for_user")
+	r.Handle("/api/v1/kolide/users/delete", h.DeleteUsers).Methods("POST").Name("delete_users")
 
 	r.Handle("/api/v1/kolide/sessions/{id}", h.GetSessionInfo).Methods("GET").Name("get_session_info")
 	r.Handle("/api/v1/kolide/sessions/{id}", h.DeleteSession).Methods("DELETE").Name("delete_session")

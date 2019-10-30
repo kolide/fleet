@@ -19,6 +19,11 @@ type UserStore interface {
 	UserByEmail(email string) (*User, error)
 	UserByID(id uint) (*User, error)
 	SaveUser(user *User) error
+	// DeleteUserByID (soft) deletes an existing user object by ID.
+	DeleteUserByID(id uint) error
+	// DeleteUsers (soft) deletes the existing user objects with the provided
+	// IDs. The number of deleted users is returned along with any error.
+	DeleteUsers(ids []uint) (uint, error)
 	// PendingEmailChange creates a record with a pending email change for a user identified
 	// by uid. The change record is keyed by a unique token. The token is emailed to the user
 	// with a link that they can use to confirm the change.
@@ -84,6 +89,13 @@ type UserService interface {
 	// ChangeUserEmail is used to confirm new email address and if confirmed,
 	// write the new email address to user.
 	ChangeUserEmail(ctx context.Context, token string) (string, error)
+
+	// DeleteUserByID (soft) deletes an existing user object by ID.
+	DeleteUserByID(ctx context.Context, id uint) error
+
+	// DeleteUsers (soft) deletes the existing user objects with the provided
+	// IDs. The number of deleted users is returned along with any error.
+	DeleteUsers(ctx context.Context, ids []uint) (uint, error)
 }
 
 // User is the model struct which represents a kolide user

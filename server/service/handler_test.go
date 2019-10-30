@@ -52,6 +52,14 @@ func TestAPIRoutes(t *testing.T) {
 			uri:  "/api/v1/kolide/users/1",
 		},
 		{
+			verb: "DELETE",
+			uri:  "/api/v1/kolide/users/1",
+		},
+		{
+			verb: "POST",
+			uri:  "/api/v1/kolide/users/delete",
+		},
+		{
 			verb: "POST",
 			uri:  "/api/v1/kolide/login",
 		},
