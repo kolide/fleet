@@ -43,12 +43,24 @@ func (d *Datastore) isEventSchedulerEnabled() (bool, error) {
 
 func (d *Datastore) ManageHostExpiryEvent(hostExpiryEnabled bool, hostExpiryWindow int) error {
 	var err error
-
-	if _, err = d.db.Exec("DROP EVENT IF EXISTS host_expiry"); err != nil {
+	hostExpiryConfig := struct {
+		Enabled bool `db:"host_expiry_enabled"`
+		Window  int  `db:"host_expiry_window"`
+	}{}
+	if err = d.db.Get(&hostExpiryConfig, "SELECT host_expiry_enabled,host_expiry_window from app_configs LIMIT 1"); err != nil {
 		return err
 	}
 
-	if hostExpiryEnabled {
+	shouldUpdateWindow := hostExpiryConfig.Window != hostExpiryWindow
+	hostExpiryDisabled := hostExpiryConfig.Enabled && !hostExpiryEnabled
+
+	if hostExpiryDisabled || shouldUpdateWindow {
+		if _, err = d.db.Exec("DROP EVENT IF EXISTS host_expiry"); err != nil {
+			return err
+		}
+	}
+
+	if hostExpiryEnabled || (shouldUpdateWindow && !hostExpiryDisabled) {
 		_, err = d.db.Exec(fmt.Sprintf("CREATE EVENT IF NOT EXISTS host_expiry ON SCHEDULE EVERY 1 HOUR ON COMPLETION PRESERVE DO DELETE FROM hosts WHERE seen_time < DATE_SUB(NOW(), INTERVAL %d DAY)", hostExpiryWindow))
 	}
 	return err
