@@ -1,0 +1,4 @@
+FROM debian:stable-slim
+RUN apt-get update && apt-get install -y wget
+RUN wget https://pkg.osquery.io/deb/osquery_4.0.2_1.linux.amd64.deb
+RUN dpkg -i osquery_4.0.2_1.linux.amd64.deb
