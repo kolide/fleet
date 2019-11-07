@@ -1,9 +1,36 @@
 version: '2'
 services:
+  fleet:
+    build:
+      context: .
+      dockerfile: Dockerfile.compose
+    image: kolide-local
+    command:
+      - /bin/bash
+      - "-c"
+      - "(
+          while ! grep -q 00:01BB /proc/net/tcp6;do echo wait;sleep 1;done; \
+          fleetctl config set --address https://localhost:443 --tls-skip-verify; \
+          fleetctl setup --email kolide@wayfair.com --password kolide; \
+          fleetctl get enroll-secret > /data/enroll-secret;cp ./tools/osquery/kolide.crt /data/ \
+        ) & \
+        fleet prepare db && fleet serve"
+    environment:
+      KOLIDE_SERVER_ADDRESS: 0.0.0.0:443
+      KOLIDE_MYSQL_ADDRESS: mysql:3306
+      KOLIDE_MYSQL_PASSWORD: kolide
+      KOLIDE_REDIS_ADDRESS: redis:6379
+      KOLIDE_AUTH_JWT_KEY: E6VMWGBgZkKzfY/dw3zsZMd9foPsUrmL
+    ports:
+      - "443:443"
+    volumes:
+      - app-volume:/data
+    restart: on-failure
+    depends_on:
+      - mysql
+
   mysql:
     image: mysql:5.7
-    volumes:
-      - .:/tmp
     command: mysqld --datadir=/tmp/mysqldata --slow_query_log=1 --log_output=TABLE --log-queries-not-using-indexes --event-scheduler=ON
     environment:
       MYSQL_ROOT_PASSWORD: toor
@@ -35,3 +62,37 @@ services:
     image: redis:3.2.4
     ports:
       - "6379:6379"
+
+
+  linux:
+    build:
+      context: .
+      dockerfile: Dockerfile.osquery
+    image: linux-local
+    command:
+      - /bin/bash
+      - "-c"
+      - "osqueryd \
+        --enroll_secret_path /data/enroll-secret \
+        --tls_server_certs=/data/kolide.crt \
+        --tls_hostname=fleet \
+        --host_identifier=uuid \
+        --enroll_tls_endpoint=/api/v1/osquery/enroll \
+        --config_plugin=tls \
+        --config_tls_endpoint=/api/v1/osquery/config \
+        --config_refresh=10 \
+        --disable_distributed=false \
+        --distributed_plugin=tls \
+        --distributed_interval=10 \
+        --distributed_tls_max_attempts=3 \
+        --distributed_tls_read_endpoint=/api/v1/osquery/distributed/read \
+        --distributed_tls_write_endpoint=/api/v1/osquery/distributed/write \
+        --logger_plugin=tls \
+        --logger_tls_endpoint=/api/v1/osquery/log \
+        --logger_tls_period=10"
+    volumes:
+      - app-volume:/data
+    restart: on-failure
+
+volumes:
+    app-volume:

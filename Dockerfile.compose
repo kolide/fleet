@@ -1,0 +1,19 @@
+FROM node:10 AS prep
+COPY . /workspace/
+WORKDIR /workspace
+RUN make deps-js
+RUN make generate-js
+
+FROM golang:1 as go
+COPY --from=prep /workspace /workspace
+WORKDIR /workspace
+RUN make deps-go
+RUN make generate-go
+RUN make build
+
+FROM debian:stable-slim
+RUN apt-get update && apt-get install -y ca-certificates
+COPY --from=go /workspace/tools/osquery /workspace/tools/osquery
+COPY --from=go /workspace/build/fleet /workspace/build/fleetctl /usr/bin/
+WORKDIR /workspace
+CMD ["fleet", "serve"]
