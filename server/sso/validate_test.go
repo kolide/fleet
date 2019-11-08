@@ -41,11 +41,15 @@ var testResponse = `PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48c2FtbHA6
 func TestValidate(t *testing.T) {
 	tm, err := time.Parse(time.UnixDate, "Sun Apr 30 22:10:00 UTC 2017")
 	require.Nil(t, err)
+
 	clock := dsig.NewFakeClockAt(tm)
 	validator, err := NewValidator(testMetadata, Clock(clock))
 	require.Nil(t, err)
 	require.NotNil(t, validator)
+
 	auth, err := DecodeAuthResponse(testResponse)
+	require.Nil(t, err)
+
 	signed, err := validator.ValidateSignature(auth)
 	require.Nil(t, err)
 	require.NotNil(t, signed)
