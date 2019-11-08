@@ -78,13 +78,18 @@ func tamperedResponse(original string) (string, error) {
 func TestVerfiyValidTamperedWithDocFails(t *testing.T) {
 	tampered, err := tamperedResponse(testResponse)
 	require.Nil(t, err)
+
 	tm, err := time.Parse(time.UnixDate, "Sun Apr 30 22:10:00 UTC 2017")
 	require.Nil(t, err)
+
 	clock := dsig.NewFakeClockAt(tm)
 	validator, err := NewValidator(testMetadata, Clock(clock))
 	require.Nil(t, err)
 	require.NotNil(t, validator)
+
 	auth, err := DecodeAuthResponse(tampered)
+	require.Nil(t, err)
+
 	_, err = validator.ValidateSignature(auth)
 	require.NotNil(t, err)
 }
