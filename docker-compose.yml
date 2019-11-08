@@ -20,7 +20,7 @@ services:
       KOLIDE_MYSQL_ADDRESS: mysql:3306
       KOLIDE_MYSQL_PASSWORD: kolide
       KOLIDE_REDIS_ADDRESS: redis:6379
-      KOLIDE_AUTH_JWT_KEY: FAKESECRETFake/thisisjustfakekey
+      KOLIDE_AUTH_JWT_KEY: insecure
     ports:
       - "443:443"
     volumes:
