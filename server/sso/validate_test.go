@@ -97,7 +97,10 @@ func TestVerfiyStaleMessageFails(t *testing.T) {
 	validator, err := NewValidator(testMetadata, Clock(clock))
 	require.Nil(t, err)
 	require.NotNil(t, validator)
+
 	auth, err := DecodeAuthResponse(testResponse)
+	require.Nil(t, err)
+
 	signed, err := validator.ValidateSignature(auth)
 	require.Nil(t, err)
 	require.NotNil(t, signed)
