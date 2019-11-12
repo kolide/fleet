@@ -11,7 +11,7 @@ services:
       - "(
           while ! grep -q 00:01BB /proc/net/tcp6;do echo wait;sleep 1;done; \
           fleetctl config set --address https://localhost:443 --tls-skip-verify; \
-          fleetctl setup --email kolide@kolide.com --password kolide; \
+          fleetctl setup --email kolide@example.com --password kolide; \
           fleetctl get enroll-secret > /data/enroll-secret;cp ./tools/osquery/kolide.crt /data/ \
         ) & \
         fleet prepare db && fleet serve"
