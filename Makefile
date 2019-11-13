@@ -107,10 +107,10 @@ endif
 build: fleet fleetctl
 
 fleet: .prefix .pre-build .pre-fleet
-	go build -i -o build/${OUTPUT} -ldflags ${KIT_VERSION} ./cmd/fleet
+	go build -i -o build/${OUTPUT} -ldflags ${KIT_VERSION} -ldflags "-w -s -extldflags '-static'" ./cmd/fleet
 
 fleetctl: .prefix .pre-build .pre-fleetctl
-	go build -i -o build/fleetctl -ldflags ${KIT_VERSION} ./cmd/fleetctl
+	go build -i -o build/fleetctl -ldflags ${KIT_VERSION} -ldflags "-w -s -extldflags '-static'" ./cmd/fleetctl
 
 lint-js:
 	yarn run eslint frontend --ext .js,.jsx
