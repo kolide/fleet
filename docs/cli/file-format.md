@@ -204,7 +204,7 @@ spec:
             3600: "SELECT total_seconds AS uptime FROM uptime"
 ```
 ## Fleet Configuration Options
-The following file describes configuration options applied to the Fleet instance. 
+The following file describes configuration options applied to the Fleet instance.
 
 ```yaml
 apiVersion: v1
@@ -241,13 +241,16 @@ spec:
     metadata: "<md:EntityDescriptor entityID="https://idp.example.org/SAML2"> ... /md:EntityDescriptor>"
     metadata_url: https://idp.example.org/idp-meta.xml
 ```
-### SMTP Authentication Options
+### SMTP Authentication
+
+**Warning:** Be careful not to store your SMTP credentials in source control. It is recommended to set the password through the web UI or `fleetctl` and then remove the line from the checked in version. Fleet will leave the password as-is if the field is missing from the applied configuration.
+
 The following options are available when configuring SMTP authentication:
 
 - `smtp_settings.authentication_type`
-  - *authtype_none* - use this if your SMTP server is open
-  - *authtype_username_password* - use this if your SMTP server requires authentication with a username and password
-- `smtp_settings.authentication_method` - required with authentication type *authtype_username_password*
-  - *authmethod_cram_md5*
-  - *authmethod_login*
-  - *authmethod_plain* 
+  - `authtype_none` - use this if your SMTP server is open
+  - `authtype_username_password` - use this if your SMTP server requires authentication with a username and password
+- `smtp_settings.authentication_method` - required with authentication type `authtype_username_password`
+  - `authmethod_cram_md5`
+  - `authmethod_login`
+  - `authmethod_plain`

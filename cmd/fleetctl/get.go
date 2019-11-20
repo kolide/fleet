@@ -422,7 +422,7 @@ func getEnrollSecretCommand() cli.Command {
 func getAppConfigCommand() cli.Command {
 	return cli.Command{
 		Name:  "config",
-		Usage: "Retrieve the fleet configuration",
+		Usage: "Retrieve the Fleet configuration",
 		Flags: []cli.Flag{
 			configFlag(),
 			contextFlag(),
