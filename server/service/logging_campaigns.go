@@ -12,19 +12,22 @@ import (
 func (mw loggingMiddleware) NewDistributedQueryCampaign(ctx context.Context, queryString string, hosts []uint, labels []uint) (*kolide.DistributedQueryCampaign, error) {
 	var (
 		loggedInUser = "unauthenticated"
+		metrics      *kolide.TargetMetrics
 		err          error
 	)
-	vc, ok := viewer.FromContext(ctx)
-	if ok {
+	if vc, ok := viewer.FromContext(ctx); ok {
+
 		loggedInUser = vc.Username()
 	}
+	metrics, err = mw.Service.CountHostsInTargets(ctx, hosts, labels)
 
 	defer func(begin time.Time) {
 		_ = mw.logger.Log(
 			"method", "NewDistributedQueryCampaign",
 			"err", err,
 			"user", loggedInUser,
-			"numHosts", len(hosts),
+			"sql", queryString,
+			"numHosts", metrics.TotalHosts,
 			"took", time.Since(begin),
 		)
 	}(time.Now())
@@ -37,8 +40,8 @@ func (mw loggingMiddleware) NewDistributedQueryCampaignByNames(ctx context.Conte
 		loggedInUser = "unauthenticated"
 		err          error
 	)
-	vc, ok := viewer.FromContext(ctx)
-	if ok {
+	if vc, ok := viewer.FromContext(ctx); ok {
+
 		loggedInUser = vc.Username()
 	}
 	defer func(begin time.Time) {
@@ -59,13 +62,14 @@ func (mw loggingMiddleware) StreamCampaignResults(ctx context.Context, conn *web
 		loggedInUser = "unauthenticated"
 		err          error
 	)
-	vc, ok := viewer.FromContext(ctx)
-	if ok {
+	if vc, ok := viewer.FromContext(ctx); ok {
+
 		loggedInUser = vc.Username()
 	}
 	defer func(begin time.Time) {
 		_ = mw.logger.Log(
 			"method", "StreamCampaignResults",
+			"campaignID", campaignID,
 			"err", err,
 			"user", loggedInUser,
 			"took", time.Since(begin),

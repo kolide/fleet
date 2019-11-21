@@ -52,8 +52,8 @@ func (mw loggingMiddleware) ScheduleQuery(ctx context.Context, sq *kolide.Schedu
 		loggedInUser = "unauthenticated"
 	)
 
-	vc, ok := viewer.FromContext(ctx)
-	if ok {
+	if vc, ok := viewer.FromContext(ctx); ok {
+
 		loggedInUser = vc.Username()
 	}
 
@@ -76,8 +76,8 @@ func (mw loggingMiddleware) DeleteScheduledQuery(ctx context.Context, id uint) e
 		loggedInUser = "unauthenticated"
 	)
 
-	vc, ok := viewer.FromContext(ctx)
-	if ok {
+	if vc, ok := viewer.FromContext(ctx); ok {
+
 		loggedInUser = vc.Username()
 	}
 
@@ -101,8 +101,8 @@ func (mw loggingMiddleware) ModifyScheduledQuery(ctx context.Context, id uint, p
 		loggedInUser = "unauthenticated"
 	)
 
-	vc, ok := viewer.FromContext(ctx)
-	if ok {
+	if vc, ok := viewer.FromContext(ctx); ok {
+
 		loggedInUser = vc.Username()
 	}
 

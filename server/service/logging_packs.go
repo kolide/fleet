@@ -15,8 +15,8 @@ func (mw loggingMiddleware) NewPack(ctx context.Context, p kolide.PackPayload) (
 		err          error
 	)
 
-	vc, ok := viewer.FromContext(ctx)
-	if ok {
+	if vc, ok := viewer.FromContext(ctx); ok {
+
 		loggedInUser = vc.Username()
 	}
 
@@ -40,8 +40,8 @@ func (mw loggingMiddleware) ModifyPack(ctx context.Context, id uint, p kolide.Pa
 		err          error
 	)
 
-	vc, ok := viewer.FromContext(ctx)
-	if ok {
+	if vc, ok := viewer.FromContext(ctx); ok {
+
 		loggedInUser = vc.Username()
 	}
 
@@ -100,8 +100,8 @@ func (mw loggingMiddleware) DeletePack(ctx context.Context, name string) error {
 		err          error
 	)
 
-	vc, ok := viewer.FromContext(ctx)
-	if ok {
+	if vc, ok := viewer.FromContext(ctx); ok {
+
 		loggedInUser = vc.Username()
 	}
 
@@ -268,8 +268,8 @@ func (mw loggingMiddleware) ApplyPackSpecs(ctx context.Context, specs []*kolide.
 		loggedInUser = "unauthenticated"
 	)
 
-	vc, ok := viewer.FromContext(ctx)
-	if ok {
+	if vc, ok := viewer.FromContext(ctx); ok {
+
 		loggedInUser = vc.Username()
 	}
 

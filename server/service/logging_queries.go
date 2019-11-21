@@ -49,8 +49,8 @@ func (mw loggingMiddleware) ListQueries(ctx context.Context, opt kolide.ListOpti
 		loggedInUser = "unauthenticated"
 		err          error
 	)
-	vc, ok := viewer.FromContext(ctx)
-	if ok {
+	if vc, ok := viewer.FromContext(ctx); ok {
+
 		loggedInUser = vc.Username()
 	}
 	defer func(begin time.Time) {
@@ -69,8 +69,8 @@ func (mw loggingMiddleware) GetQuery(ctx context.Context, id uint) (*kolide.Quer
 		loggedInUser = "unauthenticated"
 		err          error
 	)
-	vc, ok := viewer.FromContext(ctx)
-	if ok {
+	if vc, ok := viewer.FromContext(ctx); ok {
+
 		loggedInUser = vc.Username()
 	}
 	defer func(begin time.Time) {
@@ -90,8 +90,8 @@ func (mw loggingMiddleware) NewQuery(ctx context.Context, p kolide.QueryPayload)
 		loggedInUser = "unauthenticated"
 		err          error
 	)
-	vc, ok := viewer.FromContext(ctx)
-	if ok {
+	if vc, ok := viewer.FromContext(ctx); ok {
+
 		loggedInUser = vc.Username()
 	}
 	defer func(begin time.Time) {
@@ -113,8 +113,8 @@ func (mw loggingMiddleware) ModifyQuery(ctx context.Context, id uint, p kolide.Q
 		loggedInUser = "unauthenticated"
 		err          error
 	)
-	vc, ok := viewer.FromContext(ctx)
-	if ok {
+	if vc, ok := viewer.FromContext(ctx); ok {
+
 		loggedInUser = vc.Username()
 	}
 	defer func(begin time.Time) {
@@ -122,8 +122,8 @@ func (mw loggingMiddleware) ModifyQuery(ctx context.Context, id uint, p kolide.Q
 			"method", "ModifyQuery",
 			"err", err,
 			"user", loggedInUser,
-			"query", query.Name,
-			"queryString", query.Query,
+			"name", query.Name,
+			"sql", query.Query,
 			"took", time.Since(begin),
 		)
 	}(time.Now())
@@ -135,8 +135,8 @@ func (mw loggingMiddleware) DeleteQuery(ctx context.Context, name string) error 
 		loggedInUser = "unauthenticated"
 		err          error
 	)
-	vc, ok := viewer.FromContext(ctx)
-	if ok {
+	if vc, ok := viewer.FromContext(ctx); ok {
+
 		loggedInUser = vc.Username()
 	}
 	defer func(begin time.Time) {

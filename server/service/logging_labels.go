@@ -15,8 +15,8 @@ func (mw loggingMiddleware) NewLabel(ctx context.Context, p kolide.LabelPayload)
 		loggedInUser = "unauthenticated"
 	)
 
-	vc, ok := viewer.FromContext(ctx)
-	if ok {
+	if vc, ok := viewer.FromContext(ctx); ok {
+
 		loggedInUser = vc.Username()
 	}
 
@@ -40,8 +40,8 @@ func (mw loggingMiddleware) ModifyLabel(ctx context.Context, id uint, p kolide.M
 		loggedInUser = "unauthenticated"
 	)
 
-	vc, ok := viewer.FromContext(ctx)
-	if ok {
+	if vc, ok := viewer.FromContext(ctx); ok {
+
 		loggedInUser = vc.Username()
 	}
 
@@ -100,8 +100,8 @@ func (mw loggingMiddleware) DeleteLabel(ctx context.Context, name string) error 
 		loggedInUser = "unauthenticated"
 	)
 
-	vc, ok := viewer.FromContext(ctx)
-	if ok {
+	if vc, ok := viewer.FromContext(ctx); ok {
+
 		loggedInUser = vc.Username()
 	}
 
@@ -147,8 +147,8 @@ func (mw loggingMiddleware) ApplyLabelSpecs(ctx context.Context, specs []*kolide
 		loggedInUser = "unauthenticated"
 	)
 
-	vc, ok := viewer.FromContext(ctx)
-	if ok {
+	if vc, ok := viewer.FromContext(ctx); ok {
+
 		loggedInUser = vc.Username()
 	}
 

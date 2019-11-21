@@ -25,8 +25,8 @@ func (mw loggingMiddleware) ApplyOptionsSpec(ctx context.Context, spec *kolide.O
 		loggedInUser = "unauthenticated"
 	)
 
-	vc, ok := viewer.FromContext(ctx)
-	if ok {
+	if vc, ok := viewer.FromContext(ctx); ok {
+
 		loggedInUser = vc.Username()
 	}
 	defer func(begin time.Time) {

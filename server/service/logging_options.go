@@ -32,8 +32,8 @@ func (mw loggingMiddleware) ModifyOptions(ctx context.Context, req kolide.Option
 		loggedInUser = "unauthenticated"
 	)
 
-	vc, ok := viewer.FromContext(ctx)
-	if ok {
+	if vc, ok := viewer.FromContext(ctx); ok {
+
 		loggedInUser = vc.Username()
 	}
 
