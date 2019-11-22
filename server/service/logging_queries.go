@@ -99,8 +99,8 @@ func (mw loggingMiddleware) NewQuery(ctx context.Context, p kolide.QueryPayload)
 			"method", "NewQuery",
 			"err", err,
 			"user", loggedInUser,
-			"query", query.Name,
-			"queryString", query.Query,
+			"name", query.Name,
+			"sql", query.Query,
 			"took", time.Since(begin),
 		)
 	}(time.Now())
@@ -143,7 +143,7 @@ func (mw loggingMiddleware) DeleteQuery(ctx context.Context, name string) error 
 		mw.logger.Log(
 			"method", "DeleteQuery",
 			"err", err,
-			"query", name,
+			"name", name,
 			"user", loggedInUser,
 			"took", time.Since(begin),
 		)
