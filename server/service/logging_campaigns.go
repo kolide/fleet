@@ -12,32 +12,31 @@ import (
 func (mw loggingMiddleware) NewDistributedQueryCampaign(ctx context.Context, queryString string, hosts []uint, labels []uint) (*kolide.DistributedQueryCampaign, error) {
 	var (
 		loggedInUser = "unauthenticated"
-		metrics      *kolide.TargetMetrics
+		campaign     *kolide.DistributedQueryCampaign
 		err          error
 	)
 	if vc, ok := viewer.FromContext(ctx); ok {
 
 		loggedInUser = vc.Username()
 	}
-	metrics, err = mw.Service.CountHostsInTargets(ctx, hosts, labels)
-
 	defer func(begin time.Time) {
 		_ = mw.logger.Log(
 			"method", "NewDistributedQueryCampaign",
 			"err", err,
 			"user", loggedInUser,
 			"sql", queryString,
-			"numHosts", metrics.TotalHosts,
+			"numHosts", campaign.Metrics.TotalHosts,
 			"took", time.Since(begin),
 		)
 	}(time.Now())
-	campaign, err := mw.Service.NewDistributedQueryCampaign(ctx, queryString, hosts, labels)
+	campaign, err = mw.Service.NewDistributedQueryCampaign(ctx, queryString, hosts, labels)
 	return campaign, err
 }
 
 func (mw loggingMiddleware) NewDistributedQueryCampaignByNames(ctx context.Context, queryString string, hosts []string, labels []string) (*kolide.DistributedQueryCampaign, error) {
 	var (
 		loggedInUser = "unauthenticated"
+		campaign     *kolide.DistributedQueryCampaign
 		err          error
 	)
 	if vc, ok := viewer.FromContext(ctx); ok {
@@ -49,11 +48,11 @@ func (mw loggingMiddleware) NewDistributedQueryCampaignByNames(ctx context.Conte
 			"method", "NewDistributedQueryCampaignByNames",
 			"err", err,
 			"user", loggedInUser,
-			"numHosts", len(hosts),
+			"numHosts", campaign.Metrics.TotalHosts,
 			"took", time.Since(begin),
 		)
 	}(time.Now())
-	campaign, err := mw.Service.NewDistributedQueryCampaignByNames(ctx, queryString, hosts, labels)
+	campaign, err = mw.Service.NewDistributedQueryCampaignByNames(ctx, queryString, hosts, labels)
 	return campaign, err
 }
 
