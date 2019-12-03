@@ -160,7 +160,7 @@ func queryCommand() cli.Command {
 					if !flQuiet {
 						s.Suffix = msg
 					}
-					if total == responded {
+					if status != nil && total == responded {
 						s.Stop()
 						if !flQuiet {
 							fmt.Fprintln(os.Stderr, msg)
