@@ -104,7 +104,7 @@ describe('AppConfigForm - form', () => {
     });
 
     it('renders live query disabled input', () => {
-      form.find({name: 'live_query_disabled'});
+      form.find({ name: 'live_query_disabled' });
       expect(form.length).toEqual(1);
     });
   });
