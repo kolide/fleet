@@ -233,7 +233,7 @@ type OrgInfo struct {
 type ServerSettings struct {
 	KolideServerURL    *string `json:"kolide_server_url,omitempty"`
 	EnrollSecret       *string `json:"osquery_enroll_secret,omitempty"`
-	LiveQueryDisabled *bool   `json:"live_query_disabled,omitempty"`
+	LiveQueryDisabled  *bool   `json:"live_query_disabled,omitempty"`
 }
 
 // HostExpirySettings contains settings pertaining to automatic host expiry.
