@@ -2,12 +2,16 @@ module github.com/kolide/fleet
 
 go 1.12
 
+// To be removed when the necessary fixes are merged into upstream goquery
+replace github.com/AbGuthrie/goquery => github.com/zwass/goquery v1.0.1-0.20200117015906-ca134e79c4fc
+
 require (
 	cloud.google.com/go v0.37.4
+	github.com/AbGuthrie/goquery v1.0.1-0.20200109061954-791d440fb945
 	github.com/VividCortex/gohistogram v1.0.0 // indirect
 	github.com/VividCortex/mysqlerr v0.0.0-20170204212430-6c6b55f8796f
 	github.com/WatchBeam/clock v0.0.0-20170901150240-b08e6b4da7ea
-	github.com/aws/aws-sdk-go v1.19.8
+	github.com/aws/aws-sdk-go v1.26.8
 	github.com/beevik/etree v1.1.0
 	github.com/briandowns/spinner v0.0.0-20170614154858-48dbb65d7bd5
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -26,7 +30,6 @@ require (
 	github.com/igm/sockjs-go v0.0.0-20171030210102-c8a8c6429d10
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/jmoiron/sqlx v0.0.0-20180406164412-2aeb6a910c2b
-	github.com/jonboulle/clockwork v0.1.0 // indirect
 	github.com/kolide/goose v0.0.0-20181015214854-7aebd1deb5ab
 	github.com/kolide/kit v0.0.0-20180421083548-36eb8dc43916
 	github.com/kolide/launcher v0.0.0-20180427153757-cb412b945cf7
@@ -34,10 +37,8 @@ require (
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/lib/pq v1.2.0 // indirect
 	github.com/magiconair/properties v1.7.6 // indirect
-	github.com/mattn/go-colorable v0.0.9 // indirect
-	github.com/mattn/go-isatty v0.0.3 // indirect
-	github.com/mattn/go-runewidth v0.0.2 // indirect
 	github.com/mattn/go-sqlite3 v1.11.0 // indirect
+	github.com/mattn/go-tty v0.0.3 // indirect
 	github.com/mitchellh/mapstructure v0.0.0-20180220230111-00c29f56e238 // indirect
 	github.com/olekukonko/tablewriter v0.0.0-20180506121414-d4647c9c7a84
 	github.com/patrickmn/sortutil v0.0.0-20120526081524-abeda66eb583
@@ -56,14 +57,13 @@ require (
 	github.com/stretchr/testify v1.4.0
 	github.com/urfave/cli v1.20.0
 	go.opencensus.io v0.20.2 // indirect
-	golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2
+	golang.org/x/crypto v0.0.0-20191002192127-34f69633bfdc
 	golang.org/x/oauth2 v0.0.0-20190402181905-9f3314589c9a // indirect
-	golang.org/x/sync v0.0.0-20190412183630-56d357773e84 // indirect
-	golang.org/x/sys v0.0.0-20190909082730-f460065e899a // indirect
 	google.golang.org/api v0.3.2 // indirect
 	google.golang.org/grpc v1.19.0
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/guregu/null.v3 v3.4.0
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0-20170531160350-a96e63847dc3
 	gopkg.in/yaml.v2 v2.2.2
+	honnef.co/go/tools v0.0.0-20190106161140-3f1c8253044a
 )
