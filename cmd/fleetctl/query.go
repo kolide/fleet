@@ -105,8 +105,6 @@ func queryCommand() cli.Command {
 				}
 			}
 
-			//fmt.Printf("%+v", flQuery)
-
 			hosts := strings.Split(flHosts, ",")
 			labels := strings.Split(flLabels, ",")
 
