@@ -19,9 +19,9 @@ type resultOutput struct {
 
 func queryCommand() cli.Command {
 	var (
-		flHosts, flLabels, flQuery string
-		flDebug, flQuiet, flExit   bool
-		flTimeout                  time.Duration
+		flHosts, flLabels, flQuery, flQueryName string
+		flDebug, flQuiet, flExit                bool
+		flTimeout                               time.Duration
 	)
 	return cli.Command{
 		Name:      "query",
@@ -63,6 +63,13 @@ func queryCommand() cli.Command {
 				Destination: &flQuery,
 				Usage:       "Query to run",
 			},
+			cli.StringFlag{
+				Name:        "queryName",
+				EnvVar:      "QUERYNAME",
+				Value:       "",
+				Destination: &flQueryName,
+				Usage:       "Query name to run - overlaps query var",
+			},
 			cli.BoolFlag{
 				Name:        "debug",
 				EnvVar:      "DEBUG",
@@ -86,9 +93,19 @@ func queryCommand() cli.Command {
 				return errors.New("No hosts or labels targeted")
 			}
 
-			if flQuery == "" {
-				return errors.New("No query specified")
+			if flQueryName != "" {
+				q, err := fleet.GetQuery(flQueryName)
+				if err != nil {
+					return err
+				}
+				flQuery = q.Query
+			} else {
+				if flQuery == "" {
+					return errors.New("No query specified")
+				}
 			}
+
+			//fmt.Printf("%+v", flQuery)
 
 			hosts := strings.Split(flHosts, ",")
 			labels := strings.Split(flLabels, ",")
@@ -168,7 +185,7 @@ func queryCommand() cli.Command {
 						return nil
 					}
 
-				// Check for timeout expiring
+				// Check for timeout expiringpo
 				case <-timeoutChan:
 					s.Stop()
 					if !flQuiet {
