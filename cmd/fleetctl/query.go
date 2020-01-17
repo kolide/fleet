@@ -64,11 +64,11 @@ func queryCommand() cli.Command {
 				Usage:       "Query to run",
 			},
 			cli.StringFlag{
-				Name:        "queryName",
+				Name:        "query-name",
 				EnvVar:      "QUERYNAME",
 				Value:       "",
 				Destination: &flQueryName,
-				Usage:       "Query name to run - overlaps query var",
+				Usage:       "Name of saved query to run",
 			},
 			cli.BoolFlag{
 				Name:        "debug",
@@ -93,16 +93,16 @@ func queryCommand() cli.Command {
 				return errors.New("No hosts or labels targeted")
 			}
 
+			if flQuery != "" && flQueryName != "" {
+				return errors.New("Don't specify query and query name at the same time")
+			}
+
 			if flQueryName != "" {
 				q, err := fleet.GetQuery(flQueryName)
 				if err != nil {
-					return err
+					return errors.New("No query found")
 				}
 				flQuery = q.Query
-			} else {
-				if flQuery == "" {
-					return errors.New("No query specified")
-				}
 			}
 
 			hosts := strings.Split(flHosts, ",")
