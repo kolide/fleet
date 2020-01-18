@@ -6,6 +6,8 @@ github.com/AbGuthrie/goquery v1.0.0 h1:mPqoduIjiNM4fb36n4tzz66yVREPeOaDfHKy//65t
 github.com/AbGuthrie/goquery v1.0.0/go.mod h1:UQATBBDf0ZrezGSPxc1W/mmrnN60f6bEo/OSuG5cmtw=
 github.com/AbGuthrie/goquery v1.0.1-0.20200109061954-791d440fb945 h1:UquZ6Lr+kl/KaHh2h5XVcEntOPg7cTz4keEQaqfpTmk=
 github.com/AbGuthrie/goquery v1.0.1-0.20200109061954-791d440fb945/go.mod h1:aGGXsIauNawzssU5Smn/q4e6nKlFpXyJEP5bPjEfsUc=
+github.com/AbGuthrie/goquery v1.0.1-0.20200117050416-db2af98b1e59 h1:jefwckzXnEEP8Uq/jgQrOxgzCJc4d2fKN2l/P9v/rW4=
+github.com/AbGuthrie/goquery v1.0.1-0.20200117050416-db2af98b1e59/go.mod h1:aGGXsIauNawzssU5Smn/q4e6nKlFpXyJEP5bPjEfsUc=
 github.com/BurntSushi/toml v0.3.1 h1:WXkYYl6Yr3qBf1K79EBnL4mak0OimBfB0XUf9Vl28OQ=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/Microsoft/go-winio v0.4.9/go.mod h1:VhR8bwka0BXejwEJY73c50VrPtXAaKcyvVC4A4RozmA=

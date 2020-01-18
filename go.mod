@@ -2,12 +2,9 @@ module github.com/kolide/fleet
 
 go 1.12
 
-// To be removed when the necessary fixes are merged into upstream goquery
-replace github.com/AbGuthrie/goquery => github.com/zwass/goquery v1.0.1-0.20200117015906-ca134e79c4fc
-
 require (
 	cloud.google.com/go v0.37.4
-	github.com/AbGuthrie/goquery v1.0.1-0.20200109061954-791d440fb945
+	github.com/AbGuthrie/goquery v1.0.1-0.20200117050416-db2af98b1e59
 	github.com/VividCortex/gohistogram v1.0.0 // indirect
 	github.com/VividCortex/mysqlerr v0.0.0-20170204212430-6c6b55f8796f
 	github.com/WatchBeam/clock v0.0.0-20170901150240-b08e6b4da7ea
