@@ -94,15 +94,19 @@ func queryCommand() cli.Command {
 			}
 
 			if flQuery != "" && flQueryName != "" {
-				return errors.New("Don't specify query and query name at the same time")
+				return fmt.Errorf("--query and --query-name must not be provided together")
 			}
 
 			if flQueryName != "" {
 				q, err := fleet.GetQuery(flQueryName)
 				if err != nil {
-					return errors.New("No query found")
+					return fmt.Errorf("Query '%s' not found", flQueryName)
 				}
 				flQuery = q.Query
+			}
+
+			if flQuery == "" {
+				return fmt.Errorf("Query must be specified with --query or --query-name")
 			}
 
 			hosts := strings.Split(flHosts, ",")
@@ -183,7 +187,7 @@ func queryCommand() cli.Command {
 						return nil
 					}
 
-				// Check for timeout expiringpo
+				// Check for timeout expiring
 				case <-timeoutChan:
 					s.Stop()
 					if !flQuiet {
