@@ -4,7 +4,7 @@ go 1.12
 
 require (
 	cloud.google.com/go v0.37.4
-	github.com/AbGuthrie/goquery v1.0.1-0.20200117050416-db2af98b1e59
+	github.com/AbGuthrie/goquery/v2 v2.0.1
 	github.com/VividCortex/gohistogram v1.0.0 // indirect
 	github.com/VividCortex/mysqlerr v0.0.0-20170204212430-6c6b55f8796f
 	github.com/WatchBeam/clock v0.0.0-20170901150240-b08e6b4da7ea
@@ -31,11 +31,11 @@ require (
 	github.com/kolide/kit v0.0.0-20180421083548-36eb8dc43916
 	github.com/kolide/launcher v0.0.0-20180427153757-cb412b945cf7
 	github.com/kolide/osquery-go v0.0.0-20190904034940-a74aa860032d
-	github.com/kr/pretty v0.1.0 // indirect
 	github.com/lib/pq v1.2.0 // indirect
 	github.com/magiconair/properties v1.7.6 // indirect
+	github.com/mattn/go-isatty v0.0.12 // indirect
+	github.com/mattn/go-runewidth v0.0.8 // indirect
 	github.com/mattn/go-sqlite3 v1.11.0 // indirect
-	github.com/mattn/go-tty v0.0.3 // indirect
 	github.com/mitchellh/mapstructure v0.0.0-20180220230111-00c29f56e238 // indirect
 	github.com/olekukonko/tablewriter v0.0.0-20180506121414-d4647c9c7a84
 	github.com/patrickmn/sortutil v0.0.0-20120526081524-abeda66eb583
@@ -56,9 +56,9 @@ require (
 	go.opencensus.io v0.20.2 // indirect
 	golang.org/x/crypto v0.0.0-20191002192127-34f69633bfdc
 	golang.org/x/oauth2 v0.0.0-20190402181905-9f3314589c9a // indirect
+	golang.org/x/sys v0.0.0-20200122134326-e047566fdf82 // indirect
 	google.golang.org/api v0.3.2 // indirect
 	google.golang.org/grpc v1.19.0
-	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/guregu/null.v3 v3.4.0
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0-20170531160350-a96e63847dc3
 	gopkg.in/yaml.v2 v2.2.2
