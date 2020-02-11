@@ -674,6 +674,7 @@ func TestPerformRequiredPasswordReset(t *testing.T) {
 			session, err := ds.NewSession(&kolide.Session{
 				UserID: user.ID,
 			})
+			require.Nil(t, err)
 			ctx = viewer.NewContext(ctx, viewer.Viewer{User: user, Session: session})
 
 			// should error when reset not required
