@@ -72,6 +72,7 @@ func TestModifyUserEmail(t *testing.T) {
 		return nil
 	}
 	svc, err := newTestService(ms, nil)
+	require.Nil(t, err)
 	ctx := context.Background()
 	ctx = viewer.NewContext(ctx, viewer.Viewer{User: user})
 	payload := kolide.UserPayload{
