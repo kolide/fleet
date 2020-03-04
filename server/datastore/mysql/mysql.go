@@ -82,7 +82,7 @@ func (d *Datastore) withRetryTxx(fn txFn) (err error) {
 
 	bo := backoff.NewExponentialBackOff()
 	bo.MaxElapsedTime = 5 * time.Second
-	return backoff.Retry(operation, backoff.NewExponentialBackOff())
+	return backoff.Retry(operation, bo)
 }
 
 // New creates an MySQL datastore.
