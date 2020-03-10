@@ -61,23 +61,24 @@ func (d *Datastore) withRetryTxx(fn txFn) (err error) {
 			return errors.Wrap(err, "creating transaction")
 		}
 
-		err = fn(tx)
-
 		defer func() {
 			if p := recover(); p != nil {
 				tx.Rollback()
 				panic(p)
-			} else if err != nil {
-				rbErr := tx.Rollback()
-				if rbErr != nil && rbErr != sql.ErrTxDone {
-					panic(fmt.Sprintf("got err '%s' rolling back after err '%s'", rbErr, err))
-				}
-			} else {
-				err = tx.Commit()
 			}
 		}()
 
-		return err
+		err = fn(tx)
+		if err != nil {
+			rbErr := tx.Rollback()
+			if rbErr != nil && rbErr != sql.ErrTxDone {
+				panic(fmt.Sprintf("got err '%s' rolling back after err '%s'", rbErr, err))
+			}
+		} else {
+			err = tx.Commit()
+		}
+
+		return errors.Wrap(err, "committing transaction")
 	}
 
 	bo := backoff.NewExponentialBackOff()
