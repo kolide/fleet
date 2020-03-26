@@ -1,8 +1,8 @@
-FROM alpine
-MAINTAINER Kolide Developers <engineering@kolide.co>
-
-RUN apk --update add ca-certificates
+FROM gcr.io/distroless/static:nonroot
+LABEL maintainer="engineering@kolide.co"
+USER nonroot
 
 COPY ./build/binary-bundle/linux/fleet ./build/binary-bundle/linux/fleetctl /usr/bin/
 
-CMD ["fleet", "serve"]
+EXPOSE 8080
+CMD ["/usr/bin/fleet", "serve"]
