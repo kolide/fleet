@@ -126,7 +126,6 @@ func (d *Datastore) AddHostToPack(hid, pid uint) error {
 
 	for _, pt := range d.packTargets {
 		if pt.PackID == pid && pt.Target.Type == kolide.TargetHost && pt.Target.TargetID == hid {
-			d.mtx.Unlock()
 			return nil
 		}
 	}
