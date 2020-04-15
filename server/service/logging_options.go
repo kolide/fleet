@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"github.com/go-kit/kit/log/level"
 	"time"
 
 	"github.com/kolide/fleet/server/contexts/viewer"
@@ -15,7 +16,7 @@ func (mw loggingMiddleware) GetOptions(ctx context.Context) ([]kolide.Option, er
 	)
 
 	defer func(begin time.Time) {
-		mw.logger.Log(
+		_ = level.Debug(mw.logger).Log(
 			"method", "GetOptions",
 			"err", err,
 			"took", time.Since(begin),
@@ -38,7 +39,7 @@ func (mw loggingMiddleware) ModifyOptions(ctx context.Context, req kolide.Option
 	}
 
 	defer func(begin time.Time) {
-		mw.logger.Log(
+		_ = level.Debug(mw.logger).Log(
 			"method", "ModifyOptions",
 			"err", err,
 			"user", loggedInUser,
@@ -55,7 +56,7 @@ func (mw loggingMiddleware) ResetOptions(ctx context.Context) ([]kolide.Option, 
 		err     error
 	)
 	defer func(begin time.Time) {
-		mw.logger.Log(
+		_ = level.Debug(mw.logger).Log(
 			"method", "ResetOptions",
 			"err", err,
 			"took", time.Since(begin),

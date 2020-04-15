@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"github.com/go-kit/kit/log/level"
 	"time"
 
 	"github.com/kolide/fleet/server/contexts/viewer"
@@ -15,7 +16,7 @@ func (mw loggingMiddleware) GetScheduledQueriesInPack(ctx context.Context, id ui
 	)
 
 	defer func(begin time.Time) {
-		_ = mw.logger.Log(
+		_ = level.Debug(mw.logger).Log(
 			"method", "GetScheduledQueriesInPack",
 			"err", err,
 			"took", time.Since(begin),
@@ -33,7 +34,7 @@ func (mw loggingMiddleware) GetScheduledQuery(ctx context.Context, id uint) (*ko
 	)
 
 	defer func(begin time.Time) {
-		_ = mw.logger.Log(
+		_ = level.Debug(mw.logger).Log(
 			"method", "GetScheduledQuery",
 			"err", err,
 			"took", time.Since(begin),
@@ -58,7 +59,7 @@ func (mw loggingMiddleware) ScheduleQuery(ctx context.Context, sq *kolide.Schedu
 	}
 
 	defer func(begin time.Time) {
-		_ = mw.logger.Log(
+		_ = level.Debug(mw.logger).Log(
 			"method", "ScheduleQuery",
 			"err", err,
 			"user", loggedInUser,
@@ -82,7 +83,7 @@ func (mw loggingMiddleware) DeleteScheduledQuery(ctx context.Context, id uint) e
 	}
 
 	defer func(begin time.Time) {
-		_ = mw.logger.Log(
+		_ = level.Debug(mw.logger).Log(
 			"method", "DeleteScheduledQuery",
 			"err", err,
 			"user", loggedInUser,
@@ -107,7 +108,7 @@ func (mw loggingMiddleware) ModifyScheduledQuery(ctx context.Context, id uint, p
 	}
 
 	defer func(begin time.Time) {
-		_ = mw.logger.Log(
+		_ = level.Debug(mw.logger).Log(
 			"method", "ModifyScheduledQuery",
 			"err", err,
 			"user", loggedInUser,

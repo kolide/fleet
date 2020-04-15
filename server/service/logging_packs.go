@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"github.com/go-kit/kit/log/level"
 	"time"
 
 	"github.com/kolide/fleet/server/contexts/viewer"
@@ -21,7 +22,7 @@ func (mw loggingMiddleware) NewPack(ctx context.Context, p kolide.PackPayload) (
 	}
 
 	defer func(begin time.Time) {
-		_ = mw.logger.Log(
+		_ = level.Debug(mw.logger).Log(
 			"method", "NewPack",
 			"err", err,
 			"user", loggedInUser,
@@ -46,7 +47,7 @@ func (mw loggingMiddleware) ModifyPack(ctx context.Context, id uint, p kolide.Pa
 	}
 
 	defer func(begin time.Time) {
-		_ = mw.logger.Log(
+		_ = level.Debug(mw.logger).Log(
 			"method", "ModifyPack",
 			"err", err,
 			"user", loggedInUser,
@@ -65,7 +66,7 @@ func (mw loggingMiddleware) ListPacks(ctx context.Context, opt kolide.ListOption
 	)
 
 	defer func(begin time.Time) {
-		_ = mw.logger.Log(
+		_ = level.Debug(mw.logger).Log(
 			"method", "ListPacks",
 			"err", err,
 			"took", time.Since(begin),
@@ -83,7 +84,7 @@ func (mw loggingMiddleware) GetPack(ctx context.Context, id uint) (*kolide.Pack,
 	)
 
 	defer func(begin time.Time) {
-		_ = mw.logger.Log(
+		_ = level.Debug(mw.logger).Log(
 			"method", "GetPack",
 			"err", err,
 			"took", time.Since(begin),
@@ -106,7 +107,7 @@ func (mw loggingMiddleware) DeletePack(ctx context.Context, name string) error {
 	}
 
 	defer func(begin time.Time) {
-		_ = mw.logger.Log(
+		_ = level.Debug(mw.logger).Log(
 			"method", "DeletePack",
 			"err", err,
 			"user", loggedInUser,
@@ -123,7 +124,7 @@ func (mw loggingMiddleware) AddLabelToPack(ctx context.Context, lid uint, pid ui
 	)
 
 	defer func(begin time.Time) {
-		_ = mw.logger.Log(
+		_ = level.Debug(mw.logger).Log(
 			"method", "AddLabelToPack",
 			"err", err,
 			"took", time.Since(begin),
@@ -140,7 +141,7 @@ func (mw loggingMiddleware) RemoveLabelFromPack(ctx context.Context, lid uint, p
 	)
 
 	defer func(begin time.Time) {
-		_ = mw.logger.Log(
+		_ = level.Debug(mw.logger).Log(
 			"method", "RemoveLabelFromPack",
 			"err", err,
 			"took", time.Since(begin),
@@ -158,7 +159,7 @@ func (mw loggingMiddleware) ListLabelsForPack(ctx context.Context, pid uint) ([]
 	)
 
 	defer func(begin time.Time) {
-		_ = mw.logger.Log(
+		_ = level.Debug(mw.logger).Log(
 			"method", "ListLabelsForPack",
 			"err", err,
 			"took", time.Since(begin),
@@ -175,7 +176,7 @@ func (mw loggingMiddleware) AddHostToPack(ctx context.Context, hid uint, pid uin
 	)
 
 	defer func(begin time.Time) {
-		_ = mw.logger.Log(
+		_ = level.Debug(mw.logger).Log(
 			"method", "AddHostToPack",
 			"err", err,
 			"took", time.Since(begin),
@@ -192,7 +193,7 @@ func (mw loggingMiddleware) RemoveHostFromPack(ctx context.Context, hid uint, pi
 	)
 
 	defer func(begin time.Time) {
-		_ = mw.logger.Log(
+		_ = level.Debug(mw.logger).Log(
 			"method", "RemoveHostFromPack",
 			"err", err,
 			"took", time.Since(begin),
@@ -210,7 +211,7 @@ func (mw loggingMiddleware) ListPacksForHost(ctx context.Context, hid uint) ([]*
 	)
 
 	defer func(begin time.Time) {
-		_ = mw.logger.Log(
+		_ = level.Debug(mw.logger).Log(
 			"method", "ListPacksForHost",
 			"err", err,
 			"took", time.Since(begin),
@@ -228,7 +229,7 @@ func (mw loggingMiddleware) ListHostsInPack(ctx context.Context, pid uint, opt k
 	)
 
 	defer func(begin time.Time) {
-		_ = mw.logger.Log(
+		_ = level.Debug(mw.logger).Log(
 			"method", "ListHostsInPack",
 			"err", err,
 			"took", time.Since(begin),
@@ -241,7 +242,7 @@ func (mw loggingMiddleware) ListHostsInPack(ctx context.Context, pid uint, opt k
 
 func (mw loggingMiddleware) GetPackSpec(ctx context.Context, name string) (spec *kolide.PackSpec, err error) {
 	defer func(begin time.Time) {
-		mw.logger.Log(
+		_ = level.Debug(mw.logger).Log(
 			"method", "GetPackSpec",
 			"err", err,
 			"took", time.Since(begin),
@@ -253,7 +254,7 @@ func (mw loggingMiddleware) GetPackSpec(ctx context.Context, name string) (spec 
 
 func (mw loggingMiddleware) GetPackSpecs(ctx context.Context) (specs []*kolide.PackSpec, err error) {
 	defer func(begin time.Time) {
-		mw.logger.Log(
+		_ = level.Debug(mw.logger).Log(
 			"method", "GetPackSpecs",
 			"err", err,
 			"took", time.Since(begin),
@@ -274,7 +275,7 @@ func (mw loggingMiddleware) ApplyPackSpecs(ctx context.Context, specs []*kolide.
 	}
 
 	defer func(begin time.Time) {
-		_ = mw.logger.Log(
+		_ = level.Debug(mw.logger).Log(
 			"method", "ApplyPackSpecs",
 			"err", err,
 			"user", loggedInUser,

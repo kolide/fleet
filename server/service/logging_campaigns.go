@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"github.com/go-kit/kit/log/level"
 	"time"
 
 	"github.com/kolide/fleet/server/contexts/viewer"
@@ -24,7 +25,7 @@ func (mw loggingMiddleware) NewDistributedQueryCampaign(ctx context.Context, que
 		if campaign != nil {
 			numHosts = campaign.Metrics.TotalHosts
 		}
-		_ = mw.logger.Log(
+		_ = level.Debug(mw.logger).Log(
 			"method", "NewDistributedQueryCampaign",
 			"err", err,
 			"user", loggedInUser,
@@ -52,7 +53,7 @@ func (mw loggingMiddleware) NewDistributedQueryCampaignByNames(ctx context.Conte
 		if campaign != nil {
 			numHosts = campaign.Metrics.TotalHosts
 		}
-		_ = mw.logger.Log(
+		_ = level.Debug(mw.logger).Log(
 			"method", "NewDistributedQueryCampaignByNames",
 			"err", err,
 			"user", loggedInUser,
@@ -74,7 +75,7 @@ func (mw loggingMiddleware) StreamCampaignResults(ctx context.Context, conn *web
 		loggedInUser = vc.Username()
 	}
 	defer func(begin time.Time) {
-		_ = mw.logger.Log(
+		_ = level.Debug(mw.logger).Log(
 			"method", "StreamCampaignResults",
 			"campaignID", campaignID,
 			"err", err,

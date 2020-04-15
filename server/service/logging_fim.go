@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"github.com/go-kit/kit/log/level"
 	"time"
 
 	"github.com/kolide/fleet/server/kolide"
@@ -9,7 +10,7 @@ import (
 
 func (lm loggingMiddleware) GetFIM(ctx context.Context) (cfg *kolide.FIMConfig, err error) {
 	defer func(begin time.Time) {
-		lm.logger.Log(
+		_ = level.Debug(lm.logger).Log(
 			"method", "GetFIM",
 			"err", err,
 			"took", time.Since(begin),
@@ -21,7 +22,7 @@ func (lm loggingMiddleware) GetFIM(ctx context.Context) (cfg *kolide.FIMConfig, 
 
 func (lm loggingMiddleware) ModifyFIM(ctx context.Context, fim kolide.FIMConfig) (err error) {
 	defer func(begin time.Time) {
-		lm.logger.Log(
+		_ = level.Debug(lm.logger).Log(
 			"method", "ModifyFIM",
 			"err", err,
 			"took", time.Since(begin),

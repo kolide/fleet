@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"github.com/go-kit/kit/log/level"
 	"time"
 )
 
@@ -11,7 +12,7 @@ func (mw loggingMiddleware) ChangeUserEmail(ctx context.Context, token string) (
 		newMail string
 	)
 	defer func(begin time.Time) {
-		mw.logger.Log(
+		_ = level.Debug(mw.logger).Log(
 			"method",
 			"CommitEmailChange",
 			"err", err,
