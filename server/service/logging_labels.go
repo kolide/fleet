@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"github.com/go-kit/kit/log/level"
 	"time"
 
 	"github.com/kolide/fleet/server/contexts/viewer"

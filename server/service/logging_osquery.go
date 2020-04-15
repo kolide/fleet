@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"encoding/json"
-	"github.com/go-kit/kit/log/level"
 	"time"
 
 	kithttp "github.com/go-kit/kit/transport/http"
