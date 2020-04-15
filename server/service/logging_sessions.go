@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"github.com/go-kit/kit/log/level"
 	"time"
 
 	"github.com/kolide/fleet/server/kolide"
@@ -11,7 +10,7 @@ import (
 func (mw loggingMiddleware) Login(ctx context.Context, username, password string) (user *kolide.User, token string, err error) {
 
 	defer func(begin time.Time) {
-		_ = level.Debug(mw.logger).Log(
+		_ = mw.loggerForError(err).Log(
 			"method", "Login",
 			"user", username,
 			"err", err,
@@ -25,7 +24,7 @@ func (mw loggingMiddleware) Login(ctx context.Context, username, password string
 
 func (mw loggingMiddleware) Logout(ctx context.Context) (err error) {
 	defer func(begin time.Time) {
-		_ = level.Debug(mw.logger).Log(
+		_ = mw.loggerForError(err).Log(
 			"method", "Logout",
 			"err", err,
 			"took", time.Since(begin),
@@ -38,7 +37,7 @@ func (mw loggingMiddleware) Logout(ctx context.Context) (err error) {
 
 func (mw loggingMiddleware) InitiateSSO(ctx context.Context, relayURL string) (idpURL string, err error) {
 	defer func(begin time.Time) {
-		_ = level.Debug(mw.logger).Log(
+		_ = mw.loggerForError(err).Log(
 			"method", "InitiateSSO",
 			"err", err,
 			"took", time.Since(begin),
@@ -51,7 +50,7 @@ func (mw loggingMiddleware) InitiateSSO(ctx context.Context, relayURL string) (i
 
 func (mw loggingMiddleware) CallbackSSO(ctx context.Context, auth kolide.Auth) (sess *kolide.SSOSession, err error) {
 	defer func(begin time.Time) {
-		_ = level.Debug(mw.logger).Log(
+		_ = mw.loggerForError(err).Log(
 			"method", "CallbackSSO",
 			"err", err,
 			"took", time.Since(begin),
@@ -63,7 +62,7 @@ func (mw loggingMiddleware) CallbackSSO(ctx context.Context, auth kolide.Auth) (
 
 func (mw loggingMiddleware) SSOSettings(ctx context.Context) (settings *kolide.SSOSettings, err error) {
 	defer func(begin time.Time) {
-		_ = level.Debug(mw.logger).Log(
+		_ = mw.loggerForError(err).Log(
 			"method", "SSOSettings",
 			"err", err,
 			"took", time.Since(begin),

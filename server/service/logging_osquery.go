@@ -18,7 +18,7 @@ func (mw loggingMiddleware) EnrollAgent(ctx context.Context, enrollSecret string
 	)
 
 	defer func(begin time.Time) {
-		_ = level.Debug(mw.logger).Log(
+		_ = mw.loggerForError(err).Log(
 			"method", "EnrollAgent",
 			"ip_addr", ctx.Value(kithttp.ContextKeyRequestRemoteAddr).(string),
 			"x_for_ip_addr", ctx.Value(kithttp.ContextKeyRequestXForwardedFor).(string),
@@ -38,7 +38,7 @@ func (mw loggingMiddleware) AuthenticateHost(ctx context.Context, nodeKey string
 	)
 
 	defer func(begin time.Time) {
-		_ = level.Debug(mw.logger).Log(
+		_ = mw.loggerForError(err).Log(
 			"method", "AuthenticateHost",
 			"ip_addr", ctx.Value(kithttp.ContextKeyRequestRemoteAddr).(string),
 			"x_for_ip_addr", ctx.Value(kithttp.ContextKeyRequestXForwardedFor).(string),
@@ -58,7 +58,7 @@ func (mw loggingMiddleware) GetClientConfig(ctx context.Context) (map[string]int
 	)
 
 	defer func(begin time.Time) {
-		_ = level.Debug(mw.logger).Log(
+		_ = mw.loggerForError(err).Log(
 			"method", "GetClientConfig",
 			"ip_addr", ctx.Value(kithttp.ContextKeyRequestRemoteAddr).(string),
 			"x_for_ip_addr", ctx.Value(kithttp.ContextKeyRequestXForwardedFor).(string),
@@ -79,7 +79,7 @@ func (mw loggingMiddleware) GetDistributedQueries(ctx context.Context) (map[stri
 	)
 
 	defer func(begin time.Time) {
-		_ = level.Debug(mw.logger).Log(
+		_ = mw.loggerForError(err).Log(
 			"method", "GetDistributedQueries",
 			"ip_addr", ctx.Value(kithttp.ContextKeyRequestRemoteAddr).(string),
 			"x_for_ip_addr", ctx.Value(kithttp.ContextKeyRequestXForwardedFor).(string),
@@ -98,7 +98,7 @@ func (mw loggingMiddleware) SubmitDistributedQueryResults(ctx context.Context, r
 	)
 
 	defer func(begin time.Time) {
-		_ = level.Debug(mw.logger).Log(
+		_ = mw.loggerForError(err).Log(
 			"method", "SubmitDistributedQueryResults",
 			"ip_addr", ctx.Value(kithttp.ContextKeyRequestRemoteAddr).(string),
 			"x_for_ip_addr", ctx.Value(kithttp.ContextKeyRequestXForwardedFor).(string),
@@ -117,7 +117,7 @@ func (mw loggingMiddleware) SubmitStatusLogs(ctx context.Context, logs []json.Ra
 	)
 
 	defer func(begin time.Time) {
-		_ = level.Debug(mw.logger).Log(
+		_ = mw.loggerForError(err).Log(
 			"method", "SubmitStatusLogs",
 			"ip_addr", ctx.Value(kithttp.ContextKeyRequestRemoteAddr).(string),
 			"x_for_ip_addr", ctx.Value(kithttp.ContextKeyRequestXForwardedFor).(string),
@@ -136,7 +136,7 @@ func (mw loggingMiddleware) SubmitResultLogs(ctx context.Context, logs []json.Ra
 	)
 
 	defer func(begin time.Time) {
-		_ = level.Debug(mw.logger).Log(
+		_ = mw.loggerForError(err).Log(
 			"method", "SubmitResultLogs",
 			"ip_addr", ctx.Value(kithttp.ContextKeyRequestRemoteAddr).(string),
 			"x_for_ip_addr", ctx.Value(kithttp.ContextKeyRequestXForwardedFor).(string),

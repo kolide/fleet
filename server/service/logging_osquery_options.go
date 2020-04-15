@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"github.com/go-kit/kit/log/level"
 	"time"
 
 	"github.com/kolide/fleet/server/contexts/viewer"
@@ -11,7 +10,7 @@ import (
 
 func (mw loggingMiddleware) GetOptionsSpec(ctx context.Context) (spec *kolide.OptionsSpec, err error) {
 	defer func(begin time.Time) {
-		_ = level.Debug(mw.logger).Log(
+		_ = mw.loggerForError(err).Log(
 			"method", "GetOptionsSpec",
 			"err", err,
 			"took", time.Since(begin),
@@ -31,7 +30,7 @@ func (mw loggingMiddleware) ApplyOptionsSpec(ctx context.Context, spec *kolide.O
 		loggedInUser = vc.Username()
 	}
 	defer func(begin time.Time) {
-		_ = level.Debug(mw.logger).Log(
+		_ = mw.loggerForError(err).Log(
 			"method", "ApplyOptionsSpec",
 			"err", err,
 			"user", loggedInUser,

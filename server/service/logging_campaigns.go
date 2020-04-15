@@ -25,7 +25,7 @@ func (mw loggingMiddleware) NewDistributedQueryCampaign(ctx context.Context, que
 		if campaign != nil {
 			numHosts = campaign.Metrics.TotalHosts
 		}
-		_ = level.Debug(mw.logger).Log(
+		_ = mw.loggerForError(err).Log(
 			"method", "NewDistributedQueryCampaign",
 			"err", err,
 			"user", loggedInUser,
@@ -53,7 +53,7 @@ func (mw loggingMiddleware) NewDistributedQueryCampaignByNames(ctx context.Conte
 		if campaign != nil {
 			numHosts = campaign.Metrics.TotalHosts
 		}
-		_ = level.Debug(mw.logger).Log(
+		_ = mw.loggerForError(err).Log(
 			"method", "NewDistributedQueryCampaignByNames",
 			"err", err,
 			"user", loggedInUser,
@@ -75,7 +75,7 @@ func (mw loggingMiddleware) StreamCampaignResults(ctx context.Context, conn *web
 		loggedInUser = vc.Username()
 	}
 	defer func(begin time.Time) {
-		_ = level.Debug(mw.logger).Log(
+		_ = mw.loggerForError(err).Log(
 			"method", "StreamCampaignResults",
 			"campaignID", campaignID,
 			"err", err,

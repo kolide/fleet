@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"github.com/go-kit/kit/log/level"
 	"time"
 
 	"github.com/kolide/fleet/server/contexts/viewer"
@@ -11,7 +10,7 @@ import (
 
 func (mw loggingMiddleware) GetQuerySpec(ctx context.Context, name string) (spec *kolide.QuerySpec, err error) {
 	defer func(begin time.Time) {
-		_ = level.Debug(mw.logger).Log(
+		_ = mw.loggerForError(err).Log(
 			"method", "GetQuerySpec",
 			"err", err,
 			"took", time.Since(begin),
@@ -23,7 +22,7 @@ func (mw loggingMiddleware) GetQuerySpec(ctx context.Context, name string) (spec
 
 func (mw loggingMiddleware) GetQuerySpecs(ctx context.Context) (specs []*kolide.QuerySpec, err error) {
 	defer func(begin time.Time) {
-		_ = level.Debug(mw.logger).Log(
+		_ = mw.loggerForError(err).Log(
 			"method", "GetQuerySpecs",
 			"err", err,
 			"took", time.Since(begin),
@@ -35,7 +34,7 @@ func (mw loggingMiddleware) GetQuerySpecs(ctx context.Context) (specs []*kolide.
 
 func (mw loggingMiddleware) ApplyQuerySpecs(ctx context.Context, specs []*kolide.QuerySpec) (err error) {
 	defer func(begin time.Time) {
-		_ = level.Debug(mw.logger).Log(
+		_ = mw.loggerForError(err).Log(
 			"method", "ApplyQuerySpecs",
 			"err", err,
 			"took", time.Since(begin),
@@ -55,7 +54,7 @@ func (mw loggingMiddleware) ListQueries(ctx context.Context, opt kolide.ListOpti
 		loggedInUser = vc.Username()
 	}
 	defer func(begin time.Time) {
-		_ = level.Debug(mw.logger).Log(
+		_ = mw.loggerForError(err).Log(
 			"method", "ListQueries",
 			"err", err,
 			"user", loggedInUser,
@@ -75,7 +74,7 @@ func (mw loggingMiddleware) GetQuery(ctx context.Context, id uint) (*kolide.Quer
 		loggedInUser = vc.Username()
 	}
 	defer func(begin time.Time) {
-		_ = level.Debug(mw.logger).Log(
+		_ = mw.loggerForError(err).Log(
 			"method", "GetQuery",
 			"err", err,
 			"user", loggedInUser,
@@ -96,7 +95,7 @@ func (mw loggingMiddleware) NewQuery(ctx context.Context, p kolide.QueryPayload)
 		loggedInUser = vc.Username()
 	}
 	defer func(begin time.Time) {
-		_ = level.Debug(mw.logger).Log(
+		_ = mw.loggerForError(err).Log(
 			"method", "NewQuery",
 			"err", err,
 			"user", loggedInUser,
@@ -119,7 +118,7 @@ func (mw loggingMiddleware) ModifyQuery(ctx context.Context, id uint, p kolide.Q
 		loggedInUser = vc.Username()
 	}
 	defer func(begin time.Time) {
-		_ = level.Debug(mw.logger).Log(
+		_ = mw.loggerForError(err).Log(
 			"method", "ModifyQuery",
 			"err", err,
 			"user", loggedInUser,
@@ -141,7 +140,7 @@ func (mw loggingMiddleware) DeleteQuery(ctx context.Context, name string) error 
 		loggedInUser = vc.Username()
 	}
 	defer func(begin time.Time) {
-		_ = level.Debug(mw.logger).Log(
+		_ = mw.loggerForError(err).Log(
 			"method", "DeleteQuery",
 			"err", err,
 			"name", name,
