@@ -9,7 +9,7 @@ import (
 
 func (mw loggingMiddleware) GetFIM(ctx context.Context) (cfg *kolide.FIMConfig, err error) {
 	defer func(begin time.Time) {
-		_ = mw.loggerForError(err).Log(
+		_ = mw.loggerDebug(err).Log(
 			"method", "GetFIM",
 			"err", err,
 			"took", time.Since(begin),
@@ -21,7 +21,7 @@ func (mw loggingMiddleware) GetFIM(ctx context.Context) (cfg *kolide.FIMConfig, 
 
 func (mw loggingMiddleware) ModifyFIM(ctx context.Context, fim kolide.FIMConfig) (err error) {
 	defer func(begin time.Time) {
-		_ = mw.loggerForError(err).Log(
+		_ = mw.loggerInfo(err).Log(
 			"method", "ModifyFIM",
 			"err", err,
 			"took", time.Since(begin),

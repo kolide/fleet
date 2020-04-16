@@ -11,7 +11,7 @@ func (mw loggingMiddleware) ChangeUserEmail(ctx context.Context, token string) (
 		newMail string
 	)
 	defer func(begin time.Time) {
-		_ = mw.loggerForError(err).Log(
+		_ = mw.loggerInfo(err).Log(
 			"method",
 			"CommitEmailChange",
 			"err", err,
