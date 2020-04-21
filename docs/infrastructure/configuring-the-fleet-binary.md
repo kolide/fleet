@@ -689,7 +689,7 @@ AWS region to use for Firehose connection
 
 	```
 	firehose:
-		region: us-west-2
+		region: ca-central-1
 	```
 
 ##### `firehose_access_key_id`
