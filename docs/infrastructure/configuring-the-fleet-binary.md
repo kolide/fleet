@@ -689,7 +689,7 @@ AWS region to use for Firehose connection
 
 	```
 	firehose:
-		region: aws-east-2
+		region: us-west-2
 	```
 
 ##### `firehose_access_key_id`
@@ -704,7 +704,7 @@ AWS access key ID to use for Firehose authentication.
 
 	```
 	firehose:
-		access_key_id: aws-east-2
+		access_key_id: AKIAIOSFODNN7EXAMPLE
 	```
 
 ##### `firehose_secret_access_key`
@@ -719,7 +719,7 @@ AWS secret access key to use for Firehose authentication.
 
 	```
 	firehose:
-		secret_access_key: aws-east-2
+		secret_access_key: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 	```
 
 
