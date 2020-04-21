@@ -17,18 +17,12 @@ func NewLoggingService(svc kolide.Service, logger kitlog.Logger) kolide.Service 
 	return loggingMiddleware{Service: svc, logger: logger}
 }
 
-// loggerDebug returns the debug level or error if error is not nil
+// loggerDebug returns the debug level
 func (mw loggingMiddleware) loggerDebug(err error) kitlog.Logger {
-	if err != nil {
-		return level.Error(mw.logger)
-	}
 	return level.Debug(mw.logger)
 }
 
-// loggerInfo returns the info level or error if error is not nil
+// loggerInfo returns the info level
 func (mw loggingMiddleware) loggerInfo(err error) kitlog.Logger {
-	if err != nil {
-		return level.Error(mw.logger)
-	}
 	return level.Info(mw.logger)
 }
