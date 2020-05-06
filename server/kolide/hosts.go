@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/base64"
+	"encoding/json"
 	"net"
 	"time"
 )
@@ -107,6 +108,7 @@ type Host struct {
 	DistributedInterval       uint                `json:"distributed_interval" db:"distributed_interval"`
 	ConfigTLSRefresh          uint                `json:"config_tls_refresh" db:"config_tls_refresh"`
 	LoggerTLSPeriod           uint                `json:"logger_tls_period" db:"logger_tls_period"`
+	Additional                *json.RawMessage    `json:"additional,omitempty" db:"additional"`
 }
 
 // HostSummary is a structure which represents a data summary about the total

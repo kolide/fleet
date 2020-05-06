@@ -1,6 +1,7 @@
 package datastore
 
 import (
+	"encoding/json"
 	"fmt"
 	"sort"
 	"strconv"
@@ -72,12 +73,17 @@ func testSaveHosts(t *testing.T, ds kolide.Datastore) {
 		},
 	}
 
+	additionalJSON := json.RawMessage(`{"foobar": "bim"}`)
+	host.Additional = &additionalJSON
+
 	err = ds.SaveHost(host)
 	require.Nil(t, err)
 
 	host, err = ds.Host(host.ID)
 	require.Nil(t, err)
 	require.NotNil(t, host)
+	require.NotNil(t, host.Additional)
+	assert.Equal(t, additionalJSON, *host.Additional)
 	require.Equal(t, 2, len(host.NetworkInterfaces))
 	primaryNicID := host.NetworkInterfaces[0].ID
 	host.PrimaryNetworkInterfaceID = &primaryNicID

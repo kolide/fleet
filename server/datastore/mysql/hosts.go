@@ -171,7 +171,8 @@ func (d *Datastore) SaveHost(host *kolide.Host) error {
 			seen_time = ?,
 			distributed_interval = ?,
 			config_tls_refresh = ?,
-			logger_tls_period = ?
+			logger_tls_period = ?,
+			additional = ?
 		WHERE id = ?
 	`
 	err := d.withRetryTxx(func(tx *sqlx.Tx) error {
@@ -203,7 +204,9 @@ func (d *Datastore) SaveHost(host *kolide.Host) error {
 			host.DistributedInterval,
 			host.ConfigTLSRefresh,
 			host.LoggerTLSPeriod,
-			host.ID)
+			host.Additional,
+			host.ID,
+		)
 		if err != nil {
 			return errors.Wrap(err, "executing main SQL statement")
 		}
