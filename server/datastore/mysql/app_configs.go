@@ -117,8 +117,8 @@ func (d *Datastore) SaveAppConfig(info *kolide.AppConfig) error {
       fim_interval,
       fim_file_accesses,
       host_expiry_enabled,
-	    host_expiry_window,
-	    live_query_disabled,
+      host_expiry_window,
+      live_query_disabled,
       additional_queries
     )
     VALUES( 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
@@ -149,8 +149,8 @@ func (d *Datastore) SaveAppConfig(info *kolide.AppConfig) error {
       fim_interval = VALUES(fim_interval),
       fim_file_accesses = VALUES(fim_file_accesses),
       host_expiry_enabled = VALUES(host_expiry_enabled),
-   	  host_expiry_window = VALUES(host_expiry_window),
-  	  live_query_disabled = VALUES(live_query_disabled),
+      host_expiry_window = VALUES(host_expiry_window),
+      live_query_disabled = VALUES(live_query_disabled),
       additional_queries = VALUES(additional_queries)
     `
 

@@ -94,4 +94,5 @@ var testFunctions = [...]func(*testing.T, kolide.Datastore){
 	testGetLabelSpec,
 	testLabelIDsByName,
 	testListLabelsForPack,
+	testHostAdditional,
 }

@@ -244,7 +244,9 @@ spec:
   host_settings:
     # "additional" information to collect from hosts along with the host
     # details. This information will be updated at the same time as other host
-    # details and is returned by the API when host objects are returned.
+    # details and is returned by the API when host objects are returned. Users
+    # must take care to keep the data returned by these queries small in
+    # order to mitigate potential performance impacts on the Fleet server.
     additional_queries:
       time: select * from time
       macs: select mac from interface_details

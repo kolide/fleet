@@ -40,6 +40,10 @@ type HostStore interface {
 	Host(id uint) (*Host, error)
 	ListHosts(opt ListOptions) ([]*Host, error)
 	EnrollHost(osqueryHostId string, nodeKeySize int) (*Host, error)
+	// AuthenticateHost authenticates and returns host metadata by node key.
+	// This method should not return the host "additional" information as this
+	// is not typically necessary for the operations performed by the osquery
+	// endpoints.
 	AuthenticateHost(nodeKey string) (*Host, error)
 	MarkHostSeen(host *Host, t time.Time) error
 	SearchHosts(query string, omit ...uint) ([]*Host, error)
