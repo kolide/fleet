@@ -696,7 +696,7 @@ AWS region to use for Firehose connection
 
 This flag only has effect if `osquery_status_log_plugin` or `osquery_result_log_plugin` are set to `firehose`.
 
-If `firehose_access_key_id` and `firehose_secret_access_key` are ommitted, Fleet will try to use [AWS STS](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp.html) credentials.
+If `firehose_access_key_id` and `firehose_secret_access_key` are omitted, Fleet will try to use [AWS STS](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp.html) credentials.
 
 AWS access key ID to use for Firehose authentication.
 
