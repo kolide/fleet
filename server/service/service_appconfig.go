@@ -48,7 +48,7 @@ func (svc service) NewAppConfig(ctx context.Context, p kolide.AppConfigPayload) 
 		return nil, errors.Wrap(err, "generate enroll secret string")
 	}
 	spec := &kolide.EnrollSecretSpec{
-		[]kolide.EnrollSecret{
+		Secrets: []kolide.EnrollSecret{
 			kolide.EnrollSecret{
 				Name:   "default",
 				Secret: secret,
