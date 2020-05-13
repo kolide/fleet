@@ -69,3 +69,7 @@ func (c *Client) GetServerSettings() (*kolide.ServerSettings, error) {
 	}
 	return appConfig.ServerSettings, nil
 }
+
+func (c *Client) GetEnrollSecretSpec() (*kolide.EnrollSecretSpec, error) {
+	panic("todo")
+}

@@ -94,7 +94,6 @@ func (d *Datastore) SaveAppConfig(info *kolide.AppConfig) error {
       org_name,
       org_logo_url,
       kolide_server_url,
-      osquery_enroll_secret,
       smtp_configured,
       smtp_sender_address,
       smtp_server,
@@ -121,12 +120,11 @@ func (d *Datastore) SaveAppConfig(info *kolide.AppConfig) error {
       live_query_disabled,
       additional_queries
     )
-    VALUES( 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
+    VALUES( 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
     ON DUPLICATE KEY UPDATE
       org_name = VALUES(org_name),
       org_logo_url = VALUES(org_logo_url),
       kolide_server_url = VALUES(kolide_server_url),
-      osquery_enroll_secret = VALUES(osquery_enroll_secret),
       smtp_configured = VALUES(smtp_configured),
       smtp_sender_address = VALUES(smtp_sender_address),
       smtp_server = VALUES(smtp_server),
@@ -158,7 +156,6 @@ func (d *Datastore) SaveAppConfig(info *kolide.AppConfig) error {
 		info.OrgName,
 		info.OrgLogoURL,
 		info.KolideServerURL,
-		info.EnrollSecret,
 		info.SMTPConfigured,
 		info.SMTPSenderAddress,
 		info.SMTPServer,
@@ -187,4 +184,25 @@ func (d *Datastore) SaveAppConfig(info *kolide.AppConfig) error {
 	)
 
 	return err
+}
+
+func (d *Datastore) VerifyEnrollSecret(secret string) (string, error) {
+	var s kolide.EnrollSecret
+	err := d.db.Get(&s, "SELECT name, active FROM enroll_secrets WHERE secret = ?", secret)
+	if err != nil {
+		return "", errors.New("no matching secret found")
+	}
+	if !s.Active {
+		return "", errors.New("secret is inactive")
+	}
+
+	return s.Name, nil
+}
+
+func (d *Datastore) ApplyEnrollSecretSpec(spec *kolide.EnrollSecretSpec) error {
+	panic("todo")
+}
+
+func (d *Datastore) GetEnrollSecretSpec() (*kolide.EnrollSecretSpec, error) {
+	panic("not implemented")
 }

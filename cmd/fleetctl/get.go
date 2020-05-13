@@ -392,8 +392,9 @@ func getOptionsCommand() cli.Command {
 
 func getEnrollSecretCommand() cli.Command {
 	return cli.Command{
-		Name:  "enroll-secret",
-		Usage: "Retrieve the osquery enroll secret",
+		Name:    "enroll-secret",
+		Aliases: []string{"enroll-secrets"},
+		Usage:   "Retrieve the osquery enroll secrets",
 		Flags: []cli.Flag{
 			configFlag(),
 			contextFlag(),
@@ -404,15 +405,13 @@ func getEnrollSecretCommand() cli.Command {
 				return err
 			}
 
-			settings, err := fleet.GetServerSettings()
+			spec, err := fleet.GetEnrollSecretSpec()
 			if err != nil {
 				return err
 			}
-			if settings == nil {
-				return errors.New("error: server setting were nil")
-			}
 
-			fmt.Println(*settings.EnrollSecret)
+			_ = spec
+			panic("todo")
 
 			return nil
 		},
