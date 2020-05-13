@@ -135,3 +135,49 @@ func smtpSettingsFromAppConfig(config *kolide.AppConfig) *kolide.SMTPSettingsPay
 		SMTPEnableStartTLS:       &config.SMTPEnableStartTLS,
 	}
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Apply Enroll Secret Spec
+////////////////////////////////////////////////////////////////////////////////
+
+type applyEnrollSecretSpecRequest struct {
+	Spec *kolide.EnrollSecretSpec `json:"spec"`
+}
+
+type applyEnrollSecretSpecResponse struct {
+	Err error `json:"error,omitempty"`
+}
+
+func (r applyEnrollSecretSpecResponse) error() error { return r.Err }
+
+func makeApplyEnrollSecretSpecEndpoint(svc kolide.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(applyEnrollSecretSpecRequest)
+		err := svc.ApplyEnrollSecretSpec(ctx, req.Spec)
+		if err != nil {
+			return applyEnrollSecretSpecResponse{Err: err}, nil
+		}
+		return applyEnrollSecretSpecResponse{}, nil
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get Pack Specs
+////////////////////////////////////////////////////////////////////////////////
+
+type getEnrollSecretSpecResponse struct {
+	Spec *kolide.EnrollSecretSpec `json:"specs"`
+	Err  error                    `json:"error,omitempty"`
+}
+
+func (r getEnrollSecretSpecResponse) error() error { return r.Err }
+
+func makeGetEnrollSecretSpecEndpoint(svc kolide.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		specs, err := svc.GetEnrollSecretSpec(ctx)
+		if err != nil {
+			return getEnrollSecretSpecResponse{Err: err}, nil
+		}
+		return getEnrollSecretSpecResponse{Spec: specs}, nil
+	}
+}

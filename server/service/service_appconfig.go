@@ -239,3 +239,11 @@ func appConfigFromAppConfigPayload(p kolide.AppConfigPayload, config kolide.AppC
 	}
 	return &config
 }
+
+func (svc service) ApplyEnrollSecretSpec(ctx context.Context, spec *kolide.EnrollSecretSpec) error {
+	return svc.ds.ApplyEnrollSecretSpec(spec)
+}
+
+func (svc service) GetEnrollSecretSpec(ctx context.Context) (*kolide.EnrollSecretSpec, error) {
+	return svc.ds.GetEnrollSecretSpec()
+}

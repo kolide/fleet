@@ -392,8 +392,8 @@ func getOptionsCommand() cli.Command {
 
 func getEnrollSecretCommand() cli.Command {
 	return cli.Command{
-		Name:    "enroll-secret",
-		Aliases: []string{"enroll-secrets"},
+		Name:    "enroll_secret",
+		Aliases: []string{"enroll_secrets", "enroll-secret", "enroll-secrets"},
 		Usage:   "Retrieve the osquery enroll secrets",
 		Flags: []cli.Flag{
 			configFlag(),
@@ -405,14 +405,23 @@ func getEnrollSecretCommand() cli.Command {
 				return err
 			}
 
-			spec, err := fleet.GetEnrollSecretSpec()
+			secrets, err := fleet.GetEnrollSecretSpec()
 			if err != nil {
 				return err
 			}
 
-			_ = spec
-			panic("todo")
+			spec := specGeneric{
+				Kind:    "enroll_secret",
+				Version: kolide.ApiVersion,
+				Spec:    secrets,
+			}
 
+			b, err := yaml.Marshal(spec)
+			if err != nil {
+				return err
+			}
+
+			fmt.Print(string(b))
 			return nil
 		},
 	}

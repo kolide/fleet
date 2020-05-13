@@ -14,6 +14,7 @@ func Up_20200512120000(tx *sql.Tx) error {
 	_, err := tx.Exec(
 		"CREATE TABLE `enroll_secrets` (" +
 			"`name` VARCHAR(255) NOT NULL," +
+			"`created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP," +
 			"`secret` VARCHAR(255) NOT NULL," +
 			"`active` TINYINT(1) DEFAULT TRUE," +
 			"PRIMARY KEY (`name`)" +

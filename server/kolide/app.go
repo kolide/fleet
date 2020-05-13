@@ -3,6 +3,7 @@ package kolide
 import (
 	"context"
 	"encoding/json"
+	"time"
 )
 
 // AppConfigStore contains method for saving and retrieving
@@ -30,6 +31,12 @@ type AppConfigService interface {
 	AppConfig(ctx context.Context) (info *AppConfig, err error)
 	ModifyAppConfig(ctx context.Context, p AppConfigPayload) (info *AppConfig, err error)
 	SendTestEmail(ctx context.Context, config *AppConfig) error
+
+	// ApplyEnrollSecretSpec adds and updates the enroll secrets specified in
+	// the spec.
+	ApplyEnrollSecretSpec(ctx context.Context, spec *EnrollSecretSpec) error
+	// GetEnrollSecretSpec gets the spec for the current enroll secrets.
+	GetEnrollSecretSpec(ctx context.Context) (*EnrollSecretSpec, error)
 
 	// Certificate returns the PEM encoded certificate chain for osqueryd TLS termination.
 	// For cases where the connection is self-signed, the server will attempt to
@@ -287,6 +294,8 @@ type EnrollSecret struct {
 	// Active determines whether the secret is currently allowed to be used for
 	// authentication.
 	Active bool `json:"active" db:"active"`
+	// CreatedAt is the time this enroll secret was first added.
+	CreatedAt time.Time `json:"created_at" db:"created_at"`
 }
 
 // EnrollSecretSpec is the fleetctl spec type for enroll secrets.

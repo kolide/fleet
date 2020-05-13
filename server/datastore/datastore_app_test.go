@@ -75,3 +75,80 @@ func testAdditionalQueries(t *testing.T, ds kolide.Datastore) {
 	assert.Nil(t, err)
 	assert.JSONEq(t, `{"foo":"bar"}`, string(*info.AdditionalQueries))
 }
+
+func testEnrollSecrets(t *testing.T, ds kolide.Datastore) {
+	name, err := ds.VerifyEnrollSecret("missing")
+	assert.NotNil(t, err)
+	assert.Empty(t, name)
+
+	err = ds.ApplyEnrollSecretSpec(
+		&kolide.EnrollSecretSpec{
+			Secrets: []kolide.EnrollSecret{
+				kolide.EnrollSecret{Name: "one", Secret: "one_secret", Active: true},
+				kolide.EnrollSecret{Name: "two", Secret: "two_secret", Active: false},
+			},
+		},
+	)
+	assert.Nil(t, err)
+
+	name, err = ds.VerifyEnrollSecret("one") // secret name not actual secret
+	assert.NotNil(t, err)
+	assert.Empty(t, name)
+	name, err = ds.VerifyEnrollSecret("one_secret")
+	assert.Nil(t, err)
+	assert.Equal(t, "one", name)
+	name, err = ds.VerifyEnrollSecret("two_secret")
+	assert.NotNil(t, err)
+	assert.Equal(t, "", name)
+
+	err = ds.ApplyEnrollSecretSpec(
+		&kolide.EnrollSecretSpec{
+			Secrets: []kolide.EnrollSecret{
+				kolide.EnrollSecret{Name: "one", Secret: "one_secret", Active: false},
+				kolide.EnrollSecret{Name: "two", Secret: "two_secret", Active: true},
+			},
+		},
+	)
+	assert.Nil(t, err)
+
+	name, err = ds.VerifyEnrollSecret("one_secret")
+	assert.NotNil(t, err)
+	assert.Equal(t, "", name)
+	name, err = ds.VerifyEnrollSecret("two_secret")
+	assert.Nil(t, err)
+	assert.Equal(t, "two", name)
+
+}
+
+func testEnrollSecretRoundtrip(t *testing.T, ds kolide.Datastore) {
+	spec, err := ds.GetEnrollSecretSpec()
+	require.Nil(t, err)
+	assert.Len(t, spec.Secrets, 1)
+
+	expectedSpec := kolide.EnrollSecretSpec{
+		Secrets: []kolide.EnrollSecret{
+			kolide.EnrollSecret{Name: "one", Secret: "one_secret", Active: false},
+			kolide.EnrollSecret{Name: "two", Secret: "two_secret", Active: true},
+		},
+	}
+	err = ds.ApplyEnrollSecretSpec(&expectedSpec)
+	require.Nil(t, err)
+
+	spec, err = ds.GetEnrollSecretSpec()
+	require.Nil(t, err)
+	assert.Len(t, spec.Secrets, 3)
+	for _, secret := range spec.Secrets {
+		switch secret.Name {
+		case "one":
+			assert.Equal(t, "one_secret", secret.Secret)
+			assert.Equal(t, false, secret.Active)
+		case "two":
+			assert.Equal(t, "two_secret", secret.Secret)
+			assert.Equal(t, true, secret.Active)
+		case "default":
+			// Nothing to assert
+		default:
+			t.Error("unexpected secret name: " + secret.Name)
+		}
+	}
+}

@@ -5,6 +5,7 @@ import (
 
 	"github.com/VividCortex/mysqlerr"
 	"github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
 	"github.com/kolide/fleet/server/kolide"
 	"github.com/pkg/errors"
 )
@@ -200,9 +201,30 @@ func (d *Datastore) VerifyEnrollSecret(secret string) (string, error) {
 }
 
 func (d *Datastore) ApplyEnrollSecretSpec(spec *kolide.EnrollSecretSpec) error {
-	panic("todo")
+	err := d.withRetryTxx(func(tx *sqlx.Tx) error {
+		for _, secret := range spec.Secrets {
+			sql := `
+				INSERT INTO enroll_secrets (name, secret, active)
+				VALUES (?, ?, ?)
+				ON DUPLICATE KEY UPDATE
+					secret = VALUES(secret),
+					active = VALUES(active)
+			`
+			if _, err := tx.Exec(sql, secret.Name, secret.Secret, secret.Active); err != nil {
+				return errors.Wrap(err, "insert/update secret")
+			}
+		}
+		return nil
+	})
+
+	return err
 }
 
 func (d *Datastore) GetEnrollSecretSpec() (*kolide.EnrollSecretSpec, error) {
-	panic("not implemented")
+	var spec kolide.EnrollSecretSpec
+	sql := `SELECT * FROM enroll_secrets`
+	if err := d.db.Select(&spec.Secrets, sql); err != nil {
+		return nil, errors.Wrap(err, "get secrets")
+	}
+	return &spec, nil
 }
