@@ -3,7 +3,7 @@ version: '2'
 
 services:
   ubuntu14-osquery:
-    image: "kolide/osquery:${KOLIDE_OSQUERY_VERSION}"
+    image: "dactiv/osquery:4.3.0-ubuntu14.04"
     volumes:
       - ./kolide.crt:/etc/osquery/kolide.crt
       - ./example_osquery.flags:/etc/osquery/osquery.flags
@@ -16,7 +16,7 @@ services:
         soft:  1000000000
 
   ubuntu16-osquery:
-    image: "kolide/ubuntu16-osquery:${KOLIDE_OSQUERY_VERSION}"
+    image: "dactiv/osquery:4.3.0-ubuntu16.04"
     volumes:
       - ./kolide.crt:/etc/osquery/kolide.crt
       - ./example_osquery.flags:/etc/osquery/osquery.flags
@@ -28,8 +28,21 @@ services:
         hard:  1000000000
         soft:  1000000000
 
-  centos7-osquery:
-    image: "kolide/centos7-osquery:${KOLIDE_OSQUERY_VERSION}"
+  ubuntu18-osquery:
+    image: "dactiv/osquery:4.3.0-ubuntu18.04"
+    volumes:
+      - ./kolide.crt:/etc/osquery/kolide.crt
+      - ./example_osquery.flags:/etc/osquery/osquery.flags
+    environment:
+      ENROLL_SECRET: "${ENROLL_SECRET}"
+    command: osqueryd --flagfile=/etc/osquery/osquery.flags
+    ulimits:
+      core:
+        hard:  1000000000
+        soft:  1000000000
+
+  ubuntu20-osquery:
+    image: "dactiv/osquery:4.3.0-ubuntu20.04"
     volumes:
       - ./kolide.crt:/etc/osquery/kolide.crt
       - ./example_osquery.flags:/etc/osquery/osquery.flags
@@ -42,7 +55,33 @@ services:
         soft:  1000000000
 
   centos6-osquery:
-    image: "kolide/centos6-osquery:${KOLIDE_OSQUERY_VERSION}"
+    image: "dactiv/osquery:4.3.0-centos6"
+    volumes:
+      - ./kolide.crt:/etc/osquery/kolide.crt
+      - ./example_osquery.flags:/etc/osquery/osquery.flags
+    environment:
+      ENROLL_SECRET: "${ENROLL_SECRET}"
+    command: osqueryd --flagfile=/etc/osquery/osquery.flags
+    ulimits:
+      core:
+        hard:  1000000000
+        soft:  1000000000
+
+  centos7-osquery:
+    image: "dactiv/osquery:4.3.0-centos7"
+    volumes:
+      - ./kolide.crt:/etc/osquery/kolide.crt
+      - ./example_osquery.flags:/etc/osquery/osquery.flags
+    environment:
+      ENROLL_SECRET: "${ENROLL_SECRET}"
+    command: osqueryd --flagfile=/etc/osquery/osquery.flags
+    ulimits:
+      core:
+        hard:  1000000000
+        soft:  1000000000
+
+  centos8-osquery:
+    image: "dactiv/osquery:4.3.0-centos8"
     volumes:
       - ./kolide.crt:/etc/osquery/kolide.crt
       - ./example_osquery.flags:/etc/osquery/osquery.flags
