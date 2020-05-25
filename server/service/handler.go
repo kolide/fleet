@@ -141,7 +141,7 @@ func MakeKolideServerEndpoints(svc kolide.Service, jwtKey, urlPrefix string) Kol
 		GetAppConfig:                          authenticatedUser(jwtKey, svc, canPerformActions(makeGetAppConfigEndpoint(svc))),
 		ModifyAppConfig:                       authenticatedUser(jwtKey, svc, mustBeAdmin(makeModifyAppConfigEndpoint(svc))),
 		ApplyEnrollSecretSpec:                 authenticatedUser(jwtKey, svc, mustBeAdmin(makeApplyEnrollSecretSpecEndpoint(svc))),
-		GetEnrollSecretSpec:                   authenticatedUser(jwtKey, svc, makeGetEnrollSecretSpecEndpoint(svc)),
+		GetEnrollSecretSpec:                   authenticatedUser(jwtKey, svc, canPerformActions(makeGetEnrollSecretSpecEndpoint(svc))),
 		CreateInvite:                          authenticatedUser(jwtKey, svc, mustBeAdmin(makeCreateInviteEndpoint(svc))),
 		ListInvites:                           authenticatedUser(jwtKey, svc, mustBeAdmin(makeListInvitesEndpoint(svc))),
 		DeleteInvite:                          authenticatedUser(jwtKey, svc, mustBeAdmin(makeDeleteInviteEndpoint(svc))),

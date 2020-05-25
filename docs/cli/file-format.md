@@ -255,7 +255,6 @@ spec:
     org_name: Example Org
   server_settings:
     kolide_server_url: https://fleet.example.org:8080
-    osquery_enroll_secret: supersekretsecret
   smtp_settings:
     authentication_method: authmethod_plain
     authentication_type: authtype_username_password
@@ -309,7 +308,7 @@ spec:
   - active: true
     name: new_one
     secret: reallyworks
-  - active: true
+  - active: false
     name: inactive_secret
     secret: thissecretwontwork!
 ```

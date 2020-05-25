@@ -211,7 +211,7 @@ func (d *Datastore) ApplyEnrollSecretSpec(spec *kolide.EnrollSecretSpec) error {
 					active = VALUES(active)
 			`
 			if _, err := tx.Exec(sql, secret.Name, secret.Secret, secret.Active); err != nil {
-				return errors.Wrap(err, "insert/update secret")
+				return errors.Wrap(err, "upsert secret")
 			}
 		}
 		return nil

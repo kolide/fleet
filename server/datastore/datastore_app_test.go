@@ -78,7 +78,7 @@ func testAdditionalQueries(t *testing.T, ds kolide.Datastore) {
 
 func testEnrollSecrets(t *testing.T, ds kolide.Datastore) {
 	name, err := ds.VerifyEnrollSecret("missing")
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	assert.Empty(t, name)
 
 	err = ds.ApplyEnrollSecretSpec(
@@ -89,16 +89,16 @@ func testEnrollSecrets(t *testing.T, ds kolide.Datastore) {
 			},
 		},
 	)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
-	name, err = ds.VerifyEnrollSecret("one") // secret name not actual secret
-	assert.NotNil(t, err)
-	assert.Empty(t, name)
+	name, err = ds.VerifyEnrollSecret("one")
+	assert.Error(t, err, "secret should not match")
+	assert.Empty(t, name, "secret name should be empty")
 	name, err = ds.VerifyEnrollSecret("one_secret")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, "one", name)
 	name, err = ds.VerifyEnrollSecret("two_secret")
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	assert.Equal(t, "", name)
 
 	err = ds.ApplyEnrollSecretSpec(
@@ -109,20 +109,20 @@ func testEnrollSecrets(t *testing.T, ds kolide.Datastore) {
 			},
 		},
 	)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	name, err = ds.VerifyEnrollSecret("one_secret")
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	assert.Equal(t, "", name)
 	name, err = ds.VerifyEnrollSecret("two_secret")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, "two", name)
 
 }
 
 func testEnrollSecretRoundtrip(t *testing.T, ds kolide.Datastore) {
 	spec, err := ds.GetEnrollSecretSpec()
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Len(t, spec.Secrets, 1)
 
 	expectedSpec := kolide.EnrollSecretSpec{
@@ -132,10 +132,10 @@ func testEnrollSecretRoundtrip(t *testing.T, ds kolide.Datastore) {
 		},
 	}
 	err = ds.ApplyEnrollSecretSpec(&expectedSpec)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	spec, err = ds.GetEnrollSecretSpec()
-	require.Nil(t, err)
+	require.NoError(t, err)
 	assert.Len(t, spec.Secrets, 3)
 	for _, secret := range spec.Secrets {
 		switch secret.Name {
