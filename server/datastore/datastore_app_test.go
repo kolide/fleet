@@ -2,6 +2,7 @@ package datastore
 
 import (
 	"encoding/json"
+	"sort"
 	"testing"
 
 	"github.com/kolide/fleet/server/kolide"
@@ -136,19 +137,17 @@ func testEnrollSecretRoundtrip(t *testing.T, ds kolide.Datastore) {
 
 	spec, err = ds.GetEnrollSecretSpec()
 	require.NoError(t, err)
-	assert.Len(t, spec.Secrets, 3)
-	for _, secret := range spec.Secrets {
-		switch secret.Name {
-		case "one":
-			assert.Equal(t, "one_secret", secret.Secret)
-			assert.Equal(t, false, secret.Active)
-		case "two":
-			assert.Equal(t, "two_secret", secret.Secret)
-			assert.Equal(t, true, secret.Active)
-		case "default":
-			// Nothing to assert
-		default:
-			t.Error("unexpected secret name: " + secret.Name)
-		}
-	}
+	require.Len(t, spec.Secrets, 3)
+	// sort secrets before equality checks to ensure proper order
+	sort.Slice(spec.Secrets, func(i, j int) bool { return spec.Secrets[i].Name < spec.Secrets[j].Name })
+
+	assert.Equal(t, "default", spec.Secrets[0].Name)
+
+	assert.Equal(t, "one", spec.Secrets[1].Name)
+	assert.Equal(t, "one_secret", spec.Secrets[1].Secret)
+	assert.Equal(t, false, spec.Secrets[1].Active)
+
+	assert.Equal(t, "two", spec.Secrets[2].Name)
+	assert.Equal(t, "two_secret", spec.Secrets[2].Secret)
+	assert.Equal(t, true, spec.Secrets[2].Active)
 }
