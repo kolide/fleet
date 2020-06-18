@@ -71,10 +71,10 @@ func printLabel(c *cli.Context, label *kolide.LabelSpec) error {
 
 	var err error
 
-	if c.Bool(yamlFlagName) {
-		err = printYaml(spec)
-	} else {
+	if c.Bool(jsonFlagName) {
 		err = printJSON(spec)
+	} else {
+		err = printYaml(spec)
 	}
 
 	return err
@@ -89,10 +89,10 @@ func printQuery(c *cli.Context, query *kolide.QuerySpec) error {
 
 	var err error
 
-	if c.Bool(yamlFlagName) {
-		err = printYaml(spec)
-	} else {
+	if c.Bool(jsonFlagName) {
 		err = printJSON(spec)
+	} else {
+		err = printYaml(spec)
 	}
 
 	return err
@@ -107,10 +107,10 @@ func printPack(c *cli.Context, pack *kolide.PackSpec) error {
 
 	var err error
 
-	if c.Bool(yamlFlagName) {
-		err = printYaml(spec)
-	} else {
+	if c.Bool(jsonFlagName) {
 		err = printJSON(spec)
+	} else {
+		err = printYaml(spec)
 	}
 
 	return err
@@ -125,10 +125,10 @@ func printOption(c *cli.Context, option *kolide.OptionsSpec) error {
 
 	var err error
 
-	if c.Bool(yamlFlagName) {
-		err = printYaml(spec)
-	} else {
+	if c.Bool(jsonFlagName) {
 		err = printJSON(spec)
+	} else {
+		err = printYaml(spec)
 	}
 
 	return err
@@ -143,10 +143,10 @@ func printSecret(c *cli.Context, secret *kolide.EnrollSecretSpec) error {
 
 	var err error
 
-	if c.Bool(yamlFlagName) {
-		err = printYaml(spec)
-	} else {
+	if c.Bool(jsonFlagName) {
 		err = printJSON(spec)
+	} else {
+		err = printYaml(spec)
 	}
 
 	return err
@@ -161,11 +161,12 @@ func printHost(c *cli.Context, host *kolide.Host) error {
 
 	var err error
 
-	if c.Bool(yamlFlagName) {
-		err = printYaml(spec)
-	} else {
+	if c.Bool(jsonFlagName) {
 		err = printJSON(spec)
+	} else {
+		err = printYaml(spec)
 	}
+
 	return err
 }
 
@@ -177,11 +178,12 @@ func printConfig(c *cli.Context, config *kolide.AppConfigPayload) error {
 	}
 	var err error
 
-	if c.Bool(yamlFlagName) {
-		err = printYaml(spec)
-	} else {
+	if c.Bool(jsonFlagName) {
 		err = printJSON(spec)
+	} else {
+		err = printYaml(spec)
 	}
+
 	return err
 }
 
