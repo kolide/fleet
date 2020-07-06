@@ -8,10 +8,7 @@ import Icon from 'components/icons/Icon';
 import PlatformIcon from 'components/icons/PlatformIcon';
 import SecondarySidePanelContainer from '../SecondarySidePanelContainer';
 
-import {
-  availability,
-  displayTypeForDataType,
-} from './helpers';
+import displayTypeForDataType from './helpers';
 
 const baseClass = 'query-side-panel';
 
