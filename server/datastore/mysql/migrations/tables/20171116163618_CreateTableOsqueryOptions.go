@@ -58,10 +58,12 @@ func Up_20171116163618(tx *sql.Tx) error {
 }
 
 func migrateOptions(tx *sql.Tx) error {
+	// This migration uses the deprecated types in deprecated_types.go
+
 	type configForExport struct {
 		Options    map[string]interface{} `json:"options"`
 		FilePaths  map[string][]string    `json:"file_paths,omitempty"`
-		Decorators kolide.Decorators      `json:"decorators"`
+		Decorators decorators             `json:"decorators"`
 	}
 
 	// Migrate pre fleetctl osquery options to the new osquery options
@@ -76,7 +78,7 @@ func migrateOptions(tx *sql.Tx) error {
 	`
 	// Intentionally initialize empty instead of nil so that we generate a
 	// config with empty options rather than a null value.
-	var opts []kolide.Option
+	var opts []option
 	if err := txx.Select(&opts, query); err != nil && err != sql.ErrNoRows {
 		return errors.Wrap(err, "getting options")
 	}
@@ -96,7 +98,7 @@ func migrateOptions(tx *sql.Tx) error {
 	if err != nil && err != sql.ErrNoRows {
 		return errors.Wrap(err, "retrieving fim paths")
 	}
-	fimConfig := kolide.FIMSections{}
+	fimConfig := map[string][]string{}
 	for rows.Next() {
 		var sectionName, fileName string
 		err = rows.Scan(&sectionName, &fileName)
@@ -111,22 +113,22 @@ func migrateOptions(tx *sql.Tx) error {
 		FROM decorators
 		ORDER by built_in DESC, name ASC
 	`
-	var decorators []*kolide.Decorator
-	err = txx.Select(&decorators, query)
+	var decs []*decorator
+	err = txx.Select(&decs, query)
 	if err != nil {
 		return errors.Wrap(err, "retrieving decorators")
 	}
 
-	decConfig := kolide.Decorators{
+	decConfig := decorators{
 		Interval: make(map[string][]string),
 	}
-	for _, dec := range decorators {
+	for _, dec := range decs {
 		switch dec.Type {
-		case kolide.DecoratorLoad:
+		case decoratorLoad:
 			decConfig.Load = append(decConfig.Load, dec.Query)
-		case kolide.DecoratorAlways:
+		case decoratorAlways:
 			decConfig.Always = append(decConfig.Always, dec.Query)
-		case kolide.DecoratorInterval:
+		case decoratorInterval:
 			key := strconv.Itoa(int(dec.Interval))
 			decConfig.Interval[key] = append(decConfig.Interval[key], dec.Query)
 		default:
