@@ -85,7 +85,7 @@
     "babel-preset-stage-0": "6.24.1",
     "css-loader": "0.28.11",
     "enzyme-adapter-react-16": "^1.7.1",
-    "eslint": "3.19.0",
+    "eslint": "4.18.2",
     "eslint-config-airbnb": "12.0.0",
     "eslint-import-resolver-webpack": "0.10.0",
     "eslint-plugin-import": "1.16.0",
