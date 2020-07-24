@@ -119,10 +119,10 @@ The address of the MySQL server which Fleet should connect to. Include the hostn
 - Environment variable: `KOLIDE_MYSQL_ADDRESS`
 - Config file format:
 
-  ```
-  mysql:
-    address: localhost:3306
-  ```
+	```
+	mysql:
+		address: localhost:3306
+	```
 
 ##### `mysql_database`
 
@@ -132,10 +132,10 @@ The name of the MySQL database which Fleet will use.
 - Environment variable: `KOLIDE_MYSQL_DATABASE`
 - Config file format:
 
-  ```
-  mysql:
-    database: kolide
-  ```
+	```
+	mysql:
+		database: kolide
+	```
 
 ##### `mysql_username`
 
@@ -145,10 +145,10 @@ The username to use when connecting to the MySQL instance.
 - Environment variable: `KOLIDE_MYSQL_USERNAME`
 - Config file format:
 
-  ```
-  mysql:
-    username: kolide
-  ```
+	```
+	mysql:
+		username: kolide
+	```
 
 ##### `mysql_password`
 
@@ -158,10 +158,10 @@ The password to use when connecting to the MySQL instance.
 - Environment variable: `KOLIDE_MYSQL_PASSWORD`
 - Config file format:
 
-  ```
-  mysql:
-    password: kolide
-  ```
+	```
+	mysql:
+		password: kolide
+	```
 
 ##### `mysql_tls_ca`
 
@@ -171,10 +171,10 @@ The path to a PEM encoded certificate of MYSQL's CA for client certificate authe
 - Environment variable: `KOLIDE_MYSQL_TLS_CA`
 - Config file format:
 
-  ```
-  mysql:
-    tls_ca: /path/to/server-ca.pem
-  ```
+	```
+	mysql:
+		tls_ca: /path/to/server-ca.pem
+	```
 
 ##### `mysql_tls_cert`
 
@@ -184,10 +184,10 @@ The path to a PEM encoded certificate use for tls authentication.
 - Environment variable: `KOLIDE_MYSQL_TLS_CERT`
 - Config file format:
 
-  ```
-  mysql:
-    tls_cert: /path/to/certificate.pem
-  ```
+	```
+	mysql:
+		tls_cert: /path/to/certificate.pem
+	```
 
 ##### `mysql_tls_key`
 
@@ -197,10 +197,10 @@ The path to a PEM encoded private key use for tls authentication.
 - Environment variable: `KOLIDE_MYSQL_TLS_KEY`
 - Config file format:
 
-  ```
-  mysql:
-    tls_key: /path/to/key.pem
-  ```
+	```
+	mysql:
+		tls_key: /path/to/key.pem
+	```
 
 ##### `mysql_tls_config`
 
@@ -210,10 +210,10 @@ The tls value in a MYSQL DSN. Can be `true`,`false`,`skip-verify` or the CN valu
 - Environment variable: `KOLIDE_MYSQL_TLS_CONFIG`
 - Config file format:
 
-  ```
-  mysql:
-    tls_config: true
-  ```
+	```
+	mysql:
+		tls_config: true
+	```
 
 ##### `mysql_tls_server_name`
 
@@ -223,10 +223,10 @@ The server name or IP address used by the client certificate.
 - Environment variable: `KOLIDE_MYSQL_TLS_SERVER_NAME`
 - Config file format:
 
-  ```
-  mysql:
-    servername: 127.0.0.1
-  ```
+	```
+	mysql:
+		servername: 127.0.0.1
+	```
 
 ##### `mysql_max_open_conns`
 
@@ -236,10 +236,10 @@ Maximum open connections to database
 - Environment variable: `KOLIDE_MYSQL_MAX_OPEN_CONNS`
 - Config file format:
 
-  ```
-  mysql:
-    max_open_conns: 50
-  ```
+	```
+	mysql:
+		max_open_conns: 50
+	```
 
 ##### `mysql_max_idle_conns`
 
@@ -249,10 +249,10 @@ Maximum idle connections to database. This value should be equal to or less than
 - Environment variable: `KOLIDE_MYSQL_MAX_IDLE_CONNS`
 - Config file format:
 
-  ```
-  mysql:
-    max_idle_conns: 50
-  ```
+	```
+	mysql:
+		max_idle_conns: 50
+	```
 
 #### Redis
 
@@ -264,10 +264,10 @@ The address of the Redis server which Fleet should connect to. Include the hostn
 - Environment variable: `KOLIDE_REDIS_ADDRESS`
 - Config file format:
 
-  ```
-  redis:
-    address: 127.0.0.1:7369
-  ```
+	```
+	redis:
+		address: 127.0.0.1:7369
+	```
 
 ##### `redis_password`
 
@@ -277,23 +277,22 @@ The password to use when connecting to the Redis instance.
 - Environment variable: `KOLIDE_REDIS_PASSWORD`
 - Config file format:
 
-  ```
-  redis:
-    password: foobar
-  ```
-
+	```
+	redis:
+		password: foobar
+	```
 ##### `redis_database`
 
 The database to use when connecting to the Redis instance.
 
-  - Default value: `0`
-  - Environment variable: `KOLIDE_REDIS_DATABASE`
-  - Config file format:
+- Default value: `0`
+- Environment variable: `KOLIDE_REDIS_DATABASE`
+- Config file format:
 
-    ```
-    redis:
-      database: 14
-    ```
+  ```
+  redis:
+    database: 14
+  ```
 
 #### Server
 
@@ -305,10 +304,10 @@ The address to serve the Fleet webserver.
 - Environment variable: `KOLIDE_SERVER_ADDRESS`
 - Config file format:
 
-  ```
-  server:
-    address: 0.0.0.0:443
-  ```
+	```
+	server:
+		address: 0.0.0.0:443
+	```
 
 ##### `server_cert`
 
@@ -318,10 +317,10 @@ The TLS cert to use when terminating TLS.
 - Environment variable: `KOLIDE_SERVER_CERT`
 - Config file format:
 
-  ```
-  server:
-    cert: /tmp/kolide.crt
-  ```
+	```
+	server:
+		cert: /tmp/kolide.crt
+	```
 
 
 ##### `server_key`
@@ -332,10 +331,10 @@ The TLS key to use when terminating TLS.
 - Environment variable: `KOLIDE_SERVER_KEY`
 - Config file format:
 
-  ```
-  server:
-    key: /tmp/kolide.key
-  ```
+	```
+	server:
+		key: /tmp/kolide.key
+	```
 
 
 ##### `server_tls`
@@ -346,10 +345,10 @@ Whether or not the server should be served over TLS.
 - Environment variable: `KOLIDE_SERVER_TLS`
 - Config file format:
 
-  ```
-  server:
-    tls: false
-  ```
+	```
+	server:
+		tls: false
+	```
 
 ##### `server_tls_compatibility`
 
@@ -359,10 +358,10 @@ Configures the TLS settings for compatibility with various user agents. Options 
 - Environment variable: `KOLIDE_SERVER_TLS_COMPATIBILITY`
 - Config file format:
 
-  ```
-  server:
-    tls_compatibility: intermediate
-  ```
+	```
+	server:
+		tls_compatibility: intermediate
+	```
 
 ##### `server_url_prefix`
 
@@ -374,10 +373,10 @@ Note that some other configurations may need to be changed when modifying the UR
 - Environment variable: `KOLIDE_SERVER_URL_PREFIX`
 - Config file format:
 
-  ```
-  server:
-    url_prefix: /apps/fleet
-  ```
+	```
+	server:
+		url_prefix: /apps/fleet
+	```
 
 
 #### Auth
@@ -390,23 +389,23 @@ The [JWT](https://jwt.io/) key to use when signing and validating session keys. 
 - Environment variable: `KOLIDE_AUTH_JWT_KEY`
 - Config file format:
 
-  ```
-  auth:
-    jwt_key: JVnKw7CaUdJjZwYAqDgUHVYP
-  ```
+	```
+	auth:
+		jwt_key: JVnKw7CaUdJjZwYAqDgUHVYP
+	```
 
-##### `auth_bcrypt_cost`
+#####	`auth_bcrypt_cost`
 
 The bcrypt cost to use when hashing user passwords.
 
 - Default value: `12`
-- Environment variable: `KOLIDE_AUTH_BCRYT_COST`
+- Environment variable:	`KOLIDE_AUTH_BCRYT_COST`
 - Config file format:
 
-  ```
-  auth:
-    bcrypt_cost: 14
-  ```
+	```
+	auth:
+		bcrypt_cost: 14
+	```
 
 ##### `auth_salt_key_size`
 
@@ -416,10 +415,10 @@ The key size of the salt which is generated when hashing user passwords.
 - Environment variable: `KOLIDE_AUTH_SALT_KEY_SIZE`
 - Config file format:
 
-  ```
-  auth:
-    salt_key_size: 36
-  ```
+	```
+	auth:
+		salt_key_size: 36
+	```
 
 #### App
 
@@ -431,10 +430,10 @@ Size of generated app tokens.
 - Environment variable: `KOLIDE_APP_TOKEN_KEY_SIZE`
 - Config file format:
 
-  ```
-  app:
-    token_key_size: 36
-  ```
+	```
+	app:
+		token_key_size: 36
+	```
 
 ##### `app_invite_token_validity_period`
 
@@ -444,10 +443,10 @@ How long invite tokens should be valid for.
 - Environment variable: `KOLIDE_APP_TOKEN_VALIDITY_PERIOD`
 - Config file format:
 
-  ```
-  app:
-    invite_token_validity_period: 1d
-  ```
+	```
+	app:
+		invite_token_validity_period: 1d
+	```
 
 #### Session
 
@@ -459,10 +458,10 @@ The size of the session key.
 - Environment variable: `KOLIDE_SESSION_KEY_SIZE`
 - Config file format:
 
-  ```
-  session:
-    key_size: 48
-  ```
+	```
+	session:
+		key_size: 48
+	```
 
 ##### `session_duration`
 
@@ -472,10 +471,10 @@ The amount of time that a session should last for.
 - Environment variable: `KOLIDE_SESSION_DURATION`
 - Config file format:
 
-  ```
-  session:
-    duration: 30d
-  ```
+	```
+	session:
+		duration: 30d
+	```
 
 #### Osquery
 
@@ -484,13 +483,13 @@ The amount of time that a session should last for.
 The size of the node key which is negotiated with `osqueryd` clients.
 
 - Default value: `24`
-- Environment variable: `KOLIDE_OSQUERY_NODE_KEY_SIZE`
+- Environment variable:	`KOLIDE_OSQUERY_NODE_KEY_SIZE`
 - Config file format:
 
-  ```
-  osquery:
-    node_key_size: 36
-  ```
+	```
+	osquery:
+		node_key_size: 36
+	```
 
 
 ##### `osquery_label_update_interval`
@@ -503,10 +502,10 @@ Setting this to a higher value can reduce baseline load on the Fleet server in l
 - Environment variable: `KOLIDE_OSQUERY_LABEL_UPDATE_INTERVAL`
 - Config file format:
 
-  ```
-  osquery:
-    label_update_interval: 30m
-  ```
+	```
+	osquery:
+		label_update_interval: 30m
+	```
 
 ##### `osquery_detail_update_interval`
 
@@ -518,10 +517,10 @@ Setting this to a higher value can reduce baseline load on the Fleet server in l
 - Environment variable: `KOLIDE_OSQUERY_DETAIL_UPDATE_INTERVAL`
 - Config file format:
 
-  ```
-  osquery:
-    detail_update_interval: 30m
-  ```
+	```
+	osquery:
+		detail_update_interval: 30m
+	```
 
 ##### `osquery_status_log_plugin`
 
@@ -533,10 +532,10 @@ Options are `filesystem`, `firehose`, and 'pubsub'.
 - Environment variable: `KOLIDE_OSQUERY_STATUS_LOG_PLUGIN`
 - Config file format:
 
-  ```
-  osquery:
-    status_log_plugin: firehose
-  ```
+	```
+	osquery:
+		status_log_plugin: firehose
+	```
 
 ##### `osquery_result_log_plugin`
 
@@ -548,10 +547,10 @@ Options are `filesystem`, `firehose`, and 'pubsub'.
 - Environment variable: `KOLIDE_OSQUERY_RESULT_LOG_PLUGIN`
 - Config file format:
 
-  ```
-  osquery:
-    result_log_plugin: firehose
-  ```
+	```
+	osquery:
+		result_log_plugin: firehose
+	```
 
 ##### `osquery_status_log_file`
 
@@ -563,10 +562,10 @@ The path which osquery status logs will be logged to.
 - Environment variable: `KOLIDE_OSQUERY_STATUS_LOG_FILE`
 - Config file format:
 
-  ```
-  osquery:
-    status_log_file: /var/log/osquery/status.log
-  ```
+	```
+	osquery:
+		status_log_file: /var/log/osquery/status.log
+	```
 
 ##### `osquery_result_log_file`
 
@@ -578,10 +577,10 @@ The path which osquery result logs will be logged to.
 - Environment variable: `KOLIDE_OSQUERY_RESULT_LOG_FILE`
 - Config file format:
 
-  ```
-  osquery:
-    result_log_file: /var/log/osquery/result.log
-  ```
+	```
+	osquery:
+		result_log_file: /var/log/osquery/result.log
+	```
 
 ##### `osquery_enable_log_rotation`
 
@@ -609,10 +608,10 @@ Whether or not to enable debug logging.
 - Environment variable: `KOLIDE_LOGGING_DEBUG`
 - Config file format:
 
-  ```
-  logging:
-    debug: true
-  ```
+	```
+	logging:
+		debug: true
+	```
 
 ##### `logging_json`
 
@@ -622,10 +621,10 @@ Whether or not to log in JSON.
 - Environment variable: `KOLIDE_LOGGING_JSON`
 - Config file format:
 
-  ```
-  logging:
-    json: true
-  ```
+	```
+	logging:
+		json: true
+	```
 
 ##### `logging_disable_banner`
 
@@ -635,10 +634,10 @@ Whether or not to log the welcome banner.
 - Environment variable: `KOLIDE_LOGGING_DISABLE_BANNER`
 - Config file format:
 
-  ```
-  logging:
-    diable_banner: true
-  ```
+	```
+	logging:
+		diable_banner: true
+	```
 
 #### Filesystem
 
@@ -652,10 +651,10 @@ The path which osquery status logs will be logged to.
 - Environment variable: `KOLIDE_FILESYSTEM_STATUS_LOG_FILE`
 - Config file format:
 
-  ```
-  filesystem:
-    status_log_file: /var/log/osquery/status.log
-  ```
+	```
+	filesystem:
+		status_log_file: /var/log/osquery/status.log
+	```
 
 ##### `filesystem_result_log_file`
 
@@ -667,10 +666,10 @@ The path which osquery result logs will be logged to.
 - Environment variable: `KOLIDE_FILESYSTEM_RESULT_LOG_FILE`
 - Config file format:
 
-  ```
-  filesystem:
-    result_log_file: /var/log/osquery/result.log
-  ```
+	```
+	filesystem:
+		result_log_file: /var/log/osquery/result.log
+	```
 
 ##### `filesystem_enable_log_rotation`
 
@@ -700,10 +699,10 @@ AWS region to use for Firehose connection
 - Environment variable: `KOLIDE_FIREHOSE_REGION`
 - Config file format:
 
-  ```
-  firehose:
-    region: ca-central-1
-  ```
+	```
+	firehose:
+		region: ca-central-1
+	```
 
 ##### `firehose_access_key_id`
 
@@ -717,10 +716,10 @@ AWS access key ID to use for Firehose authentication.
 - Environment variable: `KOLIDE_FIREHOSE_ACCESS_KEY_ID`
 - Config file format:
 
-  ```
-  firehose:
-    access_key_id: AKIAIOSFODNN7EXAMPLE
-  ```
+	```
+	firehose:
+		access_key_id: AKIAIOSFODNN7EXAMPLE
+	```
 
 ##### `firehose_secret_access_key`
 
@@ -732,10 +731,10 @@ AWS secret access key to use for Firehose authentication.
 - Environment variable: `KOLIDE_FIREHOSE_SECRET_ACCESS_KEY`
 - Config file format:
 
-  ```
-  firehose:
-    secret_access_key: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-  ```
+	```
+	firehose:
+		secret_access_key: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+	```
 
 
 ##### `firehose_status_stream`
@@ -748,10 +747,10 @@ Name of the Firehose stream to write osquery status logs received from clients.
 - Environment variable: `KOLIDE_FIREHOSE_STATUS_STREAM`
 - Config file format:
 
-  ```
-  firehose:
-    status_stream: osquery_status
-  ```
+	```
+	firehose:
+		status_stream: osquery_status
+	```
 
 ##### `firehose_result_stream`
 
@@ -763,10 +762,10 @@ Name of the Firehose stream to write osquery result logs received from clients.
 - Environment variable: `KOLIDE_FIREHOSE_RESULT_STREAM`
 - Config file format:
 
-  ```
-  firehose:
-    result_stream: osquery_result
-  ```
+	```
+	firehose:
+		result_stream: osquery_result
+	```
 
 #### PubSub
 
