@@ -256,7 +256,7 @@ Maximum idle connections to database. This value should be equal to or less than
 
 ##### `conn_max_lifetime`
 
-Maximum amount of time a connection may be reused.
+Maximum amount of time, in seconds, a connection may be reused.
 
 - Default value: 0
 - Environment variable: `KOLIDE_MYSQL_CONN_MAX_LIFETIME`
