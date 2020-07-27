@@ -29,7 +29,7 @@ type MysqlConfig struct {
 	TLSConfig     	string `yaml:"tls_config"` //tls=customValue in DSN
 	MaxOpenConns  	int    `yaml:"max_open_conns"`
 	MaxIdleConns  	int    `yaml:"max_idle_conns"`
-	ConnMaxLifetime int	 	 `yaml:"conn_max_lifetime"`
+	ConnMaxLifetime int    `yaml:"conn_max_lifetime"`
 }
 
 // RedisConfig defines configs related to Redis
