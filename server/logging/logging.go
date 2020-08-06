@@ -53,6 +53,11 @@ func New(config config.KolideConfig, logger log.Logger) (*OsqueryLogger, error) 
 		if err != nil {
 			return nil, errors.Wrap(err, "create pubsub status logger")
 		}
+	case "stdout":
+		status, err = NewStdoutLogWriter()
+		if err != nil {
+			return nil, errors.Wrap(err, "create stdout status logger")
+		}
 	default:
 		return nil, errors.Errorf(
 			"unknown status log plugin: %s", config.Osquery.StatusLogPlugin,
@@ -92,6 +97,11 @@ func New(config config.KolideConfig, logger log.Logger) (*OsqueryLogger, error) 
 		)
 		if err != nil {
 			return nil, errors.Wrap(err, "create pubsub result logger")
+		}
+	case "stdout":
+		result, err = NewStdoutLogWriter()
+		if err != nil {
+			return nil, errors.Wrap(err, "create stdout result logger")
 		}
 	default:
 		return nil, errors.Errorf(
