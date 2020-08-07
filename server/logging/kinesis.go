@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -68,36 +69,36 @@ func NewKinesisLogWriter(region, id, secret, stsAssumeRoleArn, stream string, lo
 	// records across Kinesis shards.
 	rand := rand.New(rand.NewSource(time.Now().UnixNano()))
 
-	f := &kinesisLogWriter{
+	k := &kinesisLogWriter{
 		client: client,
 		stream: stream,
 		logger: logger,
 		rand:   rand,
 	}
-	if err := f.validateStream(); err != nil {
+	if err := k.validateStream(); err != nil {
 		return nil, errors.Wrap(err, "create Kinesis writer")
 	}
-	return f, nil
+	return k, nil
 }
 
-func (f *kinesisLogWriter) validateStream() error {
-	out, err := f.client.DescribeStream(
+func (k *kinesisLogWriter) validateStream() error {
+	out, err := k.client.DescribeStream(
 		&kinesis.DescribeStreamInput{
-			StreamName: &f.stream,
+			StreamName: &k.stream,
 		},
 	)
 	if err != nil {
-		return errors.Wrapf(err, "describe stream %s", f.stream)
+		return errors.Wrapf(err, "describe stream %s", k.stream)
 	}
 
 	if (*(*out.StreamDescription).StreamStatus) != kinesis.StreamStatusActive {
-		return errors.Errorf("stream %s not active", f.stream)
+		return errors.Errorf("stream %s not active", k.stream)
 	}
 
 	return nil
 }
 
-func (f *kinesisLogWriter) Write(ctx context.Context, logs []json.RawMessage) error {
+func (k *kinesisLogWriter) Write(ctx context.Context, logs []json.RawMessage) error {
 	var records []*kinesis.PutRecordsRequestEntry
 	totalBytes := 0
 	for _, log := range logs {
@@ -107,7 +108,7 @@ func (f *kinesisLogWriter) Write(ctx context.Context, logs []json.RawMessage) er
 		// the beginning bytes of the log should help the Fleet admin
 		// diagnose the query generating huge results.
 		if len(log) > kinesisMaxSizeOfRecord {
-			level.Info(f.logger).Log(
+			level.Info(k.logger).Log(
 				"msg", "dropping log over 1MB Kinesis limit",
 				"size", len(log),
 				"log", string(log[:100])+"...",
@@ -115,7 +116,7 @@ func (f *kinesisLogWriter) Write(ctx context.Context, logs []json.RawMessage) er
 			continue
 		}
 
-		partitionKey := string(f.rand.Intn(256))
+		partitionKey := string(k.rand.Intn(256))
 
 		// If adding this log will exceed the limit on number of
 		// records in the batch, or the limit on total size of the
@@ -123,7 +124,7 @@ func (f *kinesisLogWriter) Write(ctx context.Context, logs []json.RawMessage) er
 		// adding any more.
 		if len(records) >= kinesisMaxRecordsInBatch ||
 			totalBytes+len(log)+len(partitionKey) > kinesisMaxSizeOfBatch {
-			if err := f.putRecords(0, records); err != nil {
+			if err := k.putRecords(0, records); err != nil {
 				return errors.Wrap(err, "put records")
 			}
 			totalBytes = 0
@@ -136,7 +137,7 @@ func (f *kinesisLogWriter) Write(ctx context.Context, logs []json.RawMessage) er
 
 	// Push the final batch
 	if len(records) > 0 {
-		if err := f.putRecords(0, records); err != nil {
+		if err := k.putRecords(0, records); err != nil {
 			return errors.Wrap(err, "put records")
 		}
 	}
@@ -144,20 +145,22 @@ func (f *kinesisLogWriter) Write(ctx context.Context, logs []json.RawMessage) er
 	return nil
 }
 
-func (f *kinesisLogWriter) putRecords(try int, records []*kinesis.PutRecordsRequestEntry) error {
+func (k *kinesisLogWriter) putRecords(try int, records []*kinesis.PutRecordsRequestEntry) error {
 	if try > 0 {
 		time.Sleep(100 * time.Millisecond * time.Duration(math.Pow(2.0, float64(try))))
 	}
 	input := &kinesis.PutRecordsInput{
-		StreamName: &f.stream,
+		StreamName: &k.stream,
 		Records:    records,
 	}
 
-	output, err := f.client.PutRecords(input)
+	output, err := k.client.PutRecords(input)
 	if err != nil {
-		if try < kinesisMaxRetries {
-			// Retry with backoff
-			return f.putRecords(try+1, records)
+		if _, ok := err.(awserr.Error); ok {
+			if try < kinesisMaxRetries {
+				// Retry with backoff
+				return k.putRecords(try+1, records)
+			}
 		}
 
 		// Not retryable or retries expired
@@ -192,7 +195,7 @@ func (f *kinesisLogWriter) putRecords(try int, records []*kinesis.PutRecordsRequ
 			}
 		}
 
-		return f.putRecords(try+1, failedRecords)
+		return k.putRecords(try+1, failedRecords)
 	}
 
 	return nil
