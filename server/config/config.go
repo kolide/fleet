@@ -17,18 +17,18 @@ const (
 
 // MysqlConfig defines configs related to MySQL
 type MysqlConfig struct {
-	Protocol      	string
-	Address       	string
-	Username      	string
-	Password      	string
-	Database      	string
-	TLSCert       	string `yaml:"tls_cert"`
-	TLSKey        	string `yaml:"tls_key"`
-	TLSCA         	string `yaml:"tls_ca"`
-	TLSServerName 	string `yaml:"tls_server_name"`
-	TLSConfig     	string `yaml:"tls_config"` //tls=customValue in DSN
-	MaxOpenConns  	int    `yaml:"max_open_conns"`
-	MaxIdleConns  	int    `yaml:"max_idle_conns"`
+	Protocol        string
+	Address         string
+	Username        string
+	Password        string
+	Database        string
+	TLSCert         string `yaml:"tls_cert"`
+	TLSKey          string `yaml:"tls_key"`
+	TLSCA           string `yaml:"tls_ca"`
+	TLSServerName   string `yaml:"tls_server_name"`
+	TLSConfig       string `yaml:"tls_config"` //tls=customValue in DSN
+	MaxOpenConns    int    `yaml:"max_open_conns"`
+	MaxIdleConns    int    `yaml:"max_idle_conns"`
 	ConnMaxLifetime int    `yaml:"conn_max_lifetime"`
 }
 
@@ -289,19 +289,19 @@ func (man Manager) LoadConfig() KolideConfig {
 
 	return KolideConfig{
 		Mysql: MysqlConfig{
-			Protocol:      		man.getConfigString("mysql.protocol"),
-			Address:       		man.getConfigString("mysql.address"),
-			Username:      		man.getConfigString("mysql.username"),
-			Password:      		man.getConfigString("mysql.password"),
-			Database:      		man.getConfigString("mysql.database"),
-			TLSCert:       		man.getConfigString("mysql.tls_cert"),
-			TLSKey:        		man.getConfigString("mysql.tls_key"),
-			TLSCA:         		man.getConfigString("mysql.tls_ca"),
-			TLSServerName: 		man.getConfigString("mysql.tls_server_name"),
-			TLSConfig:     		man.getConfigString("mysql.tls_config"),
-			MaxOpenConns:  		man.getConfigInt("mysql.max_open_conns"),
-			MaxIdleConns:  		man.getConfigInt("mysql.max_idle_conns"),
-			ConnMaxLifetime:	man.getConfigInt("mysql.conn_max_lifetime"),
+			Protocol:        man.getConfigString("mysql.protocol"),
+			Address:         man.getConfigString("mysql.address"),
+			Username:        man.getConfigString("mysql.username"),
+			Password:        man.getConfigString("mysql.password"),
+			Database:        man.getConfigString("mysql.database"),
+			TLSCert:         man.getConfigString("mysql.tls_cert"),
+			TLSKey:          man.getConfigString("mysql.tls_key"),
+			TLSCA:           man.getConfigString("mysql.tls_ca"),
+			TLSServerName:   man.getConfigString("mysql.tls_server_name"),
+			TLSConfig:       man.getConfigString("mysql.tls_config"),
+			MaxOpenConns:    man.getConfigInt("mysql.max_open_conns"),
+			MaxIdleConns:    man.getConfigInt("mysql.max_idle_conns"),
+			ConnMaxLifetime: man.getConfigInt("mysql.conn_max_lifetime"),
 		},
 		Redis: RedisConfig{
 			Address:  man.getConfigString("redis.address"),
