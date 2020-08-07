@@ -44,6 +44,18 @@ func New(config config.KolideConfig, logger log.Logger) (*OsqueryLogger, error) 
 		if err != nil {
 			return nil, errors.Wrap(err, "create firehose status logger")
 		}
+	case "kinesis":
+		status, err = NewKinesisLogWriter(
+			config.Kinesis.Region,
+			config.Kinesis.AccessKeyID,
+			config.Kinesis.SecretAccessKey,
+			config.Kinesis.StsAssumeRoleArn,
+			config.Kinesis.StatusStream,
+			logger,
+		)
+		if err != nil {
+			return nil, errors.Wrap(err, "create kinesis status logger")
+		}
 	case "pubsub":
 		status, err = NewPubSubLogWriter(
 			config.PubSub.Project,
@@ -88,6 +100,18 @@ func New(config config.KolideConfig, logger log.Logger) (*OsqueryLogger, error) 
 		)
 		if err != nil {
 			return nil, errors.Wrap(err, "create firehose result logger")
+		}
+	case "kinesis":
+		result, err = NewKinesisLogWriter(
+			config.Kinesis.Region,
+			config.Kinesis.AccessKeyID,
+			config.Kinesis.SecretAccessKey,
+			config.Kinesis.StsAssumeRoleArn,
+			config.Kinesis.ResultStream,
+			logger,
+		)
+		if err != nil {
+			return nil, errors.Wrap(err, "create kinesis result logger")
 		}
 	case "pubsub":
 		result, err = NewPubSubLogWriter(

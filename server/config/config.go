@@ -103,6 +103,16 @@ type FirehoseConfig struct {
 	ResultStream    string `yaml:"result_stream"`
 }
 
+// KinesisConfig defines configs for the AWS Kinesis logging plugin
+type KinesisConfig struct {
+	Region           string
+	AccessKeyID      string `yaml:"access_key_id"`
+	SecretAccessKey  string `yaml:"secret_access_key"`
+	StsAssumeRoleArn string `yaml:"sts_assume_role_arn"`
+	StatusStream     string `yaml:"status_stream"`
+	ResultStream     string `yaml:"result_stream"`
+}
+
 // PubSubConfig defines configs the for Google PubSub logging plugin
 type PubSubConfig struct {
 	Project     string
@@ -131,6 +141,7 @@ type KolideConfig struct {
 	Osquery    OsqueryConfig
 	Logging    LoggingConfig
 	Firehose   FirehoseConfig
+	Kinesis    KinesisConfig
 	PubSub     PubSubConfig
 	Filesystem FilesystemConfig
 }
@@ -243,6 +254,17 @@ func (man Manager) addConfigs() {
 	man.addConfigString("firehose.result_stream", "",
 		"Firehose stream name for result logs")
 
+	// Kinesis
+	man.addConfigString("kinesis.region", "", "AWS Region to use")
+	man.addConfigString("kinesis.access_key_id", "", "Access Key ID for AWS authentication")
+	man.addConfigString("kinesis.secret_access_key", "", "Secret Access Key for AWS authentication")
+	man.addConfigString("kinesis.sts_assume_role_arn", "",
+		"ARN of role to assume for AWS")
+	man.addConfigString("kinesis.status_stream", "",
+		"Kinesis stream name for status logs")
+	man.addConfigString("kinesis.result_stream", "",
+		"Kinesis stream name for result logs")
+
 	// PubSub
 	man.addConfigString("pubsub.project", "", "Google Cloud Project to use")
 	man.addConfigString("pubsub.status_topic", "", "PubSub topic for status logs")
@@ -325,6 +347,14 @@ func (man Manager) LoadConfig() KolideConfig {
 			SecretAccessKey: man.getConfigString("firehose.secret_access_key"),
 			StatusStream:    man.getConfigString("firehose.status_stream"),
 			ResultStream:    man.getConfigString("firehose.result_stream"),
+		},
+		Kinesis: KinesisConfig{
+			Region:           man.getConfigString("kinesis.region"),
+			AccessKeyID:      man.getConfigString("kinesis.access_key_id"),
+			SecretAccessKey:  man.getConfigString("kinesis.secret_access_key"),
+			StatusStream:     man.getConfigString("kinesis.status_stream"),
+			ResultStream:     man.getConfigString("kinesis.result_stream"),
+			StsAssumeRoleArn: man.getConfigString("kinesis.sts_assume_role_arn"),
 		},
 		PubSub: PubSubConfig{
 			Project:     man.getConfigString("pubsub.project"),
