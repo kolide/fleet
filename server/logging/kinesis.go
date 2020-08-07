@@ -102,12 +102,16 @@ func (k *kinesisLogWriter) Write(ctx context.Context, logs []json.RawMessage) er
 	var records []*kinesis.PutRecordsRequestEntry
 	totalBytes := 0
 	for _, log := range logs {
+		// Evenly distribute logs across shards by assigning each
+		// kinesis.PutRecordsRequestEntry a random partition key.
+		partitionKey := string(k.rand.Intn(256))
+
 		// We don't really have a good option for what to do with logs
 		// that are too big for Kinesis. This behavior is consistent
 		// with osquery's behavior in the Kinesis logger plugin, and
 		// the beginning bytes of the log should help the Fleet admin
 		// diagnose the query generating huge results.
-		if len(log) > kinesisMaxSizeOfRecord {
+		if len(log)+len(partitionKey) > kinesisMaxSizeOfRecord {
 			level.Info(k.logger).Log(
 				"msg", "dropping log over 1MB Kinesis limit",
 				"size", len(log),
@@ -115,8 +119,6 @@ func (k *kinesisLogWriter) Write(ctx context.Context, logs []json.RawMessage) er
 			)
 			continue
 		}
-
-		partitionKey := string(k.rand.Intn(256))
 
 		// If adding this log will exceed the limit on number of
 		// records in the batch, or the limit on total size of the
