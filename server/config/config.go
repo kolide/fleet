@@ -96,11 +96,12 @@ type LoggingConfig struct {
 
 // FirehoseConfig defines configs for the AWS Firehose logging plugin
 type FirehoseConfig struct {
-	Region          string
-	AccessKeyID     string `yaml:"access_key_id"`
-	SecretAccessKey string `yaml:"secret_access_key"`
-	StatusStream    string `yaml:"status_stream"`
-	ResultStream    string `yaml:"result_stream"`
+	Region           string
+	AccessKeyID      string `yaml:"access_key_id"`
+	SecretAccessKey  string `yaml:"secret_access_key"`
+	StsAssumeRoleArn string `yaml:"sts_assume_role_arn"`
+	StatusStream     string `yaml:"status_stream"`
+	ResultStream     string `yaml:"result_stream"`
 }
 
 // KinesisConfig defines configs for the AWS Kinesis logging plugin
@@ -249,6 +250,8 @@ func (man Manager) addConfigs() {
 	man.addConfigString("firehose.region", "", "AWS Region to use")
 	man.addConfigString("firehose.access_key_id", "", "Access Key ID for AWS authentication")
 	man.addConfigString("firehose.secret_access_key", "", "Secret Access Key for AWS authentication")
+	man.addConfigString("firehose.sts_assume_role_arn", "",
+		"ARN of role to assume for AWS")
 	man.addConfigString("firehose.status_stream", "",
 		"Firehose stream name for status logs")
 	man.addConfigString("firehose.result_stream", "",
@@ -342,11 +345,12 @@ func (man Manager) LoadConfig() KolideConfig {
 			DisableBanner: man.getConfigBool("logging.disable_banner"),
 		},
 		Firehose: FirehoseConfig{
-			Region:          man.getConfigString("firehose.region"),
-			AccessKeyID:     man.getConfigString("firehose.access_key_id"),
-			SecretAccessKey: man.getConfigString("firehose.secret_access_key"),
-			StatusStream:    man.getConfigString("firehose.status_stream"),
-			ResultStream:    man.getConfigString("firehose.result_stream"),
+			Region:           man.getConfigString("firehose.region"),
+			AccessKeyID:      man.getConfigString("firehose.access_key_id"),
+			SecretAccessKey:  man.getConfigString("firehose.secret_access_key"),
+			StsAssumeRoleArn: man.getConfigString("firehose.sts_assume_role_arn"),
+			StatusStream:     man.getConfigString("firehose.status_stream"),
+			ResultStream:     man.getConfigString("firehose.result_stream"),
 		},
 		Kinesis: KinesisConfig{
 			Region:           man.getConfigString("kinesis.region"),

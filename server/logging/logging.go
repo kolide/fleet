@@ -38,6 +38,7 @@ func New(config config.KolideConfig, logger log.Logger) (*OsqueryLogger, error) 
 			config.Firehose.Region,
 			config.Firehose.AccessKeyID,
 			config.Firehose.SecretAccessKey,
+			config.Firehose.StsAssumeRoleArn,
 			config.Firehose.StatusStream,
 			logger,
 		)
@@ -95,6 +96,7 @@ func New(config config.KolideConfig, logger log.Logger) (*OsqueryLogger, error) 
 			config.Firehose.Region,
 			config.Firehose.AccessKeyID,
 			config.Firehose.SecretAccessKey,
+			config.Kinesis.StsAssumeRoleArn,
 			config.Firehose.ResultStream,
 			logger,
 		)
