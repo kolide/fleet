@@ -63,6 +63,6 @@ Note that messages over 10MB will be dropped, with a notification sent to the fl
 
 With the stdout plugin, osquery result and/or status logs are written to stdout
 on the Fleet server. This is typically used for debugging or with a log
-log forwarding setup that will capture and forward stdout logs into a logging
+forwarding setup that will capture and forward stdout logs into a logging
 pipeline. Note that if multiple load-balanced Fleet servers are used, the logs
 will be load-balanced across those servers (not duplicated).
