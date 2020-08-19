@@ -58,7 +58,7 @@ func NewFirehoseLogWriter(region, id, secret, stsAssumeRoleArn, stream string, l
 		sess, err = session.NewSession(conf)
 
 		if err != nil {
-			return nil, errors.Wrap(err, "create Kinesis client")
+			return nil, errors.Wrap(err, "create Firehose client")
 		}
 	}
 	client := firehose.New(sess)
