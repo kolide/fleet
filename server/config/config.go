@@ -17,18 +17,18 @@ const (
 
 // MysqlConfig defines configs related to MySQL
 type MysqlConfig struct {
-	Protocol      	string
-	Address       	string
-	Username      	string
-	Password      	string
-	Database      	string
-	TLSCert       	string `yaml:"tls_cert"`
-	TLSKey        	string `yaml:"tls_key"`
-	TLSCA         	string `yaml:"tls_ca"`
-	TLSServerName 	string `yaml:"tls_server_name"`
-	TLSConfig     	string `yaml:"tls_config"` //tls=customValue in DSN
-	MaxOpenConns  	int    `yaml:"max_open_conns"`
-	MaxIdleConns  	int    `yaml:"max_idle_conns"`
+	Protocol        string
+	Address         string
+	Username        string
+	Password        string
+	Database        string
+	TLSCert         string `yaml:"tls_cert"`
+	TLSKey          string `yaml:"tls_key"`
+	TLSCA           string `yaml:"tls_ca"`
+	TLSServerName   string `yaml:"tls_server_name"`
+	TLSConfig       string `yaml:"tls_config"` //tls=customValue in DSN
+	MaxOpenConns    int    `yaml:"max_open_conns"`
+	MaxIdleConns    int    `yaml:"max_idle_conns"`
 	ConnMaxLifetime int    `yaml:"conn_max_lifetime"`
 }
 
@@ -112,9 +112,10 @@ type PubSubConfig struct {
 
 // FilesystemConfig defines configs for the Filesystem logging plugin
 type FilesystemConfig struct {
-	StatusLogFile     string `yaml:"status_log_file"`
-	ResultLogFile     string `yaml:"result_log_file"`
-	EnableLogRotation bool   `yaml:"enable_log_rotation"`
+	StatusLogFile        string `yaml:"status_log_file"`
+	ResultLogFile        string `yaml:"result_log_file"`
+	EnableLogRotation    bool   `yaml:"enable_log_rotation"`
+	EnableLogCompression bool   `yaml:"enable_log_compression"`
 }
 
 // KolideConfig stores the application configuration. Each subcategory is
@@ -255,6 +256,8 @@ func (man Manager) addConfigs() {
 		"Log file path to use for result logs")
 	man.addConfigBool("filesystem.enable_log_rotation", false,
 		"Enable automatic rotation for osquery log files")
+	man.addConfigBool("filesystem.enable_log_compression", false,
+		"Enable compression for the rotated osquery log files")
 }
 
 // LoadConfig will load the config variables into a fully initialized
@@ -264,19 +267,19 @@ func (man Manager) LoadConfig() KolideConfig {
 
 	return KolideConfig{
 		Mysql: MysqlConfig{
-			Protocol:      		man.getConfigString("mysql.protocol"),
-			Address:       		man.getConfigString("mysql.address"),
-			Username:      		man.getConfigString("mysql.username"),
-			Password:      		man.getConfigString("mysql.password"),
-			Database:      		man.getConfigString("mysql.database"),
-			TLSCert:       		man.getConfigString("mysql.tls_cert"),
-			TLSKey:        		man.getConfigString("mysql.tls_key"),
-			TLSCA:         		man.getConfigString("mysql.tls_ca"),
-			TLSServerName: 		man.getConfigString("mysql.tls_server_name"),
-			TLSConfig:     		man.getConfigString("mysql.tls_config"),
-			MaxOpenConns:  		man.getConfigInt("mysql.max_open_conns"),
-			MaxIdleConns:  		man.getConfigInt("mysql.max_idle_conns"),
-			ConnMaxLifetime:	man.getConfigInt("mysql.conn_max_lifetime"),
+			Protocol:        man.getConfigString("mysql.protocol"),
+			Address:         man.getConfigString("mysql.address"),
+			Username:        man.getConfigString("mysql.username"),
+			Password:        man.getConfigString("mysql.password"),
+			Database:        man.getConfigString("mysql.database"),
+			TLSCert:         man.getConfigString("mysql.tls_cert"),
+			TLSKey:          man.getConfigString("mysql.tls_key"),
+			TLSCA:           man.getConfigString("mysql.tls_ca"),
+			TLSServerName:   man.getConfigString("mysql.tls_server_name"),
+			TLSConfig:       man.getConfigString("mysql.tls_config"),
+			MaxOpenConns:    man.getConfigInt("mysql.max_open_conns"),
+			MaxIdleConns:    man.getConfigInt("mysql.max_idle_conns"),
+			ConnMaxLifetime: man.getConfigInt("mysql.conn_max_lifetime"),
 		},
 		Redis: RedisConfig{
 			Address:  man.getConfigString("redis.address"),
@@ -332,9 +335,10 @@ func (man Manager) LoadConfig() KolideConfig {
 			ResultTopic: man.getConfigString("pubsub.result_topic"),
 		},
 		Filesystem: FilesystemConfig{
-			StatusLogFile:     man.getConfigString("filesystem.status_log_file"),
-			ResultLogFile:     man.getConfigString("filesystem.result_log_file"),
-			EnableLogRotation: man.getConfigBool("filesystem.enable_log_rotation"),
+			StatusLogFile:        man.getConfigString("filesystem.status_log_file"),
+			ResultLogFile:        man.getConfigString("filesystem.result_log_file"),
+			EnableLogRotation:    man.getConfigBool("filesystem.enable_log_rotation"),
+			EnableLogCompression: man.getConfigBool("filesystem.enable_log_compression"),
 		},
 	}
 }

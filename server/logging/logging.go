@@ -29,6 +29,7 @@ func New(config config.KolideConfig, logger log.Logger) (*OsqueryLogger, error) 
 			config.Filesystem.StatusLogFile,
 			logger,
 			config.Filesystem.EnableLogRotation,
+			config.Filesystem.EnableLogCompression,
 		)
 		if err != nil {
 			return nil, errors.Wrap(err, "create filesystem status logger")
@@ -69,6 +70,7 @@ func New(config config.KolideConfig, logger log.Logger) (*OsqueryLogger, error) 
 			config.Filesystem.ResultLogFile,
 			logger,
 			config.Filesystem.EnableLogRotation,
+			config.Filesystem.EnableLogCompression,
 		)
 		if err != nil {
 			return nil, errors.Wrap(err, "create filesystem result logger")
