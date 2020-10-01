@@ -37,7 +37,7 @@ type RedisConfig struct {
 	Address  string
 	Password string
 	Database int
-	UseTLS   bool
+	UseTLS   bool `yaml:"use_tls"`
 }
 
 const (
