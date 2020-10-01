@@ -47,7 +47,12 @@ func TestConfigRoundtrip(t *testing.T) {
 			case int:
 				key_v.SetInt(int64(conf_index*100 + key_index))
 			case bool:
-				key_v.SetBool(true)
+				switch conf_v.Type().Field(key_index).Name {
+				case "UseTLS":
+					key_v.SetBool(false)
+				default:
+					key_v.SetBool(true)
+				}
 			case time.Duration:
 				d := time.Duration(conf_index*100 + key_index)
 				key_v.Set(reflect.ValueOf(d))
