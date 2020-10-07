@@ -25,6 +25,9 @@ Set the environment variable `ENROLL_SECRET` to the value of your Fleet enroll s
 
 (Optionally) Set `KOLIDE_OSQUERY_VERSION` if you want to run an osquery container besides `latest`.
 
+(Optionally) Set `FLEET_SERVER` if you want to connect to a fleet server
+besides `host.docker.internal:8080`.
+
 ### Running osqueryd
 
 The osqueryd instances are configured to use the TLS plugins at `host.docker.internal:8080`. Using the `example_osquery.flags` in this directory should configure Fleet with the appropriate settings for these `osqueryd` containers to connect.
