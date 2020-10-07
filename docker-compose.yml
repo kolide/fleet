@@ -4,7 +4,7 @@ services:
   mysql:
     image: mysql:5.7
     volumes:
-      - .:/tmp
+      - mysql-persistent-volume:/tmp
     command: mysqld --datadir=/tmp/mysqldata --slow_query_log=1 --log_output=TABLE --log-queries-not-using-indexes --event-scheduler=ON
     environment: &mysql-default-environment
       MYSQL_ROOT_PASSWORD: toor
@@ -44,3 +44,6 @@ services:
       - /var/run:/var/run:rw
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
+
+volumes:
+  mysql-persistent-volume:
