@@ -238,7 +238,7 @@ func (d *Datastore) EnrollHost(osqueryHostID, nodeKey, secretName string) (*koli
 		zeroTime := time.Unix(0, 0).Add(24 * time.Hour)
 
 		var id int64
-		err := tx.Get(&id, `SELECT id FROM hosts WHERE osquery_host_id = ?`, osqueryHostID)
+		err := tx.Get(&id, `SELECT id FROM hosts WHERE osquery_host_id = ? FOR UPDATE`, osqueryHostID)
 		if err != nil {
 			// Create new host record
 			sqlInsert := `
