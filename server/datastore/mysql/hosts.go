@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -176,6 +177,33 @@ func (d *Datastore) ListHosts(opt kolide.HostListOptions) ([]*kolide.Host, error
 	hosts := []*kolide.Host{}
 	if err := d.db.Select(&hosts, sql, params...); err != nil {
 		return nil, errors.Wrap(err, "list hosts")
+	}
+
+	// Filter additional info
+	if len(opt.AdditionalFilters) > 0 {
+		fieldsWanted := map[string]interface{}{}
+		for _, field := range opt.AdditionalFilters {
+			fieldsWanted[field] = true
+		}
+		for i, host := range hosts {
+			addInfo := map[string]interface{}{}
+			if err := json.Unmarshal(*host.Additional, &addInfo); err != nil {
+				return nil, err
+			}
+
+			for k := range addInfo {
+				if _, ok := fieldsWanted[k]; !ok {
+					delete(addInfo, k)
+				}
+			}
+			addInfoJSON := json.RawMessage{}
+			addInfoJSON, err := json.Marshal(addInfo)
+			if err != nil {
+				return nil, err
+			}
+			host.Additional = &addInfoJSON
+			hosts[i] = host
+		}
 	}
 
 	return hosts, nil
