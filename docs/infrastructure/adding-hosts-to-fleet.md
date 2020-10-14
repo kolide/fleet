@@ -24,10 +24,10 @@ To directly execute the launcher binary without having to mess with packages, in
   (retrieve from Fleet UI or `fleetctl get enroll_secret`)
 
 ```
-mkdir .tmp.osquery-tmp
+mkdir .osquery
 ./build/launcher \
   --hostname=fleet.acme.net:443 \
-  --root_directory=$(mktemp -d) \
+  --root_directory=.osquery \
   --enroll_secret=32IeN3QLgckHUmMD3iW40kyLdNJcGzP5
 ```
 
