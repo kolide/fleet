@@ -1,31 +1,55 @@
 package tables
 
 import (
+	"database/sql"
 	"fmt"
 
-	"database/sql"
-	"github.com/kolide/goose"
+	"github.com/go-sql-driver/mysql"
 )
 
 func init() {
-	goose.AddMigration(Up20201011162341, Down20201011162341)
+	MigrationClient.AddMigration(Up20201011162341, Down20201011162341)
 }
 
 func cleanupSoftDeleteFields(tx *sql.Tx, dbTable string) error {
 	deleteStmt := fmt.Sprintf("DELETE FROM `%s` WHERE deleted;", dbTable)
+	fmt.Println("DEBUG:", deleteStmt)
 
 	_, err := tx.Exec(deleteStmt)
 	if err != nil {
-		return err
+		mysqlErr, ok := err.(*mysql.MySQLError)
+		if !ok {
+			return err
+		}
+
+		if mysqlErr.Number != ER_BAD_FIELD_ERROR {
+			return err
+		}
+		fmt.Printf(
+			"Skipped deleting 'soft-deleted' entries from '%s' because the "+
+				"'deleted' column does not exist.\n",
+			dbTable)
 	}
 
 	for _, column := range []string{"deleted", "deleted_at"} {
-		alterStmt := fmt.Sprint(
+		alterStmt := fmt.Sprintf(
 			"ALTER TABLE `%s` DROP COLUMN `%s`;", dbTable, column)
 
+		fmt.Println("DEBUG:", alterStmt)
 		_, err := tx.Exec(alterStmt)
 		if err != nil {
-			return err
+			mysqlErr, ok := err.(*mysql.MySQLError)
+			if !ok {
+				return err
+			}
+
+			if mysqlErr.Number != ER_CANT_DROP_FIELD_OR_KEY {
+				return err
+			}
+			fmt.Printf(
+				"Skipped dropping column '%s' on table '%s' because column "+
+					"does not exist.\n",
+				column, dbTable)
 		}
 	}
 
