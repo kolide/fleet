@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/VividCortex/mysqlerr"
 	"github.com/go-sql-driver/mysql"
 )
 
@@ -22,7 +23,7 @@ func cleanupSoftDeleteFields(tx *sql.Tx, dbTable string) error {
 			return err
 		}
 
-		if mysqlErr.Number != ER_BAD_FIELD_ERROR {
+		if mysqlErr.Number != mysqlerr.ER_BAD_FIELD_ERROR {
 			return err
 		}
 		fmt.Printf(
@@ -43,7 +44,7 @@ func cleanupSoftDeleteFields(tx *sql.Tx, dbTable string) error {
 				return err
 			}
 
-			if mysqlErr.Number != ER_CANT_DROP_FIELD_OR_KEY {
+			if mysqlErr.Number != mysqlerr.ER_CANT_DROP_FIELD_OR_KEY {
 				return err
 			}
 			fmt.Printf(
