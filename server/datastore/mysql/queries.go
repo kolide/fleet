@@ -99,7 +99,10 @@ func (d *Datastore) NewQuery(query *kolide.Query, opts ...kolide.OptionalArg) (*
 		) VALUES ( ?, ?, ?, ?, ? )
 	`
 	result, err := db.Exec(sqlStatement, query.Name, query.Description, query.Query, query.Saved, query.AuthorID)
-	if err != nil {
+
+	if err != nil && isDuplicate(err) {
+		return nil, alreadyExists("Query", 0)
+	} else if err != nil {
 		return nil, errors.Wrap(err, "creating new Query")
 	}
 
