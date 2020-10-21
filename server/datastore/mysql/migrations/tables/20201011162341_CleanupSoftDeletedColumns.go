@@ -14,7 +14,6 @@ func init() {
 
 func cleanupSoftDeleteFields(tx *sql.Tx, dbTable string) error {
 	deleteStmt := fmt.Sprintf("DELETE FROM `%s` WHERE deleted;", dbTable)
-	fmt.Println("DEBUG:", deleteStmt)
 
 	_, err := tx.Exec(deleteStmt)
 	if err != nil {
@@ -36,7 +35,6 @@ func cleanupSoftDeleteFields(tx *sql.Tx, dbTable string) error {
 		alterStmt := fmt.Sprintf(
 			"ALTER TABLE `%s` DROP COLUMN `%s`;", dbTable, column)
 
-		fmt.Println("DEBUG:", alterStmt)
 		_, err := tx.Exec(alterStmt)
 		if err != nil {
 			mysqlErr, ok := err.(*mysql.MySQLError)
