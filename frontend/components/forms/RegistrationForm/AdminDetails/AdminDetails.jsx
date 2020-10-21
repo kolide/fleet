@@ -26,8 +26,8 @@ class AdminDetails extends Component {
   componentDidUpdate(prevProps) {
     if (this.props.currentPage && this.props.currentPage !== prevProps.currentPage) {
       setTimeout(() => {
-        this.firstInput.input.focus()
-      }, 300)
+        this.firstInput.input.focus();
+      }, 300);
     }
   }
 
