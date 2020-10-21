@@ -21,6 +21,14 @@ class OrgDetails extends Component {
     handleSubmit: PropTypes.func.isRequired,
   };
 
+  componentDidUpdate(prevProps) {
+    if (this.props.currentPage && this.props.currentPage !== prevProps.currentPage) {
+      setTimeout(() => {
+        this.firstInput.input.focus()
+      }, 300)
+    }
+  }
+
   render () {
     const { className, currentPage, fields, handleSubmit } = this.props;
     const tabIndex = currentPage ? 1 : -1;
@@ -32,6 +40,7 @@ class OrgDetails extends Component {
             {...fields.org_name}
             placeholder="Organization Name"
             tabIndex={tabIndex}
+            ref={(input) => { this.firstInput = input; }}
           />
           <InputFieldWithIcon
             {...fields.org_logo_url}

@@ -20,6 +20,14 @@ class KolideDetails extends Component {
     handleSubmit: PropTypes.func.isRequired,
   };
 
+  componentDidUpdate(prevProps) {
+    if (this.props.currentPage && this.props.currentPage !== prevProps.currentPage) {
+      setTimeout(() => {
+        this.firstInput.input.focus()
+      }, 300)
+    }
+  }
+
   render () {
     const { className, currentPage, fields, handleSubmit } = this.props;
     const tabIndex = currentPage ? 1 : -1;
@@ -32,6 +40,7 @@ class KolideDetails extends Component {
             placeholder="Fleet Web Address"
             tabIndex={tabIndex}
             hint={['Don’t include ', <code key="hint">/v1</code>, ' or any other path']}
+            ref={(input) => { this.firstInput = input; }}
           />
         </div>
         <Button type="submit" variant="gradient" tabIndex={tabIndex} disabled={!currentPage}>
