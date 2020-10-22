@@ -22,8 +22,8 @@ class KolideDetails extends Component {
 
   componentDidUpdate(prevProps) {
     if (this.props.currentPage && this.props.currentPage !== prevProps.currentPage) {
-      // Component has a transition duration of 300ms set in 
-      // RegistrationForm/_styles.scss. We need to wait 300ms before 
+      // Component has a transition duration of 300ms set in
+      // RegistrationForm/_styles.scss. We need to wait 300ms before
       // calling .focus() to preserve smooth transition.
       setTimeout(() => {
         this.firstInput.input.focus();
