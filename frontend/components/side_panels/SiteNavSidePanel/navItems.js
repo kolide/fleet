@@ -27,6 +27,16 @@ export default (admin) => {
             pathname: PATHS.ADMIN_SETTINGS,
           },
         },
+        {
+          // No such icon now. SiteNavSidePanel does not display
+          // icons for subItems
+          icon: 'osquery',
+          name: 'Osquery Options',
+          location: {
+            regex: new RegExp(`^${PATHS.ADMIN_OSQUERY}`),
+            pathname: PATHS.ADMIN_OSQUERY,
+          },
+        },
       ],
     },
   ];
@@ -98,7 +108,7 @@ export default (admin) => {
       name: 'Help',
       location: {
         regex: /^\/help/,
-        pathname: 'https://github.com/kolide/fleet/blob/master/docs/README.md',
+        pathname: 'https://github.com/fleetdm/fleet/blob/master/docs/README.md',
       },
       subItems: [],
     },

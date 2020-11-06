@@ -16,7 +16,7 @@ git push origin <VERSION>
 make binary-bundle
 ```
 
-4. Create a new release on the [GitHub releases page](https://github.com/kolide/fleet/releases). Select the newly pushed tag (GitHub should say "Existing tag"). Use the version number as the release title. Use the below template for the release description (replace items in <> with the appropriate values):
+4. Create a new release on the [GitHub releases page](https://github.com/fleetdm/fleet/releases). Select the newly pushed tag (GitHub should say "Existing tag"). Use the version number as the release title. Use the below template for the release description (replace items in <> with the appropriate values):
 
 ````
 ### Changes
@@ -25,11 +25,11 @@ make binary-bundle
 
 ### Upgrading
 
-Please visit our [update guide](https://github.com/kolide/fleet/blob/master/docs/infrastructure/updating-fleet.md) for upgrade instructions.
+Please visit our [update guide](https://github.com/fleetdm/fleet/blob/master/docs/infrastructure/updating-fleet.md) for upgrade instructions.
 
 ### Documentation
 
-Documentation for this release can be found at https://github.com/kolide/fleet/blob/<VERSION>/docs/README.md
+Documentation for this release can be found at https://github.com/fleetdm/fleet/blob/<VERSION>/docs/README.md
 
 ### Binary Checksum
 
@@ -48,4 +48,4 @@ Upload the `fleet.zip` binary bundle and click "Publish Release".
 make docker-push-release
 ```
 
-6. Announce the release in the #kolide channel of [osquery Slack](https://osquery.slack.com/join/shared_invite/zt-h29zm0gk-s2DBtGUTW4CFel0f0IjTEw#/).
+6. Announce the release in the #fleet channel of [osquery Slack](https://osquery.slack.com/join/shared_invite/zt-h29zm0gk-s2DBtGUTW4CFel0f0IjTEw#/).

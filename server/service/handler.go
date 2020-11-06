@@ -22,6 +22,7 @@ type KolideEndpoints struct {
 	ResetPassword                         endpoint.Endpoint
 	Me                                    endpoint.Endpoint
 	ChangePassword                        endpoint.Endpoint
+	CreateUserWithInvite                  endpoint.Endpoint
 	CreateUser                            endpoint.Endpoint
 	GetUser                               endpoint.Endpoint
 	ListUsers                             endpoint.Endpoint
@@ -73,6 +74,8 @@ type KolideEndpoints struct {
 	GetDistributedQueries                 endpoint.Endpoint
 	SubmitDistributedQueryResults         endpoint.Endpoint
 	SubmitLogs                            endpoint.Endpoint
+	CarveBegin                            endpoint.Endpoint
+	CarveBlock                            endpoint.Endpoint
 	CreateLabel                           endpoint.Endpoint
 	ModifyLabel                           endpoint.Endpoint
 	GetLabel                              endpoint.Endpoint
@@ -98,20 +101,23 @@ type KolideEndpoints struct {
 	SSOSettings                           endpoint.Endpoint
 	StatusResultStore                     endpoint.Endpoint
 	StatusLiveQuery                       endpoint.Endpoint
+	ListCarves                            endpoint.Endpoint
+	GetCarve                            endpoint.Endpoint
+	GetCarveBlock                         endpoint.Endpoint
 }
 
 // MakeKolideServerEndpoints creates the Kolide API endpoints.
 func MakeKolideServerEndpoints(svc kolide.Service, jwtKey, urlPrefix string) KolideEndpoints {
 	return KolideEndpoints{
-		Login:          makeLoginEndpoint(svc),
-		Logout:         makeLogoutEndpoint(svc),
-		ForgotPassword: makeForgotPasswordEndpoint(svc),
-		ResetPassword:  makeResetPasswordEndpoint(svc),
-		CreateUser:     makeCreateUserEndpoint(svc),
-		VerifyInvite:   makeVerifyInviteEndpoint(svc),
-		InitiateSSO:    makeInitiateSSOEndpoint(svc),
-		CallbackSSO:    makeCallbackSSOEndpoint(svc, urlPrefix),
-		SSOSettings:    makeSSOSettingsEndpoint(svc),
+		Login:                makeLoginEndpoint(svc),
+		Logout:               makeLogoutEndpoint(svc),
+		ForgotPassword:       makeForgotPasswordEndpoint(svc),
+		ResetPassword:        makeResetPasswordEndpoint(svc),
+		CreateUserWithInvite: makeCreateUserWithInviteEndpoint(svc),
+		VerifyInvite:         makeVerifyInviteEndpoint(svc),
+		InitiateSSO:          makeInitiateSSOEndpoint(svc),
+		CallbackSSO:          makeCallbackSSOEndpoint(svc, urlPrefix),
+		SSOSettings:          makeSSOSettingsEndpoint(svc),
 
 		// Authenticated user endpoints
 		// Each of these endpoints should have exactly one
@@ -128,6 +134,7 @@ func MakeKolideServerEndpoints(svc kolide.Service, jwtKey, urlPrefix string) Kol
 		AdminUser:            authenticatedUser(jwtKey, svc, mustBeAdmin(makeAdminUserEndpoint(svc))),
 		EnableUser:           authenticatedUser(jwtKey, svc, mustBeAdmin(makeEnableUserEndpoint(svc))),
 		RequirePasswordReset: authenticatedUser(jwtKey, svc, mustBeAdmin(makeRequirePasswordResetEndpoint(svc))),
+		CreateUser:           authenticatedUser(jwtKey, svc, mustBeAdmin(makeCreateUserEndpoint(svc))),
 		// PerformRequiredPasswordReset needs only to authenticate the
 		// logged in user
 		PerformRequiredPasswordReset:          authenticatedUser(jwtKey, svc, canPerformPasswordReset(makePerformRequiredPasswordResetEndpoint(svc))),
@@ -188,6 +195,9 @@ func MakeKolideServerEndpoints(svc kolide.Service, jwtKey, urlPrefix string) Kol
 		GetOsqueryOptionsSpec:                 authenticatedUser(jwtKey, svc, makeGetOsqueryOptionsSpecEndpoint(svc)),
 		GetCertificate:                        authenticatedUser(jwtKey, svc, makeCertificateEndpoint(svc)),
 		ChangeEmail:                           authenticatedUser(jwtKey, svc, makeChangeEmailEndpoint(svc)),
+		ListCarves:                            authenticatedUser(jwtKey, svc, makeListCarvesEndpoint(svc)),
+		GetCarve:                            authenticatedUser(jwtKey, svc, makeGetCarveEndpoint(svc)),
+		GetCarveBlock:                         authenticatedUser(jwtKey, svc, makeGetCarveBlockEndpoint(svc)),
 
 		// Authenticated status endpoints
 		StatusResultStore: authenticatedUser(jwtKey, svc, makeStatusResultStoreEndpoint(svc)),
@@ -199,6 +209,11 @@ func MakeKolideServerEndpoints(svc kolide.Service, jwtKey, urlPrefix string) Kol
 		GetDistributedQueries:         authenticatedHost(svc, makeGetDistributedQueriesEndpoint(svc)),
 		SubmitDistributedQueryResults: authenticatedHost(svc, makeSubmitDistributedQueryResultsEndpoint(svc)),
 		SubmitLogs:                    authenticatedHost(svc, makeSubmitLogsEndpoint(svc)),
+		CarveBegin:                    authenticatedHost(svc, makeCarveBeginEndpoint(svc)),
+		// For some reason osquery does not provide a node key with the block
+		// data. Instead the carve session ID should be verified in the service
+		// method.
+		CarveBlock: makeCarveBlockEndpoint(svc),
 	}
 }
 
@@ -209,6 +224,7 @@ type kolideHandlers struct {
 	ResetPassword                         http.Handler
 	Me                                    http.Handler
 	ChangePassword                        http.Handler
+	CreateUserWithInvite                  http.Handler
 	CreateUser                            http.Handler
 	GetUser                               http.Handler
 	ListUsers                             http.Handler
@@ -260,6 +276,8 @@ type kolideHandlers struct {
 	GetDistributedQueries                 http.Handler
 	SubmitDistributedQueryResults         http.Handler
 	SubmitLogs                            http.Handler
+	CarveBegin                            http.Handler
+	CarveBlock                            http.Handler
 	CreateLabel                           http.Handler
 	ModifyLabel                           http.Handler
 	GetLabel                              http.Handler
@@ -285,6 +303,9 @@ type kolideHandlers struct {
 	SettingsSSO                           http.Handler
 	StatusResultStore                     http.Handler
 	StatusLiveQuery                       http.Handler
+	ListCarves                            http.Handler
+	GetCarve                            http.Handler
+	GetCarveBlock                         http.Handler
 }
 
 func makeKolideKitHandlers(e KolideEndpoints, opts []kithttp.ServerOption) *kolideHandlers {
@@ -298,6 +319,7 @@ func makeKolideKitHandlers(e KolideEndpoints, opts []kithttp.ServerOption) *koli
 		ResetPassword:                         newServer(e.ResetPassword, decodeResetPasswordRequest),
 		Me:                                    newServer(e.Me, decodeNoParamsRequest),
 		ChangePassword:                        newServer(e.ChangePassword, decodeChangePasswordRequest),
+		CreateUserWithInvite:                  newServer(e.CreateUserWithInvite, decodeCreateUserRequest),
 		CreateUser:                            newServer(e.CreateUser, decodeCreateUserRequest),
 		GetUser:                               newServer(e.GetUser, decodeGetUserRequest),
 		ListUsers:                             newServer(e.ListUsers, decodeListUsersRequest),
@@ -349,6 +371,8 @@ func makeKolideKitHandlers(e KolideEndpoints, opts []kithttp.ServerOption) *koli
 		GetDistributedQueries:                 newServer(e.GetDistributedQueries, decodeGetDistributedQueriesRequest),
 		SubmitDistributedQueryResults:         newServer(e.SubmitDistributedQueryResults, decodeSubmitDistributedQueryResultsRequest),
 		SubmitLogs:                            newServer(e.SubmitLogs, decodeSubmitLogsRequest),
+		CarveBegin:                            newServer(e.CarveBegin, decodeCarveBeginRequest),
+		CarveBlock:                            newServer(e.CarveBlock, decodeCarveBlockRequest),
 		CreateLabel:                           newServer(e.CreateLabel, decodeCreateLabelRequest),
 		ModifyLabel:                           newServer(e.ModifyLabel, decodeModifyLabelRequest),
 		GetLabel:                              newServer(e.GetLabel, decodeGetLabelRequest),
@@ -374,6 +398,9 @@ func makeKolideKitHandlers(e KolideEndpoints, opts []kithttp.ServerOption) *koli
 		SettingsSSO:                           newServer(e.SSOSettings, decodeNoParamsRequest),
 		StatusResultStore:                     newServer(e.StatusResultStore, decodeNoParamsRequest),
 		StatusLiveQuery:                       newServer(e.StatusLiveQuery, decodeNoParamsRequest),
+		ListCarves:                            newServer(e.ListCarves, decodeListCarvesRequest),
+		GetCarve:                            newServer(e.GetCarve, decodeGetCarveRequest),
+		GetCarveBlock:                            newServer(e.GetCarveBlock, decodeGetCarveBlockRequest),
 	}
 }
 
@@ -427,7 +454,8 @@ func attachKolideAPIRoutes(r *mux.Router, h *kolideHandlers) {
 	r.Handle("/api/v1/kolide/sso", h.SettingsSSO).Methods("GET").Name("sso_config")
 	r.Handle("/api/v1/kolide/sso/callback", h.CallbackSSO).Methods("POST").Name("callback_sso")
 	r.Handle("/api/v1/kolide/users", h.ListUsers).Methods("GET").Name("list_users")
-	r.Handle("/api/v1/kolide/users", h.CreateUser).Methods("POST").Name("create_user")
+	r.Handle("/api/v1/kolide/users", h.CreateUserWithInvite).Methods("POST").Name("create_user_with_invite")
+	r.Handle("/api/v1/kolide/users/admin", h.CreateUser).Methods("POST").Name("create_user")
 	r.Handle("/api/v1/kolide/users/{id}", h.GetUser).Methods("GET").Name("get_user")
 	r.Handle("/api/v1/kolide/users/{id}", h.ModifyUser).Methods("PATCH").Name("modify_user")
 	r.Handle("/api/v1/kolide/users/{id}/enable", h.EnableUser).Methods("POST").Name("enable_user")
@@ -504,11 +532,17 @@ func attachKolideAPIRoutes(r *mux.Router, h *kolideHandlers) {
 	r.Handle("/api/v1/kolide/status/result_store", h.StatusResultStore).Methods("GET").Name("status_result_store")
 	r.Handle("/api/v1/kolide/status/live_query", h.StatusLiveQuery).Methods("GET").Name("status_live_query")
 
+	r.Handle("/api/v1/kolide/carves", h.ListCarves).Methods("GET").Name("list_carves")
+	r.Handle("/api/v1/kolide/carves/{id}", h.GetCarve).Methods("GET").Name("get_carve")
+	r.Handle("/api/v1/kolide/carves/{id}/block/{block_id}", h.GetCarveBlock).Methods("GET").Name("get_carve_block")
+
 	r.Handle("/api/v1/osquery/enroll", h.EnrollAgent).Methods("POST").Name("enroll_agent")
 	r.Handle("/api/v1/osquery/config", h.GetClientConfig).Methods("POST").Name("get_client_config")
 	r.Handle("/api/v1/osquery/distributed/read", h.GetDistributedQueries).Methods("POST").Name("get_distributed_queries")
 	r.Handle("/api/v1/osquery/distributed/write", h.SubmitDistributedQueryResults).Methods("POST").Name("submit_distributed_query_results")
 	r.Handle("/api/v1/osquery/log", h.SubmitLogs).Methods("POST").Name("submit_logs")
+	r.Handle("/api/v1/osquery/carve/begin", h.CarveBegin).Methods("POST").Name("carve_begin")
+	r.Handle("/api/v1/osquery/carve/block", h.CarveBlock).Methods("POST").Name("carve_block")
 }
 
 // WithSetup is an http middleware that checks is setup procedures have been completed.

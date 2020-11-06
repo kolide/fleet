@@ -1,3 +1,29 @@
+## Fleet 3.3.0 (Nov 05, 2020)
+
+With this release, Fleet has moved to the new github.com/fleetdm/fleet
+repository. Please follow changes and releases there.
+
+* Add file carving functionality.
+
+* Add `fleetctl user create` command.
+
+* Add osquery options editor to admin pages in UI.
+
+* Add `fleetctl query --pretty` option for pretty-printing query results. 
+
+* Add ability to disable packs with `fleetctl apply`.
+
+* Improve "Add New Host" dialog to walk the user step-by-step through host enrollment.
+
+* Improve 500 error page by allowing display of the error.
+
+* Partial transition of branding away from "Kolide Fleet".
+
+* Fix an issue with case insensitive enroll secret and node key authentication.
+
+* Fix an issue with `fleetctl query --quiet` flag not actually suppressing output.
+
+
 ## Fleet 3.2.0 (Aug 08, 2020)
 
 * Add `stdout` logging plugin.
@@ -24,7 +50,7 @@
 
 * Fix cleanup of queries in bad state. This should resolve issues in which users experienced old live queries repeatedly returned to hosts. 
 
-* Fix output kind of `fleetctl get options`
+* Fix output kind of `fleetctl get options`.
 
 ## Fleet 3.1.0 (Aug 06, 2020)
 

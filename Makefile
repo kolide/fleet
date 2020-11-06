@@ -8,7 +8,7 @@ BRANCH = $(shell git rev-parse --abbrev-ref HEAD)
 REVISION = $(shell git rev-parse HEAD)
 REVSHORT = $(shell git rev-parse --short HEAD)
 USER = $(shell whoami)
-DOCKER_IMAGE_NAME = kolide/fleet
+DOCKER_IMAGE_NAME = fleetdm/fleet
 
 ifneq ($(OS), Windows_NT)
 	# If on macOS, set the shell to bash explicitly
@@ -186,13 +186,13 @@ endif
 
 docker-build-release: xp-fleet xp-fleetctl
 	docker build -t "${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}" .
-	docker tag "${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}" kolide/fleet:${VERSION}
-	docker tag "${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}" kolide/fleet:latest
+	docker tag "${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}" fleetdm/fleet:${VERSION}
+	docker tag "${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}" fleetdm/fleet:latest
 
 docker-push-release: docker-build-release
 	docker push "${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
-	docker push kolide/fleet:${VERSION}
-	docker push kolide/fleet:latest
+	docker push fleetdm/fleet:${VERSION}
+	docker push fleetdm/fleet:latest
 
 docker-build-circle:
 	@echo ">> building docker image"
