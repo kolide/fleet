@@ -365,6 +365,14 @@ func (svc service) RequestPasswordReset(ctx context.Context, email string) error
 	return svc.mailService.SendEmail(resetEmail)
 }
 
+func (svc service) DeleteUserByID(ctx context.Context, id uint) error {
+	return svc.ds.DeleteUserByID(id)
+}
+
+func (svc service) DeleteUsers(ctx context.Context, ids []uint) (uint, error) {
+	return svc.ds.DeleteUsers(ids)
+}
+
 // saves user in datastore.
 // doesn't need to be exposed to the transport
 // the service should expose actions for modifying a user instead

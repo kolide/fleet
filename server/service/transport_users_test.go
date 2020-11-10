@@ -120,3 +120,42 @@ func TestDecodeModifyUserRequest(t *testing.T) {
 		request,
 	)
 }
+
+func TestDecodeDeleteUserByIDRequest(t *testing.T) {
+	router := mux.NewRouter()
+	router.HandleFunc("/api/v1/kolide/users/{id}", func(writer http.ResponseWriter, request *http.Request) {
+		r, err := decodeDeleteUserByIDRequest(context.Background(), request)
+		assert.Nil(t, err)
+
+		params := r.(deleteUserByIDRequest)
+		assert.Equal(t, uint(1), params.ID)
+	}).Methods("DELETE")
+
+	request := httptest.NewRequest("DELETE", "/api/v1/kolide/users/1", nil)
+	router.ServeHTTP(
+		httptest.NewRecorder(),
+		request,
+	)
+}
+
+func TestDecodeDeleteUsersRequest(t *testing.T) {
+	router := mux.NewRouter()
+	router.HandleFunc("/api/v1/kolide/users/delete", func(writer http.ResponseWriter, request *http.Request) {
+		r, err := decodeDeleteUsersRequest(context.Background(), request)
+		assert.Nil(t, err)
+
+		params := r.(deleteUsersRequest)
+		assert.Equal(t, []uint{1, 2, 3, 4}, params.IDs)
+	}).Methods("POST")
+
+	var body bytes.Buffer
+	body.Write([]byte(`{
+        "IDs": [1, 2, 3, 4]
+    }`))
+
+	request := httptest.NewRequest("POST", "/api/v1/kolide/users/delete", &body)
+	router.ServeHTTP(
+		httptest.NewRecorder(),
+		request,
+	)
+}

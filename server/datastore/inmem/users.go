@@ -114,3 +114,29 @@ func (d *Datastore) SaveUser(user *kolide.User) error {
 	d.users[user.ID] = user
 	return nil
 }
+
+func (d *Datastore) DeleteUserByID(id uint) error {
+	d.mtx.Lock()
+	defer d.mtx.Unlock()
+
+	if _, ok := d.users[id]; !ok {
+		return notFound("User").WithID(id)
+	}
+	delete(d.users, id)
+	return nil
+}
+
+func (d *Datastore) DeleteUsers(ids []uint) (uint, error) {
+	d.mtx.Lock()
+	defer d.mtx.Unlock()
+
+	deleted := uint(0)
+	for _, id := range ids {
+		if _, ok := d.users[id]; ok {
+			delete(d.users, id)
+			deleted++
+		}
+	}
+
+	return deleted, nil
+}

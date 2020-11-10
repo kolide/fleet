@@ -743,3 +743,54 @@ func TestUserPasswordRequirements(t *testing.T) {
 		})
 	}
 }
+
+func TestDeleteUserByID(t *testing.T) {
+	ds, err := inmem.New(config.TestConfig())
+	require.Nil(t, err)
+	createTestUsers(t, ds)
+
+	svc, err := newTestService(ds, nil)
+	assert.Nil(t, err)
+
+	ctx := context.Background()
+
+	users, err := ds.ListUsers(kolide.ListOptions{})
+	originalUsersLength := len(users)
+	assert.NotZero(t, originalUsersLength)
+
+	err = svc.DeleteUserByID(ctx, users[len(users)-1].ID)
+	assert.Nil(t, err)
+
+	users, err = ds.ListUsers(kolide.ListOptions{})
+	assert.Nil(t, err)
+	assert.Len(t, users, originalUsersLength-1)
+
+}
+
+func TestDeleteUsers(t *testing.T) {
+	ds, err := inmem.New(config.TestConfig())
+	require.Nil(t, err)
+	createTestUsers(t, ds)
+
+	svc, err := newTestService(ds, nil)
+	assert.Nil(t, err)
+
+	ctx := context.Background()
+
+	users, err := ds.ListUsers(kolide.ListOptions{})
+	originalUsersLength := len(users)
+	assert.NotZero(t, originalUsersLength)
+
+	usersToDelete := make([]uint, originalUsersLength)
+	for i, user := range users {
+		usersToDelete[i] = user.ID
+	}
+
+	deleted, err := svc.DeleteUsers(ctx, usersToDelete)
+	assert.Nil(t, err)
+	assert.Equal(t, uint(originalUsersLength), deleted)
+
+	users, err = ds.ListUsers(kolide.ListOptions{})
+	assert.Nil(t, err)
+	assert.Len(t, users, 0)
+}

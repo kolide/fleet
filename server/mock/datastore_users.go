@@ -18,6 +18,10 @@ type UserByIDFunc func(id uint) (*kolide.User, error)
 
 type SaveUserFunc func(user *kolide.User) error
 
+type DeleteUserByIDFunc func(id uint) error
+
+type DeleteUsersFunc func(ids []uint) (uint, error)
+
 type PendingEmailChangeFunc func(userID uint, newEmail string, token string) error
 
 type ConfirmPendingEmailChangeFunc func(userID uint, token string) (string, error)
@@ -40,6 +44,12 @@ type UserStore struct {
 
 	SaveUserFunc        SaveUserFunc
 	SaveUserFuncInvoked bool
+
+	DeleteUserByIDFunc        DeleteUserByIDFunc
+	DeleteUserByIDFuncInvoked bool
+
+	DeleteUsersFunc        DeleteUsersFunc
+	DeleteUsersFuncInvoked bool
 
 	PendingEmailChangeFunc        PendingEmailChangeFunc
 	PendingEmailChangeFuncInvoked bool
@@ -76,6 +86,16 @@ func (s *UserStore) UserByID(id uint) (*kolide.User, error) {
 func (s *UserStore) SaveUser(user *kolide.User) error {
 	s.SaveUserFuncInvoked = true
 	return s.SaveUserFunc(user)
+}
+
+func (s *UserStore) DeleteUserByID(id uint) error {
+	s.DeleteUserByIDFuncInvoked = true
+	return s.DeleteUserByIDFunc(id)
+}
+
+func (s *UserStore) DeleteUsers(ids []uint) (uint, error) {
+	s.DeleteUsersFuncInvoked = true
+	return s.DeleteUsersFunc(ids)
 }
 
 func (s *UserStore) PendingEmailChange(userID uint, newEmail string, token string) error {
