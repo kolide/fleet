@@ -1,9 +1,0 @@
-.avatar {
-  background: $white url('../assets/images/avatar-default.png') center 100% no-repeat;
-  background-size: cover;
-  border-radius: 50%;
-
-  &--small {
-    @include size(20px);
-  }
-}
